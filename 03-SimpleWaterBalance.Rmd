@@ -90,24 +90,34 @@ The control values relevant for the simple water balance model are:
 + `defaultWindSpeed [= 2.5]`: Default value for wind speed (in $m \cdot s^{-1}$) when this is missing (only used for leaf fall).
 + `cavitationRefill [= TRUE]`: If `FALSE` the model operates in a irreversible cavitation mode.
 
-### Model output
-Function `spwb` returns a list object whose elements are data tables. Each table has dates as rows and has different output variables:
+### Model output {#basicwaterbalanceoutput}
 
-+ `WaterBalance`: Components of the climatic and soil daily water balance (i.e. net precipitation, infiltration, runoff, plant transpiration...).
-+ `Soil`: Daily variation of soil variables  (volume, moisture relative to field capacity, water potential) for each soil layer.
-+ `PlantLAI`: Daily values leaf area index for each plant cohort.
-+ `PlantTranspiration`: Daily transpiration (in $mm$) for each plant cohort.
-+ `PlantPhotosynthesis`: Daily net photosynthesis (in $g C \cdot m^{-2}$) for each plant cohort.
-+ `PlantPsi`: Daily water potential of each plant (in MPa).
-+ `PlantStress`: Daily stress level suffered by each plant cohort (relative whole-plant conductance).
+Function `spwb()` returns a list of a class with the same name. The first four elements of this list (i.e., `latitude`, `topography`, `spwbInput` and `soilInput`) are simply copies of model inputs. The next three elements correspond to water balance flows, soil state variables and stand-level variables:
 
-The output of simulations can be inspected using specific `plot` and `summary` functions (see the corresponding package *vignette*).
+| Element | Description                                                |
+|---------|------------------------------------------------------------|
+| `WaterBalance`| Climatic input and water balance flows (i.e. net precipitation, infiltration, runoff, transpiration...).|
+| `Soil`| Soil variables  (volume, moisture relative to field capacity, water potential) for each soil layer. |
+| `Stand`| Stand-level variables, such as $LAI$, the water retention capacity of the canopy or the fraction of light reaching the ground.|
+
+The remaining elements include the output of plant cohort variables, with dates in rows and plant cohorts in columns:
+
+| Element | Symbol | Units | Description                               |
+|---------|--------|-------|-------------------------------------------|
+|`PlantLAI`| $LAI^{\phi}_i$ | $m^2 \cdot m^{-2}$ | Leaf area index (expanded).|
+|`PlantAbsorbedSWRFraction` | $f_i$ | [0-1] | Fraction of shortwave radiation absorbed.|
+|`PlantTranspiration`| $Tr_{i}$ | $mm$ | Transpiration per ground area.|
+|`PlantPhotosynthesis`| $A_{n,i}$ | $g C \cdot m^{-2}$ | Net photosynthesis per ground area.|
+|`PlantPsi` | $\Psi_{leaf,i}$ | MPa | Plant (leaf) water potential.|
+|`PlantStress` | $DDS_i$ | [0-1] | Stress level suffered by each plant cohort (relative whole-plant conductance).|
+
+The output of simulations can be inspected using `plot` and `summary` functions specific to `spwb` objects (examples are given in the corresponding package *vignette*).
 
 ## Applications
 
-The basic water balance model is relatively easy to parametrize and use. These features make it appropriate for applications that do not seek a high predictive at the plant level, but require robust estimates at the stand level. In our opinion the basic water balance model may be useful for the following applications: 
+The basic water balance model is relatively easy to parametrize and use. Moreover, the model is quite fast. These features make it appropriate for applications that do not seek a high predictive at the plant level, but require robust estimates at the stand level. In our opinion the basic water balance model may be useful for the following applications: 
 
-1. To monitor or forecast temporal variation in soil water content in particular stands. 
-2. Monitor or forecast temporal variation of plant drought stress in particular stands (for example to anticipate mortality events).
+1. To monitor or forecast temporal variation in soil water content in particular stands or in multiple stands across a landscape. 
+2. Monitor or forecast temporal variation of plant drought stress in particular stands or in multiple stands across a landscape (for example to anticipate mortality events).
 
 For example, @Karavani2018 employed the water balance to provide sound estimates of soil moisture dynamics to predict mushroom production in a network forest stands. The model is particularly interesting to test the relationship between forest structure/composition and the water balance at the stand level or the drought stress suffered by plants, as done in @Ameztegui2017. See also another application in @Rolo2019.
