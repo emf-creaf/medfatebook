@@ -2,7 +2,7 @@
 
 # Advanced water balance model {#advancedwaterbalance}
 
-This chapter provides an overview of a water balance model, described in De Cáceres et al. (in prep.), that shares some characteristics with the basic water balance model described in previous chapters (namely, phenological and hydrological processes). Compared to the basic model, the advanced water balance model adds more detail in some processes (light extinction, plant hydraulics and photosynthesis) and incorporates others that were absent (energy balances and hydraulic redistribution). As in chapter \@ref(basicwaterbalance), we provide an overview of the model in the present chapter and the following ones provide a much deeper understanding on model details. We recommend users to familiarize with basic water balance modelling processes before reading this and the subsequent chapters.
+This chapter provides an overview of a water balance model, described in De Cáceres et al. (in prep.), that shares some characteristics with the basic water balance model described in previous chapters. The model is executed using function `spwb()`, for a set of days, and function `spwb_day()` for a single day. Compared to the basic model, the advanced water balance model adds more detail in some processes (light extinction, plant hydraulics and photosynthesis) and incorporates others that were missing (energy balances and hydraulic redistribution). As in chapter \@ref(basicwaterbalance), we provide an overview of the model in the present chapter and the following ones provide a much deeper understanding on model details. We recommend users to familiarize with basic water balance modelling processes before reading this and the subsequent chapters.
 
 ## Design principles
 
@@ -64,7 +64,7 @@ The snow pack absorbs shortwave radiation (section \@ref(snowpack)) and snow mel
 
 ## Process scheduling
 
-Every day the model performs the following steps (note that some processes have been already described in previous chapters): 
+For every day to be simulated, the model performs the following steps:
 
 1. Update leaf area values according to the phenology of species (sections \@ref(leafphenology)).
 2. If snow dynamics are included, increase snow pack from snow precipitation ($Ps$) and decreases it from snow melting ($Sm$) (section \@ref(snowpack)).
@@ -82,6 +82,8 @@ Every day the model performs the following steps (note that some processes have 
     + Complete energy balance of the canopy and the soil, after translating plant transpiration, evaporation from bare soil, snow melt and interception loss to latent heat and calculating convective heat exchange for both the canopy and the soil (chapter \@ref(closecanopysoilenergybalance)).
     + Determine drought stress index for each plant cohort (section \@ref(advanceddroughtstress)).
 10. Calculate day-level results from subdaily results
+
+Details of the formulation of each of these processes are provided within the referred chapters and sections (some processes have been already described in previous chapters/sections).
 
 ## Inputs and outputs
 
@@ -160,19 +162,17 @@ Vegetation functional attributes are normally filled for each cohort by function
 
 ### Control parameters
 
-Control parameters modulate the overall behaviour of water balance simulations (see section \@ref(controlparameters)). The control values relevant for the advanced water balance model are:
+Control parameters modulate the overall behaviour of water balance simulations (see section \@ref(controlparameters)). Most importantly, `transpirationMode` defines the transpiration model, which in turn defines the complexity of the water balance model. If `transpirationMode = "Sperry"` then this water balance model is used. In this model, the water retention curve model is set to Van Genuchten, i.e. `soilFunctions = "VG"` (see section \@ref(waterretentioncurves)). The other control parameters relevant for the advanced water balance model are:
 
 + `verbose [=TRUE]`: Whether extra console output is desired during simulations.
-+ `soilFunctions [= "SX"]`: Water retention curve model, either "SX" (for Saxton) or "VG" (for Van Genuchten).
-+ `leafPhenology [= TRUE]`:  Whether leaf phenology is simulated.
-+ `snowpack [= TRUE]`:  Whether dynamics of snow pack are included.
-+ `drainage [= TRUE]`:  Whether water exceeding the field capacity of the bottom layer is lost by deep drainage into a non-reachable compartment.
-+ `transpirationMode [= "Granier"]`: Transpiration model, in this case should be "Sperry".
-+ `defaultWindSpeed [= 2.5]`: Default value for wind speed (in $m \cdot s^{-1}$) when this is missing (only used for leaf fall).
++ `leafPhenology [= TRUE]`:  Whether leaf phenology is simulated (see section \@ref(leafphenology)). If `FALSE` then all species are assumed to be evergreen.
++ `snowpack [= TRUE]`:  Whether dynamics of snow pack are included (see section \@ref(snowpack)).
++ `drainage [= TRUE]`:  Whether water exceeding the field capacity of the bottom layer is lost by deep drainage into a non-reachable compartment (see section \@ref(runoff)).
++ `defaultWindSpeed [= 2.5]`: Default value for wind speed (in $m \cdot s^{-1}$) when this is missing.
 + `hydraulicCostFunction [= 1]`: Variant of the hydraulic cost function used in the stomatal regulation model of @Sperry2016. Values accepted are 1 (original cost function based on the derivative of supply function), 2 (leaf vulnerability curve).
-+ `ndailysteps [=24]`: Number of daily substeps.
++ `ndailysteps [=24]`: The number of daily substeps.
 + `thermalCapacityLAI [= 1000000]`: Canopy thermal capacitance per LAI unit.
-+ `verticalLayerSize [= 100]`: The size of vertical layers (in cm) for photosynthesis calculation.
++ `verticalLayerSize [= 100]`: The size of vertical layers (in $cm$) for leaf area distribution and light extinction calculations (see section \@ref(leafdistribution)).
 + `cavitationRefill [= TRUE]`: If `FALSE` the model operates in a irreversible cavitation mode.
 + `taper [= TRUE]`: Whether taper of xylem conduits is accounted for when calculating aboveground stem conductance from xylem conductivity.
 + `averageFracRhizosphereResistance [= 0.15]`: Fraction to total continuum (stem+root+rhizosphere) resistance that corresponds to rhizosphere (averaged across soil water potential values).
