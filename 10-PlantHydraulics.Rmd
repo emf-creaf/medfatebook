@@ -12,11 +12,16 @@ col3pale = "light blue"
 col4pale = "green"
 ```
 
-The supply-loss theory of plant hydraulics, presented by @Sperry2016 and used in @Sperry2016, uses the physics of flow through soil and xylem to quantify how steady-state canopy water supply declines with drought and ceases by hydraulic failure. The theory builds on the  hydraulic model of @Sperry1998 and can be applied to different segmentations of the soil-plant continuum. In our case we considered a network of $(N \times 2 + S + 1)$ resistance elements, with soil being represented in $N$ different layers and $S$ different stem segments. For each soil layer there is a rhizosphere element in series with a root xylem element. The $N$ soil layers are in parallel up to the root crown. From there there are $S$ stem xylem segments and a final leaf segment, all in series. Althougth the model implements this network representation of the soil-plant continuum, simpler one-element, two-element and three-element representations will be used in this document to facilitate understanding.
+The supply-loss theory of plant hydraulics, presented by @Sperry2015 and used in @Sperry2016, uses the physics of flow through soil and xylem to quantify how steady-state canopy water supply declines with drought and ceases by hydraulic failure. The theory builds on the  hydraulic model of @Sperry1998 and can be applied to different segmentations of the soil-plant continuum. 
+
+The advanced water balance model of **medfate** implements steady-state hydraulic supply functions as described in @Sperry2015. The hydraulic network is described using $(N \times 2 + S + 1)$ resistance elements, with soil being represented in $N$ different soil layers and the stem by $S$ different stem segments. For each soil layer there is a rhizosphere element in series with a root xylem element. The $N$ soil layers are in parallel up to the root crown. From there there are $S$ stem xylem segments and a final leaf segment, all in series. 
+
+This chapter describes in detail how hydraulic supply functions are calculated, starting from their building blocks, i.e. vulnerability curves. Althougth the model implements this network representation of the soil-plant continuum, simpler one-element, two-element and three-element representations are first introduced to facilitate understanding.
 
 
 ## Vulnerability curves {#vulnerabilitycurves}
-Each continuum element has a vulnerability curve that starts at maximum hydraulic conductance ($k_{max}$, flow rate per pressure drop) and monotonically declines as water pressure ($\Psi$) becomes more negative. Vulnerability curves form the basis of hydraulic calculations.
+
+Vulnerability curves form the basis of hydraulic calculations. Let us use $k$ to denote hydraulic conductance, i.e. flow rate per pressure drop. Each continuum element has a vulnerability curve $k(\Psi)$ that starts at maximum hydraulic conductance ($k_{max} = k(0)$) and monotonically declines as water pressure ($\Psi$) becomes more negative. 
 
 ### Xylem vulnerability curves
 Xylem tissues are assigned a two-parameter Weibull function as the vulnerability curve $k(\Psi)$:
@@ -24,16 +29,16 @@ Xylem tissues are assigned a two-parameter Weibull function as the vulnerability
 k(\Psi) = k_{max}\cdot e^{-((\Psi/d)^c)}
 (\#eq:xylemvulnerability)
 \end{equation}
-where $k_{max}$ is the maximum hydraulic conductance (defined as flow per leaf surface unit and per pressure drop), and $c$ and $d$ are species-specific and tissue-specific parameters. Note that parameter $d$ is the water potential (in MPa) at which $k(\Psi)/k_{max} = e^{-1} = 0.367$. Parameter $c$ controls the shape of the vulnerability curve (‘exponential’ shape with no threshold has $c \leq 1$, sigmoidal threshold has $c > 1$). 
+where $k_{max}$ is the maximum hydraulic conductance (defined as flow per leaf surface unit and per pressure drop), and $c$ and $d$ are species-specific and tissue-specific parameters. Note that parameter $d$ is the water potential (in MPa) at which $k(\Psi)/k_{max} = e^{-1} = 0.367$, i.e. the water potential at which hydraulic conductance is 36.7% of its maximum value. Parameter $c$ controls the shape of the vulnerability curve (*exponential* shape with no threshold has $c \leq 1$; and *sigmoidal* shape with threshold occurs when $c > 1$). 
 
-For example, we define the following parameter values for a stem xylem ($k_{s,max}$ and parameters $c_s$ and $d_s$ of the vulnerability curve):
+For example, we define the following parameter values for a stem xylem ($k_{stem,max}$ and parameters $c_{stem}$ and $d_{stem}$ of the vulnerability curve):
 ```{r}
 kstemmax = 5.0 # mmol·m-2·s-1·MPa-1
 stemc = 3 
 stemd = -3.0 # MPa
 ```
 
-For root xylem ($k_{r,max}$), we may assume a higher conductance (i.e. higher efficiency) but also higher vulnerability to cavitation (defined by parameters $c_r$ and $d_r$):
+For root xylem ($k_{root,max}$), we may assume a higher conductance (i.e. higher efficiency) but also higher vulnerability to cavitation (defined by parameters $c_{root}$ and $d_{root}$):
 
 ```{r}
 krootmax = 6.6 # mmol·m-2·s-1·MPa-1
@@ -47,12 +52,12 @@ Emax = 20
 psiVec = seq(-0.1, -7.0, by =-0.01)
 ```
 
-The concept of vulnerability curve can be used to specify the relationship between pressure and conductance in any portion of the flow path. Leaf vulnerability curve $k_l(\Psi)$ can be modelled using the same equation as for xylem:
+The concept of vulnerability curve can be used to specify the relationship between pressure and conductance in any portion of the flow path. Leaf vulnerability curve $k_{leaf}(\Psi)$ can be modelled using the same equation as for stem xylem:
 \begin{equation}
-k_l(\Psi) = k_{l,max}\cdot e^{-((\Psi/d_l)^{c_l})}
+k_{leaf}(\Psi) = k_{leaf,max}\cdot e^{-((\Psi/d_{leaf})^{c_{leaf}})}
 (\#eq:leafvulnerability)
 \end{equation}
-where $k_{l,max}$ is the leaf maximum hydraulic conductance. Values defined below specify higher conductance for leaves but also slightly higher vulnerability:
+where $k_{leaf,max}$ is the leaf maximum hydraulic conductance. Values defined below specify higher conductance for leaves but also slightly higher vulnerability:
 ```{r}
 kleafmax = 10
 leafc = 2
@@ -60,8 +65,8 @@ leafd = -2
 ```
 
 
-With these parameter values, the vulnerability curves for root, stem and leaf are (see `hydraulics_xylemConductance()`):
-```{r, fig.width=5, fig.height=5, fig.align = "center", echo=FALSE}
+With these parameter values, the vulnerability curves for root, stem and leaf are (see `hydraulics_xylemConductance()` and `hydraulics_vulnerabilityCurvePlot()`):
+```{r, fig.width=5, fig.height=5, fig.align = "center", echo=FALSE, fig.cap="Example vulnerability curves corresponding to the parameters defined above for stem, root and leaf segments."}
 psiCav = -2.5
 plcCav = 1 -moisture_apoplasticRWC(psiCav, stemc, stemd)
 par(mar=c(4,4,1,1), mfrow=c(1,1))
@@ -79,27 +84,28 @@ legend("topright", legend =c("leaf", "stem xylem (original)","stem xylem (cavita
 ```
 
 
-The dotted line between 0 and $\Psi_{cav} = -2.5$ MPa indicates the modification of the stem xylem vulnerability curve when cavitation has occurred (i.e., previous embolism limits a the maximum conductance value), as indicated in @Sperry2016. The corresponding proportion of conductance loss can be found using the stem vulnerability curve:
+The dotted line between 0 and $\Psi_{cav} = -2.5$ MPa indicates the modification of the stem xylem vulnerability curve when cavitation has occurred (i.e., previous embolism limits the maximum conductance value), as indicated in @Sperry2016. The corresponding proportion of stem conductance loss can be found using the stem vulnerability curve:
 \begin{equation}
-PLC(\Psi_{cav}) = 1.0 - \frac{k_s(\Psi_{cav})}{k_{s,max}} = 1.0 - e^{-((\Psi/{d_s})^{c_s})}
+PLC_{stem}(\Psi_{cav}) = 1.0 - \frac{k_{stem}(\Psi_{cav})}{k_{stem,max}} = 1.0 - e^{-((\Psi/{d_{stem}})^{c_{stem}})}
 \end{equation}
 
+or, in R:
 ```{r}
 1.0 - exp(-(-2.5/stemd)^stemc)
 ```
 
 
-Although root xylem are  more vulnerable to the formation of emboli for a given potential, it is generally accepted that the less negative potentials of root xylem compared to the stem lead to cavitation occurring more often in the stem. The constrain created by cavitation has an effect on the calculation of the flow rates and derived quantities (see below).
+Although root xylem are more vulnerable to the formation of emboli for a given potential, it is generally accepted that the less negative potentials of root xylem compared to the stem lead to cavitation occurring more often in the stem. The constrain created by cavitation has an effect on the calculation of the flow rates and derived quantities (see below).
 
 
 ### Rhizosphere vulnerability curve
-The rhizosphere conductance function $k_{rh}(\Psi)$ is modeled as a van Genuchten function [@Genuchten1980]:
+The rhizosphere conductance function $k_{rhizo}(\Psi)$ is modelled as a van Genuchten function [@Genuchten1980] (this choice is the reason why the water retention curve also needs to be modelled with van Genuchten):
 \begin{eqnarray}
-k_{rh}(\Psi) &=& k_{rh,max} \cdot v^{(n-1)/(2\cdot n)} \cdot ((1-v)^{(n-1)/n}-1)^2 \\
+k_{rhizo}(\Psi) &=& k_{rhizo,max} \cdot v^{(n-1)/(2\cdot n)} \cdot ((1-v)^{(n-1)/n}-1)^2 \\
 v &=& [(\alpha \Psi)^{n}+1]^{-1}
 (\#eq:rhizovulnerability)
 \end{eqnarray}
-where $k_{rh,max}$ is the maximum rhizosphere conductance, and $n$ and $\alpha$ are texture-specific parameters [@Leij1996; @Carsel1988]. These are automatically set by function `soil()` when initializing soil objects (see parameters `VG_alpha` and `VG_n` in the output of `soil()`), but we can use function `soil_vanGenuchtenParamsCarsel()` to derive them from texture types:
+where $k_{rhizo,max}$ is the maximum rhizosphere conductance, and $n$ and $\alpha$ are texture-specific parameters [@Leij1996; @Carsel1988]. These are automatically set by function `soil()` when initializing soil objects (see section \@ref(soilinitialization)), but we can use function `soil_vanGenuchtenParamsCarsel()` to derive them from texture types:
 
 ```{r}
 textures = c("Sandy loam","Silt loam", "Clay")
@@ -142,8 +148,8 @@ krmax3 =hydraulics_findRhizosphereMaximumConductance(percentResistance,
                       kleafmax, leafc, leafd)
 krmax3
 ```
-With these parameters, the resulting $k_{rh}(\Psi)$ functions can be displayed using the function `hydraulics_vanGenuchtenConductance()`:
-```{r,  fig.width=4, fig.height=3.5, echo=FALSE, fig.align = "center"}
+With these parameters, the resulting $k_{rhizo}(\Psi)$ functions can be displayed using the function `hydraulics_vanGenuchtenConductance()`:
+```{r,  fig.width=4, fig.height=3.5, echo=FALSE, fig.align = "center", fig.cap="Example rhizosphere vulnerability curves (i.e. Van Genuchten functions) for three different soil textures."}
 par(mar=c(4,4,1,1), mfrow=c(1,1))
 k1 = unlist(lapply(psiVec,hydraulics_vanGenuchtenConductance, krmax1, n1, alpha1))
 k2 = unlist(lapply(psiVec,hydraulics_vanGenuchtenConductance, krmax2, n2, alpha2))
@@ -239,17 +245,21 @@ where $RWC_{apo,s}$ is the function of relative water content for apoplastic ste
 
 
 ## Supply functions
-The supply function describes the rate of water supply (i.e. flow) for transpiration ($E$) as a function of pressure. The steady-state flow rate $E_i$ through each $i$ element of the continuum is related to the flow-induced drop in pressure across that element ($\Delta \Psi_i$) by the integral transform of the element's vulnerability curve $k_i(\Psi)$ [@Sperry2015]:
+
+The supply function describes the steady-state rate of water supply (i.e. flow) for transpiration ($E$) as a function of pressure. The steady-state flow rate $E_i$ through any $i$ element of the continuum is related to the flow-induced drop in pressure across that element ($\Delta \Psi_i$) by the integral transform of the element's vulnerability curve $k_i(\Psi)$ [@Sperry2015]:
 \begin{equation}
 E_i(\Delta \Psi_i) = \int_{\Psi_{up}}^{\Psi_{down}}{k_i(\Psi) d\Psi}
 (\#eq:generalsupply)
 \end{equation}
-where $\Psi_{up}$ and $\Psi_{down}$ are the upstream and downstream water potential values, respectively. The integral transform assumes infinite discretization of the flow path. The supply function can be defined for individual elements of the continuum or for the whole soil-plant continuum using different topologies. In the following subsections we illustrate the supply function for different cases.
+where $\Psi_{up}$ and $\Psi_{down}$ are the upstream and downstream water potential values, respectively. The integral transform assumes infinite discretization of the flow path. 
+
+The supply function can be defined for individual elements of the continuum or for the whole soil-plant continuum using different hydraulic networks. In the following subsections we illustrate the supply function for different cases.
+
+### Supply function for a single xylem element
+
+In the case of a single xylem element, the supply function describes the steady-state flow rate as a function of  pressure at the stem top ($\Psi_{canopy}$). It can be calculated by numerical integration or aproximated using an *incomplete gamma function*. The shape of the supply function starting at different root crown water potential values ($\Psi_{rootcrown}$) is (see function `hydraulics_EXylem()`):
 
 
-### Supply function for single elements
-
-In the case of a single stem xylem element the supply function describes the flow rate as a function of canopy pressure ($\Psi_{canopy}$). It can be calculated by numerical integration or aproximated using an incomplete gamma function. The shape of the supply function starting at different root crown water potential values ($\Psi_{rootcrown}$) is (see function `hydraulics_EXylem()`):
 ```{r, fig.width=8, fig.height=3.5, fig.align = "center", echo=FALSE}
 par(mar=c(4,4,2,1), mfrow=c(1,2))
 psiSoil1 = -0.1
@@ -287,7 +297,9 @@ abline(v=-psiCav, col="gray", lwd=1.5)
 
 Right pane shows the supply functions that are obtained in the case of a cavitated xylem (i.e. without refilling), assuming that the minimum water potential experienced so far was -2.5 MPa. Note the linear part of the flow rate between $\Psi_{soil}$ and this limit.
 
-The supply function of the rhizosphere element relates the flow rate to the pressure inside the roots ($\Psi_{root}$). It is calculated by numerical integration of the van Genuchten function (see function `hydraulics_EVanGenuchten()`), for which we use the analytical approximation of @VanLier2009. Here we draw the supply function for the rhizosphere starting at the four different values of bulk soil pressure ($\Psi_{soil}$) and for the same three texture types:
+The supply function of a *rhizosphere* element relates the steady-state flow rate to the pressure inside the roots ($\Psi_{root}$). It is calculated by numerical integration of the van Genuchten function, for which we use the analytical approximation of @VanLier2009 (see function `hydraulics_EVanGenuchten()`). 
+
+In the figure below, we draw the supply function for the rhizosphere starting at the four different values of bulk soil pressure ($\Psi_{soil}$) and for the same three texture types:
 
 ```{r, fig.width=4, fig.height=4, fig.align = "center", echo=FALSE}
 par(mar=c(4,4,1,1))
