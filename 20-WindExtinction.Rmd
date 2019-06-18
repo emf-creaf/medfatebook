@@ -1,0 +1,27 @@
+# Wind extinction {#windextinction}
+
+In this chapter we describe a few wind extinction models that are implemented in **medfate**. Wind extinction is rellevant: (a) to determine convective heat exchanges between the soil and the canopy; (b) to estimate wind speed and energy balance at the leaf level for different plant cohorts; and (c) for fire behaviour calculations. 
+
+## Wind speed at the top of the canopy 
+
+Input wind speed ($u$) is assumed to represent the speed of wind at 6 m (20 feet) above the canopy. Following @Albini1979 the wind speed (in $m·s^{-1}$) at the top of the canopy is:
+
+\begin{equation}
+u_{top} = \frac{(1.01857\cdot u) \cdot 0.4265092 \cdot H_{canopy}}{log(20 + 1.181102 \cdot H_{top})}
+\end{equation}
+where $H_{top}$ is the canopy top height in $m$.
+
+## Wind extinction profile {#windextinctionprofile}
+
+The wind extinction profile, i.e the wind speed at any height $z$ in $m$, can be calculated following @Massman1987:
+
+\begin{eqnarray}
+\beta_{stand} &=& \frac{4.0 \cdot 0.2 \cdot LAI_{stand}^{phi}}{0.16 \cdot 1.5^2} \\
+u(z) &=& u_{top} \cdot \sqrt{\frac{\cosh(\beta_{stand} \cdot z / H_{top})}{\cosh(\beta_{stand})}}
+\end{eqnarray}
+
+The following figure illustrates the wind extinction profile obtained using the previous equation for an example forest stand and $u = 5$ m/s.
+
+```{r windextinction, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap="Wind extinction in an example forest stand according to the Massman equation."}
+vprofile_windExtinction(exampleforest, SpParamsMED, wind20H = 5, z = seq(0,1000, by=1))
+```
