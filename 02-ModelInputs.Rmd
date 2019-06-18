@@ -4,7 +4,7 @@ Data input for process-based models of forest functioning and dynamics can be de
 
 ## Soil description  {#soilinput}
 
-Soils can be described in **medfate** using between 1 and 5 soil layers. The number and size of layers may reflect changes in soil properties, but also can be chosen to reflect different plant rooting depths. The physical properties of the soil are needed to estimate its hydraulic properties. Most soil properties are considered static parameters in simulations, except those that depend on soil water balance (e.g. soil moisture content, soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered in simulations.
+Soils can be described in **medfate** using between $S=1$ and $S=5$ soil layers. The number and size of layers may reflect changes in soil properties, but also can be chosen to reflect different plant rooting depths. The physical properties of the soil are needed to estimate its hydraulic properties. Most soil properties are considered static parameters in simulations, except those that depend on soil water balance (e.g. soil moisture content, soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered in simulations.
 
 ### Physical properties
 
@@ -62,11 +62,16 @@ All simulation functions need an object of class `soil` to be run. Users can edi
 
 ### Water content and water table depth
 
-The *water content* ($V_s$ in mm) of a soil layer $s$ is calculated from its water potential and water retention curve using:
+The *water content* ($V_s$ in mm) of a soil layer $s$ is calculated from its water potential ($\Psi_s$) and water retention curve using:
 \begin{equation}
-V_s(\Psi) = d_s\cdot ((100-P_{rocks,s})/100)\cdot\theta_{s}(\Psi)
+V_s(\Psi_s) = d_s\cdot ((100-P_{rocks,s})/100)\cdot\theta_{s}(\Psi_s)
 \end{equation}
-where $d_s$ is the depth of the soil layer (in mm) and $P_{rocks,s}$ is the percentage of rock fragments. Besides this general formula, a number of contents are important to remember. 
+where $d_s$ is the depth of the soil layer (in mm) and $P_{rocks,s}$ is the percentage of rock fragments. The overall water content of the soil is simply the sum of water content over soil layers:
+\begin{equation}
+V_{soil} = \sum_{s=1}^S{V_s(\Psi_s)}
+\end{equation}
+
+A number of fixed water contents are important to remember. 
 
   + *Water holding capacity* ($V_{fc, s}$, in mm) of the soil layer $s$ is defined as the volumetric water content at field capacity, i.e. -0.033 MPa:
 \begin{equation}
