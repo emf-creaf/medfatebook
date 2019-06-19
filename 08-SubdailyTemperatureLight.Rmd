@@ -3,20 +3,20 @@
 After estimating leaf phenology (chapter \@ref(leafphenologylight)) and simulating the main hydrological processes (chapter \@ref(hydrology)), the advanced water balance model starts simulating subdaily processes, which include energy balances and photosynthesis/transpiration. In order to simulate those processes, it is necessary to estimate weather variables at the subdaily scale. Here we detail how subdaily estimates of temperature and atmospheric incoming radiation are derived from daily values.
 
 ## Air temperature
-Diurnal above-canopy air temperature ($T_{atm}$) variations are modeled assuming a *sinusoidal pattern* with $T_{atm} = T_{\min}$ at sunrise and $T_{atm} = (T_{\min}+T_{\max})/2$ at sunset. Air temperature varies linearly between sunset and sunrise [@McMurtrie1990]. Sunrise and sunset hours are determined from latitude and sun declination (see PDF manual for package **meteoland**).
+Diurnal above-canopy air temperature ($T_{atm}$) variations are modeled assuming a *sinusoidal pattern* with $T_{atm} = T_{\min}$ at sunrise and $T_{atm} = (T_{\min}+T_{\max})/2$ at sunset. Air temperature varies linearly between sunset and sunrise [@McMurtrie1990]. Sunrise and sunset hours are determined from latitude and sun declination (see [section 4.2 of the reference manual](http://vegmod.ctfc.cat/meteolandbook/solarradiation.html#day-length) for package **meteoland**).
 
 
 ## Diffuse and direct shortwave radiation
-Daily global radiation (in $MJ \cdot m^{-2}$) is assumed to include both direct and diffuse shortwave radiation (SWR). Using latitude information and whether is a rainy day, this quantity is partitioned into instantaneous direct and diffuse SWR and PAR for different daily substeps. Values of instantaneous direct and diffuse SWR and PAR above the canopy (i.e. $I_{beam}$ and $I_{dif}$) are calculated using the methods described in @Spitters1986, which involve comparing daily global radiation with daily potential radiation. All these calculations are performed using routines in package **meteoland** (see section 4.6 of the PDF manual for this package).
+Daily global radiation (in $MJ \cdot m^{-2}$) is assumed to include both direct and diffuse shortwave radiation (SWR). Using latitude information and whether is a rainy day, this quantity is partitioned into instantaneous direct and diffuse SWR and PAR for different daily substeps. Values of instantaneous direct and diffuse SWR and PAR above the canopy (i.e. $I_{beam}$ and $I_{dif}$) are calculated using the methods described in @Spitters1986, which involve comparing daily global radiation with daily potential radiation. All these calculations are performed using routines in package **meteoland** (see section [4.6 of the reference manual ](http://vegmod.ctfc.cat/meteolandbook/solarradiation.html#diurnal-trends-in-diffuse-and-direct-radiation) for this package).
 
-## Longwave radiation
-Once the air temperature for a given time step is known, longwave radiation (LWR) coming from the atmosphere can be calculated following @Campbell1998:
+## Longwave atmospheric radiation {#longwaveatmradiation}
+Once the air temperature for a given time step is known, longwave radiation (LWR) coming from the atmosphere ($L_{atm}$) can be calculated following @Campbell1998:
 \begin{equation}
-L_{a} = \epsilon_{a} \cdot \sigma \cdot (T_{a} + 273.16)^{4.0}
+L_{atm} = \epsilon_{a} \cdot \sigma \cdot (T_{atm} + 273.16)^{4.0}
 \end{equation}
-where $T_{a}$ is air temperature, $\sigma = 5.67 \cdot 10^{-8.0} W \cdot K^{-4} \cdot m^{-2}$ is the Stephan-Boltzmann constant and $\epsilon_{a}$ is the emmissivity of the atmosphere, calculated using:
+where $T_{atm}$ is air temperature, $\sigma = 5.67 \cdot 10^{-8.0} W \cdot K^{-4} \cdot m^{-2}$ is the Stephan-Boltzmann constant and $\epsilon_{a}$ is the emmissivity of the atmosphere, calculated using:
 \begin{eqnarray}
 \epsilon_{a} &=& (1 - 0.84 \cdot c) \cdot \epsilon_{ac} + 0.84 \cdot c \\
-\epsilon_{ac} &=& 1.72 \cdot \left(\frac{vp_{day}}{T_{a} + 273.16} \right)^{1/7}
+\epsilon_{ac} &=& 1.72 \cdot \left(\frac{vp_{atm}}{T_{atm} + 273.16} \right)^{1/7}
 \end{eqnarray}
-where $vp_{day}$ is the average daily vapor pressure (in kPa) and $c$ is the proportion of clouds. 
+where $vp_{atm}$ is the average daily vapor pressure (in kPa; see \@ref(meteoinput)) and $c$ is the proportion of clouds ($c=1$ in rainy days and $c=0$ otherwise). 

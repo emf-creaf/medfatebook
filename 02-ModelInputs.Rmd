@@ -1,6 +1,10 @@
 # Model inputs
 
-Data input for process-based models of forest functioning and dynamics can be described using three broad categories. First, a description of the target **vegetation** is needed, at a level of detail appropriate for the model design. This includes not only species composition and/or structure, but also functional parameters of the plants. Second, most often **soil** information is required, specially if underground resources (i.e. water and/or nutrients) are important for the processes included in the model. While soil and vegetation features are sometimes considered static parameters in model simulations, **meteorology** is most often a dynamic input which defines the temporal variation of environmental conditions in which biological processes occur. This chapter describes the requirements of **medfate** package with respect to each of these three kinds of input. The last section describes additional parameters that are used to control the behaviour of simulation functions, such as `spwb()` and `growth()`.
+Data input for process-based models of forest functioning and dynamics can be described using three broad categories. First, a description of the target **vegetation** is needed, at a level of detail appropriate for the model design. This includes not only species composition and/or structure, but also functional parameters of the plants. Second, most often **soil** information is required, specially if underground resources (i.e. water and/or nutrients) are important for the processes included in the model. While soil and vegetation features are sometimes considered static parameters in model simulations, **meteorology** is most often a dynamic input which defines the temporal variation of environmental conditions in which biological processes occur. Topographic variables may also be needed if internal calculations of physical variables, such as atmospheric pressure or potential radiation, require them. This chapter describes the requirements of **medfate** package with respect to each of these kinds of input. The last section describes additional parameters that are used to control the behaviour of simulation functions, such as `spwb()` and `growth()`.
+
+## Latitude and topography {#topoinput}
+
+Topography has a relatively small direct influence in **medfate** simulations, because topographic effects are assumed to be taken into account in the estimation of meteorological input. Nevertheless, *elevation* in meters is needed to estimate atmospheric pressure and air density (see \@ref(meteoinput)), whereas *aspect* (in degrees from North) and *slope* (also in degrees) are needed in addition to *latitude* (also in degrees North) to estimate sunrise/sunset hours and potential radiation in advanced water balance modelling.
 
 ## Soil description  {#soilinput}
 
@@ -176,7 +180,17 @@ Weather input data must include variables calculated at the **daily** scale. Dat
 | $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds |
 | $u$ | $m \cdot s^{-1}$ | `WindSpeed` | Wind speed |
 
-Not all simulation models require all weather variables. In particular, basic water balance modelling requires much less information than advance water balance modelling. The meteorological variables required in each case will be indicated in the corresponding model chapters. Since it allows producing data frames with appropiate variable units and column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018].
+Dates (year/month/day) should be included in rows of the input meteorology data frame. Dates are necessary for **medfate** to estimate parameters like solar declination or the day of the year ($DOY$). Not all simulation models require all weather variables. In particular, basic water balance modelling requires much less information than advance water balance modelling. The meteorological variables required in each case will be indicated in the corresponding model chapters. Since it allows producing data frames with appropiate variable units and column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018].
+
+Whereas the above meteorological variables are input requirements, **medfate** derives other atmospheric variables from them, using also topographic information (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual):
+
+| Symbol | Units | R param | Description                        |
+|--------|-------|---------|------------------------------------|
+| $P_{atm}$ | kPa |  | Atmospheric pressure |
+| $\rho_{air}$ | $kg \cdot m^{-3}$ |  | Air density |
+| $vp_{atm}$ | kPa | | Atmospheric water vapour pressure |
+
+
 
 
 ## Control parameters {#controlparameters}

@@ -32,13 +32,9 @@ Rabs = 740 #W * m-2
 
 Leaf temperature ($T_{leaf}$; in Celsius) can be calculated for any given flow rate $E_{leaf}$ using an energy balance equation [@Campbell1998]:
 \begin{equation}
-T_{leaf} = T_{canopy}+\frac{I_{abs}-\epsilon\cdot\sigma\cdot(T_{canopy}+273.15)^4-\lambda_v\cdot E_{leaf}}{C_p\cdot(g_r+g_{Ha})}
+T_{leaf} = T_{canopy}+\frac{I_{abs}-\epsilon\cdot\sigma\cdot(T_{canopy}+273.15)^4-\lambda_v(T_{canopy})\cdot E_{leaf}}{C_p\cdot(g_r+g_{Ha})}
 \end{equation}
-where $I_{abs}$ (in $W \cdot m^{-2}$) is the instantaneous shortwave and longwave radiation absorbed per leaf area unit, $E_{leaf}$ is the flow (converted to $mol \cdot s^{-1} \cdot m^{-2}$ per two-sided leaf area basis), $\epsilon$ is longwave radiation emissivity (0.97), $\sigma$ is the Stephan-Boltzman constant, $T_{canopy}$ is the canopy air temperature (in ºC) resulting from the energy balance of the previous step (see section \@ref(canopycapacitancetemperature)), $C_p$ = 29.3 $J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure and $\lambda_v$ is the latent heat of vaporization (in $J \cdot mol^{-1}$):
-\begin{equation}
-\lambda_v = (2.5023\cdot 10^6-(2430.54\cdot T_{canopy}))\cdot 0.018
-\end{equation}
-Finally, $g_r$ and $g_{Ha}$ are the radiative and heat conductance values (in $mol \cdot m^{-2} \cdot s^{-1}$), respectively [@Campbell1998]:
+where $I_{abs}$ (in $W \cdot m^{-2}$) is the instantaneous shortwave and longwave radiation absorbed per leaf area unit, $E_{leaf}$ is the flow (converted to $mol \cdot s^{-1} \cdot m^{-2}$ per two-sided leaf area basis), $\epsilon$ is longwave radiation emissivity (0.97), $\sigma$ is the Stephan-Boltzman constant, $T_{canopy}$ is the canopy air temperature (in ºC) resulting from the energy balance of the previous step (see section \@ref(canopycapacitancetemperature)), $C_p$ = 29.3 $J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure and $\lambda_v(T_{canopy})$ is the latent heat of vaporization (in $J \cdot mol^{-1}$) corresponding to $T_{canopy}$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in the **meteoland** reference manual). Finally, $g_r$ and $g_{Ha}$ are the radiative and heat conductance values (in $mol \cdot m^{-2} \cdot s^{-1}$), respectively [@Campbell1998]:
 \begin{eqnarray}
 g_r &=& \frac{4\cdot \epsilon \cdot \sigma \cdot (T_{canopy}+273.15)^3}{C_p} \\
 g_{Ha} &=& 0.189 \cdot (u_{leaf}/d)^{0.5}
@@ -46,7 +42,7 @@ g_{Ha} &=& 0.189 \cdot (u_{leaf}/d)^{0.5}
 where $u_{leaf}$ is the leaf-level wind speed (in $m \cdot s^{-1}$), taken as the wind speed at mid-crown height of the plant cohort (see \@ref(windextinctionprofile)), and $d$ is 0.72 times the leaf width (species parameter `LeafWidth` in $cm$). 
 
 
-Transpiration decreases leaf temperature, whereas radiation increases it and wind speed makes it more similar to air temperature. The following figures illustrate the effect of varying wind speed and flow rate on $T_{leaf}$ for two leaf sizes (see function `biophysics_leafTemperature`):
+Transpiration decreases leaf temperature, whereas radiation increases it and wind speed makes it more similar to air temperature. The following figures illustrate the effect of varying wind speed and flow rate on $T_{leaf}$ for two contrasted leaf sizes (see function `biophysics_leafTemperature`):
 
 
 (ref:leaftemperaturewind-cap) Values of $T_{leaf}$ for two leaf sizes and varying values of wind speed and flow rate, calculated for 24ºC canopy temperature and 740 $W \cdot m^{-2}$ instantaneous absorved radiation. 
@@ -145,7 +141,7 @@ As leaf saturated VP decreases when leaf temperature decreases, increasing trans
 ```{r}
 RHmin = 60
 RHmax = 75
-vpa = utils_averageDailyVP(Tmin, Tmax, RHmin, RHmax)
+vpa = meteoland::utils_averageDailyVP(Tmin, Tmax, RHmin, RHmax)
 vpa
 ```
 
