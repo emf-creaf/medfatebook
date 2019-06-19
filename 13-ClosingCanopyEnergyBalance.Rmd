@@ -6,23 +6,23 @@ In chapter \@ref(radiationbalance) we described the details of radiation energy 
 
 Convective energy fluxes between atmosphere and the canopy ($H_{ca}$) and between the canopy and the soil ($H_{cs}$) are determined as follows:
 \begin{eqnarray}
-H_{ca} &=& \frac{\rho_{a} \cdot c_p}{r_{ca}}\cdot (T_{can} - T_a) \\
-H_{cs} &=& \frac{\rho_{c} \cdot c_p}{r_{cs}}\cdot (T_{can} - T_{soil})
+H_{ca} &=& \frac{\rho_{atm} \cdot c_p}{r_{ca}}\cdot (T_{canopy} - T_{atm}) \\
+H_{cs} &=& \frac{\rho_{canopy} \cdot c_p}{r_{cs}}\cdot (T_{canopy} - T_{soil})
 \end{eqnarray}
-where $\rho_{a}$ and $\rho_{c}$ are the air density above-canopy and inside-canopy, respectively, $c_{p}$ = 1013.86 $J·kg^{-1}·C^{-1}$ is the specific heat capacity of the air. $r_{ca}$ and $r_{cs}$ are the atmosphere-canopy and canopy-soil aerodynamic resistances (in $s·m^{-1}$). These, in turn, are calculated using the FAO56 calculation procedure and canopy height, total LAI and above-canopy and below-canopy wind speeds. Wind speed below the canopy is calculated as explained in \@ref(windextinctionprofile) assuming a height of 2 m.
+where $\rho_{atm}$ and $\rho_{canopy}$ are the air density above-canopy and inside-canopy, respectively, calculated from the corresponding temperatures (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in meteoland reference manual); $c_{p}$ = 1013.86 $J·kg^{-1}·C^{-1}$ is the specific heat capacity of the air. $r_{ca}$ and $r_{cs}$ are the atmosphere-canopy and canopy-soil aerodynamic resistances (in $s·m^{-1}$). These, in turn, are calculated using the FAO56 calculation procedure and canopy height, total LAI and above-canopy and below-canopy wind speeds. Wind speed below the canopy is calculated as explained in \@ref(windextinctionprofile) assuming a height of 2 m.
 
 ## Latent heat
 As mentioned above, the canopy exchanges of latent heat include latent heat exchanged from plant transpiration and evaporation of rain intercepted by the canopy. After determining stomatal regulation and transpiration for each plant cohort, latent heat exchange for the canopy is calculated as:
 \begin{equation}
-LE_{c} = \lambda_{T_{canopy}} \left(In_{step} + \sum_{i}{E_i} \right)
+LE_{c} = \lambda_v(T_{canopy}) \left(In_{step} + \sum_{i}{E_i} \right)
 \end{equation}
-where $\lambda_{T_{canopy}}$ is the latent heat of vaporization at temperature $T_{canopy}$ (in $J·kg^{-1}$), $E_i$ is the instanteous transpiration flux calculated for cohort $i$ and $In_{step}$ is amount of water intercepted by the canopy for the current time step (total daily interception $In$ is divided into timesteps according to the proportion of shortwave radiation absorbed by the canopy at each time step).
+where $\lambda_v(T_{canopy})$ is the latent heat of vaporization at temperature $T_{canopy}$ (in $J·kg^{-1}$), $E_i$ is the instanteous transpiration flux calculated for cohort $i$ and $In_{step}$ is amount of water intercepted by the canopy for the current time step (total daily interception $In$ is divided into timesteps according to the proportion of shortwave radiation absorbed by the canopy at each time step).
 
 The latent heat exchange of the soil ($LE_s$) comes either from water evaporated from the soil surface or snow melting. They do not occur simultaneously, but can be expressed in the same equation:
 \begin{equation}
-LE_s = \lambda_{T_{soil}} \cdot Es_{step} + \lambda_{fusion} \cdot Sm_{step}
+LE_s = \lambda_v(T_{soil}) \cdot Es_{step} + \lambda_{f} \cdot Sm_{step}
 \end{equation}
-where $\lambda_{T_{soil}}$ is the latent heat of vaporization at temperature $T_{soil}$  and $\lambda_{fusion} = 0.33355$ is the latent heat of fusion (in $J·kg^{-1}$). As before, daily evaporation from bare soil ($Es$) and snow melt water equivalent ($Sm$) are divided into time steps according to the proportion of shortwave radiation absorbed by the soil layer each step.
+where $\lambda_v(T_{soil})$ is the latent heat of vaporization at temperature $T_{soil}$ and $\lambda_{f} = 0.33355J·kg^{-1}$ is the latent heat of fusion. As before, daily evaporation from bare soil ($Es$) and snow melt water equivalent ($Sm$) are divided into time steps according to the proportion of shortwave radiation absorbed by the soil layer each step.
 
 ## Canopy capacitance and temperature changes {#canopycapacitancetemperature}
 

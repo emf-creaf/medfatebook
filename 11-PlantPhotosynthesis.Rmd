@@ -4,7 +4,7 @@ In the previous chapter we introduced the necessary concepts of steady-state pla
 
 ## Leaf photosynthesis function {#leafenergybalancephoto}
 
-The supply function specifies the flow rate ($E_{leaf}$), as per leaf area, for values of leaf water potential $\Psi_{leaf}$. If we know air temperature, air vapour pressure and the light conditions in which leaves are, we can translate the supply function into a **leaf photosynthesis function** [@Sperry2016]. In a nutshell, $E_{leaf}$ from the supply function is first used to calculate leaf temperature from an evaluation of the leaf energy balance. The diffusive conductances of the leaf to water and $CO_{2}$ are obtained from water supply and water vapor deficit. Finally, the gross/net assimilation rate is then obtained from the diffusive conductance and a modelled curve between assimilation and leaf internal $CO_{2}$ concentration. The following subsections detail each of these steps.
+The supply function specifies the transpiration flow rate $E$ for values of leaf water potential $\Psi_{leaf}$. If we know air temperature, air vapour pressure and the light conditions in which leaves are, we can translate the supply function into a **leaf photosynthesis function** [@Sperry2016]. In a nutshell, $E_{leaf}$ from the supply function is first used to calculate leaf temperature from an evaluation of the leaf energy balance. The diffusive conductances of the leaf to water and $CO_{2}$ are obtained from water supply and water vapor deficit. Finally, the gross/net assimilation rate is then obtained from the diffusive conductance and a modelled curve between assimilation and leaf internal $CO_{2}$ concentration. The following subsections detail each of these steps.
 
 
 ```{r, echo=FALSE}
@@ -34,7 +34,7 @@ Leaf temperature ($T_{leaf}$; in Celsius) can be calculated for any given flow r
 \begin{equation}
 T_{leaf} = T_{canopy}+\frac{I_{abs}-\epsilon\cdot\sigma\cdot(T_{canopy}+273.15)^4-\lambda_v(T_{canopy})\cdot E_{leaf}}{C_p\cdot(g_r+g_{Ha})}
 \end{equation}
-where $I_{abs}$ (in $W \cdot m^{-2}$) is the instantaneous shortwave and longwave radiation absorbed per leaf area unit, $E_{leaf}$ is the flow (converted to $mol \cdot s^{-1} \cdot m^{-2}$ per two-sided leaf area basis), $\epsilon$ is longwave radiation emissivity (0.97), $\sigma$ is the Stephan-Boltzman constant, $T_{canopy}$ is the canopy air temperature (in ºC) resulting from the energy balance of the previous step (see section \@ref(canopycapacitancetemperature)), $C_p$ = 29.3 $J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure and $\lambda_v(T_{canopy})$ is the latent heat of vaporization (in $J \cdot mol^{-1}$) corresponding to $T_{canopy}$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in the **meteoland** reference manual). Finally, $g_r$ and $g_{Ha}$ are the radiative and heat conductance values (in $mol \cdot m^{-2} \cdot s^{-1}$), respectively [@Campbell1998]:
+where $I_{abs} = I_{SWR} + I_{LWR}$ (in $W \cdot m^{-2}$) is the instantaneous shortwave and longwave radiation absorbed per leaf area unit, $E_{leaf}$ is the flow (converted to $mol \cdot s^{-1} \cdot m^{-2}$ per two-sided leaf area basis), $\epsilon$ is longwave radiation emissivity (0.97), $\sigma$ is the Stephan-Boltzman constant, $T_{canopy}$ is the canopy air temperature (in ºC) resulting from the energy balance of the previous step (see section \@ref(canopycapacitancetemperature)), $C_p$ = 29.3 $J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure and $\lambda_v(T_{canopy})$ is the latent heat of vaporization (in $J \cdot mol^{-1}$) corresponding to $T_{canopy}$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in the **meteoland** reference manual). Finally, $g_r$ and $g_{Ha}$ are the radiative and heat conductance values (in $mol \cdot m^{-2} \cdot s^{-1}$), respectively [@Campbell1998]:
 \begin{eqnarray}
 g_r &=& \frac{4\cdot \epsilon \cdot \sigma \cdot (T_{canopy}+273.15)^3}{C_p} \\
 g_{Ha} &=& 0.189 \cdot (u_{leaf}/d)^{0.5}
@@ -184,14 +184,19 @@ legend("bottomleft", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 
 ### Leaf gas exchange
 
-Leaf conductance to water vapour ($g_{sw}$; in $mol H_2O \cdot s^{-1} \cdot m^{-2}$) and to carbon dioxide ($g_{sc}$; in mol $CO_{2} \cdot s^{-1} \cdot m^{-2}$) are obtained for each value of $E$ (in $mol \cdot s^{-1} \cdot m^{-2}$) and $VPD_{leaf}$ using:
+Leaf conductance to water vapour ($g_{sw}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) and to carbon dioxide ($g_{sc}$; in $mol\,CO_{2} \cdot s^{-1} \cdot m^{-2}$) are obtained for each value of transpiration flow $E$ (in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) and $VPD_{leaf}$ using:
 \begin{eqnarray}
 g_{sw} &=& E \cdot \frac{P_{atm}}{VPD_{leaf}}\\
 g_{sc} &=& g_{sw}/1.6
 \end{eqnarray}
 the application of the equation for $g_{sw}$ to the $VPD_{leaf}(\Psi_{leaf})$ curves yields the following $g_{sw}(\Psi_{leaf})$ curves:
 
-```{r, echo=FALSE, fig.width=8, fig.height=3.5, fig.align="center"}
+(ref:leafGWfunction-cap) Examples of conductance to water vapour ($g_{sw}$) functions for a hydraulic network, corresponding to fig. \@ref(fig:supplynetwork) and for different soil textures. Left/right panel shows values for uncavitated/cavitated supply functions. Minimum and maximum conductance values ($g_{swmin} = 0.0045$ and $g_{swmax} = 0.3$) are indicated using dashed lines.
+
+```{r leafGWfunction, echo=FALSE, fig.width=8, fig.height=3.5, fig.align="center", fig.cap='(ref:leafGWfunction-cap)'}
+Gmin = 0.0045;
+Gmax = 0.3
+
 par(mar=c(4,4,2,1), mfrow=c(1,2))
 plot(-supplyNetwork11$psiLeaf, psi2A11$WaterVaporConductance, type="l", col=col1, ylab="Gw", xlab = "Leaf pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,0.5), lwd=1, main="original")
 lines(-supplyNetwork12$psiLeaf,psi2A12$WaterVaporConductance, lty=1, lwd=1, col=col2)
@@ -227,39 +232,33 @@ abline(h=Gmax, col="gray", lty=2, lwd=1.5)
 legend("topleft", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 ```
 
-Hence, larger values of transpiration require larger values of leaf water vapour conductance. In the previous figure we have indicated the thresholds of $g_{swmin}$ and $g_{swmax}$, the species-specific minimum and maximum water vapour conductances (i.e. conductances when stomata are fully closed and fully open, respectively; see parameters `Gwmin` and `Gwmax` in `SpParamsMED`).
-```{r}
-Gmin = 0.0045;
-Gmax = 0.3
-```
-
-$g_{sw}$ cannot exceed $g_{swmax}$ so that some flow rates may not be possible (see stomatal regulation below). However, $g_{swmax}$ should quickly become non-limiting as soil dries (i.e. reducing $E$) or $VPD_{leaf}$ increases [@Sperry2016]. Minimum stomatal conductance is also used in **medfate** when building the supply function, as it specifies the minimum flow rates that will occur for completely-closed stomata, i.e. the minimum flow from which supply function is build.
+In the previous figure we have indicated the thresholds of $g_{swmin}$ and $g_{swmax}$, the species-specific minimum and maximum water vapour conductances (i.e. conductances when stomata are fully closed and fully open, respectively; see parameters `Gwmin` and `Gwmax` in `SpParamsMED`). $g_{sw}$ cannot exceed $g_{swmax}$ so that some flow rates may not be possible (see stomatal regulation below). However, $g_{swmax}$ should quickly become non-limiting as soil dries (i.e. reducing $E$) or $VPD_{leaf}$ increases [@Sperry2016]. Minimum stomatal conductance is also used in **medfate** when building the supply function, as it specifies the minimum flow rates that will occur for completely-closed stomata, i.e. the minimum flow from which supply function is build.
 
 ### Leaf photosynthesis
-Rubisco-limited photosynthesis rate $A_c$ (in $\mu mol CO_2 \cdot s^{-1} \cdot m^{-2}$) is modelled using [@Collatz1991; @Medlyn2002]:
+Rubisco-limited photosynthesis rate $A_c$ (in $\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$) is modelled using [@Collatz1991; @Medlyn2002]:
 \begin{equation}
 A_c=\frac{V_{max}\cdot (C_i- \Gamma*)}{C_i+K_c \cdot (1+ O_a/K_o)}
 \end{equation}
-where $V_{max}$ is Rubisco's maximum carboxylation rate (in $\mu mol CO_2 \cdot s^{-1} \cdot m^{-2}$), $C_i$ is the internal carbon dioxide concentration (in $\mu mol \cdot mol^{-1}$), $\Gamma*$ is the compensation point (in $\mu mol \cdot mol^{-1}$), $K_c$ (in $\mu mol \cdot mol^{-1}$) and $K_o$ (in $mmol \cdot mol^{-1}$) are Michaelis-Menten constants for carboxylation and oxygenation, respectively, and $O_a$ is the atmospheric oxygen concentration (i.e. 209 $mmol \cdot mol^{-1}$). $\Gamma*$, $K_c$ and $K_o$ depend on leaf temperature ($T_{leaf}$, in Celsius) [@Bernacchi2001]:
+where $V_{max}$ is Rubisco's maximum carboxylation rate (in $\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$), $C_i$ is the internal carbon dioxide concentration (in $\mu mol \cdot mol^{-1}$), $\Gamma*$ is the compensation point (in $\mu mol \cdot mol^{-1}$), $K_c$ (in $\mu mol \cdot mol^{-1}$) and $K_o$ (in $mmol \cdot mol^{-1}$) are Michaelis-Menten constants for carboxylation and oxygenation, respectively, and $O_a$ is the atmospheric oxygen concentration (i.e. 209 $mmol \cdot mol^{-1}$). $\Gamma*$, $K_c$ and $K_o$ depend on leaf temperature ($T_{leaf}$, in Celsius) [@Bernacchi2001]:
 \begin{eqnarray}
 \Gamma* &=& 42.75\cdot e^{\frac{37830\cdot (T_{leaf}-25)}{298\cdot R \cdot (T_{leaf}-273)}}\\
 K_c &=& 404.9\cdot e^{\frac{79430\cdot (T_{leaf}-25)}{298\cdot R \cdot (T_{leaf}-273)}}\\
 K_o &=& 278.4\cdot e^{\frac{36380\cdot (T_{leaf}-25)}{298\cdot R \cdot (T_{leaf}-273)}}
 \end{eqnarray}
-Electron transport-limited photosynthesis $A_e$ (in $\mu mol CO_2 \cdot s^{-1} \cdot m^{-2}$) was obtained from @Medlyn2002:
+Electron transport-limited photosynthesis $A_e$ (in $\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$) was obtained from @Medlyn2002:
 \begin{eqnarray}
 A_e &=& \frac{J}{4}\cdot \frac{C_i-\Gamma*}{C_i+2\cdot \Gamma*} \\
-J &=& \frac{(\alpha\cdot Q + J_{max})-\sqrt{(\alpha\cdot Q + J_{max})^2-4.0\cdot c \cdot \alpha \cdot Q \cdot J_{max}}}{2\cdot c}
+J &=& \frac{(\alpha\cdot Q_{PAR} + J_{max})-\sqrt{(\alpha\cdot Q_{PAR} + J_{max})^2-4.0\cdot c \cdot \alpha \cdot Q_{PAR} \cdot J_{max}}}{2\cdot c}
 \end{eqnarray}
-where $\alpha$ is the quantum yield of electron transport (0.3 $mol electrons \cdot mol photons^{-1}$), $Q$ is the PAR photon flux density ($\mu mol photons \cdot m^{-2} \cdot s^{-1}$), which is calculated from leaf irradiance ($I_{par}$; in $W \cdot m^{-2}$):
+where $\alpha = 0.3\,mol \, e \cdot mol\,photon^{-1}$ is the quantum yield of electron transport, $Q_{PAR}$ is the absorbed PAR photon flux density ($\mu mol\,photon \cdot m^{-2} \cdot s^{-1}$), which is calculated from leaf absorbed PAR ($I_{PAR}$; in $W \cdot m^{-2}$):
 \begin{equation}
-Q = I_{par}\cdot 546 \cdot 0.836\cdot 10^{-2}
+Q_{PAR} = I_{PAR}\cdot 546 \cdot 0.836\cdot 10^{-2}
 \end{equation}
-$J_{max}$ and $J$ are the maximum and actual rate of electron transport (both in $\mu mol electrons \cdot m^{-2} \cdot s^{-1}$) and $c=0.9$ defines the curvature of the light-response curve. The gross assimilation rate $A$ at a given $C_i$ is the minimum of $A_e$ and $A_c$. To obtain a smooth $A$-vs-$C_i$ curve we used [@Collatz1991]:
+$J_{max}$ and $J$ are the maximum and actual rate of electron transport (both in $\mu mol\,e \cdot m^{-2} \cdot s^{-1}$) and $c=0.9$ defines the curvature of the light-response curve. The gross assimilation rate $A$ at a given $C_i$ is the minimum of $A_e$ and $A_c$. To obtain a smooth $A$-vs-$C_i$ curve we used [@Collatz1991]:
 \begin{equation}
 A = \frac{(A_c+A_e)-\sqrt{(A_c+A_e)^2-4.0\cdot c'\cdot A_e\cdot A_c}}{2\cdot c'}
 \end{equation}
-where $c'=0.98$ is a curvature factor. The temperature dependence of $J_{max}$ and $V_{max}$ relative to 25ºC was modelled using @Leuning2002 (his eq. 1 with parameters from his Table 2). The internal CO$_2$ concentration, $C_i$, needs to be known to calculate $A$ using the previous equations. @Sperry2016a use a second equation for $A$ which uses $g_{cs}$:
+where $c'=0.98$ is a curvature factor. The temperature dependence of $J_{max}$ and $V_{max}$ relative to 25ºC (i.e., relative to input parameters $J_{max,298}$ and $V_{max,298}$) is modelled using @Leuning2002 (his eq. 1 with parameters from his Table 2). The internal $CO_2$ concentration, $C_i$, needs to be known to calculate $A$ using the previous equations. @Sperry2016a use a second equation for $A$ which uses $g_{cs}$:
 \begin{equation}
 A = g_{sc} \cdot (C_{atm}-C_i)
 \end{equation}
@@ -273,7 +272,10 @@ Jmax298 = 1.67*Vmax298
 
 one can obtain the following $A(\Psi_{leaf})$ curves from $T_{leaf}(\Psi_{leaf})$ and $g_{sc}(\Psi_{leaf})$:
 
-```{r, echo=FALSE, fig.width=8, fig.height=3.5, fig.align="center"}
+
+(ref:leafphotosynthesisfunction-cap) Examples of gross photosynthesis ($A$) functions for a hydraulic network, corresponding to fig. \@ref(fig:supplynetwork) and for different soil textures. Left/right panel shows values for uncavitated/cavitated supply functions. 
+
+```{r leafphotosynthesisfunction, echo=FALSE, fig.width=8, fig.height=3.5, fig.align="center", fig.cap = '(ref:leafphotosynthesisfunction-cap)'}
 par(mar=c(4,4,2,1), mfrow=c(1,2))
 plot(-supplyNetwork11$psiLeaf, psi2A11$Photosynthesis, type="l", col=col1, ylab="Assimilation rate", xlab = "Leaf sap pressure (-MPa)",  xlim=c(0, 7), lwd=1, main="original")
 lines(-supplyNetwork12$psiLeaf,psi2A12$Photosynthesis, lty=1, lwd=1, col=col2)
@@ -305,7 +307,7 @@ abline(v=-psiCav, col="gray", lwd=1.5)
 legend("topright", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 ```
 
-Finally, leaf net photosynthesis (i.e. accounting for autotrophic respiration) is calculated as:
+Finally, leaf net photosynthesis ($A_n$; i.e. accounting for autotrophic respiration) is calculated as:
 \begin{equation}
 A_n = A - 0.015 \cdot V_{max}
 \end{equation}
@@ -388,7 +390,7 @@ lines(absRadSH, 1:nlayer, col="red", lty=2)
 
 Following @DePury1997, we further assume that maximum assimilation rates are highest for leaves at the top of the canopy and there is a exponential decrease from there towards the bottom, where maximum rates are 50% of those at the top: 
 \begin{equation}
-V_{max,298}(L_i) =V_{max,298}\cdot exp(-0.713\cdot L_i/LAIc)   
+V_{max,298}(L_i) =V_{max,298}\cdot \exp(-0.713\cdot L_i/LAIc)   
 \end{equation}
 where $L_i$ is the cumulative LAI value at a given canopy layer $i$ and $LAIc$ is the canopy LAI.
 ```{r, echo=FALSE}
@@ -404,6 +406,7 @@ Jmax298layer=Vmax298layer*1.67
 ```
 
 Multilayer canopy models allow evaluating leaf conditions, stomatal conductance and photosynthesis for different points of the canopy. However, this comes at high computational cost. While big-leaf canopy models are known to be unaccurate under some situations, sun-shade canopy models [@DePury1997] provide estimates that are close to multiple layer models [@Hikosaka2016]. Sun-shade models involve: (a) aggregating the leaf area of sunlit/shade leaves across layers; (b) aggregating the light absorbed by leaves of each kind across layers; and (c) aggregating maximum assimilation rates across layers, again separating sunlit and shade leaves. One then calls the photosynthesis model twice (i.e. once for shade leaves and once for sunlit leaves), using the aggregated maximum assimilation rates. Separating the two kinds of leaves acknowledges that they operate at different parts of the light-saturation curve. The following figure provides the canopy photosynthesis functions obtained, under different situations, using a full 10-layer canopy description (top), a sunshade canopy model (center) or a big-leaf model (bottom). These were generated using functions `photo_multilayerPhotosynthesisFunction()`, `photo_sunshadePhotosynthesisFunction()` and `photo_leafPhotosynthesisFunction()`, respectively. Note the coincidence between the multi-layer and the sun-shade models.
+
 ```{r, echo=FALSE}
 psi2A11can = photo_multilayerPhotosynthesisFunction(supplyNetwork11$E,Catm, Patm,Tcan, vpa, 
                                                 SLarea, SHarea, ulayer, 
