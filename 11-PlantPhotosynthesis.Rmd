@@ -315,85 +315,20 @@ A_n = A - 0.015 \cdot V_{max}
 
 ## Crown photosynthesis
 
-In the previous subsection we calculated photosynthesis at the leaf level. However, the function $A(\Psi_{leaf})$ can be calculated for a whole crown. Essentially we need to repeat the calculations of leaf temperature, leaf VPD, leaf gas conductance and photosynthesis for every leaf to be considered in the crown. Gross and net photosynthesis values can be then aggregated across the crown for each value of $\Psi_{leaf}$, so that the function $A(\Psi_{leaf})$ is obtained. Here we will consider a crown of one species divided into 10 layers, with constant leaf density:
-```{r}
-LAI = 2
-nlayer = 10
-LAIlayerlive = matrix(rep(LAI/nlayer,nlayer),nlayer,1)
-LAIlayermax = matrix(rep(LAI/nlayer,nlayer),nlayer,1)
-LAIlayerdead = matrix(0,nlayer,1)
-kb = 0.8
-kd_PAR = 0.5
-kd_SWR = kd_PAR/1.35
-alpha_PAR = 0.9
-gamma_PAR = 0.04
-gamma_SWR = 0.05
-alpha_SWR = 0.7
-```
+In the previous subsection we calculated photosynthesis at the leaf level. However, the function $A(\Psi_{leaf})$ can be calculated for a whole crown. Essentially we need to repeat the calculations of leaf temperature, leaf VPD, leaf gas conductance and photosynthesis for every leaf to be considered in the crown. Gross and net photosynthesis values can be then aggregated across the crown for each value of $\Psi_{leaf}$, so that the function $A(\Psi_{leaf})$ is obtained. 
 
-
-Many aspects may vary across the crown, including environmental conditions (such as direct/diffuse light or wind speed) and photosynthesis parameters (e.g. `Vmax298`). The previous crown definition and light parameters lead to a percentage of the above-canopy irradiance reaching each layer [@Anten2016]. Furthermore, it is generally accepted that sunlit and shade leaves need to be treated separately [@DePury1997].Extinction of direct radiation also defines the proportion of leaves of each layer that are affected by direct light beams (i.e. the proportion of sunlit leaves).
-
-```{r, echo=FALSE, fig.width=7, fig.height=4, fig.align="center"}
-Ibfpar = light_layerIrradianceFraction(LAIlayerlive,LAIlayerdead,LAIlayermax, kb, alpha_PAR)
-Idfpar = light_layerIrradianceFraction(LAIlayerlive,LAIlayerdead,LAIlayermax, kd_PAR, alpha_PAR)
-Ibfswr = light_layerIrradianceFraction(LAIlayerlive,LAIlayerdead,LAIlayermax, kb, alpha_SWR)
-Idfswr = light_layerIrradianceFraction(LAIlayerlive,LAIlayerdead,LAIlayermax, kd_SWR, alpha_SWR)
-fsunlit = light_layerSunlitFraction(LAIlayerlive, LAIlayerdead, kb)
-SHarea = (1-fsunlit)*LAIlayerlive[,1] 
-SLarea = fsunlit*LAIlayerlive[,1] 
-
-par(mar=c(4,4,1,1), mfrow=c(1,2))
-plot(Ibfpar*100, 1:nlayer,type="l", ylab="Layer", xlab="Percentage of irradiance", xlim=c(0,100), ylim=c(1,nlayer), col="dark green")
-lines(Idfpar*100, 1:nlayer, col="dark green", lty=2)
-lines(Ibfswr*100, 1:nlayer, col="red")
-lines(Idfswr*100, 1:nlayer, col="red", lty=2)
-
-plot(fsunlit*100, 1:nlayer,type="l", ylab="Layer", xlab="Percentage of leaves", xlim=c(0,100), ylim=c(1,nlayer))
-lines((1-fsunlit)*100, 1:nlayer, lty=2)
-```
-
-For simplicity, here we will assume constant windspeed in all layers:
+As in section \@ref(shortwaveradiationcanopyabs) we consider a crown of one species divided into 10 layers, with constant leaf density. Many aspects may vary across the crown, including environmental conditions (such as direct/diffuse light or wind speed) and photosynthesis parameters (e.g. `Vmax298`). The previous crown definition and light parameters lead to a percentage of the above-canopy irradiance reaching each layer [@Anten2016]. Furthermore, it is generally accepted that sunlit and shade leaves need to be treated separately [@DePury1997]. Under these conditions, the amount of SWR and PAR absorbed per unit of leaf area at each canopy layer was shown in fig. \@ref(fig:absorbanceperlayer). For simplicity, here we will assume constant windspeed in all layers:
 ```{r}
 ulayer = rep(2, 10)
 ```
 
-Regarding incoming light, we assume the following direct and diffuse irradiance at the top of the canopy:
-```{r}
-solarElevation = 0.67
-SWR_direct = 1100
-SWR_diffuse = 300
-PAR_direct = 550
-PAR_diffuse = 150
-```
-
-Solar elevation is the angle between the sun and the horizon (i.e. the complement of the zenith angle). Under these conditions, the amount of shortwave and PAR radiation absorbed per unit of leaf area at each canopy layer is [@Anten2016]:
-
-```{r, echo=FALSE, fig.width=7, fig.height=4, fig.align="center"}
-abs_PAR = light_cohortSunlitShadeAbsorbedRadiation(PAR_direct, PAR_diffuse,
-                                             Ibfpar, Idfpar, beta = solarElevation, 
-                                             LAIlayerlive, LAIlayerdead, kb, kd_PAR, alpha_PAR, gamma_PAR)
-abs_SWR = light_cohortSunlitShadeAbsorbedRadiation(SWR_direct, SWR_diffuse,
-                                             Ibfswr, Idfswr, beta = solarElevation, 
-                                             LAIlayerlive, LAIlayerdead, kb, kd_SWR, alpha_SWR, gamma_SWR)
-par(mar=c(4,4,1,1), mfrow=c(1,2))
-absRadSL = abs_SWR$I_sunlit[,1]
-absRadSH = abs_SWR$I_shade[,1]
-lambda = 546.6507
-QSL = abs_PAR$I_sunlit[,1]*lambda*0.836*0.01
-QSH = abs_PAR$I_shade[,1]*lambda*0.836*0.01
-plot(QSL, 1:nlayer,type="l", ylab="Layer", xlab="Absorbed PAR quantum flux per leaf area", ylim=c(1,nlayer), col="dark green", xlim=c(0,max(QSL)))
-lines(QSH, 1:nlayer, col="dark green", lty=2)
-plot(absRadSL, 1:nlayer,type="l", ylab="Layer", xlab="Absorbed SWR per leaf area (W/m2)", ylim=c(1,nlayer), col="red", xlim=c(0,max(absRadSL)))
-lines(absRadSH, 1:nlayer, col="red", lty=2)
-```
-
 Following @DePury1997, we further assume that maximum assimilation rates are highest for leaves at the top of the canopy and there is a exponential decrease from there towards the bottom, where maximum rates are 50% of those at the top: 
 \begin{equation}
-V_{max,298}(L_i) =V_{max,298}\cdot \exp(-0.713\cdot L_i/LAIc)   
+V_{max,298}(L_j) =V_{max,298}\cdot \exp(-0.713\cdot L_j/LAI^{live})   
 \end{equation}
-where $L_i$ is the cumulative LAI value at a given canopy layer $i$ and $LAIc$ is the canopy LAI.
-```{r, echo=FALSE}
+where $L_j$ is the cumulative LAI value at a given canopy layer $j$ and $LAI^{live}$ is the overall LAI of the plant cohort. The following figure illustrate this decrease for the single-species canopy example of section \@ref(shortwaveradiationcanopyabs):
+
+```{r, echo=FALSE, fig.width=5, fig.height=4, fig.align="center", fig.cap="Decrease of Rubisco maximum carboxilation rate across the canopy"}
 kn = 0.713 #~50% decrease from top to bottom of the canopy
 Vmax298layer = numeric(nlayer)
 s = 0
@@ -402,10 +337,16 @@ for(i in nlayer:1) {
   s =s+LAIlayerlive[i,1]
 }
 Jmax298layer=Vmax298layer*1.67
-# plot(Vmax298layer, 1:nlayer,type="l", ylab="Layer", xlab="Maximum carboxylation rate", ylim=c(1,nlayer), col="red")
+plot(Vmax298layer, 1:nlayer,type="l", ylab="Layer", xlab="Maximum carboxylation rate", ylim=c(1,nlayer), col="red")
 ```
 
-Multilayer canopy models allow evaluating leaf conditions, stomatal conductance and photosynthesis for different points of the canopy. However, this comes at high computational cost. While big-leaf canopy models are known to be unaccurate under some situations, sun-shade canopy models [@DePury1997] provide estimates that are close to multiple layer models [@Hikosaka2016]. Sun-shade models involve: (a) aggregating the leaf area of sunlit/shade leaves across layers; (b) aggregating the light absorbed by leaves of each kind across layers; and (c) aggregating maximum assimilation rates across layers, again separating sunlit and shade leaves. One then calls the photosynthesis model twice (i.e. once for shade leaves and once for sunlit leaves), using the aggregated maximum assimilation rates. Separating the two kinds of leaves acknowledges that they operate at different parts of the light-saturation curve. The following figure provides the canopy photosynthesis functions obtained, under different situations, using a full 10-layer canopy description (top), a sunshade canopy model (center) or a big-leaf model (bottom). These were generated using functions `photo_multilayerPhotosynthesisFunction()`, `photo_sunshadePhotosynthesisFunction()` and `photo_leafPhotosynthesisFunction()`, respectively. Note the coincidence between the multi-layer and the sun-shade models.
+Multilayer canopy models allow evaluating leaf conditions, stomatal conductance and photosynthesis for different points of the canopy. However, this comes at high computational cost. While big-leaf canopy models are known to be unaccurate under some situations, sun-shade canopy models [@DePury1997] provide estimates that are close to multiple layer models [@Hikosaka2016]. Sun-shade models involve the following steps: 
+
+a) aggregating the leaf area of sunlit/shade leaves across layers; 
+b) aggregating the light absorbed by leaves of each kind across layers; and 
+c) aggregating maximum assimilation rates across layers, again separating sunlit and shade leaves. 
+
+One then calls the photosynthesis model twice (i.e. once for shade leaves and once for sunlit leaves), using the aggregated maximum assimilation rates. Separating the two kinds of leaves acknowledges that they operate at different parts of the light-saturation curve. The figure below provides the canopy photosynthesis functions obtained, under different situations, using the full 10-layer canopy description (top), a sunshade canopy model (center) or a big-leaf model (bottom). These were generated using functions `photo_multilayerPhotosynthesisFunction()`, `photo_sunshadePhotosynthesisFunction()` and `photo_leafPhotosynthesisFunction()`, respectively. Note the coincidence between the multi-layer and the sun-shade models.
 
 ```{r, echo=FALSE}
 psi2A11can = photo_multilayerPhotosynthesisFunction(supplyNetwork11$E,Catm, Patm,Tcan, vpa, 
@@ -674,8 +615,9 @@ psi2A34blemb = photo_leafPhotosynthesisFunction(supplyNetwork34emb$E,Catm, Patm,
 Gmax = 0.5
 ```
 
+(ref:canopyphoto-cap) Whole-canopy photosynthesis functions obtained for a hydraulic network, corresponding to fig. \@ref(fig:supplynetwork) and different soil textures, using the full 10-layer canopy description (top), a sunshade canopy model (center) or a big-leaf model (bottom). Left/right panel shows values for uncavitated/cavitated supply functions. 
 
-```{r, echo=FALSE, fig.width=7, fig.height=10, fig.align="center"}
+```{r canopyphoto, echo=FALSE, fig.width=7, fig.height=10, fig.align="center", fig.cap="(ref:canopyphoto-cap)"}
 par(mar=c(4,4,2,1), mfrow=c(3,2))
 plot(-supplyNetwork11$psiLeaf, psi2A11can$Photosynthesis, type="l", col=col1, ylab="Multilayer photosynthesis", xlab = "Leaf pressure (-MPa)",  xlim=c(0, 7), lwd=1, main="original")
 lines(-supplyNetwork12$psiLeaf,psi2A12can$Photosynthesis, lty=1, lwd=1, col=col2)

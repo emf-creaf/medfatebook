@@ -7,18 +7,18 @@ The canopy is divided into vertical layers (whose size is determined by the cont
 
 The average irradiance reaching the top of each canopy layer $j$ is calculated separately for direct beam and diffuse radiation:
 \begin{eqnarray}
-I_{beam,j} &=& (1 - \gamma_i) \cdot I_{beam} \cdot \exp\left[ \sum_{h=j+1}^{n}{\sum_{i}^{c}{-k_{b}\cdot \alpha^{0.5}\cdot LAI^{all}_{i,h}}}\right]\\
-I_{dif,j} &=& (1 - \gamma_i) \cdot I_{dif} \cdot \exp\left[ \sum_{h=j+1}^{n}{\sum_{i}^{c}{-k_{d,i}\cdot \alpha^{0.5}\cdot LAI^{all}_{i,h}}}\right]
+I_{beam,j} &=& (1 - \gamma_i) \cdot I_{beam} \cdot \exp\left[ \sum_{h=j+1}^{n}{\sum_{i}^{c}{-k_{b}\cdot \alpha_i^{0.5}\cdot LAI^{all}_{i,h}}}\right]\\
+I_{dif,j} &=& (1 - \gamma_i) \cdot I_{dif} \cdot \exp\left[ \sum_{h=j+1}^{n}{\sum_{i}^{c}{-k_{d,i}\cdot \alpha_i^{0.5}\cdot LAI^{all}_{i,h}}}\right]
 \end{eqnarray}
-where $I_{beam}$ and $I_{dif}$ are the direct and diffuse irrradiance at the top of the canopy, $\gamma_i$ is the leaf reflectance ($\gamma_{SWR, i}$ is an input parameter, whereas $\gamma_{PAR, i} = 0.8 \cdot \gamma_{SWR, i}$), $k_{b} = 0.8$ is the extinction coefficient for direct light, $k_{d,i}$ is the extinction coefficient of cohort $i$ for diffuse light (i.e. $k_{PAR,i}$ or $k_{SWR,i}$) and $\alpha$ is the absorbance coefficient ($\alpha_{PAR} = 0.9$, $\alpha_{SWR} = 0.7$).
+where $I_{beam}$ and $I_{dif}$ are the direct and diffuse irrradiance at the top of the canopy, $\gamma_i$ is the leaf reflectance ($\gamma_{SWR, i}$ is an input parameter, whereas $\gamma_{PAR, i} = 0.8 \cdot \gamma_{SWR, i}$), $k_{b} = 0.8$ is the extinction coefficient for direct light, $k_{d,i}$ is the extinction coefficient of cohort $i$ for diffuse light (i.e. $k_{PAR,i}$ or $k_{SWR,i}$) and $\alpha_i$ is the absorbance coefficient ($\alpha_{SWR,i}$ is an input parameter, whereas $\alpha_{PAR,i} = \alpha_{SWR,i} \cdot 1.35$).
 
 The proportion of sunlit leaves, i.e. leaves in a canopy layer that the direct light beams (sunflecks) reach is:
 \begin{equation}
 f_{SL, j}  = \exp\left( \sum_{k>j}^{n}{\sum_{i}^{c}{-k_{b} \cdot LAI^{all}_{i,k}}}\right) \cdot \exp\left( \sum_{i}^{c}{-k_{b} \cdot 0.5\cdot LAI^{all}_{i,j}}\right)
 \end{equation}
-As an example we will consider a canopy of one species of LAI = 2, divided into ten layers with constant leaf density.
+As an example we will consider a canopy of one species of LAI = 2, divided into ten layers with constant leaf density:
 
-```{r, echo = FALSE}
+```{r}
 LAI = 2
 nlayer = 10
 LAIlayerlive = matrix(rep(LAI/nlayer,nlayer),nlayer,1)
@@ -63,21 +63,21 @@ legend("bottom", legend=c("sunlit","shade"), lty=c(1,2), bty="n")
 
 The amount of absorved diffuse radiation per leaf area unit of cohort $i$ within a given canopy layer $j$ is calculated as:
 \begin{equation}
-I_{dif,i,j} = I_{dif,j} \cdot k_{d,i} \cdot \alpha^{0.5} \exp\left[ \sum_{h}^{c}{-k_{d,h}\cdot \alpha^{0.5}\cdot 0.5\cdot LAI^{all}_{h,j}}\right]
+I_{dif,i,j} = I_{dif,j} \cdot k_{d,i} \cdot \alpha_i^{0.5} \exp\left[ \sum_{h}^{c}{-k_{d,h}\cdot \alpha_i^{0.5}\cdot 0.5\cdot LAI^{all}_{h,j}}\right]
 \end{equation}
 
 
 The amount of absorved scattered beam radiation per leaf area unit of cohort $i$ within a given canopy layer $j$ is calculated as:
 \begin{equation}
 % \begin{split}
-I_{sca,i,j} = I_{b,j} \cdot k_{b} \left( \alpha^{0.5}\cdot \exp \left( \sum_{h}^{c}{-k_{b}\cdot \alpha \cdot 0.5\cdot LAI^{all}_{h,i}}\right) 
--\frac{\alpha}{(1-\gamma)}\cdot \exp\left( \sum_{h}^{c}{-k_{b}\cdot 0.5\cdot LAI^{all}_{h,i}}\right) \right)
+I_{sca,i,j} = I_{b,j} \cdot k_{b} \left( \alpha_i^{0.5}\cdot \exp \left( \sum_{h}^{c}{-k_{b}\cdot \alpha_i \cdot 0.5\cdot LAI^{all}_{h,i}}\right) 
+-\frac{\alpha_i}{(1-\gamma_i)}\cdot \exp\left( \sum_{h}^{c}{-k_{b}\cdot 0.5\cdot LAI^{all}_{h,i}}\right) \right)
 % \end{split}
 \end{equation}
 
 Finally, the direct radiation absorbed by a unit of sunlit leaf area of cohort $i$ in a canopy layer $j$ does not depend on the position of the canopy layer and is:
 \begin{equation}
-I_{dir,i,j} = I_{beam} \cdot \alpha \cdot 0.5/\sin{\beta}
+I_{dir,i,j} = I_{beam} \cdot \alpha_i \cdot 0.5/\sin{\beta}
 \end{equation}
 where $\beta$ is the solar elevation angle, which changes throughout the day. The amount of light absorbed by shaded/sunlit foliage of cohort $i$ in layer $j$ per leaf area unit ($I_{SH,i,j}$ and $I_{SL,i,j}$, respectively) is:
 \begin{eqnarray}
@@ -90,10 +90,47 @@ The total amount of light absorbed by shaded/sunlit foliage of cohort $i$ per gr
 \Phi_{SL,i,j} &=& I_{SL,i,j}\cdot f_{SL,j} \cdot LAI^{\phi}_{i,j}
 \end{eqnarray}
 
+Extinction of direct radiation also defines the proportion of leaves of each layer that are affected by direct light beams (i.e. the proportion of sunlit leaves).
+
+Let us show how all this works in an example. Regarding incoming light, we assume the following direct and diffuse irradiance at the top of the canopy:
+```{r}
+solarElevation = 0.67
+SWR_direct = 1100
+SWR_diffuse = 300
+PAR_direct = 550
+PAR_diffuse = 150
+```
+
+Solar elevation is the angle between the sun and the horizon (i.e. the complement of the zenith angle). Under these conditions, and for the same canopy used for fig. \@ref(fig:irradianceperlayer), the amount of PAR and SWR absorbed per unit of leaf area at each canopy layer is [@Anten2016]:
+
+(ref:absorbanceperlayer-cap) PAR (left) and SWR (right) absorbed per unit of leaf area at each canopy layer (see function `light_cohortSunlitShadeAbsorbedRadiation()`). 
+
+```{r absorbanceperlayer, echo=FALSE, fig.width=7, fig.height=4, fig.align="center", fig.cap='(ref:absorbanceperlayer-cap)'}
+abs_PAR = light_cohortSunlitShadeAbsorbedRadiation(PAR_direct, PAR_diffuse,
+                                             Ibfpar, Idfpar, beta = solarElevation, 
+                                             LAIlayerlive, LAIlayerdead, kb, kd_PAR, alpha_PAR, gamma_PAR)
+abs_SWR = light_cohortSunlitShadeAbsorbedRadiation(SWR_direct, SWR_diffuse,
+                                             Ibfswr, Idfswr, beta = solarElevation, 
+                                             LAIlayerlive, LAIlayerdead, kb, kd_SWR, alpha_SWR, gamma_SWR)
+par(mar=c(4,4,1,1), mfrow=c(1,2))
+absRadSL = abs_SWR$I_sunlit[,1]
+absRadSH = abs_SWR$I_shade[,1]
+QSL = abs_PAR$I_sunlit[,1]
+QSH = abs_PAR$I_shade[,1]
+plot(QSL, 1:nlayer,type="l", ylab="Layer", xlab="Absorbed PAR per leaf area (W/m2)", ylim=c(1,nlayer), col="dark green", xlim=c(0,max(QSL)))
+lines(QSH, 1:nlayer, col="dark green", lty=2)
+legend("bottom", legend=c("sunlit", "shade"), lty=c(1,2), bty="n", col="dark green")
+plot(absRadSL, 1:nlayer,type="l", ylab="Layer", xlab="Absorbed SWR per leaf area (W/m2)", ylim=c(1,nlayer), col="red", xlim=c(0,max(absRadSL)))
+lines(absRadSH, 1:nlayer, col="red", lty=2)
+legend("bottom", legend=c("sunlit", "shade"), lty=c(1,2), bty="n", col="red")
+```
+
+
+
 ## Shortwave radiation absorbed by the soil {#shortwaveradiationsoilabs}
 The instantaneous shortwave radiation reaching the soil is calculated separately for direct beam and diffuse radiation:
 \begin{eqnarray}
-K_{beam, soil} &=&  K_{beam} \cdot \exp\left[ \sum_{h=j+1}^{n}{\sum_{i}^{c}{-k_{b}\cdot \alpha^{0.5} \cdot LAI^{all}_{i,h}}}\right]\\
+K_{beam, soil} &=&  K_{beam} \cdot \exp\left[ \sum_{h=j+1}^{n}{\sum_{i}^{c}{-k_{b}\cdot \alpha_i^{0.5} \cdot LAI^{all}_{i,h}}}\right]\\
 K_{dif, soil} &=& K_{dif} \cdot \exp\left[ \sum_{h=j+1}^{n}{\sum_{i}^{c}{-k_{d,i}\cdot LAI^{all}_{i,h}}}\right]
 \end{eqnarray}
 where $K_{beam}$ and $K_{dif}$ are the direct and diffuse irrradiance at the top of the canopy, $k_{b}$ is the extinction coefficient for direct light ($k_{b} = 0.8$) and $k_{d,i}$ is the extinction coefficient of cohort $i$ for diffuse SWR. From these, the SWR absorbed by the soil is found by:
