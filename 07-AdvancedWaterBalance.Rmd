@@ -2,22 +2,24 @@
 
 # Advanced water balance model {#advancedwaterbalance}
 
-This chapter provides an overview of a water balance model, described in De Cáceres et al. (in prep.), that shares some characteristics with the basic water balance model described in previous chapters. The model is executed using function `spwb()`, for a set of days, and function `spwb_day()` for a single day. Compared to the basic model, the advanced water balance model adds more detail in some processes (light extinction, plant hydraulics and photosynthesis) and incorporates others that were missing (energy balances and hydraulic redistribution). As in chapter \@ref(basicwaterbalance), we provide an overview of the model in the present chapter and the following ones provide a much deeper understanding on model details. We recommend users to familiarize with basic water balance modelling processes before reading this and the subsequent chapters.
+This chapter provides an overview of a water balance model, described in De Cáceres et al. (in prep.), that shares some characteristics with the basic water balance model described in previous chapters. The model is executed using function `spwb()`, for a set of days, and function `spwb_day()` for a single day. Compared to the basic model, the advanced water balance model adds more detail in some processes (light extinction, plant hydraulics and photosynthesis) and incorporates others that were missing (energy balances and hydraulic redistribution). 
+
+Following the structure of chapter \@ref(basicwaterbalance), we provide in this chapter an overview of the advanced water balance model. Process formulations shared with the basic water balance model were presented in previous chapters, and the following ones provide a detailed description of those submodules that are exclusive of the advanced model. We recommend users to familiarize with basic water balance modelling processes before reading this and the subsequent chapters.
 
 ## Design principles
 
-The model performs soil water balance and energy balance for a given forest stand and for the period corresponding to input weather data. Soil water balance is calculated on a daily step basis whereas radiation and energy balances are performed in subdaily steps (usually 1 hour). The model considers only the vertical spatial dimension of the stand, and not the horizontal distribution of plants within it. Still, the stand is divided into plant cohorts of different species, height and leaf area index ($LAI$). Hydrological processes are the almost same as in the basic water balance. The model includes water interception loss [@Gash1995], plant transpiration, evaporation from soil [@Ritchie1972] and the partition between infiltration and runoff [@Boughton1989]. Water exceeding soil water holding capacity is lost via deep drainage. For plant transpiration, the model determines subdaily regulation of water vapour conductance and actual transpiration for sunlit and shade leaves, involving detailed calculations of hydraulics and photosynthesis [@Sperry2016]. Compared to the basic water balance model of chapter \@ref(basicwaterbalance), the higher level of complexity of the advanced model allows a more precise estimation of photosynthesis and transpiration flows. Moreover, it generates hydraulic redistribution of water among soil layers.
+The model performs soil water balance and soil/canopy energy balance for a given forest stand and for the period corresponding to input weather data. Soil water balance is calculated on a daily step basis whereas  energy balances are performed in subdaily steps (usually 1 hour). The model considers only the vertical spatial dimension of the stand, and not the horizontal distribution of plants within it. Still, the stand is divided into plant cohorts of different species, height and leaf area index ($LAI$). Hydrological processes are the almost same as in the basic water balance. The model includes water interception loss [@Gash1995], plant transpiration, evaporation from soil [@Ritchie1972] and the partition between infiltration and runoff [@Boughton1989]. Water exceeding soil water holding capacity is lost via deep drainage. For plant transpiration, the model determines subdaily regulation of water vapour conductance and actual transpiration for sunlit and shade leaves, involving detailed calculations of hydraulics, leaf energy balance and photosynthesis [@Sperry2016]. Compared to the basic water balance model of chapter \@ref(basicwaterbalance), the higher level of complexity of the advanced model allows a more precise estimation of photosynthesis and transpiration. Moreover, it generates hydraulic redistribution of water among soil layers.
 
-As mentioned above, radiation and energy balances are conducted subdaily at two levels: canopy/soil and leaf. One one hand the model keeps track of temperature variation of the air in the canopy (i.e. canopy energy balance) and in the soil (i.e. soil energy balance) as the result of energy exchanges between them and with the atmosphere. These energy balance equations are very similar to those of Best et al. [-@Best2011] for model JULES.  On the other, the model performs the energy balance at the leaf level to determine transpiration [@Sperry2016]. At this scale, radiation inputs include shortwave radiation from the atmosphere absorbed by the leaf and absorbed longwave radiation coming from both the atmosphere and the canopy itself. Leaf temperature is determined assuming that the temperature of the air is that of the canopy. After performing stomatal regulation, the model upscales the transpiration flux to the canopy scale and the corresponding latent heat is used to complete the calculation of the energy balance at the canopy level. Latent heat fluxes from evaporation from the soil and evaporation of intercepted rainfall are also included in the energy balance.
+As mentioned above, radiation and energy balances are conducted subdaily at two levels. On one hand the model keeps track of temperature variation of the air in the canopy (i.e. canopy energy balance) and in the soil (i.e. soil energy balance) as the result of energy exchanges between them and with the atmosphere. Soil/canopy energy balance equations are very similar to those of Best et al. [-@Best2011] for model JULES.  On the other, the model performs the energy balance at the leaf level to determine transpiration [@Sperry2016]. At this scale, radiation inputs include shortwave radiation from the atmosphere absorbed by the leaf and absorbed longwave radiation coming from both the atmosphere and the canopy itself. Leaf temperature is determined assuming that the temperature of the air is that of the canopy. After performing stomatal regulation, the model upscales the transpiration flux to the canopy scale and the corresponding latent heat is used to complete the calculation of the energy balance at the canopy level. Latent heat fluxes from evaporation from the soil and evaporation of intercepted rainfall are also included in the energy balance.
 
 ## State variables
 
 The model has the following state variables:
 
-+ Cumulative growth degree days, $GDD$, are tracked by the model and determine leaf phenological status of winter deciduous species.
++ Cumulative growth degree days, $GDD$, are tracked by the model and determine leaf phenological status (i.e. $LAI$ values) of winter deciduous species.
 + Daily soil moisture content dynamics on each layer $s$ are tracked using $W = \theta(\Psi_s)/ \theta_{fc,s}$, the **proportion of volumetric soil moisture in relation to field capacity**, where field capacity, $\theta_{fc,s}$, is assumed to correspond to $\Psi_{fc} = -0.033$ MPa. Soils are not allowed to contain more water than dictated by their field capacity.
-+ The temperature of the canopy and of each soil layer ($T_c$ and $T_s$; both in ºC) are tracked for every subdaily step.
-+ If irreversible cavitation is activated, the model also tracks $P_{embolized,i}$, the maximum value of daily drought stress so far experienced.
++ The temperature of the canopy and of each soil layer ($T_{canopy}$ and $T_{soil,s}$; both in ºC) are tracked for every subdaily step.
++ If irreversible cavitation is activated, the model also tracks $P_{embolized,i}$, the proportion of embolized xylem conduits for stem hydraulic segments.
 
 ## Water and energy balances
 
@@ -29,7 +31,7 @@ Daily variations in soil water content ($\Delta{V_{soil}}$ in $mm$) can be summa
 \Delta{V_{soil}} = Pr + Sm - In - Ru - Dd - Es -Tr
 \end{equation}
 
-where $Pr$ is precipitation as rainfall, $Sm$ is water from melting the snow pack (if considered), $In$ is the interception loss (i.e., water evaporated after being intercepted by the canopy), $Ru$ is surface runoff, $Dd$ is deep drainage (i.e. water percolated to layers beyond soil depth), $Es$ is evaporation from soil and $Tr$ is plant transpiration. Note that although the advanced water balance model includes hydraulic redistribution, this does not have an effect on the overall balance, so the water balance equation is the same as that of the basic water balance model (eq.\@ref(eq:basicwaterbalanceequation)).
+where $Pr$ is precipitation as rainfall, $Sm$ is water reaching the soil from snow melt (if snow-pack dynamics are considered), $In$ is the interception loss (i.e., water evaporated after being intercepted by the canopy), $Ru$ is surface runoff, $Dd$ is deep drainage (i.e. water percolated to layers beyond soil depth), $Es$ is evaporation from soil surface and $Tr$ is plant transpiration. Note that although the advanced water balance model includes hydraulic redistribution, this does not have an effect on the overall balance, so the water balance equation is the same as that of the basic water balance model (eq.\@ref(eq:basicwaterbalanceequation)).
 
 If snow dynamics are considered, the water balance of the snow pack is defined as:
 
@@ -39,11 +41,11 @@ If snow dynamics are considered, the water balance of the snow pack is defined a
 
 where $Ps$ is precipitation as snowfall and $Sm$ is snow melt. Evaporation from bare soil cannot occur if there is a snow pack over the soil (i.e., if $S_{snow}>0$ then $Es = 0$). 
 
-Unlike the basic water balance, in this model water balance components ($Es$, $Tr$, $In$ and $Sm$) are coupled with energy balance equations of the canopy and soil.
+Unlike the basic water balance, in this model water balance components contributing to latent heat ($Es$, $Tr$, $In$ and $Sm$) are included in the energy balance equations of the canopy and soil.
 
 ### Canopy energy balance
 
-The canopy absorbs shortwave radiation from the atmosphere ($K_{abs,ca}$). It also absorbs longwave counterradiation from the atmosphere ($L_{abs,ca}$) and longwave radiation emmited from the soil ($L_{abs,cs}$). These inputs are counterbalanced by the longwave radiation emmited by the canopy ($L_{em,c}$) in both cases. Other energy fluxes considered are convective exchanges between the canopy and atmosphere ($H_{ca}$) and between the canopy and the soil ($H_{cs}$). Finally, energy is released from the canopy to the atmosphere through latent heat ($LE_{c}$) produced via transpiration ($Tr$) and evaporation of water intercepted by the canopy ($In$). Combining all energy flows, the instantaneous energy balance equation for the canopy is:
+The canopy absorbs shortwave radiation from the atmosphere ($K_{abs,ca}$). It also absorbs longwave counterradiation from the atmosphere ($L_{abs,ca}$) and longwave radiation emmited by the soil ($L_{abs,cs}$). These energy inputs are counterbalanced by the longwave radiation emmited by the canopy ($L_{em,c}$) towards the atmosphere and towards the soil. Other energy fluxes considered are convective exchanges between the canopy and atmosphere ($H_{ca}$) and between the canopy and the soil ($H_{cs}$). Finally, energy is released from the canopy to the atmosphere through latent heat ($LE_{c}$) produced via transpiration ($Tr$) and evaporation of water intercepted by the canopy ($In$). Combining all energy flows, the instantaneous energy balance equation for the canopy is:
 \begin{equation}
   C_{canopy} \cdot \frac{\delta T_{canopy}}{\delta t} = K_{abs,ca} + (L_{abs,ca} - L_{em,c}) + (L_{abs,cs} - L_{em,c}) - LE_{c} - H_{ca} - H_{cs} 
 (\#eq:canopyenergybalance)
@@ -96,7 +98,7 @@ Soil input requirements are the same as for the basic water balance model and we
 
 **Vegetation**
 
-Vegetation input requirements were fully described in section \@ref(vegetationinput). Trees and shrubs do not need to be distinguished in soil water balance calculations, since both kinds of cohort have a $LAI$ value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. $LAI^{live}$, because normally at the starting point all leaves are expanded (i.e. $LAI^{\phi} = LAI^{live}$) and one can assume no dead leaves in the canopy (i.e., $LAI^{dead} = 0$). Vegetation characteristics stay constant during simulations using function `spwb()`, although the actual expanded leaf area ($LAI^{\phi}$) and dead leaf area may vary is the species is winter deciduous.
+Vegetation input requirements were fully described in section \@ref(vegetationinput). Trees and shrubs do not need to be characterized with different variables in soil water balance calculations, since both kinds of cohort have a $LAI$ value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. $LAI^{live}$, because normally at the starting point all leaves are expanded (i.e. $LAI^{\phi} = LAI^{live}$) and one can assume no dead leaves in the canopy (i.e., $LAI^{dead} = 0$). Vegetation characteristics stay constant during simulations using function `spwb()`, although the actual expanded leaf area ($LAI^{\phi}$) and dead leaf area may vary is the species is winter deciduous.
 
 
 **Meteorology**
@@ -106,14 +108,13 @@ The minimum weather variables required to run the model are min/max temperatures
 
 ### Vegetation functional parameters
 
-Basic functional parameters relate to light extinction, water interception and leaf phenology (`paramsBase`):
+The advanced water balance model requires many functional parameters to be specified for plant cohorts. Basic functional parameters relate to light extinction, water interception and leaf phenology (`paramsBase`):
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
-| $k_{PAR,i}$ | | `k` | Extinction coefficient for direct PAR |
-| $k_{SWR,i}$ | | `k` | Extinction coefficient for direct SWR |
+| $k_{PAR,i}$ | | `k` | Extinction coefficient for diffuse PAR |
 | $\gamma_{SWR,i}$ | |`albedo` | Leaf reflectance for short-wave radiation |
-| $s_{water, i}$ | $mmH_2O·LAI^{-1}$ | `g` | Crown water storage capacity (i.e. depth of water that can be retained by leaves and branches) per LAI unit. |
+| $s_{water, i}$ | $mm\,H_2O·LAI^{-1}$ | `g` | Crown water storage capacity (i.e. depth of water that can be retained by leaves and branches) per LAI unit. |
 | $S_{GDD,i}$ | $^{\circ} \mathrm{C}$ | `Sgdd` | Growth degree days corresponding to leaf budburst for deciduous species.|
 
 A second set of plant functional parameters are related to plant anatomic attributes (`paramsAnatomy`):
@@ -126,14 +127,14 @@ A second set of plant functional parameters are related to plant anatomic attrib
 | $\rho_{leaf,i}$ | $g \cdot cm^{-3}$ | `LeafDensity` | Leaf tissue density |
 | $\rho_{wood,i}$ | $g \cdot cm^{-3}$ | `WoodDensity` | Wood tissue density |
 
-A third set of parametrs are related to transpiration and photosynthesis (`paramsTransp`):
+A third set of parameters are related to transpiration and photosynthesis (`paramsTransp`):
 
 | Symbol | Units | R param | Description                             |
 |--------|-------|---------|-----------------------------------------|
-| $g_{swmin,i}$ | $mol H_2O \cdot s^{-1} \cdot m^{-2}$ | `Gwmin` | Minimum stomatal conductance to water vapour |
-| $g_{swmax,i}$ | $mol H_2O \cdot s^{-1} \cdot m^{-2}$ | `Gwmax` | Maximum stomatal conductance to water vapour |
-| $J_{max, 298,i}$ | $\mu mol electrons \cdot m^{-2} \cdot s^{-1}$ | `Jmax298` | Maximum rate of electron transport at 298K |
-| $V_{max, 298,i}$ | $\mu mol CO_2 \cdot s^{-1} \cdot m^{-2}$ | `Vmax298` | Rubisco's maximum carboxylation rate at 298K |
+| $g_{swmin,i}$ | $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$ | `Gwmin` | Minimum stomatal conductance to water vapour |
+| $g_{swmax,i}$ | $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$ | `Gwmax` | Maximum stomatal conductance to water vapour |
+| $J_{max, 298,i}$ | $\mu mol\, e \cdot m^{-2} \cdot s^{-1}$ | `Jmax298` | Maximum rate of electron transport at 298K |
+| $V_{max, 298,i}$ | $\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$ | `Vmax298` | Rubisco's maximum carboxylation rate at 298K |
 | $k_{leaf, \max,i}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | `VCleaf_kmax` | Maximum leaf conductance (per leaf area unit) |
 | $k_{stem, \max,i}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | `VCleaf_kmax` | Maximum stem conductance (per leaf area unit) |
 | $k_{root, \max,i,s}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | `VCleaf_kmax` | Maximum root conductance (per leaf area unit) for each soil layer |
@@ -144,7 +145,7 @@ A third set of parametrs are related to transpiration and photosynthesis (`param
 | $K_{rootdisc,i}$ | [0-1] |  `pRootDisc` |  Whole-plant relative conductance corresponding to hydraulic disconnection from the soil |
 
 
-A final set of parametrs are related to water storage in plant tissues (`paramsWaterStorage`):
+A final set of parameters are related to water storage in plant tissues (`paramsWaterStorage`):
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
@@ -162,17 +163,20 @@ Vegetation functional attributes are normally filled for each cohort by function
 
 ### Control parameters
 
-Control parameters modulate the overall behaviour of water balance simulations (see section \@ref(controlparameters)). Most importantly, `transpirationMode` defines the transpiration model, which in turn defines the complexity of the water balance model. If `transpirationMode = "Sperry"` then the advanced water balance model is run. In this model, the water retention curve model is set to Van Genuchten, i.e. `soilFunctions = "VG"` (see section \@ref(waterretentioncurves)). The other control parameters relevant for the advanced water balance model are:
+Control parameters modulate the overall behaviour of water balance simulations (see section \@ref(controlparameters)). Most importantly, `transpirationMode` defines the transpiration model, which in turn defines the complexity of the water balance model. If `transpirationMode = "Sperry"` then the advanced water balance model is run. In this model, the water retention curve model is forced to be that of Van Genuchten, i.e. `soilFunctions = "VG"` (see section \@ref(waterretentioncurves)). 
+
+Another important control parameter is `ndailysteps`, the number of daily substeps. By default `ndailysteps = 24`, so that substeps are hours, but users can increase the temporal resolution, for example to half hour substeps by setting `ndailysteps = 48`.
+
+The other control parameters relevant for the advanced water balance model are:
 
 + `verbose [=TRUE]`: Whether extra console output is desired during simulations.
 + `subdailyResults [=FALSE]`: : Boolean flag to force subdaily results to be stored (as a list called `subdaily` of `spwb_day` objects, one by simulated date) in calls to `spwb()`.
 + `snowpack [= TRUE]`:  Whether dynamics of snow pack are included (see section \@ref(snowpack)).
 + `drainage [= TRUE]`:  Whether water exceeding the field capacity of the bottom layer is lost by deep drainage into a non-reachable compartment (see section \@ref(runoff)).
-+ `leafPhenology [= TRUE]`:  Whether leaf phenology is simulated (see section \@ref(leafphenology)). If `FALSE` then all species are assumed to be evergreen.
++ `leafPhenology [= TRUE]`:  Whether leaf phenology is simulated for winter-deciduous species (see section \@ref(leafphenology)). If `FALSE` then all species are assumed to be evergreen.
 + `defaultWindSpeed [= 2.5]`: Default value for wind speed (in $m \cdot s^{-1}$) when this is missing.
 + `hydraulicCostFunction [= 1]`: Variant of the hydraulic cost function used in the stomatal regulation model of @Sperry2016. Values accepted are 1 (original cost function based on the derivative of supply function), 2 (leaf vulnerability curve).
-+ `ndailysteps [=24]`: The number of daily substeps. By default substeps are hours.
-+ `thermalCapacityLAI [= 1000000]`: Canopy thermal capacitance per LAI unit.
++ `thermalCapacityLAI [= 1000000]`: Canopy thermal capacitance per LAI unit (see section \@ref(canopycapacitancetemperature)).
 + `verticalLayerSize [= 100]`: The size of vertical layers (in $cm$) for leaf area distribution and light extinction calculations (see section \@ref(leafdistribution)).
 + `nStemSegments [=1]`: Number of segments within the stem.
 + `cavitationRefill [= TRUE]`: If `FALSE` the model operates in a irreversible cavitation mode.
@@ -197,7 +201,8 @@ First, two additional elements contain the energy balance of soil and canopy and
 | `EnergyBalance` | Energy balance components (instantaneous values) for the soil and the canopy |
 | `Temperature` | Minimum and maximum temperature values for topsoil, canopy and atmosphere |
 
-Some additional results are given for plant cohorts:
+
+Additional results are given for plant cohorts:
 
 | Element | Symbol | Units | Description                               |
 |---------|--------|-------|-------------------------------------------|
@@ -229,10 +234,11 @@ Calling function `spwb_day()` with the advanced water balance model results in s
 
 ## Applications
 
-All the applications mentioned in section \@ref(basicwaterbalanceapplications) for the basic water balance model would be, in principle, valid for the advanced model. However, the difference in model complexity makes the advanced model less appealing for the average user. The advanced water balance model requires more effort in calibration and validation. To our experience, its estimates of soil moisture dynamics are only slighly more accurate than those of the basic model. The advanced water balance model is, however, justified whenever:
+All the applications mentioned in section \@ref(basicwaterbalanceapplications) for the basic water balance model would be, in principle, valid for the advanced model. However, the difference in model complexity and the corresponding increase in parametrization make the advanced model less appealing for the average user. To our experience, its estimates of soil moisture dynamics are only slighly more accurate than those of the basic model. The advanced water balance model is, however, justified whenever:
 
 1. Precise estimates are desired for the transpiration flows and/or water potential values of each plant cohort, taking into account their vertical position within the stand.
 2. One is interested in modelling subdaily variation of plant processes such as photosynthesis, transpiration and water use efficiency.
 3. Hydraulic redistribution is believed to be a key process in soil moisture dynamics.
+4. To generate predictions for meta-modelling studies, for example to improve certain processes of another model, such as our basic water balance model.
 
-These uses of the model belong mostly to eco-hydrological and eco-physiological research rather than to real-world applications. For this reason, we believe the advanced model to be useful to researchers. Another interesting application is to generate predictions for meta-modelling studies, for example to improve certain processes of another model, such as our basic water balance model.
+These model uses belong mostly to eco-hydrological and eco-physiological research rather than to applications intended to provide information for forest management. For this reason, we believe the advanced model to be useful to researchers. 
