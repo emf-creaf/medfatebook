@@ -116,11 +116,22 @@ A plant cohort $i$ is either a *tree cohort* or a *shrub cohort*, and is defined
 | $Z_{50,i}$ | mm | `Z50` | Depth above which 50% of the fine root mass is located | Y | Y |
 | $Z_{95,i}$ | mm | `Z95` | Depth above which 95% of the fine root mass is located | Y | Y |
 
-Height values refer to average height of individuals included in the cohort, and the same for crown ratio and $DBH$. $LAI$ variables refer to one-side leaf area of plants in the cohort per surface area of the stand. While plant height is relatively easy to measure, it is normally quite hard to estimate leaf area indices for stands and species. Package **medfate** provides some utilities to provide estimates crown ratio and $LAI$ from forest inventory data (e.g. heights, DBH and density for measured trees), using allometric relationships calibrated for catalonia (see chapter \@ref(allometricmodels)). 
+Height ($H$) values refer to average height of individuals included in the cohort, and the same for crown ratio ($CR$) and diameter at breast height ($DBH$). While plant height is relatively easy to measure, it is normally quite hard to estimate leaf area indices for stands and species. Package **medfate** provides some utilities to provide estimates crown ratio and $LAI$ from forest inventory data (e.g. heights, DBH and density for measured trees), using allometric relationships calibrated for catalonia (see chapter \@ref(allometricmodels)). 
 
-Trees and shrubs do not need to be distinguished in soil water balance calculations, since both kinds of cohort have a $LAI$ value. Vegetation characteristics stay constant during simulations using function `spwb()`, although the actual expanded leaf area and dead leaf area may vary is the species is winter deciduous.
+### Leaf area index
 
-In contrast, growth simulation requires updating the structure of vegetation, i.e. heights, tree diameters and shrub cover. Function `growth()` can modify any of the vegetation attributes.
+$LAI$ variables refer to *one-sided leaf area* of plants in the cohort per surface area of the stand. We will call *total leaf area index* of a plant cohort $i$ ($LAI^{all}_{i}$) to the sum of dead and live expanded leaves of the cohort:
+\begin{equation}
+LAI^{all}_{i} = LAI^{\phi}_{i}+LAI^{dead}_{i}
+\end{equation}
+
+If there are $c$ plant cohorts, the leaf area index of the whole stand can be calculated for living leaves, expanded leaves, dead leaves and total leaf area as:
+\begin{eqnarray}
+LAI^{live}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{live}} \\
+LAI^{\phi}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{\phi}} \\
+LAI^{dead}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{dead}} \\
+LAI^{all}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{all}} = LAI^{\phi}_{stand}+LAI^{dead}_{stand}
+\end{eqnarray}
 
 
 ### Vertical root distribution
@@ -164,6 +175,11 @@ Besides the physical representation of vegetation, forest ecosystem models requi
 
 The package provides functions `spwbInput()` and `growthInput()` that prepare the vegetation input for simulation functions `spwb()` and `growth()`, respectively. This initialization mostly consists in compiling the necessary functional traits from the species parameter table, following the species (or species group) attribute of plant cohorts. Some new parameters are derived from others but take into account the structural attributes of cohorts (an example of these derived quantities is stem conductance, which estimated from stem xylem conductivity and other attributes). Users can modify the output of these initialization functions to modify values for specific plant cohorts, either the species parameters or cohort specific parameters (see function `modifyCohortParams()`). 
 
+### Update of structural variables during simulations
+
+Vegetation characteristics stay constant during simulations using function `spwb()`, although the actual expanded leaf area and dead leaf area may vary is the species is winter deciduous.
+
+In contrast, growth simulation requires updating the structure of vegetation, i.e. heights, tree diameters and shrub cover. Function `growth()` can modify any of the vegetation attributes.
 
 ## Metereological input {#meteoinput}
 Weather input data must include variables calculated at the **daily** scale. Data should be arranged in a data frame with days in rows and variables in columns. The following table indicates the symbols, units, definitions and the variable name in R.
@@ -175,20 +191,22 @@ Weather input data must include variables calculated at the **daily** scale. Dat
 | $T_{max}$ | $^{\circ} \mathrm{C}$ | `MaxTemperature` | Maximum temperature |
 | $RH_{min}$ | % | `MinRelativeHumidity` | Minimum relative humidity |
 | $RH_{max}$ | % | `MaxRelativeHumidity` | Maximum relative humidity |
-| $P$ | $L \cdot m^{-2} = mm$ | `Precipitation` | Precipitation |
+| $P$ | $L \cdot m^{-2} = mm$ | `Precipitation` | Precipitation (either rainfall or snow). |
 | $PET$ | $L \cdot m^{-2} = mm$ | `PET` | Potential evapotranspiration, preferably calculated using Penman's equation |
 | $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds |
 | $u$ | $m \cdot s^{-1}$ | `WindSpeed` | Wind speed |
 
-Dates (year/month/day) should be included in rows of the input meteorology data frame. Dates are necessary for **medfate** to estimate parameters like solar declination or the day of the year ($DOY$). Not all simulation models require all weather variables. In particular, basic water balance modelling requires much less information than advance water balance modelling. The meteorological variables required in each case will be indicated in the corresponding model chapters. Since it allows producing data frames with appropiate variable units and column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018].
+*Dates* should be included as row names (in format *year-month-day*) of the input meteorology data frame. Dates are neeeded to estimate parameters like solar declination or the day of the year ($DOY$). Since it allows producing data frames with appropiate variable units and row/column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018].
 
-Whereas the above meteorological variables are input requirements, **medfate** derives other atmospheric variables from them, using also topographic information (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual):
+Not all simulation models require all weather variables. In particular, basic water balance modelling (chapter \@ref(basicwaterbalance)) requires much less information than advance water balance modelling (chapter \@ref(advancedwaterbalance)). The meteorology input requirements for growth modelling (chapter \@ref(growthmodelling)) depend on the complexity of the water balance model used within it.
+
+Whereas the meteorological variables listed in the table above are input requirements, **medfate** derives other atmospheric variables from them, using also topographic information (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual):
 
 | Symbol | Units | R param | Description                        |
 |--------|-------|---------|------------------------------------|
-| $P_{atm}$ | kPa |  | Atmospheric pressure |
+| $P_{atm}$ | $kPa$ |  | Atmospheric pressure |
 | $\rho_{air}$ | $kg \cdot m^{-3}$ |  | Air density |
-| $vp_{atm}$ | kPa | | Atmospheric water vapour pressure |
+| $vp_{atm}$ | $kPa$ | | Atmospheric water vapour pressure |
 
 
 
@@ -204,4 +222,4 @@ names(defaultControl())
 
 Not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), but there is an important control parameter called `transpirationMode`, because it allows the user to switch between the basic and advanced water balance models (chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). 
 
-Control parameters are employed when initializing vegetation information using functions `spwbInput()` and `growthInput()`, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of this functions, so the user does not need to specify again control parameters when calling simulation functions `spwb()` or `growth()`.
+Control parameters are employed when initializing vegetation information using functions `spwbInput()` and `growthInput()`, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as `spwb()` or `growth()`.

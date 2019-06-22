@@ -4,14 +4,15 @@ Leaf phenology determines seasonal variations in the surface area of leaves, hen
 
 ## Leaf phenology and leaf fall {#leafphenology}
 
-Given a base temperature ($T_{base} = 5^{\circ} \mathrm{C}$), the growth degree days ($GDD$) are zero for all those days where mean temperature $T_{mean}$ is below $T_{base}$ and start increasing when temperatures become warmer than this threshold. In other words, the $GDD$ function accumulates $\max(0.0, T_{mean} - T_{base})$ for all days previous to the current one. At the end of a year the cummulative value is set again to zero. Plant species can have either *evergreen* or *winter-deciduous* phenology. Evergreen plants maintain constant leaf area over the year, whereas in deciduous plants leaf-phenological status is updated daily, represented by $\phi_i$, the fraction of maximum leaf area (see function `pheno_leafDevelopmentStatus()`). Leaf area index ($LAI$) values of deciduous plants are adjusted for leaf phenology following [@Prentice1993; @Sitch2003]:
+Given a base temperature ($T_{base} = 5^{\circ} \mathrm{C}$), the growth degree days ($GDD$) are zero for all those days where mean temperature $T_{mean}$ is below $T_{base}$ and start increasing when temperatures become warmer than this threshold. In other words, the $GDD$ function accumulates $\max(0.0, T_{mean} - T_{base})$ for all days previous to the current one. At the end of a year the cummulative value is set again to zero. 
+
+Plant species can have either *evergreen* or *winter-deciduous* phenology. Evergreen plants maintain constant leaf area over the year, whereas in deciduous plants leaf-phenological status is updated daily, represented by $\phi_i$, the fraction of maximum leaf area (see function `pheno_leafDevelopmentStatus()`). Leaf area index ($LAI$) values of deciduous plants are adjusted for leaf phenology following [@Prentice1993; @Sitch2003]:
 
 \begin{equation}
 LAI_{i}^{\phi}=LAI^{live}_i\,\cdot\phi_i
 \end{equation}
 
-whereas for evergreen species $LAI_{i}^{\phi}=LAI^{live}_i$. Budburst in deciduous species occurs when daily temperature exceeds $T_{base}$ and $\phi_i$ increases linearly from 0 to 1 as function of the degree days above $T_{base}$, until a the
-value $S_{GDD,i}$ is reached (i.e. until $GDD > S_{GDD,i}$). In autumn, $\phi_i$ drops to 0 when average daily temperature falls again below $T_{base}$ [@Sitch2003]. 
+whereas for evergreen species $LAI_{i}^{\phi}=LAI^{live}_i$ (or equivalently $\phi_i = 1$ at all times). Leaf budburst in deciduous species occurs when daily temperature exceeds $T_{base}$ and $\phi_i$ increases linearly from 0 to 1 as function of the degree days above $T_{base}$, until the functional parameter $S_{GDD,i}$ is surpassed (i.e. until $GDD > S_{GDD,i}$). In autumn, $\phi_i$ drops to 0 when average daily temperature falls again below $T_{base}$ [@Sitch2003]. 
 
 The drop of $\phi_i$ causes live expanded leaves to become dead leaves. To avoid a sudden decrease of leaf area, dead leaves are kept in the canopy and they are reduced daily using a negative exponential function of wind speed:
 \begin{equation}
@@ -19,24 +20,14 @@ LAI^{dead}_i=LAI^{dead}_i\,\cdot e^{- u/10}
 \end{equation}
 where $u$ is wind speed in ($m \cdot s^{-1}$).
 
-We will call total leaf area of a plant cohort $i$ ($LAI^{all}_{i}$) to the sum of dead and live expanded leaves of the cohort:
-\begin{equation}
-LAI^{all}_{i} = LAI^{\phi}_{i}+LAI^{dead}_{i}
-\end{equation}
 
-If there are $c$ plant cohorts, the leaf area index of the whole stand can be calculated for living leaves, expanded leaves, dead leaves and total leaf area as:
-\begin{eqnarray}
-LAI^{live}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{live}} \\
-LAI^{\phi}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{\phi}} \\
-LAI^{dead}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{dead}} \\
-LAI^{all}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{all}} = LAI^{\phi}_{stand}+LAI^{dead}_{stand}
-\end{eqnarray}
-
-Although simulations will normally start in winter and $GDD$ will be zero at the beginning, the user can specify a starting non-zero value for $GDD$ in the object created by function \texttt{spwbInput()}. Function `pheno_updateLeaves()` updates the status of expanded leaves and dead leaves in a simulation object.
+Although simulations will normally start in winter and $GDD$ will be zero at the beginning, the user can specify a starting non-zero value for $GDD$ in the object created by function `spwbInput()`. Function `pheno_updateLeaves()` updates the status of expanded leaves and dead leaves in a simulation object.
 
 ## Leaf vertical distribution {#leafdistribution}
 
-Crown base height ($H_{crown,i}$; in $cm$) of cohort $i$ is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort ($CR_i$; a proportion between 0 and 1), i.e. the ratio between crown length and total height (see eq. \@ref(eq:CrownHeight)). The leaf area of any plant cohort is assumed to be distributed vertically following a **truncated Gaussian function** whose standardized values -1.5 and 1.5 correspond to crown base height ($H_{crown,i}$) and total plant height ($H_i$), respectively. The model divides the vertical dimension into vertical layers (see control parameter `verticalLayerSize`). Let us define $LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}$ as the leaf area index of cohort $i$ in layer $j$. The truncated Gaussian distribution defines the $LAI_{i,j}^{\phi}$ and $LAI_{i,j}^{dead}$ for all plant cohorts and vertical layers.
+Crown base height ($H_{crown,i}$; in $cm$) of cohort $i$ is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort ($CR_i$; a proportion between 0 and 1), i.e. the ratio between crown length and total height (see eq. \@ref(eq:CrownHeight)). 
+
+The leaf area of any plant cohort is assumed to be distributed vertically following a **truncated Gaussian function** whose standardized values -1.5 and 1.5 correspond to crown base height ($H_{crown,i}$) and total plant height ($H_i$), respectively. The model divides the vertical dimension into vertical layers (see control parameter `verticalLayerSize`). Let us define $LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}$ as the leaf area index of cohort $i$ in layer $j$. The truncated Gaussian distribution defines the $LAI_{i,j}^{\phi}$ and $LAI_{i,j}^{dead}$ for all plant cohorts and vertical layers.
 
 Dividing the leaf area of a given layer by its width, one obtains the *leaf area density* ($LAD$ in $m^2 \cdot m^{-3}$). Figure \@ref(fig:leafareadensity) illustrates the leaf area density profile for an example forest stand (see function `vprofile_leafAreaDensity()`). 
 
@@ -50,14 +41,14 @@ plot_grid(g1, g2, nrow=1, ncol=2)
 The leaf area density profile determines the extinction rates of light through the forest canopy. The same truncated Gaussian distribution is used to distribute leaf and small branch biomass in the vertical dimension.
 
 ## Light extinction {#basiclightextinction}
-The proportion of photosynthetic active radiation (PAR) and short-wave radiation (SWR; 400-3000 nm) decreases through the canopy following thee Beer-Lambert’s light extinction equation. 
+The proportion of photosynthetically active radiation (PAR) and short-wave radiation (SWR; 400-3000 nm) decreases through the canopy following the Beer-Lambert’s light extinction equation. 
 $L^{PAR}_{ground}$, the proportion of PAR that reaches the ground, is calculated as:
 \begin{equation}
 L^{PAR}_{ground}=e^{-\sum_{i=1}^{c}{k_{PAR,i} \cdot LAI_{i}^{all}}}
 \end{equation}
 where $k_{PAR,i}$ is the PAR extinction coefficient of cohort $i$. 
 
-The proportion of shortwave radiation (SWR) energy absorbed by each plant cohort needs to be calculated to divide the transpiration of the stand among cohorts (chapter \@ref(transpirationgranier)), and the radiation absorbed by the soil is needed to calculate soil evaporation (section \@ref(soilevaporation)). Foliage absorbs a higher proportion of PAR than SWR; thus, the extinction coefficient is higher for PAR than for SWR. However, values for the ratio of extinction coefficients are rather constant. Following Friend et al. [-@Friend1997] it is assumed that the extinction coefficient for PAR is 1.35 times larger than that for SWR (i.e.
+The proportion of short-wave radiation (SWR) energy absorbed by each plant cohort needs to be calculated to divide the transpiration of the stand among cohorts (chapter \@ref(transpirationgranier)), and the radiation absorbed by the soil is needed to calculate soil evaporation (section \@ref(soilevaporation)). Foliage absorbs a higher proportion of PAR than SWR; thus, the extinction coefficient is higher for PAR than for SWR. However, values for the ratio of extinction coefficients are rather constant. Following Friend et al. [-@Friend1997] it is assumed that the extinction coefficient for PAR is 1.35 times larger than that for SWR (i.e.
 $k_{SWR,i} = k_{PAR,i}/1.35$). Figure \@ref(fig:lightextinction) shows the PAR and SWR extinction profiles (see functions `vprofile_PARExtinction()` and `vprofile_SWRExtinction()`) corresponding to the leaf area density distribution of Fig. \@ref(fig:leafareadensity). 
 
 ```{r lightextinction, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap="Light extinction in a forest stand. Note the sharper decrease of PAR (left panel) in comparison to SWR (right panel)"}
