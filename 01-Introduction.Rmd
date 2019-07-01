@@ -6,9 +6,9 @@ This chapter provides an overview of the purpose under the development of **medf
 
 ## Purpose
 
-Being able to anticipate the impact of global change on ecosystems is one of the major environmental challenges in contemporary societies. However, uncertainties in how ecological systems function and practical constraints in how to integrate available information prevent the development of robust and reliable predictive models. Despite the amount of knowledge accumulated about the functioning and dynamics of Mediterranean forests, scientists should make coordinate their efforts to address the challenge of integrating the different global change drivers in a modelling framework useful for research and applications.
+Being able to anticipate the impact of global change on ecosystems is one of the major environmental challenges in contemporary societies. However, uncertainties in how ecological systems function and practical constraints in how to integrate available information prevent the development of robust and reliable predictive models. Despite the amount of knowledge accumulated about the functioning and dynamics of Mediterranean forests, scientists should make coordinate their efforts to address the challenge of integrating the different global change drivers into modelling frameworks useful for research and applications.
 
-The R package **medfate** has been designed to simulate the functioning and dynamics of Mediterranean forest stands at temporal scales from days to years. Fire and drought impacts are the main subjects covered by the package, although eco-hydrological processes are fundamental for the simulation models included in the package. In particular, the package allows the simulation of water balance of soils and plants within forest stands. It also allows simulating plant growth of a set of cohorts competing for light and water within a forest stand. Finally, the package also includes functions to relate the amount of plant biomass and the relative water content of plant tissues to live fuel moisture content, hence, fire hazard.
+The R package **medfate** has been designed as a platform to simulate the functioning and dynamics of Mediterranean forest stands at temporal scales from days to years. Drought and impacts and fire hazard are the main subjects covered by the package and the eco-hydrological processes surrounding these are fundamental for the simulation models included in the package. In particular, the package allows the simulation of water balance of soils and plants within forest stands. It also allows simulating plant growth of a set of cohorts competing for light and water within a forest stand. Finally, the package also includes functions to relate the amount of plant biomass and the relative water content of plant tissues to live fuel moisture content, hence, fire hazard.
 
 The version of the reference manual that you are reading is intended to reflect **version `r packageVersion("medfate")`** of the package.
 
@@ -35,17 +35,21 @@ devtools::install_github("vegmod/medfate",
 
 ## Package functions
 
+### Implementation
+
+The package has a user interface in R, but actual calculations have been implemented as C++ functions and linked to R via the **Rcpp** package. 
+
 ### Dynamic simulation functions
 
-Forest water and energy balance can be studied for a given forest stand using function `spwb()`. This function allows simulating vertical hydrological processes and some plant physiological processes (hydraulics, photosynthesis and stomatal regulation).  The same function is used to run two models of different degree of complexity, from which the user should choose depending on the intended application. Most processes are implemented at the daily scale, although others operate at subdaily steps.
+Forest water and energy balance can be studied for a given forest stand using function `spwb()`. This function allows simulating vertical hydrological processes (rainfall interception, soil infiltration, percolation and evapotranspiration) and plant physiological processes related to plant transpiration (hydraulics, photosynthesis and stomatal regulation).  The same function is used to run two models of different degree of complexity, from which the user should choose depending on the intended application. Most processes are implemented at the daily scale, although some operate at subdaily steps. Function `spwb()` has a closely related function `spwb.day()` that allows simulating processes day by day.
 
-Changes in leaf area and plant growth are key to evaluate the influence of climatic conditions on forest structure and function. Function `growth()` extends the previous models because it allows simulating  growth of a set of plant cohorts competing for light and water in a given forest stand. It can be used to forecast temporal variation in water fluxes and soil water content in forest stands while taking into account processes determining leaf area changes and plant growth.
+Changes in leaf area and plant growth are key to evaluate the influence of climatic conditions on forest structure and function. Function `growth()` extends the previous models because it allows simulating the growth of a set of plant cohorts competing for light and water in a given forest stand. It can be used to forecast temporal variation in water fluxes and soil water content in forest stands while taking into account processes determining leaf area changes and plant growth. Importantly, `growth()` function and the processes that it implements are still **under development**.
 
-While all simulation functions in the package focus on particular forest stands and vertical hydrological processes, the package has been designed so that it could be part of a broader modelling framework including lateral water flows.
+While all simulation functions in the package focus on particular forest stands and vertical hydrological processes, the package has been designed so that it could be part of a broader modelling framework including *spatial processes* such as lateral water flows.
 
 ### Sub-model functions
 
-Many of the functions included in **medfate** are internally called by simulation functions. Some of them are made available to the user, to facilitate understanding the different sub-models and to facilitate a more creative use of the package. Sub-model functions are grouped by *subject*, which is included in the name of the function. The different sub-model functions are (by subject):
+Many of the sub-models included in **medfate** are implemented as C++ functions and internally called by the simulation functions. Most of them have, however, an R interface to made them available to the user. This facilitates understanding the different sub-models and a more creative use of the package. Sub-model functions are grouped by *subject*, which is included in the name of the function. The different sub-model functions are (by subject):
 
 * `biophysics_*`: Physical and biophysical utility functions.
 * `hydraulics_*`: Plant hydraulics.
@@ -61,7 +65,7 @@ Many of the functions included in **medfate** are internally called by simulatio
 
 ### Static functions
 
-Package **medfate** include a number of functions to examine properties of the plants conforming forests, summary functions at the stand level or vertical profiles of several physical properties:
+Package **medfate** includes a number of functions to examine static properties of plants conforming forests, summary functions at the stand level or vertical profiles of several physical properties:
 
 * `plant_*`: Cohort-level information (species name, id, leaf area, height...).
 * `species_*`: Cohort-level attributes aggregated by species (e.g. basal area).
@@ -75,6 +79,3 @@ Vegetation functioning and dynamics have strong, but complex, effects on fire ha
 3. Crown fire behavior.
 4. Fire potential ratings of surface fire behavior and crown fire behavior.
 
-### Implementation
-
-The package has a user interface in R, but simulation functions and many calculations have been implemented in C++ and linked to R via the **Rcpp** package. 
