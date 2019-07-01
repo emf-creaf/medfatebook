@@ -2,9 +2,11 @@
 
 Leaf phenology determines seasonal variations in the surface area of leaves, hence influencing the energy and water exchange between plants and the atmosphere. Light extinction is an important process to consider in a model where plants have different heights. The two processes are currently dealt with in a very simple way. 
 
-## Leaf phenology and leaf fall {#leafphenology}
+## Growth degree days
 
-Given a base temperature ($T_{base} = 5^{\circ} \mathrm{C}$), the growth degree days ($GDD$) are zero for all those days where mean temperature $T_{mean}$ is below $T_{base}$ and start increasing when temperatures become warmer than this threshold. In other words, the $GDD$ function accumulates $\max(0.0, T_{mean} - T_{base})$ for all days previous to the current one. At the end of a year the cummulative value is set again to zero. 
+Given a base temperature ($T_{base} = 5^{\circ} \mathrm{C}$), the growth degree days ($GDD$, in $^{\circ} \mathrm{C}$) are zero for all those days where mean temperature $T_{mean}$ is below $T_{base}$ and start increasing when temperatures become warmer than this threshold. In other words, the $GDD$ function accumulates $\max(0.0, T_{mean} - T_{base})$ for all days previous to the current one. At the end of a year the cummulative value $GDD$ is set again to zero. 
+
+## Leaf phenology and leaf fall {#leafphenology}
 
 Plant species can have either *evergreen* or *winter-deciduous* phenology. Evergreen plants maintain constant leaf area over the year, whereas in deciduous plants leaf-phenological status is updated daily, represented by $\phi_i$, the fraction of maximum leaf area (see function `pheno_leafDevelopmentStatus()`). Leaf area index ($LAI$) values of deciduous plants are adjusted for leaf phenology following [@Prentice1993; @Sitch2003]:
 
@@ -41,7 +43,7 @@ g2<-vprofile_SWRExtinction(exampleforest, SpParamsMED, z = seq(0,1000, by=1))
 plot_grid(g1, g2, nrow=1, ncol=2)
 ```
 
-To calculate radiation absorption, where the vertical dimension of the plot is divided into layers (as explained for leaf area distribution), and the SWR absorbed is calculated for each plant cohort in each layer. Let $n$ be the number of canopy layers. The fraction of radiation incident on layer $j$ that is absorbed in the same layer is:
+To calculate radiation absorption, where the vertical dimension of the plot is divided into layers (as explained in \@ref(leafdistribution)), and the SWR absorbed is calculated for each plant cohort in each layer. Let $l$ be the number of vertical layers. The fraction of radiation incident on layer $j$ that is absorbed in the same layer is:
 \begin{equation}
 f_j=1 - e^{-\sum_{i=1}^{c}{k_{SWR,i} \cdot LAI_{i,j}^{all}}}
 \end{equation}
@@ -52,7 +54,7 @@ f_{ij} = f_j \cdot \frac{k_{SWR,i}\cdot LAI_{i,j}^{\phi}}{\sum_{h=1}^{c}{k_{SWR,
 \end{equation}
 The fraction of canopy radiation absorbed by a plant cohort $i$ across all layers is found by adding the fraction absorbed in each layer:
 \begin{equation}
-f_i = \sum_{j=1}^{n}{f_{ij}\cdot \prod_{h>j}^{n}{(1-f_h)}}
+f_i = \sum_{j=1}^{l}{f_{ij}\cdot \prod_{h>j}^{l}{(1-f_h)}}
 \end{equation}
 where for each layer the fraction of the radiation incident in the canopy that
 reaches the layer is found by multiplying the transmitted fractions across the
@@ -65,7 +67,7 @@ caswrf
 The proportion of (shortwave) net radiation absorbed by the
 ground is simply:
 \begin{equation}
-L^{SWR}_{ground} = 1 - \sum_{j}^{n}{f_j}
+L^{SWR}_{ground} = 1 - \sum_{j}^{l}{f_j}
 \end{equation}
 which in our example would be:
 ```{r, echo=FALSE}
