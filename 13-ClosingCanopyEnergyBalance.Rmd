@@ -1,6 +1,6 @@
 # Closing canopy and soil energy balances {#closecanopysoilenergybalance}
 
-In chapter \@ref(radiationbalance) we described the details of radiation energy exchanges. Plant transpiration is an important latent heat component of the canopy energy balance, and the details of how plant transpiration is determined were given in chapters \@ref(planthydraulics), \@ref(plantphotosynthesis) and \@ref(transpirationsperry). We devote the first part of the current chapter to describe the calculations of convective and latent heat energy exchanges. These are the remaining energy exchange components to close the energy balance of the canopy (eq. \@ref(eq:canopyenergybalance)) and the soil (eq. \@ref(eq:soilenergybalance)). Temperature changes applied to the canopy and soil layers are also described here.
+In chapter \@ref(radiationbalance) we described the details of radiation energy exchanges. Plant transpiration is an important latent heat component of the canopy energy balance, and the details of how plant transpiration is determined were given in chapters \@ref(planthydraulics), \@ref(plantphotosynthesis) and \@ref(transpirationsperry). We devote the first part of the current chapter to describe the calculations of convective and latent heat energy exchanges. These are the remaining energy exchange components to close the energy balance of the canopy (eq. \@ref(eq:canopyenergybalance)) and of soil layers (eqs. \@ref(eq:soilenergybalance) and \@ref(eq:deepsoilenergybalance)). Temperature changes applied to the canopy and soil layers are also described here.
 
 ## Convective energy
 
@@ -24,34 +24,36 @@ LE_{sa} = \lambda_v(T_{soil}) \cdot Es_{step} + \lambda_{f} \cdot Sm_{step}
 \end{equation}
 where $\lambda_v(T_{soil})$ is the latent heat of vaporization at temperature $T_{soil}$ and $\lambda_{f} = 0.33355J·kg^{-1}$ is the latent heat of fusion. As before, daily evaporation from bare soil ($Es$) and snow melt water equivalent ($Sm$) are divided into time steps according to the proportion of shortwave radiation absorbed by the soil layer each step.
 
-## Canopy capacitance and temperature changes {#canopycapacitancetemperature}
+## Canopy temperature changes {#canopycapacitancetemperature}
 
-After evaluating the canopy energy balance equation \@ref(eq:canopyenergybalance) one has to translate energy balance into temperature variation of the canopy, hence:
+After evaluating the canopy energy balance equation \@ref(eq:canopyenergybalance) one has to translate energy balance into temperature variation of the canopy. Rearranging the same equation and expressing it in discrete time steps we have:
 \begin{equation}
 \Delta T_{canopy} =  \Delta t_{step} \cdot \frac{K_{abs,ca} + (L_{abs,ca} - L_{em,c}) + (L_{abs,cs} - L_{em,c}) - LE_{c} - H_{ca} - H_{cs}}{C_{canopy}}
 \end{equation}
-where $C_{canopy}$ is the canopy thermal capacitance and $\Delta t_{step} = 86400/n_t$ is the size of the time step in seconds. Canopy thermal capacitance depends on the leaf area index of the stand:
+where $C_{canopy}$ is the canopy thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$) and $\Delta t_{step} = 86400/n_t$ is the size of the time step in seconds. Canopy thermal capacitance depends on the leaf area index of the stand:
 \begin{equation}
 C_{canopy} = C_{LAI} \cdot \frac{0.8 \cdot LAI_{stand} + 1.2 \cdot (LAI_{stand}^{phi} + \cdot LAI_{stand}^{dead})}{2}
 \end{equation}
 where $C_{LAI}$ is the thermal capacitance per LAI unit, which is specified by the control parameter `thermalCapacityLAI`. By using both the maximum leaf area of the stand, $LAI_{stand}$, and its current live/dead leaf area ($LAI_{stand}^{phi}+LAI_{stand}^{dead}$) it is assumed that part of thermal capacitance corresponds to stems and branches, so that capacitance does not drop to zero for deciduous canopies.
 
 ## Soil temperature changes
-
-Instantaneous soil temperature changes on each soil layer $s$ depend on the balance between incoming and outcoming energies ($G_s$ and $G_{s-1}$):
+Analogously to the canopy, the change in temperature for a given soil layer $s$ in the current time step is given by rearranging eq. \@ref(eq:deepsoilenergybalance):
 \begin{equation}
-C_{soil,s} \cdot \frac{\delta T_{soil,s}}{\delta t} = \frac{G_s - G_{s-1}}{d_s}
+\Delta T_{soil,s} = \Delta t_{step} \cdot \frac{G_{s-1,s} - G_{s,s+1}}{C_{soil,s}}
 \end{equation}
-where $d_s$ is the soil width of layer $s$ and $C_{soil,s}$ is the *thermal capacity* of layer $s$, calculated from soil moisture and texture following a simplification of @Cox1999 (see function `soil_thermalcapacity()`).
-
-Energy inflow to the first layer (i.e. $G_0$) is the result of the soil energy balance equation \@ref(eq:soilenergybalance), while energy transfers between layers (i.e. $G_s$) depend on the soil temperature gradient:
-\begin{eqnarray}
-G_0 &=&  K_{abs,sa} + L_{abs,sa} - L_{em,s} + L_{abs,sc} + H_{cs} - LE_{s} \\
-G_k &=& \lambda_{soil,s} \cdot \frac{\delta T_{soil,s}}{\delta z}
-\end{eqnarray}
-where $\lambda_{soil,s}$ is the *thermal conductivity* of layer $s$, calculted from soil moisture and texture following @Dharssi2009 (see function `soil_thermalconductivity`). The gradient in the bottom layer is calculated assuming a temperature of the earth (at 10 m) of 15.5 Celsius.
-
-The change in temperature for a given soil layer $s$ in the current time step is simply:
+where the energy balance on each soil layer $s$ depends on the balance between energy coming from above ($G_{s-1,s}$) and energy going to below ($G_{s,s+1}$) and $C_{soil,s}$, the thermal capacitance of soil layer $s$. Energy inflow to the first (uppermost) layer (i.e. $G_{0,1}$) is the result of energy exchanges between the soil layer and the canopy and atmosphere, i.e. from eq. \@ref(eq:soilenergybalance):
 \begin{equation}
-\Delta T_{soil,s} = \Delta t_{step} \cdot \frac{\delta T_{soil,s}}{\delta t}
+G_{0,1} =  K_{abs,sa} + L_{abs,sa} - L_{em,s} + L_{abs,sc} + H_{cs} - LE_{s}
 \end{equation}
+Heat conduction between layers $s$ and $s+1$ (i.e. $G_{s,s+1}$) depend on the soil temperature gradient (see function `soil_temperatureGradient()`:
+\begin{equation}
+G_{s,s+1} = \lambda_{soil,s} \cdot  \frac{\delta T_{soil,s}}{\delta z} = \lambda_{soil,s} \cdot \frac{T_{soil,s} - T_{soil,s+1}}{(Z_{s-1} - Z_{s+1})/2}
+\end{equation}
+where $Z_{s-1}$ and $Z_{s+1}$ are expressed in $m$ and $\lambda_{soil,s}$ is the *thermal conductivity* of layer $s$, calculted from soil moisture and texture following @Dharssi2009 (see function `soil_thermalconductivity()`). The gradient in the lowermost layer is calculated assuming a temperature of the earth (at 10 m) of 15.5 Celsius.
+
+Finally, $C_{soil,s}$ the thermal capacitance of soil layer $s$ is calculated as:
+\begin{equation}
+C_{soil,s} = VTC_{soil,s} \cdot d_s
+\end{equation}
+where $d_s$ is the soil width of layer $s$ (expressed in $m$) and $VTC_{s}$ is the *volumetric thermal capacity* of soil layer $s$ (in $J \cdot m^{-3} \cdot K^{-1}$), calculated from soil moisture and texture following a simplification of @Cox1999 (see function `soil_thermalcapacity()`).
+

@@ -5,10 +5,11 @@ The following tables list all symbols used in this document, along with their un
 
 ## Soils
 
-| Symbol | Units | R param | Description                        |
+| Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
 | $S$    |  | | Number of soil layers |
-| $d_{s}$ | $mm$ | `widths` | Soil layer width in soil layer $s$ |
+| $d_{s}$ | $mm$ | `widths` | Width of soil layer $s$ |
+| $Z_{s}$ | $mm$ | `widths` | Depth of soil layer $s$ |
 | $Z_{soil}$ | $mm$ |  | Overall soil depth |
 | $P_{clay,s}$ | % | `clay`|  Percent of clay in soil layer $s$ |
 | $P_{sand,s}$ | % | `sand` | Percent of sand in soil layer $s$ |
@@ -38,7 +39,7 @@ The following tables list all symbols used in this document, along with their un
 
 ## Vegetation
 
-| Symbol | Units | R param | Description                        |
+| Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
 | $c$ | | | Number of plant cohorts |
 | $SP_i$  |  | `Species` | Species identity of cohort $i$ |
@@ -64,7 +65,7 @@ The following tables list all symbols used in this document, along with their un
 | $LAI^{\phi}_{stand}$ | $m^2 \cdot m^{-2}$ | | Current expanded leaf area index of live leaves of the stand |
 | $LAI_{stand}$ | $m^2 \cdot m^{-2}$ | | Total leaf area index (live or dead) of the stand |
 | $LA_{i}$ | $m^{2}$ | | Leaf area of an individual of cohort $i$ |
-| $v_{i,s}$ | [0-1] | `V[i,s]` | The proportion of fine roots of cohort $i$ in soil layer $s$ |
+| $FRP_{i,s}$ | [0-1] | `V[i,s]` | The proportion of fine roots of cohort $i$ in soil layer $s$ |
 | $W_{i}$ | $kg \cdot m^{-2}$ | | Fine fuel biomass of cohort $i$ |
 | $Z_{50,i}$ | mm | `Z50` | Depth above which 50% of the fine root mass of cohort $i$ is located |
 | $Z_{95,i}$ | mm | `Z95` | Depth above which 95% of the fine root mass of cohort $i$ is located |
@@ -73,7 +74,7 @@ The following tables list all symbols used in this document, along with their un
 ## Meteorology
 
 
-| Symbol | Units | R param | Description                        |
+| Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
 | $T_{mean}$ | $^{\circ} \mathrm{C}$ | `MeanTemperature` | Mean temperature |
 | $T_{min}$ | $^{\circ} \mathrm{C}$ | `MinTemperature` | Minimum temperature |
@@ -95,7 +96,7 @@ The following tables list all symbols used in this document, along with their un
 
 ## Anatomy 
 
-| Symbol | Units | R param | Description                        |
+| Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
 | $HV$  | $m^2 \cdot m^{-2}$ | `1/Al2As` | Huber value (ratio of sapwood area to leaf area) |
 |  $LW$   | $cm$  | `LeafWidth` | Leaf width |
@@ -107,7 +108,7 @@ The following tables list all symbols used in this document, along with their un
 
 ## Light extinction
 
-| Symbol | Units | R param | Description                        |
+| Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
 | $l$ | | | Number of vertical layers for leaf distribution and light extinction |
 | $k_{PAR,i}$ | | `kPAR` | PAR extinction coefficient for cohort $i$ |
@@ -127,7 +128,7 @@ The following tables list all symbols used in this document, along with their un
 
 ## Hydrology and water balance
 
-| Symbol | Units | R param | Description                        |
+| Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
 | $Ps$ | $mm$ | `Snow`| Precipitation as snow |
 | $Pr$ | $mm$ | `Rain`| Precipitation as rainfall |
@@ -139,37 +140,39 @@ The following tables list all symbols used in this document, along with their un
 | $Dd$ | $mm$ | `DeepDrainage` | Water exported from the stand as deep drainage |
 | $P_G$ | $mm$ | | Amount of rainfall needed to saturate the canopy for a given event |
 | $S_{canopy}$ | $mm$ | `Cm` | Canopy water storage capacity |
-| $ER_{ratio}$ | |  | Ratio between evaporation rate and rainfall rate |  
+| $ER_{ratio}$ | (unitless) |  | Ratio between evaporation rate and rainfall rate |  
 | $C_{canopy}$ | [0-1] | | Canopy cover | 
 | $PE_{soil}$ | $mm$ | | Evaporation demand from the soil |
 | $SE_{soil}$ | $mm$ | | Evaporation supply from the soil |
 | $t_{soil}$ | $day$ | | Time needed to evaporate the current water deficit in the first soil layer |
 | $Es$ | $mm$ | `SoilEvaporation` | Evaporation from the soil surface |
 
-## Energy balance
+## Canopy and soil energy balance
 
-| Symbol | Units | R param | Description                        |
+| Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
-| $K_{abs,ca}$ | $W$ | `SWRcanin` |  Atmosphere shortwave radiation absorbed by the canopy |
-| $K_{abs,sa}$ | $W$ | `SWRsoilin`  |  Atmosphere shortwave radiation absorbed by the soil |
-| $L_{abs,ca}$ | $W$ | `LWRcanin`  |  Atmosphere longwave radiation absorbed by the canopy |
-| $L_{abs,sa}$ | $W$ | `LWRsoilin` |  Atmosphere longwave radiation absorbed by the soil |
-| $L_{abs,cs}$ | $W$ | `LWRsoilcan`|  Longwave radiation emmited by the soil and absorbed by the canopy |
-| $L_{em,c}$ | $W$ | `LWRcanout` |  Longwave radiation emmited by the canopy |
-| $L_{em,s}$ | $W$ | `LWRsoilout`|  Longwave radiation emmited by the soil |
-| $H_{ca}$ | $W$ | `Hcan` |  Convective heat exchange between the canopy and the atmosphere |
-| $H_{cs}$ | $W$ | `Hcansoil` |  Convective heat exchange between the canopy and the soil |
-| $LE_{ca}$ | $W$ | `LEcan`| Energy released as latent heat from the canopy towards the atmosphere |
-| $LE_{sa}$ | $W$ | `LEsoil` | Energy released as latent heat from the soil towards the atmosphere |
+| $K_{abs,ca}$ | $W \cdot m^{-2}$ | `SWRcanin` |  Atmosphere shortwave radiation absorbed by the canopy |
+| $K_{abs,sa}$ | $W \cdot m^{-2}$ | `SWRsoilin`  |  Atmosphere shortwave radiation absorbed by the soil |
+| $L_{abs,ca}$ | $W \cdot m^{-2}$ | `LWRcanin`  |  Atmosphere longwave radiation absorbed by the canopy |
+| $L_{abs,sa}$ | $W \cdot m^{-2}$ | `LWRsoilin` |  Atmosphere longwave radiation absorbed by the soil |
+| $L_{abs,cs}$ | $W \cdot m^{-2}$ | `LWRsoilcan`|  Longwave radiation emmited by the soil and absorbed by the canopy |
+| $L_{em,c}$ | $W \cdot m^{-2}$ | `LWRcanout` |  Longwave radiation emmited by the canopy |
+| $L_{em,s}$ | $W \cdot m^{-2}$ | `LWRsoilout`|  Longwave radiation emmited by the soil |
+| $H_{ca}$ | $W \cdot m^{-2}$ | `Hcan` |  Convective heat exchange between the canopy and the atmosphere |
+| $H_{cs}$ | $W \cdot m^{-2}$ | `Hcansoil` |  Convective heat exchange between the canopy and the soil |
+| $LE_{ca}$ | $W \cdot m^{-2}$ | `LEcan`| Energy released as latent heat from the canopy towards the atmosphere |
+| $LE_{sa}$ | $W \cdot m^{-2}$ | `LEsoil` | Energy released as latent heat from the soil towards the atmosphere |
 | $T_{atm}$ | $^\circ \mathrm{C}$ | | Above-canopy air temperature |
 | $T_{canopy}$ | $^\circ \mathrm{C}$ | | Canopy temperature |
 | $T_{soil,s}$ | $^\circ \mathrm{C}$ | | Temperature of soil layer $s$ |
-| $C_{canopy}$ | $J \cdot m^{-3} \cdot K^{-1}$ | | Canopy thermal capacity (revise units) |
-| $C_{soil}$ | $J \cdot m^{-3} \cdot K^{-1}$ | | Soil thermal capacity |
+| $C_{canopy}$ | $J \cdot m^{-2} \cdot K^{-1}$ | | Canopy thermal capacitance |
+| $C_{LAI}$ | $J \cdot m^{-2} \cdot K^{-1}$ | `thermalcapacityLAI` | Canopy thermal capacitance per LAI unit |
+| $C_{soil,s}$ | $J \cdot m^{-2} \cdot K^{-1}$ | | Thermal capacitance of soil layer $s$ |
+| $VHC_{soil,s}$ | $J \cdot m^{-3} \cdot K^{-1}$ | | Volumetric heat capacity of soil in layer $s$|
 
 ## Plant hydraulics
 
-| Symbol | Units | R param | Description                        |
+| Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
 | $K_{stem,max,ref}$ | $kg \cdot s^{-1} \cdot m^{-1} \cdot MPa^{-1}$ | `Kmax_stemxylem` | Maximum stem sapwood reference conductivity per leaf area unit |
 | $K_{root,max,ref}$ | $kg \cdot s^{-1} \cdot m^{-1} \cdot MPa^{-1}$ | `Kmax_rootxylem` | Maximum root sapwood reference conductivity per leaf area unit |
@@ -198,7 +201,7 @@ The following tables list all symbols used in this document, along with their un
 
 ## Leaf/plant photosynthesis
 
-| Symbol | Units | R param | Description                        |
+| Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
 | $J_{max}$ | $\mu mol\,e \cdot m^{-2} \cdot s^{-1}$ | `Jmax` | Maximum rate of electron transport at current leaf temperature |
 | $V_{max, 298}$ | $\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$ | `Vmax` | Rubisco's maximum carboxylation rate at current leaf temperature |
@@ -218,7 +221,7 @@ The following tables list all symbols used in this document, along with their un
 
 ## Plant water content
 
-| Symbol | Units | R param | Description                        |
+| Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
 | $\epsilon_{leaf}$ | MPa | `LeafEPS` | Modulus of elasticity of leaves |
 | $\epsilon_{stem}$ | MPa | `StemEPS` | Modulus of elasticity of symplastic xylem tissue |
@@ -233,7 +236,7 @@ The following tables list all symbols used in this document, along with their un
 
 ## Stomatal regulation
 
-| Symbol | Units | R param | Description                        |
+| Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
 | $\theta_1$, $\theta_2$  | [0-1] | | Cost functions 1 and 2 |
 | $\beta$  | [0-1] | | Gain function. |
