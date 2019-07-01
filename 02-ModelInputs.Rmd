@@ -154,7 +154,7 @@ Among them, the most important items are two data frames, `treeData` (for trees)
 While not strictly necessary, forest objects are a convenient format to start calculations with **medfate**, because there are many static functions that take forest objects as input. The package includes functions to facilitate mapping variables in user data into tables `treeData` and `shrubData` (see function `forest_mapWoodyTables()`).
 
 
-### Leaf vertical distribution {#leafdistribution}
+### Vertical leaf distribution {#leafdistribution}
 
 Crown base height ($H_{crown,i}$; in $cm$) of cohort $i$ is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort ($CR_i$; a proportion between 0 and 1), i.e. the ratio between crown length and total height (see eq. \@ref(eq:CrownHeight)). 
 
@@ -171,7 +171,7 @@ plot_grid(g1, g2, nrow=1, ncol=2)
 
 The leaf area density profile determines the extinction rates of light through the forest canopy. The same truncated Gaussian distribution is used to distribute leaf and small branch biomass in the vertical dimension.
 
-### Vertical root distribution
+### Vertical root distribution {#rootdistribution}
 
 The root system of each plant cohort $i$ is described using the proportion of fine roots in each soil layer $s$: $v_{i,s}$. The proportions $v_{i,s}$ are normally defined using the linear dose response model [@Schenk2002; @Collins2007]: 
 \begin{equation}
@@ -193,15 +193,16 @@ legend("bottomright", legend=c("Z50 = 100, Z95 = 200",
        "Z50 = 200, Z95 = 1500"), col=c("black","red"), lty=1:2, bty="n")
 ```
 
-Note, however, that the actual input to simulation functions is the matrix of $v_{i,s}$ values - not $Z_{50,i}$ and $Z_{95,i}$ -, which means that the proportions of fine roots can be modified manually or be defined by another model. In fact, **medfate** also allows calculating $v_{i,s}$ values assuming a conic distribution of fine roots (see `root_conicDistribution()`), as shown in fig. \@ref(fig:root-distribution) above. 
+
+Note that the actual input to simulation functions is the matrix of $v_{i,s}$ values - not $Z_{50,i}$ and $Z_{95,i}$ -, which means that the proportions of fine roots can be modified manually or be defined by another model. In fact, **medfate** also allows calculating $v_{i,s}$ values assuming a conic distribution of fine roots (see `root_conicDistribution()`), as shown in fig. \@ref(fig:root-distribution) above. 
 
 
 
 ### Functional traits and vegetation initialization {#functionaltraits}
 
-Besides the physical representation of vegetation, forest ecosystem models require information regarding vegetation functioning, because this influences the outcome of biophysical, physiological and hydrological processes. In the following chapters, we will indicate for each simulated process its required functional parameters. Normally, functional traits are described at the species level because infra-specific parameters are hard to get. Even at the species level, many hard (e.g. physiological) traits are hard to obtain, so in **medfate** we provide a default species parameter table for woody species found in Catalonia, with many of them occurring elsewhere in the Mediterranean Basin (`SpParamsMED`). User can modify this data frame to account for intra-specific trait variation (see function `modifySpParams()`). 
+Besides the physical representation of vegetation, forest ecosystem models require information regarding vegetation functioning, because this influences the outcome of biophysical, physiological and hydrological processes. In the following chapters, we will indicate for each simulated process its required functional parameters. Normally, functional traits are described at the species level because infra-specific parameters are hard to get. Even at the species level, many functional (e.g. physiological) traits are hard to obtain, so in **medfate** we provide a default species parameter table for woody species found in Catalonia, with many of them occurring elsewhere in the Mediterranean Basin (`SpParamsMED`). User can modify this data frame to account for intra-specific trait variation (see function `modifySpParams()`). 
 
-The package provides functions `spwbInput()` and `growthInput()` that prepare the vegetation input for simulation functions `spwb()` and `growth()`, respectively. This initialization mostly consists in compiling the necessary functional traits from the species parameter table, following the species (or species group) attribute of plant cohorts. Some new parameters are derived from others but take into account the structural attributes of cohorts (an example of these derived quantities is stem conductance, which estimated from stem xylem conductivity and other attributes). Users can modify the output of these initialization functions to modify values for specific plant cohorts, either the species parameters or cohort specific parameters (see function `modifyCohortParams()`). 
+The package provides functions `spwbInput()` and `growthInput()` that prepare the vegetation input for simulation functions `spwb()` and `growth()`, respectively. This initialization mostly consists in compiling the necessary functional traits from the species parameter table, following the $SP_i$ attribute of plant cohorts. Some new model parameters are estimated from the initial ones, while taking into account the structural attributes of cohorts (an example of these derived quantities is stem conductance, which estimated from stem xylem conductivity, Huber value and plant height). Users can take the output of these initialization functions and replace parameter values for specific plant cohorts (see function `modifyCohortParams()`). 
 
 ### Update of structural variables during simulations
 
@@ -209,7 +210,9 @@ Vegetation characteristics stay constant during simulations using function `spwb
 
 In contrast, growth simulation requires updating the structure of vegetation, i.e. heights, tree diameters and shrub cover. Function `growth()` can modify any of the vegetation attributes.
 
+
 ## Metereological input {#meteoinput}
+
 Weather input data must include variables calculated at the **daily** scale. Data should be arranged in a data frame with days in rows and variables in columns. The following table indicates the symbols, units, definitions and the variable name in R.
 
 | Symbol | Units | R param | Description                        |
