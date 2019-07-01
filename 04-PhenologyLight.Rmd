@@ -23,22 +23,6 @@ where $u$ is wind speed in ($m \cdot s^{-1}$).
 
 Although simulations will normally start in winter and $GDD$ will be zero at the beginning, the user can specify a starting non-zero value for $GDD$ in the object created by function `spwbInput()`. Function `pheno_updateLeaves()` updates the status of expanded leaves and dead leaves in a simulation object.
 
-## Leaf vertical distribution {#leafdistribution}
-
-Crown base height ($H_{crown,i}$; in $cm$) of cohort $i$ is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort ($CR_i$; a proportion between 0 and 1), i.e. the ratio between crown length and total height (see eq. \@ref(eq:CrownHeight)). 
-
-The leaf area of any plant cohort is assumed to be distributed vertically following a **truncated Gaussian function** whose standardized values -1.5 and 1.5 correspond to crown base height ($H_{crown,i}$) and total plant height ($H_i$), respectively. The model divides the vertical dimension into vertical layers (see control parameter `verticalLayerSize`). Let us define $LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}$ as the leaf area index of cohort $i$ in layer $j$. The truncated Gaussian distribution defines the $LAI_{i,j}^{\phi}$ and $LAI_{i,j}^{dead}$ for all plant cohorts and vertical layers.
-
-Dividing the leaf area of a given layer by its width, one obtains the *leaf area density* ($LAD$ in $m^2 \cdot m^{-3}$). Figure \@ref(fig:leafareadensity) illustrates the leaf area density profile for an example forest stand (see function `vprofile_leafAreaDensity()`). 
-
-```{r leafareadensity, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap="Leaf area density distribution in a forest stand. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution."}
-g1<-vprofile_leafAreaDensity(exampleforest, SpParamsMED, z = seq(0,1000, by=1), byCohorts = T)
-g1 <- g1 + theme(legend.background = element_blank(), legend.position = c(0.8,0.8))
-g2<-vprofile_leafAreaDensity(exampleforest, SpParamsMED, z = seq(0,1000, by=1))
-plot_grid(g1, g2, nrow=1, ncol=2)
-```
-
-The leaf area density profile determines the extinction rates of light through the forest canopy. The same truncated Gaussian distribution is used to distribute leaf and small branch biomass in the vertical dimension.
 
 ## Light extinction {#basiclightextinction}
 The proportion of photosynthetically active radiation (PAR) and short-wave radiation (SWR; 400-3000 nm) decreases through the canopy following the Beer-Lambert’s light extinction equation. 
@@ -61,7 +45,7 @@ To calculate radiation absorption, where the vertical dimension of the plot is d
 \begin{equation}
 f_j=1 - e^{-\sum_{i=1}^{c}{k_{SWR,i} \cdot LAI_{i,j}^{all}}}
 \end{equation}
-where $LAI_{i,j}$ is the leaf area index of cohort $i$ in layer $j$. Hence, the fraction transmitted is $(1-f_j)$. The fraction of radiation incident on layer $j$ that is absorbed by expanded leaves of plant cohort $i$ in that layer ($f_{ij}$) is calculated from the relative
+where $LAI_{i,j}^{all}$ is the leaf area index of cohort $i$ in layer $j$. Hence, the fraction transmitted is $(1-f_j)$. The fraction of radiation incident on layer $j$ that is absorbed by expanded leaves of plant cohort $i$ in that layer ($f_{ij}$) is calculated from the relative
 contribution of these leaves to the total absorption in the layer:
 \begin{equation}
 f_{ij} = f_j \cdot \frac{k_{SWR,i}\cdot LAI_{i,j}^{\phi}}{\sum_{h=1}^{c}{k_{SWR,h} \cdot LAI_{h,j}^{all}}}

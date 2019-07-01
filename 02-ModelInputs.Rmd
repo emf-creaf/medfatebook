@@ -1,33 +1,41 @@
 # Model inputs
 
-Data input for process-based models of forest functioning and dynamics can be described using three broad categories. First, a description of the target **vegetation** is needed, at a level of detail appropriate for the model design. This includes not only species composition and/or structure, but also functional parameters of the plants. Second, most often **soil** information is required, specially if underground resources (i.e. water and/or nutrients) are important for the processes included in the model. While soil and vegetation features are sometimes considered static parameters in model simulations, **meteorology** is most often a dynamic input which defines the temporal variation of environmental conditions in which biological processes occur. Topographic variables may also be needed if internal calculations of physical variables, such as atmospheric pressure or potential radiation, require them. This chapter describes the requirements of **medfate** package with respect to each of these kinds of input. The last section describes additional parameters that are used to control the behaviour of simulation functions, such as `spwb()` and `growth()`.
+Data input for process-based models of forest functioning and dynamics can be grouped into four categories. First, a description of the  **vegetation** existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Second, most often **soil** information is required, specially if underground resources (i.e. water and/or nutrients) are important for the processes included in the model. While soil and vegetation features are sometimes considered static parameters in model simulations, **meteorology** is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur. Finally, **topographic and geographic information** may be needed if internal calculations of physical variables (such as atmospheric pressure or potential radiation) require them or, more generally, if the processes implemented depend on this information. 
+
+This chapter describes the requirements of **medfate** package with respect to each of these kinds of input. The last section describes additional parameters that are used to control the behaviour of simulation functions, such as `spwb()` and `growth()`.
 
 ## Latitude and topography {#topoinput}
 
-Topography has a relatively small direct influence in **medfate** simulations, because topographic effects are assumed to be taken into account in the estimation of meteorological input. Nevertheless, *elevation* in meters is needed to estimate atmospheric pressure and air density (see \@ref(meteoinput)), whereas *aspect* (in degrees from North) and *slope* (also in degrees) are needed in addition to *latitude* (also in degrees North) to estimate sunrise/sunset hours and potential radiation in advanced water balance modelling.
+Topography has a relatively small direct influence in **medfate** simulations, because most topographic effects are assumed to be taken into account in the estimation of meteorological input. Nevertheless, *elevation* in meters is needed to estimate atmospheric pressure and air density (see \@ref(meteoinput)), whereas *aspect* (in degrees from North) and *slope* (also in degrees) are needed in addition to *latitude* (also in degrees North) to estimate sunrise/sunset hours and potential radiation in advanced water balance modelling.
 
 ## Soil description  {#soilinput}
 
-Soils can be described in **medfate** using between $S=1$ and $S=5$ soil layers. The number and size of layers may reflect changes in soil properties, but also can be chosen to reflect different plant rooting depths. The physical properties of the soil are needed to estimate its hydraulic properties. Most soil properties are considered static parameters in simulations, except those that depend on soil water balance (e.g. soil moisture content, soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered in simulations.
+Soils can be described in **medfate** using between $S=1$ and $S=5$ different soil layers. The number and size of layers may reflect changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate its hydraulic properties. Most soil properties are considered *static* parameters in simulations, except (state) variables that depend on soil water balance (e.g. soil moisture content, soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered in simulations.
 
 ### Physical properties
 
-Physical soil properties, like soil texture (i.e. percent of sand, silt and clay), bulk density or rock fragment content, can differ between soil layers, and this has important consequences for water retention capacity and soil hydraulics. In addition, specifying a deep rocky layer may be important in some biomes like the Mediterranean one, because plants often extend their roots into cracks existing in the parent rock [@Ruffault2013]. For each soil layer $s$ the following physical parameters are needed:
+Physical soil properties, like soil texture (i.e. percent of sand, silt and clay), bulk density or rock fragment content, can differ between soil layers, and this has important consequences for water retention capacity and soil hydraulics. Specifying layers with high rock fragment content (e.g. layers of weathered rock with few soil particles) may be important in some biomes like the Mediterranean one, because plants often extend their roots into cracks existing in the parent rock [@Ruffault2013]. 
+
+For each soil layer $s$ the following physical parameters are needed:
 
 | Symbol | Units | R  | Description                         | 
 |--------|-------|----| ------------------------------------|
-| $d_{s}$ | $mm$ | `widths` | Soil layer width |
-| $P_{clay,s}$ | % | `clay` | Percent of clay (within soil particles)  |
-| $P_{sand,s}$ | % | `sand` | Percent of sand (within soil particles) |
-| $OM$ | % | `om` | Percentage of organic mater per dry weight (can be missing) |
-| $BD_{s}$ | $g \cdot cm^{-3}$ |`bd` | Bulk density |
-| $P_{rocks,s}$ | % | `rfc` | Rock fragment content as percent per soil volume |
+| $d_{s}$ | $mm$ | `widths` | Width of soil layer $s$ |
+| $P_{clay,s}$ | % | `clay` | Percent of clay (within soil particles) in layer $s$  |
+| $P_{sand,s}$ | % | `sand` | Percent of sand (within soil particles) in layer $s$ |
+| $OM$ | % | `om` | Percentage of organic mater per dry weight (can be missing) in layer $s$ |
+| $BD_{s}$ | $g \cdot cm^{-3}$ |`bd` | Bulk density in layer $s$|
+| $P_{rocks,s}$ | % | `rfc` | Rock fragment content as percent volume in layer $s$ |
 
-*Soil depth* is defined as the sum of soil layer widths. If possible, soil physical properties should be measured in soil profiles conducted at the target forest plot. Soil input data should be arranged in a `data.frame` with soil layers in rows and physical variables in columns (see function `defaultSoilParams()`). The package includes function `soilgridsParams()` to fetch soil information from [SoilGrids.org](https://soilgrids.org/), a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.
+If possible, soil physical properties should be measured in soil profiles conducted at the target forest plot. Soil input data should be arranged in a `data.frame` with soil layers in rows and physical variables in columns (see function `defaultSoilParams()`). The package includes function `soilgridsParams()` to fetch soil information from [SoilGrids.org](https://soilgrids.org/), a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.
+
+Total *soil depth*  ($Z_{soil}$ in $mm$) is defined as the sum of soil layer widths. As it may include rocky layers, this may be larger than the soil depth reported in soil profiles. 
 
 ### Water retention curves {#waterretentioncurves}
 
-The water retention curve of a soil is the relationship between volumetric soil moisture ($\theta$, in $m^3 \cdot m^{-3}$ of soil, excluding rock fragments) and the soil water potential ($\Psi$, in MPa). This curve is characteristic for different types of soil, and is also called the *soil moisture characteristic curve*. Two water retention curve models are available in **medfate** (fig. \@ref(fig:retention-curves)):
+The water retention curve of a soil is the relationship between volumetric soil moisture ($\theta$, in $m^3 \cdot m^{-3}$ of soil, excluding rock fragments) and the soil water potential ($\Psi$, in MPa). This curve is characteristic for different types of soil, and is also called the *soil moisture characteristic curve*. Since soil layers may differ in their physical properties, they also normally have different water retention curves.
+
+Two water retention curve models are available in **medfate** (fig. \@ref(fig:retention-curves)):
 
 1. *Saxton model*: In this model, volumetric soil moisture $\theta(\Psi)$ corresponding to a given water potential $\Psi$ (in MPa) below $\Psi_{fc}$ is calculated using: 
 \begin{equation}\theta(\Psi) = (\Psi/A)^{(1/B)}\end{equation}
@@ -36,7 +44,7 @@ where $A$ and $B$ depend on the texture and, if available, organic matter in the
 \begin{equation}\theta(\Psi) = \theta_{res}+\frac{\theta_{sat}-\theta_{res}}{\left[1+ (\alpha \cdot \Psi)^n \right]^{1-1/n}}\end{equation}
 where $\theta(\psi)$ is the water retention, $\theta_{sat}$ is the saturated water content, $\theta_{res}$ is the residual water content, $\alpha$ is related to the inverse of the air entry pressure, and $n$ is a measure of the pore-size distribution. 
 
-(ref:retention-curves-cap) Water retention curves under the Saxton and Van Genuchten models, for the same physical attributes (25% sand, 25% clay, 50% silt and bulk density of $1.5 g \cdot cm^{-3}$).
+(ref:retention-curves-cap) Water retention curves under the Saxton and Van Genuchten models, for the same physical attributes (25% sand, 25% clay, 50% silt and bulk density of $1.5 g \cdot cm^{-3}$). Parameters of the Van Genuchten curve have been estimated using pedotransfer functions given in @Toth2015.
 
 ```{r retention-curves, fig.align='center', fig.width=4, fig.height=3.5, echo = FALSE, fig.cap='(ref:retention-curves-cap)'}
 soil_retentionCurvePlot(soil(defaultSoilParams()), model="both")+
@@ -50,51 +58,51 @@ Soil initialization is needed to estimate soil hydrological parameters for each 
 | Symbol | Units | R  | Description                               | 
 |--------|-------|----| ------------------------------------------|
 | $P_{macro, s}$ | % | `macro` | Percentage of macroporosity corresponding to each soil layers | 
-| $\gamma_{soil}$ | $mm \cdot day^{-1}$ | `Gsoil` | The maximum daily evaporation rate from soil |
-| $\kappa_{soil}$ |  | `Ksoil` | Extinction parameter to regulate the amount of water extracted from each soil layer when simulating evaporation from bare soil |
+| $\gamma_{soil}$ | $mm \cdot day^{-1}$ | `Gsoil` | The maximum daily evaporation rate from soil (see \@ref(soilevaporation)) |
+| $\kappa_{soil}$ |  | `Ksoil` | Extinction parameter to regulate the amount of water extracted from each soil layer when simulating evaporation from bare soil (see \@ref(soilevaporation)) |
 | $\theta_{sat, s}$ |$m^3 \cdot m^{-3}$ | `VG_theta_sat`| Volumetric moisture at saturation |
 | $\theta_{res, s}$ |$m^3 \cdot m^{-3}$ | `VG_theta_res` | Residual volumetric moisture |
-| $n_s$ | | `VG_n` | Parameter of the Van Genuchten [-@Genuchten1980] model |
-| $\alpha_s$ | $MPa^{-1}$ | `VG_alpha`| Parameter of the Van Genuchten [-@Genuchten1980] model |
+| $n_s$ | | `VG_n` | Parameter $n$ of the Van Genuchten [-@Genuchten1980] model |
+| $\alpha_s$ | $MPa^{-1}$ | `VG_alpha`| Parameter $\alpha$ of the Van Genuchten [-@Genuchten1980] model |
 
-Macroporosity values are calculated using the equations given in @Stolf2011, while $\gamma_{soil}$ and $\kappa_{soil}$ are derived from texture. Parameters of the van Genuchten model (including are estimated from the physical description of the soil using one of two pedotransfer functions (see help for `soil()`): 
+Macroporosity values are calculated using the equations given in @Stolf2011, while $\gamma_{soil}$ and $\kappa_{soil}$ are derived from texture. Parameters of the van Genuchten model for each layer are estimated from the physical description of the layer using one of two pedotransfer functions (see help for `soil()`): 
 
 1. Using the USDA texture classification and the average texture class parameters given by @Carsel1988.
 2. Directly from the soil texture, organic matter and bulk density, using the pedotransfer functions in @Toth2015.
 
-All simulation functions need an object of class `soil` to be run. Users can edit the `soil` object manually (it is actually a list), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil samples.
+All simulation functions need an object of class `soil` to be run. Users can edit the `soil` object manually (it is actually a list), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements.
 
 ### Water content and water table depth
 
-The *water content* ($V_s$ in mm) of a soil layer $s$ is calculated from its water potential ($\Psi_s$) and water retention curve using:
+The *volume of water* ($V_s$ in mm) in a soil layer $s$ is calculated from its water potential ($\Psi_s$) and water retention curve using:
 \begin{equation}
 V_s(\Psi_s) = d_s\cdot ((100-P_{rocks,s})/100)\cdot\theta_{s}(\Psi_s)
 \end{equation}
-where $d_s$ is the depth of the soil layer (in mm) and $P_{rocks,s}$ is the percentage of rock fragments. The overall water content of the soil is simply the sum of water content over soil layers:
+where $d_s$ is the depth of the soil layer (in mm) and $P_{rocks,s}$ is the percentage of rock fragments. The overall volome of water in the soil is simply the sum of water content over soil layers:
 \begin{equation}
 V_{soil} = \sum_{s=1}^S{V_s(\Psi_s)}
 \end{equation}
 
-A number of fixed water contents are important to remember. 
+A number of fixed water volumes (and their corresponding moisture) are important to remember: 
 
-  + *Water holding capacity* ($V_{fc, s}$, in mm) of the soil layer $s$ is defined as the volumetric water content at field capacity, i.e. -0.033 MPa:
+  + *Water holding capacity* ($V_{fc, s}$, in mm) of the soil layer $s$ is defined as the volume of water at field capacity, i.e. -0.033 MPa:
 \begin{equation}
 V_{fc,s} = V_{s}(-0.033) = d_s\cdot ((100-P_{rocks,s})/100)\cdot\theta_{fc,s}
 \end{equation}
-where $\theta_{fc,s} = \theta_s(-0.033)$. 
-  + *Water content at saturation* is calculated anagolously, but replacing $\theta_{fc,s}$ by $\theta_{sat, s} = \theta_s(0)$. 
-  + *Water content at wilting point* (-1.5 MPa) is calculated replacing $\theta_{fc,s}$ by $\theta_{wp,s} = \theta_s(-1.5)$. 
+where $\theta_{fc,s} = \theta_s(-0.033)$ is the corresponding moisture at field capacity. 
+  + *Water content at saturation* is calculated anagolously, but replacing $\theta_{fc,s}$ by $\theta_{sat, s} = \theta_s(0)$, the moisture at saturation. 
+  + *Water content at wilting point* (-1.5 MPa) is calculated replacing $\theta_{fc,s}$ by $\theta_{wp,s} = \theta_s(-1.5)$, the moisture at wilting point. 
   + The *amount of extractable water* is the difference between water content at field capacity and a the water content at a conventional minimum water potential, which can be set at wilting point or lower values (by default at -5 MPa in **medfate**).
 
-The depth of water table is the depth of saturated soil. In medfate, *water table depth* ($WT$, in mm) equals soil depth when all soil layers are below field capacity. When some layers are between field capacity and saturation, water table depth is calculated as:
+The depth of water table is the depth of saturated soil (in $mm$). In medfate, *water table depth* ($Z_{wt}$, in mm) equals soil depth (i.e. $Z_{soil}$) when all soil layers are below field capacity. When some layers are between field capacity and saturation, water table depth is calculated as:
 \begin{equation}
-WT = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\theta_{sat,s}-\theta_{fc,s})\right]}
+Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\theta_{sat,s}-\theta_{fc,s})\right]}
 \end{equation}
 
 
 ## Vegetation description {#vegetationinput}
 
-The representation of plants within a target plot is done in **medfate** by means of **cohorts** of woody plants (i.e. trees and shrubs). A plant cohort respresents plants that belong to the same species (or functional group) and are more or less of the same *size*. For example, trees in a stand may be grouped by species and diameter class. This representation is chosen so that package functions can be easily applied to forest plot data, for example from national forest inventories. The description of plant cohorts includes a measure of *abundance* of the cohort in the stand, which in the case of trees is density as stems per hectare and for shrubs is percent cover. In fact this (and the fact that shrubs are multi-stemmed) is the only motivation for distinguishing between tree cohorts and shrub cohorts. 
+The representation of plants within a target plot is done in **medfate** by means of **cohorts** of woody plants (i.e. trees and shrubs). A plant cohort respresents a set of plants that belong to the same species (or functional group) and are more or less of the same *size*. For example, trees in a stand may be grouped by species and diameter class. This representation is chosen so that package functions can be easily applied to forest plot data, for example from national forest inventories. The description of plant cohorts includes a measure of *abundance* of the cohort in the stand, which in the case of trees is density as stems per hectare and for shrubs is percent cover (shrubs are often multi-stemmed). This different abundance measure is the main motivation for distinguishing between tree cohorts and shrub cohorts. 
 
 Note that one limitation of the representation of vegetation using plant cohorts is that it is not spatially-explicit (i.e. plants cannot have explicit coordinates within forest stands) and hence spatial (horizontal) interactions cannot be taken into account.  
 
@@ -116,9 +124,9 @@ A plant cohort $i$ is either a *tree cohort* or a *shrub cohort*, and is defined
 | $Z_{50,i}$ | mm | `Z50` | Depth above which 50% of the fine root mass is located | Y | Y |
 | $Z_{95,i}$ | mm | `Z95` | Depth above which 95% of the fine root mass is located | Y | Y |
 
-Height ($H$) values refer to average height of individuals included in the cohort, and the same for crown ratio ($CR$) and diameter at breast height ($DBH$). While plant height is relatively easy to measure, it is normally quite hard to estimate leaf area indices for stands and species. Package **medfate** provides some utilities to provide estimates crown ratio and $LAI$ from forest inventory data (e.g. heights, DBH and density for measured trees), using allometric relationships calibrated for catalonia (see chapter \@ref(allometricmodels)). 
+Height ($H$) values refer to average height of individuals included in the cohort, and the same for crown ratio ($CR$) and diameter at breast height ($DBH$). While plant size (i.e. height or diameter) is relatively easy to tally, other measurements are not usually made in the field. Package **medfate** includes utility functions that provide estimates $CR$ and $LAI$ from forest inventory data (e.g. heights, DBH and density for measured trees), using allometric relationships calibrated for Catalonia (see chapter \@ref(allometricmodels)). 
 
-### Leaf area index
+**Leaf are index**
 
 $LAI$ variables refer to *one-sided leaf area* of plants in the cohort per surface area of the stand. We will call *total leaf area index* of a plant cohort $i$ ($LAI^{all}_{i}$) to the sum of dead and live expanded leaves of the cohort:
 \begin{equation}
@@ -133,6 +141,35 @@ LAI^{dead}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{dead}} \\
 LAI^{all}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{all}} = LAI^{\phi}_{stand}+LAI^{dead}_{stand}
 \end{eqnarray}
 
+### Forest plot objects {#forestobjects}
+
+Forest plots in `medfate` are assumed to be in a format that follows closely the Spanish national forest inventory. Each forest plot is represented in an object of class `forest`, a list that contains several elements:
+```{r}
+data(exampleforest)
+exampleforest
+```
+
+Among them, the most important items are two data frames, `treeData` (for trees) and `shrubData` for shrubs. Information about herbs is only used for fire hazard calculations, and `seedBank` is presently not used. Elements `ID` and `patchsize` are only relevant when using medfate functions in a spatial context.
+
+While not strictly necessary, forest objects are a convenient format to start calculations with **medfate**, because there are many static functions that take forest objects as input. The package includes functions to facilitate mapping variables in user data into tables `treeData` and `shrubData` (see function `forest_mapWoodyTables()`).
+
+
+### Leaf vertical distribution {#leafdistribution}
+
+Crown base height ($H_{crown,i}$; in $cm$) of cohort $i$ is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort ($CR_i$; a proportion between 0 and 1), i.e. the ratio between crown length and total height (see eq. \@ref(eq:CrownHeight)). 
+
+The leaf area of any plant cohort is assumed to be distributed vertically following a **truncated Gaussian function** whose standardized values -1.5 and 1.5 correspond to crown base height ($H_{crown,i}$) and total plant height ($H_i$), respectively. Simulation models in **medfate** divide the vertical dimension into vertical layers (see control parameter `verticalLayerSize`). Let us define $LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}$ as the leaf area index of cohort $i$ in layer $j$. The truncated Gaussian distribution defines the $LAI_{i,j}^{\phi}$ and $LAI_{i,j}^{dead}$ for all plant cohorts and vertical layers.
+
+Dividing the leaf area of a given layer by its width, one obtains the *leaf area density* ($LAD$ in $m^2 \cdot m^{-3}$). Figure \@ref(fig:leafareadensity) illustrates the leaf area density profile for an example forest stand (see function `vprofile_leafAreaDensity()`). 
+
+```{r leafareadensity, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap="Leaf area density distribution in a forest stand. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution."}
+g1<-vprofile_leafAreaDensity(exampleforest, SpParamsMED, z = seq(0,1000, by=1), byCohorts = T)
+g1 <- g1 + theme(legend.background = element_blank(), legend.position = c(0.8,0.8))
+g2<-vprofile_leafAreaDensity(exampleforest, SpParamsMED, z = seq(0,1000, by=1))
+plot_grid(g1, g2, nrow=1, ncol=2)
+```
+
+The leaf area density profile determines the extinction rates of light through the forest canopy. The same truncated Gaussian distribution is used to distribute leaf and small branch biomass in the vertical dimension.
 
 ### Vertical root distribution
 
@@ -140,7 +177,7 @@ The root system of each plant cohort $i$ is described using the proportion of fi
 \begin{equation}
 Y_i(z)=\frac{1}{1+(z/Z_{50,i})^{c_i}}
 \end{equation}
-where $Y_i(z)$ is the cumulative fraction of fine root mass located between surface and depth $z$; $Z_{50,i}$ is the depth above which 50% of the root mass is located; and $c_i$ is a shape parameter related to $Z_{50,i}$ and $Z_{95,i}$ as $c_i  = 2.94 / \ln(Z_{50,i} / Z_{95,i})$ (see `root_ldrDistribution()`). 
+where $Y_i(z)$ is the cumulative fraction of fine root mass located between surface and depth $z$; $Z_{50,i}$ is the depth (in $mm$) above which 50% of the root mass is located; and $c_i$ is a shape parameter related to $Z_{50,i}$ and $Z_{95,i}$ as $c_i  = 2.94 / \ln(Z_{50,i} / Z_{95,i})$. The linear dose response model is quite flexible with respect to fine root distribution, as shown in the right panel of the figure below (see `root_ldrDistribution()`). 
 
 ```{r root-distribution, echo = FALSE, fig.width=8, fig.height=4, fig.cap = "Examples of root density profile according to a conic distribution (left) and the linear dose response model (right)."}
 par(mar=c(4,4,1,1), mfrow=c(1,2))
@@ -158,15 +195,6 @@ legend("bottomright", legend=c("Z50 = 100, Z95 = 200",
 
 Note, however, that the actual input to simulation functions is the matrix of $v_{i,s}$ values - not $Z_{50,i}$ and $Z_{95,i}$ -, which means that the proportions of fine roots can be modified manually or be defined by another model. In fact, **medfate** also allows calculating $v_{i,s}$ values assuming a conic distribution of fine roots (see `root_conicDistribution()`), as shown in fig. \@ref(fig:root-distribution) above. 
 
-
-### Forest plot objects {#forestobjects}
-
-Forest plots in `medfate` are assumed to be in a format that follows closely the Spanish national forest inventory. Each forest plot is represented in an object of class `forest`, a list that contains several elements. Among them, the most important items are two data frames, `treeData` (for trees) and `shrubData` for shrubs:
-```{r}
-data(exampleforest)
-exampleforest
-```
-While not strictly necessary, forest objects are the convenient format to start calculations with **medfate**, because there are many static functions that take forest objects as input. The package includes functions to facilitate mapping variables in user data into tables `treeData` and `shrubData` (see function `forest_mapWoodyTables()`).
 
 
 ### Functional traits and vegetation initialization {#functionaltraits}
