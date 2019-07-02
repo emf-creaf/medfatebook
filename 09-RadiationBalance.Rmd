@@ -18,6 +18,14 @@ It is generally accepted that sunlit and shade leaves need to be treated separat
 \begin{equation}
 f_{SL, j}  = \exp\left( \sum_{k>j}^{l}{\sum_{i}^{c}{-k_{b} \cdot LAI^{all}_{i,k}}}\right) \cdot \exp\left( \sum_{i}^{c}{-k_{b} \cdot 0.5\cdot LAI^{all}_{i,j}}\right)
 \end{equation}
+
+From this we can derive the leaf area of each layer that is affected by direct light beams (i.e. the amount of sunlit and shade leaves):
+\begin{eqnarray}
+LAI^{sunlit}_{i,j} &=& f_{SL,j} \cdot LAI^{\phi}_{i,j} \\
+LAI^{shade}_{i,j} &=& (1 - f_{SL,j}) \cdot LAI^{\phi}_{i,j}
+(#eq:sunlitshadelai)
+\end{eqnarray}
+
 As an example we will consider a canopy of one species of LAI = 2, divided into ten layers with constant leaf density:
 
 ```{r}
@@ -79,18 +87,12 @@ Finally, the direct radiation absorbed by a unit of sunlit leaf area of cohort $
 \begin{equation}
 I_{dir,i,j} = I_{beam} \cdot \alpha_i \cdot 0.5/\sin{\beta}
 \end{equation}
-where $\beta$ is the solar elevation angle in radians, which changes throughout the day (see [section 4.3 of the reference manual](http://vegmod.ctfc.cat/meteolandbook/solarradiation.html#potential-radiation) for package **meteoland**). The amount of light absorbed by shaded/sunlit foliage of cohort $i$ in layer $j$ per leaf area unit ($I_{SH,i,j}$ and $I_{SL,i,j}$, respectively) is:
+where $\beta$ is the solar elevation angle in radians, which changes throughout the day (see [section 4.3 of the reference manual](http://vegmod.ctfc.cat/meteolandbook/solarradiation.html#potential-radiation) for package **meteoland**). The amount of light absorbed by sunlit/shaded foliage of cohort $i$ in layer $j$ per leaf area unit ($I^{sunlit}_{i,j}$ and $I^{shade}_{i,j}$, respectively) is:
 \begin{eqnarray}
-I_{SH,i,j} &=& I_{dif,i,j} + I_{sca,i,j} \\
-I_{SL,i,j} &=& I_{dif,i,j} + I_{sca,i,j} + I_{dir,i,j}
+I^{sunlit}_{i,j} &=& I_{dif,i,j} + I_{sca,i,j} + I_{dir,i,j} \\
+I^{shade}_{i,j} &=& I_{dif,i,j} + I_{sca,i,j}
+(#eq:absorbedsunlitshadeperleafarea)
 \end{eqnarray}
-The total amount of light absorbed by shaded/sunlit foliage of cohort $i$ per ground area unit is found by taking into account the proportion of sunlit foliage:
-\begin{eqnarray}
-\Phi_{SH,i,j} &=& I_{SH,i,j}\cdot (1 - f_{SL,j}) \cdot LAI^{\phi}_{i,j}\\
-\Phi_{SL,i,j} &=& I_{SL,i,j}\cdot f_{SL,j} \cdot LAI^{\phi}_{i,j}
-\end{eqnarray}
-
-Extinction of direct radiation also defines the proportion of leaves of each layer that are affected by direct light beams (i.e. the proportion of sunlit leaves).
 
 Let us show how all this works in an example. Regarding incoming light, we assume the following direct and diffuse irradiance at the top of the canopy:
 ```{r}
@@ -103,7 +105,7 @@ PAR_diffuse = 150
 
 Solar elevation is the angle between the sun and the horizon (i.e. the complement of the zenith angle). Under these conditions, and for the same canopy used for fig. \@ref(fig:irradianceperlayer), the amount of PAR and SWR absorbed per unit of leaf area at each canopy layer is [@Anten2016]:
 
-(ref:absorbanceperlayer-cap) PAR (left) and SWR (right) absorbed per unit of leaf area at each canopy layer (see function `light_cohortSunlitShadeAbsorbedRadiation()`). 
+(ref:absorbanceperlayer-cap) PAR (left) and SWR (right) absorbed per unit of sunlit/shade leaf area at each canopy layer ($I^{sunlit}_{i,j}$ and $I^{shade}_{i,j}$, respectively;see function `light_cohortSunlitShadeAbsorbedRadiation()`). 
 
 ```{r absorbanceperlayer, echo=FALSE, fig.width=7, fig.height=4, fig.align="center", fig.cap='(ref:absorbanceperlayer-cap)'}
 abs_PAR = light_cohortSunlitShadeAbsorbedRadiation(PAR_direct, PAR_diffuse,
@@ -124,7 +126,6 @@ plot(absRadSL, 1:nlayer,type="l", ylab="Layer", xlab="Absorbed SWR per leaf area
 lines(absRadSH, 1:nlayer, col="red", lty=2)
 legend("bottom", legend=c("sunlit", "shade"), lty=c(1,2), bty="n", col="red")
 ```
-
 
 
 ## Shortwave radiation absorbed by the soil {#shortwaveradiationsoilabs}
