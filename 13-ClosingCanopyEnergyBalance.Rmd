@@ -28,13 +28,13 @@ where $\lambda_v(T_{soil})$ is the latent heat of vaporization at temperature $T
 
 After evaluating the canopy energy balance equation \@ref(eq:canopyenergybalance) one has to translate energy balance into temperature variation of the canopy. Rearranging the same equation and expressing it in discrete time steps we have:
 \begin{equation}
-\Delta T_{canopy} =  \Delta t_{step} \cdot \frac{K_{abs,ca} + (L_{abs,ca} - L_{em,c}) + (L_{abs,cs} - L_{em,c}) - LE_{c} - H_{ca} - H_{cs}}{C_{canopy}}
+\Delta TC_{canopy} =  \Delta t_{step} \cdot \frac{K_{abs,ca} + (L_{abs,ca} - L_{em,c}) + (L_{abs,cs} - L_{em,c}) - LE_{c} - H_{ca} - H_{cs}}{C_{canopy}}
 \end{equation}
-where $C_{canopy}$ is the canopy thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$) and $\Delta t_{step} = 86400/n_t$ is the size of the time step in seconds. Canopy thermal capacitance depends on the leaf area index of the stand:
+where $TC_{canopy}$ is the canopy thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$) and $\Delta t_{step} = 86400/n_t$ is the size of the time step in seconds. Canopy thermal capacitance depends on the leaf area index of the stand:
 \begin{equation}
-C_{canopy} = C_{LAI} \cdot \frac{0.8 \cdot LAI_{stand} + 1.2 \cdot (LAI_{stand}^{phi} + \cdot LAI_{stand}^{dead})}{2}
+TC_{canopy} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{stand} + 1.2 \cdot (LAI_{stand}^{phi} + \cdot LAI_{stand}^{dead})}{2}
 \end{equation}
-where $C_{LAI}$ is the thermal capacitance per LAI unit, which is specified by the control parameter `thermalCapacityLAI`. By using both the maximum leaf area of the stand, $LAI_{stand}$, and its current live/dead leaf area ($LAI_{stand}^{phi}+LAI_{stand}^{dead}$) it is assumed that part of thermal capacitance corresponds to stems and branches, so that capacitance does not drop to zero for deciduous canopies.
+where $TC_{LAI}$ is the thermal capacitance per LAI unit, which is specified by the control parameter `thermalCapacityLAI`. By using both the maximum leaf area of the stand, $LAI_{stand}$, and its current live/dead leaf area ($LAI_{stand}^{phi}+LAI_{stand}^{dead}$) it is assumed that part of thermal capacitance corresponds to stems and branches, so that capacitance does not drop to zero for deciduous canopies.
 
 ## Soil temperature changes
 Analogously to the canopy, the change in temperature for a given soil layer $s$ in the current time step is given by rearranging eq. \@ref(eq:deepsoilenergybalance):
