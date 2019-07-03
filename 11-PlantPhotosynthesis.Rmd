@@ -4,7 +4,7 @@ In chapter \@ref(planthydraulics) we introduced the necessary concepts of steady
 
 ## Leaf photosynthesis function {#leafenergybalancephoto}
 
-The supply function specifies the transpiration flow rate $E$ for values of leaf water potential $\Psi_{leaf}$. If we know air temperature, air vapour pressure and the light conditions in which leaves are, we can translate the supply function into a **leaf photosynthesis function** [@Sperry2016]. In a nutshell, $E_{leaf}$ from the supply function is first used to calculate leaf temperature from an evaluation of the leaf energy balance. The diffusive conductances of the leaf to $H_2O$ and $CO_{2}$ are obtained from water supply and water vapor deficit. Finally, the gross/net assimilation rate is then obtained from the diffusive conductance and a modelled curve between assimilation and leaf internal $CO_{2}$ concentration. The following subsections detail each of these steps.
+The supply function specifies the transpiration flow rate $E$ for values of leaf water potential $\Psi_{leaf}$. If we know air temperature, air vapour pressure and the light conditions in which leaves are, we can translate the supply function into a **leaf photosynthesis function** [@Sperry2016]. In a nutshell, $E$ from the supply function is first used to calculate leaf temperature from an evaluation of the leaf energy balance. The diffusive conductances of the leaf to $H_2O$ and $CO_{2}$ are obtained from water supply and water vapor deficit. Finally, the gross/net assimilation rate is then obtained from the diffusive conductance and a modelled curve between assimilation and leaf internal $CO_{2}$ concentration. The following subsections detail each of these steps.
 
 
 ```{r, echo=FALSE}
@@ -30,11 +30,11 @@ Rabs = 740 #W * m-2
 
 ### Leaf temperature
 
-Leaf temperature ($T_{leaf}$; in $^\circ C$) can be calculated for any given flow rate $E_{leaf}$ using an energy balance equation [@Campbell1998]:
+Leaf temperature ($T_{leaf}$; in $^\circ C$) can be calculated for any given flow rate $E$ using an energy balance equation [@Campbell1998]:
 \begin{equation}
-T_{leaf} = T_{canopy}+\frac{I_{abs}-\epsilon\cdot\sigma\cdot(T_{canopy}+273.15)^4-\lambda_v(T_{canopy})\cdot E_{leaf}}{C_p\cdot(g_r+g_{Ha})}
+T_{leaf} = T_{canopy}+\frac{I_{abs}-\epsilon\cdot\sigma\cdot(T_{canopy}+273.15)^4-\lambda_v(T_{canopy})\cdot E_{two-sided}}{C_p\cdot(g_r+g_{Ha})}
 \end{equation}
-where $I_{abs} = I_{SWR} + I_{LWR}$ (in $W \cdot m^{-2}$) is the instantaneous shortwave and longwave radiation absorbed per leaf area unit, $E_{leaf}$ is the flow (converted to $mol \cdot s^{-1} \cdot m^{-2}$ per two-sided leaf area basis), $\epsilon$ is longwave radiation emissivity (0.97), $\sigma$ is the Stephan-Boltzman constant, $T_{canopy}$ is the canopy air temperature (in $^\circ C$) resulting from the energy balance of the previous step (see section \@ref(canopycapacitancetemperature)), $C_p$ = 29.3 $J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure and $\lambda_v(T_{canopy})$ is the latent heat of vaporization (in $J \cdot mol^{-1}$) corresponding to $T_{canopy}$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in the **meteoland** reference manual). Finally, $g_r$ and $g_{Ha}$ are the radiative and heat conductance values (in $mol \cdot m^{-2} \cdot s^{-1}$), respectively [@Campbell1998]:
+where $I_{abs} = I_{SWR} + I_{LWR}$ (in $W \cdot m^{-2}$) is the instantaneous shortwave and longwave radiation absorbed per leaf area unit, $E_{two-sided}$ is the flow rate $E$ converted to $mol \cdot s^{-1} \cdot m^{-2}$ per two-sided leaf area basis, $\epsilon$ is longwave radiation emissivity (0.97), $\sigma$ is the Stephan-Boltzman constant, $T_{canopy}$ is the canopy air temperature (in $^\circ C$) resulting from the energy balance of the previous step (see section \@ref(canopycapacitancetemperature)), $C_p$ = 29.3 $J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure and $\lambda_v(T_{canopy})$ is the latent heat of vaporization (in $J \cdot mol^{-1}$) corresponding to $T_{canopy}$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in the **meteoland** reference manual). Finally, $g_r$ and $g_{Ha}$ are the radiative and heat conductance values (in $mol \cdot m^{-2} \cdot s^{-1}$), respectively [@Campbell1998]:
 \begin{eqnarray}
 g_r &=& \frac{4\cdot \epsilon \cdot \sigma \cdot (T_{canopy}+273.15)^3}{C_p} \\
 g_{Ha} &=& 0.189 \cdot (u_{leaf}/d)^{0.5}
@@ -184,9 +184,9 @@ legend("bottomleft", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 
 ### Leaf gas exchange
 
-Leaf conductance to water vapour ($g_{sw}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) and to carbon dioxide ($g_{sc}$; in $mol\,CO_{2} \cdot s^{-1} \cdot m^{-2}$) are obtained for each value of transpiration flow $E_{leaf}$ (here expressed in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) and $VPD_{leaf}$ using:
+Leaf conductance to water vapour ($g_{sw}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) and to carbon dioxide ($g_{sc}$; in $mol\,CO_{2} \cdot s^{-1} \cdot m^{-2}$) are obtained for each value of transpiration flow $E$ (here expressed in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) and $VPD_{leaf}$ using:
 \begin{eqnarray}
-g_{sw} &=& E_{leaf} \cdot \frac{P_{atm}}{VPD_{leaf}}\\
+g_{sw} &=& E \cdot \frac{P_{atm}}{VPD_{leaf}}\\
 g_{sc} &=& g_{sw}/1.6
 \end{eqnarray}
 the application of the equation for $g_{sw}$ to the $VPD_{leaf}(\Psi_{leaf})$ curves yields the following $g_{sw}(\Psi_{leaf})$ curves:
@@ -317,7 +317,7 @@ A_n = A - 0.015 \cdot V_{max}
 
 In the previous subsection we calculated photosynthesis at the leaf level. However, the function $A(\Psi_{leaf})$ can be calculated for a whole crown. Essentially we need to repeat the calculations of leaf temperature, leaf VPD, leaf gas conductance and photosynthesis for every leaf to be considered in the crown. Gross and net photosynthesis values can be then aggregated across the crown for each value of $\Psi_{leaf}$, so that the function $A(\Psi_{leaf})$ is obtained. 
 
-As in section \@ref(shortwaveradiationcanopyabs) we consider a crown of one species divided into 10 layers, with constant leaf density. Many aspects may vary across the crown, including environmental conditions (such as direct/diffuse light or wind speed) and photosynthesis parameters (e.g. `Vmax298`). The previous crown definition and light parameters lead to a percentage of the above-canopy irradiance reaching each layer [@Anten2016]. Furthermore, it is generally accepted that sunlit and shade leaves need to be treated separately [@DePury1997]. Under these conditions, the amount of SWR and PAR absorbed per unit of leaf area at each canopy layer was shown in fig. \@ref(fig:absorbanceperlayer). For simplicity, here we will assume constant windspeed in all layers:
+As in section \@ref(shortwaveradiationcanopyabs) we consider a crown of one species divided into 10 layers, with constant leaf density. Many aspects may vary across the crown, including environmental conditions (such as direct/diffuse light or wind speed) and photosynthesis parameters (e.g. `Vmax298`). The previous crown definition and light parameters lead to a percentage of the above-canopy irradiance reaching each layer [@Anten2016]. Furthermore, it is generally accepted that sunlit and shade leaves need to be treated separately [@DePury1997]. Separating the two kinds of leaves acknowledges that they operate at different parts of the light-saturation curve. Under these conditions, the amount of SWR and PAR absorbed per unit of leaf area at each canopy layer was shown in fig. \@ref(fig:absorbanceperlayer). For simplicity, here we will assume constant windspeed in all layers:
 ```{r}
 ulayer = rep(2, 10)
 ```
@@ -362,9 +362,9 @@ V^{sunlit}_{max,298,i} &=& \sum_{j=1}^{l}{V_{max,298,i,j} \cdot LAI^{sunlit}_{i,
 V^{shade}_{max,298,i} &=& \sum_{j=1}^{l}{V_{max,298,i,j} \cdot LAI^{shade}_{i,j}}
 \end{eqnarray}
 
-One then calls the photosynthesis model twice (i.e. once for shade leaves and once for sunlit leaves), using the aggregated maximum assimilation rates. 
+One then calls the photosynthesis function twice (i.e. once for shade leaves and once for sunlit leaves), using the aggregated maximum assimilation rates. This results in
 
-Separating the two kinds of leaves acknowledges that they operate at different parts of the light-saturation curve. The figure below provides the canopy photosynthesis functions obtained, under different situations, using the full 10-layer canopy description (top), a sunshade canopy model (center) or a big-leaf model (bottom). These were generated using functions `photo_multilayerPhotosynthesisFunction()`, `photo_sunshadePhotosynthesisFunction()` and `photo_leafPhotosynthesisFunction()`, respectively. Note the coincidence between the multi-layer and the sun-shade models.
+The figure below provides the canopy photosynthesis functions obtained, under different situations, using the full 10-layer canopy description (top), a sunshade canopy model (center) or a big-leaf model (bottom). These were generated using functions `photo_multilayerPhotosynthesisFunction()`, `photo_sunshadePhotosynthesisFunction()` and `photo_leafPhotosynthesisFunction()`, respectively. Note the coincidence between the multi-layer and the sun-shade models.
 
 ```{r, echo=FALSE}
 psi2A11can = photo_multilayerPhotosynthesisFunction(supplyNetwork11$E,Catm, Patm,Tcan, vpa, 
