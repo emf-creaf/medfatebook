@@ -1,27 +1,49 @@
 # Day-level results {#daylevelresults}
 
-## Day-level photosynthesis and transpiration {#daylevelphototransp}
+In the preceeding chapters we detailed how the model performs canopy and soil energy balances for subdaily time steps and how transpiration and photosynthesis values are determined for any given substep. This chapter indicates how these are aggregated at the daily scale and how other day-level model outputs are calculated.
 
-Stomatal regulation and plant transpiration are determined for each time step separately. While the cost function is the same for the whole day, the gain function and profit maximization calculations are conducted for each of the time steps, yielding instantaneous flow values $E_{t, s}$ for each soil layer $s$, in $mmol\,H_2O·s^{-1}·m^{-2}$ of leaf area unit and instantaneous net assimilation values $A_{n,t}$ in $\mu mol\, C·s^{-1}·m^{-2}$ of ground area (i.e. at the cohort level). To obtain daily values of transpiration at the cohort level the instantaneous flow rates $E_{t, s}$ need to be scaled to $E_{step,s}$ using:
+## Photosynthesis and transpiration {#daylevelphototransp}
+
+Transpiration flow $Tr_{i,t}$ of all steps are added to yield daily transpiration ($Tr_i$, in $mm\,H_2O$):
 \begin{equation}
-E_{step,s} = E_{t,s}\cdot 10^{-3} \cdot 0.01802 \cdot LAI_i^{\phi}\cdot \Delta t
+Tr_{i} = \sum_{t=1}^{n_t} {Tr_{i,t}}
 \end{equation}
-where $0.01802$ is the molar weight (in kg = L = mm) of water, $LAI_i^{\phi}$ is the leaf area index of plant cohort $i$ and $\Delta t_{step} = 86400/n_t$ the size of the time step in seconds, being $n_t$ the number of time steps. The flow rates $E_{step,s}$ of all steps are added to yield $E_s$ (in $mm\,H_2O$):
+An the same for water extraction $Tr_{i,s,t}$ for each soil layer $s$:
 \begin{equation}
-E_{s} = \sum_{n=1}^{n_t} {E_{step,s}}
+Tr_{i,s} = \sum_{t=1}^{n_t} {Tr_{i,s,t}}
 \end{equation}
-and substracted from the water content of the corresponding soil layer. Daily values of net carbon assimilation for plant cohorts are obtained similarly. The instantaneous rates $A_{n, t}$ are scaled to $A_{n,step}$ using:
+$Tr_{i,s}$ are substracted from the water content of the corresponding soil layer, closing the soil water balance of the day. 
+
+Daily values of net carbon assimilation for plant cohorts are obtained similarly. $A_{n, i, t}$ values of all steps are added to obtain $A_{n,i}$, the daily net assimilation at the cohort level (in $g\,C·m^{-2}$):
 \begin{equation}
-A_{n,step} = A_{n, t} \cdot 10^{-6} \cdot 12.01017 \cdot \Delta t
-\end{equation}
-where $12.01017$ is the molar weight of carbon (in g). $A_{n, step}$ values of all steps are added to obtain $A_n$, the daily net assimilation at the cohort level (in $g\,C·m^{-2}$):
-\begin{equation}
-A_{n,step} = \sum_{n=1}^{n_t} {A_{n,step}}
+A_{n,i,t} = \sum_{t=1}^{n_t} {A_{n,i,t}}
 \end{equation}
 
-## Plant drought stress and water potentials {#advanceddroughtstress}
+## Plant water potentials and relative water contents
 
-Because the model determines optimum transpiration for each time step, this leads to a daily sequence of leaf water potential ($\Psi_{leaf,t}$) and root crown water potential ($\Psi_{rootcrown,t}$) values. The model chooses as the leaf water potential of the day for cohort $i$ ($\Psi_{leaf,i}$) the minimum of $\Psi_{leaf,t}$ values. Analogously, the model chooses as the root crown water potential of the day for cohort $i$ ($\Psi_{rootcrown,i}$) the minimum of $\Psi_{rootcrown,t}$ values. They represent water potential values that would occur at mid-day. Unlike under the simple transpiration mode, here there is no need to average water potentials under the Sperry transpiration mode, because the differences in potential of soil layers are already integrated in the hydraulic supply function. 
+Because the model determines optimum transpiration for every subdaily time step, this leads to a daily sequence of leaf water potential ($\Psi_{leaf,i,t}$), stem water potential ($\Psi_{stem,i,t}$), root crown water potential ($\Psi_{rootcrown,i,t}$) and root surface water potential ($\Psi_{rootcrown,i,s,t}$) values for each plant cohort $i$ (and soil layer $s$ in the last case). The model defines the following daily water potentials for every cohort $i$:
+
++ *Pre-dawn leaf water potential* ($\Psi_{pd, i}$): the maximum of $\Psi_{leaf,i,t}$ values.
++ *Pre-dawn shade leaf water potential* ($\Psi_{pd, i}^{shade}$): the maximum of $\Psi_{leaf,i,t}^{shade}$ values.
++ *Pre-dawn sunlit leaf water potential* ($\Psi_{pd, i}^{sunlit}$): the maximum of $\Psi_{leaf,i,t}^{sunlit}$ values.
++ *Mid-day leaf water potential* ($\Psi_{md, i}$): the minimum of $\Psi_{leaf,i,t}$ values.
++ *Mid-day shade leaf water potential* ($\Psi_{md, i}^{shade}$): the minimum of $\Psi_{leaf,i,t}^{shade}$ values.
++ *Mid-day sunlit leaf water potential* ($\Psi_{md, i}^{sunlit}$): the minimum of $\Psi_{leaf,i,t}^{sunlit}$ values.
++ *Stem water potential* ($\Psi_{stem, i}$): the minimum of $\Psi_{stem,i,t}$ values.
++ *Root-crown water potential* ($\Psi_{rootcrown, i}$): the minimum of $\Psi_{rootcrown,i,t}$ values.
++ *Root surface water potentials* ($\Psi_{rootsurf, i,s}$): the minimum of $\Psi_{rootsurf,i,s,t}$ values for each soil layer $s$.
+
+Analogously, relative water content of stems and leaves is known for every subdaily time step, which results in a daily sequence of leaf relative water content ($RWC_{leaf,i,t}$) and stem relative water content ($RWC_{stem,i,t}$). These are summarized at the daily level for each plant cohort $i$:
+
++ *Leaf relative water content* ($RWC_{leaf, i}$): the mean $RWC_{leaf,i,t}$ values.
++ *Stem relative water content* ($RWC_{stem, i}$): the mean of $RWC_{stem,i,t}$ values.
+
+Finally, the daily sequence of slopes of the supply function ($dE/d\Psi_{i,t}$) is also averaged at the daily level:
+
++ *Slope of the supply function* ($dE/d\Psi_{i}$): the mean $dE/d\Psi_{i,t}$ values.
+
+
+## Plant drought stress {#advanceddroughtstress}
 
 In order to have an estimate of daily drought stress for the plant cohort, the model uses the stem vulnerability curve of the plant to find the conductance relative to maximum stem conductance and turns it into its complement:
 
