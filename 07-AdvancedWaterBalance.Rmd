@@ -2,7 +2,7 @@
 
 # Advanced water balance model {#advancedwaterbalance}
 
-This chapter provides an overview of a water balance model, described in De Cáceres et al. (in prep.), that shares some characteristics with the basic water balance model described in previous chapters. Like the previous one, the model is run using function `spwb()`, for a set of days, or function `spwb_day()`, for a single day. Compared to the basic model, the advanced water balance model adds more detail in some processes (light extinction, plant hydraulics and photosynthesis) and incorporates others that were missing (energy balances and hydraulic redistribution). 
+This chapter provides an overview of a water balance model, described in De Cáceres et al. (in prep.), that shares some characteristics with the basic water balance model described in previous chapters. Like the previous one, the model is run using function `spwb()`, for a set of days, or function `spwb_day()`, for a single day. Compared to the basic model, the advanced water balance model adds more detail in some processes (light extinction, plant hydraulics and photosynthesis) and incorporates others that were missing (energy balances, plant water balance and hydraulic redistribution). 
 
 The model overview is structured as in chapter \@ref(basicwaterbalance). Process formulations shared with the basic water balance model were presented in previous chapters. The following chapters provide a detailed description of those submodules that are exclusive of the advanced model. We recommend readers to familiarize themselves with basic water balance modelling processes before reading this and the subsequent chapters.
 
@@ -18,6 +18,8 @@ To calculate short and long-wave radiation absorbed by plants and the PAR at the
 
 Importantly, energy balances are conducted at two levels. On one hand the model keeps track of temperature variation within the canopy (i.e. canopy energy balance) and in the uppermost soil surface (i.e. soil energy balance) as the result of energy exchanges between them and with the atmosphere. Heat conduction also occurs among soil layers. Soil/canopy energy balance equations are very similar to those of Best et al. [-@Best2011] for JULES.  On the other, the model performs the energy balance at the leaf level to determine transpiration [@Sperry2016]. At this scale, radiation inputs include shortwave radiation from the atmosphere absorbed by the leaf and absorbed longwave radiation coming from both the atmosphere and the canopy itself. Leaf temperature is determined assuming that the temperature of the surrounding air is that of the canopy. After performing determining regulation, the model upscales the transpiration flux to the canopy scale and the corresponding latent heat is used to complete the calculation of the energy balance at the canopy level. Latent heat fluxes from evaporation from the soil and evaporation of intercepted rainfall are also included in the energy balance.
 
+While plant water content is normally determined by changes in water potential values corresponding to changes in soil moisture and transpiration rates, the model can also consider an explicit water balance within the plant. In this case, the amount of water in compartments is explicitly tracked and they decouple the extraction rate of soil water from the rate of leaf transpiration. 
+
 ## State variables
 
 The model has the following state variables:
@@ -25,7 +27,8 @@ The model has the following state variables:
 + Cumulative growth degree days, $GDD$, are tracked by the model and determine leaf phenological status (i.e. $LAI$ values) of winter deciduous species.
 + Daily soil moisture content dynamics on each layer $s$ are tracked using $W_s = \theta_s(\Psi_s)/ \theta_{fc,s}$, the *proportion of soil moisture in relation to field capacity*, where moisture at field capacity, $\theta_{fc,s}$, is assumed to correspond to $\Psi_{fc} = -0.033$ MPa. Note that $W_s$ values larger than one are possible if the soil is between field capacity and saturation (which can happen if deep drainage is not allowed).
 + The temperature of the canopy and of each soil layer ($T_{canopy}$ and $T_{soil,s}$; both in ºC) are tracked for every subdaily step.
-+ If irreversible cavitation is activated, the model also tracks $P_{embolized,i}$, the proportion of embolized xylem conduits for stem hydraulic segments of each plant cohort $i$.
++ If plant capacitance effects are considered, the model also tracks $\Psi_{apo, stem,i}$, the water potential of the stem apoplastic compartment, as well as the water potential of stem and leaf symplastic compartments, $\Psi_{symp, stem,i}$ and $\Psi_{symp, leaf,i}$ respectively.
++ If irreversible cavitation is activated, the model also tracks $P_{embolized,i}$, the proportion of stem embolized xylem conduits of each plant cohort $i$.
 
 ## Water and energy balances
 
