@@ -705,16 +705,16 @@ Note that the contribution of each soil layer depends on the soil conditions and
 
 ### Supply function of the soil-plant continuum {#supplycontinuum}
 
-As mentioned above, **medfate** uses a hydraulic network of $(S \times 2 + N + 1)$ resistance elements to represent the soil-plant continuum, with soil being represented in $S$ different layers. As before, the $S$ soil layers are in parallel up to the root crown and each soil layer requires at least a rhizosphere and a root segment. From the root crown there are $N$ stem xylem elements (normally $N = 1$) in series and a final leaf element. The whole hydraulic network is illustrated in the figure below.
+As mentioned above, **medfate** uses a hydraulic network of $(S \times 2 + 2 + 1)$ resistance elements to represent the soil-plant continuum, with soil being represented in $S$ different layers. As before, the $S$ soil layers are in parallel up to the root crown and each soil layer requires at least a rhizosphere and a root segment. From the root crown there are two stem xylem elements in series and a final leaf element. The whole hydraulic network is illustrated in the figure below.
 
-To build the supply function for the network, we proceed by calculating water potentials in the network for each value of flow. For any given $E$ value we start by calculating flows and potentials within the root system. After that, and assuming $N = 1$, the water potential at the upper end of the stem ($\Psi_{stem}$) is obtained using the inverse of the stem supply function and setting $\Psi_{up}=\Psi_{rootcrown}$. If $N > 1$, this is done for each of the stem segments (thus obtaining $\Psi_{stem, 1}$, $\Psi_{stem, 2}$, ... $\Psi_{stem, N}$), while using a maximum conductance for segments equal to $k_{max,i}$ times $N$. Leaf water potential ($\Psi_{leaf}$) is finaly obtained using the inverse of the leaf supply function and setting $\Psi_{up}=\Psi_{stem, N}$ and assuming a steady-state flow $E$. The whole supply function $E(\Psi_{leaf}$) is obtained repeating these operations from $E=0$ to a critical value $E_{crit}$. 
+To build the supply function for the network, we proceed by calculating water potentials in the network for each value of flow. For any given $E$ value we start by calculating flows and potentials within the root system. After that, the water potential at the mid of the stem ($\Psi_{stem,1}$) is obtained using the inverse of the stem supply function and setting $\Psi_{up}=\Psi_{rootcrown}$, and the water potential at the upper end of the stem, $\Psi_{stem, 2}$, is obtained similarly but setting $\Psi_{up}=\Psi_{stem,1}$. In both cases the maximum conductance for segments equal to $2 \cdot k_{stem,\max,i}$. Leaf water potential ($\Psi_{leaf}$) is finaly obtained using the inverse of the leaf supply function and setting $\Psi_{up}=\Psi_{stem, 2}$ and assuming a steady-state flow $E$. The whole supply function $E(\Psi_{leaf}$) is obtained repeating these operations from $E=0$ to a critical value $E_{crit}$. 
 
 ```{r, out.width='80%', fig.align="center", fig.cap="Schematic representation of hydraulics in a whole-plant network", echo=FALSE}
-knitr::include_graphics("hydraulics_nocap.jpg")
+knitr::include_graphics("hydraulics_network.jpg")
 ```
 
 
-The following figure shows network supply functions (with $N = 1$) for each soil texture and starting from the different soil water potential configurations (see function `hydraulics_supplyFunctionNetwork()`): 
+The following figure shows network supply functions for each soil texture and starting from the different soil water potential configurations (see function `hydraulics_supplyFunctionNetwork()`): 
 
 (ref:supplynetwork-cap) Examples of supply functions for a hydraulic network describing the potential rate of water supply for transpiration ($E$) as function of the leaf pressure ($\Psi_{leaf}$), starting from different bulk soil ($\Psi_{soil}$) values and for different soil textures. Left/right panel shows uncavitated/cavitated supply functions. 
 
@@ -1068,3 +1068,7 @@ where $RWC_{apo,s}$ is the function of relative water content for apoplastic ste
 
 ## Plant hydraulics with water compartments {#hydraulicswithcompartments}
 
+
+```{r, out.width='80%', fig.align="center", fig.cap="Schematic representation of hydraulics in a whole-plant network", echo=FALSE}
+knitr::include_graphics("hydraulics_capacitance.jpg")
+```
