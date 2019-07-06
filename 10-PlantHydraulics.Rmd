@@ -14,9 +14,12 @@ col4pale = "green"
 
 The supply-loss theory of plant hydraulics, presented by @Sperry2015 and used in @Sperry2016, uses the physics of flow through soil and xylem to quantify how steady-state canopy water supply declines with drought and ceases by hydraulic failure. The theory builds on the  hydraulic model of @Sperry1998 and can be applied to different segmentations of the soil-plant continuum. 
 
-The advanced water balance model of **medfate** implements steady-state hydraulic supply functions as described in @Sperry2015. The hydraulic network is described using $(S \times 2 + N + 1)$ resistance elements, with soil being represented in $S$ different soil layers and the stem by $N$ different stem segments. For each soil layer there is a rhizosphere element in series with a root xylem element. The $S$ soil layers are in parallel up to the root crown. From there there are $N$ stem xylem segments and a final leaf segment, all in series. Supply functions are used in the advanced water model to determine photosynthesis, stomatal conductance and transpiration (see chapters  \@ref(plantphotosynthesis) and \@ref(transpirationsperry)).
+The advanced water balance model of **medfate** implements steady-state hydraulic supply functions as described in @Sperry2015. The hydraulic network is described using $(S \times 2 + 2 + 1)$ resistance elements, with soil being represented in $S$ different soil layers. For each soil layer there is a rhizosphere element in series with a root xylem element. The $S$ soil layers are in parallel up to the root crown. From there there are two stem xylem segments and a final leaf segment, all in series. Supply functions are used in the advanced water model to determine photosynthesis, stomatal conductance and transpiration (see chapters  \@ref(plantphotosynthesis) and \@ref(transpirationsperry)).
 
-This chapter describes in detail how hydraulic supply functions are calculated, starting from their building blocks, i.e. vulnerability curves. Althougth the model implements this network representation of the soil-plant continuum, simpler one-element, two-element and three-element representations are first introduced to facilitate understanding.
+Sections \@ref(vulnerabilitycurves) and \@ref(supplyfunctions) in this chapter describe in detail how hydraulic supply functions are calculated, starting from their building blocks, i.e. vulnerability curves. Althougth the model implements this network representation of the soil-plant continuum, simpler one-element, two-element and three-element representations are first introduced to facilitate understanding.
+
+Plants have water within their tissues and this source of water is more readily accessible than soil water. To consider plant water storage compartments explicitly these need to be combined with supply functions in some way. In **medfate** we divide the hydraulic network into two parts: (1) the first is made of $(S \times 2 + 1)$ elements and draws water from the soil, pouring it into the stem xylem; and (2) the second is made of $(1+1)$ elements and draws water from stem xylem bringing it up to the leaves. Each part has its own supply function and the stem xylem segments exchange water with water storage compartments. Sections \@ref(plantwatercontent) and \@ref(hydraulicswithcompartments) are devoted to explain how plant water storage capacity is estimated and how it is integrated with the use of supply functions.
+
 
 
 ## Vulnerability curves {#vulnerabilitycurves}
@@ -163,7 +166,7 @@ legend("topright", bty="n", legend=textures, lty=1:3, cex=0.8, lwd=1.5)
 
 
 
-## Supply functions
+## Supply functions {#supplyfunctions}
 
 The supply function describes the steady-state rate of water supply (i.e. flow) for transpiration ($E$) as a function of water potential drop. The steady-state flow rate $E_i$ through any $i$ element of the continuum is related to the flow-induced drop in pressure across that element ($\Delta \Psi_i  = \Psi_{down} - \Psi_{up}$) by the integral transform of the element's vulnerability curve $k_i(\Psi)$ [@Sperry2015]:
 \begin{equation}
@@ -1004,10 +1007,10 @@ legend("topleft", bty="n", legend=c("Leaf","Stem","Root crown", "Rhizo 1", "Rhiz
 
 ## Water content of plant tissues {#plantwatercontent}
 
-In **medfate** the water content of leaves and stems is tracked explicitly. Following @Martin-StPaul2017, we consider two sources of water in plant segments [@Tyree1990]. The first comes from the conduits (tracheids or vessels), which will release water due to cavitation and may be refilled with water from adjacent living tissue. The second source of water is formed by more elastic living cells (i.e. parenchyma) and can potentially be a large source of water during relatively high water potentials. This source can be described using the relative water content of a symplasmic tissue. This storage compartment has its own water potential and exchanges water with the xylem conduits according to the difference in water potential.
+In **medfate** the water content of leaves and stems is tracked explicitly. Following @Martin-StPaul2017, we consider two kind of tissues in plant segments [@Tyree1990]. The first are conduits (tracheids or vessels), which will release water due to cavitation and may be refilled with water from adjacent living tissue or upstream segments. The second source of water is formed by more elastic living cells (i.e. parenchyma) and can potentially be a large source of water during relatively high water potentials. This source can be described using the relative water content of a symplasmic tissue. When capacitance effects are not considered, the relative water content of both kinds of plant tissues follow the water potential changes dictated by supply functions and stomatal regulation. This is done thanks to the pressure volume curves introduced in the next subsection. In contrast, when plant capacitance effects are considered, leaf and stem symplastic tissues have their own water potential as state variable, they exchange water between them and the stem symplastic tissue also exchanges water with conduits.
 
 ### Pressure-volume curves
-A pressure-volume curve of a tissue relates a water potential against relative water content ($RWC$; $kg H_2O \cdot kg^{-1}H_2O$ at saturation) in drying tissues. Pressure-volume theory is usually applied to leaves [@Bartlett2012], but it can also be applied to other tissues such as sapwood or cambium cells. 
+A pressure-volume curve of a tissue relates its water potential against its *relative water content* ($RWC$; $kg\,H_2O \cdot kg^{-1}\,H_2O$ at saturation) in drying tissues. Pressure-volume theory is usually applied to leave tissues [@Bartlett2012], but it can also be applied to other tissues such as sapwood or cambium cells. 
 
 For living cells, the relationship between $\Psi$ and $RWC$ of the symplasmic fraction ($RWC_{sym}$) is achieved by separating $\Psi$ into osmotic (solute) potential ($\Psi_{S}$) and the turgor potential ($\Psi_{P}$):
 \begin{equation}
@@ -1048,18 +1051,20 @@ plot(psi, rwc_a, type="l", xlab="Water potential (MPa)", ylab = "Apoplastic RWC"
 ```
 
 
-The average relative water content in a given compartment ($RWC$) can be obtained from $\Psi_{sym}$ and $\Psi_{apo}$ by calculating  $RWC_{sym}(\Psi_{sym})$ and $RWC_{apo}(\Psi_{apo})$ followed by assuming a constant apoplastic fraction $f_{apo}$:
+The average relative water content in a given segment or organ ($RWC$) can be obtained from $\Psi_{sym}$ and $\Psi_{apo}$ by calculating  $RWC_{sym}(\Psi_{sym})$ and $RWC_{apo}(\Psi_{apo})$ followed by assuming a constant apoplastic fraction $f_{apo}$:
 \begin{equation}
 RWC = RWC_{apo}(\Psi_{apo}) \cdot f_{apo} + RWC_{sym}(\Psi_{sym}) \cdot (1 - f_{apo})
 \end{equation}
-
+Normally the apoplastic fraction is large in stem sapwood and small in leave tissues.
 
 
 ### Relative water content and cavitation
 
-In **medfate** we assume that cavitation in stems is non-reversible. Within a given sapwood segment, we further assume that the proportion of conductance loss ($PLC$) is related to the relative water content ($RWC$) in its conduit vessels (i.e. the water volume in conduit vessels with respect to the maximum water volume):
+In **medfate** we assume that cavitation in stems is non-reversible. Within a given sapwood segment, we further assume that the proportion of conductance loss ($PLC$) is related to the relative water content ($RWC$) in its conduit vessels (i.e. the apoplastic water volume in conduit vessels with respect to the maximum water volume):
 \begin{equation}
 PLC(\Psi_{cav}) = 1 - RWC_{apo}(\Psi_{cav})
 \end{equation}
-where $RWC_{apo,s}$ is the function of relative water content for apoplastic stem tissue. With this assumption one can relate changes in PLC derived from cavitation with decreases in water content in xylem conduits. When $PLC$ increases the associated change in water content is a source of water can be added to the transpirational stream [@Martin-StPaul2017]. 
+where $RWC_{apo,s}$ is the function of relative water content for apoplastic stem tissue. With this assumption one can relate changes in PLC derived from cavitation with decreases in water content in xylem conduits. When $PLC$ increases the associated change in water content is a source of water can be added to the transpirational stream, if capacitance effects are considered [@Martin-StPaul2017]. 
+
+## Plant hydraulics with water compartments {#hydraulicswithcompartments}
 
