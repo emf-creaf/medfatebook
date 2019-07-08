@@ -1005,11 +1005,13 @@ legend("topleft", bty="n", legend=c("Leaf","Stem","Root crown", "Rhizo 1", "Rhiz
 
 ```
 
+A supply function of the soil-plant hydraulic network defines a set steady-state flows and corresponding water potentials given fixed values of soil moisture. Hence, supply functions need to be updated whenever soil moisture is updated, i.e. once a day in the water balance model (see subsection \@ref(advancedwaterbalancescheduling)). This frequency should be enough in most cases, since soil water potentials change more slowly than plant water potentials.
+
 ## Water content of plant tissues {#plantwatercontent}
 
 In **medfate** the water content of leaves and stems is tracked explicitly. Following @Martin-StPaul2017, we consider two kind of tissues in plant segments [@Tyree1990]. The first are conduits (tracheids or vessels), which will release water due to cavitation and may be refilled with water from adjacent living tissue or upstream segments. The second source of water is formed by more elastic living cells (i.e. parenchyma) and can potentially be a large source of water during relatively high water potentials. This source can be described using the relative water content of a symplasmic tissue. When capacitance effects are not considered, the relative water content of both kinds of plant tissues follow the water potential changes dictated by supply functions and stomatal regulation. This is done thanks to the pressure volume curves introduced in the next subsection. In contrast, when plant capacitance effects are considered, leaf and stem symplastic tissues have their own water potential as state variable, they exchange water between them and the stem symplastic tissue also exchanges water with conduits.
 
-### Pressure-volume curves
+### Pressure-volume curves {#pressurevolumecurves}
 A pressure-volume curve of a tissue relates its water potential against its *relative water content* ($RWC$; $kg\,H_2O \cdot kg^{-1}\,H_2O$ at saturation) in drying tissues. Pressure-volume theory is usually applied to leave tissues [@Bartlett2012], but it can also be applied to other tissues such as sapwood or cambium cells. 
 
 For living cells, the relationship between $\Psi$ and $RWC$ of the symplasmic fraction ($RWC_{sym}$) is achieved by separating $\Psi$ into osmotic (solute) potential ($\Psi_{S}$) and the turgor potential ($\Psi_{P}$):
@@ -1068,7 +1070,32 @@ where $RWC_{apo,s}$ is the function of relative water content for apoplastic ste
 
 ## Plant hydraulics with water compartments {#hydraulicswithcompartments}
 
+### Design
+Supply functions are very useful to estimate steady-state transpiration flows, i.e. situations where a constant transpiration flow through the hydraulic network generates a drop in water potential along the pathway. However, with this modelling architecture the water potential of plants is at least as negative as that of the soil. In other words, plants are hydraulically *connected* to the soil. In reality, evaporation of water in leaf intercellular spaces generates a tension that is transmitted along the xylem and generating hydraulic lift. Thus, water within xylem tissues is a source of water more readily accessible for transpiration than soil water. Considering plant water compartments explicitly opens the door to simulating the process of plant disconnection from the soil, because a plant can stop drawing soil water and rely on its own water reserves. Moreover, one can estimate the time needed for plant dessication by taking into account plant water reserves, which should be greater for larger plants.
 
-```{r, out.width='80%', fig.align="center", fig.cap="Schematic representation of hydraulics in a whole-plant network", echo=FALSE}
+To consider plant water storage compartments **medfate** divides the hydraulic network into two parts (black and red arrows in figure below): (1) the first is made of ($S×2+1$) elements and draws water from the soil, pouring it into the stem xylem; and (2) the second is made of ($1+1$) elements and draws water from stem xylem bringing it up to the leaves. This division allows considering the intermediate node, $\Psi_{stem,1}$, as the water potential of an apoplastic xylem compartment (i.e. $\Psi_{stem,1} = \Psi_{apo, stem}$) from which water is drawn towards the leaves and where soil water is poured. Moreover, this apoplastic compartment is hydraulically connected with stem and leaf symplastic compartments (whose moisture level is represented by $\Psi_{symp, stem}$ and $\Psi_{symp, leaf}$) that can also contribute with water to the transpirational stream. The larger these compartments in volume, the more water the plant will be able to transpire without needing a replacement of water from the soil. In case of edaphic drought and very much reduced soil-root conductance, the plant can be disconnected hydraulically from the soil and still transpire small amounts of water from these compartments.
+  
+```{r, out.width='80%', fig.align="center", fig.cap="Schematic representation of hydraulics in a whole-plant network with water storage compartments", echo=FALSE}
 knitr::include_graphics("hydraulics_capacitance.jpg")
 ```
+
+Note that while this approach allows some independence of stem and leaf water potentials with respect to soil water potentials (i.e. a disconnection from the soil), the root system is still connected with the soil and will follow soil water potential declines despite water reserves in the plant.
+
+### Constitutive equations
+
+The way the previous architecture is implemented is the following. Two supply functions are needed, one from soil nodes to $\Psi_{stem,1}$, and the other from $\Psi_{stem,1}$ to $\Psi_{leaf}$. The first supply function defines an input instantaneous (steady-state) flow to the stem compartment, $E_{stem, in}$, whereas the second supply function defines an outflow from the stem $E_{stem, out}$. Two other instantaneous flows, $F_{lat}$ and $F_{ver}$ are needed between plant water compartments:
+\begin{eqnarray}
+F_{lat} &=& k_{lat} \cdot (\Psi_{symp,stem} - \Psi_{stem, apo}) \\
+F_{ver} &=& k_{symp,ver} \cdot (\Psi_{symp,leaf} - \Psi_{symp,stem})
+\end{eqnarray}
+where $k_{lat}$ and $k_{symp,ver}$ are the lateral (symplastic-apoplastic) water conductance and vertical symplastic (leaf-stem) water conductance, respectively. These conductance values are defined as control parameters. The four instantaneous flows define a system of differential equations with the following volume changes:
+\begin{eqnarray}
+\frac{\delta V_{apo,stem}}{\delta t} &=& E_{stem, in}  - E_{stem, out} + F_{lat} \\
+\frac{\delta V_{symp,stem}}{\delta t} &=& F_{ver} - F_{lat} \\
+\frac{\delta V_{symp,leaf}}{\delta t} &=& - F_{ver}
+\end{eqnarray}
+These are completed with maximum storage capacity values of water compartments and the corresponding pressure-volume equations relating relative water content changes with water potentials (see section \@ref(pressurevolumecurves)). 
+
+### Implementation
+
+The dynamic system is solved in the model by time discretization. Small time steps are needed when dealing with storage comparments, which poses additional challenges. The soil-to-stem supply function only needs to be updated when soil moisture has changed substantially, i.e. at the same rate as the hydraulic system without plant compartments. However, the second supply function needs to be recalculated more often, because $\Psi_{stem,1}$ changes faster than soil water potentials. In the model, the soil-to-stem supply function is recalculated once a day, whereas the stem-to-leaf supply function is recalculated following subdaily time steps (i.e. every $t_{step}$, by default $t_{step} = 1h = 3600 s$). Water potentials of storage compartments, and flows between compartments are updated using $1s$ time steps. Stem outflow $E_{stem,out}$ is considered constant within a given subdaily $t_{step}$, but $E_{stem, in}$ is re-estimated every second depending on the value of $\Psi_{stem,1} = \Psi_{apo,stem}$. Since the soil-to-stem supply function is already defined for a range of $\Psi_{stem,1}$ values, at each $1s$ time step the model only needs to determine the value of $E$ in the supply function corresponding to the current value of $\Psi_{stem,1}$.
