@@ -1079,20 +1079,21 @@ To consider plant water storage compartments **medfate** divides the hydraulic n
 knitr::include_graphics("hydraulics_capacitance.jpg")
 ```
 
-Note that while this approach allows some independence of stem and leaf water potentials with respect to soil water potentials (i.e. a disconnection from the soil), the root system is still connected with the soil and will follow soil water potential declines despite water reserves in the plant.
+There is no explicit leaf apoplastic compartment. The lateral flow simply modifies the water demand from the leaves to the stem. While this approach allows some independence of stem and leaf water potentials with respect to soil water potentials (i.e. a disconnection from the soil), the root system is still connected with the soil and will follow soil water potential declines despite water reserves in the plant.
 
 ### Constitutive equations
 
-The way the previous architecture is implemented is the following. Two supply functions are needed, one from soil nodes to $\Psi_{stem,1}$, and the other from $\Psi_{stem,1}$ to $\Psi_{leaf}$. The first supply function defines an input instantaneous (steady-state) flow to the stem compartment, $E_{stem, in}$, whereas the second supply function defines an outflow from the stem $E_{stem, out}$. Two other instantaneous flows, $F_{lat}$ and $F_{ver}$ are needed between plant water compartments:
+The way the previous architecture is implemented is the following. Two supply functions are needed, one from soil nodes to $\Psi_{stem,1}$, and the other from $\Psi_{stem,1}$ to $\Psi_{leaf}$. The first supply function defines an input instantaneous (steady-state) flow to the stem compartment, $E_{stem, in}$, whereas the second supply function defines an outflow from the stem $E_{stem, out}$. Three other instantaneous flows, $F_{lat, stem}$, $F_{lat, leaf}$ and $F_{ver}$ are defined between plant water compartments:
 \begin{eqnarray}
-F_{lat} &=& k_{lat} \cdot (\Psi_{symp,stem} - \Psi_{stem, apo}) \\
+F_{lat,stem} &=& k_{lat,stem} \cdot (\Psi_{symp,stem} - \Psi_{stem, apo}) \\
+F_{lat,leaf} &=& k_{lat,leaf} \cdot (\Psi_{symp,leaf} - \Psi_{leaf}) \\
 F_{ver} &=& k_{symp,ver} \cdot (\Psi_{symp,leaf} - \Psi_{symp,stem})
 \end{eqnarray}
-where $k_{lat}$ and $k_{symp,ver}$ are the lateral (symplastic-apoplastic) water conductance and vertical symplastic (leaf-stem) water conductance, respectively. These conductance values are defined as control parameters. The four instantaneous flows define a system of differential equations with the following volume changes:
+where $k_{lat}$ and $k_{symp,ver}$ are the lateral (symplastic-apoplastic) water conductance and vertical symplastic (leaf-stem) water conductance, respectively. These conductance values are defined as control parameters. The five instantaneous flows define a system of differential equations with the following volume changes:
 \begin{eqnarray}
-\frac{\delta V_{apo,stem}}{\delta t} &=& E_{stem, in}  - E_{stem, out} + F_{lat} \\
-\frac{\delta V_{symp,stem}}{\delta t} &=& F_{ver} - F_{lat} \\
-\frac{\delta V_{symp,leaf}}{\delta t} &=& - F_{ver}
+\frac{\delta V_{apo,stem}}{\delta t} &=& (E_{stem, in} + F_{lat,stem}) - (E_{stem, out} + F_{lat, leaf})  \\
+\frac{\delta V_{symp,stem}}{\delta t} &=& F_{ver} - F_{lat, stem} \\
+\frac{\delta V_{symp,leaf}}{\delta t} &=& - F_{ver} - F_{lat, leaf}
 \end{eqnarray}
 These are completed with maximum storage capacity values of water compartments and the corresponding pressure-volume equations relating relative water content changes with water potentials (see section \@ref(pressurevolumecurves)). 
 
