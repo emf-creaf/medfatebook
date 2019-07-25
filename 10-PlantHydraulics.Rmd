@@ -1070,25 +1070,40 @@ where $RWC_{apo,s}$ is the function of relative water content for apoplastic ste
 
 ## Plant hydraulics with water compartments {#hydraulicswithcompartments}
 
-### Design
-Supply functions are very useful to estimate steady-state transpiration flows, i.e. situations where a constant transpiration flow through the hydraulic network generates a drop in water potential along the pathway. However, with this modelling architecture the water potential of plants is at least as negative as that of the soil. In other words, plants are hydraulically *connected* to the soil. In reality, evaporation of water in leaf intercellular spaces generates a tension that is transmitted along the xylem and generating hydraulic lift. Thus, water within xylem tissues is a source of water more readily accessible for transpiration than soil water. Considering plant water compartments explicitly opens the door to simulating the process of plant disconnection from the soil, because a plant can stop drawing soil water and rely on its own water reserves. Moreover, one can estimate the time needed for plant dessication by taking into account plant water reserves, which should be greater for larger plants.
 
-To consider plant water storage compartments **medfate** divides the hydraulic network into two parts (black and red arrows in figure below): (1) the first is made of ($S×2+1$) elements and draws water from the soil, pouring it into the stem xylem; and (2) the second is made of ($1+1$) elements and draws water from stem xylem bringing it up to the leaves. This division allows considering the intermediate node, $\Psi_{stem,1}$, as the water potential of an apoplastic xylem compartment (i.e. $\Psi_{stem,1} = \Psi_{apo, stem}$) from which water is drawn towards the leaves and where soil water is poured. Moreover, this apoplastic compartment is hydraulically connected with a stem symplastic compartment (whose moisture level is represented by $\Psi_{symp, stem}$) that can also contribute with water to the transpirational stream. Another symplasmic compartment is considered at the leaf level (whose moisture level is represented by $\Psi_{symp, leaf}$) that add or withdraws water from the transpirational stream depending on differences between leaf apoplastic and symplastic water potentials. The larger these compartments in volume, the more water the plant will be able to transpire without needing a replacement of water from the soil. In case of edaphic drought and very much reduced soil-root conductance, the plant can be disconnected hydraulically from the soil and still transpire small amounts of water from these compartments.
-  
+Supply functions are very useful to estimate steady-state transpiration flows, i.e. situations where a constant transpiration flow through the hydraulic network generates a drop in water potential along the pathway. However, with this modelling strategy the water potential of plants is at least as negative as that of the soil. In other words, plants are hydraulically *connected* to the soil at any time. In reality, evaporation of water in leaf intercellular spaces generates a tension that is transmitted along the xylem and generating hydraulic lift. Water within xylem and adjacent tissues is a source of water more readily accessible for transpiration than soil water. 
+
+Xylem conduits are quite inelastic (i.e. they have a very high elastic modulus) so their volumetric changes following diurnal changes in flow rate and water potential are small, and hence contribute little to capacitive water storage and retrieval. In contrast, more elastic living cells in the xylem and bark can potentially be a larger source of water during decreasing water potential. In addition, as xylem conduits cavitate they become filled with water vapour or gas, and nearly all the liquid water inside is freed to the transpiration stream. Cavitation can therefore affect the water status of a plant positively in the short-term due to this capacitive effect [@Holtta2009].
+
+Considering plant water compartments explicitly opens the door to simulating an effective plant disconnection from the soil, because a plant can stop drawing soil water and rely on its own water reserves. Moreover, one can estimate the time needed for plant dessication by taking into account stem and leaf water reserves, which should be greater for larger plants.
+
+### Design
+
+To consider plant water storage compartments **medfate** uses two supply functions (black and red arrows in figure below): 
+
+ 1. The first supply function is made of ($S×2+1$) elements and draws water from the soil, pouring it into the stem xylem. This supply function is used to determine soil water uptake. 
+ 2. The second is made of ($1+2+1$) elements (representing plant resistances) and is used to determine the rate of water flowing from stem up to the leaves for transpiration and photosynthesis, as in the model without water comparments. 
+ 
+This division of water input and output from the stem allows considering the intermediate node, $\Psi_{stem,1}$, as the water potential of an explicit xylem water compartment from which water is drawn towards the leaves and where soil water is poured. Following @Holtta2009, the xylem water compartment can be a source of water for transpiration when cavitation occurs. Following @Steppe2006, two symplasmic water reserve compartments are also considered, which can also provide water for transpiration. The xylem compartment is hydraulically connected with a stem symplastic compartment (whose moisture level is represented by the state variable $\Psi_{symp, stem}$) and another symplasmic compartment is considered at the leaf level (whose moisture level is represented by $\Psi_{symp, leaf}$) that adds or withdraws water from the transpirational stream depending on differences between leaf xylem and symplastic water potentials. As the supply function #2 assumes a steady state flow from the stem to the leaves (and atmosphere) the leaf symplastic water compartment is used to modulate how much of the steady-state flow will actually be drawn from the stem xylem compartment. In other words, the leaf lateral flow simply modifies the water demand from the leaves to the stem.
+
+
 ```{r, out.width='80%', fig.align="center", fig.cap="Schematic representation of hydraulics in a whole-plant network with water storage compartments", echo=FALSE}
 knitr::include_graphics("hydraulics_capacitance.jpg")
 ```
 
-There is no explicit leaf apoplastic compartment. The leaf lateral flow simply modifies the water demand from the leaves to the stem. While this approach allows some independence of stem and leaf water potentials with respect to soil water potentials (i.e. a disconnection from the soil), the root system is still connected with the soil and will follow soil water potential declines despite water reserves in the plant.
+The larger these three compartments in volume, the more water the plant will be able to transpire without needing a replacement of water from the soil. In case of edaphic drought and very much reduced soil-root conductance, the plant can be disconnected hydraulically from the soil and still loose small amounts of water (through cuticular transpiration) from these compartments.
+
 
 ### Constitutive equations
 
-The way the previous architecture is implemented is the following. Two supply functions are needed, one from soil nodes to $\Psi_{stem,1}$, and the other from $\Psi_{stem,1}$ to $\Psi_{leaf}$. The first supply function defines an input instantaneous (steady-state) flow to the stem compartment, $E_{stem, in}$, whereas the second supply function defines an outflow from the stem, i.e. $E_{stem, out}$. Two other instantaneous apoplastic-symplastic flows, $F_{lat, stem}$, and $F_{lat, leaf}$ are defined:
+The way the previous architecture is implemented is the following. Two supply functions are needed, one from soil nodes to $\Psi_{stem,1}$, and the other from $\Psi_{rootsurf}$ to $\Psi_{leaf}$. The first supply function defines an input instantaneous (steady-state) flow to the stem compartment, $E_{stem, in}$, whereas the second supply function defines an outflow from the stem, i.e. $E_{stem, out}$. The second (plant) supply function needs to be build from $\Psi_{rootsurf}$ to $\Psi_{leaf}$ (and not from $\Psi_{stem,1}$ to $\Psi_{leaf}$) because all plant resistances are needed to determine the relationship between $E_{stem, out}$ and $\Psi_{leaf}$.
+
+Two instantaneous water flows, $F_{lat, stem}$, and $F_{lat, leaf}$ are defined:
 \begin{eqnarray}
 F_{lat,stem} &=& k_{lat,stem} \cdot (\Psi_{symp,stem} - \Psi_{stem, apo}) \\
 F_{lat,leaf} &=& k_{lat,leaf} \cdot (\Psi_{symp,leaf} - \Psi_{leaf}) \\
 \end{eqnarray}
-where $k_{lat,stem}$ and $k_{lat,leaf}$ are the lateral (symplastic-apoplastic) water conductance for stem and leaves, respectively. These conductance values are defined as control parameters. The four instantaneous flows define a system of differential equations with the following volume changes:
+where $k_{lat,stem}$ and $k_{lat,leaf}$ are the lateral (between symplastic tissues and xylem) water conductance for stem and leaves, respectively. These conductance values are defined as control parameters. The four instantaneous flows define a system of equations with the following volume changes:
 \begin{eqnarray}
 \frac{\delta V_{apo,stem}}{\delta t} &=& (E_{stem, in} + F_{lat,stem}) - (E_{stem, out} + F_{lat, leaf})  \\
 \frac{\delta V_{symp,stem}}{\delta t} &=& - F_{lat, stem} \\
