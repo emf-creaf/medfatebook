@@ -1009,10 +1009,11 @@ A supply function of the soil-plant hydraulic network defines a set steady-state
 
 ## Water content of plant tissues {#plantwatercontent}
 
-In **medfate** the water content of leaves and stems is tracked explicitly. Following @Martin-StPaul2017, we consider two kind of tissues in plant segments [@Tyree1990]. The first are conduits (tracheids or vessels), which will release water due to cavitation and may be refilled with water from adjacent living tissue or upstream segments. The second source of water is formed by more elastic living cells (i.e. parenchyma) and can potentially be a large source of water during relatively high water potentials. This source can be described using the relative water content of a symplasmic tissue. When capacitance effects are not considered, the relative water content of both kinds of plant tissues follow the water potential changes dictated by supply functions and stomatal regulation. This is done thanks to the pressure volume curves introduced in the next subsection. In contrast, when plant capacitance effects are considered, leaf and stem symplastic tissues have their own water potential as state variable, they exchange water between them and the stem symplastic tissue also exchanges water with conduits.
+In **medfate** the relative water content of leaves and stems is tracked explicitly. Following @Martin-StPaul2017, we consider two kind of tissues in (leaf and stem) plant segments [@Tyree1990]. The first are conduits (tracheids or vessels), which will release water due to cavitation and may be refilled with water from adjacent living tissue or upstream segments. The second source of water is formed by more elastic living cells (i.e. parenchyma) and can potentially be a large source of water during relatively high water potentials. This source can be described using the relative water content of a symplasmic tissue. When capacitance effects are not considered, the relative water content of both kinds of plant tissues follow the water potential changes dictated by supply functions and stomatal regulation. In contrast, when plant capacitance effects are considered, leaf and stem symplastic tissues have their own water potential as state variable, they exchange water with leaf and stem xylem, respectively.
 
-### Pressure-volume curves {#pressurevolumecurves}
-A pressure-volume curve of a tissue relates its water potential against its *relative water content* ($RWC$; $kg\,H_2O \cdot kg^{-1}\,H_2O$ at saturation) in drying tissues. Pressure-volume theory is usually applied to leave tissues [@Bartlett2012], but it can also be applied to other tissues such as sapwood or cambium cells. 
+A pressure-volume curve of a tissue relates its water potential against its *relative water content* ($RWC$; $kg\,H_2O \cdot kg^{-1}\,H_2O$ at saturation). Pressure-volume theory is usually applied to leaf tissues [@Bartlett2012], but it can also be applied to other tissues such as sapwood or cambium cells. 
+
+### Relative water content of symplasmic tissues {#pressurevolumecurves}
 
 For living cells, the relationship between $\Psi$ and $RWC$ of the symplasmic fraction ($RWC_{sym}$) is achieved by separating $\Psi$ into osmotic (solute) potential ($\Psi_{S}$) and the turgor potential ($\Psi_{P}$):
 \begin{equation}
@@ -1038,35 +1039,42 @@ for(i in 1:length(psi)) rwc_s[i] =moisture_symplasticRWC(psi[i],-3,12)
 plot(psi, rwc_s, type="l", xlab="Water potential (MPa)", ylab = "Symplasmic RWC")
 ```
 
-To calculate $RWC_{sym}$ from the water potential of a tissue, the previous equations need to be combined and, after isolating $RWC_{sym}$, a quadratic relationship is obtained. 
+To calculate $RWC_{sym}$ from the water potential of a tissue, the previous equations need to be combined and, after isolating $RWC_{sym}$, a quadratic relationship is obtained [@Martin-StPaul2017]. 
   
-Apoplastic reservoirs (e.g. sapwood) consist of inelastic cells that release their water to the transpiration stream following embolism. As in @Holtta2009, we equate the relative water content of the apoplastic reservoir of a segment (leaves or stem) to the proportion of maximum conductance in the vulnerability curve:
+
+### Relative water content of apoplastic tissues 
+
+In **medfate** it is assumed that apoplastic water fraction of an organ corresponds to the water in its xylem conduits. Xylem conduits consist of inelastic cells that have very small changes of water volume in relation to changes in water potential. However, xylem conduits release their water to the transpiration stream following the formation of emboli. As in @Holtta2009, we equate the relative water content of the apoplastic reservoir of a segment (leaves or stem) to the proportion of maximum conductance in the vulnerability curve, i.e. to the complement of the proportion of conductance lost:
 \begin{equation}
-RWC_{apo}(\Psi) = \frac{k(\Psi)}{k_{max}} = e^{-((\Psi/d)^{c})}
+RWC_{apo}(\Psi_{cav}) = \frac{k(\Psi_{cav})}{k_{max}} = 1 - PLC(\Psi_{cav})
 \end{equation}
+where $\Psi_{cav}$ is the water potential corresponding to the level of $PLC$ in the stem or leaf vulnerability curve.
 
 ```{r, fig.width=4, fig.height=4, echo=FALSE, fig.align="center"}
 psi = seq(-7,0, by=0.1)
 rwc_a = rep(NA, length(psi))
 for(i in 1:length(psi)) rwc_a[i] =moisture_apoplasticRWC(psi[i],stemc,stemd)
-plot(psi, rwc_a, type="l", xlab="Water potential (MPa)", ylab = "Apoplastic RWC")
+plot(psi, rwc_a, type="l", xlab="Water potential corresponding to PLC level (MPa)", ylab = "Apoplastic RWC")
 ```
 
-
-The average relative water content in a given segment or organ ($RWC$) can be obtained from $\Psi_{sym}$ and $\Psi_{apo}$ by calculating  $RWC_{sym}(\Psi_{sym})$ and $RWC_{apo}(\Psi_{apo})$ followed by assuming a constant apoplastic fraction $f_{apo}$:
+With this assumption one can relate changes in $PLC$ derived from cavitation with decreases in water content in xylem conduits. Since cavitation in leaves is assumed reversible we have that the relative water content of the apoplastic fraction will follow the leaf xylem water potential:
 \begin{equation}
-RWC = RWC_{apo}(\Psi_{apo}) \cdot f_{apo} + RWC_{sym}(\Psi_{sym}) \cdot (1 - f_{apo})
+RWC_{leaf, apo}(\Psi_{leaf, cav}) = RWC_{leaf, apo}(\Psi_{leaf})
 \end{equation}
-Normally the apoplastic fraction is large in stem sapwood and small in leave tissues.
+In stems, $PLC$ may be non-reversible, so $RWC_{stem,apo}$ is dictated by the current level of $PLC$ and not the xylem water potential (which may be higher than \Psi_{stem, cav}). When stem $PLC$ increases the associated change in water content is a source of water can be added to the transpirational stream, if capacitance effects are considered [@Martin-StPaul2017]. This will be treated in the next section. 
 
 
-### Relative water content and cavitation
+### Average relative water content of a segment
 
-In **medfate** we assume that cavitation in stems is non-reversible. Within a given sapwood segment, we further assume that the proportion of conductance loss ($PLC$) is related to the relative water content ($RWC$) in its conduit vessels (i.e. the apoplastic water volume in conduit vessels with respect to the maximum water volume):
+The average relative water content in a given segment or organ ($RWC$) can be obtained from $\Psi_{sym}$ and $PLC(\Psi_{cav})$ by calculating  $RWC_{sym}(\Psi_{sym})$ followed by assuming a constant apoplastic fraction $f_{apo}$:
+
 \begin{equation}
-PLC(\Psi_{cav}) = 1 - RWC_{apo}(\Psi_{cav})
+RWC = RWC_{apo}(\Psi_{cav}) \cdot f_{apo} + RWC_{sym}(\Psi_{sym}) \cdot (1 - f_{apo})
 \end{equation}
-where $RWC_{apo,s}$ is the function of relative water content for apoplastic stem tissue. With this assumption one can relate changes in PLC derived from cavitation with decreases in water content in xylem conduits. When $PLC$ increases the associated change in water content is a source of water can be added to the transpirational stream, if capacitance effects are considered [@Martin-StPaul2017]. 
+
+Normally the apoplastic fraction is large (~80%) in the stem and small (~15%) in leaves. Hence, the relative water content in stems will be mostly dictated by the level of cavitation, whereas that of leaves will mostly follow leaf symplastic water potential and the symplastic pressure-volume curve.
+
+
 
 ## Plant hydraulics with water compartments {#hydraulicswithcompartments}
 
@@ -1095,21 +1103,40 @@ The larger the three compartments in volume, the more water the plant will be ab
 
 ### Constitutive equations
 
-The way the previous architecture is implemented is the following. Two supply functions are needed, one from soil nodes to $\Psi_{stem,1}$, and the other from $\Psi_{rootsurf}$ to $\Psi_{leaf}$. 
-
-Two instantaneous water flows, $F_{lat, stem}$, and $F_{lat, leaf}$ are defined:
+The way the previous architecture is implemented is the following. Two supply functions provide flows $E_{stem, in}$ and $E_{leaf, out}$, respectively. Two instantaneous water flows, $F_{lat, stem}$ and $F_{lat, leaf}$, are defined from Darcy's law:
 \begin{eqnarray}
-F_{lat,stem} &=& k_{lat,stem} \cdot (\Psi_{symp,stem} - \Psi_{stem, apo}) \\
+F_{lat,stem} &=& k_{lat,stem} \cdot (\Psi_{symp,stem} - \Psi_{stem,1}) \\
 F_{lat,leaf} &=& k_{lat,leaf} \cdot (\Psi_{symp,leaf} - \Psi_{leaf}) \\
 \end{eqnarray}
-where $k_{lat,stem}$ and $k_{lat,leaf}$ are the lateral (between symplastic tissues and xylem) water conductance for stem and leaves, respectively. These conductance values are defined as control parameters. The four instantaneous flows define a system of equations with the following volume changes:
+where $k_{lat,stem}$ and $k_{lat,leaf}$ are the lateral (between symplastic tissues and xylem) water conductance for stem and leaves, respectively. These conductance values are defined as control parameters. The flow leaving the stem is defined by the atmospheric demand minus the water supplied from the leaf symplasmic tissues ($F_{lat,leaf}$ can be negative):
+\begin{equation}
+E_{stem, out} = E_{leaf, out} - F_{lat,leaf}
+\end{equation}
+And the mass balance in the stem xylem compartment is:
+\begin{equation}
+\frac{\delta m_{stem}} {\delta t} = E_{stem, in} - E_{stem, out}
+\end{equation}
+However, the change in volume is composed of two terms: one arising from water movement in and out of the stem compartment and the other arising from the change in the gas volume caused by cavitation [@Holtta2009]:
+\begin{equation}
+\frac{\delta V_{stem,apo}} {\delta t} = \frac{1}{\rho_{w}}\cdot \frac{\delta m_{stem}} {\delta t} + \frac{\delta{V_{cav}}}{\delta t}
+\end{equation}
+where $\rho_{w}$ is the density of water. If there has been an increase in $PLC$, this creates a source of available water proportional to this change [@Holtta2009]:
+\begin{equation}
+\frac{\delta{V_{cav}}}{\delta t} = V_{stem,apo,max} \cdot \frac{\delta{PLC}}{\delta t} =  V_{stem,apo,max} \cdot  \frac{PLC(\Psi_{cav,t}) - PLC(\Psi_{cav,t-1})}{\delta t}
+\end{equation}
+where $V_{stem,apo,max}$ is the capacity of the stem xylem compartment. Otherwise, $\delta{V_{cav}}/\delta t=0.0$. The change in water pressure in the stem xylem compartment following the change in water volume follows:
+\begin{equation}
+\frac{\delta \Psi_{stem,1}} {\delta t} = \epsilon_{xylem} \cdot \frac{1}{V_{stem,apo,max}}\cdot \frac{\delta V_{stem,apo}} {\delta t} = \epsilon_{xylem} \cdot \frac{\delta RWC_{stem,apo}} {\delta t}
+\end{equation}
+Where $\epsilon_{xylem} = 10^3$ MPa is the xylem elastic modulus. 
+
+The water balance equations for the symplastic compartments are simply:
 \begin{eqnarray}
-\frac{\delta V_{apo,stem}}{\delta t} &=& (E_{stem, in} + F_{lat,stem}) - (E_{stem, out} + F_{lat, leaf})  \\
-\frac{\delta V_{symp,stem}}{\delta t} &=& - F_{lat, stem} \\
-\frac{\delta V_{symp,leaf}}{\delta t} &=& - F_{lat, leaf}
+\frac{\delta V_{stem, symp}}{\delta t} &=& - \frac{1}{\rho_{w}}\cdot F_{lat, stem} \\
+\frac{\delta V_{leaf, symp}}{\delta t} &=& - \frac{1}{\rho_{w}}\cdot F_{lat, leaf}
 \end{eqnarray}
-These are completed with maximum storage capacity values of water compartments and the corresponding pressure-volume equations relating relative water content changes with water potentials (see section \@ref(pressurevolumecurves)). 
+These are completed with maximum storage capacity values of the symplasmic water compartments ($V_{stem,symp,max}$ and $V_{leaf,symp,max}$), which allow determining changes in relative water content of symplasmic tissues, and the corresponding pressure-volume equations relating relative water content changes with water potentials $\Psi_{symp, stem}$ and $\Psi_{symp, leaf}$ (see section \@ref(pressurevolumecurves)). 
 
 ### Implementation
 
-The dynamic system is solved in the model by time discretization. Small time steps are needed when dealing with storage comparments, which poses additional challenges. The soil-to-stem supply function only needs to be updated when soil moisture has changed substantially, i.e. at the same rate as the hydraulic system without plant compartments. However, the second supply function needs to be recalculated more often, because $\Psi_{stem,1}$ changes faster than soil water potentials. In the model, the soil-to-stem supply function is recalculated once a day, whereas the stem-to-leaf supply function is recalculated following subdaily time steps (i.e. every $t_{step}$, by default $t_{step} = 1h = 3600 s$). Water potentials of storage compartments, and flows between compartments are updated using $1s$ time steps. Stem outflow $E_{stem,out}$ is considered constant within a given subdaily $t_{step}$, but $E_{stem, in}$ is re-estimated every second depending on the value of $\Psi_{stem,1} = \Psi_{apo,stem}$. Since the soil-to-stem supply function is already defined for a range of $\Psi_{stem,1}$ values, at each $1s$ time step the model only needs to determine the value of $E$ in the supply function corresponding to the current value of $\Psi_{stem,1}$.
+The dynamic system is solved in the model by time discretization. Small time steps are needed when dealing with storage comparments, which poses additional challenges. The soil-to-stem supply function only needs to be updated when soil moisture has changed substantially, i.e. at the same rate as the hydraulic system without plant compartments. However, the second supply function needs to be recalculated more often, because $\Psi_{stem,1}$ changes faster than soil water potentials. In the model, the soil-to-stem supply function is recalculated once a day, whereas the stem-to-leaf supply function is recalculated following subdaily time steps (i.e. every $t_{step}$, by default $t_{step} = 1h = 3600 s$). Water potentials of storage compartments, and lateral flows between water compartments ($F_{lat, stem}$ and $F_{lat, leaf}$) are recalculated every $1s$ time step. Instantaneous transpiration rate $E_{leaf,out}$ is considered constant within a given subdaily $t_{step}$, but $E_{stem, in}$ is re-estimated every second depending on the current value of $\Psi_{stem,1}$. Since the soil-to-stem supply function is already defined for a range of $\Psi_{stem,1}$ values, at each $1s$ time step the model only needs to determine the value of $E_{stem, in}$ in the supply function corresponding to the current value of $\Psi_{stem,1}$.
