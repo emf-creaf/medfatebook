@@ -1056,11 +1056,11 @@ for(i in 1:length(psi)) rwc_a[i] =moisture_apoplasticRWC(psi[i],stemc,stemd)
 plot(psi, rwc_a, type="l", xlab="Water potential (MPa)", ylab = "Apoplastic RWC")
 ```
 
-Since cavitation in leaves is assumed reversible we have that the relative water content of the apoplastic fraction in leaves ($RWC_{leaf,apo}$) will follow the leaf xylem water potential as indicated above. In stems, however, cavitation may be non-reversible, so $RWC_{stem,apo}$ will be dictated by the current level of embolisation, which is represented by $PLC_{stem}$ and not the current xylem water potential (which may be higher than $\Psi_{stem, cav}$): 
+Since cavitation in leaves is assumed reversible we have that the relative water content of the apoplastic fraction in leaves ($RWC_{leaf,apo}$) will follow the leaf xylem water potential as indicated above. In stems, however, cavitation may be non-reversible, so $RWC_{stem,apo}$ will be dictated by the current level of embolisation, which is represented by $PLC_{stem}$ and not by the current xylem water potential: 
 \begin{equation}
-RWC_{stem,apo}(\Psi_{apo}) = PLC_{stem}(\Psi_{stem, cav})
+RWC_{stem,apo} = 1 - PLC_{stem}
 \end{equation}
-When $PLC_{stem}$ increases the associated decrease in water content is a source of water can be added to the transpirational stream, if capacitance effects are considered [@Martin-StPaul2017]. This will be treated in the next section. 
+If water compartments are not considered, $PLC_{stem}$ is determined by $\Psi_{stem, cav}$, the minimum stem water potential experienced so far. When water comparments are considered, increases in  $PLC_{stem}$ follow decreases in stem water content and the water released can be added to the transpirational stream [@Martin-StPaul2017]. This will be treated in the next section. 
 
 
 ### Average relative water content of a segment
@@ -1121,9 +1121,9 @@ However, the change in volume is composed of two terms: one arising from water m
 \end{equation}
 where $\rho_{w}$ is the density of water. If there has been an increase in $PLC$, this creates a source of available water proportional to this change [@Holtta2009]:
 \begin{equation}
-\frac{\delta{V_{cav}}}{\delta t} = V_{stem,apo,max} \cdot \frac{\delta{PLC}}{\delta t} =  V_{stem,apo,max} \cdot  \frac{PLC(\Psi_{cav,t}) - PLC(\Psi_{cav,t-1})}{\delta t}
+\frac{\delta{V_{cav}}}{\delta t} = V_{stem,apo,max} \cdot \frac{\delta{PLC_{stem}}}{\delta t}
 \end{equation}
-where $V_{stem,apo,max}$ is the capacity of the stem xylem compartment. Otherwise, $\delta{V_{cav}}/\delta t=0.0$. Note that the above formulation of water released by cavitation assumes that the relationship between stem water potential and the proportion of cavitated conduits (i.e. the cavitation curve) follows the same function as the relationship between stem water potential and the proportion of conductance loss (i.e. the hydraulic vulnerability curve). The change in water pressure in the stem xylem compartment following the change in water volume follows:
+where $V_{stem,apo,max}$ is the capacity of the stem xylem compartment. So if $\delta{PLC_{stem} = 0$ , $\delta{V_{cav}}/\delta t=0.0$. Since we model $PLC$ using the vulnerability curve, the above formulation of water released by cavitation assumes that the relationship between stem water potential and the proportion of cavitated conduits follows the same function as the relationship between stem water potential and the proportion of conductance loss (i.e. the hydraulic vulnerability curve). The change in water pressure in the stem xylem compartment following the change in water volume is:
 \begin{equation}
 \frac{\delta \Psi_{stem,1}} {\delta t} = \epsilon_{xylem} \cdot \frac{1}{V_{stem,apo,max}}\cdot \frac{\delta V_{stem,apo}} {\delta t} = \epsilon_{xylem} \cdot \frac{\delta RWC_{stem,apo}} {\delta t}
 \end{equation}
