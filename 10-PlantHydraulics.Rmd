@@ -1060,7 +1060,7 @@ Since cavitation in leaves is assumed reversible we have that the relative water
 \begin{equation}
 RWC_{stem,apo} = 1 - PLC_{stem}
 \end{equation}
-If water compartments are not considered, $PLC_{stem}$ is determined by $\Psi_{stem, cav}$, the minimum stem water potential experienced so far. When water comparments are considered, increases in  $PLC_{stem}$ follow decreases in stem water content and the water released can be added to the transpirational stream [@Martin-StPaul2017]. This will be treated in the next section. 
+If water compartments are not considered, $PLC_{stem}$ is determined by $\Psi_{stem, cav}$, the minimum stem water potential experienced so far. When water comparments are considered, increases in  $PLC_{stem}$ follow decreases in stem water content and the water released can contribute to the transpirational stream [@Martin-StPaul2017]. This will be treated in the next section. 
 
 
 ### Average relative water content of a segment
@@ -1100,7 +1100,7 @@ knitr::include_graphics("hydraulics_capacitance.jpg")
 The larger the three compartments in volume, the more water the plant will be able to transpire without needing a replacement of water from the soil. In case of edaphic drought and very much reduced soil-root conductance, the plant can be disconnected hydraulically from the soil and still loose small amounts of water (through cuticular transpiration) from these compartments.
 
 
-### Constitutive equations
+### Constitutive equations  {#constitutiveequations}
 
 The way the previous architecture is implemented is the following. Two supply functions provide flows $E_{stem, in}$ and $E_{leaf, out}$, respectively. Two instantaneous water flows, $F_{lat, stem}$ and $F_{lat, leaf}$, are defined from Darcy's law:
 \begin{eqnarray}
@@ -1113,7 +1113,7 @@ E_{stem, out} = E_{leaf, out} - F_{lat,leaf}
 \end{equation}
 And the mass balance in the stem xylem compartment is:
 \begin{equation}
-\frac{\delta m_{stem}} {\delta t} = E_{stem, in} - E_{stem, out}
+\frac{\delta m_{stem}} {\delta t} = E_{stem, in} - E_{stem, out} + F_{lat, stem}
 \end{equation}
 However, the change in volume is composed of two terms: one arising from water movement in and out of the stem compartment and the other arising from the change in the gas volume caused by cavitation [@Holtta2009]:
 \begin{equation}
@@ -1123,7 +1123,7 @@ where $\rho_{w}$ is the density of water. If there has been an increase in $PLC$
 \begin{equation}
 \frac{\delta{V_{cav}}}{\delta t} = V_{stem,apo,max} \cdot \frac{\delta{PLC_{stem}}}{\delta t}
 \end{equation}
-where $V_{stem,apo,max}$ is the capacity of the stem xylem compartment. So if $\delta{PLC_{stem} = 0$ , $\delta{V_{cav}}/\delta t=0.0$. Since we model $PLC$ using the vulnerability curve, the above formulation of water released by cavitation assumes that the relationship between stem water potential and the proportion of cavitated conduits follows the same function as the relationship between stem water potential and the proportion of conductance loss (i.e. the hydraulic vulnerability curve). The change in water pressure in the stem xylem compartment following the change in water volume is:
+where $V_{stem,apo,max}$ is the capacity of the stem xylem compartment. So if $\delta{PLC_{stem}} = 0$ , $\delta{V_{cav}}/\delta t=0.0$. Since we model $PLC$ using the vulnerability curve, the above formulation of water released by cavitation assumes that the relationship between stem water potential and the proportion of cavitated conduits follows the same function as the relationship between stem water potential and the proportion of conductance loss (i.e. the hydraulic vulnerability curve). The change in water pressure in the stem xylem compartment following the change in water volume is:
 \begin{equation}
 \frac{\delta \Psi_{stem,1}} {\delta t} = \epsilon_{xylem} \cdot \frac{1}{V_{stem,apo,max}}\cdot \frac{\delta V_{stem,apo}} {\delta t} = \epsilon_{xylem} \cdot \frac{\delta RWC_{stem,apo}} {\delta t}
 \end{equation}
