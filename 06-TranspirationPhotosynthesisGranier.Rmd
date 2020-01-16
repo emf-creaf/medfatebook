@@ -94,11 +94,11 @@ Granier's transpiration model does not allow estimating a water potential drop f
 where $K_i^{-1}$ is the inverse of the relative whole-plant conductance eq. \@ref(eq:relativewholeplantconductance) (see function `hydraulics_K2Psi()`). 
  
 ### Cavitation and hydraulic disconnection {#irreversiblecavitation}
-The water balance model is normally run assuming that although soil drought may reduce transpiration, embolized xylem conduits are automatically refilled when soil moisture recovers (in other words, cavitation is reversible and `cavitationRefill = "total"`). It is possible to simulate irreversible cavitation by setting `cavitationRefill = "none"` in the control parameters. This option causes the model to keep track of the maximum value of drought stress so far experienced:
+The water balance model is normally run assuming that although soil drought may reduce transpiration, embolized xylem conduits are automatically refilled when soil moisture recovers (in other words, cavitation is reversible and `cavitationRefill = "total"`). It is possible to simulate irreversible cavitation by setting `cavitationRefill = "none"` in the control parameters. This option causes the model to keep track of the maximum value of drought stress so far experienced using the proportion of of lost conductance for the plant cohort $i$ ($PLC_i$):
 \begin{equation}
 PLC_{i}= \max \{PLC_{i}, DDS_i \}
 \end{equation}
-and then $K_{i,s}$ cannot be larger than the complement of this maximum drought stress:
+and then $K_{i,s}$ cannot be larger than the one-complement of $PLC_i$:
 \begin{equation}
 K_{i,s} = \min \{K_{i}(\Psi_s), 1.0 - PLC_{i} \}
 \end{equation}
