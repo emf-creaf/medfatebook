@@ -94,7 +94,7 @@ Granier's transpiration model does not allow estimating a water potential drop f
 where $K_i^{-1}$ is the inverse of the relative whole-plant conductance eq. \@ref(eq:relativewholeplantconductance) (see function `hydraulics_K2Psi()`). 
  
 ### Cavitation and hydraulic disconnection {#irreversiblecavitation}
-The water balance model is normally run assuming that although soil drought may reduce transpiration, embolized xylem conduits are automatically refilled when soil moisture recovers (in other words, cavitation is reversible and `cavitationRefill = "total"`). It is possible to simulate irreversible cavitation by setting `cavitationRefill = "none"` in the control parameters. This option causes the model to keep track of the maximum value of drought stress so far experienced using the proportion of of lost conductance for the plant cohort $i$ ($PLC_i$):
+The water balance model is normally run assuming that although soil drought may reduce transpiration, embolized xylem conduits are automatically refilled when soil moisture recovers (in other words, cavitation is reversible and `cavitationRefill = "total"`). It is possible to simulate irreversible cavitation by setting `cavitationRefill = "none"` or `cavitation = "annual"` in the control parameters. Any of these options cause the model to keep track of the maximum value of drought stress so far experienced using the proportion of of lost conductance for the plant cohort $i$ ($PLC_i$):
 \begin{equation}
 PLC_{i}= \max \{PLC_{i}, DDS_i \}
 \end{equation}
@@ -103,7 +103,7 @@ and then $K_{i,s}$ cannot be larger than the one-complement of $PLC_i$:
 K_{i,s} = \min \{K_{i}(\Psi_s), 1.0 - PLC_{i} \}
 \end{equation}
 
-For simulations of several year, it is normally advisable to allow some recovery. If `cavitation = "annual"`, $PLC_{i}$ values are set to zero at the beginning of each year, assuming that embolized plants overcome the conductance loss by creating new xylem tissue.
+For simulations of less than one year one can use `cavitationRefill = "none"` to keep track of the maximum drought stress. However, for simulations of several years, it is normally advisable to allow recovery. If `cavitation = "annual"`, $PLC_{i}$ values are set to zero at the beginning of each year, assuming that embolized plants overcome the conductance loss by creating new xylem tissue.
 
 Another optional behavior consists in allowing the plant to disconnect from the soil when its potential becomes too negative. This may be advantageous for a cavitation-sensitive plant that is competing for water with another plant with higher extraction capacity. Parameter $K_{rootdisc,i}$ can be used to specify the minimum relative conductance value that the plant will tolerate without disconnecting hydraulically from the soil (by default $K_{rootdisc,i} = 0$). If, after possibly accounting for irreversible cavitation, $K_{i,s}<K_{rootdisc,i}$
 for a given soil layer, then the model assumes that transpiration from this soil
