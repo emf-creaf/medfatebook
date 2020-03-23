@@ -1,31 +1,31 @@
 # Model inputs
 
-Data input for process-based models of forest functioning and dynamics can be grouped into four categories. First, a description of the  **vegetation** existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Second, most often **soil** information is required, specially if underground resources (i.e. water and/or nutrients) are important for the processes included in the model. While soil and vegetation features are sometimes considered static parameters in model simulations, **meteorology** is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur. Finally, **topographic and geographic information** may be needed if internal calculations of physical variables (such as atmospheric pressure or potential radiation) require them or, more generally, if the processes implemented depend on this information. 
+Data input for simulation models of forest functioning and dynamics can be grouped into four categories. First, a description of the  **vegetation** existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Second, most often **soil** information is required, specially if underground resources (i.e. water and/or nutrients) are important for the processes included in the model. While soil features are considered static parameters in model simulations, **weather** is always a dynamic input that defines the temporal (i.e. daily) variation of environmental conditions in which physical and biological processes occur. Finally, **topographic and geographic information** may be needed if internal calculations of physical variables (such as atmospheric pressure or potential radiation) require them or, more generally, if the processes implemented depend on this information. 
 
-This chapter describes the requirements of **medfate** package with respect to each of these kinds of input. The last section describes additional parameters that are used to control the behaviour of simulation functions, such as `spwb()` and `growth()`.
+This chapter describes the requirements of **medfate** package with respect to each of these data input categories. The last section describes additional parameters that are used to specify global options of simulation functions such as `spwb()` and `growth()`.
 
 ## Latitude and topography {#topoinput}
 
-Topography has a relatively small direct influence in **medfate** simulations, because most topographic effects are assumed to be taken into account in the estimation of meteorological input. Nevertheless, *elevation* in meters is needed to estimate atmospheric pressure and air density (see \@ref(meteoinput)), whereas *aspect* (in degrees from North) and *slope* (also in degrees) are needed in addition to *latitude* (also in degrees North) to estimate sunrise/sunset hours and potential radiation in advanced water balance modelling.
+Topography has a relatively small direct influence in **medfate** simulations, because most topographic effects are assumed to be taken into account in the estimation of weather input. Nonetheless, *elevation* in meters is needed to estimate atmospheric pressure and air density (see \@ref(meteoinput)), whereas *aspect* (in degrees from North) and *slope* (also in degrees) are needed in addition to *latitude* (also in degrees North) to estimate sunrise/sunset hours and potential radiation in advanced water balance modelling.
 
 ## Soil description  {#soilinput}
 
-Soils can be described in **medfate** using between $S=1$ and $S=5$ different soil layers. The number and size of layers may reflect changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate its hydraulic properties. Most soil properties are considered *static* parameters in simulations, except (state) variables that depend on soil water balance (e.g. soil moisture content, soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered in simulations.
+Soils can be described in **medfate** using between $S=1$ and $S=5$ different soil layers. Here the word *soil* refers to depths that plant roots can achieve, including cracks within the bedrock. The number and size of layers may reflect changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate its hydraulic properties. Most soil properties are considered *static* parameters in simulations, except (state) variables that depend on soil water balance (e.g. soil moisture content, soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered in simulations.
 
-### Physical properties
+### Soil physical properties
 
-Physical soil properties, like soil texture (i.e. percent of sand, silt and clay), bulk density or rock fragment content, can differ between soil layers, and this has important consequences for water retention capacity and soil hydraulics. Specifying layers with high rock fragment content (e.g. layers of weathered rock with few soil particles) may be important in some biomes like the Mediterranean one, because plants often extend their roots into cracks existing in the parent rock [@Ruffault2013]. 
+Soil physical properties, like soil texture (i.e. volume percent of sand, silt and clay), bulk density or rock fragment content, can differ between soil layers, and this has important consequences for soil water retention capacity and hydraulics. Specifying layers with high rock fragment content (e.g. layers of weathered rock with few soil particles) may be important in some biomes like the Mediterranean one, because plants often extend their roots into cracks existing in the parent rock [@Ruffault2013]. 
 
 For each soil layer $s$ the following physical parameters are needed:
 
 | Symbol | Units | R  | Description                         | 
 |--------|-------|----| ------------------------------------|
 | $d_{s}$ | $mm$ | `widths` | Width of soil layer $s$ |
-| $P_{clay,s}$ | % | `clay` | Percent of clay (within soil particles) in layer $s$  |
-| $P_{sand,s}$ | % | `sand` | Percent of sand (within soil particles) in layer $s$ |
+| $P_{clay,s}$ | % | `clay` | Percent volume of clay (within soil particles fraction) in layer $s$  |
+| $P_{sand,s}$ | % | `sand` | Percent volume of sand (within soil particles fraction) in layer $s$ |
 | $OM_s$ | % | `om` | Percentage of organic mater per dry weight (can be missing) in layer $s$ |
 | $BD_{s}$ | $g \cdot cm^{-3}$ |`bd` | Bulk density in layer $s$|
-| $P_{rocks,s}$ | % | `rfc` | Rock fragment content as percent volume in layer $s$ |
+| $P_{rocks,s}$ | % | `rfc` | Rock fragment content as percent volume (within whole soil) in layer $s$ |
 
 If possible, soil physical properties should be measured in soil profiles conducted at the target forest plot. Soil input data should be arranged in a `data.frame` with soil layers in rows and physical variables in columns (see function `defaultSoilParams()`). The package includes function `soilgridsParams()` to fetch soil information from [SoilGrids.org](https://soilgrids.org/), a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.
 
@@ -37,7 +37,7 @@ And the overall *soil depth*  ($Z_{soil}$; in $mm$) is the sum of soil layer wid
 
 ### Water retention curves {#waterretentioncurves}
 
-The water retention curve of a soil is the relationship between volumetric soil moisture ($\theta$, in $m^3 \cdot m^{-3}$ of soil, excluding rock fragments) and the soil water potential ($\Psi$, in MPa). This curve is characteristic for different types of soil, and is also called the *soil moisture characteristic curve*. Since soil layers may differ in their physical properties, they also normally have different water retention curves.
+The water retention curve of a soil is the relationship between *volumetric soil moisture content* ($\theta$, in $m^3 \cdot m^{-3}$ of soil, excluding rock fragments) and the corresponding *soil water potential* ($\Psi$, in MPa), i.e. the amount of work that must be done per unit quantity of pure water in order to transport reversibly and isothermally an infinitesimal quantity of water from a reference pool. This curve is characteristic for different types of soil, and is also called the *soil moisture characteristic curve*. Since soil layers may differ in their physical properties, they also normally have different water retention curves.
 
 Two water retention curve models are available in **medfate** (fig. \@ref(fig:retention-curves)):
 
@@ -64,8 +64,8 @@ Soil initialization is needed to estimate soil hydrological parameters for each 
 | $P_{macro, s}$ | % | `macro` | Percentage of macroporosity corresponding to each soil layers | 
 | $\gamma_{soil}$ | $mm \cdot day^{-1}$ | `Gsoil` | The maximum daily evaporation rate from soil (see \@ref(soilevaporation)) |
 | $\kappa_{soil}$ |  | `Ksoil` | Extinction parameter to regulate the amount of water extracted from each soil layer when simulating evaporation from bare soil (see \@ref(soilevaporation)) |
-| $\theta_{sat, s}$ |$m^3 \cdot m^{-3}$ | `VG_theta_sat`| Volumetric moisture at saturation |
-| $\theta_{res, s}$ |$m^3 \cdot m^{-3}$ | `VG_theta_res` | Residual volumetric moisture |
+| $\theta_{sat, s}$ |$m^3 \cdot m^{-3}$ | `VG_theta_sat`| Volumetric soil moisture at saturation |
+| $\theta_{res, s}$ |$m^3 \cdot m^{-3}$ | `VG_theta_res` | Residual volumetric soil moisture |
 | $n_s$ | | `VG_n` | Parameter $n$ of the Van Genuchten [-@Genuchten1980] model |
 | $\alpha_s$ | $MPa^{-1}$ | `VG_alpha`| Parameter $\alpha$ of the Van Genuchten [-@Genuchten1980] model |
 
@@ -74,7 +74,7 @@ Macroporosity values are calculated using the equations given in @Stolf2011, whi
 1. Using the USDA texture classification and the average texture class parameters given by @Carsel1988.
 2. Directly from the soil texture, organic matter and bulk density, using the pedotransfer functions in @Toth2015.
 
-All simulation functions need an object of class `soil` to be run. Users can edit the `soil` object manually (it is actually a list), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements.
+All simulation functions need an object of class `soil` to be run. Users can edit the `soil` object manually (it is actually a `list`), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements.
 
 ### Water content and water table depth
 
@@ -93,9 +93,9 @@ A number of fixed water volumes (and their corresponding moisture) are important
 \begin{equation}
 V_{fc,s} = V_{s}(-0.033) = d_s\cdot ((100-P_{rocks,s})/100)\cdot\theta_{fc,s}
 \end{equation}
-where $\theta_{fc,s} = \theta_s(-0.033)$ is the corresponding moisture at field capacity. 
-  + *Water content at saturation* is calculated anagolously, but replacing $\theta_{fc,s}$ by $\theta_{sat, s} = \theta_s(0)$, the moisture at saturation. 
-  + *Water content at wilting point* (-1.5 MPa) is calculated replacing $\theta_{fc,s}$ by $\theta_{wp,s} = \theta_s(-1.5)$, the moisture at wilting point. 
+where $\theta_{fc,s} = \theta_s(-0.033)$ is the corresponding moisture at *field capacity* (i.e. the amount of soil moisture held in soil after excess water has drained away). 
+  + *Water content at saturation* is calculated anagolously, but replacing $\theta_{fc,s}$ by $\theta_{sat, s} = \theta_s(0)$, the moisture at *saturation* (i.e. the amount of soil moisture when all easily drained voids between soil particles are filled with water). 
+  + *Water content at wilting point* (-1.5 MPa) is calculated replacing $\theta_{fc,s}$ by $\theta_{wp,s} = \theta_s(-1.5)$, the moisture at *wilting point* (i.e. a conventional amount of moisture that the plant requires not to wilt). 
   + The *amount of extractable water* is the difference between water content at field capacity and a the water content at a conventional minimum water potential, which can be set at wilting point or lower values (by default at -5 MPa in **medfate**).
 
 The depth of water table is the depth of saturated soil (in $mm$). In medfate, *water table depth* ($Z_{wt}$, in mm) equals soil depth (i.e. $Z_{soil}$) when all soil layers are below field capacity. When some layers are between field capacity and saturation, water table depth is calculated as:
@@ -130,7 +130,7 @@ A plant cohort $i$ is either a *tree cohort* or a *shrub cohort*, and is defined
 
 Height ($H$) values refer to average height of individuals included in the cohort, and the same for crown ratio ($CR$) and diameter at breast height ($DBH$). While plant size (i.e. height or diameter) is relatively easy to tally, other measurements are not usually made in the field. Package **medfate** includes utility functions that provide estimates $CR$ and $LAI$ from forest inventory data (e.g. heights, DBH and density for measured trees), using allometric relationships calibrated for Catalonia (see chapter \@ref(allometricmodels)). 
 
-**Leaf are index**
+**Leaf area index**
 
 $LAI$ variables refer to *one-sided leaf area* of plants in the cohort per surface area of the stand. We will call *total leaf area index* of a plant cohort $i$ ($LAI^{all}_{i}$) to the sum of dead and live expanded leaves of the cohort:
 \begin{equation}
@@ -153,16 +153,16 @@ data(exampleforestMED)
 exampleforestMED
 ```
 
-Among them, the most important items are two data frames, `treeData` (for trees) and `shrubData` for shrubs. Information about herbs is only used for fire hazard calculations, and `seedBank` is presently not used. Elements `ID` and `patchsize` are only relevant when using medfate functions in a spatial context.
+Among them, the most important items are two data frames, `treeData` (for trees) and `shrubData` for shrubs. Information about herbs is currently only used for fire hazard calculations. Elements `ID` and `patchsize` are only relevant when using medfate functions in a spatial context.
 
-While not strictly necessary, forest objects are a convenient format to start calculations with **medfate**, because there are many static functions that take forest objects as input. The package includes functions to facilitate mapping variables in user data into tables `treeData` and `shrubData` (see function `forest_mapWoodyTables()`).
+While not strictly necessary, forest objects are a convenient format to start calculations with **medfate**, because there are many static functions that take forest objects as input. The package includes functions to facilitate mapping user data in into tables `treeData` and `shrubData` (see function `forest_mapWoodyTables()`).
 
 
 ### Vertical leaf distribution {#leafdistribution}
 
-Crown base height ($H_{crown,i}$; in $cm$) of cohort $i$ is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort ($CR_i$; a proportion between 0 and 1), i.e. the ratio between crown length and total height (see eq. \@ref(eq:CrownHeight)). 
+Crown base height ($H_{crown,i}$; in $cm$) of cohort $i$ is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort ($CR_i$; a proportion between 0 and 1), i.e. the ratio between plant crown length and total height (see eq. \@ref(eq:CrownHeight)). 
 
-The leaf area of any plant cohort is assumed to be distributed vertically following a **truncated Gaussian function** whose standardized values -1.5 and 1.5 correspond to crown base height ($H_{crown,i}$) and total plant height ($H_i$), respectively. Simulation models in **medfate** divide the vertical dimension into vertical layers (see control parameter `verticalLayerSize`). Let us define $LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}$ as the leaf area index of cohort $i$ in layer $j$. The truncated Gaussian distribution defines the $LAI_{i,j}^{\phi}$ and $LAI_{i,j}^{dead}$ for all plant cohorts and vertical layers.
+The leaf area of any plant cohort is assumed to be distributed vertically following a **truncated Gaussian function** whose standardized values -1.5 and 1.5 correspond to crown base height ($H_{crown,i}$) and total plant height ($H_i$), respectively. Simulation models in **medfate** divide the vertical dimension into vertical layers (by default are 1m width, but see control parameter `verticalLayerSize`). Let us define $LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}$ as the leaf area index of cohort $i$ in layer $j$ including both functional leaves and dead leaves standing on branches. The truncated Gaussian distribution defines the $LAI_{i,j}^{\phi}$ and $LAI_{i,j}^{dead}$ for all plant cohorts and vertical layers.
 
 Dividing the leaf area of a given layer by its width, one obtains the *leaf area density* ($LAD$ in $m^2 \cdot m^{-3}$). Figure \@ref(fig:leafareadensity) illustrates the leaf area density profile (see function `vprofile_leafAreaDensity()`) corresponding to the forest stand described in the `forest` object that we showed above. 
 
@@ -173,11 +173,11 @@ g2<-vprofile_leafAreaDensity(exampleforestMED, SpParamsMED, z = seq(0,1000, by=1
 plot_grid(g1, g2, nrow=1, ncol=2)
 ```
 
-The leaf area density profile determines the extinction rates of light through the forest canopy. The same truncated Gaussian distribution is used to distribute leaf and small branch biomass in the vertical dimension.
+The leaf area density profile determines the extinction rates of light through the forest canopy. The same truncated Gaussian distribution is used to distribute leaf and small branch biomass along the vertical dimension.
 
 ### Vertical root distribution {#rootdistribution}
 
-The root system of each plant cohort $i$ is described using $FRP_{i,s}$, the proportion of fine roots in each soil layer $s$. $FRP_{i,s}$ values are normally defined using the linear dose response model [@Schenk2002; @Collins2007]: 
+The root system of each plant cohort $i$ is described using $FRP_{i,s}$, the proportion of fine roots (with respect to the whole plant) in each soil layer $s$. $FRP_{i,s}$ values are normally defined using the linear dose response model [@Schenk2002; @Collins2007]: 
 \begin{eqnarray}
 FRP_{i,s} &=& Y_i(Z_s) - Y_i(Z_{s-1}) \\
 Y_i(z) &=& \frac{1}{1+(z/Z_{50,i})^{c_i}}
@@ -220,7 +220,7 @@ In contrast, growth simulation requires updating the structure of vegetation, i.
 
 ## Metereological input {#meteoinput}
 
-Weather input data must include variables calculated at the **daily** scale. Data should be arranged in a data frame with days in rows and variables in columns. The following table indicates the symbols, units, definitions and the variable name in R.
+Weather input data must include variables calculated at the **daily** scale. Weather data should be arranged in a data frame with days in rows and variables in columns. The following table indicates the symbols, units, definitions and the variable name in R.
 
 | Symbol | Units | R param | Description                        |
 |--------|-------|---------|------------------------------------|
@@ -234,11 +234,11 @@ Weather input data must include variables calculated at the **daily** scale. Dat
 | $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds |
 | $u$ | $m \cdot s^{-1}$ | `WindSpeed` | Wind speed |
 
-*Dates* should be included as row names (in format *year-month-day*) of the input meteorology data frame. Dates are neeeded to estimate parameters like solar declination or the day of the year ($DOY$). Since it allows producing data frames with appropiate variable units and row/column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018].
+*Dates* should be included as row names (in format *year-month-day*) of the input meteorology data frame. Dates are needed to estimate parameters like solar declination or the day of the year ($DOY$). Since it allows producing data frames with appropiate variable units and row/column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018].
 
-Not all simulation models require all weather variables. In particular, basic water balance modelling (chapter \@ref(basicwaterbalance)) requires much less information than advance water balance modelling (chapter \@ref(advancedwaterbalance)). The meteorology input requirements for growth modelling (chapter \@ref(growthmodelling)) depend on the complexity of the water balance model used within it.
+Not all simulation models require all weather variables. In particular, basic water balance modelling (chapter \@ref(basicwaterbalance)) requires much less information than advance water balance modelling (chapter \@ref(advancedwaterbalance)). The weather input requirements for growth modelling (chapter \@ref(growthmodelling)) depend on the complexity of the water balance model used within it.
 
-Whereas the meteorological variables listed in the table above are input requirements, **medfate** derives other atmospheric variables from them, using also topographic information (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual):
+Whereas the weather variables listed in the table above are input requirements, **medfate** derives other atmospheric variables from them, using also topographic information (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual):
 
 | Symbol | Units | R param | Description                        |
 |--------|-------|---------|------------------------------------|
@@ -258,6 +258,6 @@ names(defaultControl())
 
 
 
-Not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), but there is an important control parameter called `transpirationMode`, because it allows the user to switch between the basic and advanced water balance models (chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). 
+Not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), but there is an important control parameter called `transpirationMode`, because it allows the user to switch between the *basic* and *advanced* water balance models (chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). 
 
-Control parameters are employed when initializing vegetation information using functions `spwbInput()` and `growthInput()`, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as `spwb()` or `growth()`.
+Control parameters are employed when initializing vegetation inputs and state variables using functions `spwbInput()` and `growthInput()`, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as `spwb()` or `growth()`.
