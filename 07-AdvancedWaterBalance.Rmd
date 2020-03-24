@@ -20,15 +20,20 @@ Importantly, energy balances are conducted at two levels. On one hand the model 
 
 While plant water content is normally determined by changes in water potential values corresponding to changes in soil moisture and transpiration rates, the model can also consider an explicit water balance within the plant. In this case, the amount of water within plant compartments is explicitly tracked and they decouple the extraction rate of soil water from the rate of transpiration. 
 
+Like in the basic water bodel, the advanced model assumes by default that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can be simulated. In this case, hydrological processes are replicated for the fraction of soil corresponding to each cohort. Transpiration of each plant cohort depends on the soil moisture beneath itself and, depending on root overlap, on the soil moisture beneath other plant cohorts.
+
 ## State variables
 
-The model has the following state variables:
+The following are state variables in the model under all simulations:
 
 + Cumulative growth degree days, $GDD$, are tracked by the model and determine leaf phenological status (i.e. $LAI$ values) of winter deciduous species.
 + Daily soil moisture content dynamics on each layer $s$ are tracked using $W_s = \theta_s(\Psi_s)/ \theta_{fc,s}$, the *proportion of soil moisture in relation to field capacity*, where moisture at field capacity, $\theta_{fc,s}$, is assumed to correspond to $\Psi_{fc} = -0.033$ MPa. Note that $W_s$ values larger than one are possible if the soil is between field capacity and saturation (which can happen if deep drainage is not allowed).
 + The temperature of the canopy and of each soil layer ($T_{canopy}$ and $T_{soil,s}$; both in ºC) are tracked for every subdaily step.
-+ If plant capacitance effects are considered, the model also tracks $\Psi_{apo, stem,i}$, the water potential of the stem apoplastic compartment, as well as the water potential of stem and leaf symplastic compartments, $\Psi_{symp, stem,i}$ and $\Psi_{symp, leaf,i}$ respectively.
-+ If cavitation is not completely reversible, the proportion of stem hydraulic conductance loss for each plant cohort $i$, $PLC_{stem,i}$, becomes a state variable.
+
+Additional state variables depend on the activation of specific control flags:
++ *If plant capacitance effects are considered*, the model also tracks $\Psi_{apo, stem,i}$, the water potential of the stem apoplastic compartment, as well as the water potential of stem and leaf symplastic compartments, $\Psi_{symp, stem,i}$ and $\Psi_{symp, leaf,i}$ respectively.
++ *If cavitation is not completely reversible*, the proportion of stem hydraulic conductance loss for each plant cohort $i$, $PLC_{stem,i}$, becomes a state variable.
++ *If plant water pools are considered*, the model also tracks $W_{i,s}$, the proportion of soil moisture in relation to field capacity for layer $s$ within fraction of stand area covered by cohort $i$.
 
 ## Water and energy balances
 
@@ -50,13 +55,14 @@ Although the advanced water balance model includes hydraulic redistribution, thi
 (\#eq:plantwaterbalance)
 \end{equation}
 
-As in the basic water balance model, if snow dynamics are considered the water balance of the snow pack is defined as:
+While the above describes the default water balance equation, variations can occur depending on specific control flags: 
 
+a. *If snow dynamics are considered*, the water balance of the snow pack is defined as:
 \begin{equation}
 \Delta{S_{snow}} = Ps - Sm
 \end{equation}
-
 where $Ps$ is precipitation as snowfall and $Sm$ is snow melt. Evaporation from bare soil cannot occur if there is a snow pack over the soil surface (i.e., if $S_{snow}>0$ then $Es = 0$). 
+b. *If plant water pools are considered*, the water balance equation applies not only to the soil of the overall stand but also to the soil beneath each plant cohort. The fraction of stand area covered by each cohort is used to keep the water balance at the two scales aligned. Moreover, the water balances of soils beneath the different plant cohort are more or less correlated depending on root overlap.
 
 Unlike the basic water balance, in this model water balance components contributing to latent heat ($Es$, $Tr$, $In$ and $Sm$) are included in the energy balance equations of the canopy and soil, therefore coupling water and energy balances.
 
@@ -205,6 +211,9 @@ The other control parameters relevant for the advanced water balance model are:
 + `drainage [= TRUE]`:  Whether water exceeding the field capacity of the bottom layer is lost by deep drainage into a non-reachable compartment (see section \@ref(runoff)).
 + `leafPhenology [= TRUE]`:  Whether leaf phenology is simulated for winter-deciduous species (see section \@ref(leafphenology)). If `FALSE` then all species are assumed to be evergreen.
 + `defaultWindSpeed [= 2.5]`: Default value for wind speed (in $m \cdot s^{-1}$) when this is missing.
++ `unlimitedSoilWater [=FALSE]`: Boolean flag to indicate the simulation of plant transpiration assuming that soil water is always at field capacity.
++ `plantWaterPools [=FALSE]`: Boolean flag to indicate the simulation of water balance assuming that each cohort has its own water pools (correlation between pools of different cohorts is regulated via `poolOverlapFactor`).
++ `poolOverlapFactor [= 0.5]`: Factor regulating the relationship between stand LAI and root overlap (actual overlap also depends on the proportion of fine roots).
 + `costModifier, gainModifier [= 1]`: Modifiers (exponents) of the gain and cost functions defined in Sperry et al. (2016) (see section \@ref(stomatalregulation)).
 + `cuticularTranspiration [=TRUE]`: Boolean flag to indicate the simulation of cuticular transpiration (at night or when stomata are fully closed) according to minimum stomatal conductance (see section \@ref(stomatalregulation)).
 + `thermalCapacityLAI [= 1000000]`: Canopy thermal capacitance per LAI unit (see section \@ref(canopycapacitancetemperature)).
