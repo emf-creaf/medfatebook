@@ -68,6 +68,33 @@ Assuming no water limitations (i.e. $K_{i,s} = 1$), we have that $Tr = Tr_{\max}
   b. The cohort has a lower amount of leaf area (it reduces $f_i$ and hence $Tr_{\max,i}$)
   c. The soil layers exploited by the cohort have more negative water potentials (it reduces $K_{i,s}$). 
 
+### Transpiration with plant water pools {#transpirationpools}
+Considering plant water pools (i.e. setting `plantWaterPools = TRUE` in the control parameters) involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many plant water pools as plant cohorts, with proportions defined by their LAI values:
+\begin{equation}
+f_{pool,i} = \frac{LAI^{live}_i}{LAI^{live}_{stand}}
+\end{equation}
+Overall soil moisture is then related to moisture of plant water pools by the following equation, that is fulfilled for each soil layer $s$:
+\begin{equation}
+W_{s} = \sum_{i}{f_{pool,i} \cdot W_{i,s}}
+\end{equation}
+where $W_{i,s}$ is the soil moisture (relative to field capacity) of layer $s$ in the plant water pool of cohort $i$, i.e. under the area of the stand attributed to cohort $i$.
+
+When transpiration occurs and plant water pools are considered, the model assumes that the rhizosphere of each plant cohort occupies its own water pool but may enter into the water pools under other plant cohorts. In other words, the root systems of different cohorts may overlap horizontally. A given plant cohort $i$ will have its roots in layer $s$ partitioned among different water pools. Let us assume that we know $fr_{i,s,j}$, the (horizontal) proportion of fine roots of cohort $i$ in layer $s$ of the water pool $j$. These proportions fulfill:
+\begin{equation}
+\sum_{j}{fr_{i,s,j}} = 1 \forall i,s
+\end{equation}
+The soil moisture *sensed* by plant cohort $i$ in layer $s$, $W_{rhizo,i,s}$ is a weighted sum of moisture in water pools, with weights being the proportion of fine roots in each pool:
+\begin{equation}
+W_{rhizo,i,s} = \sum_{j}{fr_{i,s,j} \cdot W_{i,s}}
+\end{equation}
+This moisture determines $\Psi_{s,i}$, the corresponding water potential, which replaces $\Psi_{s}$ in eq. \@ref(eq:relativewholeplantconductance), so that plant conductance depends on the soil moisture *sensed* by the rhizosphere of the plant cohort. If the (actual) transpiration of cohort $i$ from soil layer $s$ is $Tr_{i,s}$, the water extracted by transpiration from a water pool $j$ will be:
+\begin{equation}
+Tr_{i,s,j} = \frac{fr_{i,s,j} \cdot Tr_{i,s}}{f_{pool,j}}
+\end{equation}
+It is easy to verify that this definition ensures the fulfillment of an equation analogous to that between $W_{s}$ and $W_{s,i}$:
+\begin{equation}
+Tr_{i,s} = \sum_{j}{f_{pool,j} \cdot Tr_{i,s,j}}
+\end{equation}
 
 ### Plant photosynthesis {#basicphotosynthesis}
 
