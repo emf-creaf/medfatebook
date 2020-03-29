@@ -203,6 +203,31 @@ vprofile_rootDistribution(exampleforestMED, SpParamsMED)
 
 The actual input to simulation functions is the matrix of $FRP_{i,s}$ values - not $Z_{50,i}$ and $Z_{95,i}$ -, which means that the proportions of fine roots can be modified manually or be defined by another model. In fact, **medfate** also allows calculating $FRP_{i,s}$ values assuming a conic distribution of fine roots (see `root_conicDistribution()`). 
 
+### Plant water pools and horizontal distribution of fine roots {#plantwaterpools}
+
+By default, models in **medfate** assume that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can be simulated. Considering plant water pools involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many plant water pools as plant cohorts, with proportions defined by their LAI values:
+\begin{equation}
+f_{pool,i} = \frac{LAI^{live}_i}{LAI^{live}_{stand}}
+\end{equation}
+Models assume that the rhizosphere of each plant cohort occupies its own water pool but may extend into the water pools under other plant cohorts. In other words, the root systems of different cohorts may overlap horizontally. Moreover, the horizontal overal of root systems will vary across soil layers. A given plant cohort $i$ will have its roots in layer $s$ partitioned among different water pools. We thus need to define $fr_{i,s,j}$, the (horizontal) proportion of fine roots of cohort $i$ in layer $s$ of the water pool $j$, with the restriction that: 
+\begin{equation}
+\sum_{j}{fr_{i,s,j}} = 1 \,\, \forall i,s
+\end{equation}
+It is important to realize that proper estimation of $fr_{i,s,j}$ is challenging when we do not have explicit plant coordinates, root lateral widths, etc. For this reason, an intuitive approach is followed here based on the following two premises:
+
+ + The amount of overlap between roots of different plants should monotonically increase along with the LAI of the stand (i.e. $LAI^{live}_{stand}$).
+ + The amount of overlap between roots of different plants at a given soil depth should increase/decrease with the vertical proportion of roots at that depth.
+
+The specific formulation we chose for $fr_{i,s,j}$ is:
+\begin{equation}
+fr_{i,s,j}  = f_{pool,j} \cdot (1 - \exp(- f_{overlap} \cdot LAI^{live}_{stand}))  \cdot \left( \frac{\sqrt{FRP_{i,s} \cdot FRP_{j,s}}}{\max_{s}(FRP_{i,s})} \right)
+\end{equation}
+for all $j \neq i$, where $f_{overlap}$ is an overlap factor (a control parameter called `poolOverlapFactor`). For $j=i$ then we simply have: 
+\begin{equation}
+fr_{i,s,i}  =  1 - \sum_{j}{fr_{i,s,j}}
+\end{equation}
+Note that if $f_{overlap} = 0$ then $fr_{i,s,j} = 1$ if $j=i$ and zero otherwise (i.e. plants exploit their corresponding water pools only. For very large values of $LAI^{live}_{stand}$ and/or $f_{overlap}$ we have that $(1 - \exp(- f_{overlap} \cdot LAI^{live}_{stand})) = 0$ and $fr_{i,s,j} = f_{pool,j}$ (neglecting vertical differences), so that plants exploit the each water pool in the same proportion as the fraction of stand occupied by the pool (i.e. overlap is maximum).
+
 
 
 ### Functional traits and vegetation initialization {#functionaltraits}
