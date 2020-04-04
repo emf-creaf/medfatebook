@@ -31,6 +31,14 @@ C_{slow,\max} &=& \max \left(C_{slow,\max},\, (C_{p, \max}-0.05) \cdot (B_{leaf}
 \end{eqnarray}
 Note the maximum function for the slow C pool, which ensures that the size of the slow pool will not decrease if there is a decrease in leaf area. Thus, while the slow C pool is still calculated in relation to the total living biomass, it is assumed to be primarily found in long-lasting organs (stem, roots, lignotubers, ...).
 
+## Gross photosynthesis
+
+Among other outputs, the soil water balance submodel provides values of leaf water potential $\Psi_{leaf}$ (in MPa) and gross photosynthesis calculated at the plant cohort level, $A_g^{coh}$ (in $g C · m^{-2} · day^{-1}$).  $\Psi_{leaf}$ is used in the growth model to modulate drought effects on growth and leaf area losses (see below), whereas $A_g$ is needed to determine carbon balance and growth (note that the user output of function `spwb` and `pwb` refers to net photosynthesis after accounting for an estimate of leaf respiration). Since carbon balance is calculated at the individual level, $A_g^{coh}$ needs to be scaled to gross photosynthesis per individual (in $g C · ind^{-1} · day^{-1}$) using:
+\begin{equation}
+A_{g}^{ind} = 10000 \cdot A_g^{coh} / N
+\end{equation}
+where $N$ is the density of individuals per hectare.
+
 ## Maintenance respiration and C balance
 Individual daily maintenance respiration ($R^{ind}$; in $g C·ind^{-1}$) is calculated for each of the three compartments (leaves, alive vascular tissues (stem and coarse roots), and fine roots) (Mouillot et al. 2001).  The model uses a $Q_{10}$ relationship with temperature, which means that for every 10ºC change in temperature there is a $Q_{10}$ factor change in respiration. Baseline respiration rates ($r_{leaf}$, $r_{stem}$ and $r_{root}$ for leaves, vascular tissues and fine roots, respectively; in $gC·gC^{-1}$) are not species-specific and all refer to 20ºC:
 \begin{eqnarray}

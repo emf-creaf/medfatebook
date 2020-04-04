@@ -52,31 +52,42 @@ Since the growth model builds on soil and plant water balances models, the water
 The model performs daily carbon balance in leaves and sapwood (stem, branches and coarse roots) for each plant cohort. In each of these two compartments carbon balance is performed for the two storage forms, dissolved sugars and starch. At the leaf level, the carbon balance equations for dissolved sugars and starch are ($i$ subscripts ommited):
 
 \begin{eqnarray}
-\Delta{SS_{leaf}} &=& A - R_{leaf} - \Delta{ST_{leaf}} - F_{floem} - G_{leaf} \\
+\Delta{SS_{leaf}} &=& A - R_{leaf} - F_{floem} - G_{leaf} - \Delta{ST_{leaf}}\\
 \Delta{ST_{leaf}} &=& \Delta{t} \cdot [K_{synthesis}(SS_{leaf}) - K_{hydrolisis}(ST_{leaf})]
 (\#eq:leafcarbonbalanceequations)
 \end{eqnarray}
-where $A$ is (gross) photosynthesis, $R_{leaf}$ is leaf respiration, $\Delta{ST_{leaf}}$ is the change in leaf starch, $F_{floem}$ is the sugar flow via floem towards the stem and roots and $G_{leaf}$ is the carbon lost via new leaf growth. $K_{synthesis}$ and $K_{hydrolisis}$ are the instantaneous kinetic rates of starch synthesis and hydrolisis, respectively. The corresponding equations for sapwood dissolved sugars and starch are:
+where $A$ is (gross) photosynthesis, $R_{leaf}$ is leaf respiration, $F_{floem}$ is the sugar flow via floem towards the stem and roots, $G_{leaf}$ is the carbon lost via new leaf growth and $\Delta{ST_{leaf}}$ is the change in leaf starch. $K_{synthesis}$ and $K_{hydrolisis}$ are the instantaneous kinetic rates of starch synthesis and hydrolisis, respectively. Leaf senescense has no impact on dissolved sugar and starch compartments of leaves (but it affects leaf biomass, volume and leaf area) as it is assumed that these non-structural carbon sources are recycled before necrosis.
+
+The corresponding carbon balance equations for sapwood dissolved sugars and starch are:
 \begin{eqnarray}
-\Delta{SS_{sapwood}} &=& F_{floem} - R_{sapwood} - R_{fineroots} - \Delta{ST_{sapwood}} - G_{sapwood} - G_{fineroots} \\
+\Delta{SS_{sapwood}} &=& F_{floem} - R_{sapwood} - R_{fineroots} - G_{sapwood} - G_{fineroots} \\
+                     & & - \Delta{ST_{sapwood}} \\
 \Delta{ST_{sapwood}} &=& \Delta{t} \cdot [K_{synthesis}(SS_{sapwood}) - K_{hydrolisis}(ST_{sapwood})]
 (\#eq:sapwoodcarbonbalanceequations)
 \end{eqnarray}
-where $F_{floem}$ is the sugar inflow via floem transport, $R_{sapwood}$ is the sum of respiration of branches, stem and coarse roots, $R_{fineroots}$ is the respiration of fine roots. $G_{sapwood}$ and $G_{fineroots}$ are the carbon expenses of growth of new sapwood tissue or fine roots, respectively.
+where $F_{floem}$ is the sugar inflow via floem transport, $R_{sapwood}$ is the sum of respiration of branches, stem and coarse roots, $R_{fineroots}$ is the respiration of fine roots, $G_{sapwood}$ and $G_{fineroots}$ are the carbon expenses of growth of new sapwood tissue or fine roots (respectively). Analogously to leave senescense, when sapwood is converted into heartwood, non-structural carbon in the protoplasm of parenchyma cells is assumed to be absorbed by neighbouring living cells.
 
 ## Process scheduling
 
-Every day the growth model first updates the expanded leaf area of living plants according to the phenology of species and the day of the year. Then the model performs soil water balance, transpiration and photosynthesis calculations by calling the soil water balance submodel. After dealing with water fluxes and photosynthesis, the model determines the current amount of respiratory biomass (in leaves, sapwood and fine root compartments), the maximum starch storage capacity for leaves and sapwood (depending on their volume). Carbon balance equations are first evaluated for leaves and maintenance respiration. The comparison between photosynthesis and respiration leads to an amount of carbon available for growth (if no carbon pools are considered) or a change in the amount of fast carbon storage pool (if one or two carbon pools are considered). After that, the model determines variations in sapwood area, dead leaf area and live leaf area, which can originate due to conversion from sapwood to heartwood, growth or drought-induced cavitation. If two carbon storage pools are considered, at the end of the day the model determines the direction and amount of carbon transfer between them. Once a year (or by the end of the simulated period) the model translates sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover). 
+For every day to be simulated, the model performs the following steps:
+
+1. Update the expanded leaf area of living plants according to the phenology of species and the day of the year and perform soil water balance, transpiration and photosynthesis calculations by calling the water balance submodel (see \@ref(basicwaterbalancescheduling) and \@ref(advancedwaterbalancescheduling)). 
+
+After dealing with water fluxes and photosynthesis, the model performs the following steps:
+
+2. Determine the current amount of respiratory biomass (in leaves, sapwood and fine root compartments) and maximum starch storage capacity for leaves and sapwood (depending on their volume). 
+3. Estimate leaf respiration ($R_{leaf}$) and evaluate $SS_{leaf}$ after accounting for gross photosynthesis. If the balance produces a negative value $SS_{leaf}$, leaf senescense occurs until the balance becomes zero.
+4. The remaining components of leaf carbon balance (leaf growth, floem transport and sugar-starch dynamics) are evaluated sequentially.
+5. Floem transport and respiration components of sapwood carbon balance are evaluated first. If the balance becomes negative the aboveground part of the plant is assumed to die (but it could resprout from the root collar if starch is still present).
+6. The remaining components of the sapwood carbon balance (sapwood growth, fine root growth and sugar-starch dynamics) are evaluated sequentially.
+7. After evaluating carbon balance, the model determines variations in sapwood area (and sapwood volume) originated due to conversion from sapwood to heartwood, growth or drought-induced cavitation.
+
+Once a year (or by the end of the simulated period) the model translates cumulated sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover). 
 
 
 ### Water balance, plant transpiration and photosynthesis
 The growth model calls the soil water balance model as a submodel to perform soil water balance and photosynthesis calculations. We only summarize the steps here. The submodel first increases soil moisture due to precipitation, accounting for canopy interception loss, surface runoff and deep drainage. To calculate water losses due to transpiration, the submodel acts differently depending on whether  transpiration mode is set to 'Granier' or 'Sperry'. Generally speaking, though, the submodel determines stomatal conductance of each plant cohort according to the environmental conditions (i.e. light, leaf temperature, water vapor deficit and soil moisture) and this leads to an estimation of transpiration and net photosynthesis. The submodel then decreases water content due to bare soil evaporation, and plant transpiration, which completes the daily water balance. 
 
- Among other outputs, the soil water balance submodel provides values of leaf water potential $\Psi_{leaf}$ (in MPa) and net photosynthesis calculated at the plant cohort level, $A_n^{coh}$ (in $g C · m^{-2} · day^{-1}$).  $\Psi_{leaf}$ is used in the growth model to modulate drought effects on growth and leaf area losses (see below), whereas $A_n$ is obviously needed to determine carbon balance and growth. Since carbon balance is calculated at the individual level, $A_n^{coh}$ needs to be scaled to net photosynthesis per individual (in $g C · ind^{-1} · day^{-1}$) using:
-\begin{equation}
-A_{n}^{ind} = 10000 \cdot A_n^{coh} / N
-\end{equation}
-where $N$ is the density of individuals per hectare.
 
 
 ## Model input
