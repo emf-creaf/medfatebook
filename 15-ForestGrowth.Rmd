@@ -69,31 +69,37 @@ where $F_{floem}$ is the sugar inflow via floem transport, $R_{sapwood}$ is the 
 
 ## Process scheduling
 
-For every day to be simulated, the model performs the following steps:
-
-1. Update the expanded leaf area of living plants according to the phenology of species and the day of the year and perform soil water balance, transpiration and photosynthesis calculations by calling the water balance submodel (see \@ref(basicwaterbalancescheduling) and \@ref(advancedwaterbalancescheduling)). 
+For every day to be simulated, the model first updates the expanded leaf area of living plants according to the phenology of species and the day of the year and performs soil water balance, transpiration and photosynthesis calculations by calling the water balance submodel (see \@ref(basicwaterbalancescheduling) and \@ref(advancedwaterbalancescheduling)). 
 
 After dealing with water fluxes and photosynthesis, the model performs the following steps:
 
-2. Determine the current amount of respiratory biomass (in leaves, sapwood and fine root compartments) and maximum starch storage capacity for leaves and sapwood (depending on their volume). 
-3. Estimate leaf respiration ($R_{leaf}$) and evaluate $SS_{leaf}$ after accounting for gross photosynthesis. If the balance produces a negative value $SS_{leaf}$, leaf senescense occurs until the balance becomes zero.
-4. The remaining components of leaf carbon balance (leaf growth, floem transport and sugar-starch dynamics) are evaluated sequentially.
-5. Floem transport and respiration components of sapwood carbon balance are evaluated first. If the balance becomes negative the aboveground part of the plant is assumed to die (but it could resprout from the root collar if starch is still present).
-6. The remaining components of the sapwood carbon balance (sapwood growth, fine root growth and sugar-starch dynamics) are evaluated sequentially.
-7. After evaluating carbon balance, the model determines variations in sapwood area (and sapwood volume) originated due to conversion from sapwood to heartwood, growth or drought-induced cavitation.
+1. Determine the current amount of respiratory biomass (in leaves, sapwood and fine root compartments) and maximum starch storage capacity for leaves and sapwood (depending on their volume). 
+2. Estimate leaf respiration ($R_{leaf}$) and evaluate $SS_{leaf}$ after accounting for gross photosynthesis. If the balance produces a negative value $SS_{leaf}$, leaf senescense occurs until the balance becomes zero.
+3. The remaining components of leaf carbon balance (leaf growth, floem transport and sugar-starch dynamics) are evaluated sequentially.
+4. Floem transport and respiration components of sapwood carbon balance are evaluated first. If the balance becomes negative the aboveground part of the plant is assumed to die (but it could resprout from the root collar if starch is still present).
+5. The remaining components of the sapwood carbon balance (sapwood growth, fine root growth and sugar-starch dynamics) are evaluated sequentially.
+6. After evaluating carbon balance, the model determines variations in sapwood area (and sapwood volume) originated due to conversion from sapwood to heartwood, growth or drought-induced cavitation.
 
-Once a year (or by the end of the simulated period) the model translates cumulated sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover). 
-
-
-### Water balance, plant transpiration and photosynthesis
-The growth model calls the soil water balance model as a submodel to perform soil water balance and photosynthesis calculations. We only summarize the steps here. The submodel first increases soil moisture due to precipitation, accounting for canopy interception loss, surface runoff and deep drainage. To calculate water losses due to transpiration, the submodel acts differently depending on whether  transpiration mode is set to 'Granier' or 'Sperry'. Generally speaking, though, the submodel determines stomatal conductance of each plant cohort according to the environmental conditions (i.e. light, leaf temperature, water vapor deficit and soil moisture) and this leads to an estimation of transpiration and net photosynthesis. The submodel then decreases water content due to bare soil evaporation, and plant transpiration, which completes the daily water balance. 
+At the end of each year (and at the end of the simulated period) the model translates cumulated sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover). 
 
 
+## Inputs and outputs
 
-## Model input
+### Soil, vegetation and meteorology
 
+**Soil**
 
-### Vegetation state variables and parameters
+Soil input requirements are the same as for the basic water balance model and were fully described in section \@ref(soilinput). @Genuchten1980 water retention curves are forced for this model, because rhizosphere conductance is modelled using van Genuchten hydraulic equations (see subsection \@ref(vulnerabilitycurves)).
+
+**Vegetation**
+
+Vegetation input requirements were fully described in section \@ref(vegetationinput). Trees and shrubs do not need to be characterized with different variables in soil water balance calculations, since both kinds of cohort have a $LAI$ value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. $LAI^{live}$, because normally at the starting point all leaves are expanded (i.e. $LAI^{\phi} = LAI^{live}$) and one can assume no dead leaves in the canopy (i.e., $LAI^{dead} = 0$). Vegetation characteristics stay constant during simulations using function `spwb()`, although the actual expanded leaf area ($LAI^{\phi}$) and dead leaf area may vary if the species is winter deciduous.
+
+**Metereological input**
+
+Weather input data must include variables calculated at the **daily** scale. The variables required by function `growth()` depend on the transpiration mode, similarly to function `spwb()`. We recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018].
+
+### Vegetation functional parameters
 
 Vegetation in the stand is described using a set of plant cohorts, described in an object of class `growthInput`. This function assembles all parameters needed for the simulation of a given stand in a single list. Model parameters are grouped by category.  Regarding physical aboveground description of the stand, each plant cohort is defined by its species identity ($SP$; with R name [`SP`]). In addition, each cohort needs to be defined regarding the following state variables:
 
@@ -138,8 +144,10 @@ Another set of parameters is needed to transform changes in sapwood area and lea
 + $a_{cr}$, $b_{1cr}$, $b_{2cr}$, $b_{3cr}$, $c_{1cr}$, $c_{2cr}$ [`B1cr`, `B2cr`, `B3cr`, `C1cr`, `C2cr`]: Regression coefficients used to update the crown ratio of trees.
 + $a_{cw}$, $b_{cw}$ [`Acw`, `Bcw`]: Regression coefficients used to calculate the crown width of trees (as intermediary step to obtain the crown ratio).
 
-### Metereological input
+### Control parameters
 
-Weather input data must include variables calculated at the **daily** scale. The variables required by function `growth()` depend on the transpiration mode, similarly to function `spwb()`. We recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018].
+### Model output
 
-## Model output
+
+## Applications
+
