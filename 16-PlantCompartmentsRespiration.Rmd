@@ -2,12 +2,23 @@
 
 ## Biomass compartments
 
-Biomass of leaves, sapwood and fine roots is needed in the model to estimate respiratory costs (and, if needed, the size of the C storage pools). Respiratory leaf biomass per individual ($B_{leaf}$; $g C·ind^{-1}$) is the result of dividing live expanded leaf area by $SLA$ ($kg dry·m^{-2}$), the specific leaf area coefficient of the species, and multypling by a carbon conversion factor (0.3 $gC·g dry^{-1}$):
-\begin{equation}
-B_{leaf} = 0.3 \cdot 1000 \cdot LA^{\phi} / SLA
-\end{equation}
-where $LA^{\phi} = 10000 \cdot LAI^{\phi} / N$ is the expanded leaf area per individual (in m$^2$) and factor 1000 is used to convert from kg to g. Hence, only expanded leaf area has respiratory cost (i.e. winter resistance buds do not) and counts for C storage purposes. 
+Biomass of leaves, sapwood and fine roots is needed in the model to estimate respiratory costs and the size of the C storage pools. 
 
+### Leaf biomass and volume
+
+The expanded leaf area $LA^{\phi}$ per individual (in $m^2$) is:
+\begin{equation}
+LA^{\phi} = 10000 \cdot LAI^{\phi} / N
+\end{equation}
+where $N$ is the density of the cohort and $LAI^{\phi}$ is the expanded leaf area index. Respiratory leaf biomass per individual ($B^{ind}_{leaf}$; $g C·ind^{-1}$) is the result of dividing live expanded leaf area by $SLA$ ($m^{2} \cdot kg^{-1} = mm^2 \cdot mg^{-1}$), the specific leaf area coefficient of the species, and multypling by a carbon conversion factor (0.3 $gC·g dry^{-1}$):
+\begin{equation}
+B^{ind}_{leaf} = 0.3 \cdot 1000 \cdot LA^{\phi} / SLA
+\end{equation}
+where a factor 1000 is used to convert from kg to g. Hence, only expanded leaf area has respiratory cost (i.e. winter resistance buds do not). Volume available for starch storing within leaves per individual (in $l$) is:
+\begin{equation}
+V^{ind}_{leaf} = LA^{\phi}  \cdot V_{leaf}
+\end{equation}
+where $V_{leaf}$ is the water storage capacity of leaf tissue per leaf area unit (in $l\cdot m^{-2}$) (see \@ref(plantwaterstoragecapacity)).
 Respiratory sapwood biomass per individual ($B_{stem}$; $g C·ind^{-1}$) represents the sapwood biomass of stems (including trunks and branches) and coarse roots. It is defined as the product of sapwood area ($SA$; in $cm^2$) per individual times the sum of height ($H$; in cm) and rooting depth ($Z$; cm), transformed to carbon biomass using species-specific parameters of wood C density  ($W_{dens}$; $g dry·cm^{-3}$) and carbon content ($W_{C}$; $g C · g dry^{-1}$):
 \begin{equation}
 B_{stem} = SA\cdot (H + Z) \cdot W_{dens} \cdot W_{C}

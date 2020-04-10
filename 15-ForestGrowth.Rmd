@@ -2,19 +2,51 @@
 
 # Forest growth model {#growthmodelling}
 
-## Design principles
+Like the preceeding models, the physical structure of the stand is represented in one (vertical) dimension (i.e. the coordinates of plants are not explicit). The model is cohort-based, meaning that similar plant individuals are represented using a single entity with average properties (e.g. tree height or diameter) and a density variable is used to scale from individual level to the cohort level. Processes are implemented either at the cohort-level (water balance and photosynthesis) or at the individual level (carbon balance and growth). Water fluxes, soil water balance and plant photosynthesis processes follow the design of the soil water balance model and this part of the model design will not be repeated here. The model tries to reproduce the physiological processes that modulate leaf area changes and plant growth rates. Nevertheless, since the model does not implement all processes that may affect growth (such as nutrient availability), maximum growth rates and maximum plant sizes are constrained from user inputs, to ensure that model can be more easily calibrated and validated with observations. 
 
-The physical structure of the stand is represented in one (vertical) dimension. Height (or depth) is the only dimension that matters (i.e. the coordinates of plants are not explicit). The model is cohort-based, meaning that similar plant individuals are represented using a single entity with average properties (e.g. tree height or diameter) and a density variable is used to scale from individual level to the cohort level. Processes are implemented either at the cohort-level (water balance and photosynthesis) or at the individual level (carbon balance and growth). The model has been designed to be executed on forest inventory plots, but it can be run on other kind of vegetation (e.g. shrublands or crops) provided vegetation is described using the appropriate variables (i.e. diameter and height for trees, percent cover and height for shrubs). The model tries to reproduce the physiological processes that modulate leaf area changes and plant growth rates. Nevertheless, since the model does not implement all processes that may affect growth (such as nutrient availability), maximum growth rates and maximum plant sizes are constrained from user inputs, to ensure that model can be more easily calibrated and validated with observations. Consequently, we believe the model is suited to study variations of plant growth derived from environmental conditions and competition for light and water.
+## Design principles (basic water balance model)
 
-Leaf area of each plant cohort is divided between live (wether in resistance buds or unfolded leaves) and dead (standing dead trees). Expanded leaf area corresponds to the portion of live leaf area that is unfolded at any given moment through the leaf phenological cycle. Leaf area density of individuals is considered constant across the crown. Sapwood area of individuals is another important state variable. The Pipe model [@Shinozaki1964] is adopted to link increments of leaf area, sapwood area and fine root biomass. Ratios of leaf area to sapwood area (Huber value) can vary within species, due to environmental conditions [@Mencuccini1995]. The model assumes a constant, species-specific Huber value, but allows deviations from the pipe model caused by drought-related leaf area reductions. 
+Leaf area of each plant cohort is divided between live (wether in resistance buds or unfolded leaves) and dead (standing dead leaves). Expanded leaf area corresponds to the portion of live leaf area that is unfolded at any given moment through the leaf phenological cycle [this should change with a better treatment of phenology]. Leaf area increase by leaf growth and decreases by leaf senescense. 
 
-Water fluxes, soil water balance and plant photosynthesis processes follow the design of the soil water balance model and this part of the model design will not be repeated here. Plant respiration is calculated at the individual level, by estimating the respiration of leaves, stem and fine root compartments. While fine root respiration is proportional to leaf respiration, and hence to expanded leaf area, stem respiration depends on plant size.
+*Constant Huber value* (basic water balance model). The Pipe model [@Shinozaki1964] is adopted to link increments of leaf area, sapwood area and fine root biomass. The model assumes a constant, species-specific Huber value, but allows deviations from the pipe model caused by drought-related leaf area reductions. 
 
 Growth is determined taking into account environmental limitations on both source (i.e. carbon assimilation) and sink (i.e. carbon investment on plant tissue expansion) [@Fatichi2014; @Guillemot2015; @Korner2015]. With respect to carbon availability for growth, the model offers three alternatives. In the first one, carbon available for growth is simply the daily difference between net photosynthesis and maintenance respiration (i.e. no carbon storage). The second alternatives involves a single (fast) carbon storage pool that allows decoupling assimilation from growth. Finally, the third alternative involves two carbon storage pools ('fast' and 'slow') with a transfer rate between them [@Richardson2013; @Dietze2014], which we assume to be regulated by the need to maintain, as much as possible, a minimum amount of carbon in the fast pool (i.e. for metabolic and osmotic purposes). In the second and third modes, maximum overall C storage capacity is proportional to plant size.
 
 The LPG model [@Sitch2003] applies different turnover rates for different tissues, but then tries to satisfy the pipe model [@Shinozaki1964] by allocating C where it is more limiting. Instead, we assume that baseline leaf and fine root turnover rates are linearly related to conversion from sapwood to heartwood. Similarly to 3-PG [@Landsberg1997] we assume that the turnover rate is smallest for young plants, and it increases up to a maximum value. The model assumes that plants cannot suffer from cavitation if the leaf water potential is large enough for growth to occur (i.e. if cell turgidity is large enough for cell elongation). Similarly, it also assumes that growth stops before cavitation starts during drought events. When sapwood area reduction occurs, this not only reduces leaf area, but also decreases the amount of fast C reserves available for future growth. Thus it is assumed that parts of the plant are effectively disconnected.
 
 Tree structural variables are updated as in forest gap models [@Lindner1997].
+
+## Design principles (advanced water balance model)
+
+### Carbon compartments, transport and carbon balance
+
+Three kinds of carbon pools are considered: **structural**, **metabolic** and **storage**: 
+
+ + *Structural carbon* corresponds carbon forming cell membranes, cell walls and the cytosolic machinery. Structural carbon is used to calculate maintenance respiration and growth costs. Structural carbon occurs in three compartments: **leaves**, **sapwood** (stem, branches and coarse roots) and **fine roots**, which have different maintenance and growth costs. Structural carbon is lost when senescence occurs in each of these compartments.
+ + *Metabolic carbon* is assumed to correspond to sugars (glucose or fructose) that are used to sustain cell functioning and provide carbon for growth or storage. Metabolic carbon occurs in **leaves** and **sapwood**. Leaf metabolic carbon is generated from photosynthesis and used in different functions, including export to sapwood. Sugar concentration in the floem is assumed to be (passively) in equilibrium with leaf metabolic sugar concentration. In sapwood, metabolic carbon comes from floem transport and is used to sustain growth and maintenance respiration of sapwood and fine roots. Moreover, changes metabolic carbon are coupled to variations in osmotic potential. 
++ *Storage carbon* in the leaf is intented to represent short-term storage (mainly starch in chloroplasts) and its inclusion in the model follows the need to buffer daily variations in metabolic carbon as well as the corresponding leaf osmotic potential. Storage carbon in sapwood (branches, stems and coarse roots) is intended to serve as long-term (seasonal and interannual) storage.
+
+Carbon balance of leaf metabolic and storage carbon is perfomed by considering photosynthesis, sugar-starch conversion and floem tranport. Plant respiration is calculated at the individual level, by estimating the respiration of leaves, stem and fine root compartments. While fine root respiration is proportional to leaf respiration, and hence to expanded leaf area, stem respiration depends on plant size.
+
+
+
+```{r, out.width='100%', fig.align="center", fig.cap="Schematic representation of relationships between plant hydraulics and carbon balance", echo=FALSE}
+knitr::include_graphics("hydraulics_carbon_relations.png")
+```
+
+
+### Growth
+
+
+
+Sapwood area of individuals is another important state variable. Two options are possible regarding the relationship between leaf area and sapwood area (Huber values):
+
+
+  2. *Dynamic Huber value* (advanced water balance model): Ratios of leaf area to sapwood area (Huber value) can vary within species, due to environmental conditions [@Mencuccini1995]. Huber value variations arise as a result of the dynamic equilibrium of growth/senescence in leaf area and sapwood area, both constrained by plant hydraulics. Growth in leaves is hierarchically prioritized because carbon for growth comes from the leaf metabolic carbon (sugars), so that it may be used before being exported towards the stem. Excess of leaf growth leds to a decrease in stem and fine root conductance (per leaf area), which may feedback negatively to leaf growth via a decreased leaf turgor. This can only be compensated by increasing again stem/root conductance via sapwood secondary growth and fine root conductance via fine root growth. 
+
+
+### Growth
+
 
 ## State variables
 
@@ -151,3 +183,4 @@ Another set of parameters is needed to transform changes in sapwood area and lea
 
 ## Applications
 
+We believe the model is suited to study variations of plant growth derived from environmental conditions and competition for light and water.

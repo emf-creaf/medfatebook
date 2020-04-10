@@ -73,7 +73,7 @@ where $H$ is the tree height (here in m), $A_{s}$ is the sapwood area, $A_{l}$ i
 Al2As = 2512 
 
 kstemmax = hydraulics_maximumStemHydraulicConductance(xylem_kmax, 
-                  Href, Al2As, H, angiosperm = TRUE,taper = FALSE)
+                  Href, Al2As, H, taper = FALSE)
 kstemmax
 ```
 
@@ -110,7 +110,7 @@ The maximum stem conductance with taper ($k_{s, max, taper}$) of a *Q. ilex* tre
 
 ```{r}
 kstemmax_tap = hydraulics_maximumStemHydraulicConductance(xylem_kmax, 
-                      Href, Al2As, H, angiosperm = TRUE, taper = TRUE)
+                      Href, Al2As, H, taper = TRUE)
 kstemmax_tap
 ```
 
@@ -124,10 +124,10 @@ Hs <- 50:5000
 
 for (i in 1:length(Hs)) {
   qi_with_tap[i] <- hydraulics_maximumStemHydraulicConductance(
-  xylem_kmax, Href, Al2As, Hs[i], angiosperm = TRUE, taper =TRUE
+  xylem_kmax, Href, Al2As, Hs[i],  taper =TRUE
 )
   qi_no_tap[i] <- hydraulics_maximumStemHydraulicConductance(
-  xylem_kmax, Href, Al2As, Hs[i], angiosperm = TRUE,taper = FALSE
+  xylem_kmax, Href, Al2As, Hs[i], taper = FALSE
 )
 }
 
@@ -333,7 +333,7 @@ Parameters of the pressure-volume curve (i.e. $\pi_{0,stem}$ and $\epsilon_{stem
 \epsilon_{stem} = \sqrt{1.02 \cdot e^{8.5\cdot \rho_{wood}}-2.89}
 \end{equation}
 
-### Plant water storage capacity
+### Plant water storage capacity {#plantwaterstoragecapacity}
 The water storage capacity of sapwood tissue per leaf area unit ($V_{sapwood}$; in $l \cdot m^{-2}$) can be estimated as the product of stem height ($H$ in m) and Huber value ($H_v$; ratio of sapwood area to leaf area in $m^2 \cdot m^{-2}$) times a factor to account for the non-cylindrical shape (http://www.fao.org/forestry/17109/en/):
 \begin{equation}
 V_{sapwood} = 10^3 \cdot 0.48 \cdot H \cdot H_v \cdot \Theta_{sapwood}
