@@ -20,14 +20,13 @@ Tree structural variables are updated as in forest gap models [@Lindner1997].
 
 ### Carbon compartments, transport and carbon balance
 
-Three kinds of carbon pools are considered: **structural**, **metabolic** and **storage**: 
+Carbon pools are differentiated between **structural** and **labile**, the second being divided into **metabolic** and **storage**: 
 
  + *Structural carbon* corresponds carbon forming cell membranes, cell walls and the cytosolic machinery. Structural carbon is used to calculate maintenance respiration and growth costs. Structural carbon occurs in three compartments: **leaves**, **sapwood** (stem, branches and coarse roots) and **fine roots**, which have different maintenance and growth costs. Structural carbon is lost when senescence occurs in each of these compartments.
- + *Metabolic carbon* is assumed to correspond to sugars (glucose or fructose) that are used to sustain cell functioning and provide carbon for growth or storage. Metabolic carbon occurs in **leaves** and **sapwood**. Leaf metabolic carbon is generated from photosynthesis and used in different functions, including export to sapwood. Sugar concentration in the floem is assumed to be (passively) in equilibrium with leaf metabolic sugar concentration. In sapwood, metabolic carbon comes from floem transport and is used to sustain growth and maintenance respiration of sapwood and fine roots. Moreover, changes metabolic carbon are coupled to variations in osmotic potential. 
+ + *Metabolic carbon* is labile carbon assumed to correspond to sugars (glucose or fructose) that are used to sustain cell functioning (i.e. provide carbon for maintenance and growth). Metabolic carbon occurs in **leaves** and **sapwood**. Leaf metabolic carbon is generated from photosynthesis and used in different functions, including export to sapwood. Sugar concentration in the floem is assumed to be (passively) in equilibrium with leaf metabolic sugar concentration. In sapwood, metabolic carbon comes from floem transport and is used to sustain growth and maintenance respiration of sapwood and fine roots. Moreover, changes metabolic carbon are coupled to variations in osmotic potential. 
 + *Storage carbon* in the leaf is intented to represent short-term storage (mainly starch in chloroplasts) and its inclusion in the model follows the need to buffer daily variations in metabolic carbon as well as the corresponding leaf osmotic potential. Storage carbon in sapwood (branches, stems and coarse roots) is intended to serve as long-term (seasonal and interannual) storage.
 
-Carbon balance of leaf metabolic and storage carbon is perfomed by considering photosynthesis, sugar-starch conversion and floem tranport. Plant respiration is calculated at the individual level, by estimating the respiration of leaves, stem and fine root compartments. While fine root respiration is proportional to leaf respiration, and hence to expanded leaf area, stem respiration depends on plant size.
-
+Carbon balance of leaf labile (metabolic and storage) carbon is perfomed by considering photosynthesis, sugar-starch conversion and floem tranport. Plant respiration is calculated at the individual level, by estimating the respiration of leaves, stem and fine root compartments. Stem respiration depends on sapwood area, stem height and root depth.
 
 
 ```{r, out.width='100%', fig.align="center", fig.cap="Schematic representation of relationships between plant hydraulics and carbon balance", echo=FALSE}
@@ -37,15 +36,11 @@ knitr::include_graphics("hydraulics_carbon_relations.png")
 
 ### Growth
 
+Ratios of leaf area to sapwood area (Huber value) can vary within species, due to environmental conditions [@Mencuccini1995]. Three options are possible regarding the relationship between leaf area and sapwood area (Huber values):
 
-
-Sapwood area of individuals is another important state variable. Two options are possible regarding the relationship between leaf area and sapwood area (Huber values):
-
-
-  2. *Dynamic Huber value* (advanced water balance model): Ratios of leaf area to sapwood area (Huber value) can vary within species, due to environmental conditions [@Mencuccini1995]. Huber value variations arise as a result of the dynamic equilibrium of growth/senescence in leaf area and sapwood area, both constrained by plant hydraulics. Growth in leaves is hierarchically prioritized because carbon for growth comes from the leaf metabolic carbon (sugars), so that it may be used before being exported towards the stem. Excess of leaf growth leds to a decrease in stem and fine root conductance (per leaf area), which may feedback negatively to leaf growth via a decreased leaf turgor. This can only be compensated by increasing again stem/root conductance via sapwood secondary growth and fine root conductance via fine root growth. 
-
-
-### Growth
+  1. *Constant Huber value*: Growth of leaf area and sapwood area need to be coordinated so that Huber value remains constant. Whole-plant conductance will decrease with the progressive increase in plant height.
+  2. *Constant whole-plant conductance*: Growth of leaf area, sapwood area and height needs to be coordinated so that whole-plant conductance (excluding rhizosphere) is constant and equal to the initial value. Increases in daily leaf area or sapwood area are targetted depending on whether the current whole-plant conductance is above or below the target value.  
+  3. *Emergent Huber value and whole-plant conductance*: Huber value variations arise as a result of the dynamic equilibrium of growth/senescence in leaf area and sapwood area, both constrained by plant hydraulics. Growth in leaves should be hiearchically prioritized (hormonal control?). An excess of leaf growth leds to a decrease in stem and root conductance (per leaf area), which may feedback negatively to leaf growth via a decreased leaf turgor. This can only be compensated by increasing again stem/root conductance via sapwood secondary growth. 
 
 
 ## State variables
@@ -106,7 +101,7 @@ For every day to be simulated, the model first updates the expanded leaf area of
 After dealing with water fluxes and photosynthesis, the model performs the following daily steps:
 
 1. Determine the current amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and carbon construction costs per unit tissue (leaf or sapwood) area. 
-2. For every subdaily step perform carbon balance as follows:
+2. For every **subdaily step** perform carbon balance as follows:
     a. Calculate gross photosynthesis per individual ($A$).
     b. Determine maintenance respiration costs for leaves ($R_{leaf}$), sapwood ($R_{sapwood}$) and fine roots ($R_{fineroot}$), taking into account both live structural biomass and labile sugar biomass.
     c. Evaluate temperature and turgor sink limitations for growth of leaves and sapwood. If leaf/sapwood growth is permitted, estimate growth costs ($G_{leaf}$ and $G_{sapwood}$) and record leaf/sapwood area increases. 
