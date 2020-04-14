@@ -103,14 +103,22 @@ where $F_{floem}$ is the sugar inflow via floem transport, $R_{sapwood}$ is the 
 
 For every day to be simulated, the model first updates the expanded leaf area of living plants according to the phenology of species and the day of the year and performs soil water balance, transpiration and photosynthesis calculations by calling the water balance submodel (see \@ref(basicwaterbalancescheduling) and \@ref(advancedwaterbalancescheduling)). 
 
-After dealing with water fluxes and photosynthesis, the model performs the following steps:
+After dealing with water fluxes and photosynthesis, the model performs the following daily steps:
 
-1. Determine the current amount of respiratory biomass (in leaves, sapwood and fine root compartments) and maximum starch storage capacity for leaves and sapwood (depending on their volume). 
-2. Estimate leaf respiration ($R_{leaf}$) and evaluate $SS_{leaf}$ after accounting for gross photosynthesis. If the balance produces a negative value $SS_{leaf}$, leaf senescense occurs until the balance becomes zero.
-3. The remaining components of leaf carbon balance (leaf growth, floem transport and sugar-starch dynamics) are evaluated sequentially.
-4. Floem transport and respiration components of sapwood carbon balance are evaluated first. If the balance becomes negative the aboveground part of the plant is assumed to die (but it could resprout from the root collar if starch is still present).
-5. The remaining components of the sapwood carbon balance (sapwood growth, fine root growth and sugar-starch dynamics) are evaluated sequentially.
-6. After evaluating carbon balance, the model determines variations in sapwood area (and sapwood volume) originated due to conversion from sapwood to heartwood, growth or drought-induced cavitation.
+1. Determine the current amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and carbon construction costs per unit tissue (leaf or sapwood) area. 
+2. For every subdaily step perform carbon balance as follows:
+    a. Calculate gross photosynthesis per individual ($A$).
+    b. Determine maintenance respiration costs for leaves ($R_{leaf}$), sapwood ($R_{sapwood}$) and fine roots ($R_{fineroot}$), taking into account both live structural biomass and labile sugar biomass.
+    c. Evaluate temperature and turgor sink limitations for growth of leaves and sapwood. If leaf/sapwood growth is permitted, estimate growth costs ($G_{leaf}$ and $G_{sapwood}$) and record leaf/sapwood area increases. 
+    d. Update $SS_{leaf}$ and $SS_{sapwood}$ taking into account photosynthesis, maintenance respiration and growth respiration.
+    e. Evaluate floem transport ($F_{floem}$) and sugar-starch dynamics ($K_{synthesis}$ and $K_{hydrolisis}$) in the leaf and sapwood compartments **at 1s time steps**. This completes the carbon balance of $SS_{leaf}$ \@ref(eq:leafcarbonbalanceequations) and $SS_{sapwood}$ \@ref(eq:sapwoodcarbonbalanceequations) for the subdaily time step.
+  
+3. If the balance of $SS_{leaf}$ is negative, apply leaf senescense as the exceeding leaf area according to respiration costs. Otherwise, a constant leaf senescense rate is applied according to leaf lifespan. Leaf senescence does not affect leaf C storage.
+4. Apply a constant rate of sapwood senescense (conversion to heartwood), which does not affect sapwood C storage.
+5. Increase sapwood area ($SA$) and leaf area ($LAI^{live}$) according to cumulative increases obtained from carbon balance.
+6. Update Huber values, hydraulic conductance of stems and roots according to current sapwood and leaf area values. 
+7. Update osmotic potential at full turgor of leaves and sapwood according to current sugar concentrations (a constant concentration of salts is assumed).
+8. If non-stomatal photosynthesis limitations are considered, apply them.
 
 At the end of each year (and at the end of the simulated period) the model translates cumulated sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover). 
 
