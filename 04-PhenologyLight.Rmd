@@ -1,29 +1,63 @@
 # Leaf phenology and light extinction {#leafphenologylight}
 
-Leaf phenology determines seasonal variations in the surface area of leaves, hence influencing the energy and water exchange between plants and the atmosphere. Light extinction is an important process to consider in a model where plants have different heights. The two processes are currently dealt with in a very simple way. 
+Leaf phenology determines seasonal variations in the surface area of leaves, hence influencing the energy and water exchange between plants and the atmosphere. Light extinction is an important process to consider in a model where plants have different heights.  
 
-## Growth degree days
+## Leaf phenology  {#leafphenology}
 
-Given a base temperature ($T_{base} = 5^{\circ} \mathrm{C}$), the growth degree days ($GDD$, in $^{\circ} \mathrm{C}$) are zero for all those days where mean temperature $T_{mean}$ is below $T_{base}$ and start increasing when temperatures become warmer than this threshold. In other words, the $GDD$ function accumulates $\max(0.0, T_{mean} - T_{base})$ for all days previous to the current one. At the end of a year the cummulative value $GDD$ is set again to zero. 
+### Phenological types and leaf expanded area
 
-## Leaf phenology and leaf fall {#leafphenology}
-
-Plant species can have either *evergreen* or *winter-deciduous* phenology. Evergreen plants maintain constant leaf area over the year, whereas in deciduous plants leaf-phenological status is updated daily, represented by $\phi_i$, the fraction of maximum leaf area (see function `pheno_leafDevelopmentStatus()`). Leaf area index ($LAI$) values of deciduous plants are adjusted for leaf phenology following [@Prentice1993; @Sitch2003]:
+Plant species can have either *evergreen* or *winter-deciduous* leaf phenology. The former are assumed to shed old leaves at the same time as new leaves  appear, so that the leaf area remains constant throughout the year. In winter-deciduous plants, leaf shedding and leaf bud formation occurs in autumn. Buds remain under dormancy until spring, when budburst and unfolding occurs. Evergreen plants thus maintain constant leaf area over the year, whereas in deciduous plants leaf-expanded status is updated daily, represented by $\phi_i$, the fraction of maximum leaf area:
 
 \begin{equation}
 LAI_{i}^{\phi}=LAI^{live}_i\,\cdot\phi_i
 \end{equation}
+whereas for evergreen species $LAI_{i}^{\phi}=LAI^{live}_i$ (or equivalently $\phi_i = 1$ at all times).
 
-whereas for evergreen species $LAI_{i}^{\phi}=LAI^{live}_i$ (or equivalently $\phi_i = 1$ at all times). Leaf budburst in deciduous species occurs when daily temperature exceeds $T_{base}$ and $\phi_i$ increases linearly from 0 to 1 as function of the degree days above $T_{base}$, until the functional parameter $S_{GDD,i}$ is surpassed (i.e. until $GDD > S_{GDD,i}$). In autumn, $\phi_i$ drops to 0 when average daily temperature falls again below $T_{base}$ [@Sitch2003]. 
+The general structure of process based phenological models explained in Chuine et al. @Chuine2013. These models aim determine, for a given phenological phase $n$ (endodormancy, ecodormancy, maturation, etc), the day of its finalisation $d_n$, such that the following equation holds:
+\begin{equation} 
+S_{n,d} = \sum_{d_{n-1}}^{d_n} R_{n,d} = S_n^*
+\end{equation}
+where $S_{n,d}$ is the state of development on day $d$ in phase $n$, and $d_{n-1}$ is the end of the previous phase. $R_{n,d}$ is the rate of development during phase $n$ on day $d$, which depends on environmental variables (temperature, photoperiod,...) and $S_n^*$ is the critical threshold to achieve the change of phase. 
 
+In the water balance model leaf area index ($LAI$) values of winter-deciduous plants are adjusted for leaf phenology following a leaf development model in spring and a leaf senescence model in autumn. Function `pheno_updateLeaves()` updates the status of expanded leaves and dead leaves in a simulation object.
+
+### Bud burst and leaf unfolding
+Transition from ecodormancy to bud burst is estimated using a very simple one-phase ecodormancy model (also called the spring warming model) implemented in function `pheno_leafDevelopmentStatus()`. Given a base temperature ($T_{eco}$, in $^{\circ}\mathrm{C}$), the rate of development during the ecodormancy phase ($R_{eco}$, in $^{\circ} \mathrm{C}$) is zero for those days where mean temperature $T_{mean}$ is below $T_{eco}$ and  $T_{mean} - T_{eco})$ for those days where temperatures become warmer than this threshold:
+\begin{eqnarray}
+R_{eco,d}(T_d) &=& 0  \,\, &if& \,\, T_d \leq T_{eco} \\
+              &=& T_d - T_{eco}  \,\, &if& \,\, T_d > T_{eco} \\
+\end{eqnarray}
+Daily $R_{eco,d}$ values are added to the cumulative sum $S_{eco,d}$ and budburst occurs when $S_{eco,d} > S_{eco}^*$. Both $T_{eco}$ and $S_{eco}^*$ are plant-specific parameters in `spwbInput`. 
+
+After budburst, we model progressive leaf unfolding in a similar manner, by accumulating degree days using the same definition as for $R_{eco,d}$:
+\begin{eqnarray}
+R_{unf,d} &=& R_{eco,d} \\
+\end{eqnarray}
+and then defining an unfolding development status $S_{unf,d} = \sum_{d,eco}^{d} R_{unf,d}$, which we use to determine $\phi_{i,d}$, the degree of leaf expansion of cohort $i$ at day $d$:
+\begin{equation}
+\phi_{i,d} = S_{unf,d}/S_{unf}^*
+\end{equation}
+until $S_{unf}^*$ is reached and the unfolding process ends, where $S_{unf}^*$ is a simulation control parameter `unfoldingDD`.
+
+### Leaf senescence
+Leaf senescence follows the models developed by Delpierre et al @Delpierre2009. The daily rate of development of senescence $R_{sen,d}$ is defined on the basis of daily photoperiod ($P_{d}$, in hours) and temperature ($T_d$, in $^{\circ} \mathrm{C}$):
+\begin{eqnarray}
+R_{sen,d}(P_d, T_d) &=& 0  \,\, &if& \,\, T_d \geq T_{sen} \,\, or \,\, P_d>P_{sen} \\
+              &=& (T_d - T_{sen})^2 \cdot (P_d/P_{sen})^2  \,\, &if& \,\, T_d < T_{sen} \,\,and \,\, P_d<P_{sen}\\
+\end{eqnarray}
+where $P_{sen}$ is the maximum photoperiod to start counting the senescence. The state of development of senescence $S_{sen,d}$ is defined
+\begin{equation} 
+S_{sen,d} = \sum R_{sen,d}
+\end{equation}
+and when $S_{sen,d} = S_{sen}^*$ then expanded leaves are assumed to suddenly die. This model is implemented in function `pheno_leafSenescenceStatus()` and returns $\phi_{i,d}=1$ for all days until $S_{sen,d} = S_{sen}^*$ when it returns $\phi_{i,d}=0$.
+
+### Leaf absission
 The drop of $\phi_i$ causes live expanded leaves to become dead leaves. To avoid a sudden decrease of leaf area, dead leaves are kept in the canopy and they are reduced daily using a negative exponential function of wind speed:
 \begin{equation}
 LAI^{dead}_i=LAI^{dead}_i\,\cdot e^{- u/10}
 \end{equation}
 where $u$ is wind speed in ($m \cdot s^{-1}$).
 
-
-Although simulations will normally start in winter and $GDD$ will be zero at the beginning, the user can specify a starting non-zero value for $GDD$ in the object created by function `spwbInput()`. Function `pheno_updateLeaves()` updates the status of expanded leaves and dead leaves in a simulation object.
 
 
 ## Light extinction {#basiclightextinction}

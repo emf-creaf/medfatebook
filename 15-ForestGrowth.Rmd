@@ -4,43 +4,51 @@
 
 Like the preceeding models, the physical structure of the stand is represented in one (vertical) dimension (i.e. the coordinates of plants are not explicit). The model is cohort-based, meaning that similar plant individuals are represented using a single entity with average properties (e.g. tree height or diameter) and a density variable is used to scale from individual level to the cohort level. Processes are implemented either at the cohort-level (water balance and photosynthesis) or at the individual level (carbon balance and growth). Water fluxes, soil water balance and plant photosynthesis processes follow the design of the soil water balance model and this part of the model design will not be repeated here. The model tries to reproduce the physiological processes that modulate leaf area changes and plant growth rates. Nevertheless, since the model does not implement all processes that may affect growth (such as nutrient availability), maximum growth rates and maximum plant sizes are constrained from user inputs, to ensure that model can be more easily calibrated and validated with observations. 
 
-## Design principles (basic water balance model)
-
-Leaf area of each plant cohort is divided between live (wether in resistance buds or unfolded leaves) and dead (standing dead leaves). Expanded leaf area corresponds to the portion of live leaf area that is unfolded at any given moment through the leaf phenological cycle [this should change with a better treatment of phenology]. Leaf area increase by leaf growth and decreases by leaf senescense. 
-
-*Constant Huber value* (basic water balance model). The Pipe model [@Shinozaki1964] is adopted to link increments of leaf area, sapwood area and fine root biomass. The model assumes a constant, species-specific Huber value, but allows deviations from the pipe model caused by drought-related leaf area reductions. 
-
-Growth is determined taking into account environmental limitations on both source (i.e. carbon assimilation) and sink (i.e. carbon investment on plant tissue expansion) [@Fatichi2014; @Guillemot2015; @Korner2015]. With respect to carbon availability for growth, the model offers three alternatives. In the first one, carbon available for growth is simply the daily difference between net photosynthesis and maintenance respiration (i.e. no carbon storage). The second alternatives involves a single (fast) carbon storage pool that allows decoupling assimilation from growth. Finally, the third alternative involves two carbon storage pools ('fast' and 'slow') with a transfer rate between them [@Richardson2013; @Dietze2014], which we assume to be regulated by the need to maintain, as much as possible, a minimum amount of carbon in the fast pool (i.e. for metabolic and osmotic purposes). In the second and third modes, maximum overall C storage capacity is proportional to plant size.
-
-The LPG model [@Sitch2003] applies different turnover rates for different tissues, but then tries to satisfy the pipe model [@Shinozaki1964] by allocating C where it is more limiting. Instead, we assume that baseline leaf and fine root turnover rates are linearly related to conversion from sapwood to heartwood. Similarly to 3-PG [@Landsberg1997] we assume that the turnover rate is smallest for young plants, and it increases up to a maximum value. The model assumes that plants cannot suffer from cavitation if the leaf water potential is large enough for growth to occur (i.e. if cell turgidity is large enough for cell elongation). Similarly, it also assumes that growth stops before cavitation starts during drought events. When sapwood area reduction occurs, this not only reduces leaf area, but also decreases the amount of fast C reserves available for future growth. Thus it is assumed that parts of the plant are effectively disconnected.
-
-Tree structural variables are updated as in forest gap models [@Lindner1997].
-
 ## Design principles (advanced water balance model)
 
 ### Carbon compartments, transport and carbon balance
 
-Carbon pools are differentiated between **structural** and **labile**, the second being divided into **metabolic** and **storage**: 
+Carbon pools are differentiated between **structural** and **labile**. Labile carbon involves two different pools (**metabolic** and **storage**) with a transfer rate between them [@Richardson2013; @Dietze2014], which we assume to be regulated by the need to maintain, as much as possible, a minimum amount of sugar carbon for metabolic and osmotic purposes. 
 
  + *Structural carbon* corresponds carbon forming cell membranes, cell walls and the cytosolic machinery. Structural carbon is used to calculate maintenance respiration and growth costs. Structural carbon occurs in three compartments: **leaves**, **sapwood** (stem, branches and coarse roots) and **fine roots**, which have different maintenance and growth costs. Structural carbon is lost when senescence occurs in each of these compartments.
  + *Metabolic carbon* is labile carbon assumed to correspond to sugars (glucose or fructose) that are used to sustain cell functioning (i.e. provide carbon for maintenance and growth). Metabolic carbon occurs in **leaves** and **sapwood**. Leaf metabolic carbon is generated from photosynthesis and used in different functions, including export to sapwood. Sugar concentration in the floem is assumed to be (passively) in equilibrium with leaf metabolic sugar concentration. In sapwood, metabolic carbon comes from floem transport and is used to sustain growth and maintenance respiration of sapwood and fine roots. Moreover, changes metabolic carbon are coupled to variations in osmotic potential. 
 + *Storage carbon* in the leaf is intented to represent short-term storage (mainly starch in chloroplasts) and its inclusion in the model follows the need to buffer daily variations in metabolic carbon as well as the corresponding leaf osmotic potential. Storage carbon in sapwood (branches, stems and coarse roots) is intended to serve as long-term (seasonal and interannual) storage.
 
-Carbon balance of leaf labile (metabolic and storage) carbon is perfomed by considering photosynthesis, sugar-starch conversion and floem tranport. Plant respiration is calculated at the individual level, by estimating the respiration of leaves, stem and fine root compartments. Stem respiration depends on sapwood area, stem height and root depth.
+Carbon balance of leaf labile (metabolic and storage) carbon is perfomed by considering photosynthesis, sugar-starch conversion and floem tranport. Growth and maintenance respiration is calculated at the individual level, by estimating the respiration of leaves, stem and fine root compartments. Stem respiration depends on sapwood area, stem height and root depth.
 
+### Links between plant hydraulics and carbon balance
+
+The model tries to coordinate carbon and water aspects of plant functioning by establishing several links between them (figure below):
+
+ a. Transpiration and photosynthesis are coordinated via the stomatal regulation model.
+ b. Leaf water potential of symplastic tissues determines turgor of leaf tissues for growth, while sugar concentration in the leaf tissues determines changes in osmotic potential at full turgor and hence, the relative water content of symplasmic storage.
+ c. Analogously, water potential of stem symplastic tissues determines the turgor in the cambium and the sapwood formation rate, while the sugar concentration in the sapwood determines the osmotic potential at full turgor of stem symplastic tissues.
+ d. Leaf growth and senescence influence hydraulic conductance of several tissues (fine roots, coarse root sapwood and stem sapwood) via changes in leaf area.
+ e. Sapwood growth and senescence influence hydraulic conductance of coarse root and stem sapwood via changes in sapwood area.
+ f. Fine root dynamics (should) influence fine root conductance and distribution across soil layers.
 
 ```{r, out.width='100%', fig.align="center", fig.cap="Schematic representation of relationships between plant hydraulics and carbon balance", echo=FALSE}
 knitr::include_graphics("hydraulics_carbon_relations.png")
 ```
 
 
-### Growth
+### Leaf area and sapwood area dynamics
+
+Leaf area of each plant cohort is divided between live (wether in resistance buds or unfolded leaves) and dead (standing dead leaves). Expanded leaf area corresponds to the portion of live leaf area that is unfolded at any given moment through the leaf phenological cycle [this should change with a better treatment of phenology]. Leaf area increase by leaf growth and decreases by leaf senescense. 
+
+Leaf senescence can occur due to leaf aging or due to a negative carbon balance in the leaf. Losts in sapwood area (i.e. conversion to heartwood) can occur via embolism or aging. Similarly to 3-PG [@Landsberg1997] we assume that the relative turnover rate of sapwood is smallest for young plants, and it increases up to a maximum value.
+
+Growth is determined taking into account environmental limitations on both source (i.e. carbon assimilation) and sink (i.e. carbon investment on plant tissue expansion) [@Fatichi2014; @Guillemot2015; @Korner2015].
 
 Ratios of leaf area to sapwood area (Huber value) can vary within species, due to environmental conditions [@Mencuccini1995]. Three options are possible regarding the relationship between leaf area and sapwood area (Huber values):
 
-  1. *Constant Huber value*: Growth of leaf area and sapwood area need to be coordinated so that Huber value remains constant. Whole-plant conductance will decrease with the progressive increase in plant height.
+  1. *Constant Huber value*: Growth of leaf area and sapwood area need to be coordinated so that Huber value remains constant. Whole-plant conductance will decrease with the progressive increase in plant height. This is similar to the LPG model [@Sitch2003], where different turnover rates are applied for different tissues, but then tries to satisfy the pipe model [@Shinozaki1964] by allocating C where it is more limiting. 
   2. *Constant whole-plant conductance*: Growth of leaf area, sapwood area and height needs to be coordinated so that whole-plant conductance (excluding rhizosphere) is constant and equal to the initial value. Increases in daily leaf area or sapwood area are targetted depending on whether the current whole-plant conductance is above or below the target value.  
   3. *Emergent Huber value and whole-plant conductance*: Huber value variations arise as a result of the dynamic equilibrium of growth/senescence in leaf area and sapwood area, both constrained by plant hydraulics. Growth in leaves should be hiearchically prioritized (hormonal control?). An excess of leaf growth leds to a decrease in stem and root conductance (per leaf area), which may feedback negatively to leaf growth via a decreased leaf turgor. This can only be compensated by increasing again stem/root conductance via sapwood secondary growth. 
+
+### Tree diameter, tree height and shrub cover updates
+
+Tree structural variables are updated as in forest gap models [@Lindner1997].
 
 
 ## State variables
