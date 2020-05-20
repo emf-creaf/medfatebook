@@ -42,27 +42,28 @@ The package has a user interface in R, but actual calculations have been impleme
 
 ### Dynamic simulation functions
 
-Forest water and energy balance can be studied for a given forest stand using function `spwb()` (soil-plant-water-balance). This function allows simulating vertical hydrological processes (rainfall interception, soil infiltration, percolation and evapotranspiration) and plant physiological processes related to plant transpiration (hydraulics, photosynthesis and stomatal regulation).  The same function is used to run two models of different degree of complexity, from which the user should choose depending on the intended application and data availability. Most processes are implemented at the daily scale, although some operate at subdaily steps. Function `spwb()` has a closely related function `spwb.day()` that allows simulating processes day by day. Finally, one can simulate plant physiological processes only, while having soil moisture as a dynamic input like weather, using function `pwb()` (plant-water-balance).
+Forest water and energy balance can be studied for a given forest stand using function `spwb()` (soil-plant-water-balance). This function allows simulating vertical hydrological processes (rainfall interception, soil infiltration, percolation and evapotranspiration) and plant physiological processes related to plant transpiration (hydraulics, photosynthesis and stomatal regulation).  The same function is used to run two models of different degree of complexity, from which the user should choose depending on the intended application and data availability. Most processes are implemented at the daily scale, although some operate at subdaily time steps. Function `spwb()` has a closely related function `spwb.day()` that allows focusing on subdaily processes. Finally, one can simulate plant physiological processes only, while having soil moisture as a dynamic input like weather, using function `pwb()` (plant-water-balance).
 
-Changes in leaf area and plant growth are key to evaluate the influence of climatic conditions on forest structure and function. Function `growth()` extends the previous models because it allows simulating the growth of a set of plant cohorts competing for light and water in a given forest stand. It can be used to forecast temporal variation in water fluxes and soil water content in forest stands while taking into account processes determining leaf area changes and plant growth. Importantly, `growth()` function and the processes that it implements are still **under development**.
+Changes in primary (leaf area) and secondary (wood) growth are key to evaluate the influence of climatic conditions on plant and forest structure and function. Function `growth()` extends the previous models because it allows simulating growth and mortality of a set of plant cohorts competing for light and water in a given forest stand. It can be used to forecast temporal variation in water fluxes and soil water content in forest stands while taking into account plant acclimation. Analogously to the simulation of water balance, `growth()` has a closely related function `growth.day()` that allows focusing on subdaily processes (i.e. carbon balance). Importantly, `growth()` function and the processes that it implements are still **under development**.
 
-While all simulation functions in the package focus on particular forest stands and vertical hydrological processes, the package has been designed so that it could be part of a broader modelling infrastructure including *spatial processes* such as lateral water flows.
+While simulation functions in the package are run on individual forest stands, the package has been designed so that it could be part of a broader modelling infrastructure including *spatial processes* such as lateral water flows.
 
 ### Sub-model functions
 
 Many of the sub-models included in **medfate** are implemented as C++ functions and internally called by the simulation functions implementing top-level models. Most sub-models have, however, their corresponding R function to made them directly available to the user. This facilitates understanding the different sub-models and a more creative use of the package. Sub-model functions are grouped by *subject*, which is included in the name of the function. The different sub-model functions are (by subject):
 
 * `biophysics_*`: Physical and biophysical utility functions.
+* `carbon_*`: Structural and non-structural carbon compartments and flows.
 * `hydraulics_*`: Plant hydraulics.
-* `hydrology_*`: Canopy and soil hydrology (rainfall interception, soil evaporation, soil infiltration).
+* `hydrology_*`: Canopy and soil hydrology.
 * `light_*`: Light extinction and absortion.
-* `moisture_*`: Live tissue moisture.
+* `moisture_*`: Tissue water relations and live tissue moisture.
 * `pheno_*`: Leaf phenology.
 * `photo_*`: Leaf photosynthesis.
-* `root_*`: Root distribution and conductance calculations.
+* `root_*`: Root distribution and root/rhizosphere conductance estimation.
 * `soil_*`: Soil hydraulics and thermodynamics.
-* `spwb_*`: Soil water balance parameter optimization/calibration routines.
-* `transp_*`: Stomatal regulation and resulting transpiration/photosynthesis.
+* `spwb_*`: Soil water balance routines.
+* `transp_*`: Stomatal regulation and plant transpiration.
 
 ### Static functions
 
@@ -73,7 +74,7 @@ Package **medfate** includes a number of functions to examine static properties 
 * `stand_*`: Stand-level attributes (e.g. basal area).
 * `vprofile_*`: Vertical profiles (light, wind, fuel density, leaf area density).
 
-Vegetation functioning and dynamics have strong, but complex, effects on fire hazard. On one hand, growth and death of organs and individuals changes the amount of standing live and dead fuels, as well as downed dead fuels. On the other, day-to-day changes in soil and plant water content changes the physical properties of fuel, notably fuel moisture content. Package **medfate** provides functions to estimate fuel properties and potential fire behaviour in forest inventory plots. Specifically, function `fuel_stratification()` provides a stratification of the stand into understory and canopy strata; and `fuel_FCCS()` calculates fuel characteristics. Function `fuel_cohortFineFMC()` allows obtaining daily fuel moisture content estimates corresponding to the water status of plants, as returned by function `spwb()`. A fire behaviour model is implemented in function `fire_FCCS()` to calculate the intensity of surface fire reaction and the rate of fire spread of surface fires assuming a steady-state fire. Fuel and fire behaviour functions allow obtaining the following: 
+Vegetation functioning and dynamics have strong, but complex, effects on fire hazard. On one hand, growth and death of organs and individuals changes the amount of standing live and dead fuels, as well as downed dead fuels. On the other, day-to-day changes in soil and plant water content changes the physical properties of fuel, notably fuel moisture content. Package **medfate** provides functions to estimate fuel properties and potential fire behaviour in forest inventory plots. Specifically, function `fuel_stratification()` provides a stratification of the stand into understory and canopy strata; and `fuel_FCCS()` calculates fuel characteristics. A fire behaviour model is implemented in function `fire_FCCS()` to calculate the intensity of surface fire reaction and the rate of fire spread of surface fires assuming a steady-state fire. Fuel and fire behaviour functions allow obtaining the following: 
 
 1. Fuel characteristics by stratum.
 2. Surface fire behavior (i.e. reaction intensity, rate of spread, fireline intensity and flame length).

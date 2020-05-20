@@ -1,20 +1,20 @@
 # Model inputs
 
-Data input for simulation models of forest functioning and dynamics can be grouped into four categories. First, a description of the  **vegetation** existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Second, most often **soil** information is required, specially if underground resources (i.e. water and/or nutrients) are important for the processes included in the model. While soil features are considered static parameters in model simulations, **weather** is always a dynamic input that defines the temporal (i.e. daily) variation of environmental conditions in which physical and biological processes occur. Finally, **topographic and geographic information** may be needed if internal calculations of physical variables (such as atmospheric pressure or potential radiation) require them or, more generally, if the processes implemented depend on this information. 
+Data input for simulation models can be grouped into four conceptually distinct categories. First, a description of the  **vegetation** existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in `spwb()` calls, but becomes dynamic in calls to `growth()`. Hence, in this latter case the input vegetation describes to the starting point. Second, **soil** information is also required, because underground water resources are important for the processes included in the model. While soil features are considered static parameters in model simulations, **weather** is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur. Finally, **topographic and geographic information** is often required, since internal calculations of some physical variables (such as atmospheric pressure or potential radiation) require them. 
 
-This chapter describes the requirements of **medfate** package with respect to each of these data input categories. The last section describes additional parameters that are used to specify global options of simulation functions such as `spwb()` and `growth()`.
+This chapter describes the requirements of **medfate** package with respect to each of these data input categories. The last section describes additional parameters that are used to specify global options of simulation functions (i.e., `spwb()`, `pwb()`, `growth()` and daily simulation functions).
 
 ## Latitude and topography {#topoinput}
 
-Topography has a relatively small direct influence in **medfate** simulations, because most topographic effects are assumed to be taken into account in the estimation of weather input. Nonetheless, *elevation* in meters is needed to estimate atmospheric pressure and air density (see \@ref(meteoinput)), whereas *aspect* (in degrees from North) and *slope* (also in degrees) are needed in addition to *latitude* (also in degrees North) to estimate sunrise/sunset hours and potential radiation in advanced water balance modelling.
+Topography has a relatively small direct influence in **medfate** simulations, because most topographic effects are assumed to be taken into account in the estimation of weather input. Nonetheless, *elevation* in meters is needed to estimate atmospheric pressure and air density (see \@ref(meteoinput)), whereas *aspect* (in degrees from North) and *slope* (also in degrees) are needed in addition to *latitude* (also in degrees North) to estimate sunrise/sunset hours and potential radiation. Topographic variables should be readily accessible for users having access to a digital elevation model.
 
 ## Soil description  {#soilinput}
 
-Soils can be described in **medfate** using between $S=1$ and $S=5$ different soil layers. Here the word *soil* refers to depths that plant roots can achieve, including cracks within the bedrock. The number and size of layers may reflect changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate its hydraulic properties. Most soil properties are considered *static* parameters in simulations, except (state) variables that depend on soil water balance (e.g. soil moisture content, soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered in simulations.
+Soils can be described in **medfate** using between $S=1$ and $S=5$ different soil layers. Here the word *soil* refers to depths that plant roots can achieve (critical zone), including cracks within the bedrock. The number and size of soil layers may reflect changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties. Most soil properties are considered *static* parameters in simulations, except soil moisture content, variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered in simulations.
 
 ### Soil physical properties
 
-Soil physical properties, like soil texture (i.e. volume percent of sand, silt and clay), bulk density or rock fragment content, can differ between soil layers, and this has important consequences for soil water retention capacity and hydraulics. Specifying layers with high rock fragment content (e.g. layers of weathered rock with few soil particles) may be important in some biomes like the Mediterranean one, because plants often extend their roots into cracks existing in the parent rock [@Ruffault2013]. 
+Soil physical properties, like *texture* (i.e. volume percent of sand, silt and clay), *organic matter content*, *bulk density* or *rock fragment content*, can differ between soil layers, and this has important consequences for soil water retention capacity and hydraulics. Specifying layers with high rock fragment content (e.g. layers of weathered rock with few soil particles) may be important in some biomes like the Mediterranean one, because plants often extend their roots into cracks existing in the parent rock [@Ruffault2013]. 
 
 For each soil layer $s$ the following physical parameters are needed:
 
@@ -27,7 +27,7 @@ For each soil layer $s$ the following physical parameters are needed:
 | $BD_{s}$ | $g \cdot cm^{-3}$ |`bd` | Bulk density in layer $s$|
 | $P_{rocks,s}$ | % | `rfc` | Rock fragment content as percent volume (within whole soil) in layer $s$ |
 
-If possible, soil physical properties should be measured in soil profiles conducted at the target forest plot. Soil input data should be arranged in a `data.frame` with soil layers in rows and physical variables in columns (see function `defaultSoilParams()`). The package includes function `soilgridsParams()` to fetch soil information from [SoilGrids.org](https://soilgrids.org/), a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.
+If possible, soil physical properties should be measured in soil profiles conducted at the target forest plot (although soil profiles rarely reach plant rooting depths). Soil input data should be arranged in a `data.frame` with soil layers in rows and physical variables in columns (see function `defaultSoilParams()`). The package includes function `soilgridsParams()` to fetch soil information from [SoilGrids.org](https://soilgrids.org/), a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.
 
 The depth of a given soil layer $s$ ($Z_s$; in $mm$) is defined as the sum of layer widths from the surface to the target layer:
 \begin{equation}
@@ -37,7 +37,7 @@ And the overall *soil depth*  ($Z_{soil}$; in $mm$) is the sum of soil layer wid
 
 ### Water retention curves {#waterretentioncurves}
 
-The water retention curve of a soil is the relationship between *volumetric soil moisture content* ($\theta$, in $m^3 \cdot m^{-3}$ of soil, excluding rock fragments) and the corresponding *soil water potential* ($\Psi$, in MPa), i.e. the amount of work that must be done per unit quantity of pure water in order to transport reversibly and isothermally an infinitesimal quantity of water from a reference pool. This curve is characteristic for different types of soil, and is also called the *soil moisture characteristic curve*. Since soil layers may differ in their physical properties, they also normally have different water retention curves.
+The water retention curve of a soil is the relationship between *volumetric soil moisture content* ($\theta$, in $m^3 \cdot m^{-3}$ of soil, excluding rock fragments) and the corresponding *soil water potential* ($\Psi$, in MPa), i.e. the amount of work that must be done per unit quantity of pure water in order to transport reversibly and isothermally an infinitesimal quantity of water from a reference pool. The shape of the water retention curve (also called the *soil moisture characteristic curve*) depends on physical properties (mainly texture and bulk density, but also organic matter content). Since soil layers usually differ in their physical properties they also normally have different water retention curves.
 
 Two water retention curve models are available in **medfate** (fig. \@ref(fig:retention-curves)):
 
@@ -74,15 +74,15 @@ Macroporosity values are calculated using the equations given in @Stolf2011, whi
 1. Using the USDA texture classification and the average texture class parameters given by @Carsel1988.
 2. Directly from the soil texture, organic matter and bulk density, using the pedotransfer functions in @Toth2015.
 
-All simulation functions need an object of class `soil` to be run. Users can edit the `soil` object manually (it is actually a `list`), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements.
+Besides defining soil parameters, function `soil()` also initializes *soil state variables*: soil moisture content, soil temperature (although set to a missing value) and water table depth. All simulation functions need an object of class `soil` to be run. Users can edit the `soil` object manually (it is actually a `list`), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements.
 
 ### Water content and water table depth
 
-The *volume of water* ($V_s$ in mm) in a soil layer $s$ is calculated from its water potential ($\Psi_s$) and water retention curve using:
+The *volume of water* ($V_s$ in $ mm = l \cdot m^{-2}$ of ground area) in a soil layer $s$ is calculated from its water potential ($\Psi_s$) and water retention curve using:
 \begin{equation}
 V_s(\Psi_s) = d_s\cdot ((100-P_{rocks,s})/100)\cdot\theta_{s}(\Psi_s)
 \end{equation}
-where $d_s$ is the depth of the soil layer (in mm) and $P_{rocks,s}$ is the percentage of rock fragments. The overall volome of water in the soil is simply the sum of water content over soil layers:
+where $d_s$ is the depth of the soil layer (in mm) and $P_{rocks,s}$ is the percentage of rock fragments. The overall volume of water in the soil (accessible by roots) is simply the sum of water content over soil layers:
 \begin{equation}
 V_{soil} = \sum_{s=1}^S{V_s(\Psi_s)}
 \end{equation}
@@ -93,10 +93,10 @@ A number of fixed water volumes (and their corresponding moisture) are important
 \begin{equation}
 V_{fc,s} = V_{s}(-0.033) = d_s\cdot ((100-P_{rocks,s})/100)\cdot\theta_{fc,s}
 \end{equation}
-where $\theta_{fc,s} = \theta_s(-0.033)$ is the corresponding moisture at *field capacity* (i.e. the amount of soil moisture held in soil after excess water has drained away). 
-  + *Water content at saturation* is calculated anagolously, but replacing $\theta_{fc,s}$ by $\theta_{sat, s} = \theta_s(0)$, the moisture at *saturation* (i.e. the amount of soil moisture when all easily drained voids between soil particles are filled with water). 
-  + *Water content at wilting point* (-1.5 MPa) is calculated replacing $\theta_{fc,s}$ by $\theta_{wp,s} = \theta_s(-1.5)$, the moisture at *wilting point* (i.e. a conventional amount of moisture that the plant requires not to wilt). 
-  + The *amount of extractable water* is the difference between water content at field capacity and a the water content at a conventional minimum water potential, which can be set at wilting point or lower values (by default at -5 MPa in **medfate**).
+where $\theta_{fc,s} = \theta_s(-0.033)$ is the corresponding moisture at *field capacity*, the amount of soil moisture held in soil after excess water has drained away. 
+  + *Water content at saturation* is calculated anagolously, but replacing $\theta_{fc,s}$ by $\theta_{sat, s} = \theta_s(0)$, the moisture at *saturation*, the amount of soil moisture when all easily drained spaces between soil particles (i.e. macropores) are also filled with water. 
+  + *Water content at wilting point* (-1.5 MPa) is calculated replacing $\theta_{fc,s}$ by $\theta_{wp,s} = \theta_s(-1.5)$, the moisture at *wilting point*, a conventional amount of soil moisture beyond which plants are assumed have problems extracting water and start to wilt. In reality, however, many plants can extract water from much drier soils.
+  + The *amount of extractable water* is the difference between water content at field capacity and the water content at a conventional minimum water potential, which can be set at wilting point or lower values (by default at -5 MPa in **medfate**).
 
 The depth of water table is the depth of saturated soil (in $mm$). In medfate, *water table depth* ($Z_{wt}$, in mm) equals soil depth (i.e. $Z_{soil}$) when all soil layers are below field capacity. When some layers are between field capacity and saturation, water table depth is calculated as:
 \begin{equation}
@@ -112,7 +112,7 @@ Note that one limitation of the representation of vegetation using plant cohorts
 
 ### Structural attributes of plant cohorts 
 
-A plant cohort $i$ is either a *tree cohort* or a *shrub cohort*, and is defined using a set of structural attributes shown in the following table, where columns **spwb** and **growth** indicate whether attributes are required by functions `spwb()` and `growth()`, respectively:
+A plant cohort $i$ is either a *tree cohort* or a *shrub cohort*, and is defined using a set of structural attributes shown in the following table, where columns **spwb** and **growth** indicate whether attributes are required by functions `spwb()` (or `pwb()`) and `growth()`, respectively:
 
 | Symbol | Units | R  | Description                        | spwb | growth |
 |--------|-------|----| ------------------------------------|-----|-----|
