@@ -78,7 +78,7 @@ Besides defining soil parameters, function `soil()` also initializes *soil state
 
 ### Water content and water table depth
 
-The *volume of water* ($V_s$ in $ mm = l \cdot m^{-2}$ of ground area) in a soil layer $s$ is calculated from its water potential ($\Psi_s$) and water retention curve using:
+The *volume of water* ($V_s$ in $mm = l \cdot m^{-2}$ of ground area) in a soil layer $s$ is calculated from its water potential ($\Psi_s$) and water retention curve using:
 \begin{equation}
 V_s(\Psi_s) = d_s\cdot ((100-P_{rocks,s})/100)\cdot\theta_{s}(\Psi_s)
 \end{equation}
@@ -106,13 +106,13 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 
 ## Vegetation description {#vegetationinput}
 
-The representation of plants within a target plot is done in **medfate** by means of **cohorts** of woody plants (i.e. trees and shrubs). A plant cohort respresents a set of plants that belong to the same species (or functional group) and are more or less of the same *size*. For example, trees in a stand may be grouped by species and diameter class. This representation is chosen so that package functions can be easily applied to forest plot data, for example from national forest inventories. The description of plant cohorts includes a measure of *abundance* of the cohort in the stand, which in the case of trees is density as stems per hectare and for shrubs is percent cover (shrubs are often multi-stemmed). This different abundance measure is the main motivation for distinguishing between tree cohorts and shrub cohorts. 
+The representation of plants within a target plot is done in **medfate** by means of **cohorts** of woody plants (i.e. trees and shrubs). A plant cohort respresents a set of plants that belong to the same species (or functional group) and are more or less of the same *size*. For example, trees in a stand may be grouped by species and diameter class. This representation is chosen so that package functions can be easily applied to forest plot data, for example from national forest inventories. The description of plant cohorts includes a measure of *abundance* of the cohort in the stand, which in the case of trees is *density* as stems per hectare and for shrubs is *percent cover* (shrubs are often multi-stemmed). This different abundance measure is the main motivation for distinguishing between tree cohorts and shrub cohorts, rather than their height. 
 
-Note that one limitation of the representation of vegetation using plant cohorts is that it is not spatially-explicit (i.e. plants cannot have explicit coordinates within forest stands) and hence spatial (horizontal) interactions cannot be taken into account.  
+Note that one limitation of the representation of vegetation in **medfate** is that it is not spatially-explicit (i.e. plants cannot have explicit coordinates within forest stands) and hence spatial (horizontal) interactions between plant cannot be taken into account explicitly (but see \@ref(plantwaterpools)).  
 
 ### Structural attributes of plant cohorts 
 
-A plant cohort $i$ is either a *tree cohort* or a *shrub cohort*, and is defined using a set of structural attributes shown in the following table, where columns **spwb** and **growth** indicate whether attributes are required by functions `spwb()` (or `pwb()`) and `growth()`, respectively:
+A plant cohort $i$ is either a *tree cohort* or a *shrub cohort*, and is defined using a set of structural attributes shown in the following table, where columns **spwb** and **growth** indicate whether attributes are required by simulation functions `spwb()/pwb()` and `growth()`, respectively:
 
 | Symbol | Units | R  | Description                        | spwb | growth |
 |--------|-------|----| ------------------------------------|-----|-----|
@@ -132,22 +132,23 @@ Height ($H$) values refer to average height of individuals included in the cohor
 
 **Leaf area index**
 
-$LAI$ variables refer to *one-sided leaf area* of plants in the cohort per surface area of the stand. We will call *total leaf area index* of a plant cohort $i$ ($LAI^{all}_{i}$) to the sum of dead and live expanded leaves of the cohort:
+$LAI$ variables refer to *one-sided leaf area* of plants in the cohort per surface area of the stand. Leaves standing on branches can be alive or dead. We will call *total leaf area index* of a plant cohort $i$ ($LAI^{all}_{i}$) to the sum of dead and live (and unfolded) leaves of the cohort:
 \begin{equation}
 LAI^{all}_{i} = LAI^{\phi}_{i}+LAI^{dead}_{i}
 \end{equation}
 
-If there are $c$ plant cohorts, the leaf area index of the whole stand can be calculated for living leaves, expanded leaves, dead leaves and total leaf area as:
+For simulations not involving growth, winter deciduous phenology is still simulated, and the current level of leaves unfolded may be lower than the maximum (live) amount of leaves. If there are $c$ plant cohorts, the leaf area index of the whole stand can be calculated for living leaves, unfolded leaves, dead leaves and total leaf area as:
 \begin{eqnarray}
 LAI^{live}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{live}} \\
 LAI^{\phi}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{\phi}} \\
 LAI^{dead}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{dead}} \\
 LAI^{all}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{all}} = LAI^{\phi}_{stand}+LAI^{dead}_{stand}
 \end{eqnarray}
+For evergreen species, $LAI_{i}^{live} = LAI_{i}^{\phi}$ and the distinction does not exist.
 
 ### Forest plot objects {#forestobjects}
 
-Forest plots in `medfate` are assumed to be in a format that follows closely the Spanish national forest inventory. Each forest plot is represented in an object of class `forest`, a list that contains several elements:
+While the previous section described the structural forest variables required to run simulations in **medfate**, forest plot data input in the package is easier if one uses a format that follows closely the Spanish national forest inventory. In this format, each forest plot is represented in an object of class `forest`, a list that contains several elements:
 ```{r}
 data(exampleforestMED)
 exampleforestMED
@@ -155,14 +156,14 @@ exampleforestMED
 
 Among them, the most important items are two data frames, `treeData` (for trees) and `shrubData` for shrubs. Information about herbs is currently only used for fire hazard calculations. Elements `ID` and `patchsize` are only relevant when using medfate functions in a spatial context.
 
-While not strictly necessary, forest objects are a convenient format to start calculations with **medfate**, because there are many static functions that take forest objects as input. The package includes functions to facilitate mapping user data in into tables `treeData` and `shrubData` (see function `forest_mapWoodyTables()`).
+While not strictly necessary, forest objects are a convenient format to start calculations with **medfate**, because there are many static functions that take forest objects as input and calculate leaf area index for each plant cohort. Another pathway to obtain LAI estimations is by specifying foliar biomass values as additional columns of forest objects. The package also includes functions to facilitate mapping user data in into tables `treeData` and `shrubData` (see function `forest_mapWoodyTables()`).
 
 
 ### Vertical leaf distribution {#leafdistribution}
 
-Crown base height ($H_{crown,i}$; in $cm$) of cohort $i$ is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort ($CR_i$; a proportion between 0 and 1), i.e. the ratio between plant crown length and total height (see eq. \@ref(eq:CrownHeight)). 
+The vegetation inputs for height, leaf area index and crown ratio allow the package to determine the vertical distribution of leaves in the stand. The leaf area of any plant cohort is assumed to be distributed vertically following a **truncated Gaussian function** whose standardized values -1.5 and 1.5 correspond to crown base height ($H_{crown,i}$; in $cm$) and total plant height ($H_i$), respectively. Crown base height ($H_{crown,i}$) of cohort $i$ is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort ($CR_i$; a proportion between 0 and 1), i.e. the ratio between plant crown length and total height (see eq. \@ref(eq:CrownHeight)). 
 
-The leaf area of any plant cohort is assumed to be distributed vertically following a **truncated Gaussian function** whose standardized values -1.5 and 1.5 correspond to crown base height ($H_{crown,i}$) and total plant height ($H_i$), respectively. Simulation models in **medfate** divide the vertical dimension into vertical layers (by default are 1m width, but see control parameter `verticalLayerSize`). Let us define $LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}$ as the leaf area index of cohort $i$ in layer $j$ including both functional leaves and dead leaves standing on branches. The truncated Gaussian distribution defines the $LAI_{i,j}^{\phi}$ and $LAI_{i,j}^{dead}$ for all plant cohorts and vertical layers.
+Simulation models in **medfate** divide the vertical dimension into vertical layers (by default are 1m width, but see control parameter `verticalLayerSize`). Let us define $LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}$ as the leaf area index of cohort $i$ in layer $j$ including both functional leaves and dead leaves standing on branches. The truncated Gaussian distribution defines the $LAI_{i,j}^{\phi}$ and $LAI_{i,j}^{dead}$ for all plant cohorts and vertical layers.
 
 Dividing the leaf area of a given layer by its width, one obtains the *leaf area density* ($LAD$ in $m^2 \cdot m^{-3}$). Figure \@ref(fig:leafareadensity) illustrates the leaf area density profile (see function `vprofile_leafAreaDensity()`) corresponding to the forest stand described in the `forest` object that we showed above. 
 
@@ -177,7 +178,7 @@ The leaf area density profile determines the extinction rates of light through t
 
 ### Vertical root distribution {#rootdistribution}
 
-The root system of each plant cohort $i$ is described using $FRP_{i,s}$, the proportion of fine roots (with respect to the whole plant) in each soil layer $s$. $FRP_{i,s}$ values are normally defined using the linear dose response model [@Schenk2002; @Collins2007]: 
+Analogously to the aboveground vegetation parameters, inputs describing depths corresponding to 50% and 95% of fine roots ($Z_{50,i}$ and $Z_{95,i}$) are used to completely specify the distribution of roots across soil layers. The root system of each plant cohort $i$ is described using $FRP_{i,s}$, the proportion of fine roots (with respect to the whole plant) in each soil layer $s$. $FRP_{i,s}$ values are normally defined using the linear dose response model [@Schenk2002; @Collins2007]: 
 \begin{eqnarray}
 FRP_{i,s} &=& Y_i(Z_s) - Y_i(Z_{s-1}) \\
 Y_i(z) &=& \frac{1}{1+(z/Z_{50,i})^{c_i}}
@@ -205,7 +206,7 @@ The actual input to simulation functions is the matrix of $FRP_{i,s}$ values - n
 
 ### Plant water pools and horizontal distribution of fine roots {#plantwaterpools}
 
-By default, models in **medfate** assume that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can be simulated. Considering plant water pools involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many plant water pools as plant cohorts, with proportions defined by their LAI values:
+By default, models in **medfate** assume that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can also be simulated. Considering plant water pools involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many plant water pools as plant cohorts, with proportions defined by their LAI values:
 \begin{equation}
 f_{pool,i} = \frac{LAI^{live}_i}{LAI^{live}_{stand}}
 \end{equation}
@@ -232,13 +233,13 @@ Note that if $f_{overlap} = 0$ then $fr_{i,s,j} = 1$ if $j=i$ and zero otherwise
 
 ### Functional traits and vegetation initialization {#functionaltraits}
 
-Besides the physical representation of vegetation, forest ecosystem models require information regarding vegetation functioning, because this influences the outcome of biophysical, physiological and hydrological processes. In the following chapters, we will indicate for each simulated process its required functional parameters. Normally, functional traits are described at the species level because infra-specific parameters are hard to get. Even at the species level, many functional (e.g. physiological) traits are hard to obtain, so in **medfate** we provide a default species parameter table for woody species found in Catalonia, with many of them occurring elsewhere in the Mediterranean Basin (`SpParamsMED`). User can modify this data frame to account for intra-specific trait variation (see function `modifySpParams()`). 
+Besides the physical representation of vegetation, forest ecosystem models require information regarding vegetation functioning, because this influences the outcome of biophysical, physiological and hydrological processes. In the following chapters, we will indicate for each simulated process its required functional parameters. Normally, functional traits are described at the species level because infra-specific parameters are hard to get. Even at the species level, many functional (e.g. physiological) traits are hard to obtain, so in **medfate** we provide a default species parameter table for woody species found in Catalonia, with many of them occurring elsewhere in the Mediterranean Basin (`SpParamsMED`). Recently, a new parameter data set is being developed for plants in California (`SpParamsUS`). User can modify these data frames to account for intra-specific trait variation (see function `modifySpParams()`). 
 
 The package provides functions `spwbInput()` and `growthInput()` that prepare the vegetation input for simulation functions `spwb()` and `growth()`, respectively. This initialization mostly consists in compiling the necessary functional traits from the species parameter table, following the $SP_i$ attribute of plant cohorts. Some new model parameters are estimated from the initial ones, while taking into account the structural attributes of cohorts (an example of these derived quantities is stem conductance, which estimated from stem xylem conductivity, Huber value and plant height). Users can take the output of these initialization functions and replace parameter values for specific plant cohorts (see function `modifyCohortParams()`). 
 
 ### Update of structural variables during simulations
 
-Vegetation characteristics stay constant during simulations using function `spwb()`, although the actual expanded leaf area and dead leaf area may vary is the species is winter deciduous.
+Vegetation characteristics stay constant during simulations using functions `spwb()` or `pwb()`, although the actual (unfolded) leaf area and dead leaf area may vary if the species is winter deciduous.
 
 In contrast, growth simulation requires updating the structure of vegetation, i.e. heights, tree diameters and shrub cover. Function `growth()` can modify any of the vegetation attributes.
 
@@ -247,21 +248,21 @@ In contrast, growth simulation requires updating the structure of vegetation, i.
 
 Weather input data must include variables calculated at the **daily** scale. Weather data should be arranged in a data frame with days in rows and variables in columns. The following table indicates the symbols, units, definitions and the variable name in R.
 
-| Symbol | Units | R param | Description                        |
-|--------|-------|---------|------------------------------------|
-| $T_{mean}$ | $^{\circ} \mathrm{C}$ | `MeanTemperature` | Mean temperature |
-| $T_{min}$ | $^{\circ} \mathrm{C}$ | `MinTemperature` | Minimum temperature |
-| $T_{max}$ | $^{\circ} \mathrm{C}$ | `MaxTemperature` | Maximum temperature |
-| $RH_{min}$ | % | `MinRelativeHumidity` | Minimum relative humidity |
-| $RH_{max}$ | % | `MaxRelativeHumidity` | Maximum relative humidity |
-| $P$ | $L \cdot m^{-2} = mm$ | `Precipitation` | Precipitation (either rainfall or snow). |
-| $PET$ | $L \cdot m^{-2} = mm$ | `PET` | Potential evapotranspiration, preferably calculated using Penman's equation |
-| $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds |
-| $u$ | $m \cdot s^{-1}$ | `WindSpeed` | Wind speed |
+| Symbol | Units | R param | Description                        | Basic | Advanced |
+|--------|-------|---------|------------------------------------|--------|----------|
+| $T_{mean}$ | $^{\circ} \mathrm{C}$ | `MeanTemperature` | Mean temperature | Y | Y |
+| $T_{min}$ | $^{\circ} \mathrm{C}$ | `MinTemperature` | Minimum temperature | N | Y |
+| $T_{max}$ | $^{\circ} \mathrm{C}$ | `MaxTemperature` | Maximum temperature | N | Y |
+| $RH_{min}$ | % | `MinRelativeHumidity` | Minimum relative humidity | N | Y |
+| $RH_{max}$ | % | `MaxRelativeHumidity` | Maximum relative humidity | N | Y |
+| $P$ | $L \cdot m^{-2} = mm$ | `Precipitation` | Precipitation (either rainfall or snow). | Y | Y |
+| $PET$ | $L \cdot m^{-2} = mm$ | `PET` | Potential evapotranspiration, preferably calculated using Penman's (1948) equation | Y | N |
+| $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds | (opt.) | Y |
+| $u$ | $m \cdot s^{-1}$ | `WindSpeed` | Wind speed | Y | Y |
 
-*Dates* should be included as row names (in format *year-month-day*) of the input meteorology data frame. Dates are needed to estimate parameters like solar declination or the day of the year ($DOY$). Since it allows producing data frames with appropiate variable units and row/column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018].
+Dates are needed in **medfate** to estimate parameters like solar declination or the day of the year ($DOY$). Importantly, *dates* should be included as row names (in format *year-month-day*) of the input meteorology data frame. Since it allows producing data frames with appropiate variable units and row/column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018], but many other sources are possible.
 
-Not all simulation models require all weather variables. In particular, basic water balance modelling (chapter \@ref(basicwaterbalance)) requires much less information than advance water balance modelling (chapter \@ref(advancedwaterbalance)). The weather input requirements for growth modelling (chapter \@ref(growthmodelling)) depend on the complexity of the water balance model used within it.
+Not all simulation models require all weather variables (see rightmost columns in the previous table). In particular, basic water balance modelling (chapter \@ref(basicwaterbalance)) requires much less information than advance water balance modelling (chapter \@ref(advancedwaterbalance)). The weather input requirements for growth modelling (chapter \@ref(growthmodelling)) depend on the complexity of the water balance model used within it.
 
 Whereas the weather variables listed in the table above are input requirements, **medfate** derives other atmospheric variables from them, using also topographic information (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual):
 

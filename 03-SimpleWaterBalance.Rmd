@@ -78,22 +78,28 @@ The minimum daily weather variables required to run the model are mean temperatu
 
 ### Vegetation functional parameters
 
-A relatively small set of functional parameters should be supplied for each plant cohort $i$. A first set of parameters relate to light extinction, water interception and leaf phenology processes (`paramsBase`):
+A relatively small set of functional parameters should be supplied for each plant cohort $i$. A first set of parameters relate to light extinction and water interception (`paramsInterception`):
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
 | $k_{PAR,i}$ | | `kPAR` | PAR extinction coefficient (see section \@ref(basiclightextinction)). |
 | $s_{water, i}$ | $mm\,H_2O·LAI^{-1}$ | `g` | Crown water storage capacity (i.e. depth of water that can be retained by leaves and branches) per LAI unit (see section \@ref(interception)). |
-| $S_{GDD,i}$ | $^{\circ} \mathrm{C}$ | `Sgdd` | Growth degree days corresponding to leave budburst (see section \@ref(leafphenology)). If $S_{GDD,i} = 0$ the cohort is considered evergreen. |
 
-
-A second set of parameters are related to transpiration and photosynthesis (`paramsTransp`):
+A second set refers to leaf phenology (`paramsPhenology`):
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
-| $\Psi_{extract,i}$ | $MPa$ | `Psi_Extract` |  The water potential at which whole plant conductance is 50% of maximum (see section \@ref(actualtranspiration)).|
+| $S_{GDD,i}$ | $^{\circ} \mathrm{C}$ | `Sgdd` | Growth degree days corresponding to leave budburst (see section \@ref(leafphenology)). If $S_{GDD,i} = 0$ the cohort is considered evergreen. |
+
+
+A second set of parameters are related to transpiration and photosynthesis (`paramsTranspiration`):
+
+| Symbol | Units | R  | Description                                  | 
+|--------|-------|----| ---------------------------------------------|
+| $\Psi_{extract,i}$ | $MPa$ | `Psi_Extract` |  The water potential at which plant transpiration is 50% of its maximum (see section \@ref(actualtranspiration)).|
+| $\Psi_{critic,i}$ | $MPa$ | `Psi_Critic` |  The water potential corresponding to 50% of  cavitation (see section \@ref(irreversiblecavitation)).|
 | $WUE_{\max,i}$ | $g\, C \cdot mm^{-1}$ |  `WUE` |  Maximum water use efficency (see section \@ref(basicphotosynthesis)).  |
-| $K_{rootdisc,i}$ | [0-1] |  `pRootDisc` |  Whole-plant relative conductance corresponding to hydraulic disconnection from the soil (see section \@ref(irreversiblecavitation)).  |
+| $K_{rootdisc,i}$ | [0-1] |  `pRootDisc` |  Whole-plant relative transpiration corresponding to hydraulic disconnection from the soil (see section \@ref(irreversiblecavitation)).  |
 
 Vegetation functional attributes are normally filled for each cohort $i$ by function `spwbInput()` or `forest2spwbInput()` from species identity (i.e. $SP_i$). However, different parameters can be specified for different cohorts of the same species if desired (see section \@ref(functionaltraits)). 
 
@@ -117,24 +123,26 @@ The other control parameters relevant for the basic water balance model are:
 
 ### Model output {#basicwaterbalanceoutput}
 
-Function `spwb()` returns a list of a class with the same name. The first four elements of this list (i.e., `latitude`, `topography`, `spwbInput` and `soilInput`) are simply copies of model inputs. The next three elements correspond to water balance *flows*, *soil state* variables and *stand-level* variables:
+Functions `spwb()` and `pwb()` return a list of a class with the same name. The first four elements of this list (i.e., `latitude`, `topography`, `spwbInput` and `soilInput`) are simply copies of model inputs. The next four elements correspond to *water balance flows*, *soil state* variables, *stand-level* variables, and *plant-level* variables:
 
 | Element | Description                                                |
 |---------|------------------------------------------------------------|
 | `WaterBalance`| Climatic input and water balance flows (i.e. net precipitation, infiltration, runoff, transpiration...). All of them in $mm = l \cdot m^{-2}$. |
 | `Soil`| Soil variables for each soil layer: Moisture relative to field capacity ($W_s$), water potential ($\Psi_s$) and volumetric water content ($V_s$). |
 | `Stand`| Stand-level variables, such as $LAI^{\phi}_{stand}$, $LAI^{dead}_{stand}$, the water retention capacity of the canopy ($S_{canopy}$) or the fraction of light reaching the ground ($L^{PAR}_{ground}$ and $L^{SWR}_{ground}$).|
+| `Plants`| Plant-level variables, such as $LAI^{phi}_i$, plant transpiration, plant water potential, etc. |
 
-The remaining elements include the output of variables at the *plant cohort level*, with dates in rows and plant cohorts in columns:
+Elements `WaterBalance`, `Soil` and `Stand` are data frame with dates in rows and variables in columns, whereas `Plants` is itself a list with several elements,  with dates in rows and plant cohorts in columns:
 
 | Element | Symbol | Units | Description                               |
 |---------|--------|-------|-------------------------------------------|
-|`PlantLAI`| $LAI^{\phi}_i$ | $m^2 \cdot m^{-2}$ | Leaf area index (expanded).|
-|`PlantAbsorbedSWRFraction` | $f_i$ | [0-1] | Fraction of shortwave radiation absorbed.|
-|`PlantTranspiration`| $Tr_{i}$ | $mm$ | Transpiration per ground area.|
-|`PlantPhotosynthesis`| $A_{n,i}$ | $g\,C \cdot m^{-2}$ | Net photosynthesis per ground area.|
-|`PlantPsi` | $\Psi_{leaf,i}$ | $MPa$ | Plant (leaf) water potential.|
-|`PlantStress` | $DDS_i$ | [0-1] | Drought stress level suffered by each plant cohort (relative whole-plant conductance).|
+|`LAI`| $LAI^{\phi}_i$ | $m^2 \cdot m^{-2}$ | Leaf area index (expanded).|
+|`AbsorbedSWRFraction` | $f_i$ | [0-1] | Fraction of shortwave radiation absorbed.|
+|`Transpiration`| $Tr_{i}$ | $mm$ | Transpiration per ground area.|
+|`Photosynthesis`| $A_{n,i}$ | $g\,C \cdot m^{-2}$ | Net photosynthesis per ground area.|
+|`PlantPsi` | $\Psi_{leaf,i}$ | $MPa$ | Plant water potential.|
+|`StemPLC` | $PLC_{i}$ | [0-1] | Degree of stem embolisation.|
+|`PlantStress` | $DDS_i$ | [0-1] | Drought stress level suffered by each plant cohort (relative whole-plant transpiration).|
 
 The output of simulations can be inspected using `plot` and `summary` functions specific to `spwb` objects (examples are given in the corresponding package *vignette*).
 
@@ -144,7 +152,7 @@ As it simulates water balance for only one day, function `spwb_day()` returns a 
 
 The basic water balance model is relatively easy to parametrize and use. Moreover, the model is quite fast. These features make it appropriate for applications that do not seek a high predictive at the plant level, but require robust estimates at the stand, landscape or regional levels. In our opinion the basic water balance model may be useful for the following applications: 
 
-1. To monitor or forecast temporal variation in soil water content in particular stands or in multiple stands across a landscape or region. 
+1. To monitor or forecast temporal variation in transpiration flows and soil water content in particular stands or in multiple stands across a landscape or region. 
 2. Monitor or forecast temporal variation of plant drought stress in particular stands or in multiple stands across a landscape or region (for example to anticipate mortality events).
 
 For example, @Karavani2018 employed the water balance to provide sound estimates of soil moisture dynamics to predict mushroom production in a network forest stands. The model is particularly interesting to test the relationship between forest structure/composition and the water balance at the stand level or the drought stress suffered by plants, as done in @Ameztegui2017. See also another application in @Rolo2019.
