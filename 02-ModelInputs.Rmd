@@ -10,11 +10,11 @@ Topography has a relatively small direct influence in **medfate** simulations, b
 
 ## Soil description  {#soilinput}
 
-Soils can be described in **medfate** using between $S=1$ and $S=5$ different soil layers. Here the word *soil* refers to depths that plant roots can achieve (critical zone), including cracks within the bedrock. The number and size of soil layers may reflect changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties. Most soil properties are considered *static* parameters in simulations, except soil moisture content, variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered in simulations.
+Soils can be described in **medfate** using $S > 1$ different soil layers ($s \in \{1, 2, ..., S\}$). Here the word *soil* refers to depths that plant rooting systems can reach (critical zone), including cracks within the bedrock. The number and size of soil layers may reflect changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties. Most soil properties are considered *static* parameters in simulations, except soil moisture content, variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered in simulations.
 
 ### Soil physical properties
 
-Soil physical properties, like *texture* (i.e. volume percent of sand, silt and clay), *organic matter content*, *bulk density* or *rock fragment content*, can differ between soil layers, and this has important consequences for soil water retention capacity and hydraulics. Specifying layers with high rock fragment content (e.g. layers of weathered rock with few soil particles) may be important in some biomes like the Mediterranean one, because plants often extend their roots into cracks existing in the parent rock [@Ruffault2013]. 
+Soil physical properties, such as *texture* (i.e. volume percent of sand, silt and clay), *organic matter content*, *bulk density* or *rock fragment content*, can differ between soil layers, and this has important consequences for soil water retention capacity and hydraulics. Specifying layers with high rock fragment content (e.g. layers of weathered rock with few soil particles) may be important in some biomes like the Mediterranean one, because plants often extend their roots into cracks existing in the parent rock [@Ruffault2013]. 
 
 For each soil layer $s$ the following physical parameters are needed:
 
@@ -68,13 +68,14 @@ Soil initialization is needed to estimate soil hydrological parameters for each 
 | $\theta_{res, s}$ |$m^3 \cdot m^{-3}$ | `VG_theta_res` | Residual volumetric soil moisture |
 | $n_s$ | | `VG_n` | Parameter $n$ of the Van Genuchten [-@Genuchten1980] model |
 | $\alpha_s$ | $MPa^{-1}$ | `VG_alpha`| Parameter $\alpha$ of the Van Genuchten [-@Genuchten1980] model |
+| $K_{sat_s}$ | $mmol \cdot s^{-1} \cdot m^{-1} \cdot MPa^{-1}$ | `Ksat` | Saturated soil conductivity |
 
 Macroporosity values are calculated using the equations given in @Stolf2011, while $\gamma_{soil}$ and $\kappa_{soil}$ are derived from texture. Parameters of the van Genuchten model for each layer are estimated from the physical description of the layer using one of two pedotransfer functions (see help for `soil()`): 
 
 1. Using the USDA texture classification and the average texture class parameters given by @Carsel1988.
 2. Directly from the soil texture, organic matter and bulk density, using the pedotransfer functions in @Toth2015.
 
-Besides defining soil parameters, function `soil()` also initializes *soil state variables*: soil moisture content, soil temperature (although set to a missing value) and water table depth. All simulation functions need an object of class `soil` to be run. Users can edit the `soil` object manually (it is actually a `list`), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements.
+Saturated soil conductivity values are estimated using @Saxton2006 or @Saxton1986, depending on whether an estimate of organic mater is available. Besides defining soil parameters, function `soil()` also initializes *soil state variables*: soil moisture content, soil temperature (although set to a missing value) and water table depth. All simulation functions need an object of class `soil` to be run. Users can edit the `soil` object manually (it is actually a `list`), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements.
 
 ### Water content and water table depth
 
@@ -214,21 +215,7 @@ Models assume that the rhizosphere of each plant cohort occupies its own water p
 \begin{equation}
 \sum_{j}{fr_{i,s,j}} = 1 \,\, \forall i,s
 \end{equation}
-It is important to realize that proper estimation of $fr_{i,s,j}$ is challenging when we do not have explicit plant coordinates, root lateral widths, etc. For this reason, an intuitive approach is followed here based on the following two premises:
-
- + The amount of overlap between roots of different plants should monotonically increase along with the LAI of the stand (i.e. $LAI^{live}_{stand}$).
- + The amount of overlap between roots of different plants at a given soil depth should increase/decrease with the vertical proportion of roots at that depth.
-
-The specific formulation we chose for $fr_{i,s,j}$ is:
-\begin{equation}
-fr_{i,s,j}  = f_{pool,j} \cdot (1 - \exp(- f_{overlap} \cdot LAI^{live}_{stand}))  \cdot \left( \frac{\sqrt{FRP_{i,s} \cdot FRP_{j,s}}}{\max_{s}(FRP_{i,s})} \right)
-\end{equation}
-for all $j \neq i$, where $f_{overlap}$ is an overlap factor (a control parameter called `poolOverlapFactor`). For $j=i$ then we simply have: 
-\begin{equation}
-fr_{i,s,i}  =  1 - \sum_{j}{fr_{i,s,j}}
-\end{equation}
-Note that if $f_{overlap} = 0$ then $fr_{i,s,j} = 1$ if $j=i$ and zero otherwise (i.e. plants exploit their corresponding water pools only. For very large values of $LAI^{live}_{stand}$ and/or $f_{overlap}$ we have that $(1 - \exp(- f_{overlap} \cdot LAI^{live}_{stand})) = 0$ and $fr_{i,s,j} = f_{pool,j}$ (neglecting vertical differences), so that plants exploit the each water pool in the same proportion as the fraction of stand occupied by the pool (i.e. overlap is maximum).
-
+It is important to realize that proper estimation of $fr_{i,s,j}$ is challenging when we do not have explicit plant coordinates, root lateral widths, etc. Estimation of this proportions depends on the complexity of the water balance model and is explained in \@ref(horizontalrootoverlap).
 
 
 ### Functional traits and vegetation initialization {#functionaltraits}

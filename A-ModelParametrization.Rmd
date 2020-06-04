@@ -4,6 +4,28 @@
 
 Package **medfate** provides routines to estimate them from a minimum set of input parameters. The whole process of estimation of those parameters is done automatically in functions `spwbInput()` and `forest2spwbInput()`, with the user controlling the process through the species parameter table input (e.g., `SpParamsMED`) an object `control` (see default values in `defaultControl()`). In the following we detail the calculations and present individual functions that perform partial calculations.
 
+## Horizontal root overlap {#horizontalrootoverlap}
+### Basic water balance
+A given plant cohort $i$ will have its roots in layer $s$ partitioned among different water pools. We thus need to define $fr_{i,s,j}$, the (horizontal) proportion of fine roots of cohort $i$ in layer $s$ of the water pool $j$, with the restriction that: 
+\begin{equation}
+\sum_{j}{fr_{i,s,j}} = 1 \,\, \forall i,s
+\end{equation}
+It is important to realize that proper estimation of $fr_{i,s,j}$ is challenging when we do not have explicit plant coordinates, root lateral widths, etc. For this reason, an intuitive approach is followed here based on the following two premises:
+
+ + The amount of overlap between roots of different plants should monotonically increase along with the LAI of the stand (i.e. $LAI^{live}_{stand}$).
+ + The amount of overlap between roots of different plants at a given soil depth should increase/decrease with the vertical proportion of roots at that depth.
+
+The specific formulation we chose for $fr_{i,s,j}$ is:
+\begin{equation}
+fr_{i,s,j}  = f_{pool,j} \cdot (1 - \exp(- f_{overlap} \cdot LAI^{live}_{stand}))  \cdot \left( \frac{\sqrt{FRP_{i,s} \cdot FRP_{j,s}}}{\max_{s}(FRP_{i,s})} \right)
+\end{equation}
+for all $j \neq i$, where $f_{overlap}$ is an overlap factor (a control parameter called `poolOverlapFactor`). For $j=i$ then we simply have: 
+\begin{equation}
+fr_{i,s,i}  =  1 - \sum_{j}{fr_{i,s,j}}
+\end{equation}
+Note that if $f_{overlap} = 0$ then $fr_{i,s,j} = 1$ if $j=i$ and zero otherwise (i.e. plants exploit their corresponding water pools only. For very large values of $LAI^{live}_{stand}$ and/or $f_{overlap}$ we have that $(1 - \exp(- f_{overlap} \cdot LAI^{live}_{stand})) = 0$ and $fr_{i,s,j} = f_{pool,j}$ (neglecting vertical differences), so that plants exploit the each water pool in the same proportion as the fraction of stand occupied by the pool (i.e. overlap is maximum).
+
+
 ## Plant Hydraulics
 ### Vulnerability curves
 Leaf and xylem vulnerability curves are often described using $\Psi_{50}$, the water potential at which hydraulic conductance is half of maximum. As noted above, parameter $d$ in eq. \@ref(eq:xylemvulnerability) is the water potential $\Psi$ at which $k_{x}(\Psi)/k_{x,max} = e^{-1} = 0.367$ (and the same for eq. \@ref(eq:leafvulnerability)). Hence, the two definitions do not match. Using the definition of $\Psi_{50}$ in eq. \@ref(eq:xylemvulnerability) we have:
@@ -169,9 +191,9 @@ v1 = root_ldrDistribution(Z50,Z95, d)
 v1
 ```
 
-Having this information, the calculation of root length (i.e. the sum of vertical and radial lengths) to each layer ($L_j$) is done using function `root_rootLength()`:
+Having this information, the calculation of root length (i.e. the sum of vertical and radial lengths) to each layer ($L_j$) is done using function `root_coarseRootLengths()`:
 ```{r}
-rl = root_rootLengths(v1, d)
+rl = root_coarseRootLengths(v1, d)
 rl
 ```
 
