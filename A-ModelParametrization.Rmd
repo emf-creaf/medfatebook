@@ -193,33 +193,23 @@ v1
 
 Having this information, the calculation of root length (i.e. the sum of vertical and radial lengths) to each layer ($L_j$) is done using function `root_coarseRootLengths()`:
 ```{r}
-# rl = root_coarseRootLengths(v1, d)
-# rl
+rfc = c(20,50,70)
+Vol = root_coarseRootSoilVolumeFromConductance(1.0, 2500,krootmax,
+                                               v1, d, rfc)
+l = root_coarseRootLengthsFromVolume(Vol, v1, d, rfc)
+l
 ```
 
 where lengths are in mm. The proportion of total root xylem conductance corresponding to each layer ($w_j$) is given by `root_xylemConductanceProportions()`:
 ```{r}
-# w1 = root_xylemConductanceProportions(v1, d)
-# w1
+w1 = hydraulics_rootxylemConductanceProportions(v1, l)
+w1
 ```
 
 Xylem conductance proportions can be quite different than the fine root biomass proportions. This is because radial lengths are largest for the first top layers and vertical lengths are largest for the bottom layers. The maximum root xylem conductances of each layer will be the product of maximum total conductance of root xylem and weights:
 ```{r}
-# w1*krootmax
+w1*krootmax
 ```
-
-In **medfate** we calculate maximum root xylem conductance using a reference root xylem conductivity value ($K_{r,max,ref}$):
-\begin{equation}
-k_{r,max}=\frac{1000}{0.018} \cdot \sum_{j}{\frac{w_j \cdot K_{r,max,ref}\cdot A_{s}}{L_j\cdot A_{l}}}
-\end{equation}
-where $w_j$ are root xylem conductance proportion of layer $j$ and $L_j$ is the root length (in m) to layer $j$. Note that here we use weights $w_j$ assuming they represent proportions of total sapwood area that come from each layer (i.e. the longer the path the larger the proportion of sapwood area). This calculation is made available by function `hydraulics_maximumRootHydraulicConductance()`. When $K_{r,max,ref}$ is missing, then we assume that $K_{r,max,ref} = K_{x,max,ref}$. Let's consider the same *Q. ilex* tree of 4m height as before. If we specify root xylem specific conductivity as $K_{r,max,ref} = K_{s,max,ref} =0.77$ we have:
-```{r}
-rootxylem_kmax = 0.77
-krootmax = hydraulics_maximumRootHydraulicConductance(rootxylem_kmax, Al2As, 
-                                                      v1, d)
-krootmax
-```
-
 The maximum root xylem conductances of each layer would be:
 ```{r}
 krootmaxvec = w1*krootmax
