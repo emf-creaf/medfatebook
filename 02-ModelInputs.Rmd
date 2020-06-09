@@ -14,9 +14,9 @@ Soils can be described in **medfate** using $S > 1$ different soil layers ($s \i
 
 ### Soil physical properties
 
-Soil physical properties, such as *texture* (i.e. volume percent of sand, silt and clay), *organic matter content*, *bulk density* or *rock fragment content*, can differ between soil layers, and this has important consequences for soil water retention capacity and hydraulics. Specifying layers with high rock fragment content (e.g. layers of weathered rock with few soil particles) may be important in some biomes like the Mediterranean one, because plants often extend their roots into cracks existing in the parent rock [@Ruffault2013]. 
+Soil physical properties, such as *texture* (i.e. volume percent of sand, silt and clay), *organic matter content*, *bulk density* or *rock fragment content*, can differ between soil layers, and this has important consequences for soil water retention capacity and soil hydraulics. Specifying layers with an elevated rock fragment content (e.g. layers of weathered rock where soil particles are scarce) may be important in  seasonally-arid climates like the Mediterranean, because plants often extend their roots into cracks existing in the parent rock to access water during summer [@Ruffault2013]. 
 
-For each soil layer $s$ the following physical parameters are needed:
+For each soil layer $s$, the following physical parameters are needed:
 
 | Symbol | Units | R  | Description                         | 
 |--------|-------|----| ------------------------------------|
@@ -27,13 +27,15 @@ For each soil layer $s$ the following physical parameters are needed:
 | $BD_{s}$ | $g \cdot cm^{-3}$ |`bd` | Bulk density in layer $s$|
 | $P_{rocks,s}$ | % | `rfc` | Rock fragment content as percent volume (within whole soil) in layer $s$ |
 
-If possible, soil physical properties should be measured in soil profiles conducted at the target forest plot (although soil profiles rarely reach plant rooting depths). Soil input data should be arranged in a `data.frame` with soil layers in rows and physical variables in columns (see function `defaultSoilParams()`). The package includes function `soilgridsParams()` to fetch soil information from [SoilGrids.org](https://soilgrids.org/), a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.
+The percent volume of silt is 100% minus the percent volume of clay and sand. Whenever possible, soil physical properties should be measured in soil profiles conducted at the target forest plot (although soil profiles rarely reach rooting depths of deeply-rooted plants). Soil input data should be arranged in a `data.frame` with soil layers in rows and physical variables in columns (see function `defaultSoilParams()`). 
+
+The package includes function `soilgridsParams()` to fetch soil information from [SoilGrids.org](https://soilgrids.org/), a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.
 
 The depth of a given soil layer $s$ ($Z_s$; in $mm$) is defined as the sum of layer widths from the surface to the target layer:
 \begin{equation}
 Z_s = \sum_{i=1}^s{d_s}
 \end{equation}
-And the overall *soil depth*  ($Z_{soil}$; in $mm$) is the sum of soil layer widths. As it may include rocky layers, $Z_{soil}$ may be larger than the soil depth reported in soil profiles. 
+And the overall *soil depth*  ($Z_{soil}$; in $mm$) is the sum of soil layer widths. As it may include rocky layers, the value of $Z_{soil}$ may be larger than the soil depth reported in soil profiles. 
 
 ### Water retention curves {#waterretentioncurves}
 
@@ -178,6 +180,7 @@ plot_grid(g1, g2, nrow=1, ncol=2)
 The leaf area density profile determines the extinction rates of light through the forest canopy. The same truncated Gaussian distribution is used to distribute leaf and small branch biomass along the vertical dimension.
 
 ### Vertical root distribution {#rootdistribution}
+Roots can be distinguished functionally into two different organs. Coarse roots are responsible for transport of water and nutrients towards the stem, whereas fine roots, which are responsible for absorbing water and nutrients. 
 
 Analogously to the aboveground vegetation parameters, inputs describing depths corresponding to 50% and 95% of fine roots ($Z_{50,i}$ and $Z_{95,i}$) are used to completely specify the distribution of roots across soil layers. The root system of each plant cohort $i$ is described using $FRP_{i,s}$, the proportion of fine roots (with respect to the whole plant) in each soil layer $s$. $FRP_{i,s}$ values are normally defined using the linear dose response model [@Schenk2002; @Collins2007]: 
 \begin{eqnarray}
@@ -205,9 +208,9 @@ vprofile_rootDistribution(exampleforestMED, SpParamsMED)
 
 The actual input to simulation functions is the matrix of $FRP_{i,s}$ values - not $Z_{50,i}$ and $Z_{95,i}$ -, which means that the proportions of fine roots can be modified manually or be defined by another model. In fact, **medfate** also allows calculating $FRP_{i,s}$ values assuming a conic distribution of fine roots (see `root_conicDistribution()`). 
 
-### Plant water pools and horizontal distribution of fine roots {#plantwaterpools}
+### Plant water pools and root horizontal distribution {#plantwaterpools}
 
-By default, models in **medfate** assume that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can also be simulated. Considering plant water pools involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many plant water pools as plant cohorts, with proportions defined by their LAI values:
+By default, models in **medfate** assume that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can also be simulated if required by the user. Considering plant water pools involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many plant water pools as plant cohorts, with proportions defined by their LAI values:
 \begin{equation}
 f_{pool,i} = \frac{LAI^{live}_i}{LAI^{live}_{stand}}
 \end{equation}
@@ -215,7 +218,24 @@ Models assume that the rhizosphere of each plant cohort occupies its own water p
 \begin{equation}
 \sum_{j}{fr_{i,s,j}} = 1 \,\, \forall i,s
 \end{equation}
-It is important to realize that proper estimation of $fr_{i,s,j}$ is challenging when we do not have explicit plant coordinates, root lateral widths, etc. Estimation of this proportions depends on the complexity of the water balance model and is explained in \@ref(horizontalrootoverlap).
+It is important to realize that proper estimation of $fr_{i,s,j}$ is challenging when we do not have explicit plant coordinates, root lateral widths, etc. At this point, we will assume we have a reasonable estimate of the soil volume $Vol_{i}$ explored by coarse roots of an individual of cohort $i$. Assuming that the proportion of fine roots in each layer is proportional to the proportion of total soil volume explored by coarse roots that corresponds to the same layer we have.
+\begin{equation}
+Vol_{i,s} = FRP_{i,s}\cdot Vol_{i}
+\end{equation}
+In **medfate**, coarse roots are represented by *axial* and *radial* components. The length of axial component of a given layer ($L_{axial, i, s}$) is simply equivalent to its bottom depth, whereas the radial component ($L_{radial, i, s}$) is unknown. However, we can assume that the soil volume explored by coarse roots corresponds to a cylinder:  
+\begin{equation}
+Vol_{i,s} = \pi \cdot L_{radial,i,s}^2 \cdot L_{axial, i, s}
+\end{equation}
+and substituting the soil volume $Vol_{i,s}$ we can isolate $L_{radial,i,s}$ (see function `root_coarseRootLengthsFromVolume()`). Once we have the radial component we can estimate the area ($m^2$) covered by coarse roots of an individual of the cohort in a given layer $s$:
+\begin{equation}
+Area_{i,s} = \pi \cdot L_{radial,i,s}^2
+\end{equation}
+We can then compare $Area_{i,s}$ to the area of the water pool for an individual of cohort $i$, which in $m^2$ is:
+\begin{equation}
+AreaPool_{i} = 10000 \cdot f_{pool,i}/N_{i}
+\end{equation}
+If $Area_{i,s} \leq AreaPool_{i}$, then the roots of the individual do not exceed the area of the pool, in other words $fr_{i,s,i} = 1$ and $fr_{i,s,j} = 0$ for all $j \neq i$. If
+$Area_{i,s} > AreaPool_{i}$ then the excess should be counted as overlap with the other pools. Assuming that plants are randomly distributed (i.e. no clumping) the probability of finding the pool of a cohort is equal to the proportion of its water pool (see function `root_horizontalProportions()`). All these calculations were done assuming $Vol_{i}$ were known. Estimation of $Vol_{i}$ depends on the complexity of the water balance model and is explained in \@ref(horizontalrootoverlap).
 
 
 ### Functional traits and vegetation initialization {#functionaltraits}
@@ -271,6 +291,6 @@ names(defaultControl())
 
 
 
-Not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), but there is an important control parameter called `transpirationMode`, because it allows the user to switch between the *basic* and *advanced* water balance models (chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). 
+Not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), but there is an important control parameter called `transpirationMode`, because it allows the user to switch between the *basic* and *advanced* water balance models (chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). Another relevant control parameter is `plantWaterPools`, which allows considering plant water pools as explained in \@ref(plantwaterpools).
 
 Control parameters are employed when initializing vegetation inputs and state variables using functions `spwbInput()` and `growthInput()`, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as `spwb()` or `growth()`.

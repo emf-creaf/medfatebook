@@ -536,10 +536,15 @@ krhizomaxvec2 = krmax2*FRP
 krhizomaxvec3 = krmax3*FRP
 ```
 
-To divide maximum root xylem conductance among soil layers we need weights inversely proportional to the length of transport distances [@Sperry2016a]. Vertical transport lengths can be calculated from soil depths and radial spread can be calculated assuming cylinders with volume proportional to the proportions of fine root biomass. The whole process can be done using function `root_rootXylemConductanceProportions()`:
+To divide maximum root xylem conductance among soil layers we need weights inversely proportional to the length of transport distances [@Sperry2016a]. Vertical transport lengths can be calculated from soil depths and radial spread can be calculated assuming cylinders with volume that has to be in accordance with the xylem root conductance (TO BE DESCRIBED). The whole process can be done using functions `root_coarseRootSoilVolumeFromConductance()` and `root_coarseRootLengthsFromVolume()`:
 ```{r}
-weights = root_xylemConductanceProportions(FRP, d)
-weights
+rfc = c(20,50,70)
+Vol = root_coarseRootSoilVolumeFromConductance(1.0, 2500,krootmax,
+                                               FRP,d, rfc)
+lengths = root_coarseRootLengthsFromVolume(Vol, FRP, d, rfc)
+lengths
+
+weights = lengths/sum(lengths)
 ```
 
 Transport weights are quite different than the fine root biomass proportions. This is because radial lengths are largest for the first (top) layer and vertical lengths are largest for the third (bottom) layer. The root xylem conductances are (in this case they do not depend on soil texture):
