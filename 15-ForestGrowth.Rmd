@@ -2,9 +2,16 @@
 
 # Forest growth model {#growthmodelling}
 
-Like the preceeding models, the physical structure of the stand is represented in one (vertical) dimension (i.e. the coordinates of plants are not explicit). The model is cohort-based, meaning that similar plant individuals are represented using a single entity with average properties (e.g. tree height or diameter) and a density variable is used to scale from individual level to the cohort level. Processes are implemented either at the cohort-level (water balance and photosynthesis) or at the individual level (carbon balance and growth). Water fluxes, soil water balance and plant photosynthesis processes follow the design of the soil water balance model and this part of the model design will not be repeated here. The model tries to reproduce the physiological processes that modulate leaf area changes and plant growth rates. Nevertheless, since the model does not implement all processes that may affect growth (such as nutrient availability), maximum growth rates and maximum plant sizes are constrained from user inputs, to ensure that model can be more easily calibrated and validated with observations. 
+This chapter provides an overview of a forest growth model, which builds on previous models and allows simulating carbon and water balance on a daily step basis for a given forest stand and for the period corresponding to input weather data. The model is run using function `growth()`, for a set of days, or function `growth_day()`, for a single day. 
 
-## Design principles (advanced water balance model)
+Since it builds on water balance modelling, the forest growth model can be run in two different levels of complexity (basic and advanced, corresponding to chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). While most of the description correspond to the forest growth model with adavanced water balance, we will indicate those design and formulation elements where the basic forest growth model differs from the advanced one.
+
+The information provided in this chapter should be enough to understand what the model does and when it can be useful, but the reading previous chapters and the following ones should provide a more detailed understanding on how the different processes are formulated.
+
+## Design principles
+
+Like the preceeding models, the physical structure of the stand is represented in one (vertical) dimension (i.e. the coordinates of plants are not explicit). The model is cohort-based, meaning that similar plant individuals are represented using a single entity with average properties (e.g. tree height or diameter) and a density variable is used to scale from individual level to the cohort level. Processes are implemented either at the cohort-level (water balance and photosynthesis) or at the individual level (carbon balance and growth). Water fluxes, soil water balance and plant photosynthesis processes follow the design of the soil water balance model and this part of the model design will not be repeated here. The model tries to reproduce the physiological processes that modulate leaf area changes, diameter increment and changes in fine root distribution (this last process only under the advanced model). Nevertheless, since the model does not implement all processes that may affect growth (such as nutrient availability), maximum diameter increment rates and maximum plant sizes are constrained from user inputs, to ensure that model can be more easily calibrated and validated with observations. Simulations with the forest growth model can lead to the death of some plant cohorts, either because of exhaustion of carbon reserves (starvation) or dehydration of plant tissues (dessication).
+
 
 ### Carbon compartments, transport and carbon balance
 
@@ -14,7 +21,7 @@ Carbon pools are differentiated between **structural** and **labile**. Labile ca
  + *Metabolic carbon* is labile carbon assumed to correspond to sugars (glucose or fructose) that are used to sustain cell functioning (i.e. provide carbon for maintenance and growth). Metabolic carbon occurs in **leaves** and **sapwood**. Leaf metabolic carbon is generated from photosynthesis and used in different functions, including export to sapwood. Sugar concentration in the floem is assumed to be (passively) in equilibrium with leaf metabolic sugar concentration. In sapwood, metabolic carbon comes from floem transport and is used to sustain growth and maintenance respiration of sapwood and fine roots. Moreover, changes metabolic carbon are coupled to variations in osmotic potential. 
 + *Storage carbon* in the leaf is intented to represent short-term storage (mainly starch in chloroplasts) and its inclusion in the model follows the need to buffer daily variations in metabolic carbon as well as the corresponding leaf osmotic potential. Storage carbon in sapwood (branches, stems and coarse roots) is intended to serve as long-term (seasonal and interannual) storage.
 
-Carbon balance of leaf labile (metabolic and storage) carbon is perfomed by considering photosynthesis, sugar-starch conversion and floem tranport. Growth and maintenance respiration is calculated at the individual level, by estimating the respiration of leaves, stem and fine root compartments. Stem respiration depends on sapwood area, stem height and root depth.
+Carbon balance of leaf labile (metabolic and storage) carbon is perfomed by considering photosynthesis, sugar-starch conversion and floem tranport. Growth and maintenance respiration is calculated at the individual level, by estimating the respiration of leaves, sapwood and fine root compartments. Sapwood respiration depends on sapwood area, stem height and coarse root length.
 
 ### Links between plant hydraulics and carbon balance
 
@@ -62,23 +69,26 @@ Several structural variables that were static in the previous models become stat
  + Percent cover of shrubs, $Cover_i$.
  + Plant height, $H_i$.
  + Crown ratio, $CR_i$.
- + Maximum rooting depth, $Z_i$, and the proportion of fine roots, $V_{i,s}$, in each soil layer $s$.
+ + The proportion of fine roots, $FRP_{i,s}$, in each soil layer $s$.
+ + The radial length of coarse roots $L_{radial, i,s}$ in each soil layer $s$.
  
  Finally, there are functional state variables necessary to know the fisiological status of plants, defined at the individual level:
  
  + Sapwood area, $SA_i$ (in $cm^2$).
- + Sugar storage in leaves, $SS_{leaf,i}$ (in $g C$).
- + Starch storage in leaves, $ST_{leaf,i}$ (in $g C$).
- + Sugar storage in sapwood (stem, branches and coarse roots), $SS_{sapwood,i}$ (in $g C$).
- + Starch storage in sapwood (stem, branches and coarse roots), $ST_{sapwood,i}$ (in $g C$).
- + Biomass of fine roots (in $g C$).
+ + Leaf area, $LA_i$ (in $m^2$)
+ + Fine root area, $FRA_i$ (in $m^2$).
+ + Sugar storage in leaves, $SS_{leaf,i}$ ($mol gluc ·L^{-1}$).
+ + Starch storage in leaves, $ST_{leaf,i}$ ($mol gluc ·L^{-1}$).
+ + Sugar storage in sapwood (stem, branches and coarse roots), $SS_{sapwood,i}$ ($mol gluc ·L^{-1}$).
+ + Starch storage in sapwood (stem, branches and coarse roots), $ST_{sapwood,i}$ ($mol gluc ·L^{-1}$).
  
 Note that other functional variables can be derived without the need to store them:
 
  + Leaf biomass (in $g C$) from $LAI^{live}$, $N$ and $SLA$.
  + Leaf volume (in $l$) from leaf biomass and density of leaf tissue.
- + Sapwood volume (in $l$) from $SA$, $H$ and $Z$.
+ + Sapwood volume (in $l$) from $SA$, $H$ and $FRP$ and $L_{radial}$.
  + Sapwood biomass (in $g C$) from sapwood volume and wood density.
+ + Fine root biomass (in $g C$) from fine root area, specific root length ($SRL$) and fine root tissue density ($\rho_{fineroot}$).
  
 ## Carbon balances
 
@@ -189,8 +199,66 @@ Another set of parameters is needed to transform changes in sapwood area and lea
 
 ### Control parameters
 
-### Model output
+Control parameters modulate the overall behaviour of growth simulations (see section \@ref(controlparameters)). Parameters controlling water balance have been already described in sections \@ref(basicwaterbalancecontrol) and \@ref(basicwaterbalancecontrol). Here we only mention those control parameters specific to the `growth()` function:
 
++ `allocationStrategy  [="Plant_kmax"]` defines the allocation strategy (investment in leaf area vs. sapwood area) of the growth model. If `allocationStrategy = "Plant_kmax"` then the target leaf area is set to maintain the input whole-plant maximum conductance. If `allocationStrategy = "Al2As"` then the target leaf area is set to maintain the input Huber value.
++ `nonStomatalPhotosynthesisLimitation  [=TRUE]`: A flag to apply limitations of pho-tosynthesis when leaf sugar levels become too high (only for `transpirationMode = "Sperry"`).
++ `nonSugarConcentration [=0.3]`: A constant specifying non-sugar (inorganic) solute concentration ($mol \cdot l^{-1}$) in cells.
++ `equilibriumOsmoticConcentration [= c(leaf = 0.8, sapwood = 0.6)]`: Equilibrium osmotic concentrations ($mol \cdot l^{-1}$) for leaf and sapwood cells. 
++ `minimumSugarForGrowth [= c(leaf = 0.25, sapwood=0.25, fineroot = 0.25)]`:  Minimum concentration of sugars ($mol \cdot l^{-1}$) for growth to occur in different tissues. 
++ `respirationRates [= c(leaf = 0.00260274, sapwood = 6.849315e-05, fineroot = 0.002054795)]`: Maintenance respiration rates for different tissues ($g\,gluc \cdot g\, dry^{-1} · day^{-1}$).
++ `turnoverRates [= c(sapwood = 0.0001261398, fineroot = 0.001897231)]`: Relative turnover rates ($day^{-1}$) for sapwood and fineroots. Default are equivalent to 4.5% and 50% annual turnover for sapwood and fine roots, respectively.
++ `constructionCosts [= c(leaf = 1.5, sapwood = 1.47, fineroot = 1.30)]`: Construction costs, including respiration and structural carbon, per dry weight of new tissue ($g\,gluc \cdot g\,dry^{-1}$).
++ `maximumRelativeGrowthRates [= c(leaf = 0.01, sapwood = 0.001, fineroot = 0.1)]`: Maximum leaf growth rate relative to sapwood area ($m^{2}\cdot cm^{-2} \cdot day^{-1}$), maximum sapwood relative growth rate ($cm^{2}\cdot cm^{-2} \cdot day^{-1}$) and maximum fine root growth rate relative to sapwood area ($g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$). Values for leaves and fine roots are used for all species, whereas the value for sapwood is the default used when relative growth rate is not specified via SpParams.
+
+### Model output {#forestgrowthoutput}
+
+#### Daily and annual output
+
+Function `growth` returns a list object with the following elements (many of them equal to the output of function `spwb`, see sections \@ref(basicwaterbalanceoutput) and \@ref(advancedwaterbalanceoutput)):
+
+| Element | Description                                                |
+|---------|------------------------------------------------------------|
+| `WaterBalance`| Climatic input and water balance flows (i.e. net precipitation, infiltration, runoff, transpiration...). All of them in $mm = l \cdot m^{-2}$. |
+| `EnergyBalance` | Energy balance components (instantaneous values) for the soil and the canopy |
+| `Temperature` | Minimum and maximum temperature values for topsoil, canopy and atmosphere |
+| `Soil`| Soil variables for each soil layer: Moisture relative to field capacity ($W_s$), water potential ($\Psi_s$) and volumetric water content ($V_s$). |
+| `Stand`| Stand-level variables, such as $LAI^{\phi}_{stand}$, $LAI^{dead}_{stand}$, the water retention capacity of the canopy ($S_{canopy}$) or the fraction of light reaching the ground ($L^{PAR}_{ground}$ and $L^{SWR}_{ground}$).|
+| `Plants`| Plant-level variables, such as $LAI^{phi}_i$, plant transpiration, plant water potential, etc. |
+| `SunlitLeaves` | Leaf-level output variables for sunlit leaves (`transpirationMode = "Sperry"`). |
+| `ShadeLeaves` | Leaf-level output variables for shade leaves (`transpirationMode = "Sperry"`). |
+| `PlantCarbonBalance`| A list with the daily results of carbon balance components (photosynthesis and respiration) and carbon pools. |
+| `PlantGrowth`| A list with daily results of leaf area, sapwood area, fine root area and the corresponding daily growth rates. |
+| `StandStructures`| A list with the aboveground structure of the stand at the beginning of the simulation and after each simulated year. |
+| `StandSummary`| Stand-level summaries (leaf area index, tree basal area, tree density, shrub cover, etc.) at the beginning of the simulation and after each simulated year. |
+
+The following table describes the child elements of `PlantCarbonBalance`, each of them a data frame with dates in rows and plant cohorts in columns:
+
+| Element | Symbol | Units | Description                               |
+|---------|--------|-------|-------------------------------------------|
+| `GrossPhotosynthesis`|$A_{g,i}$ | $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$ | Gross photosynthesis rate per dry weight of living biomass. |
+| `MaintentanceRespiration`|$R_{m,i}$ | $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$ | Maintenance respiration rate (including leaves, sapwood and fine roots) per dry weight of living biomass. |
+| `GrowthRespiration`|$R_{g,i}$ | $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$ | Growth respiration rate  (including leaves, sapwood and fine roots) per dry weight of living biomass. |
+| `CarbonBalance`|$CB_{i}$ | $g\,gluc \cdot g\,dry^{-1}$ | Daily plant carbon balance (difference of photosynthesis - respiration) per dry weight of living biomass. |
+| `SugarLeaf`|$SS_{leaf,i}$ | $mol\,gluc ·L^{-1}$ | Sugar concentration in leaves. |
+| `StarchLeaf`|$ST_{leaf,i}$ | $mol\,gluc ·L^{-1}$ | Starch concentration in leaves. |
+| `SugarSapwood`|$SS_{sapwood,i}$ | $mol\,gluc ·L^{-1}$ | Sugar concentration in sapwood. |
+| `StarchSapwood`|$ST_{sapwood,i}$ | $mol gluc ·L^{-1}$ | Starch concentration in sapwood. |
+
+The following table describes the child elements of `PlantGrowth`, again each of them a data frame with dates in rows and plant cohorts in columns:
+
+| Element | Symbol | Units | Description                               |
+|---------|--------|-------|-------------------------------------------|
+| `LeafArea`|$LA_{i}$ | $m^{2}$ | Daily amount of leaf area for an average individual. |
+| `SapwoodArea`|$SA_{i}$ | $cm^{2}$ | Daily amount of sapwood area for an average individual. |
+| `FineRootArea`|$FRA_{i}$ | $m^{2}$ | Daily amount of fine root area for an average individual. |
+| `LAgrowth`|$LA_{g,i}$ | $m^{2}\cdot cm^{-2} \cdot day^{-1}$ | Leaf area growth relative to sapwood area for an average individual. |
+| `SAgrowth`|$SA_{g,i}$ | $cm^{2}\cdot cm^{-2} \cdot day^{-1}$ | Leaf area growth relative to sapwood area for an average individual. |
+| `FRAgrowth`|$FRA_{g,i}$ | $m^{2}\cdot cm^{-2} \cdot day^{-1}$ | Fine root area growth relative to sapwood area for an average individual. |
+
+#### Subdaily output
+
+As with function `spwb()`, subdaily output can also be generated with function `growth()`. This is done via setting  `subdailyResults = TRUE` in the control parameter list. In that case, the output list of `growth()` will include an element `subdaily`, whose subelements correspond to the results of `growth_day()` for each date simulated. Refer to the documentation of functions `growth_day()` for details of subdaily output.
 
 ## Applications
 
