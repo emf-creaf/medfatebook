@@ -70,14 +70,15 @@ Soil initialization is needed to estimate soil hydrological parameters for each 
 | $\theta_{res, s}$ |$m^3 \cdot m^{-3}$ | `VG_theta_res` | Residual volumetric soil moisture |
 | $n_s$ | | `VG_n` | Parameter $n$ of the Van Genuchten [-@Genuchten1980] model |
 | $\alpha_s$ | $MPa^{-1}$ | `VG_alpha`| Parameter $\alpha$ of the Van Genuchten [-@Genuchten1980] model |
-| $K_{sat_s}$ | $mmol \cdot s^{-1} \cdot m^{-1} \cdot MPa^{-1}$ | `Ksat` | Saturated soil conductivity |
+| $K_{sat,s}$ | $mmol \cdot s^{-1} \cdot m^{-1} \cdot MPa^{-1}$ | `Ksat` | Saturated soil conductivity |
+| $K_{drain}$ | $mm \cdot d^{-1}$ | `Kdrain` | Hydraulic conductivity for deep drainage. |
 
 Macroporosity values are calculated using the equations given in @Stolf2011, while $\gamma_{soil}$ and $\kappa_{soil}$ are derived from texture. Parameters of the van Genuchten model for each layer are estimated from the physical description of the layer using one of two pedotransfer functions (see help for `soil()`): 
 
 1. Using the USDA texture classification and the average texture class parameters given by @Carsel1988.
 2. Directly from the soil texture, organic matter and bulk density, using the pedotransfer functions in @Toth2015.
 
-Saturated soil conductivity values are estimated using @Saxton2006 or @Saxton1986, depending on whether an estimate of organic mater is available. Besides defining soil parameters, function `soil()` also initializes *soil state variables*: soil moisture content, soil temperature (although set to a missing value) and water table depth. All simulation functions need an object of class `soil` to be run. Users can edit the `soil` object manually (it is actually a `list`), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements.
+Saturated soil conductivity values are estimated using @Saxton2006 or @Saxton1986, depending on whether an estimate of organic mater is available. Besides defining soil parameters, function `soil()` also initializes *soil state variables*: soil moisture content, soil temperature (although set to a missing value) and water table depth. All simulation functions need an object of class `soil` to be run. Users can edit the `soil` object manually (it is actually a `list`), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements. $K_{drain}$ is currently initialized from soil saturated conductivity in the deepest soil layer, but should be defined depending on the permeability of the bedrock material.
 
 ### Water content and water table depth
 

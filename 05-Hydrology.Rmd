@@ -154,7 +154,10 @@ lines(NP,NP-hydrology_infiltrationAmount(NP, V[5]), lty=5)
 legend("topleft", bty="n", lty=1:5, legend=c(paste("d =", SoilDepth,"Vsoil =",round(V),"mm")))
 ```
 
-If `drainage = TRUE`, the water percolating from the lowest layer is considered deep drainage, $Dd$, and soil layers are never above field capacity. If `drainage = FALSE`, the excess of water in the lowest soil layer is not lost via drainage, so that this layer (and those above) can be filled up to saturation. This additional filling is done starting from below, and when a given layer reaches saturation, the model adds the remaining water to the layer above. If all layers are filled to saturation, the remaining water is assumed to be infiltration excess and is added to the surface runoff. 
+Percolation in deepest layer may be treated differently in the model. If it is a rocky layer (i.e if rock fragment content > 95\%) and `rockyLayerDrainage = FALSE`, the model assumes that most cracks in the rock are not hydraulically connected to groundwater, so that they conform water pockets from which plants can extract water. Hence, in this situation the percolation excess occurs only if saturation is surpassed. Otherwise, percolation excess is estimated if field capacity is surpassed, as in the other soil layers. When a percolation excess exists, the remaining water fills soil layers over field capacity up to saturation, from bottom to top. If the soil becomes saturated and there is still an excess of water, this is assumed as infiltration excess and added to the surface runoff ($Ru$).
+
+Deep drainage ($Dd$) is estimated after percolation of soil water inputs. First, hydraulic head is estimated summing the amount of water contained in macropores across soil layers (i.e. water over field capacity). Then, an estimation of the daily maximum drainage is obtained by multiplying hydraulic head by the saturated vertical hydraulic conductivity $K_{drain}$. Drainage of saturated water is then applied from top to bottom until the maximum drainage is achieved or macropores are empty in all soil layers. As before, the drainage from the deepest rocky layer may be prevented if `rockyLayerDrainage = FALSE`.
+
 
 ## Bare soil evaporation {#soilevaporation}
 
