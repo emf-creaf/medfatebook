@@ -2,17 +2,27 @@
 
 # Introduction {#intro}
 
-This chapter provides an overview of the purpose of developing the **medfate** R package, its main simulation functions and expected applications. 
+This chapter provides an overview of the purpose of developing the **medfate** an **medfateland** R packages, their main simulation functions and expected applications. 
 
 ## Purpose
 
 Being able to anticipate the impact of global change on forests is one of the major environmental challenges in contemporary societies. However, uncertainties in how forest ecosystems function and practical constraints in how to integrate available information still hinder the availability of robust and reliable predictive models. Despite the amount of knowledge accumulated about the functioning and dynamics of Mediterranean forests, scientists should make coordinate their efforts to address the challenge of integrating the different global change drivers into simulation tools useful for research and applications.
 
-The R package **medfate** has been designed as a platform to simulate the functioning and dynamics of Mediterranean forest stands at temporal scales from days to years. Drought and impacts and fire hazard are the main environmental drivers covered by the package and the ecological, hydrological and physiological processes surrounding these are fundamental for the simulation models included in the package. In particular, the package allows the simulation of water balance of soils and plants within forest stands. It also allows simulating plant growth of a set of cohorts competing for light and water within a forest stand. Finally, the package functions to relate the amount of plant biomass and the water status of plant tissues to fuel characteristics and, hence, fire hazard.
+### **medfate**
+
+The R package **medfate** has been designed as a platform to simulate the functioning and dynamics of individual forest stands at temporal scales from days to years. Climate is the main environmental driver covered by the package and the ecological, hydrological and physiological processes surrounding these are fundamental for the simulation models included in the package. In particular, the package allows the simulation of water balance of soils and plants within forest stands. It also allows simulating plant growth of a set of cohorts competing for light and water within a forest stand. Finally, the package functions to relate the amount of plant biomass and the water status of plant tissues to fuel characteristics and, hence, fire hazard.
 
 The version of the reference manual that you are reading is intended to reflect **version `r packageVersion("medfate")`** of the package.
 
+### **medfateland**
+
+The R package **medfateland** has been designed to extend the capabilities of **medfate** to the landscape level. It allows running the stand-level models available in medfate on points and cells within landscape. More importantly, **medfateland** allows considering spatial hydrological processes in forested watersheds. Hence, **medfateland** can be used as a tool for eco-hydrological applications.   
+
+The version of the reference manual that you are reading is intended to reflect **version `r packageVersion("medfateland")`** of the package.
+
 ## Package installation
+
+### **medfate**
 
 Package **medfate** can be found at [CRAN](https://CRAN.R-project.org/package=medfate), where it is updated every few months. Hence, it can be installed using:
 ```{r eval=FALSE}
@@ -32,13 +42,22 @@ devtools::install_github("vegmod/medfate",
                          build_opts = c("--no-resave-data", "--no-manual"))
 ```
 
-Note that some package dependencies (such as package **GSIF** providing access to soil data) are only *suggested*, so that they are not automatically installed when installing **medfate**.
+Note that some package dependencies are only *suggested*, so that they are not automatically installed when installing **medfate**.
+
+### **medfateland**
+
+Package **medfateland** is currently only available at GitHub, and can be installed using: 
+
+```{r installation medfateland, eval = FALSE}
+devtools::install_github("vegmod/medfateland")
+```
+
+### Installation from sources
+
+Both packages have a user interface in R, but actual calculations have been implemented as C++ functions and linked to R via the **Rcpp** package. This means that you will need a compiler to install **medfate** and **medfateland** packages from sources (i.e. Rtools in Windows).
 
 ## Package functions
 
-### Implementation
-
-The package has a user interface in R, but actual calculations have been implemented as C++ functions and linked to R via the **Rcpp** package. This means that you will need a compiler to install the package from sources (i.e. Rtools in Windows).
 
 ### Dynamic simulation functions
 
