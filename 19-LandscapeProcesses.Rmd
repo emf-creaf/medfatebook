@@ -7,6 +7,8 @@
 In gridded simulations, lateral water transport between adjancent cells is also considered. Then, the surface water inputs of the stand include not only precipitation and snow melt but also overland surface flows from cells of its upper microwatershed, with routing following T-HYDRO @Ostendorf1993; and subsurface flows (and variations in water table depth) are modelled following the kinematic wave approach of DSHVM @Wigmosta1994.
 
 
+Split-parameter parametrization following @Frances2007.
+
 ## State variables {#statevariableswatershed}
 
 ## Water balance {#watershedbalance}
@@ -16,15 +18,17 @@ When landscape hydrological processes are considered, daily variations in soil w
   \begin{equation}
   \Delta{SWC} = Pr + Sm + Ro - In - Ru - Dd - Es - Tr + \Delta{S_{sub}}
   \end{equation}
-where $Ro$ is surface runon water entering the cell from neighbouring cells at higher elevation and $\Delta{S_{sub}}$ is the variation in water content derived from subsurface lateral processes. 
+where $Ro$ is surface runon water entering the cell from neighboring cells at higher elevation and $\Delta{S_{sub}}$ is the variation in water content derived from subsurface lateral processes. 
 
 ### Water balance at watershed level
 
 ## Process scheduling {#watershedbalancescheduling}
 
-In gridded simulations,  however, water balance of a given day is conducted for all cells before starting the next day. Moreover, surface flows and subsurface flows are dealt in separate steps:
-+ Vertical flows and overland lateral flows are simulated first. A relative discharge parameter table is prepared at the beginning of the simulation, and cells are processed in an order determined by elevation (i.e. cells at higher elevation are processed before cells at lower elevation) and the water balance of a given target cell is influenced by surface runon ($Ro$) coming froom those neighboring cells that are at higher elevation.
-+ Subsurface flows (i.e., flows leading to $\Delta{S_{sub}}$) are simulated at the end of the day. Cells are allowed to exchange subsurface water with their eight neighbours, depending on the water table slope in each direction, which may not exactly follow elevation differences.
+ 1. Calculation of soil and aquifer water table elevation.
+ 2. Calculation of soil and aquifer lateral flows between adjacent cells, according to hydraulic gradients.
+ 3. Apply changes in soil moisture content due to soil lateral flows (i.e. determine $\Delta{S_{sub}}$), including the possibility of a return flow to the surface if the soil becomes saturated (i.e. saturation excess flow).
+ 4. Apply changes in aquifer water content, including the possibility of discharge from the aquifer to the soil and a saturation excess flow.
+ 5. Determine remaining flows by processing watershed cells in order of decreasing elevation (i.e. cells at higher elevation are processed before cells at lower elevation). For each cell to be processed, determine snowpack dynamics, rainfall interception loss, infiltration and runoff, transpiration, soil evaporation processes as described in \@ref(basicwaterbalancescheduling), while adding saturation excess flow as well as potential runon ($Ro$) from upslope cells as additional water input.
 
 ## Inputs and outputs
 
@@ -50,12 +54,11 @@ In gridded simulations,  however, water balance of a given day is conducted for 
 
 ### Overland flows
 
-To simulate surface runoff from one cell to the other, the approach of Ostendorf \& Reynolds
-(1993) is used, as in SIERRA (Mouillot et al. 2001). Overland  water lateral transport occurs instantaneously and depends on topography only. The model determines cell neigbours following the queen rule (up to eight neighbours per cell). The proportion of surface water runoff of cell $i$ that will be added to the infiltration input (runon) of a neighbouring cell $j$ is @Quinn1991:
+To simulate surface runoff routing from one cell to the other, the approach of @Ostendorf1993 is used, as in SIERRA [@Mouillot2001]. Overland  water lateral transport occurs instantaneously and depends on topography only. The model determines cell neigbours following the queen rule (up to eight neighbours per cell). The proportion of surface water runoff of cell $i$ that will be added to the infiltration input (runon) of a neighbouring cell $j$ is @Ostendorf1993:
 \begin{equation}
 q_{ij} = \frac{\Delta z_{ij}/L_{ij}}{\sum_{j}{\Delta z_{ij}/L_{ij}}}
 \end{equation}
-if $\Delta z_{ij} = z_i - z_j > 0$, that is, if the difference in elevation between the two cells is positive (i.e. if $z_j < z_i$). Otherwise there is no overland transport from $i$ to $j$, i.e. $q_{ij} = 0$. $L_{ij}$ indicates the distance between cell $i$ and $j$ (which depends on cell size and on whether the neighbouring cell $j$ is diagonal to cell $i$). The sumatory of the denominator is done only for neighbours at lower elevation, so that $\sum_{i}{qij} = 1$. The table of $q_{ij}$ values is calculated at the beginning of simulations only.
+if $\Delta z_{ij} = z_i - z_j > 0$, that is, if the difference in elevation between the two cells is positive (i.e. if $z_j < z_i$). Otherwise there is no overland transport from $i$ to $j$, i.e. $q_{ij} = 0$. $L_{ij}$ indicates the distance between cell $i$ and $j$ (which depends on cell size and on whether the neighbouring cell $j$ is diagonal to cell $i$). The summation of the denominator is done only for neighbours at lower elevation, so that $\sum_{i}{qij} = 1$. The table of $q_{ij}$ values is calculated when initializing distributed watershed objects.
 
 Every day, cells are processed in order from higher to lower elevation. After the daily water balance of a given cell $i$, water runoff $R_i$ is divided among the neighbouring cells at lower elevation. The runon of a neighbour $j$, $O_j$ is updated as:
 
