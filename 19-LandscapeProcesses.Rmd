@@ -18,22 +18,38 @@ Split-parameter parametrization following @Frances2007.
 
 ## State variables {#statevariableswatershed}
 
+Distributed simulation of rainfall-runoff processes implies that state variables are defined for each cell of the watershed. For this kind of simulations, state variables describing the water content of different compartments are the most important:
+
++ $W_s$, the proportion of soil moisture in relation to field capacity for each soil layer $s$ in the cell.
++ $S_{snow}$ the snow water equivalent (mm) of the snow pack storage over the cell surface.
++ $S_{aquifer}$ the water content (mm) in the cell's aquifer beyond the reach of plant roots.
+
+Additional cell state variables concern the water status (or other state variables) of plant cohorts in the cell, and they were described in chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance).
+
 ## Water balance {#watershedbalance}
 
+In distributed watershed simulations water balance can be defined both at the cell level and at the watershed level.
+
 ### Cell level water balance
-At the cell level, daily variations in water content can occur in the snow pack, soil or groundwater compartments. Daily variations in snow pack water equivalent content follows eq. \@ref(eq:snowbalanceequation). Daily variations in soil water content ($\Delta{V_{soil}}$) are summarized as (compare to \@ref(eq:basicwaterbalanceequation)):
+At the cell level, daily variations in water content can occur in the *snowpack*, *soil* or *groundwater* compartments: 
+
+1. Variations in snowpack water equivalent content follows eq. \@ref(eq:snowbalanceequation).
+2. Variations in soil water content ($\Delta{V_{soil}}$) need to account for additional flows and are summarized as (compare to \@ref(eq:basicwaterbalanceequation)):
   \begin{equation}
   \Delta{V_{soil}} = Pr + Sm + Ro + Ad - In - Ru - Dd - Es - Tr + \Delta{S_{inter}}
+  (\#eq:cellsoilwaterbalanceequation)
   \end{equation}
-where $Pr$ is precipitation as rainfall, $Sm$ is snowmelt, $Ro$ is surface *runon* water entering the cell from neighboring cells at higher elevation, $Ad$ is aquifer discharge, $In$ is rainfall interception loss, $Ru$ is cell surface runoff, $Dd$ is deep drainage towards the aquifer, $Es$ is soil evaporation, $Tr$ is plant transpiration and $\Delta{S_{inter}}$ is the variation in water content derived from the balance between saturated soil lateral inputs and outputs. Finally, variations in the cell aquifer water content are summarized by:
+where $Pr$ is precipitation as rainfall, $Sm$ is snowmelt, $Ro$ is surface *runon* water entering the cell from neighboring cells at higher elevation, $Ad$ is aquifer discharge, $In$ is rainfall interception loss, $Ru$ is cell surface runoff, $Dd$ is deep drainage towards the aquifer, $Es$ is soil evaporation, $Tr$ is plant transpiration and $\Delta{S_{inter}}$ is the variation in soil water content derived from the balance between saturated soil lateral inputs and outputs.
+3. Variations in the aquifer water content of a cell are summarized by:
 \begin{equation}
   \Delta{S_{aquifer}} = Dd - Ad - \Delta{S_{base}}
+  (\#eq:cellaquiferwaterbalanceequation)
 \end{equation}
-where $\Delta{S_{base}}$ is the variation in water content derived from the balance between groundwater lateral inputs and outputs.
+where $\Delta{S_{base}}$ is the variation in water content of the aquifer derived from the balance between groundwater lateral inputs and outputs.
 
 ### Watershed water balance
 
-At the watershed level, separate water balances can be defined for the average water content of snow pack, soil or groundwater compartments. And a water balance is defined regarding the overall water content in the watershed. 
+At the watershed level, separate water balances can again be defined for the average water content of snow pack, soil or groundwater compartments. These result from averaging water balances across cells. Additionally, a water balance is defined regarding the overall water content in the watershed. 
 
 1. Changes in the average snow pack water equivalent over cells is the result of balancing precipitation as snow ($Ps$) and snow melt ($Sm$), both flows averaged over cells:
 \begin{equation}
@@ -49,7 +65,7 @@ where $\hat{Pr}$, $\hat{Ad}$, $\hat{Ro}$, $\hat{Ru}$, $\hat{In}$, $\hat{Dd}$, $\
 \begin{equation}
   \Delta{\hat{S}_{aquifer}} = \hat{Dd} - \hat{Ad}
 \end{equation}
-If we integrate the three water compartments, water balance at the watershed level is given by:
+4. If we integrate the three water compartments, water balance at the watershed level is given by:
 \begin{equation}
   \Delta{S_{watershed}} = \hat{Pr} - \hat{In} - \hat{Es} - \hat{Tr} - \hat{Ex}
 \end{equation}
@@ -57,49 +73,49 @@ where $\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}+\Delta{\hat{V}_{soil}}+\De
 
 ## Process scheduling {#watershedbalancescheduling}
 
- 1. Calculation of soil and aquifer water table elevation.
- 2. Calculation of soil and aquifer lateral flows between adjacent cells, according to hydraulic gradients.
- 3. Apply changes in soil moisture content due to soil lateral flows (i.e. determine $\Delta{S_{sub}}$), including the possibility of a return flow to the surface if the soil becomes saturated (i.e. saturation excess flow).
- 4. Apply changes in aquifer water content, including the possibility of discharge from the aquifer to the soil and a saturation excess flow.
- 5. Determine remaining flows by processing watershed cells in order of decreasing elevation (i.e. cells at higher elevation are processed before cells at lower elevation). For each cell to be processed, determine snowpack dynamics, rainfall interception loss, infiltration and runoff, transpiration, soil evaporation processes as described in \@ref(basicwaterbalancescheduling), while adding saturation excess flow as well as potential runon ($Ro$) from upslope cells as additional water input.
+For every day to be simulated, the model performs the following steps:
+
+ 1. Calculation of soil and groundwater hydraulic heads for each cell (see \@ref(subsurfaceflows)).
+ 2. Calculation of soil and groundwater lateral flows between adjacent cells, according to hydraulic gradients (see \@ref(subsurfaceflows)).
+ 3. Apply changes in cell soil moisture content due to soil lateral flows (i.e. determine $\Delta{S_{sub}}$ for each cell), including the possibility of a return flow to the surface if the soil becomes saturated (i.e. saturation excess flow).
+ 4. Apply changes in cell aquifer water content, including the possibility of discharge from the aquifer to the soil and a saturation excess flow (eq. \@ref(eq:cellaquiferwaterbalanceequation)).
+ 5. Determine remaining cell flows by processing watershed cells in order of decreasing elevation (i.e. cells at higher elevation are processed before cells at lower elevation). For each cell to be processed:
+    a. Determine snowpack dynamics, rainfall interception loss, infiltration and runoff, transpiration, soil evaporation processes as described in \@ref(basicwaterbalancescheduling), while including saturation excess flow as well as potential runon ($Ro$) from upslope cells as additional water inputs.
+    b. Distribute surface runoff among cells downhill (\@ref(overlandflows)). If a cell does not have downhill neighbors (i.e outlet cell) its runoff becomes water exported from the watershed.
 
 ## Inputs and outputs
 
 ### Soil, vegetation and meteorology
 
-**Soil**
 
-**Vegetation**
+### Watershed hydraulic correction parameters {#watershedbalancecontrol}
 
-**Meteorology**
-
-
-### Control parameters {#watershedbalancecontrol}
 
 ### Model output {#watershedbalanceoutput}
-
-#### Daily output
 
 
 ## Applications
 
 ## Details of processes
 
-### Overland flows
+### Subsurface flows  {#subsurfaceflows}
 
-To simulate surface runoff routing from one cell to the other, the approach of @Ostendorf1993 is used, as in SIERRA [@Mouillot2001]. Overland  water lateral transport occurs instantaneously and depends on topography only. The model determines cell neigbours following the queen rule (up to eight neighbours per cell). The proportion of surface water runoff of cell $i$ that will be added to the infiltration input (runon) of a neighbouring cell $j$ is @Ostendorf1993:
+### Overland flows {#overlandflows}
+
+To simulate surface runoff routing from one cell to the other, the approach of @Ostendorf1993 is used, as in SIERRA [@Mouillot2001]. Overland water lateral transport for a given day occurs instantaneously (i.e. no velocities are calculated) and depends on topography only. The model determines cell neighbors following the queen rule (up to eight neighbors per cell). The proportion of surface water runoff of cell $i$ that will be added to the infiltration input (runon) of a neighboring cell $j$ is @Ostendorf1993:
 \begin{equation}
 q_{ij} = \frac{\Delta z_{ij}/L_{ij}}{\sum_{j}{\Delta z_{ij}/L_{ij}}}
 \end{equation}
-if $\Delta z_{ij} = z_i - z_j > 0$, that is, if the difference in elevation between the two cells is positive (i.e. if $z_j < z_i$). Otherwise there is no overland transport from $i$ to $j$, i.e. $q_{ij} = 0$. $L_{ij}$ indicates the distance between cell $i$ and $j$ (which depends on cell size and on whether the neighbouring cell $j$ is diagonal to cell $i$). The summation of the denominator is done only for neighbours at lower elevation, so that $\sum_{i}{qij} = 1$. The table of $q_{ij}$ values is calculated when initializing distributed watershed objects.
+if $\Delta z_{ij} = z_i - z_j > 0$, that is, if the difference in elevation between the two cells is positive (i.e. if $z_j < z_i$). Otherwise there is no overland transport from $i$ to $j$, i.e. $q_{ij} = 0$. $L_{ij}$ indicates the distance between cell $i$ and $j$ (which depends on cell size and on whether the neighboring cell $j$ is diagonal to cell $i$). The summation of the denominator is done only for neighbors at lower elevation, so that $\sum_{i}{q_{ij}} = 1$. The table of $q_{ij}$ values is calculated when initializing distributed watershed objects.
 
-Every day, cells are processed in order from higher to lower elevation. After the daily water balance of a given cell $i$, water runoff $R_i$ is divided among the neighbouring cells at lower elevation. The runon of a neighbour $j$, $O_j$ is updated as:
+Every day, cells are processed in order from higher to lower elevation. After the daily water balance of a given cell $i$, water runoff $R_i$ is divided among the neighboring cells at lower elevation. The runon of a neighbor $j$, $O_j$ is updated as:
 
 \begin{equation}
 O_j = O_j + R_i \cdot q_{ij}
 \end{equation}
 
-Note that a given cell $j$ can receive overland flow from more than one neighbour. $O_j$ values are set to zero at the beginning of each day.
+Note that a given cell $j$ can receive overland flow from more than one neighbor. $O_j$ values are set to zero at the beginning of each day.
 
-### Subsurface and grounwater flows
+### Watershed runoff
 
+A special situation arises when processing cells that do not have downhill neighbors defined (i.e. where $q_{ij} = 0$ for all $j$), either because they are in flat surfaces or at the watershed boundary. In both cases, these cells should correspond to water bodies or streams connecting to the catchment outlet. Hence, these cells are called *outlet cells* in the model, and the runoff they generate becomes watershed runoff.
