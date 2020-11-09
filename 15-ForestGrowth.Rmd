@@ -23,6 +23,27 @@ Carbon pools are differentiated between **structural** and **labile**. In turn, 
 
 Carbon balance of leaf labile (metabolic and storage) carbon is performed by considering photosynthesis, sugar-starch conversion and phloem transport. Growth and maintenance respiration is calculated at the individual level, by estimating the respiration of leaves, sapwood and fine root compartments. Sapwood respiration depends on sapwood area, stem height and coarse root length.
 
+
+### Leaf area, sapwood area and fine root area dynamics
+
+The forest growth model allows simulating variation leaf area, sapwood area and fine root area via the following processes:
+
+ i. **Leaf area** of each plant cohort is divided between live (whether in resistance buds or unfolded leaves) and dead (standing dead leaves). Whereas in the water balance models expanded leaf area corresponded to the portion of live leaf area that was unfolded at any given moment, in the growth model live leaf area and expanded leaf area are conceptually the same, but leaf phenological phases still control leaf development. Leaf area growth occurs during *leaf unfolding* periods only, whereas *bud formation* periods are required to update the target leaf area in accordance to an allocation strategy (see below). Leaf senescence (and the corresponding increases in dead leaf area) can occur due to aging (as determined by leaf life span), due to a leaf negative carbon balance or due to drought impacts. 
+ ii. Formation of **sapwood area** can only occur if leaves are present. Sapwood formation is modelled as a ring of tracheids that are issued from cambium divisions and progressively undergo enlargement and maturation (ref). Losses in sapwood area (i.e. conversion to heartwood) can occur via stem embolism or aging (i.e. assuming a daily rate of conversion). Similarly to 3-PG [@Landsberg1997] we assume that the relative turnover rate of sapwood is smallest for young plants, and it increases up to a maximum value.
+ iii. **Fine root area** dynamics also arises from the interplay of fine root growth and senescence, the latter occurring via aging (i.e. turnover rate depending on soil temperature). 
+
+Formation of leaf, sapwood and fine root tissues is determined taking into account both source (i.e. carbon assimilation) and sink (i.e. carbon investment on plant tissue expansion) limitations [@Fatichi2014; @Guillemot2015; @Korner2015]. However, while leaf and fine root source limitations are set by available metabolic carbon, stem growth is assumed to be limited by availability of storage (i.e. starch) in the stem. This is done to create a preferential allocation into leaf and fine root tissues over stem growth, as long as leaf and fine root areas are below the respective targets set by allocation rules. Two options are possible regarding allocation between leaves and sapwood tissues:
+
+  1. *Constant Huber value*: In this strategy, growth of leaf area and sapwood area need to be coordinated so that Huber value remains constant. Increases in leaf area are scheduled whenever Huber value is larger than the target (i.e. there is an excess of sapwood area). This is similar to the LPG model [@Sitch2003], where different turnover rates are applied for different tissues, but then tries to satisfy the pipe model [@Shinozaki1964] by allocating C where it is more limiting. Note that in this strategy the whole-plant conductance will progressively decrease with the progressive increase in plant height. 
+  2. *Constant whole-plant conductance*: Ratios of leaf area to sapwood area (Huber value) can vary within species, due to environmental conditions [@Mencuccini1995]. In this allocation strategy, growth of leaf area, sapwood area and height needs to be coordinated so that whole-plant conductance (excluding rhizosphere) is constant and equal to the initial value. Increases in leaf area are scheduled whenever the current whole-plant conductance is above target value.  
+
+Fine root area growth is coordinated with the other tissues via the need to ensure an average resistance fraction in the rhizosphere, which is used to define the fine root area target. Growth rate in all three tissues is regulated by maximum relative growth rates (i.e. the daily growth area relative to the amount of tissue area present). However, since leaf and fine root area targets depend on sapwood area, the relative growth rate for sapwood area indirectly determines the growth rates of leaves and fine roots. 
+
+### Tree diameter, tree height and shrub cover updates
+
+Tree structural variables are updated as in forest gap models [@Lindner1997].
+
+
 ### Links between plant hydraulics and carbon balance
 
 The model tries to coordinate carbon and water aspects of plant functioning by establishing several links between them (figure below):
@@ -37,27 +58,6 @@ The model tries to coordinate carbon and water aspects of plant functioning by e
 ```{r, out.width='100%', fig.align="center", fig.cap="Schematic representation of relationships between plant hydraulics and carbon balance", echo=FALSE}
 knitr::include_graphics("hydraulics_carbon_relations.png")
 ```
-
-
-### Leaf area, sapwood area and fine root area dynamics
-
-Leaf area of each plant cohort is divided between live (whether in resistance buds or unfolded leaves) and dead (standing dead leaves). Whereas in the water balance models expanded leaf area corresponded to the portion of live leaf area that was unfolded at any given moment, in the growth model live leaf area and expanded leaf area are conceptually the same, but leaf phenological phases still control leaf development. Leaf area growth occurs during *leaf unfolding* periods only, whereas *bud formation* periods are required to update the target leaf area in accordance to an allocation strategy (see below). Leaf senescence (and the corresponding increases in dead leaf area) can occur due to aging (as determined by leaf life span), due to a leaf negative carbon balance or due to drought impacts. 
-
-Formation of new sapwood area can only occur if leaves are present. Sapwood formation is modelled as a ring of tracheids that are issued from cambium divisions and progressively undergo enlargement and maturation (ref). Losses in sapwood area (i.e. conversion to heartwood) can occur via stem embolism or aging (i.e. assuming a daily rate of conversion). Similarly to 3-PG [@Landsberg1997] we assume that the relative turnover rate of sapwood is smallest for young plants, and it increases up to a maximum value.
-
-Fine root biomass (and area) dynamics also arises from the interplay of growth and senescence, the latter occurring via aging (i.e. turnover rate depending on soil temperature). 
-
-Ratios of leaf area to sapwood area (Huber value) can vary within species, due to environmental conditions [@Mencuccini1995]. Two options are possible regarding the relationship between leaf area and sapwood area (Huber values):
-
-  1. *Constant Huber value*: Growth of leaf area and sapwood area need to be coordinated so that Huber value remains constant. Whole-plant conductance will decrease with the progressive increase in plant height. This is similar to the LPG model [@Sitch2003], where different turnover rates are applied for different tissues, but then tries to satisfy the pipe model [@Shinozaki1964] by allocating C where it is more limiting. 
-  2. *Constant whole-plant conductance*: Growth of leaf area, sapwood area and height needs to be coordinated so that whole-plant conductance (excluding rhizosphere) is constant and equal to the initial value. Increases in daily leaf area or sapwood area are targeted depending on whether the current whole-plant conductance is above or below the target value.  
-
-
-Growth of leaf, sapwood and fine root tissues is determined taking into account both source (i.e. carbon assimilation) and sink (i.e. carbon investment on plant tissue expansion) limitations [@Fatichi2014; @Guillemot2015; @Korner2015]. However, while leaf and fine root source limitations are set by available metabolic carbon, stem growth is assumed to be limited by availability of storage (i.e. starch) in the stem. This is done to create a preferential allocation into leaf and fine root tissues over stem growth, as long as leaf and fine root areas are below the respective targets set by allocation rules. 
-
-### Tree diameter, tree height and shrub cover updates
-
-Tree structural variables are updated as in forest gap models [@Lindner1997].
 
 
 ## State variables
