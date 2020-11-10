@@ -111,8 +111,7 @@ where $A$ is (gross) photosynthesis, $R_{leaf}$ is leaf respiration, $F_{phloem}
 
 The corresponding carbon balance equations for sapwood dissolved sugars and starch are:
 \begin{eqnarray}
-\Delta{SS_{sapwood}} &=& F_{phloem} - R_{sapwood} - R_{fineroots} - G_{sapwood} - G_{fineroots} \\
-                     & & - SC_{sapwood} \\
+\Delta{SS_{sapwood}} &=& F_{phloem} - R_{sapwood} - R_{fineroots} - G_{sapwood} - G_{fineroots} - SC_{sapwood} \\
 \Delta{ST_{sapwood}} &=& SC_{sapwood} - RE_{sapwood}
 (\#eq:sapwoodcarbonbalanceequations)
 \end{eqnarray}
@@ -120,24 +119,42 @@ where $F_{phloem}$ is the sugar inflow via phloem transport, $R_{sapwood}$ is th
 
 ## Process scheduling
 
-For every day to be simulated, the model first updates the expanded leaf area of living plants according to the phenology of species and the day of the year and performs soil water balance, transpiration and photosynthesis calculations by calling the water balance submodel (see \@ref(basicwaterbalancescheduling) and \@ref(advancedwaterbalancescheduling)). 
+Growth simulations are conducted in **daily** time steps. Depending on the transpiration mode (`Granier` or `Sperry`) the actual steps conducted are different.
 
-After dealing with water fluxes and photosynthesis, the model performs the following daily steps:
+### Basic scheduling
+For every day to be simulated, the model performs the following steps:
 
-1. Determine the current amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and carbon construction costs per unit tissue (leaf or sapwood) area. 
-2. For every **subdaily step** perform carbon balance as follows:
-    a. Calculate gross photosynthesis per individual ($A$).
-    b. Determine maintenance respiration costs for leaves ($R_{leaf}$), sapwood ($R_{sapwood}$) and fine roots ($R_{fineroot}$), taking into account both live structural biomass and labile sugar biomass.
-    c. Evaluate temperature and turgor sink limitations for growth of leaves and sapwood. If leaf/sapwood growth is permitted, estimate growth costs ($G_{leaf}$ and $G_{sapwood}$) and record leaf/sapwood area increases. 
+1. Performs soil water balance, transpiration and photosynthesis calculations by calling the basic water balance model (see \@ref(basicwaterbalancescheduling)).
+2. Determine the current amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and carbon construction costs per unit tissue (leaf or sapwood) area. 
+3. Calculate gross photosynthesis per individual ($A$), maintenance respiration costs for leaves ($R_{leaf}$), sapwood ($R_{sapwood}$) and fine roots ($R_{fineroot}$).
+4. If phenology indicates leaf unfolding, evaluate temperature and turgor sink limitations for growth of leaves, estimate growth costs ($G_{leaf}$) and record leaf area increases. 
+5. If sapwood growth is permitted, evaluate temperature and turgor sink limitations for growth of sapwood, estimate growth costs ($G_{sapwood}$) and record sapwood area increases. 
+6. Apply changes to labile carbon compartments, including the transfer from leaf metabolic to sapwood metabolic carbon (via phloem) and conversions between storage and metabolic carbon. Record surplus in storage carbon as root exudation. This completes the carbon balance of $SS_{leaf}$ \@ref(eq:leafcarbonbalanceequations) and $SS_{sapwood}$ \@ref(eq:sapwoodcarbonbalanceequations) for the daily time step.
+7. Determine leaf area dynamics, including growth and senescence (aging, starvation and embolism effects).
+8. Determine sapwood area dynamics, including growth and senescence (aging and embolism effects).
+9. Update derived variables (e.g., leaf area index and Huber value) and evaluate if death by starvation or plant desiccation occurred.
+
+### Advanced scheduling
+For every day to be simulated, the model performs the following steps:
+
+1. Performs soil water balance, energy balance, transpiration and photosynthesis calculations by calling the advanced water balance model (\@ref(advancedwaterbalancescheduling)).
+2. Determine the current amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and carbon construction costs per unit tissue (leaf or sapwood) area. 
+3. For every **subdaily** step perform carbon balance as follows:
+    a. Calculate gross photosynthesis per individual ($A$) and maintenance respiration costs for leaves ($R_{leaf}$), sapwood ($R_{sapwood}$) and fine roots ($R_{fineroot}$), taking into account both live structural biomass and labile sugar biomass.
+    b. If phenology indicates leaf unfolding, evaluate temperature and turgor sink limitations for growth of leaves, estimate growth costs ($G_{leaf}$) and record leaf area increases. 
+    c. If sapwood growth is permitted, evaluate temperature and turgor sink limitations for growth of sapwood, estimate growth costs ($G_{sapwood}$) and record sapwood area increases. 
+    d. Evaluate temperature and turgor sink limitations for growth of fine roots, estimate growth costs ($G_{fineroot}$) and record fine root biomass increases. 
     d. Update $SS_{leaf}$ and $SS_{sapwood}$ taking into account photosynthesis, maintenance respiration and growth respiration.
-    e. Evaluate floem transport ($F_{floem}$) and sugar-starch dynamics ($K_{synthesis}$ and $K_{hydrolisis}$) in the leaf and sapwood compartments **at 1s time steps**. This completes the carbon balance of $SS_{leaf}$ \@ref(eq:leafcarbonbalanceequations) and $SS_{sapwood}$ \@ref(eq:sapwoodcarbonbalanceequations) for the subdaily time step.
+    e. Evaluate phloem transport ($F_{phloem}$) and sugar-starch dynamics in the leaf and sapwood compartments **at 1s time steps**, including diversion towards root exudation if maximum starch capacity is attained. This completes the carbon balance of $SS_{leaf}$ \@ref(eq:leafcarbonbalanceequations) and $SS_{sapwood}$ \@ref(eq:sapwoodcarbonbalanceequations) for the subdaily time step.
   
-3. If the balance of $SS_{leaf}$ is negative, apply leaf senescense as the exceeding leaf area according to respiration costs. Otherwise, a constant leaf senescense rate is applied according to leaf lifespan. Leaf senescence does not affect leaf C storage.
-4. Apply a constant rate of sapwood senescense (conversion to heartwood), which does not affect sapwood C storage.
-5. Increase sapwood area ($SA$) and leaf area ($LAI^{live}$) according to cumulative increases obtained from carbon balance.
-6. Update Huber values, hydraulic conductance of stems and roots according to current sapwood and leaf area values. 
-7. Update osmotic potential at full turgor of leaves and sapwood according to current sugar concentrations (a constant concentration of salts is assumed).
-8. If non-stomatal photosynthesis limitations are considered, apply them.
+4. If the balance of $SS_{leaf}$ is negative, apply leaf senescence as the exceeding leaf area according to respiration costs. Otherwise, a constant leaf senescence rate is applied according to leaf lifespan. 
+5. Apply a constant rate of sapwood senescence (conversion to heartwood), which does not affect sapwood C storage.
+6. Increase sapwood area ($SA$) and leaf area ($LAI^{live}$) according to cumulative increases obtained from carbon balance.
+7. Update Huber values, hydraulic conductance of stems and roots according to current sapwood and leaf area values. 
+8. Update osmotic potential at full turgor of leaves and sapwood according to current sugar concentrations (a constant concentration of salts is assumed).
+9. If non-stomatal photosynthesis limitations are considered, apply them.
+
+### Structural update
 
 At the end of each year (and at the end of the simulated period) the model translates cumulated sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover). 
 
@@ -152,7 +169,7 @@ Soil input requirements are the same as for the basic water balance model and we
 
 **Vegetation**
 
-Vegetation input requirements were fully described in section \@ref(vegetationinput). Trees and shrubs do not need to be characterized with different variables in soil water balance calculations, since both kinds of cohort have a $LAI$ value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. $LAI^{live}$, because normally at the starting point all leaves are expanded (i.e. $LAI^{\phi} = LAI^{live}$) and one can assume no dead leaves in the canopy (i.e., $LAI^{dead} = 0$). Vegetation characteristics stay constant during simulations using function `spwb()`, although the actual expanded leaf area ($LAI^{\phi}$) and dead leaf area may vary if the species is winter deciduous.
+Vegetation input requirements were fully described in section \@ref(vegetationinput). Trees and shrubs do not need to be characterized with different variables in soil water balance calculations, since both kinds of cohort have a $LAI$ value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. $LAI^{live}$, because one can assume no dead leaves in the canopy (i.e., $LAI^{dead} = 0$). Note that vegetation characteristics are modified by simulations in this model.
 
 **Metereological input**
 
