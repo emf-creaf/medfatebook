@@ -4,24 +4,45 @@
 
 This chapter provides an overview of a forest growth model, which builds on previous models and allows simulating carbon and water balance on a daily step basis for a given forest stand and for the period corresponding to input weather data. The model is run using function `growth()`, for a set of days, or function `growth_day()`, for a single day. 
 
-Since it builds on water balance modelling, the forest growth model can be run in two different levels of complexity (basic and advanced, corresponding to chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). While most of the description correspond to the forest growth model with adavanced water balance, we will indicate those design and formulation elements where the basic forest growth model differs from the advanced one.
+Since it builds on water balance modelling, the forest growth model can be run in two different levels of complexity (basic and advanced, corresponding to chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). While most of the description correspond to the forest growth model using an advanced water balance, we will indicate those design and formulation elements where the basic forest growth model differs from the advanced one.
 
 The information provided in this chapter should be enough to understand what the model does and when it can be useful, but the reading previous chapters and the following ones should provide a more detailed understanding on how the different processes are formulated.
 
 ## Design principles
 
-Like the preceeding models, the physical structure of the stand is represented in one (vertical) dimension (i.e. the coordinates of plants are not explicit). The model is cohort-based, meaning that similar plant individuals are represented using a single entity with average properties (e.g. tree height or diameter) and a density variable is used to scale from individual level to the cohort level. Processes are implemented either at the cohort-level (water balance and photosynthesis) or at the individual level (carbon balance and growth). Water fluxes, soil water balance and plant photosynthesis processes follow the design of the soil water balance model and this part of the model design will not be repeated here. The model tries to reproduce the physiological processes that modulate leaf area changes, diameter increment and changes in fine root distribution (this last process only under the advanced model). Nevertheless, since the model does not implement all processes that may affect growth (such as nutrient availability), maximum diameter increment rates and maximum plant sizes are constrained from user inputs, to ensure that model can be more easily calibrated and validated with observations. Simulations with the forest growth model can lead to the death of some plant cohorts, either because of exhaustion of carbon reserves (starvation) or dehydration of plant tissues (dessication).
+Like the preceding models, the physical structure of the stand is represented in one (vertical) dimension (i.e. the coordinates of plants are not explicit). The model is cohort-based, meaning that similar plant individuals are represented using a single entity with average characteristics (e.g. tree height or diameter) and a density variable is used to scale from individual level to the cohort level. Processes are implemented either at the cohort-level (water balance and photosynthesis) or at the individual level (carbon balance and tissue growth). Water fluxes, soil water balance and plant photosynthesis processes follow the design of the soil water balance model and this part of the model design will not be repeated here. The model tries to reproduce the physiological processes that modulate leaf area changes, sapwood area changes and in fine root area changes (this last process only under the advanced model), including those affecting carbon availability and sink limitations to tissue growth. Sapwood area formation leads to diameter and height increases, so that physiological processes involve structural changes. Nevertheless, since the model does not implement all processes and drivers (such as nutrient availability) affecting growth, the model includes input parameters to empirically constrain growth rates and plant size, i.e. maximum relative sapwood area growth rates, maximum plant height and diameter-height ratios. Simulations with the forest growth model can eventually lead to the death of some plant cohorts, either because of exhaustion of carbon reserves (i.e. plant starvation) or dehydration of plant tissues (i.e. plant desiccation).
 
 
 ### Carbon compartments, transport and carbon balance
 
-Carbon pools are differentiated between **structural** and **labile**. Labile carbon involves two different pools (**metabolic** and **storage**) with a transfer rate between them [@Richardson2013; @Dietze2014], which we assume to be regulated by the need to maintain, as much as possible, a minimum amount of sugar carbon for metabolic and osmotic purposes. 
+Carbon pools are differentiated between **structural** and **labile**. In turn, labile carbon involves two different pools (**metabolic** and **storage**) with a transfer rate between them [@Richardson2013; @Dietze2014], which we assume to be regulated by the need to maintain, as much as possible, a minimum amount of sugar carbon for metabolic and osmotic purposes. 
 
- + *Structural carbon* corresponds carbon forming cell membranes, cell walls and the cytosolic machinery. Structural carbon is used to calculate maintenance respiration and growth costs. Structural carbon occurs in three compartments: **leaves**, **sapwood** (stem, branches and coarse roots) and **fine roots**, which have different maintenance and growth costs. Structural carbon is lost when senescence occurs in each of these compartments.
- + *Metabolic carbon* is labile carbon assumed to correspond to sugars (glucose or fructose) that are used to sustain cell functioning (i.e. provide carbon for maintenance and growth). Metabolic carbon occurs in **leaves** and **sapwood**. Leaf metabolic carbon is generated from photosynthesis and used in different functions, including export to sapwood. Sugar concentration in the floem is assumed to be (passively) in equilibrium with leaf metabolic sugar concentration. In sapwood, metabolic carbon comes from floem transport and is used to sustain growth and maintenance respiration of sapwood and fine roots. Moreover, changes metabolic carbon are coupled to variations in osmotic potential. 
-+ *Storage carbon* in the leaf is intented to represent short-term storage (mainly starch in chloroplasts) and its inclusion in the model follows the need to buffer daily variations in metabolic carbon as well as the corresponding leaf osmotic potential. Storage carbon in sapwood (branches, stems and coarse roots) is intended to serve as long-term (seasonal and interannual) storage.
+ + *Structural carbon* corresponds carbon forming cell membranes, cell walls and the cytosolic machinery. Structural carbon is used to calculate maintenance respiration and growth costs. Structural carbon occurs in three compartments: **leaves**, **sapwood** (stem, branches and coarse roots) and **fine roots**, which have different maintenance and growth costs. Structural carbon is lost when senescence occurs in each of these compartments (in the case of sapwood due to conversion to heartwood).
+ + *Metabolic carbon* is labile carbon assumed to correspond to sugars (glucose or fructose) that are used to sustain cell functioning (i.e. provide carbon for maintenance and growth). Metabolic carbon occurs in **leaves** and **sapwood**. Leaf metabolic carbon is generated from photosynthesis and used in different functions, including export to sapwood. An excess of leaf metabolic carbon can inhibit photosynthesis. Sugar concentration in the phloem is assumed to be (passively) in equilibrium with leaf metabolic sugar concentration. In sapwood, metabolic carbon comes from phloem transport and is used to sustain growth and maintenance respiration of sapwood and fine roots. Moreover, changes metabolic carbon are coupled to variations in osmotic potential. Excess sapwood metabolic carbon is diverted towards storage or root exudation.
++ *Storage carbon* in the leaf is intended to represent short-term storage (mainly starch in chloroplasts) and its inclusion in the model follows the need to buffer daily variations in leaf metabolic carbon as well as the corresponding leaf osmotic potential. Storage carbon in sapwood (branches, stems and coarse roots) is intended to serve as long-term (seasonal and inter-annual) storage.
 
-Carbon balance of leaf labile (metabolic and storage) carbon is perfomed by considering photosynthesis, sugar-starch conversion and floem tranport. Growth and maintenance respiration is calculated at the individual level, by estimating the respiration of leaves, sapwood and fine root compartments. Sapwood respiration depends on sapwood area, stem height and coarse root length.
+Carbon balance of leaf labile (metabolic and storage) carbon is performed by considering photosynthesis, sugar-starch conversion and phloem transport. Growth and maintenance respiration is calculated at the individual level, by estimating the respiration of leaves, sapwood and fine root compartments. Sapwood respiration depends on sapwood area, stem height and coarse root length.
+
+
+### Leaf area, sapwood area and fine root area dynamics
+
+The forest growth model allows simulating variation leaf area, sapwood area and fine root area via the following processes:
+
+ i. **Leaf area** of each plant cohort is divided between live (whether in resistance buds or unfolded leaves) and dead (standing dead leaves). Whereas in the water balance models expanded leaf area corresponded to the portion of live leaf area that was unfolded at any given moment, in the growth model live leaf area and expanded leaf area are conceptually the same, but leaf phenological phases still control leaf development. Leaf area growth occurs during *leaf unfolding* periods only, whereas *bud formation* periods are required to update the target leaf area in accordance to an allocation strategy (see below). Leaf senescence (and the corresponding increases in dead leaf area) can occur due to aging (as determined by leaf life span), due to a leaf negative carbon balance or due to drought impacts. 
+ ii. Formation of **sapwood area** can only occur if leaves are present. Sapwood formation is modelled as a ring of tracheids that are issued from cambium divisions and progressively undergo enlargement and maturation (ref). Losses in sapwood area (i.e. conversion to heartwood) can occur via stem embolism or aging (i.e. assuming a daily rate of conversion). Similarly to 3-PG [@Landsberg1997] we assume that the relative turnover rate of sapwood is smallest for young plants, and it increases up to a maximum value.
+ iii. **Fine root area** dynamics also arises from the interplay of fine root growth and senescence, the latter occurring via aging (i.e. turnover rate depending on soil temperature). 
+
+Formation of leaf, sapwood and fine root tissues is determined taking into account both source (i.e. carbon assimilation) and sink (i.e. carbon investment on plant tissue expansion) limitations [@Fatichi2014; @Guillemot2015; @Korner2015]. However, while leaf and fine root source limitations are set by available metabolic carbon, stem growth is assumed to be limited by availability of storage (i.e. starch) in the stem. This is done to create a preferential allocation into leaf and fine root tissues over stem growth, as long as leaf and fine root areas are below the respective targets set by allocation rules. Two options are possible regarding allocation between leaves and sapwood tissues:
+
+  1. *Constant Huber value*: In this strategy, growth of leaf area and sapwood area need to be coordinated so that Huber value remains constant. Increases in leaf area are scheduled whenever Huber value is larger than the target (i.e. there is an excess of sapwood area). This is similar to the LPG model [@Sitch2003], where different turnover rates are applied for different tissues, but then tries to satisfy the pipe model [@Shinozaki1964] by allocating C where it is more limiting. Note that in this strategy the whole-plant conductance will progressively decrease with the progressive increase in plant height. 
+  2. *Constant whole-plant conductance*: Ratios of leaf area to sapwood area (Huber value) can vary within species, due to environmental conditions [@Mencuccini1995]. In this allocation strategy, growth of leaf area, sapwood area and height needs to be coordinated so that whole-plant conductance (excluding rhizosphere) is constant and equal to the initial value. Increases in leaf area are scheduled whenever the current whole-plant conductance is above target value.  
+
+Fine root area growth is coordinated with the other tissues via the need to ensure an average resistance fraction in the rhizosphere, which is used to define the fine root area target. Growth rate in all three tissues is regulated by maximum relative growth rates (i.e. the daily growth area relative to the amount of tissue area present). However, since leaf and fine root area targets depend on sapwood area, the relative growth rate for sapwood area indirectly determines the growth rates of leaves and fine roots. 
+
+### Tree diameter, tree height and shrub cover updates
+
+Tree structural variables are updated as in forest gap models [@Lindner1997].
+
 
 ### Links between plant hydraulics and carbon balance
 
@@ -39,30 +60,11 @@ knitr::include_graphics("hydraulics_carbon_relations.png")
 ```
 
 
-### Leaf area and sapwood area dynamics
-
-Leaf area of each plant cohort is divided between live (wether in resistance buds or unfolded leaves) and dead (standing dead leaves). Expanded leaf area corresponds to the portion of live leaf area that is unfolded at any given moment through the leaf phenological cycle [this should change with a better treatment of phenology]. Leaf area increase by leaf growth and decreases by leaf senescense. 
-
-Leaf senescence can occur due to leaf aging or due to a negative carbon balance in the leaf. Losts in sapwood area (i.e. conversion to heartwood) can occur via embolism or aging. Similarly to 3-PG [@Landsberg1997] we assume that the relative turnover rate of sapwood is smallest for young plants, and it increases up to a maximum value.
-
-Growth is determined taking into account environmental limitations on both source (i.e. carbon assimilation) and sink (i.e. carbon investment on plant tissue expansion) [@Fatichi2014; @Guillemot2015; @Korner2015].
-
-Ratios of leaf area to sapwood area (Huber value) can vary within species, due to environmental conditions [@Mencuccini1995]. Three options are possible regarding the relationship between leaf area and sapwood area (Huber values):
-
-  1. *Constant Huber value*: Growth of leaf area and sapwood area need to be coordinated so that Huber value remains constant. Whole-plant conductance will decrease with the progressive increase in plant height. This is similar to the LPG model [@Sitch2003], where different turnover rates are applied for different tissues, but then tries to satisfy the pipe model [@Shinozaki1964] by allocating C where it is more limiting. 
-  2. *Constant whole-plant conductance*: Growth of leaf area, sapwood area and height needs to be coordinated so that whole-plant conductance (excluding rhizosphere) is constant and equal to the initial value. Increases in daily leaf area or sapwood area are targetted depending on whether the current whole-plant conductance is above or below the target value.  
-  3. *Emergent Huber value and whole-plant conductance*: Huber value variations arise as a result of the dynamic equilibrium of growth/senescence in leaf area and sapwood area, both constrained by plant hydraulics. Growth in leaves should be hiearchically prioritized (hormonal control?). An excess of leaf growth leds to a decrease in stem and root conductance (per leaf area), which may feedback negatively to leaf growth via a decreased leaf turgor. This can only be compensated by increasing again stem/root conductance via sapwood secondary growth. 
-
-### Tree diameter, tree height and shrub cover updates
-
-Tree structural variables are updated as in forest gap models [@Lindner1997].
-
-
 ## State variables
 
 Some state variables are inherited by the corresponding water balance model (see  \@ref(statevariablesbasic) and \@ref(statevariablesadvanced)). 
 
-Several structural variables that were static in the previous models become state variables here (for each cohort $i$):
+Several structural variables that were treated parameters in the water balance models become state variables here (for each cohort $i$):
 
  + Leaf area index of live leaves, $LAI^{live}_i$.
  + Diameter at breast height for trees, $DBH_i$.
@@ -72,7 +74,7 @@ Several structural variables that were static in the previous models become stat
  + The proportion of fine roots, $FRP_{i,s}$, in each soil layer $s$.
  + The radial length of coarse roots $L_{radial, i,s}$ in each soil layer $s$.
  
- Finally, there are functional state variables necessary to know the fisiological status of plants, defined at the individual level:
+ Finally, there are functional state variables necessary to know the physiological status of plants, defined at the individual level:
  
  + Sapwood area, $SA_i$ (in $cm^2$).
  + Leaf area, $LA_i$ (in $m^2$)
@@ -82,7 +84,7 @@ Several structural variables that were static in the previous models become stat
  + Sugar storage in sapwood (stem, branches and coarse roots), $SS_{sapwood,i}$ ($mol gluc ·L^{-1}$).
  + Starch storage in sapwood (stem, branches and coarse roots), $ST_{sapwood,i}$ ($mol gluc ·L^{-1}$).
  
-Note that other functional variables can be derived without the need to store them:
+Note that other functional variables can be derived from state variables and, hence, hence do not need to be treated as state variables themselves:
 
  + Leaf biomass (in $g C$) from $LAI^{live}$, $N$ and $SLA$.
  + Leaf volume (in $l$) from leaf biomass and density of leaf tissue.
@@ -90,27 +92,27 @@ Note that other functional variables can be derived without the need to store th
  + Sapwood biomass (in $g C$) from sapwood volume and wood density.
  + Fine root biomass (in $g C$) from fine root area, specific root length ($SRL$) and fine root tissue density ($\rho_{fineroot}$).
  
-## Carbon balances
+## Carbon balance of different compartments
 
 Since the growth model builds on soil and plant water balances models, the water and energy balances explained in sections \@ref(soilwaterbalance) or \@ref(waterenergybalances) (depending on `transpirationMode`) also hold for this model.
 
-The model performs daily carbon balance in leaves and sapwood (stem, branches and coarse roots) for each plant cohort. In each of these two compartments carbon balance is performed for the two storage forms, dissolved sugars and starch. At the leaf level, the carbon balance equations for dissolved sugars and starch are ($i$ subscripts ommited):
+The model performs daily carbon balance in leaves and sapwood (stem, branches and coarse roots) for each plant cohort. In each of these two compartments carbon balance is performed for the two storage forms, dissolved sugars and starch. At the leaf level, the carbon balance equations for dissolved sugars and starch are ($i$ subscripts omitted):
 
 \begin{eqnarray}
 \Delta{SS_{leaf}} &=& A - R_{leaf} - F_{floem} - G_{leaf} - \Delta{ST_{leaf}}\\
 \Delta{ST_{leaf}} &=& \Delta{t} \cdot [K_{synthesis}(SS_{leaf}) - K_{hydrolisis}(ST_{leaf})]
 (\#eq:leafcarbonbalanceequations)
 \end{eqnarray}
-where $A$ is (gross) photosynthesis, $R_{leaf}$ is leaf respiration, $F_{floem}$ is the sugar flow via floem towards the stem and roots, $G_{leaf}$ is the carbon lost via new leaf growth and $\Delta{ST_{leaf}}$ is the change in leaf starch. $K_{synthesis}$ and $K_{hydrolisis}$ are the instantaneous kinetic rates of starch synthesis and hydrolisis, respectively. Leaf senescense has no impact on dissolved sugar and starch compartments of leaves (but it affects leaf biomass, volume and leaf area) as it is assumed that these non-structural carbon sources are recycled before necrosis.
+where $A$ is (gross) photosynthesis, $R_{leaf}$ is leaf respiration, $F_{floem}$ is the sugar flow via phloem towards the stem and roots, $G_{leaf}$ is the carbon lost via new leaf growth and $\Delta{ST_{leaf}}$ is the change in leaf starch. $K_{synthesis}$ and $K_{hydrolysis}$ are the instantaneous kinetic rates of starch synthesis and hydrolysis, respectively. Leaf senescence has no impact on dissolved sugar and starch compartments of leaves (but it affects leaf biomass, volume and leaf area) as it is assumed that these non-structural carbon sources are recycled before necrosis.
 
 The corresponding carbon balance equations for sapwood dissolved sugars and starch are:
 \begin{eqnarray}
 \Delta{SS_{sapwood}} &=& F_{floem} - R_{sapwood} - R_{fineroots} - G_{sapwood} - G_{fineroots} \\
                      & & - \Delta{ST_{sapwood}} \\
-\Delta{ST_{sapwood}} &=& \Delta{t} \cdot [K_{synthesis}(SS_{sapwood}) - K_{hydrolisis}(ST_{sapwood})]
+\Delta{ST_{sapwood}} &=& \Delta{t} \cdot [K_{synthesis}(SS_{sapwood}) - K_{hydrolysis}(ST_{sapwood})]
 (\#eq:sapwoodcarbonbalanceequations)
 \end{eqnarray}
-where $F_{floem}$ is the sugar inflow via floem transport, $R_{sapwood}$ is the sum of respiration of branches, stem and coarse roots, $R_{fineroots}$ is the respiration of fine roots, $G_{sapwood}$ and $G_{fineroots}$ are the carbon expenses of growth of new sapwood tissue or fine roots (respectively). Analogously to leave senescense, when sapwood is converted into heartwood, non-structural carbon in the protoplasm of parenchyma cells is assumed to be absorbed by neighbouring living cells.
+where $F_{floem}$ is the sugar inflow via phloem transport, $R_{sapwood}$ is the sum of respiration of branches, stem and coarse roots, $R_{fineroots}$ is the respiration of fine roots, $G_{sapwood}$ and $G_{fineroots}$ are the carbon expenses of growth of new sapwood tissue or fine roots (respectively). Analogously to leave senescence, when sapwood is converted into heartwood, non-structural carbon in the protoplasm of parenchyma cells is assumed to be absorbed by neighboring living cells.
 
 ## Process scheduling
 
