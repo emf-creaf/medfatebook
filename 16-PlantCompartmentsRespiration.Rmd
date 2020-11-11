@@ -10,38 +10,46 @@ The live leaf area $LA^{live}$ per individual (in $m^2$) is:
 \begin{equation}
 LA^{live} = 10000 \cdot LAI^{live} / N
 \end{equation}
-where $N$ is the density of the cohort and $LAI^{live}$ is the leaf area index. Structural leaf biomass per individual ($B^{ind}_{leaf}$; $g\,dry·ind^{-1}$) is the result of dividing live leaf area by $SLA$ ($m^{2} \cdot kg^{-1}$), the specific leaf area of the species:
+where $N$ is the density of the cohort and $LAI^{live}$ is the leaf area index. Structural leaf biomass per individual ($B_{leaf}$; $g\,dry·ind^{-1}$) is the result of dividing live leaf area by $SLA$ ($m^{2} \cdot kg^{-1}$), the specific leaf area of the species:
 \begin{equation}
-B^{ind}_{leaf} = 1000 \cdot LA^{live} / SLA
+B_{leaf} = 1000 \cdot LA^{live} / SLA
 \end{equation}
-where a factor 1000 is used to convert from kg to g. Hence, only expanded leaf area has respiratory cost (i.e. winter resistance buds do not). Leaf volume for an individual ($V^{ind}_{leaf}$; in $l$) is:
+where a factor 1000 is used to convert from kg to g. Hence, only expanded leaf area has respiratory cost (i.e. winter resistance buds do not). Leaf storage volume for an individual ($V_{storage,leaf}$; in $L \cdot ind^{-1}$) is:
 \begin{equation}
-V^{ind}_{leaf} = LA^{live}  \cdot V_{leaf}
+V_{storage, leaf} = LA^{live}  \cdot V_{leaf}
 \end{equation}
-where $V_{leaf}$ is the water storage capacity of leaf tissue per leaf area unit (in $l\cdot m^{-2}$) (see \@ref(plantwaterstoragecapacity)). Leaf volume is necessary to estimate the biomass of metabolic (sugars) or storage (starch) from the concentration of these substances in leaves ($SS_{leaf}$ and $ST_{leaf}$, which are expressed in $mol\,gluc \cdot L^{-1}$), and conversely. To estimate leaf storage capacity, the model assumes that up to 10\% of leaf tissue volume can be occupied with starch, so that the leaf starch storage capacity ($ST^{max}_{leaf}$; in $mol \cdot ind^{-1}$) is:
+where $V_{leaf}$ is the water storage capacity of leaf tissue per leaf area unit (in $L\cdot m^{-2}$) (see \@ref(plantwaterstoragecapacity)). Leaf storage volume is necessary to estimate the biomass of metabolic (sugars) or storage (starch) from the concentration of these substances in leaves ($SS_{leaf}$ and $ST_{leaf}$, which are expressed in $mol\,gluc \cdot L^{-1}$), and conversely. For example:
 \begin{equation}
-ST^{max}_{leaf} = 0.1 \cdot 1000 \cdot \frac{V^{ind}_{leaf} \cdot \rho_{starch}}{m_{starch}}
+B_{sugar,leaf} = SS_{leaf} \cdot V_{storage, leaf} \cdot m_{gluc}
+\end{equation}
+where $m_{gluc}$ is the molar mass of glucose. To estimate leaf starch storage capacity, the model assumes that up to 10\% of leaf tissue volume can be occupied with starch, so that the leaf starch storage capacity ($ST^{max}_{leaf}$; in $mol \cdot ind^{-1}$) is:
+\begin{equation}
+ST^{max}_{leaf} = 0.1 \cdot 1000 \cdot \frac{V_{storage, leaf} \cdot \rho_{starch}}{m_{starch}}
 \end{equation}
 
 where $\rho_{starch}$ is the density of starch and $m_{starch}$ is its molar mass.
 
 ### Sapwood structural, metabolic and storage biomass
 
-Sapwood volume ($V_{stem}$; in $L \cdot ind^{-1}$) is defined as the product of sapwood area and the sum of aboveground height and belowground coarse root length:
+Sapwood volume ($V_{sapwood}$; in $L \cdot ind^{-1}$) is defined as the product of sapwood area and the sum of aboveground height and belowground coarse root length:
 \begin{equation}
-V_{stem} = 1000 \cdot SA\cdot (H + \sum_{s}{FRP_s \cdot L_s})
+V_{sapwood} = 1000 \cdot SA\cdot (H + \sum_{s}{FRP_s \cdot L_s})
 \end{equation}
-where $SA$ is sapwood area, $H$ is plant height, $FRP_{s}$ is the proportion of fine roots in soil layer $s$ and $L_{s}$ is the coarse root length in layer $s$ (all lengths expressed here in $m$). Sapwood structural biomass per individual ($B_{stem}$; $g\,dry·ind^{-1}$) represents the sapwood biomass of stems (including trunks and branches) and coarse roots. It is defined as the product of $V_{stem}$ and wood density  ($\rho_{wood}$; $g dry·cm^{-3}$):
+where $SA$ is sapwood area, $H$ is plant height, $FRP_{s}$ is the proportion of fine roots in soil layer $s$ and $L_{s}$ is the coarse root length in layer $s$ (all lengths expressed here in $m$). Sapwood structural biomass per individual ($B_{sapwood}$; $g\,dry·ind^{-1}$) represents the sapwood biomass of sapwood of trunks, branches and coarse roots. It is defined as the product of $V_{sapwood}$ and wood density  ($\rho_{wood}$; $g dry·cm^{-3}$):
 \begin{equation}
-B_{stem} = 1000 \cdot V_{stem} \cdot\rho_{wood}
+B_{sapwood} = 1000 \cdot V_{sapwood} \cdot\rho_{wood}
 \end{equation}
-While $B_{stem}$ represents the structural biomass and can be used to estimate maintenance respiration costs (assuming empirical coefficients are determined for units of sapwood dry weight), the volume available for metabolic or storage carbon within sapwood is limited by wood porosity (i.e. $(1 - (\rho_{wood}/1.54))$) and the fact that sapwood contains vessels, which are dead cells. Sapwood storage volume ($V_{storage, stem}$; in $L \cdot ind^{-1}$) is:
+While $B_{sapwood}$ represents the structural sapwood biomass and can be used to estimate maintenance respiration costs (assuming empirical coefficients are determined for units of sapwood dry weight), the volume available for metabolic or storage carbon within sapwood is limited by wood porosity (i.e. $(1 - (\rho_{wood}/1.54))$) and the fact that sapwood contains vessels, which are dead cells. Sapwood storage volume ($V_{storage, sapwood}$; in $L \cdot ind^{-1}$) is:
 \begin{equation}
-V_{storage, stem} = V_{stem} \cdot (1 - (\rho_{wood}/1.54)) \cdot (1 - p_{vessels})
+V_{storage, sapwood} = V_{sapwood} \cdot (1 - (\rho_{wood}/1.54)) \cdot (1 - p_{vessels})
 \end{equation}
-where $p_{vessels} = 0.5$ is the proportion of vessels, assumed to be 50\% (hence 50\% of parenchymatic cells). Analogously to leaf carbon, $V_{storage, stem}$ is used to estimate the biomass of metabolic (sugars) or storage (starch) from the concentration of these substances in sapwood ($SS_{sapwood}$ and $ST_{sapwood}$, which are expressed in $mol\,gluc \cdot L^{-1}$), and conversely. To estimate sapwood storage capacity, the model assumes that up to 50\% of volume of parenchymatic cells can be occupied with starch, so that the sapwood starch storage capacity ($ST^{max}_{sapwood}$; in $mol \cdot ind^{-1}$) is:
+where $p_{vessels} = 0.5$ is the proportion of vessels, assumed to be 50\% (hence 50\% of parenchymatic cells). Analogously to leaf carbon, $V_{storage, sapwood}$ is used to estimate the biomass of metabolic (sugars) or storage (starch) from the concentration of these substances in sapwood ($SS_{sapwood}$ and $ST_{sapwood}$, which are expressed in $mol\,gluc \cdot L^{-1}$), and conversely. For example:
 \begin{equation}
-ST^{max}_{sapwood} = 0.5 \cdot 1000 \cdot \frac{V_{sapwood,stem} \cdot \rho_{starch}}{m_{starch}}
+B_{sugar,sapwood} = SS_{sapwood} \cdot V_{storage, sapwood} \cdot m_{gluc}
+\end{equation}
+where $m_{gluc}$ is the molar mass of glucose. To estimate sapwood storage capacity, the model assumes that up to 50\% of volume of parenchymatic cells can be occupied with starch, so that the sapwood starch storage capacity ($ST^{max}_{sapwood}$; in $mol \cdot ind^{-1}$) is:
+\begin{equation}
+ST^{max}_{sapwood} = 0.5 \cdot 1000 \cdot \frac{V_{storage,sapwood} \cdot \rho_{starch}}{m_{starch}}
 \end{equation}
 
 ### Fine root structural biomass
@@ -57,7 +65,7 @@ B_{fineroot} = \sum_{s}{\frac{10000\cdot FLA_s}{N\cdot 0.01 \cdot SRL}}
 where $N$ is the density of individuals and $SRL$ ($cm \cdot g\,dry^{-1}$) is the specific root length.
 
 
-## Components of carbon balance
+## Components of carbon balance {#carbonbalancecomponents}
 
 ### Gross photosynthesis
 
@@ -68,20 +76,50 @@ A_{g}^{ind} = 10000 \cdot A_g^{coh} / N
 where $N$ is the density of individuals per hectare.
 
 ### Maintenance respiration
-Individual daily maintenance respiration ($R^{ind}$; in $g C·ind^{-1}$) is calculated for each of the three compartments (leaves, alive vascular tissues (stem and coarse roots), and fine roots) (Mouillot et al. 2001).  The model uses a $Q_{10}$ relationship with temperature, which means that for every 10ºC change in temperature there is a $Q_{10}$ factor change in respiration. Baseline respiration rates ($r_{leaf}$, $r_{stem}$ and $r_{root}$ for leaves, vascular tissues and fine roots, respectively; in $gC·gC^{-1}$) are not species-specific and all refer to 20ºC:
+Maintenance respiration (in $g\,gluc·ind^{-1}$) is calculated for each of the three compartments (leaves, sapwood, and fine roots) individually [@Mouillot2001].  The model uses a $Q_{10}$ relationship with temperature, which means that for every 10 ºC change in temperature there is a $Q_{10}$ factor change in respiration. Baseline respiration rates per dry biomass ($RR_{leaf}$, $RR_{sapwood}$ and $RR_{fineroot}$ for leaves, sapwood and fine roots, respectively; in $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$) are specified as control parameters (i.e. they are not species-specific) and should refer to 20\ºC:
 \begin{eqnarray}
-R_{leaf} &=& B_{leaf} \cdot r_{leaf} \cdot Q_{10}^{(T_{mean}-20)/10} \\
-R_{stem} &=& B_{stem} \cdot r_{stem} \cdot Q_{10}^{(T_{mean}-20)/10} \\
-R_{root} &=& B_{root} \cdot r_{root} \cdot Q_{10}^{(T_{mean}-20)/10} \\
-R^{ind} &=& R_{leaf}+R_{stem}+R_{root}
+R_{leaf} &=& (B_{leaf} + B_{sugar,leaf}) \cdot RR_{leaf} \cdot Q_{10}^{(T_{mean}-20)/10} \\
+R_{sapwood} &=& (B_{sapwood} + B_{sugar,sapwood}) \cdot RR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
+R_{fineroot} &=& B_{fineroot} \cdot RR_{fineroot} \cdot Q_{10}^{(T_{mean}-20)/10} 
 \end{eqnarray}
-where $T_{mean}$ is the average daily temperature (in ºC). Note that the output of `growth()` regarding respiration is actually the result of scaling $R^{ind}$ to the cohort level ($R^{coh}$ in $g C · m^{-2} · day^{-1}$), for comparability with photosynthesis and transpiration:
-\begin{equation}
-R^{coh} =  R^{ind} \cdot N / 10000
-\end{equation}
+where $T_{mean}$ is the average daily temperature (in ºC). Same equations are used for growth simulations with the basic or advanced water model, the only differences being that in the latter the daily rates are divided by the number of subdaily steps and daily temperature variation is taken into account.
 
-### Growth construction costs
+### Growth respiration
+
+Construction costs per unit dry weight of new tissue ($CC_{leaf}$, $CC_{sapwood}$ and $CC_{fineroot}$ for leaves, sapwood and fine roots; in $g\,gluc \cdot g\,dry^{-1}$) are specified as control parameters (i.e. they are not species-specific). These unitary costs include both the carbon used in respiration during growth and structural carbon. Given an increase in leaf area $\Delta LA$, leaf growth respiration is:
+\begin{equation}
+G_{leaf} = \Delta LA \cdot CC_{leaf} \cdot 1000 / SLA \\
+\end{equation}
+Analogously, given an increase in sapwood area $\Delta LA$, sapwood growth respiration is:
+\begin{equation}
+G_{sapwood} = \Delta SA \cdot CC_{sapwood} \cdot (H + \sum_{s}{FRP_s \cdot L_s}) \cdot \rho_{wood}
+\end{equation}
+Finally, and given an increase in fine root biomass $\Delta B_{fineroot}$:
+\begin{equation}
+G_{fineroot} = \Delta B_{fineroot} \cdot CC_{fineroot}
+\end{equation}
 
 ### Phloem transport
 
+Phloem flow is modelled following @Holtta2017. Specifically, instantaneous phloem flow per leaf area basis ($mol\,gluc\cdot m^{-2} \cdot s^{-1}$) depends on $k_{phloem}$, phloem conductance per leaf area basis ($L\cdot m^{-2} \cdot MPa^{-1} \cdot s^{-1}$), sap viscosity relative to water and the difference in turgor between the leaf and sapwood compartments. 
+
+In turn, the turgor in each compartment depends on temperature, (symplastic) water potential and sugar concentration.
+
+
 ### Sugar-starch dynamics
+
+If two carbon pools are considered then carbon can be transferred from one to the other. The model assumes that the direction of transfer depends on the C concentration in the fast pool. When the pool is at full capacity its C should be converted to long-term storage, whereas if the pool is empty C stored in the slow pool should be mobilised. The relative rate of transfer ($r_{transfer}$; in $g C·g C^{-1}$) is modelled using a sigmoidal function:
+\begin{equation}
+r_{transf} = 0.1 \cdot \frac{2}{1+\exp \left(-5 \cdot \frac{(C_{fast}/C_{fast, \max})-0.5}{0.5}\right)}-1
+\end{equation}
+
+```{r, echo=FALSE, fig.width=4, fig.height=3.5, fig.align='center'}
+par(mar=c(4,4,1,1))
+p = seq(0,100, by = 0.1)
+f = 0.1*(2.0/(1.0+exp(-5.0*((p/100)-0.5)/0.5))-1.0)
+plot(p, f, xlab = "Carbon concentration in the fast pool (%)", ylab = "Relative rate of C transfer", type="l", ylim=c(-0.1,0.1))
+abline(h=0, col="gray", lty=2)
+abline(v=50, col="gray", lty=2)
+```
+
+where $0.1$ indicates that the maximum daily transfer rate is 10% of the source C pool size. If $r_{transf}<0$ then $-r_{transf} \cdot C_{slow, \max}$ g of carbon are taken from the slow C pool and 90% of this amount is added into the fast C pool (the remaining 10\% is assumed to be the transfer cost). Similarly, if $r_{transf}>0$ then $r_{transf} \cdot C_{fast, \max}$ g of carbon are taken from the fast C pool and 90\% of this amount is added into the slow C pool (again, the remaining 10\% is assumed to be the transfer cost). The amounts of C transferred are also limited by the amount that would be needed to fill the sink pool (i.e., if the sink pool is already full, no carbon is transferred).

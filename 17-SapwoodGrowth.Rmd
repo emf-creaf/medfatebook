@@ -1,4 +1,14 @@
-# Tissue growth and senescence
+# Growth, senescence and mortality
+
+## Tissue growth
+
+### Leaf area growth
+
+### Sapwood growth
+
+### Fine root growth
+
+## Tissue senescence
 
 ## Sapwood conversion to heartwood, embolism and growth
 
@@ -129,22 +139,6 @@ LAI^{live} = \min(LAI^{live} - N \cdot \Delta SA_{turnover} \cdot Hv , \, LAI^{p
 \end{equation}
 and expanded leaf area ($LAI^{\phi}$) and dead leaf area ($LAI^{dead}$) are modified accordingly. 
 
-## Transfer between carbon pools
-If two carbon pools are considered then carbon can be transferred from one to the other. The model assumes that the direction of transfer depends on the C concentration in the fast pool. When the pool is at full capacity its C should be converted to long-term storage, whereas if the pool is empty C stored in the slow pool should be mobilised. The relative rate of transfer ($r_{transfer}$; in $g C·g C^{-1}$) is modelled using a sigmoidal function:
-\begin{equation}
-r_{transf} = 0.1 \cdot \frac{2}{1+\exp \left(-5 \cdot \frac{(C_{fast}/C_{fast, \max})-0.5}{0.5}\right)}-1
-\end{equation}
-
-```{r, echo=FALSE, fig.width=4, fig.height=3.5, fig.align='center'}
-par(mar=c(4,4,1,1))
-p = seq(0,100, by = 0.1)
-f = 0.1*(2.0/(1.0+exp(-5.0*((p/100)-0.5)/0.5))-1.0)
-plot(p, f, xlab = "Carbon concentration in the fast pool (%)", ylab = "Relative rate of C transfer", type="l", ylim=c(-0.1,0.1))
-abline(h=0, col="gray", lty=2)
-abline(v=50, col="gray", lty=2)
-```
-
-where $0.1$ indicates that the maximum daily transfer rate is 10% of the source C pool size. If $r_{transf}<0$ then $-r_{transf} \cdot C_{slow, \max}$ g of carbon are taken from the slow C pool and 90% of this amount is added into the fast C pool (the remaining 10\% is assumed to be the transfer cost). Similarly, if $r_{transf}>0$ then $r_{transf} \cdot C_{fast, \max}$ g of carbon are taken from the fast C pool and 90\% of this amount is added into the slow C pool (again, the remaining 10\% is assumed to be the transfer cost). The amounts of C transferred are also limited by the amount that would be needed to fill the sink pool (i.e., if the sink pool is already full, no carbon is transferred).
 
 
 ## Update of maximum stem conductance
