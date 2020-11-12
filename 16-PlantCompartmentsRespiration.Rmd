@@ -67,6 +67,8 @@ where $N$ is the density of individuals and $SRL$ ($cm \cdot g\,dry^{-1}$) is th
 
 ## Components of carbon balance {#carbonbalancecomponents}
 
+Here we provide the details of carbon balance calculations, i.e. how the components of eqs. \@ref(eq:leafcarbonbalanceequations) and \@ref(eq:sapwoodcarbonbalanceequations) are determined.
+
 ### Gross photosynthesis
 
 Among other outputs, the soil water balance submodel provides values of leaf water potential $\Psi_{leaf}$ (in MPa) and gross photosynthesis calculated at the plant cohort level, $A_g^{coh}$ (in $g C · m^{-2} · day^{-1}$).  $\Psi_{leaf}$ is used in the growth model to modulate drought effects on growth and leaf area losses (see below), whereas $A_g$ is needed to determine carbon balance and growth (note that the user output of function `spwb` and `pwb` refers to net photosynthesis after accounting for an estimate of leaf respiration). Since carbon balance is calculated at the individual level, $A_g^{coh}$ needs to be scaled to gross photosynthesis per individual (in $g C · ind^{-1} · day^{-1}$) using:
@@ -76,13 +78,13 @@ A_{g}^{ind} = 10000 \cdot A_g^{coh} / N
 where $N$ is the density of individuals per hectare.
 
 ### Maintenance respiration
-Maintenance respiration (in $g\,gluc·ind^{-1}$) is calculated for each of the three compartments (leaves, sapwood, and fine roots) individually [@Mouillot2001].  The model uses a $Q_{10}$ relationship with temperature, which means that for every 10 ºC change in temperature there is a $Q_{10}$ factor change in respiration. Baseline respiration rates per dry biomass ($RR_{leaf}$, $RR_{sapwood}$ and $RR_{fineroot}$ for leaves, sapwood and fine roots, respectively; in $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$) are specified as control parameters (i.e. they are not species-specific) and should refer to 20\ºC:
+Maintenance respiration (in $g\,gluc·ind^{-1}$) is calculated for each of the three compartments (leaves, sapwood, and fine roots) individually [@Mouillot2001].  The model uses a $Q_{10}$ relationship with temperature, which means that for every 10 ºC change in temperature there is a $Q_{10}$ factor change in respiration. Baseline respiration rates per dry biomass ($RR_{leaf}$, $RR_{sapwood}$ and $RR_{fineroot}$ for leaves, sapwood and fine roots, respectively; in $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$) are specified as control parameters (i.e. they are not species-specific) and should refer to 20 ºC:
 \begin{eqnarray}
 R_{leaf} &=& (B_{leaf} + B_{sugar,leaf}) \cdot RR_{leaf} \cdot Q_{10}^{(T_{mean}-20)/10} \\
 R_{sapwood} &=& (B_{sapwood} + B_{sugar,sapwood}) \cdot RR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
 R_{fineroot} &=& B_{fineroot} \cdot RR_{fineroot} \cdot Q_{10}^{(T_{mean}-20)/10} 
 \end{eqnarray}
-where $T_{mean}$ is the average daily temperature (in ºC). Same equations are used for growth simulations with the basic or advanced water model, the only differences being that in the latter the daily rates are divided by the number of subdaily steps and daily temperature variation is taken into account.
+where $T_{mean}$ is the average daily temperature (in ºC). The same equations are used for growth simulations with the basic or advanced water model, the only differences being that in the latter the daily rates are divided by the number of subdaily steps and, hence, subdaily temperature variation is taken into account.
 
 ### Growth respiration
 
@@ -101,25 +103,15 @@ G_{fineroot} = \Delta B_{fineroot} \cdot CC_{fineroot}
 
 ### Phloem transport
 
-Phloem flow is modelled following @Holtta2017. Specifically, instantaneous phloem flow per leaf area basis ($mol\,gluc\cdot m^{-2} \cdot s^{-1}$) depends on $k_{phloem}$, phloem conductance per leaf area basis ($L\cdot m^{-2} \cdot MPa^{-1} \cdot s^{-1}$), sap viscosity relative to water and the difference in turgor between the leaf and sapwood compartments. 
-
-In turn, the turgor in each compartment depends on temperature, (symplastic) water potential and sugar concentration.
+When growth is simulated using the basic water balance model, phloem transport between leaf and sapwood ($F_{phloem}$) is simply modelled as the flow needed to make the concentration of metabolic carbon equal in both compartments. When the advanced water balance submodel is used, $F_{phloem}$ is modelled following @Holtta2017. Specifically, the instantaneous phloem flow per leaf area basis ($mol\,gluc\cdot m^{-2} \cdot s^{-1}$) depends on $k_{phloem}$, i.e. the phloem conductance per leaf area basis ($L\cdot m^{-2} \cdot MPa^{-1} \cdot s^{-1}$), sap viscosity relative to water and the difference in turgor between the leaf and sapwood compartments. In turn, sap viscosity is calculated following @Forst2002, which takes into account temperature and the average sugar concentration between the two compartments (no phloem flow can occur if temperature is below zero). Turgor in each compartment depends on symplastic water potential and osmotic water potential. Van't Hoff equation is used to calculate the osmotic water potential, depending on temperature,  sugar concentration and the concentration of other solutes (a control parameter). Here leaf or sapwood sugar concentration is modulated to account for the effect of the relative water content of the compartment on osmotic water potential.
 
 
 ### Sugar-starch dynamics
 
-If two carbon pools are considered then carbon can be transferred from one to the other. The model assumes that the direction of transfer depends on the C concentration in the fast pool. When the pool is at full capacity its C should be converted to long-term storage, whereas if the pool is empty C stored in the slow pool should be mobilised. The relative rate of transfer ($r_{transfer}$; in $g C·g C^{-1}$) is modelled using a sigmoidal function:
-\begin{equation}
-r_{transf} = 0.1 \cdot \frac{2}{1+\exp \left(-5 \cdot \frac{(C_{fast}/C_{fast, \max})-0.5}{0.5}\right)}-1
-\end{equation}
+When growth is simulated using the basic water balance submodel, sugar-starch dynamics ($SC_{leaf}$ and $SC_{sapwood}$) are simply defined as the conversion between metabolic and storage carbon needed to keep the sugar concentration equal to an equilibrium required for metabolic functioning, which is specified by control parameters `equilibriumOsmoticConcentration` (including two values, for leaves and sapwood respectively) and `nonSugarConcentration`. For example, if leaf osmotic equilibrium concentration is 0.8 $mol\,gluc \cdot L^{-1}$ and non-sugar concentration is 0.3 $mol\,gluc \cdot L^{-1}$, the model will simulate sugar-starch dynamics to stabilize sugar concentration in leaves to 0.5 $mol\,gluc \cdot L^{-1}$. A lower equilibrium osmotic concentration is required for sapwood, by default 0.6 $mol\,gluc \cdot L^{-1}$, so that sugar equilibrium concentration is 0.1 $mol\,gluc \cdot L^{-1}$. That lower equilibrium concentrations are required for sapwood than for leaves is necessary to sustain the phloem transport of sugars from leaves towards sapwood.
 
-```{r, echo=FALSE, fig.width=4, fig.height=3.5, fig.align='center'}
-par(mar=c(4,4,1,1))
-p = seq(0,100, by = 0.1)
-f = 0.1*(2.0/(1.0+exp(-5.0*((p/100)-0.5)/0.5))-1.0)
-plot(p, f, xlab = "Carbon concentration in the fast pool (%)", ylab = "Relative rate of C transfer", type="l", ylim=c(-0.1,0.1))
-abline(h=0, col="gray", lty=2)
-abline(v=50, col="gray", lty=2)
-```
+When growth is simulated using the basic water balance submodel, sugar-starch dynamics are similar to the previous case, in the sense that equilibrium sugar concentrations are sought for leaves and sapwood. However, instantaneous conversion rates are calculated depending on equations regulating starch synthesis (occurring when sugar concentration is higher than the equilibrium concentration) and starch hydrolysis (occurring when sugar concentration is lower than the equilibrium concentration). Synthesis is modelled as a Michaelis-Menten function, whereas hydrolysis rate is simply a linear function of starch concentration. Maximum synthesis rates and hydrolysis linear factors are larger (i.e. faster sugar-starch dynamics) in leaves than sapwood.
 
-where $0.1$ indicates that the maximum daily transfer rate is 10% of the source C pool size. If $r_{transf}<0$ then $-r_{transf} \cdot C_{slow, \max}$ g of carbon are taken from the slow C pool and 90% of this amount is added into the fast C pool (the remaining 10\% is assumed to be the transfer cost). Similarly, if $r_{transf}>0$ then $r_{transf} \cdot C_{fast, \max}$ g of carbon are taken from the fast C pool and 90\% of this amount is added into the slow C pool (again, the remaining 10\% is assumed to be the transfer cost). The amounts of C transferred are also limited by the amount that would be needed to fill the sink pool (i.e., if the sink pool is already full, no carbon is transferred).
+### Root exudation
+
+Surplus in leaf or sapwood storage carbon is diverted towards root exudation ($RE_{leaf}$ or $RE_{sapwood}$). Hence, root exudation is not a process competing for metabolic carbon, but only a consequence of plant C storage capacity being surpassed [@Prescott2020]. Root exudation will happen in the model when growth is restricted due to sink limitations but photosynthesis continues and storage carbon levels have attained the storage capacity in the leaf or sapwood compartments.
