@@ -1,18 +1,26 @@
 # Growth, senescence and mortality
 
-## Tissue growth
+## Growth
+
+### Allocation targets
+
 
 ### Temperature and turgor sink limitations
 
-Sink limitations due to temperature and turgor effects on growth are modelled following @Cabon2019 and @Cabon2020. Cell relative expansion rate ($r_{cell}$) is defined as the relative time derivative of cell volume:
+Sink limitations due to temperature and turgor effects on growth are modelled following @Cabon2019 and @Cabon2020. These authors suggested equations to model sink limitations on cambium cell division and tracheid expansion, but we apply the same approach for simulating growth of leaves, sapwood and fine roots. Cell relative expansion rate ($r_{cell}$) is central to the approach by Cabon et al. and is defined as the relative time derivative of cell volume:
 \begin{equation}
 r_{cell} = \frac{dV}{Vdt}
 \end{equation}
-@Cabon2020 suggested to account for turgor and temperature limitations on growth using the following equation for $r_{cell}$:
+@Cabon2019 first suggested to model the dependence of $r_{cell}$ on cell turgor using Lockhart's equation:
+\begin{equation}
+r_{cell}(\Psi, \pi_0) = \phi_{max} \cdot (\Psi - \pi_0  - Y_{P})
+\end{equation}
+where $\Psi$ is the water potential, $\pi_0$ is the osmotic water potential at full turgor and $Y_P = 0.05$ MPa is the turgor yield threshold. Later, @Cabon2020 suggested to account for both turgor and temperature limitations on $r_{cell}$ using the following expanded equation:
 \begin{equation}
 r_{cell}(T, \Psi, \pi_0) = \phi_{max} \cdot (\Psi - \pi_0  - Y_{P}) \cdot \frac{f_{met}(T_K)}{f_{met}(288.15)} \cdot{f_{micro}(T, T_{thr})}
 \end{equation}
-where $T$ is temperature, $\Psi$ is the water potential, $\pi_0$ is the osmotic water potential at full turgor, $Y_P = 0.05$ MPa is the turgor yield threshold, $f_{met}(T_K)$ is a function modulating the effect of temperature $T_K$ in Kelvin, on metabolic rate, and $f_{micro}(T, T_{thr})$ is a sigmoidal function modulating the effect of temperature on microtubule stability, depending on a temperature threshold $T_{thr}=5$ ºC. Function  $f_{met}(T_K)$ is defined as: 
+where $T$ is temperature, $f_{met}(T_K)$ is a function modulating the effect of temperature $T_K$ in Kelvin, on metabolic rate, and $f_{micro}(T, T_{thr})$ is a sigmoidal function modulating the effect of temperature on microtubule stability, depending on a temperature threshold $T_{thr}=5$ ºC. 
+Function  $f_{met}(T_K)$ is defined as: 
 \begin{equation}
 f_{met}(T_K) = \frac{T_K \cdot \exp \big\{ \frac{\Delta H_A}{R^n \cdot T_K}\big\}}{1 + \exp \big\{ \frac{\Delta S_D}{R^n} \cdot \left(1 - \frac{\Delta H_D}{\Delta S_D \cdot T_K} \right)\big\}}
 \end{equation}
@@ -24,28 +32,53 @@ Leaf area increment $\Delta LA$ only occurs when phenological state is *unfoldin
 \begin{equation}
 \Delta LA = \min( \Delta LA_{alloc}, \Delta LA_{source}, \Delta LA_{sink})
 \end{equation}
-$\Delta LA_{alloc}$ is the maximum leaf area increment allowed by the leaf area target set by the allocation rule, $LA^{target}$ in comparison with current leaf area $LA^{live}$:
+First, $\Delta LA_{alloc}$ is the maximum leaf area increment allowed by the leaf area target set by the allocation rule, $LA^{target}$ in comparison with current leaf area $LA^{live}$:
 \begin{equation}
 \Delta LA_{alloc} = \max(LA^{target} - LA^{live},0)
 \end{equation}
-$Delta LA_{source}$ represents source limitations and is:
-\begin{equation}
-\Delta LA_{source} = s
-\end{equation}
-metabolic sugar availability - minimum growth and construction cost per LA unit
-Finally, $\Delta LA_{sink}$ is the leaf area increment expected by taking into account leaf tissue growth rate ($RGR_{leaf}$) relative to sapwood area $SA$ and the relative cell expansion rate given $T_{day}$, $\Psi_{symp,leaf}$ and $\pi_{0,leaf}$; divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(25, 0, -2)$: 
-\begin{equation}
-\Delta LA_{sink} = SA \cdot RGR_{leaf} \cdot \frac{r_{cell}(T_{day}, \Psi_{leaf}, \pi_{0,leaf})}{r_{cell,max}}
-\end{equation}
+Remember that leaf area target is updated during *bud formation* (which occurred the year before in the case of deciduous plants). 
 
+Second, $\Delta LA_{source}$ represents the leaf area increment expected given carbon source limitations and is calculated:
+\begin{equation}
+\Delta LA_{source} = \frac{\max(SS_{leaf}-SS_{leaf,growth},0)\cdot m_{gluc}\cdot V_{storage,leaf}}{1000 \cdot CC_{leaf} / SLA}
+\end{equation}
+where $SS_{leaf}$ is the current concentration of metabolic sugar, $SS_{leaf,growth}$ is the minimum concentration required for growth (specified in control vector `minimumSugarForGrowth`), $V_{storage,leaf}$ is the leaf storage volume, $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per leaf area unit, see eq. \@ref(eq:leafconstructioncost).
 
-growth cost as explained above.
+Finally, $\Delta LA_{sink}$ represents the leaf area increment expected by taking into account maximum leaf tissue growth rate ($RGR_{leaf, max}$; in $m^2 \cdot cm^{-2} \cdot day^{-1}$) relative to sapwood area $SA$ (in $cm^2$)  and the relative cell expansion rate given $T_{day}$, $\Psi_{symp,leaf}$ and $\pi_{0,leaf}$: 
+\begin{equation}
+\Delta LA_{sink} = SA \cdot RGR_{leaf, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{leaf}, \pi_{0,leaf})}{r_{cell,max}}
+\end{equation}
+cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(25, 0, -2)$ so that $RGR_{leaf, max}$ is attained when sink conditions are optimal.
 
 ### Sapwood growth
 
 ### Fine root growth
 
-## Tissue senescence
+Fine root growth is only modelled when simulating growth with the advanced water balance submodel (when using the basic water balance submodel fine root respiration costs are proportional to leaf respiration costs). 
+
+Fine root biomass increment is modelled for each soil layer separately, and is defined analogously to leaf area increment: 
+\begin{equation}
+\Delta B_{fineroot} = \min( \Delta B_{fineroot,alloc}, \Delta B_{fineroot,source}, \Delta B_{fineroot,sink})
+\end{equation}
+First, $\Delta B_{fineroot,alloc}$ is the maximum fine root biomass increment allowed by the biomass target set by the allocation rule, $B_{fineroot,target}$ in comparison with current biomass, $B_{fineroot}$:
+\begin{equation}
+\Delta B_{fineroot,alloc} = \max(B_{fineroot,target} - B_{fineroot},0)
+\end{equation}
+
+Second, $\Delta B_{fineroot,source}$ represents the biomass increment expected given carbon source limitations and is calculated:
+\begin{equation}
+\Delta B_{fineroot,source} = \frac{\max(SS_{sapwood}-SS_{fineroot,growth},0)\cdot m_{gluc}\cdot V_{storage,sapwood}}{CC_{fineroot}}
+\end{equation}
+where $SS_{sapwood}$ is the current sapwood concentration of metabolic sugar, $SS_{fineroot,growth}$ is the minimum concentration required for fine root growth (specified in control vector `minimumSugarForGrowth`), $V_{storage,sapwood}$ is the sapwood storage volume, $m_{gluc}$ is glucose molar mass and $CC_{fineroot}$ is the construction costs per fine root biomass unit.
+
+Finally, $\Delta B_{fineroot,sink}$ represents the biomass increment expected by taking into account maximum  tissue growth rate ($RGR_{fineroot, max}$; in $g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$) and the relative cell expansion rate given temperature ($T_{day}$), water potential in the rhizosphere ($\Psi_{rhizo,s}$) and the stem osmotic potential at full turgor($\pi_{0,stem}$): 
+\begin{equation}
+\Delta B_{fineroot,sink} = B_{fineroot} \cdot RGR_{fineroot, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{rhizo,s}, \pi_{0,stem})}{r_{cell,max}}
+\end{equation}
+cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(25, 0, -2)$ so that $RGR_{fineroot, max}$ is attained when sink conditions are optimal.
+
+
+## Senescence
 
 ### Leaf senescence
 
