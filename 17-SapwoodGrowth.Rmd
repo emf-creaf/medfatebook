@@ -2,8 +2,6 @@
 
 ## Growth
 
-### Allocation targets
-
 
 ### Temperature and turgor sink limitations
 
@@ -118,27 +116,46 @@ Sapwood turnover is applied at the same rate in evergreen and deciduous species.
 \begin{equation}
 \Delta SA_{turnover} = SA \cdot p_{heartwood}
 \end{equation}
-Before applying either growth or cavitation the model determines the extent to which cell turgor allows growth using a negative exponential function: 
-\begin{equation}
-f_{turgor}(\Psi_{leaf}) = 1 - \left[e^{(\Psi_{leaf}/\Psi_{tlp})-1}\right]^5
-\end{equation}
-where $f_{turgor}(\Psi_{leaf})=0$ if $\Psi_{leaf} > \Psi_{tlp}$. The following figure illustrates the function for $\Psi_{tlp}=-1.5$ MPa:
-```{r, echo=FALSE, fig.width=4, fig.height=3.5, fig.align='center'}
-par(mar=c(4,4,1,1))
-psi = seq(0,3, by = 0.1)
-f_turg = pmax(0, 1 - exp((psi/1.5) - 1)^5)
-plot(psi, f_turg, xlab = "Leaf water potential (-MPa)", ylab = "Turgor function", type="l", ylim=c(0,1))
-```
-
-If $f_{turgor}(\Psi_{leaf})>0$ growth is applied, but there can be leaf area losses from sapwood turnover, whereas if $f_{turgor}(\Psi_{leaf}) = 0$ growth does not occur and cavitation is possible. The following two subsection detail the behavior of the growth model in each case.
 
 ### Fine root senescence
 
-## Update of maximum stem conductance
-The inclusion of $Hv$ in the initialization of $SA$ and in growth equations causes sapwood area and leaf area to maintain a constant ratio equal to $Hv$. However, this rule may be broken by leaf phenology or when losing leaves because of drought stress. Leaf area reductions cause transpirational demand to be reduced accordingly. Moreover, in the case of Complex's transpiration mode leaf loss causes variations in leaf area to sapwood area ratio, which may become lower than $Hv$ and, hence, maximum stem hydraulic conductance may increase. Tree size controls much of the variation in stem hydraulic conductance, since hydraulic path length increases with tree height. We modelled stem conductance per leaf area unit ($k_{stem, \max}$; in $mmol·m^{-2}·s^{-1}·MPa^{-1}$) as a function of species-specific xylem conductivity ($k_{xylem, \max}$; in $kg·m^{-1}·s^{-1}·MPa^{-1}$), leaf area to sapwood area ratio and tree height [@Christoffersen2016]:
-\begin{equation}
-k_{stem, \max} = \frac{1000}{0.018} \cdot \frac{k_{xylem, \max} \cdot (SA/10000)}{(H/100) \cdot LA^{\phi}} \cdot \chi_{taper}
-\end{equation}
-where $\chi_{taper}$ is a factor to account for taper of xylem conduit with height [@Savage2010; @Christoffersen2016], 0.018 is the molar weight of water (in kg·mol$^{-1}$). This way, if the leaf-to-sapwood area ratio decreases with tree height, as has been documented in several species (McDowell et al. 2002), the decreasing conductance effects with height may be partially overcome [@Christoffersen2016]. A drought-induced decrease in $LA^{\phi}$ alleviate drought effects (i.e. a lower decrease in water potential across the stem for the same flow) because of an increase in conductance. 
+## Update of plant traits and allocation targets
 
+### Plant traits
+
+Several anatomic and physiological parameters are updated every day after applying changes in the size of leaf, sapwood and fine root compartments. Hence, the model allows simulating plastic responses to environmental cues mediated by growth and senescence of plant tissues.
+
+First leaf area index ($LAI^{live}$) is updated from leaf area ($LA^{live}$) inverting eq. \@ref(eq:leafarea). The Huber value ($H_v$, the sapwood area to leaf area ratio; in $m^{2}\cdot m^{-2}$) is affected by changes in $LA^{live}$ and sapwood area $SA$:
+\begin{equation}
+H_v = \frac{SA/10000}{LA^{live}}
+\end{equation}
+
+Stem maximum conductance per leaf area unit ($k_{stem, max}$; in $mmol·m^{-2}·s^{-1}·MPa^{-1}$) is modelled as a function of species-specific xylem conductivity ($k_{xylem, max}$; in $kg·m^{-1}·s^{-1}·MPa^{-1}$), leaf area, sapwood area and tree height [@Christoffersen2016]:
+\begin{equation}
+k_{stem, max} = \frac{1000}{0.018} \cdot \frac{k_{xylem, max} \cdot (SA/10000)}{(H/100) \cdot LA^{live}} \cdot \chi_{taper}
+\end{equation}
+where $\chi_{taper}$ is a factor to account for taper of xylem conduit with height [@Savage2010; @Christoffersen2016], 0.018 is the molar weight of water (in $kg\cdot mol^{-1}$). Both an increase in $SA$ or a decrease in $LA^{live}$ (i.e. an increase in $H_v$) increase $k_{stem, max}$ and, hence, alleviate drought effects (i.e. a lower decrease in water potential across the stem for the same flow). In contrast, an increase in plant height will decrease stem conductance and increase drought stress. 
+
+Changes in stem maximum conductances have cascade effects on root and rhizosphere conductances. First, coarse root minimum resistance is defined as a fixed proportion of whole-plant minimum resistance, so an increase in stem maximum conductance will increase whole-plant conductance and coarse root conductance, $k_{root,max}$. In turn, rhizosphere minimum resistance (i.e. maximum conductance) is defined as a fraction value of total resistance, when averaged across a range of soil water potential values. An increase in $k_{stem, max}$, will also affect whole-plant conductance, $k_{plant, max}$, and therefore $k_{rhizo,max}$.
+
+The proportion of conductance loss due to cavitation ($PLC_{stem}$) is reduced whenever sapwood area growth occurs (provided control parameter `cavitationRefill = "growth"`):
+\begin{equation}
+PLC_{stem, t+1} = \min(PLC_{stem,t} - \frac{\Delta SA}{SA},0)
+\end{equation}
+
+### Leaf area and fine root biomass targets
+
+Leaf area target ($LA_{target}$) is updated when phenological phase is *bud formation*. If allocation follows a *constant Huber value* strategy, the model tries to keep a constant value $H_{v,target}$, and the leaf area target is defined as: 
+\begin{equation}
+LA_{target} = \frac{SA}{10000 \cdot H_{v,target}}
+\end{equation}
+Note that the specification of $LA_{target}$ will cause sapwood area increases to be followed by leaf area increases, as long as $H_{v} > H_{v,target}$. If allocation follows a *constant whole-plant conductance* strategy, the model tries to keep a constant value $k_{plant,target}$, and here the leaf area target is defined as: 
+\begin{equation}
+LA_{target} = LA^{live} \cdot \frac{k_{plant,max}}{k_{plant,target}}
+\end{equation}
+In this strategy, increases in leaf area will be scheduled whenever the current whole-plant conductance is above target value (i.e. $k_{plant,max} > k_{plant,target}$).  
+
+While leaf area target depends on the allocation strategy, fine root biomass target ($B_{fineroot,target}$) for any given layer directly follows changes in rhizosphere maximum conductance ($k_{rhizo,max}$). The estimation of fine root biomass also depends on soil saturated conductance, species-specific root length, root length density and density of fine roots.
+
+## Plant mortality
 

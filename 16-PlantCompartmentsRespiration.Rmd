@@ -1,6 +1,6 @@
 # Carbon pools and components of carbon balance
 
-## Estimation of carbon pools {#estimationcarbonpools}
+## Size of carbon pools {#estimationcarbonpools}
 
 Biomass of leaves, sapwood and fine roots is needed in the model to estimate respiratory costs and the size of the C storage pools. 
 
@@ -9,6 +9,7 @@ Biomass of leaves, sapwood and fine roots is needed in the model to estimate res
 The live leaf area $LA^{live}$ per individual (in $m^2$) is:
 \begin{equation}
 LA^{live} = 10000 \cdot LAI^{live} / N
+(\#eq:leafarea)
 \end{equation}
 where $N$ is the density of the cohort and $LAI^{live}$ is the leaf area index. Structural leaf biomass per individual ($B_{leaf}$; $g\,dry·ind^{-1}$) is the result of dividing live leaf area by $SLA$ ($m^{2} \cdot kg^{-1}$), the specific leaf area of the species:
 \begin{equation}
@@ -104,7 +105,11 @@ G_{fineroot} = \Delta B_{fineroot} \cdot CC_{fineroot}
 
 ### Phloem transport
 
-When growth is simulated using the basic water balance model, phloem transport between leaf and sapwood ($F_{phloem}$) is simply modelled as the flow needed to make the concentration of metabolic carbon equal in both compartments. When the advanced water balance submodel is used, $F_{phloem}$ is modelled following @Holtta2017. Specifically, the instantaneous phloem flow per leaf area basis ($mol\,gluc\cdot m^{-2} \cdot s^{-1}$) depends on $k_{phloem}$, i.e. the phloem conductance per leaf area basis ($L\cdot m^{-2} \cdot MPa^{-1} \cdot s^{-1}$), sap viscosity relative to water and the difference in turgor between the leaf and sapwood compartments. In turn, sap viscosity is calculated following @Forst2002, which takes into account temperature and the average sugar concentration between the two compartments (no phloem flow can occur if temperature is below zero). Turgor in each compartment depends on symplastic water potential and osmotic water potential. Van't Hoff equation is used to calculate the osmotic water potential, depending on temperature,  sugar concentration and the concentration of other solutes (a control parameter). Here leaf or sapwood sugar concentration is modulated to account for the effect of the relative water content of the compartment on osmotic water potential.
+When growth is simulated using the basic water balance model, phloem transport between leaf and sapwood ($F_{phloem}$) is simply modelled as the flow needed to make the concentration of metabolic carbon equal in both compartments. When the advanced water balance submodel is used, $F_{phloem}$ is modelled following @Holtta2017. Specifically, the instantaneous phloem flow per leaf area basis ($mol\,gluc\cdot m^{-2} \cdot s^{-1}$) depends on $k_{phloem}$, i.e. the phloem conductance per leaf area basis ($L\cdot m^{-2} \cdot MPa^{-1} \cdot s^{-1}$), sap viscosity relative to water and the difference in turgor between the sieve cells of leaf and sapwood compartments. $k_{phloem}$ is estimated as linear function of stem maximum conductance, $k_{stem,max}$:
+\begin{equation}
+k_{phloem} = f_{phloem} \cdot k_{stem,\max}
+\end{equation}
+where factor $f_{phloem}$ is specified by the control parameter `phloemConductanceFactor`. Sap viscosity is calculated following @Forst2002, which takes into account temperature and the average sugar concentration between the two compartments (no phloem flow can occur if temperature is below zero). Turgor in sieve cells of each compartment depends on symplastic water potential and osmotic water potential, with Van't Hoff's equation being used to calculate the osmotic water potential, based on temperature, sugar concentration and the concentration of other solutes (control parameter `nonSugarConcentration`). Note that here leaf or sapwood sugar concentration is modulated to account for the effect of the relative water content of the compartment on osmotic water potential.
 
 
 ### Sugar-starch dynamics
