@@ -16,8 +16,9 @@ r_{cell}(\Psi, \pi_0) = \phi_{max} \cdot (\Psi - \pi_0  - Y_{P})
 where $\Psi$ is the water potential, $\pi_0$ is the osmotic water potential at full turgor and $Y_P = 0.05$ MPa is the turgor yield threshold. Later, @Cabon2020 suggested to account for both turgor and temperature limitations on $r_{cell}$ using the following expanded equation:
 \begin{equation}
 r_{cell}(T, \Psi, \pi_0) = \phi_{max} \cdot (\Psi - \pi_0  - Y_{P}) \cdot \frac{f_{met}(T_K)}{f_{met}(288.15)} \cdot{f_{micro}(T, T_{thr})}
+(\#eq:cellexpansion)
 \end{equation}
-where $T$ is temperature, $f_{met}(T_K)$ is a function modulating the effect of temperature $T_K$ in Kelvin, on metabolic rate, and $f_{micro}(T, T_{thr})$ is a sigmoidal function modulating the effect of temperature on microtubule stability, depending on a temperature threshold $T_{thr}=5$ ºC. 
+where $T$ is temperature, $f_{met}(T_K)$ is a function modulating the effect of temperature $T_K$ in Kelvin, on metabolic rate, and $f_{micro}(T, T_{thr})$ is a sigmoidal function modulating the effect of temperature on microtubule stability, depending on a temperature threshold $T_{thr}$. 
 Function  $f_{met}(T_K)$ is defined as: 
 \begin{equation}
 f_{met}(T_K) = \frac{T_K \cdot \exp \big\{ \frac{\Delta H_A}{R^n \cdot T_K}\big\}}{1 + \exp \big\{ \frac{\Delta S_D}{R^n} \cdot \left(1 - \frac{\Delta H_D}{\Delta S_D \cdot T_K} \right)\big\}}
@@ -46,9 +47,19 @@ Finally, $\Delta LA_{sink}$ represents the leaf area increment expected by takin
 \begin{equation}
 \Delta LA_{sink} = SA \cdot RGR_{leaf, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{leaf}, \pi_{0,leaf})}{r_{cell,max}}
 \end{equation}
-cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(25, 0, -2)$ so that $RGR_{leaf, max}$ is attained when sink conditions are optimal.
+cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(25, 0, -2)$ so that $RGR_{leaf, max}$ is attained when sink conditions are optimal. Other parameters for eq. \@ref(eq:cellexpansion) are $\phi_{max} = 0.5$, $Y_{P} = 0.05\,MPa$ and $T_thr = 5$ºC.
 
 ### Sapwood growth
+
+Sapwood area increment $\Delta SA$ can only occur if $LA^{live}>0$. Unlike leaf area, it is not explicitly constrained by any allocation rule. However, newly assimilated carbon is preferentially allocated to leaves and fine roots because sapwood growth depends on storage reserves. $\Delta SA$ is defined as the minimum of two values expressing source and sink constraints:
+\begin{equation}
+\Delta SA = \min(\Delta SA_{source}, \Delta SA_{sink})
+\end{equation}
+$\Delta SA_{source}$ represents the sapwood area increment expected given carbon source limitations and is calculated using:
+\begin{equation}
+\Delta SA_{source} = \frac{\max(ST_{sapwood}-SS_{sapwood,growth},0)\cdot m_{gluc}\cdot V_{storage,sapwood}}{CC_{sapwood} \cdot (H + \sum_{s}{FRP_s \cdot L_s}) \cdot \rho_{wood}}
+\end{equation}
+where $ST_{sapwood}$ is the current starch concentration, $SS_{sapwood,growth}$ is the minimum concentration required for growth (specified in control vector `minimumSugarForGrowth`), $V_{storage,sapwood}$ is the sapwood storage volume, $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per sapwood area unit, see eq. \@ref(eq:sapwoodconstructioncost).
 
 ### Fine root growth
 
@@ -73,7 +84,7 @@ Finally, $\Delta B_{fineroot,sink}$ represents the biomass increment expected by
 \begin{equation}
 \Delta B_{fineroot,sink} = B_{fineroot} \cdot RGR_{fineroot, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{rhizo,s}, \pi_{0,stem})}{r_{cell,max}}
 \end{equation}
-cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(25, 0, -2)$ so that $RGR_{fineroot, max}$ is attained when sink conditions are optimal.
+cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(25, 0, -2)$ so that $RGR_{fineroot, max}$ is attained when sink conditions are optimal. Other parameters for eq. \@ref(eq:cellexpansion) are like for leaf growth, $\phi_{max} = 0.5$, $Y_{P} = 0.05\,MPa$ and $T_thr = 5$ºC.
 
 
 ## Senescence
@@ -129,8 +140,7 @@ First leaf area index ($LAI^{live}$) is updated from leaf area ($LA^{live}$) inv
 \begin{equation}
 H_v = \frac{SA/10000}{LA^{live}}
 \end{equation}
-
-Stem maximum conductance per leaf area unit ($k_{stem, max}$; in $mmol·m^{-2}·s^{-1}·MPa^{-1}$) is modelled as a function of species-specific xylem conductivity ($k_{xylem, max}$; in $kg·m^{-1}·s^{-1}·MPa^{-1}$), leaf area, sapwood area and tree height [@Christoffersen2016]:
+When simulating growth with the basic water balance model, leaf area index and Huber value are the only traits affected by changes in the size of compartments. It is only when we simulate growth with the advanced water balance model that we get a real sense of plant acclimation. Stem maximum conductance per leaf area unit ($k_{stem, max}$; in $mmol·m^{-2}·s^{-1}·MPa^{-1}$) is modelled as a function of species-specific xylem conductivity ($k_{xylem, max}$; in $kg·m^{-1}·s^{-1}·MPa^{-1}$), leaf area, sapwood area and tree height [@Christoffersen2016]:
 \begin{equation}
 k_{stem, max} = \frac{1000}{0.018} \cdot \frac{k_{xylem, max} \cdot (SA/10000)}{(H/100) \cdot LA^{live}} \cdot \chi_{taper}
 \end{equation}
@@ -157,5 +167,6 @@ In this strategy, increases in leaf area will be scheduled whenever the current 
 
 While leaf area target depends on the allocation strategy, fine root biomass target ($B_{fineroot,target}$) for any given layer directly follows changes in rhizosphere maximum conductance ($k_{rhizo,max}$). The estimation of fine root biomass also depends on soil saturated conductance, species-specific root length, root length density and density of fine roots.
 
-## Plant mortality
+## Plant mortality thresholds
 
+Plant cohorts can die from either *starvation* (if metabolic carbon is exhausted) or *dessication* (tissue dehydration). When simulating growth with the basic water balance submodel, starvation occurs if $SS_{sapwood} \leq 0$ and, since plant water balance is not explicitly modelled, dessication is determined if $PLC_{stem} \geq 0.5$.  When simulating growth with the advanced water balance submodel, starvation occurs also if $SS_{sapwood} \leq 0$, but in this case a better indicator of dehydration can be used, the stem symplastic relative water content $RWC_{stem, symp}$. Dessication is determined in this case if $RWC_{stem, symp} \leq 0.5$. 
