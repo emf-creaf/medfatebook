@@ -25,17 +25,19 @@ f_{met}(T_K) = \frac{T_K \cdot \exp \big\{ \frac{\Delta H_A}{R^n \cdot T_K}\big\
 \end{equation}
 where $R^n$ is the ideal gas constant, $\Delta H_A = 87500$ the enthalpy of activation and $\Delta H_D = 333000$ and $\Delta S_D = 1090$ the enthalpy and entropy difference (respectively) between the catalytically active and inactive states of the enzymatic system). 
 
+Scaling from the cell to the tissue level is conducted by assuming that maximum cell-level expansion rates correspond to maximum tissue-level relative growth rates.
+
 ### Leaf growth
 
 Leaf area increment $\Delta LA$ only occurs when phenological state is *unfolding*, and is defined as the minimum of three values expressing three corresponding constraints:
 \begin{equation}
 \Delta LA = \min( \Delta LA_{alloc}, \Delta LA_{source}, \Delta LA_{sink})
 \end{equation}
-First, $\Delta LA_{alloc}$ is the maximum leaf area increment allowed by the leaf area target set by the allocation rule, $LA^{target}$ in comparison with current leaf area $LA^{live}$:
+First, $\Delta LA_{alloc}$ is the maximum leaf area increment allowed by the leaf area target set by the allocation rule, $LA^{target}$, in comparison with current leaf area $LA^{live}$:
 \begin{equation}
 \Delta LA_{alloc} = \max(LA^{target} - LA^{live},0)
 \end{equation}
-Remember that leaf area target is updated during *bud formation* (which occurred the year before in the case of deciduous plants). 
+Remember that leaf area target is updated during *bud formation* (see \@ref(updateallocationtargets)). 
 
 Second, $\Delta LA_{source}$ represents the leaf area increment expected given carbon source limitations and is calculated:
 \begin{equation}
@@ -43,15 +45,15 @@ Second, $\Delta LA_{source}$ represents the leaf area increment expected given c
 \end{equation}
 where $SS_{leaf}$ is the current concentration of metabolic sugar, $SS_{leaf,growth}$ is the minimum concentration required for growth (specified in control vector `minimumSugarForGrowth`), $V_{storage,leaf}$ is the leaf storage volume, $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per leaf area unit, see eq. \@ref(eq:leafconstructioncost).
 
-Finally, $\Delta LA_{sink}$ represents the leaf area increment expected by taking into account maximum leaf tissue growth rate ($RGR_{leaf, max}$; in $m^2 \cdot cm^{-2} \cdot day^{-1}$) relative to sapwood area $SA$ (in $cm^2$)  and the relative cell expansion rate given $T_{day}$, $\Psi_{symp,leaf}$ and $\pi_{0,leaf}$: 
+Finally, $\Delta LA_{sink}$ represents the leaf area increment expected by taking into account the maximum leaf tissue growth rate relative to sapwood area ($RGR_{leaf, max}$; in $m^2 \cdot cm^{-2} \cdot day^{-1}$) and the relative cell expansion rate given $T_{day}$, $\Psi_{symp,leaf}$ and $\pi_{0,leaf}$: 
 \begin{equation}
 \Delta LA_{sink} = SA \cdot RGR_{leaf, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{symp,leaf}, \pi_{0,leaf})}{r_{cell,max}}
 \end{equation}
-cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(25, 0, -2)$ so that $RGR_{leaf, max}$ is attained when sink conditions are optimal. Other parameters for eq. \@ref(eq:cellexpansion) are $\phi_{max} = 0.5$, $Y_{P} = 0.05\,MPa$ and $T_{thr} = 5$ºC.
+where cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(25, 0, -2)$ so that $RGR_{leaf, max}$ is attained when sink conditions are optimal. Other parameters for eq. \@ref(eq:cellexpansion) are $\phi_{max} = 0.5$, $Y_{P} = 0.05\,MPa$ and $T_{thr} = 5$ºC.
 
 ### Sapwood growth
 
-Sapwood area increment $\Delta SA$ can only occur if $LA^{live}>0$. Unlike leaf area, it is not explicitly constrained by any allocation rule. However, newly assimilated carbon is preferentially allocated to leaves and fine roots because sapwood growth depends on storage reserves. $\Delta SA$ is defined as the minimum of two values expressing source and sink constraints:
+Sapwood area increment $\Delta SA$ can only occur if $LA^{live}>0$. Unlike leaf area or fine root biomass, it is not explicitly constrained by any allocation rule. However, newly assimilated carbon is preferentially allocated to leaves and fine roots because sapwood growth depends on storage reserves and not on metabolic carbon. $\Delta SA$ is defined as the minimum of two values expressing source and sink constraints:
 \begin{equation}
 \Delta SA = \min(\Delta SA_{source}, \Delta SA_{sink})
 \end{equation}
@@ -61,19 +63,19 @@ $\Delta SA_{source}$ represents the sapwood area increment expected given carbon
 \end{equation}
 where $ST_{sapwood}$ is the current starch concentration, $SS_{sapwood,growth}$ is the minimum concentration required for growth (specified in control vector `minimumSugarForGrowth`), $V_{storage,sapwood}$ is the sapwood storage volume, $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per sapwood area unit, see eq. \@ref(eq:sapwoodconstructioncost).
 
-Sink limitations to sapwood growth are simulated using a set of $N_c = 10$ cambium cells that undergo cell division and generate a ring (i.e. a vector) of vessels that undergo enlargement and maturation [@Friend2019]. Assuming that cambium cell volume must double before division, that cell-doubling time is the variable limiting cell division and that each division instantly results in a cell exiting the cambium and initiating differentiation into a vessel, production rate ($PR$) of new vessels cells can be related to the cambial cell expansion rate $r_{cambium}$ such that [@Cabon2020]:
+Sink limitations to sapwood growth are simulated using a set of $N_c = 10$ cambium cells that undergo division and the new cells are added to a ring (i.e. a vector) of vessels that later suffer enlargement and maturation [@Friend2019]. Assuming that cambium cell volume must double before division, that cell-doubling time is the variable limiting cell division and that each division instantly results in a cell exiting the cambium and initiating differentiation into a vessel, production rate ($PR_{cambium}$) of new vessels cells can be related to the cambial cell expansion rate $r_{cambium}$ such that [@Cabon2020]:
 \begin{equation}
 PR_{cambium} = \frac{N_c}{ln(2)}\cdot r_{cambium}
 \end{equation}
-where $r_{cambium} = r_{cell}(T_{day},\Psi_{symp,stem}, -0.8)$, with other parameters of eq. \@ref(eq:cellexpansion) being $\phi_{max}=0.13$, $Y_{P} = 0.05\,MPa$ and $Y_{thr} = 8$ ºC. $PR$ daily values are accumulated (i.e. $P_{cambium, t} = P_{cambium, t-1} + PR_{cambium,t}$) and a new vessel is added to the ring every time $P_{cambium}$ advances one integer. All vessel cells in the ring undergo daily enlargement following eq. \@ref(eq:cellexpansion), again with $Y_{P} = 0.05\,MPa$ and $Y_{thr} = 8$ ºC. During cell later stages of enlargement, the cell wall becomes thicker and more rigid as a consequence of cell wall deposition. Consequently, $\phi_{max}=0.13$ for newly formed cells, but then variations in $\phi_{max}$ are modelled as [@Cabon2019]:
+where $r_{cambium} = r_{cell}(T_{day},\Psi_{symp,stem}, -0.8)$, with other parameters of eq. \@ref(eq:cellexpansion) being $\phi_{max}=0.13$, $Y_{P} = 0.05\,MPa$ and $Y_{thr} = 8$ ºC. The ring growth model is implemented at daily time steps and daily $PR_{cambium}$ values are accumulated (i.e. $P_{cambium, t} = P_{cambium, t-1} + PR_{cambium,t}$). A new vessel is formed and added to the ring every time $P_{cambium}$ advances one integer. All vessel cells in the ring undergo daily enlargement following eq. \@ref(eq:cellexpansion), again with $Y_{P} = 0.05\,MPa$ and $Y_{thr} = 8$ ºC. During cell later stages of enlargement, the cell wall becomes thicker and more rigid as a consequence of cell wall deposition. Consequently, $\phi_{max}=0.13$ for newly formed cells, but then variations in $\phi_{max}$ are modelled as [@Cabon2019]:
 \begin{equation}
 \frac{d\phi_{max}}{\phi_{max}\cdot dt} = s\cdot r_{cell} - h \cdot \frac{f_{met}(T_K)}{f_{met}(288.15)}
 \end{equation}
-where $s = 1.8$ and $h = 0.043\cdot1.8$ are a softening factor and a constant hardening rate, respectively, and the hardening rate is modulated by temperature effects. Cell radial diameter is initially $8.3 \mu m$ and tangential diameter is assumed constant and equal to $20 \mu m$, so that volume increases in ring cells can be translated to daily ring area increases, $\Delta A_{ring}$ (in $\mu m^{2}$). Assuming that the maximum relative sapwood growth rate $RGR_{sapwood, max}$ corresponds to a maximum rate of daily ring area increase, we have:
+where $s = 1.8$ and $h = 0.043\cdot1.8$ are a softening factor and a constant hardening rate, respectively, and the hardening rate is modulated by temperature effects. Cell radial diameter is initially $8.3 \mu m$ and tangential diameter is assumed constant and equal to $20 \mu m$, so that volume increases in ring cells can be translated to daily ring area increases, $\Delta A_{ring}$ (in $\mu m^{2}$). Assuming that the maximum relative sapwood growth rate $RGR_{sapwood, max}$ corresponds to a maximum rate of daily ring area increase, we have that the daily increase in sapwood area according to sink limitations, $\Delta SA_{sink}$, is:
 \begin{equation}
 \Delta SA_{sink} = SA \cdot RGR_{sapwood, max} \cdot \frac{\Delta A_{ring}}{\Delta A_{ring,max}}
 \end{equation}
-where $\Delta A_{ring,max} = N_c \cdot 20$, which assumes a maximum daily cell area growth of $20\mu m^{2}$ or, equivalently, a maximum daily cell radial diameter increase of $1\mu m$.
+where $\Delta A_{ring,max} = N_c \cdot 20\,\mu m^{2} \cdot day^{-1}$, which assumes a maximum daily cell area growth of $20\,\mu m^{2} \cdot day^{-1}$ or, equivalently, a maximum daily cell radial diameter increase of $1\mu m \cdot day^{-1}$.
 
 ### Fine root growth
 
@@ -83,7 +85,7 @@ Fine root biomass increment is modelled for each soil layer separately, and is d
 \begin{equation}
 \Delta B_{fineroot} = \min( \Delta B_{fineroot,alloc}, \Delta B_{fineroot,source}, \Delta B_{fineroot,sink})
 \end{equation}
-First, $\Delta B_{fineroot,alloc}$ is the maximum fine root biomass increment allowed by the biomass target set by the allocation rule, $B_{fineroot,target}$ in comparison with current biomass, $B_{fineroot}$:
+First, $\Delta B_{fineroot,alloc}$ is the maximum fine root biomass increment allowed by the biomass target set by the allocation rule, $B_{fineroot,target}$ (see \@ref(updateallocationtargets)), in comparison with current biomass, $B_{fineroot}$:
 \begin{equation}
 \Delta B_{fineroot,alloc} = \max(B_{fineroot,target} - B_{fineroot},0)
 \end{equation}
@@ -98,7 +100,7 @@ Finally, $\Delta B_{fineroot,sink}$ represents the biomass increment expected by
 \begin{equation}
 \Delta B_{fineroot,sink} = B_{fineroot} \cdot RGR_{fineroot, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{rhizo,s}, \pi_{0,stem})}{r_{cell,max}}
 \end{equation}
-cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(25, 0, -2)$ so that $RGR_{fineroot, max}$ is attained when sink conditions are optimal. Other parameters for eq. \@ref(eq:cellexpansion) are like for leaf growth, $\phi_{max} = 0.5$, $Y_{P} = 0.05\,MPa$ and $T_thr = 5$ºC.
+cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(25, 0, -2)$ so that $RGR_{fineroot, max}$ is attained when sink conditions are optimal. Other parameters for eq. \@ref(eq:cellexpansion) are like for leaf growth, $\phi_{max} = 0.5$, $Y_{P} = 0.05\,MPa$ and $T_{thr} = 5$ºC.
 
 
 ## Senescence
@@ -146,7 +148,7 @@ Sapwood turnover is applied at the same rate in evergreen and deciduous species.
 
 ## Update of plant traits and allocation targets
 
-### Plant traits
+### Plant traits {#updateplanttraits}
 
 Several anatomic and physiological parameters are updated every day after applying changes in the size of leaf, sapwood and fine root compartments. Hence, the model allows simulating plastic responses to environmental cues mediated by growth and senescence of plant tissues.
 
@@ -167,7 +169,7 @@ The proportion of conductance loss due to cavitation ($PLC_{stem}$) is reduced w
 PLC_{stem, t+1} = \min(PLC_{stem,t} - \frac{\Delta SA}{SA},0)
 \end{equation}
 
-### Leaf area and fine root biomass targets
+### Leaf area and fine root biomass targets {#updateallocationtargets}
 
 Leaf area target ($LA_{target}$) is updated when phenological phase is *bud formation*. If allocation follows a *constant Huber value* strategy, the model tries to keep a constant value $H_{v,target}$, and the leaf area target is defined as: 
 \begin{equation}
