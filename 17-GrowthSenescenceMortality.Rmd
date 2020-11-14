@@ -13,7 +13,7 @@ r_{cell} = \frac{dV}{Vdt}
 \begin{equation}
 r_{cell}(\Psi, \pi_0) = \phi_{max} \cdot (\Psi - \pi_0  - Y_{P})
 \end{equation}
-where $\Psi$ is the water potential, $\pi_0$ is the osmotic water potential at full turgor and $Y_P = 0.05$ MPa is the turgor yield threshold. Later, @Cabon2020 suggested to account for both turgor and temperature limitations on $r_{cell}$ using the following expanded equation:
+where $\Psi$ is the water potential, $\pi_0$ is the osmotic water potential at full turgor, $Y_P$ is the turgor yield threshold and $\phi_{max}$ is the maximum cell wall extensibility. Later, @Cabon2020 suggested to account for both turgor and temperature limitations on $r_{cell}$ using the following expanded equation:
 \begin{equation}
 r_{cell}(T, \Psi, \pi_0) = \phi_{max} \cdot (\Psi - \pi_0  - Y_{P}) \cdot \frac{f_{met}(T_K)}{f_{met}(288.15)} \cdot{f_{micro}(T, T_{thr})}
 (\#eq:cellexpansion)
@@ -45,9 +45,9 @@ where $SS_{leaf}$ is the current concentration of metabolic sugar, $SS_{leaf,gro
 
 Finally, $\Delta LA_{sink}$ represents the leaf area increment expected by taking into account maximum leaf tissue growth rate ($RGR_{leaf, max}$; in $m^2 \cdot cm^{-2} \cdot day^{-1}$) relative to sapwood area $SA$ (in $cm^2$)  and the relative cell expansion rate given $T_{day}$, $\Psi_{symp,leaf}$ and $\pi_{0,leaf}$: 
 \begin{equation}
-\Delta LA_{sink} = SA \cdot RGR_{leaf, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{leaf}, \pi_{0,leaf})}{r_{cell,max}}
+\Delta LA_{sink} = SA \cdot RGR_{leaf, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{symp,leaf}, \pi_{0,leaf})}{r_{cell,max}}
 \end{equation}
-cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(25, 0, -2)$ so that $RGR_{leaf, max}$ is attained when sink conditions are optimal. Other parameters for eq. \@ref(eq:cellexpansion) are $\phi_{max} = 0.5$, $Y_{P} = 0.05\,MPa$ and $T_thr = 5$ºC.
+cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(25, 0, -2)$ so that $RGR_{leaf, max}$ is attained when sink conditions are optimal. Other parameters for eq. \@ref(eq:cellexpansion) are $\phi_{max} = 0.5$, $Y_{P} = 0.05\,MPa$ and $T_{thr} = 5$ºC.
 
 ### Sapwood growth
 
@@ -60,6 +60,20 @@ $\Delta SA_{source}$ represents the sapwood area increment expected given carbon
 \Delta SA_{source} = \frac{\max(ST_{sapwood}-SS_{sapwood,growth},0)\cdot m_{gluc}\cdot V_{storage,sapwood}}{CC_{sapwood} \cdot (H + \sum_{s}{FRP_s \cdot L_s}) \cdot \rho_{wood}}
 \end{equation}
 where $ST_{sapwood}$ is the current starch concentration, $SS_{sapwood,growth}$ is the minimum concentration required for growth (specified in control vector `minimumSugarForGrowth`), $V_{storage,sapwood}$ is the sapwood storage volume, $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per sapwood area unit, see eq. \@ref(eq:sapwoodconstructioncost).
+
+Sink limitations to sapwood growth are simulated using a set of $N_c = 10$ cambium cells that undergo cell division and generate a ring (i.e. a vector) of vessels that undergo enlargement and maturation [@Friend2019]. Assuming that cambium cell volume must double before division, that cell-doubling time is the variable limiting cell division and that each division instantly results in a cell exiting the cambium and initiating differentiation into a vessel, production rate ($PR$) of new vessels cells can be related to the cambial cell expansion rate $r_{cambium}$ such that [@Cabon2020]:
+\begin{equation}
+PR_{cambium} = \frac{N_c}{ln(2)}\cdot r_{cambium}
+\end{equation}
+where $r_{cambium} = r_{cell}(T_{day},\Psi_{symp,stem}, -0.8)$, with other parameters of eq. \@ref(eq:cellexpansion) being $\phi_{max}=0.13$, $Y_{P} = 0.05\,MPa$ and $Y_{thr} = 8$ ºC. $PR$ daily values are accumulated (i.e. $P_{cambium, t} = P_{cambium, t-1} + PR_{cambium,t}$) and a new vessel is added to the ring every time $P_{cambium}$ advances one integer. All vessel cells in the ring undergo daily enlargement following eq. \@ref(eq:cellexpansion), again with $Y_{P} = 0.05\,MPa$ and $Y_{thr} = 8$ ºC. During cell later stages of enlargement, the cell wall becomes thicker and more rigid as a consequence of cell wall deposition. Consequently, $\phi_{max}=0.13$ for newly formed cells, but then variations in $\phi_{max}$ are modelled as [@Cabon2019]:
+\begin{equation}
+\frac{d\phi_{max}}{\phi_{max}\cdot dt} = s\cdot r_{cell} - h \cdot \frac{f_{met}(T_K)}{f_{met}(288.15)}
+\end{equation}
+where $s = 1.8$ and $h = 0.043\cdot1.8$ are a softening factor and a constant hardening rate, respectively, and the hardening rate is modulated by temperature effects. Cell radial diameter is initially $8.3 \mu m$ and tangential diameter is assumed constant and equal to $20 \mu m$, so that volume increases in ring cells can be translated to daily ring area increases, $\Delta A_{ring}$ (in $\mu m^{2}$). Assuming that the maximum relative sapwood growth rate $RGR_{sapwood, max}$ corresponds to a maximum rate of daily ring area increase, we have:
+\begin{equation}
+\Delta SA_{sink} = SA \cdot RGR_{sapwood, max} \cdot \frac{\Delta A_{ring}}{\Delta A_{ring,max}}
+\end{equation}
+where $\Delta A_{ring,max} = N_c \cdot 2$, which assumes a maximum daily cell area growth of $2\mu m^{2}$.
 
 ### Fine root growth
 
