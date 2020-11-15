@@ -1,4 +1,4 @@
-# Growth, senescence and mortality
+# Growth, senescence and mortality {#growthsenescencemortality}
 
 ## Growth
 
@@ -27,7 +27,7 @@ where $R^n$ is the ideal gas constant, $\Delta H_A = 87500$ the enthalpy of acti
 
 Scaling from the cell to the tissue level is conducted by assuming that maximum cell-level expansion rates correspond to maximum tissue-level relative growth rates.
 
-### Leaf growth
+### Leaf growth {#leafgrowth}
 
 Leaf area increment $\Delta LA$ only occurs when phenological state is *unfolding*, and is defined as the minimum of three values expressing three corresponding constraints:
 \begin{equation}
@@ -43,7 +43,7 @@ Second, $\Delta LA_{source}$ represents the leaf area increment expected given c
 \begin{equation}
 \Delta LA_{source} = \frac{\max(SS_{leaf}-SS_{leaf,growth},0)\cdot m_{gluc}\cdot V_{storage,leaf}}{1000 \cdot CC_{leaf} / SLA}
 \end{equation}
-where $SS_{leaf}$ is the current concentration of metabolic sugar, $SS_{leaf,growth}$ is the minimum concentration required for growth (specified in control vector `minimumSugarForGrowth`), $V_{storage,leaf}$ is the leaf storage volume, $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per leaf area unit, see eq. \@ref(eq:leafconstructioncost).
+where $SS_{leaf}$ is the current concentration of metabolic sugar, $SS_{leaf,growth}$ is the minimum concentration required for growth (specified in control vector `minimumSugarForGrowth`), $V_{storage,leaf}$ is the leaf storage volume, $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per leaf area unit, see eq. \@ref(eq:leafconstructioncost). Note that for deciduous species there is no leaf area before budburst, so that $SS_{leaf} = 0$. The model solves this problem by drawing carbon from $SS_{sapwood}$ when $LA^{live} = 0$.
 
 Finally, $\Delta LA_{sink}$ represents the leaf area increment expected by taking into account the maximum leaf tissue growth rate relative to sapwood area ($RGR_{leaf, max}$; in $m^2 \cdot cm^{-2} \cdot day^{-1}$) and the relative cell expansion rate given $T_{day}$, $\Psi_{symp,leaf}$ and $\pi_{0,leaf}$: 
 \begin{equation}
@@ -51,7 +51,7 @@ Finally, $\Delta LA_{sink}$ represents the leaf area increment expected by takin
 \end{equation}
 where cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(25, 0, -2)$ so that $RGR_{leaf, max}$ is attained when sink conditions are optimal. Other parameters for eq. \@ref(eq:cellexpansion) are $\phi_{max} = 0.5$, $Y_{P} = 0.05\,MPa$ and $T_{thr} = 5$ºC.
 
-### Sapwood growth
+### Sapwood growth {#sapwoodgrowth}
 
 Sapwood area increment $\Delta SA$ can only occur if $LA^{live}>0$. Unlike leaf area or fine root biomass, it is not explicitly constrained by any allocation rule. However, newly assimilated carbon is preferentially allocated to leaves and fine roots because sapwood growth depends on storage reserves and not on metabolic carbon. $\Delta SA$ is defined as the minimum of two values expressing source and sink constraints:
 \begin{equation}
@@ -77,7 +77,7 @@ where $s = 1.8$ and $h = 0.043\cdot1.8$ are a softening factor and a constant ha
 \end{equation}
 where $\Delta A_{ring,max} = N_c \cdot 20\,\mu m^{2} \cdot day^{-1}$, which assumes a maximum daily cell area growth of $20\,\mu m^{2} \cdot day^{-1}$ or, equivalently, a maximum daily cell radial diameter increase of $1\mu m \cdot day^{-1}$.
 
-### Fine root growth
+### Fine root growth {#finerootgrowth}
 
 Fine root growth is only modelled when simulating growth with the advanced water balance submodel (when using the basic water balance submodel fine root respiration costs are proportional to leaf respiration costs). 
 
@@ -105,7 +105,7 @@ cell relative expansion rate is divided by the maximum relative cell expansion r
 
 ## Senescence
 
-### Leaf senescence
+### Leaf senescence {#leafsenescence}
 
 
 During drought-periods (i.e. if $f_{turgor}(\Psi_{leaf})=0$) cavitation may occur. However, cavitation is applied at the leaf area level and not at the sapwood area level. During drought periods reductions of live leaf area can come from either sapwood conversion into heartwood or cavitation. First, the model compares the current $\Psi_{leaf}$ value with $\Psi_{\min}$ the minimum potential experienced since drought started:
@@ -127,7 +127,7 @@ LAI^{live} = \min(LAI^{live} - N \cdot \Delta SA_{turnover} \cdot Hv , \, LAI^{p
 and expanded leaf area ($LAI^{\phi}$) and dead leaf area ($LAI^{dead}$) are modified accordingly. 
 
 
-### Sapwood senescence
+### Sapwood senescence {#sapwoodsenescence}
 
 @Prentice1993 assumed a constant annual rate of 4% for the conversion from sapwood to heartwood. Similarly, @Sitch2003 assumed a sapwood annual turnover rate of 5% for all biomes. A reasonable value for maximum daily turnover rate would be (assuming an annual rate 4.5%):
 \begin{equation}
@@ -144,7 +144,7 @@ Sapwood turnover is applied at the same rate in evergreen and deciduous species.
 \Delta SA_{turnover} = SA \cdot p_{heartwood}
 \end{equation}
 
-### Fine root senescence
+### Fine root senescence {#finerootsenescence}
 
 ## Update of plant traits and allocation targets
 
@@ -183,6 +183,6 @@ In this strategy, increases in leaf area will be scheduled whenever the current 
 
 While leaf area target depends on the allocation strategy, fine root biomass target ($B_{fineroot,target}$) for any given layer directly follows changes in rhizosphere maximum conductance ($k_{rhizo,max}$). The estimation of fine root biomass also depends on soil saturated conductance, species-specific root length, root length density and density of fine roots.
 
-## Plant mortality thresholds
+## Plant mortality thresholds {#plantmortality}
 
 Plant cohorts can die from either *starvation* (if metabolic carbon is exhausted) or *dessication* (tissue dehydration). When simulating growth with the basic water balance submodel, starvation occurs if $SS_{sapwood} \leq 0$ and, since plant water balance is not explicitly modelled, dessication is determined if $PLC_{stem} \geq 0.5$.  When simulating growth with the advanced water balance submodel, starvation occurs also if $SS_{sapwood} \leq 0$, but in this case a better indicator of dehydration can be used, the stem symplastic relative water content $RWC_{stem, symp}$. Dessication is determined in this case if $RWC_{stem, symp} \leq 0.5$. 
