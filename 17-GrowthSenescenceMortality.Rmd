@@ -107,6 +107,34 @@ cell relative expansion rate is divided by the maximum relative cell expansion r
 
 ### Leaf senescence {#leafsenescence}
 
+Leaf senescence can occur due to three processes: aging, starvation or dessication. Leaf senescence due to carbon starvation occurs whenever the carbon balance for metabolic carbon becomes negative ($\Delta SS_{sugar} < 0$). At this point, the model determines $p_{starvation,leaf}$, the proportion of leaf area that caused a respiration excess using:
+\begin{equation}
+p_{starvation,leaf} = \frac{-\Delta SS_{sugar} \cdot (V_{storage, leaf} \cdot m_{gluc})}{R_{leaf}}
+\end{equation}
+and applies this proportion to $LA^{live}$.
+
+Senescence due to advanced leaf age is assumed to be programmed (Ca+ accumulation?). In deciduous species all live leaf area turns to death leaf area when the phenology submodel indicates it (\@ref(leafphenosenescence)). In evergreen species the proportion of leaf area that undergoes senescence each day is determined by the species-specific leaf duration parameter ($LD$):
+\begin{equation}
+p_{aging,leaf} = \frac{1}{365.25 \cdot LD}
+\end{equation}
+Senescence due to drought effects occurs as a consequence of stem cavitation. The model first determines the leaf area corresponding to the current level of cavitation:
+\begin{equation}
+LA^{cavitation} = (1 - PLC_{stem}) \cdot LA^{target}
+\end{equation}
+if $LA^{cavitation} < LA^{live}$ then the corresponding proportion $p_{cavitation, leaf}$ is estimated. The maximum of $p_{aging,leaf}$ and $p_{cavitation, leaf}$ is applied as a reduction of leaf area. If growth is simulated using the advanced water model, it also checks whether the relative water content in leaves becomes less than 50\% (i.e. $RWC_{leaf} < 0.5$) and, if this happens, the plant cohort is completely defoliated.
+
+### Sapwood senescence {#sapwoodsenescence}
+
+@Prentice1993 assumed a constant annual rate of 4% for the conversion from sapwood to heartwood. Similarly, @Sitch2003 assumed a sapwood annual turnover rate of 5% for all biomes. A reasonable value for maximum daily turnover rate would be (assuming an annual rate 4.5%):
+\begin{equation}
+1-0.955^{(1/365)} = 0.0001261398
+\end{equation}
+The actual proportion of sapwood area that is transformed into heartwood daily is:
+\begin{equation}
+p_{aging, sapwood} = \frac{0.0001261398}{1+15\cdot e^{-0.01\cdot H}}
+\end{equation}
+where 0.01 is a constant causing short plants to have slower turnover rates. 
+
 
 During drought-periods (i.e. if $f_{turgor}(\Psi_{leaf})=0$) cavitation may occur. However, cavitation is applied at the leaf area level and not at the sapwood area level. During drought periods reductions of live leaf area can come from either sapwood conversion into heartwood or cavitation. First, the model compares the current $\Psi_{leaf}$ value with $\Psi_{\min}$ the minimum potential experienced since drought started:
 \begin{equation}
@@ -126,25 +154,13 @@ LAI^{live} = \min(LAI^{live} - N \cdot \Delta SA_{turnover} \cdot Hv , \, LAI^{p
 \end{equation}
 and expanded leaf area ($LAI^{\phi}$) and dead leaf area ($LAI^{dead}$) are modified accordingly. 
 
-
-### Sapwood senescence {#sapwoodsenescence}
-
-@Prentice1993 assumed a constant annual rate of 4% for the conversion from sapwood to heartwood. Similarly, @Sitch2003 assumed a sapwood annual turnover rate of 5% for all biomes. A reasonable value for maximum daily turnover rate would be (assuming an annual rate 4.5%):
-\begin{equation}
-1-0.955^{(1/365)} = 0.0001261398
-\end{equation}
-The actual proportion of sapwood area that is transformed into heartwood is:
-\begin{equation}
-p_{heartwood} = \frac{0.0001261398}{1+15\cdot e^{-0.01\cdot H}}
-\end{equation}
-where 0.01 is a constant causing short plants to have slower turnover rates. 
-
-Sapwood turnover is applied at the same rate in evergreen and deciduous species. The amount of sapwood that is converted to heartwood every day, $\Delta SA_{turnover}$, is thus:
-\begin{equation}
-\Delta SA_{turnover} = SA \cdot p_{heartwood}
-\end{equation}
-
 ### Fine root senescence {#finerootsenescence}
+
+Fine root senescence only occurs when modelling growth with the advanced water balance. Aging is the only process leading to fine root senescence. Default daily turnover proportion for fine roots, $p_{aging,fineroot,25}$ is specified via the control parameters `turnoverRates`, which are assumed to correspond to a temperature of 25 ºC. Actual turnover proportion for a given soil layer ($p_{aging,fineroot}$) decreases linearly with soil temperature down to zero at 5 ºC:
+\begin{equation}
+p_{aging,fineroot} = p_{aging,fineroot,25} \cdot \frac{\max(T_{soil,s}-5,0)}{20}
+\end{equation}
+Default values for $p_{aging,fineroot,25}$ are set to produce an annual 50\% turnover of fine roots.
 
 ## Update of plant traits and allocation targets
 
@@ -156,18 +172,22 @@ First leaf area index ($LAI^{live}$) is updated from leaf area ($LA^{live}$) inv
 \begin{equation}
 H_v = \frac{SA/10000}{LA^{live}}
 \end{equation}
-When simulating growth with the basic water balance model, leaf area index and Huber value are the only traits affected by changes in the size of compartments. It is only when we simulate growth with the advanced water balance model that we get a real sense of plant acclimation. Stem maximum conductance per leaf area unit ($k_{stem, max}$; in $mmol·m^{-2}·s^{-1}·MPa^{-1}$) is modelled as a function of species-specific xylem conductivity ($k_{xylem, max}$; in $kg·m^{-1}·s^{-1}·MPa^{-1}$), leaf area, sapwood area and tree height [@Christoffersen2016]:
+When simulating growth with the basic water balance model, leaf area index and Huber value are the only traits affected by changes in the size of compartments. It is only when we simulate growth with the advanced water balance model that we get a real sense of plant acclimation. Fine root biomass changes in each soil layer ($B_{fineroot,s}$) lead to updates in the proportion of fine roots in each layer ($FRP_s$). Stem maximum conductance per leaf area unit ($k_{stem, max}$; in $mmol·m^{-2}·s^{-1}·MPa^{-1}$) is modelled as a function of species-specific xylem conductivity ($k_{xylem, max}$; in $kg·m^{-1}·s^{-1}·MPa^{-1}$), leaf area, sapwood area and tree height [@Christoffersen2016]:
 \begin{equation}
 k_{stem, max} = \frac{1000}{0.018} \cdot \frac{k_{xylem, max} \cdot (SA/10000)}{(H/100) \cdot LA^{live}} \cdot \chi_{taper}
 \end{equation}
 where $\chi_{taper}$ is a factor to account for taper of xylem conduit with height [@Savage2010; @Christoffersen2016], 0.018 is the molar weight of water (in $kg\cdot mol^{-1}$). Both an increase in $SA$ or a decrease in $LA^{live}$ (i.e. an increase in $H_v$) increase $k_{stem, max}$ and, hence, alleviate drought effects (i.e. a lower decrease in water potential across the stem for the same flow). In contrast, an increase in plant height will decrease stem conductance and increase drought stress. 
 
-Changes in stem maximum conductances have cascade effects on root and rhizosphere conductances. First, coarse root minimum resistance is defined as a fixed proportion of whole-plant minimum resistance, so an increase in stem maximum conductance will increase whole-plant conductance and coarse root conductance, $k_{root,max}$. In turn, rhizosphere minimum resistance (i.e. maximum conductance) is defined as a fraction value of total resistance, when averaged across a range of soil water potential values. An increase in $k_{stem, max}$, will also affect whole-plant conductance, $k_{plant, max}$, and therefore $k_{rhizo,max}$.
+Changes in stem maximum conductances have cascade effects on root and rhizosphere conductances. First, coarse root minimum resistance is defined as a fixed proportion of whole-plant minimum resistance, so an increase in stem maximum conductance will increase whole-plant conductance and coarse root conductance, $k_{root,max}$. In turn, rhizosphere minimum resistance (i.e. maximum conductance) is defined as a fraction value of total resistance, when averaged across a range of soil water potential values. An increase in $k_{stem, max}$, will also affect whole-plant conductance, $k_{plant, max}$, and therefore $k_{rhizo,max}$. In addition, changes in fine root proportions ($FRP_{s}$) have their corresponding effects on the rhizosphere maximum conductance in each soil layer.
 
 The proportion of conductance loss due to cavitation ($PLC_{stem}$) is reduced whenever sapwood area growth occurs (provided control parameter `cavitationRefill = "growth"`):
 \begin{equation}
 PLC_{stem, t+1} = \min(PLC_{stem,t} - \frac{\Delta SA}{SA},0)
 \end{equation}
+
+[Update of $\pi_{0,leaf}$ and $\pi_{0,stem}$]
+
+If photosynthesis limitations are included, the model starts to limit photosynthesis $SS_{sugar,leaf} > 0.5\,mol\cdot L^{-1}$ and decreases linearly to zero $SS_{sugar,leaf} > 1.5\,mol\cdot L^{-1}$.
 
 ### Leaf area and fine root biomass targets {#updateallocationtargets}
 
