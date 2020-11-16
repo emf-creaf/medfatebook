@@ -61,10 +61,13 @@ B_{fineroot} = B_{leaf}/2
 \end{equation}
 Hence, in this model fine-root maintenance respiration costs are also influenced by leaf-phenological status [@Sitch2003]. When growth is simulated using the advanced water balance model, fine root length per area in each soil layer ($FLA_s$; $m \cdot m^{-2}$) is estimated from rhizosphere conductance, assuming a cylindrical flow geometry in the rhizosphere. Then fine root biomass per individual ($g\,dry\cdot ind^{-1}$) is calculated using:
 \begin{equation}
-B_{fineroot} = \sum_{s}{\frac{10000\cdot FLA_s}{N\cdot 0.01 \cdot SRL}}
+B_{fineroot} = \sum_{s}{B_{fineroot,s}} = \sum_{s}{\frac{10000\cdot FLA_s}{N\cdot 0.01 \cdot SRL}}
 \end{equation}
-where $N$ is the density of individuals and $SRL$ ($cm \cdot g\,dry^{-1}$) is the specific root length.
-
+where $N$ is the density of individuals and $SRL$ ($cm \cdot g\,dry^{-1}$) is the specific root length. One of the model output variables is fine root area in each soil layer ($FRA_s$), which is calculated from $B_{fineroot}$ using:
+\begin{equation}
+FRA_{s} = 10^{-4}\cdot B_{fineroot,s} \cdot 2.0 \cdot \frac{\pi \cdot SRL}{\rho_{fineroot}}
+\end{equation}
+where $\rho_{fineroot}$ is fine root tissue density ($g\,dry \cdot cm^{-3}$).
 
 ## Components of carbon balance {#carbonbalancecomponents}
 
@@ -72,7 +75,7 @@ Here we provide the details of carbon balance calculations, i.e. how the compone
 
 ### Gross photosynthesis
 
-The soil water balance submodel provides values of photosynthesis calculated at the plant cohort level, but note that the user output of function `spwb` and `pwb` refers to net photosynthesis ($A_n$) after accounting for an estimate of leaf respiration. In the basic water balance model there is no way to make the distinction between gross and net photosynthesis, so we will assume here that $A_g = A_n$ (in $g\,C \cdot m^{-2}$) as calculated in section \@ref(basicphotosynthesis). In the advance water balance model the output is also net photosynthesis, but the distinction is possible (see section \@ref(leafenergybalancephoto)). In any case, here we start with a $A_g$ value in units of carbon per ground area unit, i.e. $g\,C \cdot m^{-2}$, and to enter the carbon balance we need scale photosynthesis to units of glucose per individual ($g\,gluc \cdot ind^{-1}$). This is done using:
+The soil water balance submodel provides values of photosynthesis calculated at the plant cohort level, but note that the user output of function `spwb` and `pwb` refers to net photosynthesis ($A_n$) after accounting for an estimate of leaf respiration. In the basic water balance model there is no way to make the distinction between gross and net photosynthesis, so we will assume here that $A_g = A_n$ (in $g\,C \cdot m^{-2}$) as calculated in section \@ref(basicphotosynthesis). In the advance water balance model the output is also net photosynthesis, but the distinction is possible (see section \@ref(leafenergybalancephoto)). In any case, here we start with a $A_g$ value in units of carbon per ground area unit, i.e. $g\,C \cdot m^{-2}$, and to enter the carbon balance we need scale photosynthesis to units of glucose per individual ($A$; in $g\,gluc \cdot ind^{-1}$). This is done using:
 \begin{equation}
 A = \frac{10000 \cdot A_g}{N} \cdot \frac{m_{gluc}}{m_{carbon} \cdot 6}
 \end{equation}
