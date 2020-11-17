@@ -141,32 +141,34 @@ then carbon balance at the plant level reduces to:
 \Delta{S_{plant}} = A - M - G - RE
 (\#eq:plantcarbonbalanceequation)
 \end{equation}
-where $M = M_{leaf} + M_{sapwood} + M_{fineroot}$,  $G = G_{leaf} + G_{sapwood} + G_{fineroot}$ and $RE = RE_{leaf} + RE_{sapwood}$.
+where $M = M_{leaf} + M_{sapwood} + M_{fineroot}$ is plant-level maintenance respiration,  $G = G_{leaf} + G_{sapwood} + G_{fineroot}$ is plant-level growth costs and $RE = RE_{leaf} + RE_{sapwood}$ is plant-level root exudation.
 
 ## Process scheduling
 
 Growth simulations are conducted in **daily** time steps. Depending on the transpiration mode (`Granier` or `Sperry`) the actual steps conducted are different.
 
 ### Basic scheduling
-For every day to be simulated, the model performs the following steps:
+For every day to be simulated, first executes soil water balance, transpiration and photosynthesis calculations by calling the basic water balance model (\@ref(basicwaterbalancescheduling)). After that, the model performs the following steps for each plant cohort:
 
-1. Performs soil water balance, transpiration and photosynthesis calculations by calling the basic water balance model (\@ref(basicwaterbalancescheduling)).
-2. Determine the current amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and storage capacity (\@ref(estimationcarbonpools)). 
-3. If phenology indicates bud formation, update the leaf area target (\@ref(updateallocationtargets)).
-4. Calculate gross photosynthesis per individual ($A$), maintenance respiration for leaves ($M_{leaf}$), sapwood ($M_{sapwood}$) and fine roots ($M_{fineroot}$) (\@ref(carbonbalancecomponents)).
-5. If phenology indicates leaf unfolding, evaluate temperature and turgor sink limitations for growth of leaves, estimate growth costs ($G_{leaf}$) and record leaf area increases (\@ref(leafgrowth)). 
-6. If sapwood growth is permitted, evaluate temperature and turgor sink limitations for growth of sapwood, estimate growth costs ($G_{sapwood}$) and record sapwood area increases (\@ref(sapwoodgrowth)). 
-6. Apply transfer from leaf metabolic to sapwood metabolic carbon (via phloem) and conversions between storage and metabolic carbon. Record surplus in storage carbon as root exudation ($RE_{leaf}$ and $RE_{sapwood}$). This completes the carbon balance of $SS_{leaf}$ \@ref(eq:leafcarbonbalanceequations) and $SS_{sapwood}$ \@ref(eq:sapwoodcarbonbalanceequations) for the daily time step.
-7. Determine leaf area senescence, including aging, starvation and embolism effects (\@ref(leafsenescence)).
-8. Determine sapwood area senescence, including aging and embolism effects (\@ref(sapwoodsenescence)).
-9. Update derived variables (e.g., leaf area index and Huber value) (\@ref(updateplanttraits)) and determine if death by starvation or desiccation occurred (\@ref(plantmortality)).
+1. Determine the amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and storage capacity (\@ref(estimationcarbonpools)). 
+2. If phenology indicates bud formation, update the leaf area target (\@ref(updateallocationtargets)).
+3. Calculate gross photosynthesis per individual ($A$), maintenance respiration for leaves ($M_{leaf}$), sapwood ($M_{sapwood}$) and fine roots ($M_{fineroot}$) (\@ref(carbonbalancecomponents)).
+4. If phenology indicates leaf unfolding, evaluate leaf temperature and turgor sink limitations, growth costs ($G_{leaf}$) and leaf area increase (\@ref(leafgrowth)). 
+5. If sapwood growth is permitted, evaluate sapwood temperature and turgor sink limitations, growth costs ($G_{sapwood}$) and sapwood area increase (\@ref(sapwoodgrowth)). 
+6. Update changes in sugar and starch compartments due to photosynthesis, maintenance respiration and growth. Apply transfer from leaf metabolic to sapwood metabolic carbon (\@ref(phloemtransport)) and conversions between storage and metabolic carbon (\@ref(sugarstarchdynamics)).  
+7. Determine leaf area senescence by aging, starvation or cavitation effects (\@ref(leafsenescence)). 
+8. Determine sapwood area senescence by aging (\@ref(sapwoodsenescence)).
+9. Evaluate labile carbon translocation due to senescence ($TS_{leaf}$, $TT_{leaf}$ and $TS_{sapwood}$), adding the resulting carbon to the starch sapwood pool.
+10. Move any surplus in storage carbon to root exudation ($RE_{leaf}$ and $RE_{sapwood}$). This completes the daily carbon balance for leaf labile pools \@ref(eq:leafcarbonbalanceequations), sapwood labile pools \@ref(eq:sapwoodcarbonbalanceequations), and plant-level labile carbon \@ref(eq:plantcarbonbalanceequation).
+11. Update leaf area, sapwood area, storage volumes and the concentration of labile pools. 
+12. Update derived variables (e.g., leaf area index and Huber value) (\@ref(updateplanttraits)).
+13. Determine if plant death by starvation or desiccation occurred (\@ref(plantmortality)).
 
 ### Advanced scheduling
-For every day to be simulated, the model performs the following steps:
+For every day to be simulated, the model first executes soil water balance, energy balance, transpiration and photosynthesis calculations in subdaily times steps, by calling the advanced water balance model (\@ref(advancedwaterbalancescheduling)).After that, the model performs the following steps for each plant cohort:
 
-1. Performs soil water balance, energy balance, transpiration and photosynthesis calculations in subdaily times steps, by calling the advanced water balance model (\@ref(advancedwaterbalancescheduling)).
-2. Determine the current amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and storage capacity (\@ref(estimationcarbonpools)). 
-3. For every **subdaily** step perform carbon balance as follows:
+1. Determine the amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and storage capacity (\@ref(estimationcarbonpools)). 
+2. For every **subdaily** step, perform carbon balance as follows:
     a. Calculate gross photosynthesis per individual ($A$) and maintenance respiration for leaves ($M_{leaf}$), sapwood ($M_{sapwood}$) and fine roots ($M_{fineroot}$), taking into account both live structural biomass and labile sugar biomass (see \@ref(carbonbalancecomponents)).
     b. If phenology indicates leaf unfolding, evaluate temperature and turgor sink limitations for growth of leaves, estimate growth costs ($G_{leaf}$) and record leaf area increases (\@ref(leafgrowth)). 
     c. If sapwood growth is permitted, evaluate temperature and turgor sink limitations for growth of sapwood, estimate growth costs ($G_{sapwood}$) and record sapwood area increases (\@ref(sapwoodgrowth)). 
