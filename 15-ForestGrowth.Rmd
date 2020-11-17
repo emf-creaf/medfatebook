@@ -21,12 +21,12 @@ Three carbon compartments are differentiated in the model: **leaves**, **sapwood
 + **Storage carbon** is a labile carbon form assumed to correspond to starch. *Leaf storage carbon* is intended to represent short-term storage (mainly starch in chloroplasts) and its inclusion in the model follows the need to buffer daily variations in leaf metabolic carbon as well as the corresponding leaf osmotic potential. *Sapwood storage carbon* sapwood (branches, stems and coarse roots) conforms a much larger pool and is intended to serve as long-term (seasonal and inter-annual) storage. Unlike leaf and fine root growth, the carbon used for sapwood growth is taken directly from sapwood storage carbon (remember that the sapwood compartment includes coarse roots).
 
 
-```{r carbonpools, out.width='100%', fig.align="center", fig.cap="Schematic representation of carbon compartments, carbon pools and carbon balance components (maintenance respiration not included)", echo=FALSE}
+```{r carbonpools, out.width='100%', fig.align="center", fig.cap="Schematic representation of carbon compartments, carbon pools and carbon balance components (maintenance respiration and translocation of reserves during senescence not included)", echo=FALSE}
 knitr::include_graphics("Carbon_pools.png")
 
 ```
 
-Photosynthesis estimates come from the water balance submodel. Growth and maintenance respiration are calculated at the individual level, by estimating the respiration of leaves, sapwood and fine root compartments. Maintenance respiration of leaves and sapwood depends on both structural and metabolic carbon, whereas only structural carbon counts for fine roots because they lack a metabolic carbon pool. Sapwood maintenance and growth respiration depends on sapwood area, stem height and coarse root length. Carbon balance of leaf labile (metabolic and storage) carbon is performed by considering photosynthesis, sugar-starch conversion and phloem transport. Surplus in leaf or sapwood storage carbon is diverted towards root exudation. Hence, root exudation is not a process competing for metabolic carbon, but only a consequence of plant C storage capacity being surpassed [@Prescott2020]. 
+Photosynthesis estimates come from the water balance submodel. Growth and maintenance respiration are calculated at the individual level, by estimating the respiration of leaves, sapwood and fine root compartments. Maintenance respiration of leaves and sapwood depends on both structural and metabolic carbon, whereas only structural carbon counts for fine root maintenance respiration because they lack labile carbon pools. Sapwood maintenance and growth respiration depends on sapwood area, stem height and coarse root length. Carbon balance of leaf labile (metabolic and storage) carbon is performed by considering photosynthesis, sugar-starch conversion and phloem transport. Surplus in leaf or sapwood storage carbon is diverted towards root exudation. Hence, root exudation is not a process competing for metabolic carbon, but only a consequence of plant C storage capacity being surpassed [@Prescott2020]. During leaf senescence it is assumed that non-structural carbon sources (i.e. labile carbon pools) are recycled before necrosis and translocated to sapwood storage. Analogously, when sapwood is converted into heartwood, labile carbon in the protoplasm of parenchyma cells is assumed to be absorbed by neighboring living cells as storage.
 
 Further design details and formulation regarding the estimation of carbon pool sizes and carbon balance components are given in chapter \@ref(carbonpoolsbalance). 
 
@@ -39,7 +39,7 @@ The forest growth model allows simulating variation leaf area, sapwood area and 
  ii. Formation of **sapwood area** can only occur if unfolded leaves are present, assuming that hormonal signals controlling cambium division are mainly synthesized within leaves. Sapwood formation is modelled as a radial file of vessels issued from cell divisions in cambium and which progressively undergo enlargement and maturation [@Friend2019]. Losses in sapwood area (i.e. conversion to heartwood) occur via tissue *aging* (i.e. assuming a daily rate of conversion), although stem cavitation reduces the area of sapwood that is effectively functional for water transport. Similarly to 3-PG [@Landsberg1997] we assume that the relative turnover rate of sapwood is smallest for young plants, and it increases up to a maximum value.
  iii. **Fine root area** dynamics also arises from the interplay of fine root growth and senescence. Fine root growth can in principle occur any time of the year (i.e. the model does not explicitly consider root phenology), but since fine root biomass targets depend on leaf area, seasonal fine root area patterns can arise in drought- or winter-deciduous species. Fine root senescence occurs via *aging* with a turnover rate depending on soil temperature. 
 
-Formation of new leaf, sapwood and fine root tissues is determined taking into account both source (i.e. carbon availability) and sink (i.e. biophysical constraints on plant tissue expansion) limitations [@Fatichi2014; @Guillemot2015; @Korner2015]. Sink limitations are implemented following @Cabon2019 and @Cabon2020, although these authors developed their approach for tracheid production and enlargement, whereas we apply it to different kinds of tissues. While leaf and fine root source limitations are set by available metabolic carbon, stem growth is assumed to be limited by the availability of storage (i.e. starch) in the stem (Fig. 15.1). This is done to create a preferential allocation of recently assimilated carbon into leaf and fine root tissues over stem growth, as long as leaf and fine root areas are below the respective targets set by allocation rules. 
+Formation of new leaf, sapwood and fine root tissues is determined taking into account both source (i.e. carbon availability) and sink (i.e. biophysical constraints on plant tissue expansion) limitations [@Fatichi2014; @Guillemot2015; @Korner2015]. Sink limitations are implemented following @Cabon2019 and @Cabon2020, although these authors developed their approach for tracheid production and enlargement, whereas we apply it to different kinds of tissues. While leaf and fine root source limitations are set by available metabolic carbon, stem growth is assumed to be limited by the availability of storage (i.e. starch) in the stem (Fig. \@ref(fig:carbonpools)). This is done to create a preferential allocation of recently assimilated carbon into leaf and fine root tissues over stem growth, as long as leaf and fine root areas are below the respective targets set by allocation rules. 
 
 Two options are possible regarding the allocation to leaves vs sapwood:
 
@@ -94,10 +94,10 @@ Additional *individual-level state variables* are needed in growth model simulat
  + Sapwood area, $SA_i$ ($cm^2$).
  + Leaf area, $LA_i$ ($m^2$).
  + Fine root biomass $B_{fineroot,i,s}$ ($g\,dry$) in each soil layer $s$.
- + Sugar storage in leaves, $SS_{leaf,i}$ ($mol\,gluc \cdot L^{-1}$).
- + Starch storage in leaves, $ST_{leaf,i}$ ($mol\,gluc \cdot L^{-1}$).
- + Sugar storage in sapwood (stem, branches and coarse roots), $SS_{sapwood,i}$ ($mol\,gluc \cdot L^{-1}$).
- + Starch storage in sapwood (stem, branches and coarse roots), $ST_{sapwood,i}$ ($mol\,gluc \cdot L^{-1}$).
+ + Sugar concentration in leaves, $SS_{leaf,i}$ ($mol\,gluc \cdot L^{-1}$).
+ + Starch concentration in leaves, $ST_{leaf,i}$ ($mol\,gluc \cdot L^{-1}$).
+ + Sugar concentration in sapwood (stem, branches and coarse roots), $SS_{sapwood,i}$ ($mol\,gluc \cdot L^{-1}$).
+ + Starch concentration in sapwood (stem, branches and coarse roots), $ST_{sapwood,i}$ ($mol\,gluc \cdot L^{-1}$).
  
 Note that $LA_i$ is the same state variable as $LAI^{live}_i$, but expressed at the individual level, because the density of individuals in the cohort does not change during the simulation. Other functional variables can be derived from the previous state variables and, hence, hence do not need to be treated as state variables themselves:
 
@@ -113,30 +113,35 @@ Belowground variables (fine root biomass, fine root distribution and radial leng
 
 Since the growth model builds on soil and plant water balances models, the water and energy balances explained in sections \@ref(soilwaterbalance) or \@ref(waterenergybalances) (depending on `transpirationMode`) also hold for this model.
 
-The model performs daily carbon balance in leaves and sapwood (stem, branches and coarse roots) for each plant cohort. In each of these two compartments carbon balance is performed for the two storage forms, dissolved sugars and starch. At the leaf level, the carbon balance equations for dissolved sugars and starch are ($i$ subscripts omitted):
+The model performs daily carbon balance in leaves and sapwood (stem, branches and coarse roots) for each plant cohort. In each of these two compartments carbon balance is performed for the two storage forms, dissolved sugars and starch. In the following all carbon flows (i.e. the components of right hand side of equations) are assumed to be in units of $g\,gluc \cdot day^{-1}$. At the leaf level, the carbon balance equations for dissolved sugars and starch are ($i$ subscripts omitted):
 
 \begin{eqnarray}
-\Delta{SS_{leaf}} &=& A - R_{leaf} - F_{phloem} - G_{leaf} - SC_{leaf}\\
-\Delta{ST_{leaf}} &=& SC_{leaf} - RE_{leaf}
+\Delta{SS_{leaf}} \cdot V_{storage,leaf} &=& A - M_{leaf} - F_{phloem} - G_{leaf} - SC_{leaf} - TS_{leaf}\\
+\Delta{ST_{leaf}} \cdot V_{storage,leaf} &=& SC_{leaf} - TT_{leaf} - RE_{leaf}
 (\#eq:leafcarbonbalanceequations)
 \end{eqnarray}
-where $A$ is (gross) photosynthesis, $R_{leaf}$ is leaf maintenance respiration, $F_{phloem}$ is the sugar flow via phloem towards the stem and roots, $G_{leaf}$ is the carbon lost via new leaf growth, $SC_{leaf}$ is the conversion from leaf sugar to leaf starch and $RE_{leaf}$ is the root exudation of leaf carbon. 
+where $A$ is (gross) photosynthesis, $M_{leaf}$ is leaf maintenance respiration, $F_{phloem}$ is the sugar flow via phloem towards the stem and roots, $G_{leaf}$ is the carbon cost of forming new leaves, $SC_{leaf}$ is the conversion from leaf sugar to leaf starch, $TS_{leaf}$ and $TT_{leaf}$ are the translocation of leaf sugars and starch, respectively, during leaf senescence and $RE_{leaf}$ is the root exudation of leaf carbon. 
 
 The corresponding carbon balance equations for sapwood dissolved sugars and starch are:
 \begin{eqnarray}
-\Delta{SS_{sapwood}} &=& F_{phloem} - R_{sapwood} - R_{fineroots} - G_{sapwood} - G_{fineroots} - SC_{sapwood} \\
-\Delta{ST_{sapwood}} &=& SC_{sapwood} - RE_{sapwood}
+\Delta{SS_{sapwood}} \cdot V_{storage,sapwood} &=& F_{phloem} - M_{sapwood} - M_{fineroot} - G_{sapwood} - G_{fineroot} \\
+& & - SC_{sapwood}  - TS_{sapwood} \\
+\Delta{ST_{sapwood}} \cdot V_{storage,sapwood} &=& SC_{sapwood} + TS_{leaf} + TT_{leaf} + TS_{sapwood} - RE_{sapwood}
 (\#eq:sapwoodcarbonbalanceequations)
 \end{eqnarray}
-where $F_{phloem}$ is the sugar inflow via phloem transport, $R_{sapwood}$ is the sum of maintenance respiration of branches, stem and coarse roots, $R_{fineroots}$ is the maintenance respiration of fine roots, $G_{sapwood}$ and $G_{fineroots}$ are the carbon expenses of growth of new sapwood tissue or fine roots (respectively), $SC_{sapwood}$ is the conversion of sapwood sugar to sapwood starch and $RE_{sapwood}$ is the root exudation of sapwood carbon. 
+where $F_{phloem}$ is the sugar inflow via phloem transport, $M_{sapwood}$ is the sum of maintenance respiration of branches, stem and coarse roots, $M_{fineroot}$ is the maintenance respiration of fine roots, $G_{sapwood}$ and $G_{fineroot}$ are the carbon costs of forming new sapwood or fine roots (respectively), $SC_{sapwood}$ is the conversion of sapwood sugar to sapwood starch, $TS_{sapwood}$ is the translocation of sapwood sugars into starch during leaf senescence and $RE_{sapwood}$ is the root exudation of sapwood carbon. 
 
-REVISE (currently false): Leaf senescence has no impact on dissolved sugar and starch compartments of leaves (but it affects leaf biomass, volume and leaf area) as it is assumed that these non-structural carbon sources are recycled before necrosis. Analogously to leave senescence, when sapwood is converted into heartwood, non-structural carbon in the protoplasm of parenchyma cells is assumed to be absorbed by neighboring living cells.
 
-At the plant level, carbon balance becomes:
+If we define $S_{plant}$ as the total amount of labile carbon in the plant (in $g\,gluc$):
 \begin{equation}
-\Delta{S_{plant}} = A_{leaf} - R - G - RE
+S_{plant} = (SS_{leaf} + ST_{leaf}) \cdot V_{storage,leaf} + (SS_{sapwood} + ST_{sapwood}) \cdot V_{storage,sapwood}
 \end{equation}
-where $R = R_{leaf} + R_{sapwood} + R_{fineroot}$,  $G = G_{leaf} + G_{sapwood} + G_{fineroot}$ and $RE = RE_{leaf} + RE_{sapwood}$.
+then carbon balance at the plant level reduces to:
+\begin{equation}
+\Delta{S_{plant}} = A - M - G - RE
+(\#eq:plantcarbonbalanceequation)
+\end{equation}
+where $M = M_{leaf} + M_{sapwood} + M_{fineroot}$,  $G = G_{leaf} + G_{sapwood} + G_{fineroot}$ and $RE = RE_{leaf} + RE_{sapwood}$.
 
 ## Process scheduling
 
@@ -148,10 +153,10 @@ For every day to be simulated, the model performs the following steps:
 1. Performs soil water balance, transpiration and photosynthesis calculations by calling the basic water balance model (\@ref(basicwaterbalancescheduling)).
 2. Determine the current amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and storage capacity (\@ref(estimationcarbonpools)). 
 3. If phenology indicates bud formation, update the leaf area target (\@ref(updateallocationtargets)).
-4. Calculate gross photosynthesis per individual ($A$), maintenance respiration costs for leaves ($R_{leaf}$), sapwood ($R_{sapwood}$) and fine roots ($R_{fineroot}$) (\@ref(carbonbalancecomponents)).
+4. Calculate gross photosynthesis per individual ($A$), maintenance respiration for leaves ($M_{leaf}$), sapwood ($M_{sapwood}$) and fine roots ($M_{fineroot}$) (\@ref(carbonbalancecomponents)).
 5. If phenology indicates leaf unfolding, evaluate temperature and turgor sink limitations for growth of leaves, estimate growth costs ($G_{leaf}$) and record leaf area increases (\@ref(leafgrowth)). 
 6. If sapwood growth is permitted, evaluate temperature and turgor sink limitations for growth of sapwood, estimate growth costs ($G_{sapwood}$) and record sapwood area increases (\@ref(sapwoodgrowth)). 
-6. Apply transfer from leaf metabolic to sapwood metabolic carbon (via phloem) and conversions between storage and metabolic carbon. Record surplus in storage carbon as root exudation. This completes the carbon balance of $SS_{leaf}$ \@ref(eq:leafcarbonbalanceequations) and $SS_{sapwood}$ \@ref(eq:sapwoodcarbonbalanceequations) for the daily time step.
+6. Apply transfer from leaf metabolic to sapwood metabolic carbon (via phloem) and conversions between storage and metabolic carbon. Record surplus in storage carbon as root exudation ($RE_{leaf}$ and $RE_{sapwood}$). This completes the carbon balance of $SS_{leaf}$ \@ref(eq:leafcarbonbalanceequations) and $SS_{sapwood}$ \@ref(eq:sapwoodcarbonbalanceequations) for the daily time step.
 7. Determine leaf area senescence, including aging, starvation and embolism effects (\@ref(leafsenescence)).
 8. Determine sapwood area senescence, including aging and embolism effects (\@ref(sapwoodsenescence)).
 9. Update derived variables (e.g., leaf area index and Huber value) (\@ref(updateplanttraits)) and determine if death by starvation or desiccation occurred (\@ref(plantmortality)).
@@ -162,12 +167,12 @@ For every day to be simulated, the model performs the following steps:
 1. Performs soil water balance, energy balance, transpiration and photosynthesis calculations in subdaily times steps, by calling the advanced water balance model (\@ref(advancedwaterbalancescheduling)).
 2. Determine the current amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and storage capacity (\@ref(estimationcarbonpools)). 
 3. For every **subdaily** step perform carbon balance as follows:
-    a. Calculate gross photosynthesis per individual ($A$) and maintenance respiration costs for leaves ($R_{leaf}$), sapwood ($R_{sapwood}$) and fine roots ($R_{fineroot}$), taking into account both live structural biomass and labile sugar biomass (see \@ref(carbonbalancecomponents)).
+    a. Calculate gross photosynthesis per individual ($A$) and maintenance respiration for leaves ($M_{leaf}$), sapwood ($M_{sapwood}$) and fine roots ($M_{fineroot}$), taking into account both live structural biomass and labile sugar biomass (see \@ref(carbonbalancecomponents)).
     b. If phenology indicates leaf unfolding, evaluate temperature and turgor sink limitations for growth of leaves, estimate growth costs ($G_{leaf}$) and record leaf area increases (\@ref(leafgrowth)). 
     c. If sapwood growth is permitted, evaluate temperature and turgor sink limitations for growth of sapwood, estimate growth costs ($G_{sapwood}$) and record sapwood area increases (\@ref(sapwoodgrowth)). 
     d. Evaluate temperature and turgor sink limitations for growth of fine roots, estimate growth costs ($G_{fineroot}$) and record fine root biomass increases (\@ref(finerootgrowth)). 
     d. Update $SS_{leaf}$ and $SS_{sapwood}$ taking into account photosynthesis, maintenance respiration and growth respiration.
-    e. Evaluate phloem transport ($F_{phloem}$) and sugar-starch dynamics in the leaf and sapwood compartments **at 1s time steps** (\@ref(phloemtransport)), including diversion towards root exudation if maximum starch capacity is attained. This completes the carbon balance of $SS_{leaf}$ \@ref(eq:leafcarbonbalanceequations) and $SS_{sapwood}$ \@ref(eq:sapwoodcarbonbalanceequations) for the subdaily time step.
+    e. Evaluate phloem transport ($F_{phloem}$) and sugar-starch dynamics in the leaf and sapwood compartments **at 1s time steps** (\@ref(phloemtransport)), including diversion towards root exudation if maximum leaf or sapwood starch capacity is attained ($RE_{leaf}$ and $RE_{sapwood}$). This completes the carbon balance of $SS_{leaf}$ \@ref(eq:leafcarbonbalanceequations) and $SS_{sapwood}$ \@ref(eq:sapwoodcarbonbalanceequations) for the subdaily time step.
   
 4. If the balance of $SS_{leaf}$ is negative, apply leaf senescence as the exceeding leaf area according to respiration costs. Otherwise, a constant leaf senescence rate is applied according to leaf lifespan (\@ref(leafsenescence)). 
 5. Apply a constant rate of sapwood senescence (conversion to heartwood), which does not affect sapwood C storage (\@ref(sapwoodsenescence)).
@@ -274,7 +279,7 @@ Function `growth` returns a list object with the following elements (many of the
 | `Plants`| Plant-level variables, such as $LAI^{phi}_i$, plant transpiration, plant water potential, etc. |
 | `SunlitLeaves` | Leaf-level output variables for sunlit leaves (`transpirationMode = "Sperry"`). |
 | `ShadeLeaves` | Leaf-level output variables for shade leaves (`transpirationMode = "Sperry"`). |
-| `PlantCarbonBalance`| A list with the daily results of carbon balance components (photosynthesis and respiration) and carbon pools. |
+| `PlantCarbonBalance`| A list with the daily results of carbon balance components and carbon pools. |
 | `PlantGrowth`| A list with daily results of leaf area, sapwood area, fine root area and the corresponding daily growth rates. |
 | `StandStructures`| A list with the aboveground structure of the stand at the beginning of the simulation and after each simulated year. |
 | `StandSummary`| Stand-level summaries (leaf area index, tree basal area, tree density, shrub cover, etc.) at the beginning of the simulation and after each simulated year. |
@@ -283,15 +288,15 @@ The following table describes the child elements of `PlantCarbonBalance`, each o
 
 | Element | Symbol | Units | Description                               |
 |---------|--------|-------|-------------------------------------------|
-| `GrossPhotosynthesis`|$A_{i}/B_{i}$ | $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$ | Gross photosynthesis rate per dry weight of living biomass. |
-| `MaintentanceRespiration`|$R_{i}/B_{i}$ | $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$ | Maintenance respiration rate (including leaves, sapwood and fine roots) per dry weight of living biomass. |
-| `GrowthRespiration`|$G_{i}/B_{i}$ | $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$ | Growth respiration rate  (including leaves, sapwood and fine roots) per dry weight of living biomass. |
-| `CarbonBalance`|$\Delta S_{i}/B_{i}$ | $g\,gluc \cdot g\,dry^{-1}$ | Daily plant carbon balance (difference of photosynthesis - respiration) per dry weight of living biomass. |
+| `GrossPhotosynthesis`|$A_{i}/B_{i}$ | $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$ | Daily gross photosynthesis per dry weight of living biomass. |
+| `MaintentanceRespiration`|$M_{i}/B_{i}$ | $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$ | Daily maintenance respiration (including leaves, sapwood and fine roots) per dry weight of living biomass. |
+| `GrowthCosts`|$G_{i}/B_{i}$ | $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$ | Daily growth costs  (including leaves, sapwood and fine roots) per dry weight of living biomass. |
+| `RootExudation`|$RE_{i}$ | $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$ | Daily root exudation per dry weight of living biomass. |
+| `CarbonBalance`|$\Delta S_{i}/B_{i}$ | $g\,gluc \cdot g\,dry^{-1}$ | Daily plant carbon balance (eq. \@ref(eq:plantcarbonbalanceequation)) per dry weight of living biomass. |
 | `SugarLeaf`|$SS_{leaf,i}$ | $mol\,gluc \cdot L^{-1}$ | Sugar concentration in leaves. |
 | `StarchLeaf`|$ST_{leaf,i}$ | $mol\,gluc \cdot L^{-1}$ | Starch concentration in leaves. |
 | `SugarSapwood`|$SS_{sapwood,i}$ | $mol\,gluc \cdot L^{-1}$ | Sugar concentration in sapwood. |
 | `StarchSapwood`|$ST_{sapwood,i}$ | $mol\,gluc \cdot L^{-1}$ | Starch concentration in sapwood. |
-| `RootExudation`|$RE_{i}$ | $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$ | Daily root exudation per dry weight of living biomass. |
 
 The following table describes the child elements of `PlantGrowth`, again each of them a data frame with dates in rows and plant cohorts in columns:
 
