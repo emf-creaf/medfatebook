@@ -145,24 +145,25 @@ where $M = M_{leaf} + M_{sapwood} + M_{fineroot}$ is plant-level maintenance res
 
 ## Process scheduling
 
-Growth simulations are conducted in **daily** time steps. Depending on the transpiration mode (`Granier` or `Sperry`) the actual steps conducted are different.
+Growth simulations are conducted in **daily** time steps. Depending on the transpiration mode (`Granier` or `Sperry`) the actual steps conducted are different (see subsections below). At the end of each year (or at the end of the simulated period) the model translates cumulative sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover), as explained in chapter \@ref(structuralupdate). 
 
 ### Basic scheduling
 For every day to be simulated, first executes soil water balance, transpiration and photosynthesis calculations by calling the basic water balance model (\@ref(basicwaterbalancescheduling)). After that, the model performs the following steps for each plant cohort:
 
 1. Determine the amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and storage capacity (\@ref(estimationcarbonpools)). 
-2. If phenology indicates bud formation, update the leaf area target (\@ref(updateallocationtargets)).
-3. Calculate gross photosynthesis per individual ($A$), maintenance respiration for leaves ($M_{leaf}$), sapwood ($M_{sapwood}$) and fine roots ($M_{fineroot}$) (\@ref(carbonbalancecomponents)).
-4. If phenology indicates leaf unfolding, evaluate leaf temperature and turgor sink limitations, growth costs ($G_{leaf}$) and leaf area increase (\@ref(leafgrowth)). 
-5. If sapwood growth is permitted, evaluate sapwood temperature and turgor sink limitations, growth costs ($G_{sapwood}$) and sapwood area increase (\@ref(sapwoodgrowth)). 
-6. Update changes in sugar and starch compartments due to photosynthesis, maintenance respiration and growth. Apply transfer from leaf metabolic to sapwood metabolic carbon (\@ref(phloemtransport)) and conversions between storage and metabolic carbon (\@ref(sugarstarchdynamics)).  
-7. Determine leaf area senescence by aging, starvation or cavitation effects (\@ref(leafsenescence)). 
+2. Calculate gross photosynthesis per individual ($A$), maintenance respiration for leaves ($M_{leaf}$), sapwood ($M_{sapwood}$) and fine roots ($M_{fineroot}$) (\@ref(carbonbalancecomponents)).
+3. If phenology indicates leaf unfolding, evaluate leaf temperature and turgor sink limitations, growth costs ($G_{leaf}$) and leaf area increase (\@ref(leafgrowth)). 
+4. If sapwood growth is permitted, evaluate sapwood temperature and turgor sink limitations, growth costs ($G_{sapwood}$) and sapwood area increase (\@ref(sapwoodgrowth)). 
+5. Update changes in sugar and starch compartments due to photosynthesis, maintenance respiration and growth. Apply transfer from leaf metabolic to sapwood metabolic carbon (\@ref(phloemtransport)) and conversions between storage and metabolic carbon (\@ref(sugarstarchdynamics)).  
+6. Determine leaf senescence due to carbon starvation (\@ref(leafsenescence)).
+7. Determine leaf senescence due to aging or cavitation effects (\@ref(leafsenescence)). 
 8. Determine sapwood area senescence by aging (\@ref(sapwoodsenescence)).
 9. Evaluate labile carbon translocation due to senescence ($TS_{leaf}$, $TT_{leaf}$ and $TS_{sapwood}$), adding the resulting carbon to the starch sapwood pool.
 10. Move any surplus in storage carbon to root exudation ($RE_{leaf}$ and $RE_{sapwood}$). This completes the daily carbon balance for leaf labile pools \@ref(eq:leafcarbonbalanceequations), sapwood labile pools \@ref(eq:sapwoodcarbonbalanceequations), and plant-level labile carbon \@ref(eq:plantcarbonbalanceequation).
 11. Update leaf area, sapwood area, storage volumes and the concentration of labile pools. 
-12. Update derived variables (e.g., leaf area index and Huber value) (\@ref(updateplanttraits)).
-13. Determine if plant death by starvation or desiccation occurred (\@ref(plantmortality)).
+12. Determine if plant death by starvation or desiccation occurred (\@ref(plantmortality)).
+13. Update derived variables (e.g., leaf area index and Huber value) (\@ref(updateplanttraits)).
+14. If phenology indicates bud formation, update the leaf area target (\@ref(updateallocationtargets)).
 
 ### Advanced scheduling
 For every day to be simulated, the model first executes soil water balance, energy balance, transpiration and photosynthesis calculations in subdaily times steps, by calling the advanced water balance model (\@ref(advancedwaterbalancescheduling)).After that, the model performs the following steps for each plant cohort:
@@ -173,20 +174,17 @@ For every day to be simulated, the model first executes soil water balance, ener
     b. If phenology indicates leaf unfolding, evaluate temperature and turgor sink limitations for growth of leaves, estimate growth costs ($G_{leaf}$) and record leaf area increases (\@ref(leafgrowth)). 
     c. If sapwood growth is permitted, evaluate temperature and turgor sink limitations for growth of sapwood, estimate growth costs ($G_{sapwood}$) and record sapwood area increases (\@ref(sapwoodgrowth)). 
     d. Evaluate temperature and turgor sink limitations for growth of fine roots, estimate growth costs ($G_{fineroot}$) and record fine root biomass increases (\@ref(finerootgrowth)). 
-    d. Update $SS_{leaf}$ and $SS_{sapwood}$ taking into account photosynthesis, maintenance respiration and growth respiration.
-    e. Evaluate phloem transport ($F_{phloem}$) and sugar-starch dynamics in the leaf and sapwood compartments **at 1s time steps** (\@ref(phloemtransport)), including diversion towards root exudation if maximum leaf or sapwood starch capacity is attained ($RE_{leaf}$ and $RE_{sapwood}$). This completes the carbon balance of $SS_{leaf}$ \@ref(eq:leafcarbonbalanceequations) and $SS_{sapwood}$ \@ref(eq:sapwoodcarbonbalanceequations) for the subdaily time step.
-  
-4. If the balance of $SS_{leaf}$ is negative, apply leaf senescence as the exceeding leaf area according to respiration costs. Otherwise, a constant leaf senescence rate is applied according to leaf lifespan (\@ref(leafsenescence)). 
-5. Apply a constant rate of sapwood senescence (conversion to heartwood), which does not affect sapwood C storage (\@ref(sapwoodsenescence)).
-6. Update sapwood area ($SA$) and leaf area ($LAI^{live}$), Huber values, hydraulic conductance of stems, roots and rhizosphere according to current sapwood and leaf area values (\@ref(updateplanttraits)).
-7. Update the fine root biomass target, according to the hydraulic conductance in the rhizosphere (\@ref(updateallocationtargets)).
-8. Update osmotic potential at full turgor of leaves and sapwood according to current sugar concentrations (a constant concentration of salts is assumed) and potential non-stomatal photosynthesis limitations (\@ref(updateplanttraits)).
-9. Determine if death by starvation or desiccation occurred (\@ref(plantmortality)).
-
-
-### Structural update
-
-At the end of each year (or at the end of the simulated period) the model translates cumulative sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover), as explained in chapter \@ref(structuralupdate). 
+    e. Evaluate phloem transport ($F_{phloem}$) and sugar-starch dynamics in the leaf and sapwood compartments **at 1s time steps** (\@ref(phloemtransport)), including photosynthesis, maintenance respiration and growth respiration as well as diversion towards root exudation if maximum leaf or sapwood starch capacity is attained ($RE_{leaf}$ and $RE_{sapwood}$). 
+    f. Determine leaf senescence due to negative carbon balance (\@ref(leafsenescence)). This completes the sub-daily carbon balance for plant-level labile carbon \@ref(eq:plantcarbonbalanceequation).
+4. Determine leaf senescence due to aging or cavitation effects (\@ref(leafsenescence)). 
+5. Determine sapwood area senescence by aging (\@ref(sapwoodsenescence)).
+6. Evaluate labile carbon translocation due to senescence ($TS_{leaf}$, $TT_{leaf}$ and $TS_{sapwood}$), adding the resulting carbon to the starch sapwood pool. This completes the daily carbon balance for leaf labile pools \@ref(eq:leafcarbonbalanceequations), sapwood labile pools \@ref(eq:sapwoodcarbonbalanceequations).
+7. Apply fine root biomass growth and senescence (\@ref(finerootsenescence)).
+8. Update leaf area, sapwood area, storage volumes and the concentration of labile pools. 
+9. Determine if plant death by starvation or desiccation occurred (\@ref(plantmortality)).
+10. Update derived variables (e.g., leaf area index, Huber values, hydraulic conductance of stems, roots and rhizosphere, osmotic potential at full turgor of leaves and sapwood) (\@ref(updateplanttraits)).
+11. If phenology indicates bud formation, update the leaf area target (\@ref(updateallocationtargets)).
+12. Update the fine root biomass target, according to the hydraulic conductance in the rhizosphere (\@ref(updateallocationtargets)).
 
 
 ## Inputs and outputs
@@ -207,48 +205,42 @@ Weather input data must include variables calculated at the **daily** scale. The
 
 ### Vegetation functional parameters
 
-Vegetation in the stand is described using a set of plant cohorts, described in an object of class `growthInput`. This function assembles all parameters needed for the simulation of a given stand in a single list. Model parameters are grouped by category.  Regarding physical aboveground description of the stand, each plant cohort is defined by its species identity ($SP$; with R name [`SP`]). In addition, each cohort needs to be defined regarding the following state variables:
+The growth model requires many functional parameters to be specified for plant cohorts. Some of them depend on whether the basic or advanced water balance is adopted. Here we report functional parameters needed in addition to those necessary for the water balance submodel.
 
-+ $N$ [`N`]: The density of individuals (in $ind · ha^{-1}$).
-+ $DBH$ [`DBH`]: Tree diameter at breast height (in cm).
-+ $Cover$ [`Cover`]: Shrub percent cover (in %).
-+ $H$ [`H`]: Total tree or shrub height (in cm).}
-+ $CR$ [`CR`]: Crown ratio (i.e. the ratio between crown length and total height).}
-+ $LAI^{live}$ [`LAI_live`]: Live leaf area index (one-side live leaf area of plants in the cohort per surface area of the stand) (in m$^2$·m$^{-2}$).}
-+ $LAI^{\phi}$ [`LAI_expanded`]: Expanded leaf area index (one-side expanded leaf area of plants in the cohort per surface area of the stand) (in m$^2$·m$^{-2}$).}
-+ $LAI^{dead}$ [`LAI_dead`]: Dead leaf area index (one-side dead leaf area of plants in the cohort per surface area of the stand) (in m$^2$·m$^{-2}$).}
-+ $LAI^{predrought}$ [`LAI_predrought`]: Live leaf area index before the current drought started (one-side dead leaf area of plants in the cohort per surface area of the stand) (in m$^2$·m$^{-2}$).}
-+ $SA$ [`SA`]: Area of functional sapwood per individual (in cm$^2$·ind$^{-1}$).}
-+ $C_{fast}$ [`fastCstorage`]: Amount of C in the fast carbon storage pool (in g C·ind$^{-1}$).}
-+ $C_{slow}$ [`slowCstorage`]: Amount of C in the slow carbon storage pool (in g C·ind$^{-1}$).}
+A first set of parameters refers to anatomical features (`paramsAnatomy`):
 
-Excepting $SP$ (species identity) and $N$ (density), the remaining aboveground state variables are modified during growth simulations. Belowground parameters are the following:
+| Symbol | Units | R  | Description                                  | 
+|--------|-------|----| ---------------------------------------------|
+| $H_{max,i}$  | $cm$ | `Hmax` | Maximum plant height |
+| $H_{med,i}$  | $cm$ | `Hmed` | Median plant height |
+| $1/H_{v,i}$  | $m^2 \cdot m^{-2}$ | `Al2As` | Leaf area to sapwood area ratio |
+| $SLA_i$  | $m^2 \cdot kg^{-1}$ | `SLA` | Specific leaf area |
+| $LW_i$   | $cm$  | `LeafWidth` | Leaf width |
+| $\rho_{leaf,i}$ | $g \cdot cm^{-3}$ | `LeafDensity` | Leaf tissue density |
+| $\rho_{wood,i}$ | $g \cdot cm^{-3}$ | `WoodDensity` | Wood tissue density |
+| $\rho_{fineroot,i}$ | $g \cdot cm^{-3}$ | `FineRootDensity` | Fine root tissue density |
+| $SRL$ | $cm \cdot g^{-1}$ | `SRL` | Specific root length |
+| $RLD$ | $cm \cdot cm^{-3}$ | `RLD` | Fine root length density (i.e. density of root length per soil volume) |
+| $r_{6.35}$ | | `r635` | Ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm |
 
-+ $Z$ [`Z`]: The rooting depth (in cm).}
-+ $V$ [`V`]: A matrix with the proportion of fine roots in each soil layer.}
+A second set of parameters refers to allometric coefficients needed for structural updates (`paramsAllometries`).
 
-Additional belowground variables are included if `transpirationMode = "Sperry"`. These, and the parameters needed for water balance calculations are described in vignette '\textbf{Soil description and root system architecture}'. 
+| Symbol       | Units | R param       | Description                      |
+|--------------|-------|---------------|----------------------------------|
+| $a_{ash}$ | | `Aash` | Coefficient relating the square of shrub height with shrub area |
+| $a_{bsh}$, $b_{bsh}$ | |`Absh`, `Bbsh` | Coefficients relating crown volume with dry weight of shrub individuals |
+| $a_{cr}$, $b_{1cr}$, $b_{2cr}$, $b_{3cr}$, $c_{1cr}$, $c_{2cr}$ | | `B1cr`, `B2cr`, `B3cr`, `C1cr`, `C2cr` | Coefficients to calculate crown ratio of trees |
+| $a_{cw}$, $b_{cw}$ | | `Acw`, `Bcw` | Regression coefficients used to calculate the crown width of trees (as intermediary step to obtain the crown ratio).|
 
-The following physiological parameters are needed for growth calculations:
+A third set of parameters refers to growth parameters (`paramsGrowth`).
 
-+ $SLA$ [`SLA`]: Specific leaf area (m$^2$·kg$^{-1}$).
-+ $Hv$ [`Al2As`]: Huber value. Leaf area to sapwood area ratio (in m$^2$·m$^{-2}$).}
-+ $W_{dens}$ [`WoodDens`]: Wood density (at 0\% humidity) (in g·cm$^{-3}$).}
-+ $W_{C}$ [`WoodC`]: Wood carbon content in relation to dry weight (in g·g$^{-1}$).}
-+ $C_{p,\max}$ [`Cstoragepmax`]: Maximum storage capacity, expressed as C per total respiratory C (in gC·gC$^{-1}$).
-+ $RGR_{\max}$ [`RGRmax`]: Maximum daily relative growth rate (in sapwood area basis) (in cm$^2$·cm$^{-2}$).
+| Symbol       | Units | R param       | Description                      |
+|--------------|-------|---------------|----------------------------------|
+| $RGR_{sapwood, max}$ | $cm^2 \cdot cm^{-2}$| `RGRsapwoodmax` | Maximum daily relative growth rate (in sapwood area basis) |
+| $f_{HD,min}$ | $cm \cdot cm^{-1}$ | `fHDmin` | Minimum height-to-diameter ratio |
+| $f_{HD,max}$ | $cm \cdot cm^{-1}$ | `fHDmax` | Maximum height-to-diameter ratio |
 
-Another set of parameters is needed to transform changes in sapwood area and leaf area to changes in the structural variables such as tree height, tree crown ratio or shrub cover:
-
-+ $H_{\max}$ [`Hmax`]: Maximum plant height (in cm).
-+ $f_{HD,\min}$, $f_{HD,\max}$ [`fHDmin}, `fHDmax`]: Minimum and maximum values of the height-diameter ratio (in cm·cm$^{-1}$).
-+ $Z_{\max}$ [`Zmax`]: Maximum rooting depth (in mm).
-+ $a_{ash}$ [`Aash`]: Regression coefficient for the quadratic relationship between shrub height and shrub area.
-+ $a_{bsh}$, $b_{bsh}$ [`Absh`, `Bbsh`]: Allometric coefficients relating crown phytovolume with dry weight of shrub individuals.
-+ $CR$ [`cr`]: Ratio between crown length and total height (constant value for shrubs).
-+ $r_{6.35}$ [`r635`]: Ratio between the dry weight of leaves plus branches and the dry weight of leaves alone for branches of 6.35 mm of diameter.
-+ $a_{cr}$, $b_{1cr}$, $b_{2cr}$, $b_{3cr}$, $c_{1cr}$, $c_{2cr}$ [`B1cr`, `B2cr`, `B3cr`, `C1cr`, `C2cr`]: Regression coefficients used to update the crown ratio of trees.
-+ $a_{cw}$, $b_{cw}$ [`Acw`, `Bcw`]: Regression coefficients used to calculate the crown width of trees (as intermediary step to obtain the crown ratio).
+Vegetation functional attributes are normally filled for each cohort by function `growthInput()` or `forest2growthInput()` from species identity. However, different parameters can be specified for different cohorts of the same species if desired (see section \@ref(functionaltraits)). 
 
 ### Control parameters
 
