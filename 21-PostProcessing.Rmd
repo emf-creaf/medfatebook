@@ -4,24 +4,26 @@
 
 ## Live fuel moisture content
 
-Pressure-volume curves are useful to determine the moisture content of live fuel elements (leaves and twigs). Given an average relative water content of a water compartment, its live fuel moisture content ($LFMC$ in $g H_2O \cdot g^{-1}$ of dry tissue) can be calculated using:
+Given an average relative water content of a plant organ, its live fuel moisture content ($LFMC$ in $g H_2O \cdot g^{-1}$ of dry tissue) can be calculated using:
 \begin{equation}
 LFMC = RWC \cdot \Theta \cdot \frac{\rho_{H_2O}}{\rho} = RWC \cdot LFMC_{max}
 \end{equation}
-where $\Theta$ is the tissue porosity ($cm^3$ of water per $cm^3$ of tissue), $\rho$ is the density of the tissue and $\rho_{H_2O}$ is the density of water.
+where $\Theta$ is the tissue porosity ($cm^3$ of water per $cm^3$ of tissue), $\rho$ is the density of the tissue and $\rho_{H_2O}$ is the density of water. In practice estimates of maximum fuel moisture content $LFMC_{max}$ are easier to obtain, so the equation reduces to the product of $RWC$ and $LFMC_{max}$. The package allows estimating $LFMC$ from the output of soil water balance model, using function `moisture_cohortFMC()`.
 
-If we know $RWC_{apo}(\Psi_{apo})$, the relative water content in conduits, and $V_{segment}$ (in $m^3$), the volume of conducting tissue (sapwood) in the segment, then the mass of water that is stored in conduits is: 
-\begin{equation}
-S_{apo}(\Psi_{apo}) = V_{segment} \cdot f_{apo} \cdot RWC_{apo}(\Psi_{apo}) \cdot \rho_{w}
-\end{equation}
-where $\rho_{w}$ is the density of water ($kgH_2O \cdot m^{-3}$) and $f_{apo,s}$ is the volume fraction of apoplastic tissue within sapwood. Similarly, the amount of water stored in the symplastic tissue of the segment at any time is:
-\begin{equation}
-S_{sym}(\Psi_{sym}) = V_{segment} \cdot (1 - f_{apo}) \cdot RWC_{sym}(\Psi_{sym}) \cdot \rho_{w}
-\end{equation}
+**LFMC from basic water balance**
 
-Finally, if we consider that both apoplastic and symplastic tissues are at the same water potential, the water content in the segment will be:
+The basic soil water balance model returns, among other outputs, the daily water potential of each plant cohort, $\Psi_{plant}$, representing an weighted average of soil layer water potentials using fine root distribution as weights. Daily LFMC estimates can be obtained if we translate $\Psi_{plant}$ into relative water content using symplasmic leaf pressure-volume curves (see \@ref(pressurevolumecurves)) and then simply multiply the resulting value by $LFMC_{max}$:
 \begin{equation}
-S(\Psi) = V_{segment} \cdot (f_{apo} \cdot RWC_{apo}(\Psi) + (1 - f_{apo}) \cdot RWC_{sym}(\Psi)) \cdot \rho_{w}
+LFMC = RWC_{sym,leaf}(\Psi_{plant}) \cdot LFMC_{max}
 \end{equation}
+The equation assumes that symplasmic tissue dominates LFMC of leaves. Function `moisture_cohortFMC()` takes daily values $\Psi_{plant}$ from the output of `spwb()`, but parameters $\pi_{0,leaf}$, $\epsilon_{leaf}$ and $LFMC_{max}$ are taken from the data frame `SpParams` of species parameter values.
+
+**LFMC from advanced water balance**
+
+The advanced water balance model explicitly tracks the water potential in different plant segments, allowing the distinction between apoplastic and symplastic tissues to be accounted for. In this case, the relative water content of leaves, and hence its $LFMC$, are estimated using (see \@ref(averagerelativewatercontent)):
+\begin{equation}
+LFCM = (RWC_{apo, leaf} \cdot f_{apo, leaf} + RWC_{sym,leaf} \cdot (1 - f_{apo,leaf})) \cdot LFMC_{max}
+\end{equation}
+where $RWC_{apo,leaf}$ and $RWC_{sym,leaf}$ derive directly from the plant water balance and $f_{apo,leaf}$ is the fraction of apoplastic tissue in leaves. In this case, when calling `moisture_cohortFMC()` only $LFMC_{max}$ is taken from the data frame `SpParams` of species parameter values, the remaining information being drawn from the output of `spwb()`.
 
 ## Water use efficiency
