@@ -274,7 +274,8 @@ Function `growth` returns a list object with the following elements (many of the
 | `SunlitLeaves` | Leaf-level output variables for sunlit leaves (`transpirationMode = "Sperry"`). |
 | `ShadeLeaves` | Leaf-level output variables for shade leaves (`transpirationMode = "Sperry"`). |
 | `PlantCarbonBalance`| A list with the daily results of carbon balance components and carbon pools. |
-| `PlantGrowth`| A list with daily results of leaf area, sapwood area, fine root area and the corresponding daily growth rates. |
+| `PlantStructure`| A list with daily results of plant compartment sizes, in terms of area and biomass. |
+| `PlantGrowth`| A list with daily results of growth rates for leaf, sapwood and fine roots. |
 | `StandStructures`| A list with the aboveground structure of the stand at the beginning of the simulation and after each simulated year. |
 | `StandSummary`| Stand-level summaries (leaf area index, tree basal area, tree density, shrub cover, etc.) at the beginning of the simulation and after each simulated year. |
 
@@ -292,13 +293,24 @@ The following table describes the child elements of `PlantCarbonBalance`, each o
 | `SugarSapwood`|$SS_{sapwood,i}$ | $mol\,gluc \cdot L^{-1}$ | Sugar concentration in sapwood. |
 | `StarchSapwood`|$ST_{sapwood,i}$ | $mol\,gluc \cdot L^{-1}$ | Starch concentration in sapwood. |
 
-The following table describes the child elements of `PlantGrowth`, again each of them a data frame with dates in rows and plant cohorts in columns:
+The following table describes the child elements of `PlantStructure`, again each of them a data frame with dates in rows and plant cohorts in columns:
 
 | Element | Symbol | Units | Description                               |
 |---------|--------|-------|-------------------------------------------|
 | `LeafArea`|$LA_{i}$ | $m^{2}$ | Daily amount of leaf area for an average individual. |
 | `SapwoodArea`|$SA_{i}$ | $cm^{2}$ | Daily amount of sapwood area for an average individual. |
 | `FineRootArea`|$FRA_{i}$ | $m^{2}$ | Daily amount of fine root area for an average individual. |
+| `LeafBiomass`|$B_{leaf,i}$ | $g\,dry \cdot ind^{-1}$ | Daily leaf biomass for an average individual. |
+| `SapwoodBiomass`|$B_{sapwood, i}$ | $g\,dry \cdot ind^{-1}$ | Daily sapwood biomass for an average individual. |
+| `FineRootBiomass`|$B_{fineroot,i}$ | $g\,dry \cdot ind^{-1}$ | Daily fine root biomass for an average individual. |
+| `LabileBiomass`|$B_{sugar,i}+B_{starch,i}$ | $g\,dry \cdot ind^{-1}$ | Daily labile carbon biomass for an average individual. |
+| `TotalLivingBiomass`|$B_{total,i}$ | $g\,dry \cdot ind^{-1}$ | Daily total living biomass for an average individual. |
+
+
+The following table describes the child elements of `PlantGrowth`, again each of them a data frame with dates in rows and plant cohorts in columns:
+
+| Element | Symbol | Units | Description                               |
+|---------|--------|-------|-------------------------------------------|
 | `LAgrowth`|$\Delta LA_{i}/SA_i$ | $m^{2}\cdot cm^{-2} \cdot day^{-1}$ | Leaf area growth relative to sapwood area for an average individual. |
 | `SAgrowth`|$\Delta SA_{i}/SA_i$ | $cm^{2}\cdot cm^{-2} \cdot day^{-1}$ | Leaf area growth relative to sapwood area for an average individual. |
 | `FRAgrowth`|$\Delta FRA_{i}/SA_i$ | $m^{2}\cdot cm^{-2} \cdot day^{-1}$ | Fine root area growth relative to sapwood area for an average individual. |
