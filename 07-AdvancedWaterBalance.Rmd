@@ -8,15 +8,17 @@ The following overview is structured as in chapter \@ref(basicwaterbalance). Pro
 
 ## Design principles
 
-The model performs soil/plant water balance and soil/canopy energy balance for a given forest stand and for the period corresponding to input weather data. Soil water balance is calculated on a daily step basis whereas energy balances and plant transpiration are determined at subdaily steps (usually 1h). The model considers only the vertical spatial dimension of the stand, and not the horizontal distribution of plants within it. Still, the stand is divided into plant cohorts of different species, height and leaf area index ($LAI$). 
+The model performs soil/plant water balance and soil/canopy energy balance for a given forest stand and for the period corresponding to input weather data. Soil water balance is calculated on a daily step basis whereas energy balances and plant transpiration are determined at subdaily steps. The model considers only the vertical spatial dimension of the stand, and not the horizontal distribution of plants within it. Still, the forest stand is divided into: (a) canopy vertical layers; (b) plant cohorts of different species, height and leaf area index ($LAI$). 
 
 Hydrological processes are the same as in chapter \@ref(basicwaterbalance), except for the addition of hydraulic redistribution of soil water via plant roots. The model includes water interception loss [@Gash1995], plant transpiration, evaporation from soil [@Ritchie1972] and the partition between infiltration and runoff [@Boughton1989]. Infiltration is partitioned among soil layers, depending on macroporosity, and water exceeding soil water holding capacity is lost via deep drainage. Snow pack dynamics can also be simulated.
 
-Most of the complexity of the advanced model concerns the estimation of plant transpiration and photosynthesis. The model simulates stomatal regulation of water vapour conductance and actual transpiration for sunlit and shade leaves at subdaily steps, involving detailed calculations of hydraulics, leaf energy balance and photosynthesis [@Sperry2016]. Compared to the basic water balance model of chapter \@ref(basicwaterbalance), the higher level of complexity of the advanced model allows a more precise estimation of photosynthesis and transpiration. Moreover, the plant hydraulics submodel generates redistribution of water among soil layers.
+A great deal of the complexity of the advanced model concerns the estimation of plant transpiration and photosynthesis. The model simulates stomatal regulation of gas exchange separately for sunlit and shade leaves at sub-daily steps, involving detailed calculations of hydraulics, leaf energy balance and photosynthesis [@Sperry2016]. Compared to the basic water balance model of chapter \@ref(basicwaterbalance), the higher level of complexity of the advanced model allows a more precise estimation of photosynthesis and transpiration. Moreover, the plant hydraulics submodel generates redistribution of water among soil layers.
 
-To calculate short and long-wave radiation absorbed by plants and the PAR at the leaf level, the leaf area of each plant cohort is divided into vertical layers. Photosynthesis and transpiration of sunlit and shade leaves are treated separatedly [@DePury1997]. Given an input direct and diffuse short-wave irradiance at the top of the canopy, the amount of light absorbed by sunlit leaves, shade leaves and the soil follows the model of @Anten2016.  
+To calculate radiation balance and incident PAR at the leaf level, the leaf area of each plant cohort is divided into vertical layers according to its crown limits. Photosynthesis and transpiration of sunlit and shade leaves are treated separatedly [@DePury1997]. Given an input direct and diffuse short-wave irradiance at the top of the canopy, the amount of light absorbed by sunlit leaves, shade leaves and the soil follows the model of @Anten2016. The scheme for long-wave radiation transfer between the atmosphere, the different canopy layers and the soil follows the SHAW model [@Flerchinger2009].
 
-Importantly, energy balances are conducted at two levels. On one hand the model keeps track of temperature variation within the canopy (i.e. canopy energy balance) and in the uppermost soil surface (i.e. soil energy balance) as the result of energy exchanges between them and with the atmosphere. Heat conduction also occurs among soil layers. Soil/canopy energy balance equations are very similar to those of Best et al. [-@Best2011] for JULES.  On the other, the model performs the energy balance at the leaf level to determine transpiration [@Sperry2016]. At this scale, radiation inputs include shortwave radiation from the atmosphere absorbed by the leaf and absorbed longwave radiation coming from both the atmosphere and the canopy itself. Leaf temperature is determined assuming that the temperature of the surrounding air is that of the canopy. After performing determining regulation, the model upscales the transpiration flux to the canopy scale and the corresponding latent heat is used to complete the calculation of the energy balance at the canopy level. Latent heat fluxes from evaporation from the soil and evaporation of intercepted rainfall are also included in the canopy/soil energy balances.
+Energy balances are conducted at two levels: the canopy (or canopy layers) level and the leaf level. The model keeps track of temperature variation within the canopy (i.e. canopy energy balance) and in the uppermost soil surface (i.e. soil energy balance) as the result of energy exchanges between them and with the atmosphere. Heat conduction also occurs among soil layers. Energy balance can be performed assuming a single canopy layer, with soil and canopy energy balance equations being similar to those of Best et al. [-@Best2011] for JULES. Alternatively, energy balance can be conducted for each vertical layer following @Bonan2014. In this case, the model allows considering within-canopy gradients in temperature, water vapor pressure, and $CO_2$ as well as the turbulent transport of heat, water vapor and $CO_2$ between canopy layers [@Ma2019].
+
+The model also performs the energy balance at the leaf level to determine transpiration [@Sperry2016]. At this scale, radiation inputs include shortwave radiation from the atmosphere absorbed by the leaf and the net balance of long-wave radiation. Leaf temperature is determined assuming that the temperature of the surrounding air is that of the canopy (or canopy layer). After determining stomatal regulation, the model up-scales the transpiration flux to the canopy (or canopy layer) scale and the corresponding latent heat is used to complete the calculation of the energy balance at the canopy (or canopy layer) level. Latent heat fluxes from evaporation from the soil and evaporation of intercepted rainfall are also included in the canopy/soil energy balances.
 
 While plant water content is normally determined by changes in water potential values corresponding to changes in soil moisture and transpiration rates, the model can also consider an explicit water balance within the plant. In this case, the amount of water within plant compartments is explicitly tracked and the rate of extraction of soil water can be decoupled from the rate of transpiration. 
 
@@ -30,11 +32,12 @@ The following are state variables in the model under all simulations:
 + Daily soil moisture content dynamics on each layer $s$ are tracked using $W_s = \theta_s(\Psi_s)/ \theta_{fc,s}$, the *proportion of soil moisture in relation to field capacity*, where moisture at field capacity, $\theta_{fc,s}$, is assumed to correspond to $\Psi_{fc} = -0.033$ MPa. Note that $W_s$ values larger than one are possible if the soil is between field capacity and saturation (which can happen if deep drainage is not allowed).
 + The temperature of the canopy and of each soil layer ($T_{canopy}$ and $T_{soil,s}$; both in ºC) are tracked for every subdaily step.
 
-Additional state variables depend on the activation of specific control flags:
+Additional state variables depend on the activation of specific control flags (see subsection \@ref(advancedwaterbalancecontrol)):
 
 + *If plant capacitance effects are considered*, the model also tracks $\Psi_{apo, stem,i}$, the water potential of the stem apoplastic compartment, as well as the water potential of stem and leaf symplastic compartments, $\Psi_{symp, stem,i}$ and $\Psi_{symp, leaf,i}$ respectively.
 + *If cavitation is not completely reversible*, the proportion of stem hydraulic conductance loss for each plant cohort $i$, $PLC_{stem,i}$, becomes a state variable.
 + *If plant water pools are considered*, the model also tracks $W_{i,s}$, the proportion of soil moisture in relation to field capacity for layer $s$ within fraction of stand area covered by cohort $i$.
++ *If multi-layer canopy energy balance is activated*, the model tracks for each vertical layer $h$: (a) the air temperature, $T_{air,h}$; (b) the water vapor pressure, $vp_{h}$; (c) and the $CO_2$ concentration, $C_{air,h}$.
 
 ## Water and energy balances {#waterenergybalances}
 
@@ -67,21 +70,28 @@ b. *If plant water pools are considered*, the water balance equation applies not
 
 Unlike the basic water balance, in this model water balance components contributing to latent heat ($Es$, $Tr$, $In$ and $Sm$) are included in the energy balance equations of the canopy and soil, therefore coupling water and energy balances.
 
-### Canopy energy balance
+### Single-layer canopy energy balance
 
-For the sake of performing energy balance, the canopy is considered a single layer that exchanges energy with the soil and the atmosphere. First, it absorbs shortwave radiation from the atmosphere ($K_{abs,ca}$), longwave counterradiation from the atmosphere ($L_{abs,ca}$) and longwave radiation emmited by the soil ($L_{abs,cs}$). These energy inputs are counterbalanced by the longwave radiation emmited by the canopy ($L_{em,c}$) towards the atmosphere and towards the soil. Other energy fluxes considered are convective exchanges between the canopy and atmosphere ($H_{ca}$) and between the canopy and the soil ($H_{cs}$). Finally, energy is released from the canopy to the atmosphere through latent heat ($LE_{ca}$) produced via transpiration ($Tr$) and evaporation of water intercepted by the canopy ($In$). Combining all energy flows (all of them in $W \cdot m^{-2}$), the instantaneous energy balance equation for the canopy is:
+For the sake of performing energy balance, the canopy can be considered a single layer that exchanges energy with the soil and the atmosphere [@Best2011]. First, it absorbs shortwave radiation from the atmosphere ($K_{abs,ca}$) and long-wave radiation resulting from net radiation balance  ($L_{net,ca}$). Other energy fluxes considered are convective exchanges between the canopy and atmosphere ($H_{ca}$) and between the canopy and the soil ($H_{cs}$). Finally, energy is released from the canopy to the atmosphere through latent heat ($LE_{ca}$) produced via transpiration ($Tr$) and evaporation of water intercepted by the canopy ($In$). Combining all energy flows (all of them in $W \cdot m^{-2}$), the instantaneous energy balance equation for the canopy is:
 \begin{equation}
-  TC_{canopy} \cdot \frac{\delta T_{canopy}}{\delta t} = K_{abs,ca} + (L_{abs,ca} - L_{em,c}) + (L_{abs,cs} - L_{em,c}) \\
-  - LE_{ca} - H_{ca} - H_{cs} 
+  TC_{canopy} \cdot \frac{\delta T_{canopy}}{\delta t} = K_{abs,ca} + L_{net,ca}  - LE_{ca} - H_{ca} - H_{cs} 
 (\#eq:canopyenergybalance)
 \end{equation}
 where $TC_{canopy}$ is the canopy thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$). 
 
+### Multiple-layer canopy energy balance
+Alternatively, the model allows performing an energy balance for each vertical layer in the canopy, including its heat storage capacity [@Ma2019]. The energy balance equation for canopy layer $h$ is:
+\begin{equation}
+  TC_{h} \cdot \frac{\delta T_{air,h}}{\delta t} = K_{abs,h} + L_{net,h}  - LE_{h} + H_{h} 
+(\#eq:canopylayerenergybalance)
+\end{equation}
+where $K_{abs,h}$ is the short-wave radiation absorbed by leaves in the layer, $L_{net,h}$ is the net long-wave radiation balance of the layer, $LE_{h}$ is the latent heat flux and $H_h$ is the sensible heat flux, which includes heat coming from leaves or soil surfaces as well as turbulent heat transport from adjacent layers. Finally, $TC_{h}$ is the thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$) of canopy layer $h$.
+
 ### Soil energy balance
 
-Like the canopy, the uppermost soil layer absorbs short- and longwave radiation from the atmosphere ($K_{abs,sa}$ and $L_{abs,sa}$), absorbs longwave radiation released by the canopy ($L_{abs,sc} = L_{em,c}$) and emmits longwave radiation ($L_{em,s}$). The longwave energy emmitted by the soil and absorbed by the canopy, $L_{abs,cs}$, is equal or lower than $L_{em,s}$ because part of the radiation emmitted by the soil is sent to the atmosphere without being intercepted by the canopy. The uppermost soil layer also exchanges convective energy with the canopy ($H_{cs}$) and releases energy to the atmosphere in form of latent heat ($LE_{sa}$), which includes snow melt ($Sm$) and evaporation from the soil surface ($Es$). Finally, the soil layer exchanges thermal energy by conduction with the layer below ($G_{1,2}$) The energy balance equation for the uppermost soil layer is:
+Like the canopy, the uppermost soil layer absorbs short-wave radiation from the atmosphere ($K_{abs,s}$) and has a net long-wave radiation balance ($L_{net,s}$). The uppermost soil layer also exchanges heat with the canopy ($H_{cs}$) and releases energy in the form of latent heat ($LE_{s}$), which includes snow melt ($Sm$) and evaporation from the soil surface ($Es$). Finally, the soil layer exchanges thermal energy by conduction with the layer below ($G_{1,2}$) The energy balance equation for the uppermost soil layer is:
 \begin{equation}
-  TC_{soil, 1} \cdot \frac{\delta T_{soil, 1}}{\delta t} = K_{abs,sa} + L_{abs,sa} - L_{em,s} + L_{abs,sc} + H_{cs} - LE_{sa} - G_{1,2}
+  TC_{soil, 1} \cdot \frac{\delta T_{soil, 1}}{\delta t} = K_{abs,s} + L_{net,s} + H_{cs} - LE_{s} - G_{1,2}
 (\#eq:soilenergybalance)
 \end{equation}
 where $TC_{soil,1}$ is the thermal capacitance of soil layer 1 (the uppermost layer). 
@@ -93,7 +103,7 @@ Instantaneous soil temperature changes on each soil layer depend on the balance 
 \end{equation}
 where $G_{s-1,s}$ is the energy inflow from layers above, $G_{s,s+1}$ is the energy outflow towards layers below and $TC_{soil,s}$ is the thermal capacitance of soil layer $s$ (in $J \cdot m^{-2} \cdot K^{-1}$).
 
-Unlike in JULES [@Best2011], the model considers the snow pack and the uppermost soil layer as a single layer in terms of energy exchange, but treats this layer differently depending on whether snow is present or not. The snow pack absorbs shortwave radiation (section \@ref(snowpack)) and snow melt is included as latent heat in the energy balance, but the snow layer does not exchange longwave radiation with the soil nor the atmosphere. $K_{abs,sa}$ is set to zero when snow pack is present (because shortwave radiation is absorbed by snow), but the soil layer still exchanges longwave radiation and convective energy with the canopy and the atmosphere. In addition, remember that bare soil evaporation does not occur when the snow pack is present (section \@ref(soilevaporation)).  
+Unlike @Best2011, the model considers the snow pack and the uppermost soil layer as a single layer in terms of energy exchange, but treats this layer differently depending on whether snow is present or not. The snow pack absorbs shortwave radiation (section \@ref(snowpack)) and snow melt is included as latent heat in the energy balance, but the snow layer does not exchange long-wave radiation with the soil nor the atmosphere. $K_{abs,s}$ is set to zero when snow pack is present (because shortwave radiation is absorbed by snow), but the soil layer still exchanges long-wave radiation and convective energy with the canopy and the atmosphere. In addition, remember that bare soil evaporation does not occur when the snow pack is present (section \@ref(soilevaporation)).  
 
 
 ## Process scheduling {#advancedwaterbalancescheduling}
@@ -109,14 +119,14 @@ For every day to be simulated, the model performs the following steps:
 7. Determine shortwave radiation absorbed by plant cohorts and the soil at subdaily steps (sections \@ref(shortwaveradiationcanopyabs) and \@ref(shortwaveradiationsoilabs)).
 8. Update the water supply function of each plant cohort, according to the hydraulic model and the current soil water potential (chapter \@ref(planthydraulics)). If plant capacitance effects are considered, the supply function involves only the soil-to-stem part of the hydraulic pathway. Otherwise, it describes the complete soil-to-leaf pathway.
 9. Determine instantaneous plant cohort transpiration, photosynthesis rates and close soil/canopy energy balance at subdaily steps (chapters \@ref(transpirationsperry) and \@ref(closecanopysoilenergybalance)). This involves the following actions for each subdaily step:
-    + Determine longwave radiation exchange between soil, canopy and atmosphere, according to their temperature (section \@ref(longwaveradiationexchange)).
+    + Determine long-wave radiation exchange between soil, canopy layers and atmosphere (section \@ref(longwaveradiationexchange)).
     + If plant capacitance effects are considered update the stem-to-leaf hydraulic supply function.
     + Calculate leaf energy balance and photosynthesis (for shade and sunlit leaves of each plant cohort) corresponding to each transpiration value of the supply function (section \@ref(leafenergybalancephoto)). If plant capacitance effects are considered this concerns the stem-to-leaf hydraulic supply function.
     + Determine stomatal conductance, transpiration and photosynthesis on shade and sunlit leaves of each plant cohort according to Sperry's [-@Sperry2016] profit maximization strategy (section \@ref(stomatalregulation)).
     + Scale transpiration ($Tr$) and net photosynthesis ($A_n$) from sunlit/shade leaves to the plant cohort level (section \@ref(scalingtranspirationphotosynthesis)).
-    + If plant capacitance effects are considered perform water balance of plant compartments at high temporal resolution (1 second steps), while re-estimating the flow from the soil to the stem at each step according to changes in stem water potential. 
+    + If plant capacitance effects are considered perform water balance of plant compartments at high temporal resolution (1 second steps), while re-estimating the flow from the soil to the stem at each step according to changes in stem water potential (see \@ref(hydraulicswithcompartments)). 
     + Scale water extraction from soil layers ($Ex$) to the plant cohort level.
-    + Complete energy balance of the canopy and the soil, after translating plant transpiration, evaporation from bare soil, snow melt and interception loss to latent heat and calculating convective heat exchange for both the canopy and the soil (chapter \@ref(closecanopysoilenergybalance)).
+    + Complete energy balance of the canopy and the soil, after translating plant transpiration, evaporation from bare soil, snow melt and interception loss to latent heat and calculating convective heat exchange for both the canopy and the soil. Alternatively, perform energy balance for individual canopy layers (at 1-min steps), while including turbulent heat exchange and turbulent transport of water vapor and $CO_2$ between layers (chapter \@ref(closecanopysoilenergybalance)).
 10. Determine day-level photosynthesis and transpiration from instantaneous rates and update soil moisture (section \@ref(daylevelphototransp)), effectively closing the soil water balance at the daily scale.
 11. Determine drought stress for each plant cohort (section \@ref(advanceddroughtstress)).
 
@@ -138,7 +148,7 @@ Vegetation input requirements were fully described in section \@ref(vegetationin
 
 **Meteorology**
 
-The minimum weather variables required to run the model are min/max temperatures ($T_{min}$ and $T_{max}$), min/max relative humidity ($RH_{min}$ and $RH_{max}$), precipitation ($P$) and solar radiation ($Rad$). Wind speed ($u$) is also needed for the advanced water balance model, but the user may use missing values if not available (a default value will be used in this case). Definitions and units of these variables were given in section \@ref(meteoinput).
+The minimum weather variables required to run the model are min/max temperatures ($T_{min}$ and $T_{max}$), min/max relative humidity ($RH_{min}$ and $RH_{max}$), precipitation ($P$) and solar radiation ($Rad$). Wind speed ($u$) is also needed for the advanced water balance model, but the user may use missing values if not available (a default value will be used in this case). Wind speed is assumed to have been measured at a specific height above the canopy (by default at 2 m). Definitions and units of these variables were given in section \@ref(meteoinput).
 
 
 ### Vegetation functional parameters
@@ -207,6 +217,7 @@ Control parameters modulate the overall behaviour of water balance simulations (
 1. `transpirationMode` defines the transpiration model, which in turn defines the complexity of the water balance model. If `transpirationMode = "Sperry"` then the advanced water balance model is run. In this model, the water retention curve model is forced to be that of Van Genuchten, i.e. `soilFunctions = "VG"` (see section \@ref(waterretentioncurves)). 
 2. `capacitance` defines whether plant capacitance (hence, plant water balance) is considered. By default it is set to `capacitance = FALSE`.
 3. `ndailysteps` defines the number of daily substeps. By default `ndailysteps = 24`, so that substeps are hours, but users can increase the temporal resolution, for example to half hour substeps by setting `ndailysteps = 48`.
+4. `multiLayerBalance` is a boolean flag to indicate that multi-layer energy balance is desired (by default `multiLayerBalance = FALSE`).
 
 The other control parameters relevant for the advanced water balance model are:
 
@@ -216,6 +227,8 @@ The other control parameters relevant for the advanced water balance model are:
 + `rockyLayerDrainage [= TRUE]`:  Whether water exceeding the field capacity of the deepest layer can be drained via macropore flow towards a non-reachable compartment, only for layers with > 95\% rocks (see section \@ref(runoff)).
 + `leafPhenology [= TRUE]`:  Whether leaf phenology is simulated for winter-deciduous species (see section \@ref(leafphenology)). If `FALSE` then all species are assumed to be evergreen.
 + `defaultWindSpeed [= 2.5]`: Default value for wind speed (in $m \cdot s^{-1}$) when this is missing.
++ `windMeasurementHeight [= 200]`: Distance (in cm) above the top of the canopy corresponding to the measurement of wind speed.
++ `boundaryLayerSize [= 2000]`: Size of the canopy boundary layer (in cm). The boundary layer causes the model to define vertical layers above the top of the canopy. The parameter is only relevant when multi-layer canopy energy balance is performed.
 + `unlimitedSoilWater [=FALSE]`: Boolean flag to indicate the simulation of plant transpiration assuming that soil water is always at field capacity.
 + `plantWaterPools [=FALSE]`: Boolean flag to indicate the simulation of water balance assuming that each cohort has its own water pools.
 + `costModifier, gainModifier [= 1]`: Modifiers (exponents) of the gain and cost functions defined in Sperry et al. (2016) (see section \@ref(stomatalregulation)).
@@ -227,7 +240,7 @@ The other control parameters relevant for the advanced water balance model are:
 + `klatstem [= 0.01]`: Stem symplastic-apoplastic lateral conductance (in $mmol·s^{-1}·m^{-2}·MPa^{-1}$). Only relevant when `capacitance = TRUE` (see section \@ref(hydraulicswithcompartments)).
 + `klatleaf [= 0.01]`: Leaf symplastic-apoplastic lateral conductance (in $mmol·s^{-1}·m^{-2}·MPa^{-1}$). Only relevant when `capacitance = TRUE` (see section \@ref(hydraulicswithcompartments)).
 + `numericParams`: A list with params for numerical approximation routines.
-+ `Catm [=386]`: Atmospheric CO2 concentration (in micromol $CO_2 \cdot mol^{-1}$ = ppm).
++ `Catm [=386]`: Atmospheric $CO_2$ concentration (in micromol $CO_2 \cdot mol^{-1}$ = ppm).
 
 In addition, a number of control parameters are used to modify how hydraulic parameters are estimated when calling function `spwbInput()`: 
 

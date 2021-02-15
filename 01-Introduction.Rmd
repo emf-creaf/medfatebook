@@ -88,6 +88,7 @@ Many of the sub-models included in **medfate** are implemented as C++ functions 
 * `soil_*`: Soil hydraulics and thermodynamics.
 * `spwb_*`: Soil water balance routines.
 * `transp_*`: Stomatal regulation and plant transpiration.
+* `wind_*`: Canopy turbulence.
 
 ### Static functions
 
@@ -109,6 +110,24 @@ Vegetation functioning and dynamics have strong, but complex, effects on fire ha
 
 ### Data structures
 
-While simulation functions in the package are run on individual forest stands, the package has been designed so that it could be part of a broader modelling infrastructure including *spatial processes* such as lateral water flows.
+Package **medfateland** allows simulating forest functioning and dynamics on sets forests stands distributed spatially. Three S4 classes have been defined to facilitate simulations on particular locations and over grids. They extend spatial classes from package **meteoland**
+
++ S4 class `SpatialPointsLandscape` contains a list of soil and forest stand descriptions along with the spatial location of stands. It extends class `SpatialPointsTopography`.
++ S4 class `SpatialPixelsLandscape` contains a set of soil and forest stand descriptions along with the location over a grid of the corresponding set of pixels. It extends class `SpatialPixelsTopography`.
++ S4 class `SpatialGridLandscape` contains a set of soil and forest stand descriptions along with the location over a full grid. It extends class `SpatialGridTopography`.
+
+While simulation functions in the package can be run sequentially on individual forest stands of the former classes, the package has been designed so that it could be part of a broader modelling infrastructure including *spatial hydrological processes* such as lateral water flows. An additional S4 class has been defined for this purpose.
+
++ S4 class `DistributedWatershed` contains a set of soil and forest stand descriptions along with the location over a grid of the corresponding set of pixels, because it extends class `SpatialPixelsLandscape`. In addition, however, `DistributedWatershed` includes many other spatial layers, such as list of discharge values to neighbors, an integer vector of cell processing order or the water content of the underlying aquifer. 
 
 ### Dynamic simulation functions
+
+Package **medfateland** offers sets of simulation functions for the three S4 classes presented above. Simulations available are analogous to those of package **medfate**:
+
++ Forest water and energy balance can be studied for a set of forest stands using functions `spwbpoints()`, `spwbpixels()` and  `spwbgrid()` .
++ Growth and mortality of a set of plant cohorts competing for light and water can be simulated for a set of forest stands using functions `growthpoints()`, `growthpixels()` and `growthgrid()` .
+
+In addition, the package offers a simulation function tailored to be used with objects of class `DistributedWatershed`:
+
++ Function `wswb()` is distributed hydrological model that simulates daily water balance on the cells of a watershed while accounting for overland runoff, subsurface flow and groundwater flow between cells.
+
