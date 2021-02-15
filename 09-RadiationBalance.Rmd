@@ -1,10 +1,10 @@
 # Radiation absortion and emmission {#radiationbalance}
 
-In the previous chapter we detailed atmospheric radiation inputs. Here we deal with the absorption of diffuse and direct shortwave radiation through the canopy as well as longwave radiation emmission by the canopy and the soil. This is necessary to estimate components of the canopy and soil energy balances (see eqs. \@ref(eq:canopyenergybalance) and \@ref(eq:soilenergybalance)).
+In the previous chapter we detailed atmospheric radiation inputs. Here we deal with the absorption of diffuse and direct shortwave radiation through the canopy as well as long-wave radiation net radiation for canopy layers and the soil layer. These are necessary to estimate components of the canopy and soil energy balances (see eqs. \@ref(eq:canopyenergybalance), \@ref(eq:canopylayerenergybalance) and \@ref(eq:soilenergybalance)).
 
-Shortwave absorption can be determined for all subdaily steps once the variation of atmospheric inputs are known. In contrast, radiation emmission by the canopy and soil depend on their temperature and therefore, need to be evaluated at each subdaily step after closing the energy balance of the previous step (see chapter \@ref(closecanopysoilenergybalance)). 
+Short-wave radiation (SWR) absorption can be determined for all subdaily steps once the variation of atmospheric inputs are known. In contrast, the long-wave radiation (LWR) balance for any surface depends on its temperature and therefore, net LWR for canopy and soil layers need to be evaluated at each subdaily step after closing the energy balance of the previous step (see chapter \@ref(closecanopysoilenergybalance)). 
 
-## Shortwave radiation absorbed by the canopy {#shortwaveradiationcanopyabs}
+## Short-wave radiation absorbed by the canopy {#shortwaveradiationcanopyabs}
 As explained in section \@ref(leafdistribution), the canopy is divided into vertical layers (whose size is determined by the control parameter `verticalLayerSize`), and the expanded and dead leaf area index of each cohort within each layer is determined. Let $l$ be the number of canopy layers, $c$ the number of plant cohorts, and $LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}$ be the leaf area index of cohort $i$ in layer $j$. 
 
 In section \@ref(directdiffuseSWR) we explained how the model estimates instantaneous and direct/diffuse SWR and PAR at the top of the canopy. The average irradiance reaching the top of each canopy layer $j$ is calculated separately for direct beam and diffuse radiation (the same equations are valid for SWR or PAR, but with different coefficients):
@@ -127,49 +127,58 @@ lines(absRadSH, 1:nlayer, col="red", lty=2)
 legend("bottom", legend=c("sunlit", "shade"), lty=c(1,2), bty="n", col="red")
 ```
 
+The SWR absorbed by canopy layer $j$ ($K_{abs,j}$) is found using:
+\begin{equation}
+K_{abs,j} = \sum_i{(I^{sunlit}_{i,j} \cdot LAI^{sunlit}_{i,j}) + (I^{shade}_{i,j} \cdot  LAI^{shade}_{i,j})}
+\end{equation}
+whereas the SWR absorbed by the whole canopy ($K_{abs,ca}$) is:
+\begin{equation}
+K_{abs,ca} = \sum_j{K_{abs,j}}
+\end{equation}
 
-## Shortwave radiation absorbed by the soil {#shortwaveradiationsoilabs}
+## Short-wave radiation absorbed by the soil {#shortwaveradiationsoilabs}
 The instantaneous shortwave radiation reaching the soil is calculated separately for direct beam and diffuse radiation:
 \begin{eqnarray}
 K_{beam, soil} &=&  K_{beam} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{b}\cdot \alpha_i^{0.5} \cdot LAI^{all}_{i,h}}}\right]\\
 K_{dif, soil} &=& K_{dif} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{d,i}\cdot LAI^{all}_{i,h}}}\right]
 \end{eqnarray}
-where $K_{beam}$ and $K_{dif}$ are the direct and diffuse irrradiance at the top of the canopy, $k_{b}$ is the extinction coefficient for direct light ($k_{b} = 0.8$) and $k_{d,i}$ is the extinction coefficient of cohort $i$ for diffuse SWR. From these, the SWR absorbed by the soil is found by:
+where $K_{beam}$ and $K_{dif}$ are the direct and diffuse irrradiance at the top of the canopy, $k_{b}$ is the extinction coefficient for direct light ($k_{b} = 0.8$) and $k_{d,i}$ is the extinction coefficient of cohort $i$ for diffuse SWR. From these, the SWR absorbed by the soil ($K_{abs,s}$) is found by:
 \begin{equation}
-K_{abs,sa} = (1 - \gamma_{SWR, soil})\cdot (K_{beam, soil} + K_{dif, soil})
+K_{abs,s} = (1 - \gamma_{SWR, soil})\cdot (K_{beam, soil} + K_{dif, soil})
 \end{equation}
 where $\gamma_{SWR, soil} = 0.10$ is the SWR reflectance (10% albedo) of the soil. 
 
-## Longwave radiation absorbed by the soil {#longwaveradiationsoilabs}
+## Long-wave radiation balance {#longwaveradiationbalance}
 
-LWR is treated in the same way as diffuse SWR. The instantaneous LWR reaching the soil is:
+Long-wave radiation (LWR) transfer within the canopy is based on the SWAW model [@Flerchinger2009]. Assume canopy layers are ordered from $j=1$ (in contact with the soil) to $j=J$ (in contact with the atmosphere above the boundary layer). The procedure first calculates downward LWR below each canopy layer, $L_{d,j}$,  from $j=J$ to $j=1$. The downward LWR below layer $j$ is calculated as:
 \begin{equation}
-L_{abs,sa} = (1 - \gamma_{LWR, soil})\cdot L_{atm} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{LWR}\cdot LAI^{all}_{i,h}}}\right]
+L_{d,j} = \tau_{j} \cdot L_{d,j+1} + (1 - \tau_j) \cdot \epsilon_c \cdot \sigma \cdot (T_{air,j}+273.16)^{4}
 \end{equation}
-where $L_{atm}$ is the atmosphere longwave irradiance (section \@ref(longwaveatmradiation)), $k_{LWR} = 0.8$ is the extinction coefficient for LWR and $\gamma_{LWR, soil} = 0.05$ is LWR soil reflectance (5% albedo) of the soil.
-
-## Longwave soil-canopy radiation exchange {#longwaveradiationexchange}
-Longwave radiation (LWR) emmited by a surface ($L_{em}$, in $W \cdot m^{-2}$) would be a function of canopy temperature $T_{canopy}$:
+where $L_{d,j+1}$ is the downward LWR of the layer above ($L_{atm}$ in the case of $j=J$), $T_{air,j}$ is the air temperature of layer $j$, $\tau_j$ is the diffuse transmissivity of layer $j$, $\sigma = 5.67 \cdot 10^{-8}\,W \cdot K^{-4}\cdot m^{-2}$ is the Stephan-Boltzmann constant and $\epsilon_c = 0.97$ is the canopy emmissivity. Diffuse transmissivity values are defined by cohort $i$ and layer $j$ using:
 \begin{equation}
-L_{em} = 0.95 \cdot \sigma \cdot (T_{canopy} + 273.16)^{4.0}
+\tau_{i,j} = \exp{(-k_{LWR} \cdot LAI^{all}_{i,j})}
 \end{equation}
-where $0.95$ is emissivity and $\sigma = 5.67 \cdot 10^{-8.0}\,W \cdot K^{-4} \cdot m^{-2}$ is the Stephan-Boltzmann constant. However, the canopy may only partially cover the soil surface, so the value must be reduced by the proportion of the canopy layer actually exchanging energy. We take this as the proportion between atmospheric and absorbed LWR:
+where $k_{LWR} = 0.7815$ is the extinction coefficient for LWR. The transmissivity of layer $j$ is simply $\tau_{j} = \sum_j {\tau_{i,j}}$. Once we know $L_{d,1}$ we can calculate the upwards LWR from the soil ($L_{u,s}$) using:
 \begin{equation}
-p_{exch} = \frac{L_{abs,ca}}{L_{atm}}
+L_{u,s} = (1- \epsilon_{s}) \cdot L_{d,1} + \epsilon_s \cdot \sigma \cdot (T_{soil,1}+273.16)^{4}
 \end{equation}
-so the LWR actually emmited by the canopy ($L_{em, c}$, in $W \cdot m^{-2}$) is:
+where $T_{soil, 1}$ is the temperature of the topmost soil layer and $\epsilon_s = 0.97$ is the soil emmissivity. Now we calculate upward LWR from $j=1$ to $j=J$:
 \begin{equation}
-L_{em, c} = p_{exch} \cdot L_{em}
+L_{u,j} = \tau_{j} \cdot L_{u,j-1} + (1 - \tau_j) \cdot \epsilon_c \cdot \sigma \cdot (T_{air,j}+273.16)^{4}
 \end{equation}
-$L_{em, c}$ is discounted twice from the canopy energy balance: as losses to the atmosphere and losses to the soil (see eq. \@ref(eq:canopyenergybalance)). 
-
-LWR emmited by the soil ($L_{em, s}$, in $W \cdot m^{-2}$) is calculated from the temperature of the first (uppermost) soil layer:
+where $L_{u,j-1}$ is the downward LWR of the layer below ($L_{u,s}$ in the case of $j=1$). Once we have downward and upward LWR fluxes, we can estimate the net LWR absorbed within canopy layer $j$ using:
 \begin{equation}
-L_{em, s} = 0.95 \cdot \sigma \cdot (T_{soil,1} + 273.16)^{4.0}
+L_{net,j} = \epsilon_c \cdot (1 - \tau_j) \cdot (L_{d,j} + L_{u,j} - \sigma \cdot (T_{air,j}+273.16)^{4})
 \end{equation}
-
-Again, the canopy only absorbs part of this radiation, the remaining going to the atmosphere:
-
+The net LWR of cohort $i$ in layer $j$ is found using the relative proportion of light absorbed by the cohort (i.e. the complement of its diffuse transmissivity):
 \begin{equation}
-L_{abs, cs} = p_{exch} \cdot L_{em,s}
+L_{net,i, j} = L_{net,j} \cdot \frac{1-\tau_{i,j}}{\sum_h{1-\tau_{i,h}}}
+\end{equation}
+whereas the net LWR of the whole canopy ($L_{net,ca}$) is simply the sum across layers of net LWR:
+\begin{equation}
+L_{net,ca} = \sum_j{L_{net,j}}
+\end{equation}
+and the net LWR of the soil ($L_{net,s}$) is:
+\begin{equation}
+L_{net,s} = \epsilon_{s} \cdot (L_{d,1} - \sigma \cdot (T_{soil,1}+273.16)^{4})
 \end{equation}
