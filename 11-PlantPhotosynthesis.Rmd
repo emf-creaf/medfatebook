@@ -329,17 +329,23 @@ A_n = A - 0.015 \cdot V_{max}
 
 ## Crown photosynthesis {#crownphotosynthesis}
 
-In the previous subsection we calculated photosynthesis at the leaf level. However, the function $A(\Psi_{leaf})$ can be calculated for a whole crown. Essentially we need to repeat the calculations of leaf temperature, leaf VPD, leaf gas conductance and photosynthesis for every leaf to be considered in the crown. Gross and net photosynthesis values can be then aggregated across the crown for each value of $\Psi_{leaf}$, so that the function $A(\Psi_{leaf})$ is obtained. 
+In the previous subsection we showed how to calculate photosynthesis at the leaf level, but the function $A(\Psi_{leaf})$ needs to be up-scaled to a whole crown. 
+
+### Multi-canopy photosynthesis model
+Essentially we need to repeat the calculations of leaf temperature, leaf VPD, leaf gas conductance and photosynthesis for every leaf to be considered in the crown. Gross and net photosynthesis values can be then aggregated across the crown for each value of $\Psi_{leaf}$, so that the function $A(\Psi_{leaf})$ is obtained. 
 
 As in section \@ref(shortwaveradiationcanopyabs) we consider a crown of one species divided into 10 layers, with constant leaf density. Many aspects may vary across the crown, including environmental conditions (such as direct/diffuse light or wind speed) and photosynthesis parameters (e.g. `Vmax298`). The previous crown definition and light parameters lead to a percentage of the above-canopy irradiance reaching each layer [@Anten2016]. Furthermore, it is generally accepted that sunlit and shade leaves need to be treated separately [@DePury1997]. Separating the two kinds of leaves acknowledges that they operate at different parts of the light-saturation curve. Under these conditions, the amount of SWR and PAR absorbed per unit of leaf area at each canopy layer was shown in fig. \@ref(fig:absorbanceperlayer). For simplicity, here we will assume constant windspeed in all layers:
 ```{r}
 ulayer = rep(2, 10)
 ```
 
-Following @DePury1997, we further assume that maximum assimilation rates are highest for leaves at the top of the canopy and there is a exponential decrease from there towards the bottom, where maximum rates are 50% of those at the top: 
-\begin{equation}
-V_{max,298,i,j} =V_{max,298,i}\cdot \exp(-0.713\cdot L^{\phi}_{i,j}/LAI_i^{\phi})   
-\end{equation}
+### Vertical variation in photosynthetic capacity
+
+Following @DePury1997, we further assume that maximum carboxylation and electron transport rates are highest for leaves at the top of the canopy and there is a exponential decrease from there towards the bottom, where maximum rates are 50% of those at the top: 
+\begin{eqnarray}
+V_{max,298,i,j} &=& V_{max,298,i}\cdot \exp(-0.713\cdot L^{\phi}_{i,j}/LAI_i^{\phi}) \\  
+J_{max,298,i,j} &=& J_{max,298,i}\cdot \exp(-0.713\cdot L^{\phi}_{i,j}/LAI_i^{\phi})    
+\end{eqnarray}
 where $LAI^{\phi}_{i,j}$ is the LAI value of the plant cohort $i$ at a given canopy layer $j$ and $LAI_i^{\phi}$ is the expanded LAI of the plant cohort. The following figure illustrate this decrease for the single-species canopy example of section \@ref(shortwaveradiationcanopyabs):
 
 ```{r, echo=FALSE, fig.width=5, fig.height=4, fig.align="center", fig.cap="Decrease of Rubisco maximum carboxilation rate across the canopy"}
@@ -354,7 +360,9 @@ Jmax298layer=Vmax298layer*1.67
 plot(Vmax298layer, 1:nlayer,type="l", ylab="Layer", xlab="Maximum carboxylation rate", ylim=c(1,nlayer), col="red")
 ```
 
-Multilayer canopy models allow evaluating leaf conditions, stomatal conductance and photosynthesis for different points of the canopy. However, this comes at high computational cost. While big-leaf canopy models are known to be unaccurate under some situations, sun-shade canopy models [@DePury1997] provide estimates that are close to multiple layer models [@Hikosaka2016]. Sun-shade models involve the following steps: 
+### Sun-shade canopy photosynthesis model
+
+Multi-layer canopy photosynthesis models allow evaluating leaf conditions, stomatal conductance and photosynthesis for different points of the canopy. However, this comes at high computational cost. While big-leaf canopy models are known to be unaccurate under some situations, sun-shade canopy models [@DePury1997] provide estimates that are close to multiple layer models [@Hikosaka2016]. Sun-shade models involve the following steps: 
 
 a. Aggregating the leaf area of sunlit/shade leaves across layers: 
 \begin{eqnarray}
@@ -377,6 +385,8 @@ V^{shade}_{max,298,i} &=& \sum_{j=1}^{l}{V_{max,298,i,j} \cdot LAI^{shade}_{i,j}
 \end{eqnarray}
 
 One then calls the photosynthesis function twice (i.e. once for shade leaves and once for sunlit leaves), using the aggregated maximum assimilation rates. This results in
+
+### Comparison of big-leaf, sun-shade and multi-canopy photosynthesis models
 
 The figure below provides the canopy photosynthesis functions obtained, under different situations, using the full 10-layer canopy description (top), a sunshade canopy model (center) or a big-leaf model (bottom). These were generated using functions `photo_multilayerPhotosynthesisFunction()`, `photo_sunshadePhotosynthesisFunction()` and `photo_leafPhotosynthesisFunction()`, respectively. Note the coincidence between the multi-layer and the sun-shade models.
 
