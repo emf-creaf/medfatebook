@@ -1,10 +1,10 @@
 # Plant photosynthesis {#plantphotosynthesis}
 
-In chapter \@ref(planthydraulics) we introduced the necessary concepts of steady-state plant hydraulics to define the *hydraulic supply function for the soil-plant continuum*. The supply function specifies the flow rate, as per leaf area, for values of leaf water potential and given a soil moisture status. In the first section of this chapter we describe leaf photosynthesis functions, which define leaf gas exchange, photosynthesis and energy balance for values of leaf water potential. This requires knowing environmental conditions surrounding leaves (section \@ref(canopycapacitancetemperature)) and the short-wave radiation absorbed by them (section \@ref(shortwaveradiationcanopyabs)). In the second section we discuss how to upscale photosynthesis values to the crown level.
+In chapter \@ref(planthydraulics) we introduced the necessary concepts of steady-state plant hydraulics to define the *hydraulic supply function for the soil-plant continuum*. The supply function specifies the flow rate, as per leaf area, for values of leaf water potential and given a soil moisture status. In the first section of this chapter we describe leaf photosynthesis functions, which define leaf gas exchange, photosynthesis and energy balance for values of leaf water potential. This requires knowing wind, water vapor and temperature conditions of the air surrounding leaves (section \@ref(canopycapacitancetemperature)), the short-wave radiation absorbed by leaf elements (section \@ref(shortwaveradiationcanopyabs)) and the leaf long-wave radiation balance (section \@ref(longwaveradiation)). In the second section of this chapter we discuss how to upscale photosynthesis values to the crown level.
 
-## Leaf photosynthesis function {#leafenergybalancephoto}
+## Leaf energy balance, gas exchange and photosynthesis {#leafenergybalancephoto}
 
-The supply function specifies the transpiration flow rate $E$ for values of leaf water potential $\Psi_{leaf}$. If we know air temperature, air vapour pressure and the light conditions in which leaves are, we can translate the supply function into a **leaf photosynthesis function** [@Sperry2016]. In a nutshell, $E$ from the supply function is first used to calculate leaf temperature from an evaluation of the leaf energy balance. The diffusive conductances of the leaf to $H_2O$ and $CO_{2}$ are obtained from water supply and water vapor deficit. Finally, the gross/net assimilation rate is then obtained from the diffusive conductance and a modelled curve between assimilation and leaf internal $CO_{2}$ concentration. The following subsections detail each of these steps.
+The supply function specifies the transpiration flow rate $E$ for values of leaf water potential $\Psi_{leaf}$. If we know air temperature, water vapor pressure and the light conditions in which leaves are, we can translate the supply function into a **leaf photosynthesis function** [@Sperry2016]. In a nutshell, $E$ from the supply function is first used to calculate leaf temperature from an evaluation of the leaf energy balance. The diffusive conductances of the leaf to $H_2O$ and $CO_{2}$ are obtained from water supply and leaf water vapor deficit. Finally, the gross/net assimilation rate is then obtained from the diffusive conductance and a modelled curve between assimilation and leaf internal $CO_{2}$ concentration. The following subsections detail each of these steps separately.
 
 
 ```{r, echo=FALSE}
@@ -33,8 +33,9 @@ Rabs = 740 #W * m-2
 Leaf temperature ($T_{leaf}$; in $^\circ C$) can be calculated for any given flow rate $E$ using an energy balance equation [@Campbell1998]:
 \begin{equation}
 T_{leaf} = T_{air}+\frac{I_{SWR}^{leaf} + L_{net}^{leaf}-\lambda_v(T_{air})\cdot E_{two-sided}}{C_p\cdot(g_r+g_{Ha})}
+(\#eq:leaftemperatureequation)
 \end{equation}
-where $I_{SWR}^{leaf}$ (in $W \cdot m^{-2}$) is the instantaneous shortwave radiation absorbed per leaf area unit, $L_{net}^{leaf}$ is the instantaneous net long-wave radiation per leaf area unit, $E_{two-sided}$ is the flow rate $E$ converted to $mol \cdot s^{-1} \cdot m^{-2}$ per two-sided leaf area basis, $\epsilon$ is longwave radiation emissivity (0.97), $\sigma$ is the Stephan-Boltzman constant, $T_{air}$ is the temperature of the air surrounding the leaf (in $^\circ C$), $C_p$ = 29.3 $J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure and $\lambda_v(T_{air})$ is the latent heat of vaporization (in $J \cdot mol^{-1}$) corresponding to $T_{air}$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in the **meteoland** reference manual). If canopy energy balance is performed assuming a single canopy layer $T_{air} = T_{canopy}$ where $T_{canopy}$ is the canopy temperature resulting from the energy balance of the previous step (see section \@ref(canopycapacitancetemperature)). If a multi-layer canopy energy balance is used, $T_{air}$ corresponds with the air temperature of the canopy layer where the leaf occurs, which can be different for sunlit and shade leaves of each cohort. Finally, $g_r$ and $g_{Ha}$ are the radiative and heat conductance values (in $mol \cdot m^{-2} \cdot s^{-1}$), respectively [@Campbell1998]:
+where $I_{SWR}^{leaf}$ (in $W \cdot m^{-2}$) is the instantaneous shortwave radiation absorbed per leaf area unit, $L_{net}^{leaf}$ is the instantaneous net long-wave radiation per leaf area unit, $E_{two-sided}$ is the flow rate $E$ converted to $mol \cdot s^{-1} \cdot m^{-2}$ per two-sided leaf area basis, $\epsilon$ is longwave radiation emissivity (0.97), $\sigma$ is the Stephan-Boltzman constant, $T_{air}$ is the temperature of the air surrounding the leaf (in $^\circ C$), $C_p$ = 29.3 $J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure and $\lambda_v(T_{air})$ is the latent heat of vaporization (in $J \cdot mol^{-1}$) corresponding to $T_{air}$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in the **meteoland** reference manual). If canopy energy balance is performed assuming a single canopy layer $T_{air} = T_{canopy}$, where $T_{canopy}$ is the canopy air temperature resulting from the energy balance of the previous step (see section \@ref(canopycapacitancetemperature)). If a multi-layer canopy energy balance is used, $T_{air}$ corresponds with the air temperature of the canopy layer where the leaf occurs, which can be different for sunlit and shade leaves of each cohort. Finally, $g_r$ and $g_{Ha}$ are the radiative and heat conductance values (in $mol \cdot m^{-2} \cdot s^{-1}$), respectively [@Campbell1998]:
 \begin{eqnarray}
 g_r &=& \frac{4\cdot \epsilon \cdot \sigma \cdot (T_{air}+273.15)^3}{C_p} \\
 g_{Ha} &=& 0.189 \cdot (u_{leaf}/d)^{0.5}
@@ -42,7 +43,7 @@ g_{Ha} &=& 0.189 \cdot (u_{leaf}/d)^{0.5}
 where $u_{leaf}$ is the leaf-level wind speed (in $m \cdot s^{-1}$) and $d$ is 0.72 times the leaf width (species parameter `LeafWidth` in $cm$). As before, $u_{leaf}$ is the wind-speed at the vertical location of the leaf (see \@ref(windextinctionprofile)).
 
 
-Transpiration flow decreases leaf temperature, whereas radiation increases it and wind speed makes it more similar to the temperature of the surrounding air. The following figures illustrate the effect of varying wind speed and flow rate on $T_{leaf}$ for two contrasted leaf widths (see function `biophysics_leafTemperature`):
+By inspecting eq. \@ref(eq:leaftemperatureequation), we can conclude that transpiration flow decreases leaf temperature, whereas radiation increases it and wind speed makes it more similar to the temperature of the surrounding air. The following figures illustrate the effect of varying wind speed and flow rate on $T_{leaf}$ for two contrasted leaf widths (see function `biophysics_leafTemperature`):
 
 
 (ref:leaftemperaturewind-cap) Values of $T_{leaf}$ for two leaf widths and varying values of wind speed and flow rate, calculated for 24ºC air temperature and 740 $W \cdot m^{-2}$ instantaneous absorbed radiation (including SWR and LWR). 
@@ -138,10 +139,11 @@ VPD_{leaf} = vp_{leaf} - vp_{air}
 Where $vp_{air}$ is the water vapor pressure of the air surrounding the leaf (but beyond the leaf boundary layer) and $vp_{leaf}$ is the leaf vapor pressure, which can be calculated from leaf temperature ($T_{leaf}$) and leaf water potential ($\Psi_{leaf}$):
 \begin{equation}
 vp_{leaf} = VP(T_{leaf}) \cdot e^{\frac{2.17 \cdot \Psi_{leaf}}{T_{leaf}+273.15}}
+(\#eq:leafvpequation)
 \end{equation}
 where $VP(T)$ is a function giving the saturated vapor pressure for temperature $T$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual). If a single-canopy energy balance is considered, the water vapor pressure of the air surrounding the leaf is taken as the average atmospheric water vapor pressure of the day, i.e. $vp_{air} = vp_{day}$. When a multi-layer canopy energy balance is simulated, $vp_{air}$ will correspond to the water vapor pressure of the canopy layer where the leaf is located.
 
-Since $vp_{leaf}$ decreases when leaf temperature decreases, increasing transpiration decreases leaf VPD as a result of decreasing leaf temperature. To illustrate this effect, let us assume the following values of relative humidity, yielding a $vp_{air} = 1.91\, kPa$:
+Since $vp_{leaf}$ decreases when leaf temperature decreases in eq. \@ref(eq:leafvpequation), increasing transpiration decreases leaf VPD as a result of decreasing leaf temperature. To illustrate this effect, let us assume the following values of relative humidity, yielding a $vp_{air} = 1.91\, kPa$:
 ```{r}
 RHmin = 60
 RHmax = 75
@@ -155,7 +157,7 @@ The application of the above equation to the $T_{leaf}(\Psi_{leaf})$ curves of f
 
 ```{r leafVPDfunction, echo=FALSE, fig.width=8, fig.height=3.5, fig.align="center", fig.cap='(ref:leafVPDfunction-cap)'}
 par(mar=c(4,4,2,1), mfrow=c(1,2))
-plot(-supplyNetwork11$psiLeaf, psi2A11$LeafVPD, type="l", col=col1, ylab="Leaf VPD (kPa)", xlab = "Leaf pressure (-MPa)",  xlim=c(0, 7), lwd=1, ylim=c(1.4,1.72), main="original")
+plot(-supplyNetwork11$psiLeaf, psi2A11$LeafVPD, type="l", col=col1, ylab="Leaf VPD (kPa)", xlab = "Leaf pressure (-MPa)",  xlim=c(0, 7), lwd=1, ylim=c(1.3,1.72), main="original")
 lines(-supplyNetwork12$psiLeaf,psi2A12$LeafVPD, lty=1, lwd=1, col=col2)
 lines(-supplyNetwork13$psiLeaf, psi2A13$LeafVPD, lty=1, lwd=1, col=col3)
 lines(-supplyNetwork14$psiLeaf, psi2A14$LeafVPD, lty=1, lwd=1, col=col4)
@@ -169,7 +171,7 @@ lines(-supplyNetwork33$psiLeaf, psi2A33$LeafVPD, lty=3, lwd=1, col=col3)
 lines(-supplyNetwork34$psiLeaf, psi2A34$LeafVPD, lty=3, lwd=1, col=col4)
 legend("bottomleft", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 
-plot(-supplyNetwork11emb$psiLeaf, psi2A11emb$LeafVPD, type="l", col=col1, ylab="Leaf VPD (kPa)", xlab = "Leaf pressure (-MPa)",  xlim=c(0, 7), lwd=1, ylim=c(1.4,1.72), main="after cavitation")
+plot(-supplyNetwork11emb$psiLeaf, psi2A11emb$LeafVPD, type="l", col=col1, ylab="Leaf VPD (kPa)", xlab = "Leaf pressure (-MPa)",  xlim=c(0, 7), lwd=1, ylim=c(1.3,1.72), main="after cavitation")
 lines(-supplyNetwork12emb$psiLeaf,psi2A12emb$LeafVPD, lty=1, lwd=1, col=col2)
 lines(-supplyNetwork13emb$psiLeaf, psi2A13emb$LeafVPD, lty=1, lwd=1, col=col3)
 lines(-supplyNetwork14emb$psiLeaf, psi2A14emb$LeafVPD, lty=1, lwd=1, col=col4)
@@ -184,7 +186,7 @@ lines(-supplyNetwork34emb$psiLeaf, psi2A34emb$LeafVPD, lty=3, lwd=1, col=col4)
 abline(v=-psiCav, col="gray", lwd=1.5)
 legend("bottomleft", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 ```
-Note that the VPD decreasing curves do not start at the same $VPD_{leaf}$ value despite corresponding to the same $T_{leaf}$ value, because of the effect of $\Psi_{leaf}$ on $vp_{leaf}$.
+Note that the VPD decreasing curves do not start at the same $VPD_{leaf}$ value despite corresponding to the same $T_{leaf}$ value, because of the effect of $\Psi_{leaf}$ on $vp_{leaf}$ in eq. \@ref(eq:leafvpequation).
 
 ### Leaf gas exchange
 

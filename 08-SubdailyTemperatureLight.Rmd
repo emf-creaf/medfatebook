@@ -1,6 +1,6 @@
 # Subdaily atmospheric temperature and radiation variation {#subdailytemplight}
 
-After estimating leaf phenology (chapter \@ref(leafphenologylight)) and simulating the main hydrological processes (chapter \@ref(hydrology)), the advanced water balance model (chapter \@ref(advancedwaterbalance)) starts simulating *subdaily* processes, which include energy balances and photosynthesis/transpiration. In order to perform those processes it is necessary to estimate weather variables at the subdaily scale. Here we detail how subdaily estimates of temperature and atmospheric incoming radiation are derived from daily input values.
+After estimating leaf phenology (chapter \@ref(leafphenologylight)) and simulating the main hydrological processes (chapter \@ref(hydrology)), the advanced water balance model (chapter \@ref(advancedwaterbalance)) starts simulating *subdaily* processes, which include energy balances and photosynthesis/transpiration. In order to properly simulate these processes it is important to consider sub-daily variations in temperature and radiation. Here we detail how sub-daily estimates of above-canopy air temperature and atmospheric incoming radiation are derived from daily input values.
 
 ## Above-canopy air temperature
 
@@ -11,7 +11,7 @@ Diurnal above-canopy air temperature ($T_{atm}$, in $^\circ C$) variations are m
 Daily global radiation ($Rad$, in $MJ \cdot m^{-2} \cdot d^{-1}$) is assumed to include both direct and diffuse short-wave radiation (SWR). Using latitude information and whether is a rainy day, this quantity is partitioned into instantaneous direct and diffuse SWR and PAR for different daily substeps. Values of instantaneous direct and diffuse SWR and PAR above the canopy ($I_{beam}$ and $I_{dif}$, in $W \cdot m^{-2}$) are calculated using the methods described in @Spitters1986, which involve comparing daily global radiation with daily potential radiation. All these calculations are performed using routines in package **meteoland** (see details in section [4.6 of the reference manual ](http://vegmod.ctfc.cat/meteolandbook/solarradiation.html#diurnal-trends-in-diffuse-and-direct-radiation) for this package).
 
 ## Incoming long-wave radiation {#longwaveatmradiation}
-Once the air temperature for a given time step is known, instantaneous long-wave radiation (LWR) coming from the atmosphere ($L_{atm}$, in $W \cdot m^{-2}$) can be calculated following @Campbell1998:
+Once the above-canopy air temperature for a given time step is known, instantaneous long-wave radiation (LWR) coming from the atmosphere ($L_{atm}$, in $W \cdot m^{-2}$) can be calculated following @Campbell1998:
 \begin{equation}
 L_{atm} = \epsilon_{a} \cdot \sigma \cdot (T_{atm} + 273.16)^{4.0}
 \end{equation}
