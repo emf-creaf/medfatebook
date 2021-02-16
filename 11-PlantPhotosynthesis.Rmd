@@ -32,20 +32,20 @@ Rabs = 740 #W * m-2
 
 Leaf temperature ($T_{leaf}$; in $^\circ C$) can be calculated for any given flow rate $E$ using an energy balance equation [@Campbell1998]:
 \begin{equation}
-T_{leaf} = T_{canopy}+\frac{I_{abs}-\epsilon\cdot\sigma\cdot(T_{canopy}+273.15)^4-\lambda_v(T_{canopy})\cdot E_{two-sided}}{C_p\cdot(g_r+g_{Ha})}
+T_{leaf} = T_{air}+\frac{I_{SWR}^{leaf} + L_{net}^{leaf}-\lambda_v(T_{air})\cdot E_{two-sided}}{C_p\cdot(g_r+g_{Ha})}
 \end{equation}
-where $I_{abs} = I_{SWR} + I_{LWR}$ (in $W \cdot m^{-2}$) is the instantaneous shortwave and longwave radiation absorbed per leaf area unit, $E_{two-sided}$ is the flow rate $E$ converted to $mol \cdot s^{-1} \cdot m^{-2}$ per two-sided leaf area basis, $\epsilon$ is longwave radiation emissivity (0.97), $\sigma$ is the Stephan-Boltzman constant, $T_{canopy}$ is the canopy air temperature (in $^\circ C$) resulting from the energy balance of the previous step (see section \@ref(canopycapacitancetemperature)), $C_p$ = 29.3 $J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure and $\lambda_v(T_{canopy})$ is the latent heat of vaporization (in $J \cdot mol^{-1}$) corresponding to $T_{canopy}$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in the **meteoland** reference manual). Finally, $g_r$ and $g_{Ha}$ are the radiative and heat conductance values (in $mol \cdot m^{-2} \cdot s^{-1}$), respectively [@Campbell1998]:
+where $I_{SWR}^{leaf}$ (in $W \cdot m^{-2}$) is the instantaneous shortwave radiation absorbed per leaf area unit, $L_{net}^{leaf}$ is the instantaneous net long-wave radiation per leaf area unit, $E_{two-sided}$ is the flow rate $E$ converted to $mol \cdot s^{-1} \cdot m^{-2}$ per two-sided leaf area basis, $\epsilon$ is longwave radiation emissivity (0.97), $\sigma$ is the Stephan-Boltzman constant, $T_{air}$ is the temperature of the air surrounding the leaf (in $^\circ C$), $C_p$ = 29.3 $J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure and $\lambda_v(T_{air})$ is the latent heat of vaporization (in $J \cdot mol^{-1}$) corresponding to $T_{air}$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in the **meteoland** reference manual). If canopy energy balance is performed assuming a single canopy layer $T_{air} = T_{canopy}$ where $T_{canopy}$ is the canopy temperature resulting from the energy balance of the previous step (see section \@ref(canopycapacitancetemperature)). If a multi-layer canopy energy balance is used, $T_{air}$ corresponds with the air temperature of the canopy layer where the leaf occurs, which can be different for sunlit and shade leaves of each cohort. Finally, $g_r$ and $g_{Ha}$ are the radiative and heat conductance values (in $mol \cdot m^{-2} \cdot s^{-1}$), respectively [@Campbell1998]:
 \begin{eqnarray}
-g_r &=& \frac{4\cdot \epsilon \cdot \sigma \cdot (T_{canopy}+273.15)^3}{C_p} \\
+g_r &=& \frac{4\cdot \epsilon \cdot \sigma \cdot (T_{air}+273.15)^3}{C_p} \\
 g_{Ha} &=& 0.189 \cdot (u_{leaf}/d)^{0.5}
 \end{eqnarray}
-where $u_{leaf}$ is the leaf-level wind speed (in $m \cdot s^{-1}$), taken as the wind speed at mid-crown height of the plant cohort (see \@ref(windextinctionprofile)), and $d$ is 0.72 times the leaf width (species parameter `LeafWidth` in $cm$). 
+where $u_{leaf}$ is the leaf-level wind speed (in $m \cdot s^{-1}$) and $d$ is 0.72 times the leaf width (species parameter `LeafWidth` in $cm$). As before, $u_{leaf}$ is the wind-speed at the vertical location of the leaf (see \@ref(windextinctionprofile)).
 
 
 Transpiration flow decreases leaf temperature, whereas radiation increases it and wind speed makes it more similar to the temperature of the surrounding air. The following figures illustrate the effect of varying wind speed and flow rate on $T_{leaf}$ for two contrasted leaf widths (see function `biophysics_leafTemperature`):
 
 
-(ref:leaftemperaturewind-cap) Values of $T_{leaf}$ for two leaf widths and varying values of wind speed and flow rate, calculated for 24ºC canopy temperature and 740 $W \cdot m^{-2}$ instantaneous absorved radiation. 
+(ref:leaftemperaturewind-cap) Values of $T_{leaf}$ for two leaf widths and varying values of wind speed and flow rate, calculated for 24ºC air temperature and 740 $W \cdot m^{-2}$ instantaneous absorbed radiation (including SWR and LWR). 
 
 
 ```{r leaftemperaturewind, echo=FALSE, fig.width=8, fig.height=4, fig.align="center", fig.cap='(ref:leaftemperaturewind-cap)'}
@@ -133,15 +133,15 @@ legend("bottomleft", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 
 Vapor pressure deficit in the leaf ($VPD_{leaf}$, in kPa) is calculated as:
 \begin{equation}
-VPD_{leaf} = vp_{leaf} - vp_{day}
+VPD_{leaf} = vp_{leaf} - vp_{air}
 \end{equation}
-Where $vp_{day}$ is the average daily vapor pressure and $vp_{leaf}$ is the leaf vapor pressure, which can be calculated from leaf temperature ($T_{leaf}$) and leaf water potential ($\Psi_{leaf}$):
+Where $vp_{air}$ is the water vapor pressure of the air surrounding the leaf (but beyond the leaf boundary layer) and $vp_{leaf}$ is the leaf vapor pressure, which can be calculated from leaf temperature ($T_{leaf}$) and leaf water potential ($\Psi_{leaf}$):
 \begin{equation}
 vp_{leaf} = VP(T_{leaf}) \cdot e^{\frac{2.17 \cdot \Psi_{leaf}}{T_{leaf}+273.15}}
 \end{equation}
-where $VP(T)$ is a function giving the saturated vapor pressure for temperature $T$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual). 
+where $VP(T)$ is a function giving the saturated vapor pressure for temperature $T$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual). If a single-canopy energy balance is considered, the water vapor pressure of the air surrounding the leaf is taken as the average atmospheric water vapor pressure of the day, i.e. $vp_{air} = vp_{day}$. When a multi-layer canopy energy balance is simulated, $vp_{air}$ will correspond to the water vapor pressure of the canopy layer where the leaf is located.
 
-Since $vp_{leaf}$ decreases when leaf temperature decreases, increasing transpiration decreases leaf VPD as a result of decreasing leaf temperature. To illustrate this effect, let us assume the following values of relative humidity, yielding an average $vp_{day}$:
+Since $vp_{leaf}$ decreases when leaf temperature decreases, increasing transpiration decreases leaf VPD as a result of decreasing leaf temperature. To illustrate this effect, let us assume the following values of relative humidity, yielding a $vp_{air} = 1.91\, kPa$:
 ```{r}
 RHmin = 60
 RHmax = 75
@@ -184,7 +184,7 @@ lines(-supplyNetwork34emb$psiLeaf, psi2A34emb$LeafVPD, lty=3, lwd=1, col=col4)
 abline(v=-psiCav, col="gray", lwd=1.5)
 legend("bottomleft", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 ```
-
+Note that the VPD decreasing curves do not start at the same $VPD_{leaf}$ value despite corresponding to the same $T_{leaf}$ value, because of the effect of $\Psi_{leaf}$ on $vp_{leaf}$.
 
 ### Leaf gas exchange
 
@@ -262,19 +262,19 @@ Electron transport-limited photosynthesis $A_e$ (in $\mu mol\, CO_2 \cdot s^{-1}
 A_e &=& \frac{J}{4}\cdot \frac{C_i-\Gamma*}{C_i+2\cdot \Gamma*} \\
 J &=& \frac{(\alpha\cdot Q_{PAR} + J_{max})-\sqrt{(\alpha\cdot Q_{PAR} + J_{max})^2-4.0\cdot c \cdot \alpha \cdot Q_{PAR} \cdot J_{max}}}{2\cdot c}
 \end{eqnarray}
-where $\alpha = 0.3\,mol \, e \cdot mol\,photon^{-1}$ is the quantum yield of electron transport, $Q_{PAR}$ is the absorbed PAR photon flux density ($\mu mol\,photon \cdot m^{-2} \cdot s^{-1}$), which is calculated from leaf absorbed PAR ($I_{PAR}$; in $W \cdot m^{-2}$):
+where $\alpha = 0.3\,mol \, e \cdot mol\,photon^{-1}$ is the quantum yield of electron transport, $Q^{leaf}_{PAR}$ is the absorbed PAR photon flux density per leaf area ($\mu mol\,photon \cdot m^{-2} \cdot s^{-1}$), which is calculated from absorbed PAR per leaf area ($I^{leaf}_{PAR}$; in $W \cdot m^{-2}$):
 \begin{equation}
-Q_{PAR} = I_{PAR}\cdot 546 \cdot 0.836\cdot 10^{-2}
+Q^{leaf}_{PAR} = I^{leaf}_{PAR}\cdot 546 \cdot 0.836\cdot 10^{-2}
 \end{equation}
 where $546$ is the wavelength in $nm$. $J_{max}$ and $J$ are the maximum and actual rate of electron transport (both in $\mu mol\,e \cdot m^{-2} \cdot s^{-1}$) and $c=0.9$ defines the curvature of the light-response curve. The gross assimilation rate $A$ at a given $C_i$ is the minimum of $A_e$ and $A_c$. To obtain a smooth $A$-vs-$C_i$ curve we used [@Collatz1991]:
 \begin{equation}
 A = \frac{(A_c+A_e)-\sqrt{(A_c+A_e)^2-4.0\cdot c'\cdot A_e\cdot A_c}}{2\cdot c'}
 \end{equation}
-where $c'=0.98$ is a curvature factor. The temperature dependence of $J_{max}$ and $V_{max}$ relative to 25ºC (i.e., relative to input parameters $J_{max,298}$ and $V_{max,298}$) is modelled using @Leuning2002 (his eq. 1 with parameters from his Table 2). The internal $CO_2$ concentration, $C_i$, needs to be known to calculate $A$ using the previous equations. @Sperry2016a use a second equation for $A$ which uses $g_{cs}$:
+where $c'=0.98$ is a curvature factor. The temperature dependence of $J_{max}$ and $V_{max}$ relative to 25ºC (i.e., relative to input parameters $J_{max,298}$ and $V_{max,298}$) is modelled using @Leuning2002 (his eq. 1 with parameters from his Table 2). The internal $CO_2$ concentration, $C_i$, needs to be known to calculate $A$ using the previous equations. @Sperry2016a use a second equation for $A$ which uses $g_{c}$, the diffusive conductance to $CO_2$ (which includes both the stomatal conductance and boundary layer conductance):
 \begin{equation}
-A = g_{sc} \cdot (C_{atm}-C_i)
+A = g_{c} \cdot (C_{air}-C_i)
 \end{equation}
-where $C_{atm}$ is the atmospheric $CO_{2}$ concentration (in $\mu mol \cdot mol^{-1}$; see parameter \texttt{Catm} in function `defaultControl()`). Combining the two equations for $A$ and finding the root of the resulting equation using Newton-Raphson method allows determining $C_i$ and therefore $A$. Thus, after defining PAR photon flux density, atmosphere $CO_{2}$ concentration and maximum rate parameters:
+where $C_{air}$ is the  $CO_{2}$ concentration (in $\mu mol \cdot mol^{-1}$) in the air surrounding the leaf (beyond the leaf boundary layer). If a single-layer canopy energy balance is used then $C_{air}=C_{atm}$, the atmospheric $CO_{2}$ concentration (see parameter \texttt{Catm} in function `defaultControl()`), whereas if a multi-layer canopy energy balance is used $C_{air}$ corresponds to the $CO_2$ concentration in the canopy layer where the leaf occurs, analogously to $T_{air}$ and $vp_{air}$. Combining the two equations for $A$ and finding the root of the resulting equation using Newton-Raphson method allows determining $C_i$ and therefore $A$. Thus, after defining PAR photon flux density, atmosphere $CO_{2}$ concentration and maximum rate parameters:
 ```{r}
 Q = 2000
 Catm = 386
@@ -282,7 +282,7 @@ Vmax298 = 100
 Jmax298 = 1.67*Vmax298
 ```
 
-one can obtain the following $A(\Psi_{leaf})$ curves from $T_{leaf}(\Psi_{leaf})$ and $g_{sc}(\Psi_{leaf})$:
+one can obtain the following $A(\Psi_{leaf})$ curves from $T_{leaf}(\Psi_{leaf})$ and $g_{sw}(\Psi_{leaf})$:
 
 
 (ref:leafphotosynthesisfunction-cap) Examples of gross photosynthesis ($A$) functions for a hydraulic network, corresponding to fig. \@ref(fig:supplynetwork) and for different soil textures. Left/right panel shows values for uncavitated/cavitated supply functions. 
