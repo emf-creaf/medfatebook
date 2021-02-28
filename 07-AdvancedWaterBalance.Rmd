@@ -30,7 +30,7 @@ The following are state variables in the model under all simulations:
 
 + Cumulative growth degree days, $GDD$, are tracked by the model and determine leaf phenological status (i.e. $LAI$ values) of winter deciduous species.
 + Daily soil moisture content dynamics on each layer $s$ are tracked using $W_s = \theta_s(\Psi_s)/ \theta_{fc,s}$, the *proportion of soil moisture in relation to field capacity*, where moisture at field capacity, $\theta_{fc,s}$, is assumed to correspond to $\Psi_{fc} = -0.033$ MPa. Note that $W_s$ values larger than one are possible if the soil is between field capacity and saturation (which can happen if deep drainage is not allowed).
-+ The temperature of the canopy and of each soil layer ($T_{canopy}$ and $T_{soil,s}$; both in ºC) are tracked for every subdaily step.
++ The air temperature within the canopy ($T_{air,can}$; ºC) and the temperature of each soil layer $s$ ($T_{soil,s}$; ºC) are tracked for every subdaily step.
 
 Additional state variables depend on the activation of specific control flags (see subsection \@ref(advancedwaterbalancecontrol)):
 
@@ -72,12 +72,12 @@ Unlike the basic water balance, in this model water balance components contribut
 
 ### Single-layer canopy energy balance
 
-For the sake of performing energy balance, the canopy can be considered a single layer that exchanges energy with the soil and the atmosphere [@Best2011]. First, it absorbs shortwave radiation from the atmosphere ($K_{abs,ca}$) and long-wave radiation resulting from net radiation balance  ($L_{net,ca}$). Other energy fluxes considered are convective exchanges between the canopy and atmosphere ($H_{ca}$) and between the canopy and the soil ($H_{cs}$). Finally, energy is released from the canopy to the atmosphere through latent heat ($LE_{ca}$) produced via transpiration ($Tr$) and evaporation of water intercepted by the canopy ($In$). Combining all energy flows (all of them in $W \cdot m^{-2}$), the instantaneous energy balance equation for the canopy is:
+For the sake of performing energy balance, the canopy can be considered a single layer that exchanges energy with the soil and the atmosphere [@Best2011]. First, it absorbs shortwave radiation from the atmosphere ($K_{abs,can}$) and long-wave radiation resulting from net radiation balance  ($L_{net,can}$). Other energy fluxes considered are convective exchanges between the canopy and atmosphere ($H_{can}$) and between the canopy and the soil ($H_{cs}$). Finally, energy is released from the canopy to the atmosphere through latent heat ($LE_{can}$) produced via transpiration ($Tr$) and evaporation of water intercepted by the canopy ($In$). Combining all energy flows (all of them in $W \cdot m^{-2}$), the instantaneous energy balance equation for the canopy is:
 \begin{equation}
-  TC_{canopy} \cdot \frac{\delta T_{canopy}}{\delta t} = K_{abs,ca} + L_{net,ca}  - LE_{ca} - H_{ca} - H_{cs} 
+  TC_{can} \cdot \frac{\delta T_{air,can}}{\delta t} = K_{abs,can} + L_{net,can}  - LE_{can} - H_{can} - H_{cs} 
 (\#eq:canopyenergybalance)
 \end{equation}
-where $TC_{canopy}$ is the canopy thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$). 
+where $TC_{can}$ is the canopy thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$). 
 
 ### Multiple-layer canopy energy balance
 Alternatively, the model allows performing an energy balance for each vertical layer in the canopy, including its heat storage capacity [@Ma2019]. The energy balance equation for canopy layer $j$ is:
@@ -89,9 +89,9 @@ where $K_{abs,j}$ is the short-wave radiation absorbed by leaves in the layer, $
 
 ### Soil energy balance
 
-Like the canopy, the uppermost soil layer absorbs short-wave radiation from the atmosphere ($K_{abs,s}$) and has a net long-wave radiation balance ($L_{net,s}$). The uppermost soil layer also exchanges heat with the canopy ($H_{cs}$) and releases energy in the form of latent heat ($LE_{s}$), which includes snow melt ($Sm$) and evaporation from the soil surface ($Es$). Finally, the soil layer exchanges thermal energy by conduction with the layer below ($G_{1,2}$) The energy balance equation for the uppermost soil layer is:
+Like the canopy, the uppermost soil layer absorbs short-wave radiation from the atmosphere ($K_{abs,soil}$) and has a net long-wave radiation balance ($L_{net,soil}$). The uppermost soil layer also exchanges heat with the canopy ($H_{cs}$) and releases energy in the form of latent heat ($LE_{soil}$), which includes snow melt ($Sm$) and evaporation from the soil surface ($Es$). Finally, the soil layer exchanges thermal energy by conduction with the layer below ($G_{1,2}$) The energy balance equation for the uppermost soil layer is:
 \begin{equation}
-  TC_{soil, 1} \cdot \frac{\delta T_{soil, 1}}{\delta t} = K_{abs,s} + L_{net,s} + H_{cs} - LE_{s} - G_{1,2}
+  TC_{soil, 1} \cdot \frac{\delta T_{soil, 1}}{\delta t} = K_{abs,soil} + L_{net,soil} + H_{cs} - LE_{soil} - G_{1,2}
 (\#eq:soilenergybalance)
 \end{equation}
 where $TC_{soil,1}$ is the thermal capacitance of soil layer 1 (the uppermost layer). 
@@ -103,7 +103,7 @@ Instantaneous soil temperature changes on each soil layer depend on the balance 
 \end{equation}
 where $G_{s-1,s}$ is the energy inflow from layers above, $G_{s,s+1}$ is the energy outflow towards layers below and $TC_{soil,s}$ is the thermal capacitance of soil layer $s$ (in $J \cdot m^{-2} \cdot K^{-1}$).
 
-Unlike @Best2011, the model considers the snow pack and the uppermost soil layer as a single layer in terms of energy exchange, but treats this layer differently depending on whether snow is present or not. The snow pack absorbs shortwave radiation (section \@ref(snowpack)) and snow melt is included as latent heat in the energy balance, but the snow layer does not exchange long-wave radiation with the soil nor the atmosphere. $K_{abs,s}$ is set to zero when snow pack is present (because shortwave radiation is absorbed by snow), but the soil layer still exchanges long-wave radiation and convective energy with the canopy and the atmosphere. In addition, remember that bare soil evaporation does not occur when the snow pack is present (section \@ref(soilevaporation)).  
+Unlike @Best2011, the model considers the snow pack and the uppermost soil layer as a single layer in terms of energy exchange, but treats this layer differently depending on whether snow is present or not. The snow pack absorbs shortwave radiation (section \@ref(snowpack)) and snow melt is included as latent heat in the energy balance, but the snow layer does not exchange long-wave radiation with the soil nor the atmosphere. $K_{abs,soil}$ is set to zero when snow pack is present (because shortwave radiation is absorbed by snow), but the soil layer still exchanges long-wave radiation and convective energy with the canopy and the atmosphere. In addition, remember that bare soil evaporation does not occur when the snow pack is present (section \@ref(soilevaporation)).  
 
 
 ## Process scheduling {#advancedwaterbalancescheduling}

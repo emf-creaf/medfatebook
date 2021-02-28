@@ -80,23 +80,23 @@ legend("bottom", legend=c("sunlit","shade"), lty=c(1,2), bty="n")
 
 The amount of absorbed diffuse radiation per leaf area unit of cohort $i$ within a given canopy layer $j$ is calculated as:
 \begin{equation}
-I_{dif,i,j} = I_{dif,j} \cdot k_{d,i} \cdot \alpha_i^{0.5} \exp\left[ \sum_{h}^{c}{-k_{d,h}\cdot \alpha_i^{0.5}\cdot 0.5\cdot LAI^{all}_{h,j}}\right]
+\Phi_{dif,i,j} = I_{dif,j} \cdot k_{d,i} \cdot \alpha_i^{0.5} \exp\left[ \sum_{h}^{c}{-k_{d,h}\cdot \alpha_i^{0.5}\cdot 0.5\cdot LAI^{all}_{h,j}}\right]
 \end{equation}
 
 The amount of absorbed scattered beam radiation per leaf area unit of cohort $i$ within a given canopy layer $j$ is calculated as:
 \begin{equation}
-I_{sca,i,j} = I_{b,j} \cdot k_{b} \left( \alpha_i^{0.5}\cdot \exp \left( \sum_{h}^{c}{-k_{b}\cdot \alpha_i \cdot 0.5\cdot LAI^{all}_{h,i}}\right) \\
+\Phi_{sca,i,j} = I_{b,j} \cdot k_{b} \left( \alpha_i^{0.5}\cdot \exp \left( \sum_{h}^{c}{-k_{b}\cdot \alpha_i \cdot 0.5\cdot LAI^{all}_{h,i}}\right) \\
 -\frac{\alpha_i}{(1-\gamma_i)}\cdot \exp\left( \sum_{h}^{c}{-k_{b}\cdot 0.5\cdot LAI^{all}_{h,i}}\right) \right)
 \end{equation}
 
 Finally, the direct radiation absorbed by a unit of sunlit leaf area of cohort $i$ in a canopy layer $j$ does not depend on the position of the canopy layer and is:
 \begin{equation}
-I_{dir,i,j} = I_{beam} \cdot \alpha_i \cdot 0.5/\sin{\beta}
+\Phi_{dir,i,j} = I_{beam} \cdot \alpha_i \cdot 0.5/\sin{\beta}
 \end{equation}
-where $\beta$ is the solar elevation angle in radians, which changes throughout the day (see [section 4.3 of the reference manual](http://vegmod.ctfc.cat/meteolandbook/solarradiation.html#potential-radiation) for package **meteoland**). The amount of light absorbed by sunlit/shaded foliage of cohort $i$ in layer $j$ per leaf area unit ($I^{sunlit}_{i,j}$ and $I^{shade}_{i,j}$, respectively) is:
+where $\beta$ is the solar elevation angle in radians, which changes throughout the day (see [section 4.3 of the reference manual](http://vegmod.ctfc.cat/meteolandbook/solarradiation.html#potential-radiation) for package **meteoland**). The amount of light absorbed by sunlit/shaded foliage of cohort $i$ in layer $j$ per leaf area unit ($\Phi^{sunlit}_{i,j}$ and $\Phi^{shade}_{i,j}$, respectively) is:
 \begin{eqnarray}
-I^{sunlit}_{i,j} &=& I_{dif,i,j} + I_{sca,i,j} + I_{dir,i,j} \\
-I^{shade}_{i,j} &=& I_{dif,i,j} + I_{sca,i,j}
+\Phi^{sunlit}_{i,j} &=& \Phi_{dif,i,j} + \Phi_{sca,i,j} + \Phi_{dir,i,j} \\
+\Phi^{shade}_{i,j} &=& \Phi_{dif,i,j} + \Phi_{sca,i,j}
 (\#eq:absorbedsunlitshadeperleafarea)
 \end{eqnarray}
 
@@ -136,8 +136,8 @@ legend("bottom", legend=c("sunlit", "shade"), lty=c(1,2), bty="n", col="red")
 
 The SWR absorbed per ground area unit by sunlit and shade foliage of cohort $i$ in canopy layer $j$ is:
 \begin{eqnarray}
-K_{abs,i,j}^{sunlit} &=& I^{sunlit}_{i,j} \cdot LAI^{sunlit}_{i,j} \\
-K_{abs,i,j}^{shade} &=&  I^{shade}_{i,j} \cdot  LAI^{shade}_{i,j}
+K_{abs,i,j}^{sunlit} &=& \Phi^{sunlit}_{i,j} \cdot LAI^{sunlit}_{i,j} \\
+K_{abs,i,j}^{shade} &=&  \Phi^{shade}_{i,j} \cdot  LAI^{shade}_{i,j}
 \end{eqnarray}
 The previous quantities can be aggregated across cohorts or layers. The SWR absorbed per ground area unit by cohort $i$ ($K_{abs,i}$) is found using:
 \begin{equation}
@@ -155,12 +155,12 @@ K_{abs,ca} = \sum_j^l{K_{abs,j}} = \sum_i^c{K_{abs,i}} =\sum_i^c{\sum_j^l{K_{abs
 ### Short-wave radiation absorbed by the soil {#shortwaveradiationsoilabs}
 The instantaneous shortwave radiation reaching the soil is calculated separately for direct beam and diffuse radiation:
 \begin{eqnarray}
-K_{beam, soil} &=&  K_{beam} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{b}\cdot \alpha_i^{0.5} \cdot LAI^{all}_{i,h}}}\right]\\
-K_{dif, soil} &=& K_{dif} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{d,i}\cdot LAI^{all}_{i,h}}}\right]
+I_{beam, soil} &=&  I_{beam} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{b}\cdot \alpha_i^{0.5} \cdot LAI^{all}_{i,h}}}\right]\\
+I_{dif, soil} &=& I_{dif} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{d,i}\cdot LAI^{all}_{i,h}}}\right]
 \end{eqnarray}
-where $K_{beam}$ and $K_{dif}$ are the direct and diffuse irrradiance at the top of the canopy, $k_{b}$ is the extinction coefficient for direct light ($k_{b} = 0.8$) and $k_{d,i}$ is the extinction coefficient of cohort $i$ for diffuse SWR. From these, the SWR absorbed by the soil ($K_{abs,soil}$) is found by:
+where $I_{beam}$ and $I_{dif}$ are the direct and diffuse irrradiance at the top of the canopy, $k_{b}$ is the extinction coefficient for direct light ($k_{b} = 0.8$) and $k_{d,i}$ is the extinction coefficient of cohort $i$ for diffuse SWR. From these, the SWR absorbed by the soil ($K_{abs,soil}$) is found by:
 \begin{equation}
-K_{abs,soil} = (1 - \gamma_{SWR, soil})\cdot (K_{beam, soil} + K_{dif, soil})
+K_{abs,soil} = (1 - \gamma_{SWR, soil})\cdot (I_{beam, soil} + I_{dif, soil})
 \end{equation}
 where $\gamma_{SWR, soil} = 0.10$ is the SWR reflectance (10% albedo) of the soil. 
 
@@ -169,38 +169,38 @@ where $\gamma_{SWR, soil} = 0.10$ is the SWR reflectance (10% albedo) of the soi
 Long-wave radiation (LWR) transfer within the canopy is based on the SWAW model [@Flerchinger2009]. 
 
 ### Long-wave radiation balance by canopy layers {#longwaveradiationbalance}
-Assume canopy layers are ordered from $j=1$ (in contact with the soil) to $j=l$ (in contact with the atmosphere above the boundary layer). The procedure first calculates downward LWR below each canopy layer, $L_{d,j}$,  from $j=l$ to $j=1$. The downward LWR below layer $j$ is calculated as:
+Assume canopy layers are ordered from $j=1$ (in contact with the soil) to $j=l$ (in contact with the atmosphere above the boundary layer). The procedure first calculates downward LWR below each canopy layer, $L_{down,j}$,  from $j=l$ to $j=1$. The downward LWR below layer $j$ is calculated as:
 \begin{equation}
-L_{d,j} = \tau_{j} \cdot L_{d,j+1} + (1 - \tau_j) \cdot \epsilon_c \cdot \sigma \cdot (T_{air,j}+273.16)^{4}
+L_{down,j} = \tau_{j} \cdot L_{down,j+1} + (1 - \tau_j) \cdot \epsilon_{can} \cdot \sigma \cdot (T_{air,j}+273.16)^{4}
 \end{equation}
-where $L_{d,j+1}$ is the downward LWR of the layer above ($L_{atm}$ in the case of $j=l$), $T_{air,j}$ is the air temperature of layer $j$, $\tau_j$ is the diffuse transmissivity of layer $j$, $\sigma = 5.67 \cdot 10^{-8}\,W \cdot K^{-4}\cdot m^{-2}$ is the Stephan-Boltzmann constant and $\epsilon_c = 0.97$ is the canopy emmissivity. Diffuse transmissivity values are defined by cohort $i$ and layer $j$ using:
+where $L_{down,j+1}$ is the downward LWR of the layer above ($L_{atm}$ in the case of $j=l$), $T_{air,j}$ is the air temperature of layer $j$, $\tau_j$ is the diffuse transmissivity of layer $j$, $\sigma = 5.67 \cdot 10^{-8}\,W \cdot K^{-4}\cdot m^{-2}$ is the Stephan-Boltzmann constant and $\epsilon_{can} = 0.97$ is the canopy emmissivity. Diffuse transmissivity values are defined by cohort $i$ and layer $j$ using:
 \begin{equation}
 \tau_{i,j} = \exp{(-k_{LWR} \cdot LAI^{all}_{i,j})}
 \end{equation}
-where $k_{LWR} = 0.7815$ is the extinction coefficient for LWR. The transmissivity of layer $j$ is simply $\tau_{j} = \sum_i^c {\tau_{i,j}}$. Once we know $L_{d,1}$ we can calculate the upwards LWR from the soil ($L_{u,s}$) using:
+where $k_{LWR} = 0.7815$ is the extinction coefficient for LWR. The transmissivity of layer $j$ is simply $\tau_{j} = \sum_i^c {\tau_{i,j}}$. Once we know $L_{down,1}$ we can calculate the upwards LWR from the soil ($L_{up,s}$) using:
 \begin{equation}
-L_{u,s} = (1- \epsilon_{s}) \cdot L_{d,1} + \epsilon_s \cdot \sigma \cdot (T_{soil,1}+273.16)^{4}
+L_{up,soil} = (1- \epsilon_{soil}) \cdot L_{down,1} + \epsilon_{soil} \cdot \sigma \cdot (T_{soil,1}+273.16)^{4}
 \end{equation}
-where $T_{soil, 1}$ is the temperature of the topmost soil layer and $\epsilon_s = 0.97$ is the soil emmissivity. Now we calculate upward LWR from $j=1$ to $j=J$:
+where $T_{soil, 1}$ is the temperature of the topmost soil layer and $\epsilon_{soil} = 0.97$ is the soil emmissivity. Now we calculate upward LWR from $j=1$ to $j=J$:
 \begin{equation}
-L_{u,j} = \tau_{j} \cdot L_{u,j-1} + (1 - \tau_j) \cdot \epsilon_c \cdot \sigma \cdot (T_{air,j}+273.16)^{4}
+L_{up,j} = \tau_{j} \cdot L_{up,j-1} + (1 - \tau_j) \cdot \epsilon_{can} \cdot \sigma \cdot (T_{air,j}+273.16)^{4}
 \end{equation}
-where $L_{u,j-1}$ is the downward LWR of the layer below ($L_{u,s}$ in the case of $j=1$). Once we have downward and upward LWR fluxes, we can estimate the net LWR absorbed within canopy layer $j$ using:
+where $L_{up,j-1}$ is the downward LWR of the layer below ($L_{up,soil}$ in the case of $j=1$). Once we have downward and upward LWR fluxes, we can estimate the net LWR absorbed within canopy layer $j$ using:
 \begin{equation}
-L_{net,j} = \epsilon_c \cdot (1 - \tau_j) \cdot (L_{d,j} + L_{u,j} - \sigma \cdot (T_{air,j}+273.16)^{4})
+L_{net,j} = \epsilon_{can} \cdot (1 - \tau_j) \cdot (L_{down,j} + L_{up,j} - \sigma \cdot (T_{air,j}+273.16)^{4})
 \end{equation}
 
 ### Net long-wave radiation of the whole canopy and the soil
-Net LWR can be aggregated at the scale of the whole canopy. The net LWR of the whole canopy ($L_{net,ca}$) is simply the sum across layers of net LWR:
+Net LWR can be aggregated at the scale of the whole canopy. The net LWR of the whole canopy ($L_{net,can}$) is simply the sum across layers of net LWR:
 \begin{equation}
-L_{net,ca} = \sum_j^l{L_{net,j}}
+L_{net,can} = \sum_j^l{L_{net,j}}
 \end{equation}
-whereas the net LWR of the soil ($L_{net,s}$) is:
+whereas the net LWR of the soil ($L_{net,soil}$) is:
 \begin{equation}
-L_{net,s} = \epsilon_{s} \cdot (L_{d,1} - \sigma \cdot (T_{soil,1}+273.16)^{4})
+L_{net,soil} = \epsilon_{soil} \cdot (L_{down,1} - \sigma \cdot (T_{soil,1}+273.16)^{4})
 \end{equation}
 
-### Long-wave radiation balance by plant cohorts
+### Long-wave radiation balance by plant cohorts {#longwaveradiationcohorts}
 The net LWR per leaf area unit absorbed within canopy layer $j$ can also be decomposed among plant cohorts. The net LWR of cohort $i$ in layer $j$ is found using the relative proportion of light absorbed by the cohort (i.e. the complement of its diffuse transmissivity):
 \begin{equation}
 L_{net,i, j} = L_{net,j} \cdot \frac{1-\tau_{i,j}}{\sum_h{1-\tau_{h,j}}}

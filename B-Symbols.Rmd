@@ -46,6 +46,7 @@ The following tables list all symbols used in this document, along with their un
 | Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
 | $c$ | (count) | | Number of plant cohorts |
+| $l$ | (count) | | Number of vertical layers for leaf distribution |
 | $SP_i$  | (count) | `Species` | Species identity of cohort $i$ |
 | $A_{sh,i}$  | $cm^2$ |  | Area occupied by an average shrub individual of cohort $i$ |
 | $B_{sh,i}$  | $kg$ |  | Fine-fuel biomass of an average shrub individual of cohort $i$ |
@@ -114,20 +115,20 @@ The following tables list all symbols used in this document, along with their un
 | $RLD$ | $cm \cdot cm^{-3}$ | `RLD` | Fine root length density (i.e. density of root length per soil volume) |
 | $r_{6.35}$ | | `r635` | Ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm |
 
-## Light extinction
+## Radiation
 
 | Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
-| $l$ | (count) | | Number of vertical layers for leaf distribution and light extinction |
 | $k_{PAR,i}$ | (unitless) | `kPAR` | PAR extinction coefficient for cohort $i$ |
 | $k_{SWR,i}$ | (unitless) |  | SWR extinction coefficient for cohort $i$ |
+| $k_{LWR}$ | (unitless) |  | LWR extinction coefficient |
 | $k_{b}$ | (unitless) | | Extinction coefficient for direct light  for cohort $i$|
 | $k_{d,i}$ | (unitless) | | Extinction coefficient for diffuse light for cohort $i$ (equal to $k_{PAR,i}$ or $k_{SWR,i}$) |
 | $\alpha_{SWR,i}$ | [0-1] | `alphaSWR` | Short-wave radiation absorbance coefficient  for cohort $i$|
 | $\alpha_{PAR,i}$ | [0-1] | | PAR absorbance coefficient  for cohort $i$|
 | $\gamma_{SWR,i}$ | [0-1] |`gammaSWR` | Short-wave radiation leaf reflectance (albedo) for cohort $i$ |
+| $\gamma_{SWR,soil}$ | [0-1] | | Short-wave radiation soil reflectance |
 | $\gamma_{PAR,i}$ | [0-1] | | PAR leaf reflectance for cohort $i$ |
-| $\gamma_{LWR}$ | [0-1] | | Long-wave radiation leaf reflectance coefficient |
 | $L^{PAR}_{ground}$ | [0-1] | `LgroundPAR` | Fraction of PAR reaching the ground |
 | $L^{SWR}_{ground}$ | [0-1] | `LgroundSWR` | Fraction of SWR reaching the ground |
 | $I_{beam}$ | $W·m^{-2}$ | | Instantaneous direct shortwave irrradiance from the atmosphere |
@@ -135,6 +136,14 @@ The following tables list all symbols used in this document, along with their un
 | $L_{atm}$ | $W·m^{-2}$ | | Instantaneous longwave radiation from the atmosphere |
 | $I_{beam,j}$ | $W·m^{-2}$ | | Instantaneous direct shortwave irrradiance at the top of canopy layer $j$ |
 | $I_{dif,j}$ | $W·m^{-2}$ | | Instantaneous diffuse shortwave irrradiance at the top of canopy layer $j$ |
+| $I_{beam,soil}$ | $W·m^{-2}$ | | Instantaneous direct shortwave irrradiance reaching the soil |
+| $I_{dif,soil}$ | $W·m^{-2}$ | | Instantaneous diffuse shortwave irrradiance reaching the soil |
+| $LAI^{sunlit}_{i,j}$ | $m^2·m^{-2}$ | | Leaf area index of sunlit leaves of cohort $i$ in layer $j$.|
+| $LAI^{shade}_{i,j}$ | $m^2·m^{-2}$ | | Leaf area index of shade leaves of cohort $i$ in layer $j$.|
+| $\Phi^{sunlit}_{i,j}$ | $W·m^{-2}$ | | Short-wave radiation absorbed by sunlit leaves of cohort $i$ in layer $j$, per leaf area unit.|
+| $\Phi^{shade}_{i,j}$ | $W·m^{-2}$ | | Short-wave radiation absorbed by sunlit leaves of cohort $i$ in layer $j$, per leaf area unit.|
+| $K^{sunlit}_{abs,i,j}$ | $W·m^{-2}$ | | Short-wave radiation absorbed by sunlit foliage of cohort $i$ in layer $j$, per ground area unit.|
+| $K^{shade}_{abs,i,j}$ | $W·m^{-2}$ | | Short-wave radiation absorbed by sunlit foliage of cohort $i$ in layer $j$, per ground area unit.|
 
 ## Hydrology and water balance
 
@@ -159,26 +168,29 @@ The following tables list all symbols used in this document, along with their un
 | $Tr$ | $mm$ | `PlantTranspiration`| Plant transpiration |
 | $Tr_{i}$ | $mm$ | | Transpiration of plant cohort $i$|
 
-## Canopy and soil energy balance
+## Energy balance
 
 | Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
-| $K_{abs,ca}$ | $W \cdot m^{-2}$ | `SWRcanin` |  Atmosphere shortwave radiation absorbed by the canopy |
-| $K_{abs,sa}$ | $W \cdot m^{-2}$ | `SWRsoilin`  |  Atmosphere shortwave radiation absorbed by the soil |
-| $L_{abs,ca}$ | $W \cdot m^{-2}$ | `LWRcanin`  |  Atmosphere longwave radiation absorbed by the canopy |
-| $L_{abs,sa}$ | $W \cdot m^{-2}$ | `LWRsoilin` |  Atmosphere longwave radiation absorbed by the soil |
-| $L_{abs,cs}$ | $W \cdot m^{-2}$ | `LWRsoilcan`|  Longwave radiation emmited by the soil and absorbed by the canopy |
-| $L_{em,c}$ | $W \cdot m^{-2}$ | `LWRcanout` |  Longwave radiation emmited by the canopy |
-| $L_{em,s}$ | $W \cdot m^{-2}$ | `LWRsoilout`|  Longwave radiation emmited by the soil |
-| $H_{ca}$ | $W \cdot m^{-2}$ | `Hcan` |  Convective heat exchange between the canopy and the atmosphere |
-| $H_{cs}$ | $W \cdot m^{-2}$ | `Hcansoil` |  Convective heat exchange between the canopy and the soil |
-| $LE_{ca}$ | $W \cdot m^{-2}$ | `LEcan`| Energy released as latent heat from the canopy towards the atmosphere |
-| $LE_{sa}$ | $W \cdot m^{-2}$ | `LEsoil` | Energy released as latent heat from the soil towards the atmosphere |
-| $T_{atm}$ | $^\circ \mathrm{C}$ | | Above-canopy air temperature |
-| $T_{canopy}$ | $^\circ \mathrm{C}$ | | Canopy temperature |
-| $T_{soil,s}$ | $^\circ \mathrm{C}$ | | Temperature of soil layer $s$ |
-| $TC_{canopy}$ | $J \cdot m^{-2} \cdot K^{-1}$ | | Canopy thermal capacitance |
+| $K_{abs,can}$ | $W \cdot m^{-2}$ | `SWRcan` |  Atmosphere shortwave radiation absorbed by the canopy |
+| $K_{abs,j}$ | $W \cdot m^{-2}$ | |  Atmosphere shortwave radiation absorbed by canopy layer $j$ |
+| $K_{abs,soil}$ | $W \cdot m^{-2}$ | `SWRsoil`  |  Atmosphere shortwave radiation absorbed by the soil |
+| $L_{net,can}$ | $W \cdot m^{-2}$ | `LWRcan`  |  Canopy net longwave radiation |
+| $L_{net,j}$ | $W \cdot m^{-2}$ | |  Net long-wave radiation of canopy layer $j$ |
+| $L_{net,soil}$ | $W \cdot m^{-2}$ | `LWRsoil` |  Soil net longwave radiation |
+| $H_{ca}$ | $W \cdot m^{-2}$ | `Hcan` |  Sensible heat exchange between the canopy and the atmosphere |
+| $H_{j}$ | $W \cdot m^{-2}$ | | Sensible heat flux in canopy layer $j$ |
+| $H_{cs}$ | $W \cdot m^{-2}$ | `Hcansoil` |  Sensible heat exchange between the canopy and the soil |
+| $LE_{can}$ | $W \cdot m^{-2}$ | `LEcan`| Energy released as latent heat from the canopy towards the atmosphere |
+| $LE_{j}$ | $W \cdot m^{-2}$ | | Energy released as latent heat by canopy layer $j$ |
+| $LE_{soil}$ | $W \cdot m^{-2}$ | `LEsoil` | Energy released as latent heat from the soil |
+| $T_{atm}$ | $^\circ \mathrm{C}$ | `Tatm` | Above-canopy air temperature |
+| $T_{air,can}$ | $^\circ \mathrm{C}$ | `Tcan` | Canopy air temperature |
+| $T_{air,j}$ | $^\circ \mathrm{C}$ |  | Air temperature in canopy layer $j$ |
+| $T_{soil,s}$ | $^\circ \mathrm{C}$ | `Tsoil.s` | Temperature of soil layer $s$ |
 | $TC_{LAI}$ | $J \cdot m^{-2} \cdot K^{-1}$ | `thermalcapacityLAI` | Canopy thermal capacitance per LAI unit |
+| $TC_{can}$ | $J \cdot m^{-2} \cdot K^{-1}$ | | Canopy thermal capacitance |
+| $TC_{j}$ | $J \cdot m^{-2} \cdot K^{-1}$ | | Thermal capacitance of canopy layer $j$ |
 | $TC_{soil,s}$ | $J \cdot m^{-2} \cdot K^{-1}$ | | Thermal capacitance of soil layer $s$ |
 | $VHC_{soil,s}$ | $J \cdot m^{-3} \cdot K^{-1}$ | | Volumetric heat capacity of soil in layer $s$|
 
@@ -211,7 +223,7 @@ The following tables list all symbols used in this document, along with their un
 | $\Psi_{up}$ | MPa | | Upstream water potential |
 | $\Psi_{down}$ | MPa | | Downstream water potential |
 
-## Leaf/plant photosynthesis
+## Photosynthesis
 
 | Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
@@ -222,13 +234,13 @@ The following tables list all symbols used in this document, along with their un
 | $T_{leaf}$ | $^\circ C$| | Leaf temperature. |
 | $u_{leaf}$ | $m \cdot s^{-1}$| | Leaf-level wind speed. |
 | $VPD_{leaf}$ | kPa | | Leaf vapour pressure deficit. |
-| $g_{w}$ | $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$ | | Leaf diffusive conductance to water vapour |
+| $g_{w}$ | $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$ | | Leaf diffusive conductance to water vapor |
 | $g_{c}$ | $mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$ |  | Leaf diffusive conductance to carbon dioxide |
 | $g_{sw}$ | $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$ | | Leaf stomatal conductance to water vapour |
 | $g_{sw,\min}$ | $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$ | `Gswmin` | Minimum stomatal conductance to water vapour |
 | $g_{sw,\max}$ | $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$ | `Gswmax` | Maximum stomatal conductance to water vapour |
-| $I_{PAR}$ | $W \cdot m^{-2}$ | | Leaf photosynthetically active irradiance |
-| $Q_{PAR}$ | $\mu mol\,photon \cdot m^{-2} \cdot s^{-1}$ | | PAR photon flux density |
+| $\Phi^{leaf}_{PAR}$ | $W \cdot m^{-2}$ | | Photosynthetically active radiation absorbed per leaf area |
+| $Q^{leaf}_{PAR}$ | $\mu mol\,photon \cdot m^{-2} \cdot s^{-1}$ | | PAR photon flux density per leaf area |
 | $A_c$ | $\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$ | | Rubisco-limited photosynthesis rate |
 | $A_e$ | $\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$ | | Electron transport-limited photosynthesis rate |
 | $A$ | $\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$ | | Leaf gross photosynthesis rate |

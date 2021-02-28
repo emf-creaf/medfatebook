@@ -32,16 +32,15 @@ Rabs = 740 #W * m-2
 
 Leaf temperature ($T_{leaf}$; in $^\circ C$) can be calculated for any given flow rate $E$ using an energy balance equation [@Campbell1998]:
 \begin{equation}
-T_{leaf} = T_{air}+\frac{I_{SWR}^{leaf} + L_{net}^{leaf}-\lambda_v(T_{air})\cdot E_{two-sided}}{C_p\cdot(g_r+g_{Ha})}
+T_{leaf} = T_{air}+\frac{\Phi_{SWR}^{leaf} + L_{net}^{leaf}-\lambda_v(T_{air})\cdot E_{two-sided}}{C_p\cdot(g_r+g_{Ha})}
 (\#eq:leaftemperatureequation)
 \end{equation}
-where $I_{SWR}^{leaf}$ (in $W \cdot m^{-2}$) is the instantaneous shortwave radiation absorbed per leaf area unit, $L_{net}^{leaf}$ is the instantaneous net long-wave radiation per leaf area unit, $E_{two-sided}$ is the flow rate $E$ converted to $mol \cdot s^{-1} \cdot m^{-2}$ per two-sided leaf area basis, $\epsilon$ is longwave radiation emissivity (0.97), $\sigma$ is the Stephan-Boltzman constant, $T_{air}$ is the temperature of the air surrounding the leaf (in $^\circ C$), $C_p$ = 29.3 $J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure and $\lambda_v(T_{air})$ is the latent heat of vaporization (in $J \cdot mol^{-1}$) corresponding to $T_{air}$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in the **meteoland** reference manual). If canopy energy balance is performed assuming a single canopy layer $T_{air} = T_{canopy}$, where $T_{canopy}$ is the canopy air temperature resulting from the energy balance of the previous step (see section \@ref(canopycapacitancetemperature)). If a multi-layer canopy energy balance is used, $T_{air}$ corresponds with the air temperature of the canopy layer where the leaf occurs, which can be different for sunlit and shade leaves of each cohort. Finally, $g_r$ and $g_{Ha}$ are the radiative and heat conductance values (in $mol \cdot m^{-2} \cdot s^{-1}$), respectively [@Campbell1998]:
+where $\Phi_{SWR}^{leaf}$ (in $W \cdot m^{-2}$) is the instantaneous shortwave radiation absorbed per leaf area unit, $L_{net}^{leaf}$ is the instantaneous net long-wave radiation per leaf area unit, $E_{two-sided}$ is the flow rate $E$ converted to $mol \cdot s^{-1} \cdot m^{-2}$ per two-sided leaf area basis, $\epsilon$ is longwave radiation emissivity (0.97), $\sigma$ is the Stephan-Boltzman constant, $T_{air}$ is the temperature of the air surrounding the leaf (in $^\circ C$), $C_p$ = 29.3 $J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure and $\lambda_v(T_{air})$ is the latent heat of vaporization (in $J \cdot mol^{-1}$) corresponding to $T_{air}$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in the **meteoland** reference manual). If canopy energy balance is performed assuming a single canopy layer $T_{air}$ corresponds to  $T_{canopy}$, the whole-canopy air temperature resulting from the energy balance of the previous step (see section \@ref(canopycapacitancetemperature)). If a multi-layer canopy energy balance is used, $T_{air}$ corresponds with the air temperature of the canopy layer including the leaf. Finally, $g_r$ and $g_{Ha}$ are the radiative and heat conductance values (in $mol \cdot m^{-2} \cdot s^{-1}$), respectively [@Campbell1998]:
 \begin{eqnarray}
 g_r &=& \frac{4\cdot \epsilon \cdot \sigma \cdot (T_{air}+273.15)^3}{C_p} \\
 g_{Ha} &=& 0.189 \cdot (u_{leaf}/d)^{0.5}
 \end{eqnarray}
 where $u_{leaf}$ is the leaf-level wind speed (in $m \cdot s^{-1}$) and $d$ is 0.72 times the leaf width (species parameter `LeafWidth` in $cm$). As before, $u_{leaf}$ is the wind-speed at the vertical location of the leaf (see \@ref(windextinctionprofile)).
-
 
 By inspecting eq. \@ref(eq:leaftemperatureequation), we can conclude that transpiration flow decreases leaf temperature, whereas radiation increases it and wind speed makes it more similar to the temperature of the surrounding air. The following figures illustrate the effect of varying wind speed and flow rate on $T_{leaf}$ for two contrasted leaf widths (see function `biophysics_leafTemperature`):
 
@@ -252,6 +251,7 @@ In the previous figure we have indicated the thresholds of $g_{sw,\min}$ and $g_
 Rubisco-limited photosynthesis rate $A_c$ (in $\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$) is modelled using [@Collatz1991; @Medlyn2002]:
 \begin{equation}
 A_c=\frac{V_{max}\cdot (C_i- \Gamma*)}{C_i+K_c \cdot (1+ O_a/K_o)}
+(\#eq:leafAcequation) 
 \end{equation}
 where $V_{max}$ is Rubisco's maximum carboxylation rate (in $\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$), $C_i$ is the internal carbon dioxide concentration (in $\mu mol \cdot mol^{-1}$), $\Gamma*$ is the compensation point (in $\mu mol \cdot mol^{-1}$), $K_c$ (in $\mu mol \cdot mol^{-1}$) and $K_o$ (in $mmol \cdot mol^{-1}$) are Michaelis-Menten constants for carboxylation and oxygenation, respectively, and $O_a$ is the atmospheric oxygen concentration (i.e. 209 $mmol \cdot mol^{-1}$). $\Gamma*$, $K_c$ and $K_o$ depend on leaf temperature ($T_{leaf}$, in $^\circ C$) [@Bernacchi2001]:
 \begin{eqnarray}
@@ -262,11 +262,11 @@ K_o &=& 278.4\cdot e^{\frac{36380\cdot (T_{leaf}-25)}{298\cdot R \cdot (T_{leaf}
 Electron transport-limited photosynthesis $A_e$ (in $\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$) was obtained from @Medlyn2002:
 \begin{eqnarray}
 A_e &=& \frac{J}{4}\cdot \frac{C_i-\Gamma*}{C_i+2\cdot \Gamma*} \\
-J &=& \frac{(\alpha\cdot Q_{PAR} + J_{max})-\sqrt{(\alpha\cdot Q_{PAR} + J_{max})^2-4.0\cdot c \cdot \alpha \cdot Q_{PAR} \cdot J_{max}}}{2\cdot c}
+J &=& \frac{(\alpha\cdot Q^{leaf}_{PAR} + J_{max})-\sqrt{(\alpha\cdot Q^{leaf}_{PAR} + J_{max})^2-4.0\cdot c \cdot \alpha \cdot Q^{leaf}_{PAR} \cdot J_{max}}}{2\cdot c}
 \end{eqnarray}
-where $\alpha = 0.3\,mol \, e \cdot mol\,photon^{-1}$ is the quantum yield of electron transport, $Q^{leaf}_{PAR}$ is the absorbed PAR photon flux density per leaf area ($\mu mol\,photon \cdot m^{-2} \cdot s^{-1}$), which is calculated from absorbed PAR per leaf area ($I^{leaf}_{PAR}$; in $W \cdot m^{-2}$):
+where $\alpha = 0.3\,mol \, e \cdot mol\,photon^{-1}$ is the quantum yield of electron transport, $Q^{leaf}_{PAR}$ is the absorbed PAR photon flux density per leaf area ($\mu mol\,photon \cdot m^{-2} \cdot s^{-1}$), which is calculated from absorbed PAR per leaf area ($\Phi^{leaf}_{PAR}$; in $W \cdot m^{-2}$):
 \begin{equation}
-Q^{leaf}_{PAR} = I^{leaf}_{PAR}\cdot 546 \cdot 0.836\cdot 10^{-2}
+Q^{leaf}_{PAR} = \Phi^{leaf}_{PAR}\cdot 546 \cdot 0.836\cdot 10^{-2}
 (\#eq:leafQequation) 
 \end{equation}
 where $546$ is the wavelength in $nm$. $J_{max}$ and $J$ are the maximum and actual rate of electron transport (both in $\mu mol\,e \cdot m^{-2} \cdot s^{-1}$) and $c=0.9$ defines the curvature of the light-response curve. The gross assimilation rate $A$ at a given $C_i$ is the minimum of $A_e$ and $A_c$. To obtain a smooth $A$-vs-$C_i$ curve we used [@Collatz1991]:
@@ -377,10 +377,10 @@ where $LAI^{sunlit}_{i,j}$ and $LAI^{shade}_{i,j}$ are the leaf area index of su
 
 b. Average the SWR/PAR absorbed by leaves of each kind across layers. The average light absorbed by sunlit/shaded foliage of cohort $i$ per ground area unit is found using:
 \begin{eqnarray}
-I^{sunlit}_{abs,i} &=& \frac{\sum_{j=1}^{l}{K^{sunlit}_{abs,i,j}}}{LAI^{sunlit}_{i}} \\
-I^{shade}_{abs,i} &=& \frac{\sum_{j=1}^{l}{K^{shade}_{abs,i,j}}}{LAI^{shade}_{i}}
+\Phi^{sunlit}_{abs,i} &=& \frac{\sum_{j=1}^{l}{K^{sunlit}_{abs,i,j}}}{LAI^{sunlit}_{i}} \\
+\Phi^{shade}_{abs,i} &=& \frac{\sum_{j=1}^{l}{K^{shade}_{abs,i,j}}}{LAI^{shade}_{i}}
 \end{eqnarray}
-where $K^{sunlit}_{abs,i,j}$ and $K^{shade}_{abs,i,j}$ are the light absorbed per ground area unit by sunlit/shade leaves of cohort $i$ at layer $j$ (see section \@ref(shortwaveradiationcanopyabs)).
+where $K^{sunlit}_{abs,i,j}$ and $K^{shade}_{abs,i,j}$ are the light absorbed per ground area unit by sunlit/shade leaves of cohort $i$ at layer $j$ (see section \@ref(shortwaveradiationcanopyabs)). Analogous equations were already given for the net long-wave radiation balance of sunlit leaves ($L^{sunlit}_{net,i}$) and shade leaves ($L^{shade}_{net,i}$) in section \@ref(longwaveradiationcohorts).
 
 c. Average the maximum carboxylation (respectively, electron transport) rates across layers, again separating sunlit and shade leaves: 
 \begin{eqnarray}
@@ -388,7 +388,7 @@ V^{sunlit}_{max,298,i} &=& \frac{\sum_{j=1}^{l}{V_{max,298,i,j} \cdot LAI^{sunli
 V^{shade}_{max,298,i} &=& \frac{\sum_{j=1}^{l}{V_{max,298,i,j} \cdot LAI^{shade}_{i,j}}}{LAI^{shade}_{i}}
 \end{eqnarray}
 
-d. Using $I^{sunlit}_{SWR,i}$ as $I^{leaf}_{SWR}$ and $L^{sunlit}_{net,i}$ as $L^{leaf}_{net}$ in eq. \@ref(eq:leaftemperatureequation); and $I^{sunlit}_{PAR,i}$ as $I_{PAR}^{leaf}$ in \@ref(eq:leafQequation) to estimate sunlit leaf photosynthesis, which can be up-scaled to the crown level multiplying by $LAI^{sunlit}_{i}$. The same would be done for shade leaves. In a sun-shade canopy model one then calls the photosynthesis function twice (i.e. once for shade leaves and once for sunlit leaves) for each plant cohort $i$.
+d. Use $V^{sunlit}_{max,298,i}$ as $V_{max,298}$ in @Leuning2002 to obtain $V_{max}$ for eq. \@ref(eq:leafAcequation); $\Phi^{sunlit}_{SWR,i}$ as $\Phi^{leaf}_{SWR}$ and $L^{sunlit}_{net,i}$ as $L^{leaf}_{net}$ in eq. \@ref(eq:leaftemperatureequation); and $\Phi^{sunlit}_{PAR,i}$ as $\Phi_{PAR}^{leaf}$ in eq. \@ref(eq:leafQequation) to estimate sunlit leaf photosynthesis, which can be up-scaled to the crown level multiplying by $LAI^{sunlit}_{i}$. The same would be done for shade leaves. In a sun-shade canopy model one then calls the photosynthesis function twice (i.e. once for shade leaves and once for sunlit leaves) for each plant cohort $i$.
 
 ### Comparison of big-leaf, sun-shade and multi-canopy photosynthesis models
 
