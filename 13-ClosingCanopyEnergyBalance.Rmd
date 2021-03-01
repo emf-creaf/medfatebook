@@ -2,7 +2,8 @@
 
 In chapter \@ref(radiationbalance) we described the details of radiation energy exchanges. Plant transpiration is an important latent heat component of the canopy energy balance, and the details of how plant transpiration is determined were given in chapters \@ref(planthydraulics), \@ref(plantphotosynthesis) and \@ref(transpirationsperry). We devote the first part of the current chapter to describe the calculations of convective and latent heat energy exchanges. These are the remaining energy exchange components to close the energy balance of the canopy (eq. \@ref(eq:canopyenergybalance)) and of soil layers (eqs. \@ref(eq:soilenergybalance) and \@ref(eq:deepsoilenergybalance)). Temperature changes applied to the canopy and soil layers are also described here.
 
-## Convective energy
+## Single-layer canopy energy balance
+### Convective energy
 
 Convective energy fluxes between atmosphere and the canopy ($H_{ca}$) and between the canopy and the soil ($H_{cs}$) are determined as follows:
 \begin{eqnarray}
@@ -11,21 +12,13 @@ H_{cs} &=& \frac{\rho_{canopy} \cdot c_p}{r_{cs}}\cdot (T_{canopy} - T_{soil})
 \end{eqnarray}
 where $\rho_{atm}$ and $\rho_{canopy}$ are the air density above-canopy and inside-canopy, respectively, calculated from the corresponding temperatures (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in meteoland reference manual); $c_{p}$ = 1013.86 $J·kg^{-1}·C^{-1}$ is the specific heat capacity of the air. $r_{ca}$ and $r_{cs}$ are the atmosphere-canopy and canopy-soil aerodynamic resistances (in $s·m^{-1}$). These, in turn, are calculated using the FAO56 calculation procedure and canopy height, total LAI and above-canopy and below-canopy wind speeds. Wind speed below the canopy is calculated as explained in \@ref(windextinctionprofile) assuming a height of 2 m.
 
-## Latent heat
+### Latent heat
 
-The canopy exchanges of latent heat include latent heat exchanged from plant transpiration and evaporation of rain intercepted by the canopy. In the single-layer canopy energy balance, latent heat exchange for the whole canopy ($LE_{can}$) is calculated as:
+Canopy exchanges of latent heat include latent heat exchanged from plant transpiration and evaporation of rain intercepted by the canopy. In the single-layer canopy energy balance, latent heat exchange for the whole canopy ($LE_{can}$) is calculated as:
 \begin{equation}
-LE_{can} = \lambda_v(T_{can}) \left(In_{step} + \sum_{i}{E_i} \right)
+LE_{can} = \lambda_v(T_{can}) \left(In_{step} + \sum_{i=1}^{c}{E_i} \right)
 \end{equation}
-where $\lambda_v(T_{can})$ is the latent heat of vaporization at temperature $T_{can}$ (in $J·kg^{-1}$), $E_i$ is the instanteous transpiration flux calculated for cohort $i$ and $In_{step}$ is the instantaneous amount of intercepted water evaporated from the canopy for the current time step (total daily interception $In$ is divided into timesteps according to the proportion of shortwave radiation absorbed by the canopy at each time step). In a multi-layer canopy energy balance, the latent heat for a given layer $j$ is:
-\begin{equation}
-LE_{j} = \lambda_v(T_{air,j}) \left(In_{step,j} + \sum_{i}{E_{i,j}} \right)
-\end{equation}
-where $\lambda_v(T_{air,j})$ is the latent heat of vaporization at temperature $T_{air,j}$ (in $J·kg^{-1}$), $In_{step,j}$ is the instantaneous amount of intercepted water evaporated from the canopy layer, determined dividing $In_{step}$ among canopy layers:
-\begin{equation}
-In_{step, j} = In_{step} \cdot \frac{\sum_{i=1}{LAI_{i,j}^{\phi}}}{LAI^{\phi}_{stand}}
-\end{equation}
-
+where $\lambda_v(T_{can})$ is the latent heat of vaporization at temperature $T_{can}$ (in $J·kg^{-1}$), $E_i$ is the instantaneous transpiration flux calculated for cohort $i$ and $In_{step}$ is the instantaneous amount of intercepted water evaporated from the canopy for the current time step (total daily interception $In$ is divided into timesteps according to the proportion of shortwave radiation absorbed by the canopy at each time step).
 
 The latent heat exchange between the soil and the atmosphere ($LE_{soil}$) comes either from water evaporated from the soil surface or snow melting. They do not occur simultaneously, but can be expressed in the same equation:
 \begin{equation}
@@ -33,26 +26,26 @@ LE_{soil} = \lambda_v(T_{soil}) \cdot Es_{step} + \lambda_{f} \cdot Sm_{step}
 \end{equation}
 where $\lambda_v(T_{soil})$ is the latent heat of vaporization at temperature $T_{soil}$ and $\lambda_{f} = 0.33355J·kg^{-1}$ is the latent heat of fusion. As before, daily evaporation from bare soil ($Es$) and snow melt water equivalent ($Sm$) are divided into time steps according to the proportion of shortwave radiation absorbed by the soil layer each step.
 
-## Canopy temperature changes {#canopycapacitancetemperature}
+### Canopy temperature changes {#canopycapacitancetemperature}
 
 After evaluating the canopy energy balance equation \@ref(eq:canopyenergybalance) one has to translate energy balance into temperature variation of the canopy. Rearranging the same equation and expressing it in discrete time steps we have:
 \begin{equation}
-\Delta TC_{canopy} =  \Delta t_{step} \cdot \frac{K_{abs,ca} + (L_{abs,ca} - L_{em,c}) + (L_{abs,cs} - L_{em,c}) - LE_{c} - H_{ca} - H_{cs}}{C_{canopy}}
+\Delta T_{can} =  \Delta t_{step} \cdot \frac{K_{abs,can} + L_{net,ca} - LE_{can} - H_{ca} - H_{cs}}{TC_{can}}
 \end{equation}
-where $TC_{canopy}$ is the canopy thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$) and $\Delta t_{step} = 86400/n_t$ is the size of the time step in seconds. Canopy thermal capacitance depends on the leaf area index of the stand:
+where $TC_{can}$ is the canopy thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$) and $\Delta t_{step} = 86400/n_t$ is the size of the time step in seconds. Canopy thermal capacitance depends on the leaf area index of the stand:
 \begin{equation}
-TC_{canopy} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{stand} + 1.2 \cdot (LAI_{stand}^{phi} + \cdot LAI_{stand}^{dead})}{2}
+TC_{can} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{stand} + 1.2 \cdot (LAI_{stand}^{phi} + \cdot LAI_{stand}^{dead})}{2}
 \end{equation}
 where $TC_{LAI}$ is the thermal capacitance per LAI unit, which is specified by the control parameter `thermalCapacityLAI`. By using both the maximum leaf area of the stand, $LAI_{stand}$, and its current live/dead leaf area ($LAI_{stand}^{phi}+LAI_{stand}^{dead}$) it is assumed that part of thermal capacitance corresponds to stems and branches, so that capacitance does not drop to zero for deciduous canopies.
 
-## Soil temperature changes
+### Soil temperature changes
 Analogously to the canopy, the change in temperature for a given soil layer $s$ in the current time step is given by rearranging eq. \@ref(eq:deepsoilenergybalance):
 \begin{equation}
 \Delta T_{soil,s} = \Delta t_{step} \cdot \frac{G_{s-1,s} - G_{s,s+1}}{C_{soil,s}}
 \end{equation}
 where the energy balance on each soil layer $s$ depends on the balance between energy coming from above ($G_{s-1,s}$) and energy going to below ($G_{s,s+1}$) and $C_{soil,s}$, the thermal capacitance of soil layer $s$. Energy inflow to the first (uppermost) layer (i.e. $G_{0,1}$) is the result of energy exchanges between the soil layer and the canopy and atmosphere, i.e. from eq. \@ref(eq:soilenergybalance):
 \begin{equation}
-G_{0,1} =  K_{abs,sa} + L_{abs,sa} - L_{em,s} + L_{abs,sc} + H_{cs} - LE_{s}
+G_{0,1} =  K_{soil} + L_{net,soil} + H_{cs} - LE_{soil}
 \end{equation}
 Heat conduction between layers $s$ and $s+1$ (i.e. $G_{s,s+1}$) depend on the soil temperature gradient (see function `soil_temperatureGradient()`:
 \begin{equation}
@@ -66,3 +59,18 @@ C_{soil,s} = VTC_{soil,s} \cdot d_s
 \end{equation}
 where $d_s$ is the soil width of layer $s$ (expressed in $m$) and $VTC_{s}$ is the *volumetric thermal capacity* of soil layer $s$ (in $J \cdot m^{-3} \cdot K^{-1}$), calculated from soil moisture and texture following a simplification of @Cox1999 (see function `soil_thermalcapacity()`).
 
+## Multi-layer canopy energy balance
+
+### Latent heat
+In a multi-layer canopy energy balance, the latent heat for a given layer $j$ is:
+\begin{equation}
+LE_{j} = \lambda_v(T_{air,j}) \left(In_{step,j} + \sum_{i=1}^{c}{E_{i,j}} \right)
+\end{equation}
+where $\lambda_v(T_{air,j})$ is the latent heat of vaporization at temperature $T_{air,j}$ (in $J·kg^{-1}$), $In_{step,j}$ is the instantaneous amount of intercepted water evaporated from the canopy layer and $E_{i,j}$ is the instantaneous transpiration flux for cohort $i$ in layer $j$. $In_{step,j}$ is determined by dividing $In_{step}$ among canopy layers according to their LAI:
+\begin{equation}
+In_{step, j} = In_{step} \cdot \frac{\sum_{i=1}{LAI_{i,j}^{\phi}}}{LAI^{\phi}_{stand}}
+\end{equation}
+Similarly, $E_{i,j}$ is determined by dividing $E_{i}$ among the canopy layers according to the LAI of cohort $i$:
+\begin{equation}
+E_{i, j} = E_{i} \cdot \frac{LAI_{i,j}^{\phi}}{LAI_{i}^{\phi}}
+\end{equation}
