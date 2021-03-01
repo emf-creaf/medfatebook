@@ -13,7 +13,7 @@ Tmax = 30
 RHmin = 60
 RHmax = 75
 Tcan = meteoland::utils_averageDaylightTemperature(Tmin, Tmax)
-vpa = meteoland::utils_averageDailyVP(Tmin, Tmax, RHmin, RHmax)
+VPatm = meteoland::utils_averageDailyVP(Tmin, Tmax, RHmin, RHmax)
 Patm = meteoland::utils_atmosphericPressure(100)
 
 Q = 2000
@@ -35,12 +35,12 @@ Leaf temperature ($T_{leaf}$; in $^\circ C$) can be calculated for any given flo
 T_{leaf} = T_{air}+\frac{\Phi_{SWR}^{leaf} + L_{net}^{leaf}-\lambda_v(T_{air})\cdot E_{two-sided}}{C_p\cdot(g_r+g_{Ha})}
 (\#eq:leaftemperatureequation)
 \end{equation}
-where $\Phi_{SWR}^{leaf}$ (in $W \cdot m^{-2}$) is the instantaneous shortwave radiation absorbed per leaf area unit, $L_{net}^{leaf}$ is the instantaneous net long-wave radiation per leaf area unit, $E_{two-sided}$ is the flow rate $E$ converted to $mol \cdot s^{-1} \cdot m^{-2}$ per two-sided leaf area basis, $\epsilon$ is longwave radiation emissivity (0.97), $\sigma$ is the Stephan-Boltzman constant, $T_{air}$ is the temperature of the air surrounding the leaf (in $^\circ C$), $C_p$ = 29.3 $J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure and $\lambda_v(T_{air})$ is the latent heat of vaporization (in $J \cdot mol^{-1}$) corresponding to $T_{air}$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in the **meteoland** reference manual). If canopy energy balance is performed assuming a single canopy layer $T_{air}$ corresponds to  $T_{canopy}$, the whole-canopy air temperature resulting from the energy balance of the previous step (see section \@ref(canopycapacitancetemperature)). If a multi-layer canopy energy balance is used, $T_{air}$ corresponds with the air temperature of the canopy layer including the leaf. Finally, $g_r$ and $g_{Ha}$ are the radiative and heat conductance values (in $mol \cdot m^{-2} \cdot s^{-1}$), respectively [@Campbell1998]:
+where $\Phi_{SWR}^{leaf}$ (in $W \cdot m^{-2}$) is the instantaneous shortwave radiation absorbed per leaf area unit, $L_{net}^{leaf}$ is the instantaneous net long-wave radiation per leaf area unit, $E_{two-sided}$ is the flow rate $E$ converted to $mol \cdot s^{-1} \cdot m^{-2}$ per two-sided leaf area basis, $\epsilon$ is longwave radiation emissivity (0.97), $\sigma$ is the Stephan-Boltzman constant, $T_{air}$ is the temperature of the air surrounding the leaf (in $^\circ C$), $C_p$ = 29.3 $J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure and $\lambda_v(T_{air})$ is the latent heat of vaporization (in $J \cdot mol^{-1}$) corresponding to $T_{air}$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in the **meteoland** reference manual). If canopy energy balance is performed assuming a single canopy layer $T_{air}$ corresponds to  $T_{can}$, the whole-canopy air temperature resulting from the energy balance of the previous step (see section \@ref(canopycapacitancetemperature)). If a multi-layer canopy energy balance is used, $T_{air}$ corresponds to $T_{air,j}$, the air temperature of the canopy layer $j$ that contains the leaf. Finally, $g_r$ and $g_{Ha}$ are the radiative and heat conductance values (in $mol \cdot m^{-2} \cdot s^{-1}$), respectively [@Campbell1998]:
 \begin{eqnarray}
 g_r &=& \frac{4\cdot \epsilon \cdot \sigma \cdot (T_{air}+273.15)^3}{C_p} \\
 g_{Ha} &=& 0.189 \cdot (u_{leaf}/d)^{0.5}
 \end{eqnarray}
-where $u_{leaf}$ is the leaf-level wind speed (in $m \cdot s^{-1}$) and $d$ is 0.72 times the leaf width (species parameter `LeafWidth` in $cm$). As before, $u_{leaf}$ is the wind-speed at the vertical location of the leaf (see \@ref(windextinctionprofile)).
+where $u_{leaf}$ is the leaf-level wind speed (in $m \cdot s^{-1}$) and $d$ is 0.72 times the leaf width (species parameter `LeafWidth` in $cm$). As before, $u_{leaf}$ corresponds to $u_j$, the wind-speed at the canopy layer $j$ where the leaf is located (see \@ref(windextinctionprofile)).
 
 By inspecting eq. \@ref(eq:leaftemperatureequation), we can conclude that transpiration flow decreases leaf temperature, whereas radiation increases it and wind speed makes it more similar to the temperature of the surrounding air. The following figures illustrate the effect of varying wind speed and flow rate on $T_{leaf}$ for two contrasted leaf widths (see function `biophysics_leafTemperature`):
 
@@ -73,31 +73,31 @@ Let us now fix wind speed at the leaf leavel to $u_{leaf} = 2$ m/s. The applicat
 ```{r leaftemperaturefunction, echo=FALSE, fig.width=8, fig.height=4, fig.align="center", fig.cap='(ref:leaftemperaturefunction-cap)'}
 u = 2 # m*s-1
 par(mar=c(4,4,2,1), mfrow=c(1,2))
-psi2A11 = photo_leafPhotosynthesisFunction(supplyNetwork11$E,supplyNetwork11$psiLeaf, Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A12 = photo_leafPhotosynthesisFunction(supplyNetwork12$E,supplyNetwork12$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A13 = photo_leafPhotosynthesisFunction(supplyNetwork13$E,supplyNetwork13$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A14 = photo_leafPhotosynthesisFunction(supplyNetwork14$E,supplyNetwork14$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A21 = photo_leafPhotosynthesisFunction(supplyNetwork21$E,supplyNetwork21$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A22 = photo_leafPhotosynthesisFunction(supplyNetwork22$E,supplyNetwork22$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A23 = photo_leafPhotosynthesisFunction(supplyNetwork23$E,supplyNetwork23$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A24 = photo_leafPhotosynthesisFunction(supplyNetwork24$E,supplyNetwork24$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A31 = photo_leafPhotosynthesisFunction(supplyNetwork31$E,supplyNetwork31$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A32 = photo_leafPhotosynthesisFunction(supplyNetwork32$E,supplyNetwork32$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A33 = photo_leafPhotosynthesisFunction(supplyNetwork33$E,supplyNetwork33$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A34 = photo_leafPhotosynthesisFunction(supplyNetwork34$E,supplyNetwork34$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
+psi2A11 = photo_leafPhotosynthesisFunction(supplyNetwork11$E,supplyNetwork11$psiLeaf, Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A12 = photo_leafPhotosynthesisFunction(supplyNetwork12$E,supplyNetwork12$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A13 = photo_leafPhotosynthesisFunction(supplyNetwork13$E,supplyNetwork13$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A14 = photo_leafPhotosynthesisFunction(supplyNetwork14$E,supplyNetwork14$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A21 = photo_leafPhotosynthesisFunction(supplyNetwork21$E,supplyNetwork21$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A22 = photo_leafPhotosynthesisFunction(supplyNetwork22$E,supplyNetwork22$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A23 = photo_leafPhotosynthesisFunction(supplyNetwork23$E,supplyNetwork23$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A24 = photo_leafPhotosynthesisFunction(supplyNetwork24$E,supplyNetwork24$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A31 = photo_leafPhotosynthesisFunction(supplyNetwork31$E,supplyNetwork31$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A32 = photo_leafPhotosynthesisFunction(supplyNetwork32$E,supplyNetwork32$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A33 = photo_leafPhotosynthesisFunction(supplyNetwork33$E,supplyNetwork33$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A34 = photo_leafPhotosynthesisFunction(supplyNetwork34$E,supplyNetwork34$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
 
-psi2A11emb = photo_leafPhotosynthesisFunction(supplyNetwork11emb$E,supplyNetwork11emb$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A12emb = photo_leafPhotosynthesisFunction(supplyNetwork12emb$E,supplyNetwork12emb$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A13emb = photo_leafPhotosynthesisFunction(supplyNetwork13emb$E,supplyNetwork13emb$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A14emb = photo_leafPhotosynthesisFunction(supplyNetwork14emb$E,supplyNetwork14emb$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A21emb = photo_leafPhotosynthesisFunction(supplyNetwork21emb$E,supplyNetwork21emb$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A22emb = photo_leafPhotosynthesisFunction(supplyNetwork22emb$E,supplyNetwork22emb$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A23emb = photo_leafPhotosynthesisFunction(supplyNetwork23emb$E,supplyNetwork23emb$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A24emb = photo_leafPhotosynthesisFunction(supplyNetwork24emb$E,supplyNetwork24emb$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A31emb = photo_leafPhotosynthesisFunction(supplyNetwork31emb$E,supplyNetwork31emb$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A32emb = photo_leafPhotosynthesisFunction(supplyNetwork32emb$E,supplyNetwork32emb$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A33emb = photo_leafPhotosynthesisFunction(supplyNetwork33emb$E,supplyNetwork33emb$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
-psi2A34emb = photo_leafPhotosynthesisFunction(supplyNetwork34emb$E,supplyNetwork34emb$psiLeaf,Catm, Patm,Tcan, vpa, u, Rabs, Q, Vmax298, Jmax298)
+psi2A11emb = photo_leafPhotosynthesisFunction(supplyNetwork11emb$E,supplyNetwork11emb$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A12emb = photo_leafPhotosynthesisFunction(supplyNetwork12emb$E,supplyNetwork12emb$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A13emb = photo_leafPhotosynthesisFunction(supplyNetwork13emb$E,supplyNetwork13emb$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A14emb = photo_leafPhotosynthesisFunction(supplyNetwork14emb$E,supplyNetwork14emb$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A21emb = photo_leafPhotosynthesisFunction(supplyNetwork21emb$E,supplyNetwork21emb$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A22emb = photo_leafPhotosynthesisFunction(supplyNetwork22emb$E,supplyNetwork22emb$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A23emb = photo_leafPhotosynthesisFunction(supplyNetwork23emb$E,supplyNetwork23emb$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A24emb = photo_leafPhotosynthesisFunction(supplyNetwork24emb$E,supplyNetwork24emb$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A31emb = photo_leafPhotosynthesisFunction(supplyNetwork31emb$E,supplyNetwork31emb$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A32emb = photo_leafPhotosynthesisFunction(supplyNetwork32emb$E,supplyNetwork32emb$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A33emb = photo_leafPhotosynthesisFunction(supplyNetwork33emb$E,supplyNetwork33emb$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
+psi2A34emb = photo_leafPhotosynthesisFunction(supplyNetwork34emb$E,supplyNetwork34emb$psiLeaf,Catm, Patm,Tcan, VPatm, u, Rabs, Q, Vmax298, Jmax298)
 
 plot(-supplyNetwork11$psiLeaf, psi2A11$LeafTemperature, type="l", col=col1, ylab="Leaf temperature (ºC)", xlab = "Leaf pressure (-MPa)",  xlim=c(0, 7), ylim=c(26,27.5), lwd=1, main="original")
 lines(-supplyNetwork12$psiLeaf,psi2A12$LeafTemperature, lty=1, lwd=1, col=col2)
@@ -131,23 +131,23 @@ legend("bottomleft", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 
 ### Leaf vapor pressure deficit
 
-Vapor pressure deficit in the leaf ($VPD_{leaf}$, in kPa) is calculated as:
+Vapor pressure deficit in the leaf ($e_{leaf}$, in kPa) is calculated as:
 \begin{equation}
-VPD_{leaf} = vp_{leaf} - vp_{air}
+VPD_{leaf} = e_{leaf} - e_{air}
 \end{equation}
-Where $vp_{air}$ is the water vapor pressure of the air surrounding the leaf (but beyond the leaf boundary layer) and $vp_{leaf}$ is the leaf vapor pressure, which can be calculated from leaf temperature ($T_{leaf}$) and leaf water potential ($\Psi_{leaf}$):
+Where $e_{air}$ is the water vapor pressure of the air surrounding the leaf (but beyond the leaf boundary layer) and $e_{leaf}$ is the leaf vapor pressure, which can be calculated from leaf temperature ($T_{leaf}$) and leaf water potential ($\Psi_{leaf}$):
 \begin{equation}
-vp_{leaf} = VP(T_{leaf}) \cdot e^{\frac{2.17 \cdot \Psi_{leaf}}{T_{leaf}+273.15}}
+e_{leaf} = e_{sat}(T_{leaf}) \cdot \exp\left\{\frac{2.17 \cdot \Psi_{leaf}}{T_{leaf}+273.15}\right\}
 (\#eq:leafvpequation)
 \end{equation}
-where $VP(T)$ is a function giving the saturated vapor pressure for temperature $T$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual). If a single-canopy energy balance is considered, the water vapor pressure of the air surrounding the leaf is taken as the average atmospheric water vapor pressure of the day, i.e. $vp_{air} = vp_{day}$. When a multi-layer canopy energy balance is simulated, $vp_{air}$ will correspond to the water vapor pressure of the canopy layer where the leaf is located.
+where $e_{sat}(T)$ is a function giving the saturated vapor pressure for temperature $T$ (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual). If a single-canopy energy balance is considered, the water vapor pressure of the air surrounding the leaf is taken as the average atmospheric water vapor pressure of the day, i.e. $e_{air} = e_{atm}$. When a multi-layer canopy energy balance is simulated, $e_{air}$ will correspond to the water vapor pressure $e_{air,j}$ of the canopy layer $j$ where the leaf is located.
 
-Since $vp_{leaf}$ decreases when leaf temperature decreases in eq. \@ref(eq:leafvpequation), increasing transpiration decreases leaf VPD as a result of decreasing leaf temperature. To illustrate this effect, let us assume the following values of relative humidity, yielding a $vp_{air} = 1.91\, kPa$:
+Since $e_{leaf}$ decreases when leaf temperature decreases in eq. \@ref(eq:leafvpequation), increasing transpiration decreases leaf VPD as a result of decreasing leaf temperature. To illustrate this effect, let us assume the following values of relative humidity, yielding a $e_{air} = e_{atm} =1.91\, kPa$:
 ```{r}
 RHmin = 60
 RHmax = 75
-vpa = meteoland::utils_averageDailyVP(Tmin, Tmax, RHmin, RHmax)
-vpa
+VPatm = meteoland::utils_averageDailyVP(Tmin, Tmax, RHmin, RHmax)
+VPatm
 ```
 
 The application of the above equation to the $T_{leaf}(\Psi_{leaf})$ curves of fig. \@ref(fig:leaftemperaturefunction) yields the following $VPD_{leaf}(\Psi_{leaf})$ curves:
@@ -185,7 +185,7 @@ lines(-supplyNetwork34emb$psiLeaf, psi2A34emb$LeafVPD, lty=3, lwd=1, col=col4)
 abline(v=-psiCav, col="gray", lwd=1.5)
 legend("bottomleft", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 ```
-Note that the VPD decreasing curves do not start at the same $VPD_{leaf}$ value despite corresponding to the same $T_{leaf}$ value, because of the effect of $\Psi_{leaf}$ on $vp_{leaf}$ in eq. \@ref(eq:leafvpequation).
+Note that the VPD decreasing curves do not start at the same $VPD_{leaf}$ value despite corresponding to the same $T_{leaf}$ value, because of the effect of $\Psi_{leaf}$ on $e_{leaf}$ in eq. \@ref(eq:leafvpequation).
 
 ### Leaf gas exchange
 
@@ -277,7 +277,7 @@ where $c'=0.98$ is a curvature factor. The temperature dependence of $J_{max}$ a
 \begin{equation}
 A = g_{c} \cdot (C_{air}-C_i)
 \end{equation}
-where $C_{air}$ is the  $CO_{2}$ concentration (in $\mu mol \cdot mol^{-1}$) in the air surrounding the leaf (beyond the leaf boundary layer). If a single-layer canopy energy balance is used then $C_{air}=C_{atm}$, the atmospheric $CO_{2}$ concentration (see parameter \texttt{Catm} in function `defaultControl()`), whereas if a multi-layer canopy energy balance is used $C_{air}$ corresponds to the $CO_2$ concentration in the canopy layer where the leaf occurs, analogously to $T_{air}$ and $vp_{air}$. Combining the two equations for $A$ and finding the root of the resulting equation using Newton-Raphson method allows determining $C_i$ and therefore $A$. Thus, after defining PAR photon flux density, atmosphere $CO_{2}$ concentration and maximum rate parameters:
+where $C_{air}$ is the  $CO_{2}$ concentration (in $\mu mol \cdot mol^{-1}$) in the air surrounding the leaf (beyond the leaf boundary layer). If a single-layer canopy energy balance is used then $C_{air}=C_{atm}$, the atmospheric $CO_{2}$ concentration (see parameter \texttt{Catm} in function `defaultControl()`), whereas if a multi-layer canopy energy balance is used $C_{air}$ corresponds to $C_{air,j}$, the $CO_2$ concentration in the canopy layer $j$ where the leaf occurs, analogously to $T_{air}$ and $e_{air}$. Combining the two equations for $A$ and finding the root of the resulting equation using Newton-Raphson method allows determining $C_i$ and therefore $A$. Thus, after defining PAR photon flux density, atmosphere $CO_{2}$ concentration and maximum rate parameters:
 ```{r}
 Q = 2000
 Catm = 386
@@ -395,100 +395,100 @@ d. Use $V^{sunlit}_{max,298,i}$ as $V_{max,298}$ in @Leuning2002 to obtain $V_{m
 The figure below provides the canopy photosynthesis functions obtained using the multi-layer canopy photosynthesis model (top), a sunshade canopy photosynthesis model (center) or a big-leaf photosynthesis model (bottom). These were generated using functions `photo_multilayerPhotosynthesisFunction()`, `photo_sunshadePhotosynthesisFunction()` and `photo_leafPhotosynthesisFunction()`, respectively, and assuming homogeneous wind, temperature and water vapor pressure through the canopy. Thus, only absorbed radiation varied across layers and leaf types. Note the coincidence between the multi-layer and the sun-shade models.
 
 ```{r, echo=FALSE}
-psi2A11can = photo_multilayerPhotosynthesisFunction(supplyNetwork11$E,supplyNetwork11$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A11can = photo_multilayerPhotosynthesisFunction(supplyNetwork11$E,supplyNetwork11$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A12can = photo_multilayerPhotosynthesisFunction(supplyNetwork12$E,supplyNetwork12$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A12can = photo_multilayerPhotosynthesisFunction(supplyNetwork12$E,supplyNetwork12$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A13can = photo_multilayerPhotosynthesisFunction(supplyNetwork13$E,supplyNetwork13$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A13can = photo_multilayerPhotosynthesisFunction(supplyNetwork13$E,supplyNetwork13$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A14can = photo_multilayerPhotosynthesisFunction(supplyNetwork14$E,supplyNetwork14$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A14can = photo_multilayerPhotosynthesisFunction(supplyNetwork14$E,supplyNetwork14$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A21can = photo_multilayerPhotosynthesisFunction(supplyNetwork21$E,supplyNetwork21$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A21can = photo_multilayerPhotosynthesisFunction(supplyNetwork21$E,supplyNetwork21$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A22can = photo_multilayerPhotosynthesisFunction(supplyNetwork22$E,supplyNetwork22$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A22can = photo_multilayerPhotosynthesisFunction(supplyNetwork22$E,supplyNetwork22$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A23can = photo_multilayerPhotosynthesisFunction(supplyNetwork23$E,supplyNetwork23$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A23can = photo_multilayerPhotosynthesisFunction(supplyNetwork23$E,supplyNetwork23$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A24can = photo_multilayerPhotosynthesisFunction(supplyNetwork24$E,supplyNetwork24$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A24can = photo_multilayerPhotosynthesisFunction(supplyNetwork24$E,supplyNetwork24$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A31can = photo_multilayerPhotosynthesisFunction(supplyNetwork31$E,supplyNetwork31$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A31can = photo_multilayerPhotosynthesisFunction(supplyNetwork31$E,supplyNetwork31$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A32can = photo_multilayerPhotosynthesisFunction(supplyNetwork32$E,supplyNetwork32$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A32can = photo_multilayerPhotosynthesisFunction(supplyNetwork32$E,supplyNetwork32$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A33can = photo_multilayerPhotosynthesisFunction(supplyNetwork33$E,supplyNetwork33$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A33can = photo_multilayerPhotosynthesisFunction(supplyNetwork33$E,supplyNetwork33$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A34can = photo_multilayerPhotosynthesisFunction(supplyNetwork34$E,supplyNetwork34$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A34can = photo_multilayerPhotosynthesisFunction(supplyNetwork34$E,supplyNetwork34$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
 
-psi2A11canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork11emb$E,supplyNetwork11emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A11canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork11emb$E,supplyNetwork11emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A12canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork12emb$E,supplyNetwork12emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A12canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork12emb$E,supplyNetwork12emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A13canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork13emb$E,supplyNetwork13emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A13canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork13emb$E,supplyNetwork13emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A14canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork14emb$E,supplyNetwork14emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A14canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork14emb$E,supplyNetwork14emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A21canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork21emb$E,supplyNetwork21emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A21canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork21emb$E,supplyNetwork21emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A22canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork22emb$E,supplyNetwork22emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A22canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork22emb$E,supplyNetwork22emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A23canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork23emb$E,supplyNetwork23emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A23canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork23emb$E,supplyNetwork23emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A24canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork24emb$E,supplyNetwork24emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A24canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork24emb$E,supplyNetwork24emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A31canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork31emb$E,supplyNetwork31emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A31canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork31emb$E,supplyNetwork31emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A32canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork32emb$E,supplyNetwork32emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A32canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork32emb$E,supplyNetwork32emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A33canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork33emb$E,supplyNetwork33emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A33canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork33emb$E,supplyNetwork33emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
-psi2A34canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork34emb$E,supplyNetwork34emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A34canemb = photo_multilayerPhotosynthesisFunction(supplyNetwork34emb$E,supplyNetwork34emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298layer, Jmax298layer)
@@ -506,99 +506,99 @@ Vmax298SH= sum(Vmax298layer*LAIlayerlive[,1]*(1-fsunlit))
 Jmax298SH = sum(Jmax298layer*LAIlayerlive[,1]*(1-fsunlit))
 ulayer = ulayer[1]
 
-psi2A11ss = photo_sunshadePhotosynthesisFunction(supplyNetwork11$E,supplyNetwork11$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A11ss = photo_sunshadePhotosynthesisFunction(supplyNetwork11$E,supplyNetwork11$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A12ss = photo_sunshadePhotosynthesisFunction(supplyNetwork12$E,supplyNetwork12$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A12ss = photo_sunshadePhotosynthesisFunction(supplyNetwork12$E,supplyNetwork12$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A13ss = photo_sunshadePhotosynthesisFunction(supplyNetwork13$E,supplyNetwork13$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A13ss = photo_sunshadePhotosynthesisFunction(supplyNetwork13$E,supplyNetwork13$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A14ss = photo_sunshadePhotosynthesisFunction(supplyNetwork14$E,supplyNetwork14$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A14ss = photo_sunshadePhotosynthesisFunction(supplyNetwork14$E,supplyNetwork14$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A21ss = photo_sunshadePhotosynthesisFunction(supplyNetwork21$E,supplyNetwork21$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A21ss = photo_sunshadePhotosynthesisFunction(supplyNetwork21$E,supplyNetwork21$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A22ss = photo_sunshadePhotosynthesisFunction(supplyNetwork22$E,supplyNetwork22$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A22ss = photo_sunshadePhotosynthesisFunction(supplyNetwork22$E,supplyNetwork22$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A23ss = photo_sunshadePhotosynthesisFunction(supplyNetwork23$E,supplyNetwork23$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A23ss = photo_sunshadePhotosynthesisFunction(supplyNetwork23$E,supplyNetwork23$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A24ss = photo_sunshadePhotosynthesisFunction(supplyNetwork24$E,supplyNetwork24$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A24ss = photo_sunshadePhotosynthesisFunction(supplyNetwork24$E,supplyNetwork24$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A31ss = photo_sunshadePhotosynthesisFunction(supplyNetwork31$E,supplyNetwork31$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A31ss = photo_sunshadePhotosynthesisFunction(supplyNetwork31$E,supplyNetwork31$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A32ss = photo_sunshadePhotosynthesisFunction(supplyNetwork32$E,supplyNetwork32$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A32ss = photo_sunshadePhotosynthesisFunction(supplyNetwork32$E,supplyNetwork32$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A33ss = photo_sunshadePhotosynthesisFunction(supplyNetwork33$E,supplyNetwork33$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A33ss = photo_sunshadePhotosynthesisFunction(supplyNetwork33$E,supplyNetwork33$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A34ss = photo_sunshadePhotosynthesisFunction(supplyNetwork34$E,supplyNetwork34$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A34ss = photo_sunshadePhotosynthesisFunction(supplyNetwork34$E,supplyNetwork34$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A11ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork11emb$E,supplyNetwork11emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A11ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork11emb$E,supplyNetwork11emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A12ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork12emb$E,supplyNetwork12emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A12ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork12emb$E,supplyNetwork12emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A13ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork13emb$E,supplyNetwork13emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A13ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork13emb$E,supplyNetwork13emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A14ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork14emb$E,supplyNetwork14emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A14ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork14emb$E,supplyNetwork14emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A21ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork21emb$E,supplyNetwork21emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A21ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork21emb$E,supplyNetwork21emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A22ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork22emb$E,supplyNetwork22emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A22ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork22emb$E,supplyNetwork22emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A23ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork23emb$E,supplyNetwork23emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A23ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork23emb$E,supplyNetwork23emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A24ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork24emb$E,supplyNetwork24emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A24ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork24emb$E,supplyNetwork24emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A31ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork31emb$E,supplyNetwork31emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A31ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork31emb$E,supplyNetwork31emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A32ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork32emb$E,supplyNetwork32emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A32ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork32emb$E,supplyNetwork32emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A33ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork33emb$E,supplyNetwork33emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A33ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork33emb$E,supplyNetwork33emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
-psi2A34ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork34emb$E,supplyNetwork34emb$psiLeaf,Catm, Patm,Tcan, vpa, 
+psi2A34ssemb = photo_sunshadePhotosynthesisFunction(supplyNetwork34emb$E,supplyNetwork34emb$psiLeaf,Catm, Patm,Tcan, VPatm, 
                                                 SLarea, SHarea, ulayer, 
                                                 absRadSL, absRadSH, QSL, QSH,
                                                 Vmax298SL, Vmax298SH, Jmax298SL, Jmax298SH)
@@ -609,54 +609,54 @@ absRadBL = absRadSL+absRadSH
 Vmax298BL = Vmax298SL + Vmax298SH
 Jmax298BL = Jmax298SL + Jmax298SH
 Gmax = 2.0
-psi2A11bl = photo_leafPhotosynthesisFunction(supplyNetwork11$E, supplyNetwork11$psiLeaf,Catm, Patm,Tcan, vpa, ulayer,
+psi2A11bl = photo_leafPhotosynthesisFunction(supplyNetwork11$E, supplyNetwork11$psiLeaf,Catm, Patm,Tcan, VPatm, ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A12bl = photo_leafPhotosynthesisFunction(supplyNetwork12$E, supplyNetwork12$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A12bl = photo_leafPhotosynthesisFunction(supplyNetwork12$E, supplyNetwork12$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A13bl = photo_leafPhotosynthesisFunction(supplyNetwork13$E, supplyNetwork13$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A13bl = photo_leafPhotosynthesisFunction(supplyNetwork13$E, supplyNetwork13$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A14bl = photo_leafPhotosynthesisFunction(supplyNetwork14$E, supplyNetwork14$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A14bl = photo_leafPhotosynthesisFunction(supplyNetwork14$E, supplyNetwork14$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A21bl = photo_leafPhotosynthesisFunction(supplyNetwork21$E, supplyNetwork21$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A21bl = photo_leafPhotosynthesisFunction(supplyNetwork21$E, supplyNetwork21$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A22bl = photo_leafPhotosynthesisFunction(supplyNetwork22$E, supplyNetwork22$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A22bl = photo_leafPhotosynthesisFunction(supplyNetwork22$E, supplyNetwork22$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A23bl = photo_leafPhotosynthesisFunction(supplyNetwork23$E, supplyNetwork23$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A23bl = photo_leafPhotosynthesisFunction(supplyNetwork23$E, supplyNetwork23$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A24bl = photo_leafPhotosynthesisFunction(supplyNetwork24$E, supplyNetwork24$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A24bl = photo_leafPhotosynthesisFunction(supplyNetwork24$E, supplyNetwork24$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A31bl = photo_leafPhotosynthesisFunction(supplyNetwork31$E, supplyNetwork31$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A31bl = photo_leafPhotosynthesisFunction(supplyNetwork31$E, supplyNetwork31$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A32bl = photo_leafPhotosynthesisFunction(supplyNetwork32$E, supplyNetwork32$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A32bl = photo_leafPhotosynthesisFunction(supplyNetwork32$E, supplyNetwork32$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A33bl = photo_leafPhotosynthesisFunction(supplyNetwork33$E, supplyNetwork33$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A33bl = photo_leafPhotosynthesisFunction(supplyNetwork33$E, supplyNetwork33$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A34bl = photo_leafPhotosynthesisFunction(supplyNetwork34$E, supplyNetwork34$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A34bl = photo_leafPhotosynthesisFunction(supplyNetwork34$E, supplyNetwork34$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
 
-psi2A11blemb = photo_leafPhotosynthesisFunction(supplyNetwork11emb$E, supplyNetwork11emb$psiLeaf,Catm, Patm,Tcan, vpa, ulayer,
+psi2A11blemb = photo_leafPhotosynthesisFunction(supplyNetwork11emb$E, supplyNetwork11emb$psiLeaf,Catm, Patm,Tcan, VPatm, ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A12blemb = photo_leafPhotosynthesisFunction(supplyNetwork12emb$E, supplyNetwork12emb$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A12blemb = photo_leafPhotosynthesisFunction(supplyNetwork12emb$E, supplyNetwork12emb$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A13blemb = photo_leafPhotosynthesisFunction(supplyNetwork13emb$E, supplyNetwork13emb$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A13blemb = photo_leafPhotosynthesisFunction(supplyNetwork13emb$E, supplyNetwork13emb$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A14blemb = photo_leafPhotosynthesisFunction(supplyNetwork14emb$E, supplyNetwork14emb$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A14blemb = photo_leafPhotosynthesisFunction(supplyNetwork14emb$E, supplyNetwork14emb$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A21blemb = photo_leafPhotosynthesisFunction(supplyNetwork21emb$E, supplyNetwork21emb$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A21blemb = photo_leafPhotosynthesisFunction(supplyNetwork21emb$E, supplyNetwork21emb$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A22blemb = photo_leafPhotosynthesisFunction(supplyNetwork22emb$E, supplyNetwork22emb$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A22blemb = photo_leafPhotosynthesisFunction(supplyNetwork22emb$E, supplyNetwork22emb$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A23blemb = photo_leafPhotosynthesisFunction(supplyNetwork23emb$E, supplyNetwork23emb$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A23blemb = photo_leafPhotosynthesisFunction(supplyNetwork23emb$E, supplyNetwork23emb$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A24blemb = photo_leafPhotosynthesisFunction(supplyNetwork24emb$E, supplyNetwork24emb$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A24blemb = photo_leafPhotosynthesisFunction(supplyNetwork24emb$E, supplyNetwork24emb$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A31blemb = photo_leafPhotosynthesisFunction(supplyNetwork31emb$E, supplyNetwork31emb$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A31blemb = photo_leafPhotosynthesisFunction(supplyNetwork31emb$E, supplyNetwork31emb$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A32blemb = photo_leafPhotosynthesisFunction(supplyNetwork32emb$E, supplyNetwork32emb$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A32blemb = photo_leafPhotosynthesisFunction(supplyNetwork32emb$E, supplyNetwork32emb$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A33blemb = photo_leafPhotosynthesisFunction(supplyNetwork33emb$E, supplyNetwork33emb$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A33blemb = photo_leafPhotosynthesisFunction(supplyNetwork33emb$E, supplyNetwork33emb$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
-psi2A34blemb = photo_leafPhotosynthesisFunction(supplyNetwork34emb$E, supplyNetwork34emb$psiLeaf,Catm, Patm,Tcan, vpa,  ulayer,
+psi2A34blemb = photo_leafPhotosynthesisFunction(supplyNetwork34emb$E, supplyNetwork34emb$psiLeaf,Catm, Patm,Tcan, VPatm,  ulayer,
                                              absRadBL,QBL,Vmax298BL, Jmax298BL, 1.0, BLarea)
 Gmax = 0.5
 ```
@@ -752,4 +752,4 @@ legend("bottomright", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 
 ### Within-canopy variation in environmental conditions
 
-When presenting the sun-shade photosynthesis model, we assumed constant wind, temperature, water vapor pressure and $CO_2$ concentration values through the canopy. If a single-layer canopy energy balance is used, wind speed can still be different at different canopy heights. If a multi-layer canopy energy balance is used, all four environmental variables can differ between canopy layers. While @DePury1997 showed how to aggregate absorbed radiation and photosynthetic capacity, one has to choose specific values of environmental factors when calculating sunlit or shade photosynthesis. This can be done by determining the height corresponding to the mass center of sunlit/shade leaves for each cohort $i$. The canopy layer where this mass center height is contained is chosen as the layer from which environmental conditions will be taken. For any given plant cohort $i$, sunlit leaves will take their environmental conditions from layers above (or equal to) those corresponding to shade leaves.
+When presenting the sun-shade photosynthesis model, we assumed constant wind, temperature, water vapor pressure and $CO_2$ concentration values through the canopy. If a single-layer canopy energy balance is used, $CO_2$ concentration and vapor pressure are assumed equal to the atmosphere (i.e., $e_{air}  = e_{atm}$ and $C_{air} = C_{atm}$), whereas air temperature is that of the canopy (i.e., $T_{air} = T_{can}$), but leaf-level wind speed ($u_{leaf}$) can still be different for different canopy layers. If a multi-layer canopy energy balance is used, all four environmental variables can differ between canopy layers (i.e. $T_{air,j}$, $e_{air,j}$, $C_{air,j}$ and $u_j$). In the sun-shade photosynthesis model, the question arises on how to determine layer $j$ for sunlit or shade leaves of a given cohort $i$. The choice is done by calculating the height corresponding to the mass center of sunlit leaves or shade leaves of each cohort $i$. The canopy layer $j$ where this mass center height is contained is chosen as the layer from which environmental conditions will be taken. For any given plant cohort $i$, sunlit leaves will take their environmental conditions from layers above (or equal to) those corresponding to shade leaves.

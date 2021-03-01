@@ -30,14 +30,17 @@ The following are state variables in the model under all simulations:
 
 + Cumulative growth degree days, $GDD$, are tracked by the model and determine leaf phenological status (i.e. $LAI$ values) of winter deciduous species.
 + Daily soil moisture content dynamics on each layer $s$ are tracked using $W_s = \theta_s(\Psi_s)/ \theta_{fc,s}$, the *proportion of soil moisture in relation to field capacity*, where moisture at field capacity, $\theta_{fc,s}$, is assumed to correspond to $\Psi_{fc} = -0.033$ MPa. Note that $W_s$ values larger than one are possible if the soil is between field capacity and saturation (which can happen if deep drainage is not allowed).
-+ The air temperature within the canopy ($T_{air,can}$; ºC) and the temperature of each soil layer $s$ ($T_{soil,s}$; ºC) are tracked for every subdaily step.
++ The air temperature within the canopy ($T_{can}$; ºC) and the temperature of each soil layer $s$ ($T_{soil,s}$; ºC) are tracked for every subdaily step.
 
 Additional state variables depend on the activation of specific control flags (see subsection \@ref(advancedwaterbalancecontrol)):
 
 + *If plant capacitance effects are considered*, the model also tracks $\Psi_{apo, stem,i}$, the water potential of the stem apoplastic compartment, as well as the water potential of stem and leaf symplastic compartments, $\Psi_{symp, stem,i}$ and $\Psi_{symp, leaf,i}$ respectively.
 + *If cavitation is not completely reversible*, the proportion of stem hydraulic conductance loss for each plant cohort $i$, $PLC_{stem,i}$, becomes a state variable.
 + *If plant water pools are considered*, the model also tracks $W_{i,s}$, the proportion of soil moisture in relation to field capacity for layer $s$ within fraction of stand area covered by cohort $i$.
-+ *If multi-layer canopy energy balance is activated*, the model tracks for each vertical layer $h$: (a) the air temperature, $T_{air,h}$; (b) the water vapor pressure, $vp_{h}$; (c) and the $CO_2$ concentration, $C_{air,h}$.
++ *If multi-layer canopy energy balance is activated*, the model tracks for each vertical layer $j \in \{1,l\}$: 
+  a. Air temperature, $T_{air,j}$
+  b. Water vapor pressure, $e_{air,j}$
+  c. $CO_2$ concentration, $C_{air,j}$.
 
 ## Water and energy balances {#waterenergybalances}
 
@@ -74,7 +77,7 @@ Unlike the basic water balance, in this model water balance components contribut
 
 For the sake of performing energy balance, the canopy can be considered a single layer that exchanges energy with the soil and the atmosphere [@Best2011]. First, it absorbs shortwave radiation from the atmosphere ($K_{abs,can}$) and long-wave radiation resulting from net radiation balance  ($L_{net,can}$). Other energy fluxes considered are convective exchanges between the canopy and atmosphere ($H_{can}$) and between the canopy and the soil ($H_{cs}$). Finally, energy is released from the canopy to the atmosphere through latent heat ($LE_{can}$) produced via transpiration ($Tr$) and evaporation of water intercepted by the canopy ($In$). Combining all energy flows (all of them in $W \cdot m^{-2}$), the instantaneous energy balance equation for the canopy is:
 \begin{equation}
-  TC_{can} \cdot \frac{\delta T_{air,can}}{\delta t} = K_{abs,can} + L_{net,can}  - LE_{can} - H_{can} - H_{cs} 
+  TC_{can} \cdot \frac{\delta T_{can}}{\delta t} = K_{abs,can} + L_{net,can}  - LE_{can} - H_{can} - H_{cs} 
 (\#eq:canopyenergybalance)
 \end{equation}
 where $TC_{can}$ is the canopy thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$). 
@@ -119,7 +122,7 @@ For every day to be simulated, the model performs the following steps:
 7. Determine shortwave radiation absorbed by plant cohorts and the soil at subdaily steps (sections \@ref(shortwaveradiationcanopyabs) and \@ref(shortwaveradiationsoilabs)).
 8. Update the water supply function of each plant cohort, according to the hydraulic model and the current soil water potential (chapter \@ref(planthydraulics)). If plant capacitance effects are considered, the supply function involves only the soil-to-stem part of the hydraulic pathway. Otherwise, it describes the complete soil-to-leaf pathway.
 9. Determine instantaneous plant cohort transpiration, photosynthesis rates and close soil/canopy energy balance at subdaily steps (chapters \@ref(transpirationsperry) and \@ref(closecanopysoilenergybalance)). This involves the following actions for each subdaily step:
-    + Determine long-wave radiation exchange between soil, canopy layers and atmosphere (section \@ref(longwaveradiationexchange)).
+    + Determine long-wave radiation exchange between soil, canopy layers and atmosphere (section \@ref(longwaveradiation)).
     + If plant capacitance effects are considered update the stem-to-leaf hydraulic supply function.
     + Calculate leaf energy balance and photosynthesis (for shade and sunlit leaves of each plant cohort) corresponding to each transpiration value of the supply function (section \@ref(leafenergybalancephoto)). If plant capacitance effects are considered this concerns the stem-to-leaf hydraulic supply function.
     + Determine stomatal conductance, transpiration and photosynthesis on shade and sunlit leaves of each plant cohort according to Sperry's [-@Sperry2016] profit maximization strategy (section \@ref(stomatalregulation)).

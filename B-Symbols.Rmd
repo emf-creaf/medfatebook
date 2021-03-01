@@ -81,23 +81,30 @@ The following tables list all symbols used in this document, along with their un
 
 | Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
-| $T_{mean}$ | $^{\circ} \mathrm{C}$ | `MeanTemperature` | Mean temperature |
-| $T_{min}$ | $^{\circ} \mathrm{C}$ | `MinTemperature` | Minimum temperature |
-| $T_{max}$ | $^{\circ} \mathrm{C}$ | `MaxTemperature` | Maximum temperature |
+| $DOY$ | | `DOY`| Day of the year |
+| $T_{mean}$ | $^{\circ} \mathrm{C}$ | `MeanTemperature` | Mean daily temperature |
+| $T_{min}$ | $^{\circ} \mathrm{C}$ | `MinTemperature` | Minimum daily temperature |
+| $T_{max}$ | $^{\circ} \mathrm{C}$ | `MaxTemperature` | Maximum daily temperature |
 | $T_{base}$ | $^{\circ} \mathrm{C}$ |  | Base temperature for calculation of $GDD$ |
-| $RH_{min}$ | % | `MinRelativeHumidity` | Minimum relative humidity |
-| $RH_{max}$ | % | `MaxRelativeHumidity` | Maximum relative humidity |
+| $RH_{min}$ | % | `MinRelativeHumidity` | Minimum daily relative humidity |
+| $RH_{max}$ | % | `MaxRelativeHumidity` | Maximum daily relative humidity |
 | $P$ | $L \cdot m^{-2} = mm$ | `Precipitation` | Precipitation (including rainfall and snow) |
 | $Pr$ | $L \cdot m^{-2} = mm$ | `Rainfall` | Liquid water precipitation (rainfall) |
 | $Ps$ | $L \cdot m^{-2} = mm$ | `Snow` | Snow precipitation |
 | $PET$ | $L \cdot m^{-2} = mm$ | `PET` | Potential evapotranspiration, preferably calculated using Penman's equation |
 | $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds |
 | $u$ | $m \cdot s^{-1}$ | `WindSpeed` | Wind speed |
-| $DOY$ | | `DOY`| Day of the year |
-| $GDD$ | $^{\circ} \mathrm{C}$ | `GDD` | Growth degree days. |
 | $P_{atm}$ | kPa |  | Atmospheric pressure |
 | $\rho_{air}$ | $kg \cdot m^{-3}$ |  | Air density |
-| $vp_{atm}$ | kPa | | Atmospheric water vapour pressure |
+| $T_{atm}$ | $^{\circ} \mathrm{C}$ |  `Tatm` | Atmospheric (above-canopy) air temperature |
+| $T_{can}$ | $^\circ \mathrm{C}$ | `Tcan` | Canopy air temperature |
+| $T_{air,j}$ | $^\circ \mathrm{C}$ | `Tair` | Air temperature in canopy layer $j$ |
+| $T_{soil,s}$ | $^\circ \mathrm{C}$ | `Tsoil.s` | Temperature of soil layer $s$ |
+| $e_{atm}$ | kPa | | Atmospheric  (above-canopy) water vapor pressure |
+| $e_{air,j}$ | kPa | `VPair` | Water vapor pressure in canopy layer $j$ |
+| $C_{atm}$ | kPa | `Catm` | Atmospheric  (above-canopy) $CO_2$ concentration |
+| $C_{air,j}$ | kPa | `VPair` | $CO_2$ concentration in canopy layer $j$ |
+| $u_j$ | $m \cdot s^{-1}$ |  | Wind speed at canopy layer $j$ |
 
 ## Anatomy 
 
@@ -145,7 +152,8 @@ The following tables list all symbols used in this document, along with their un
 | $K^{sunlit}_{abs,i,j}$ | $W·m^{-2}$ | | Short-wave radiation absorbed by sunlit foliage of cohort $i$ in layer $j$, per ground area unit.|
 | $K^{shade}_{abs,i,j}$ | $W·m^{-2}$ | | Short-wave radiation absorbed by sunlit foliage of cohort $i$ in layer $j$, per ground area unit.|
 
-## Hydrology and water balance
+
+## Water balance
 
 | Symbol | Units | R | Description                        |
 |--------|-------|---------|------------------------------------|
@@ -157,13 +165,6 @@ The following tables list all symbols used in this document, along with their un
 | $Ru$ | $mm$ | `Runoff` | Water exported from the stand as runoff |
 | $Ro$ | $mm$ | `Runon` | Water imported to the stand as runon |
 | $Dd$ | $mm$ | `DeepDrainage` | Water exported from the stand as deep drainage |
-| $P_G$ | $mm$ | | Amount of rainfall needed to saturate the canopy for a given event |
-| $S_{canopy}$ | $mm$ | `Cm` | Canopy water storage capacity |
-| $ER_{ratio}$ | (unitless) |  | Ratio between evaporation rate and rainfall rate |  
-| $C_{canopy}$ | [0-1] | | Canopy cover | 
-| $PE_{soil}$ | $mm$ | | Evaporation demand from the soil |
-| $SE_{soil}$ | $mm$ | | Evaporation supply from the soil |
-| $t_{soil}$ | $day$ | | Time needed to evaporate the current water deficit in the first soil layer |
 | $Es$ | $mm$ | `SoilEvaporation` | Evaporation from the soil surface |
 | $Tr$ | $mm$ | `PlantTranspiration`| Plant transpiration |
 | $Tr_{i}$ | $mm$ | | Transpiration of plant cohort $i$|
@@ -184,15 +185,23 @@ The following tables list all symbols used in this document, along with their un
 | $LE_{can}$ | $W \cdot m^{-2}$ | `LEcan`| Energy released as latent heat from the canopy towards the atmosphere |
 | $LE_{j}$ | $W \cdot m^{-2}$ | | Energy released as latent heat by canopy layer $j$ |
 | $LE_{soil}$ | $W \cdot m^{-2}$ | `LEsoil` | Energy released as latent heat from the soil |
-| $T_{atm}$ | $^\circ \mathrm{C}$ | `Tatm` | Above-canopy air temperature |
-| $T_{air,can}$ | $^\circ \mathrm{C}$ | `Tcan` | Canopy air temperature |
-| $T_{air,j}$ | $^\circ \mathrm{C}$ |  | Air temperature in canopy layer $j$ |
-| $T_{soil,s}$ | $^\circ \mathrm{C}$ | `Tsoil.s` | Temperature of soil layer $s$ |
 | $TC_{LAI}$ | $J \cdot m^{-2} \cdot K^{-1}$ | `thermalcapacityLAI` | Canopy thermal capacitance per LAI unit |
 | $TC_{can}$ | $J \cdot m^{-2} \cdot K^{-1}$ | | Canopy thermal capacitance |
 | $TC_{j}$ | $J \cdot m^{-2} \cdot K^{-1}$ | | Thermal capacitance of canopy layer $j$ |
 | $TC_{soil,s}$ | $J \cdot m^{-2} \cdot K^{-1}$ | | Thermal capacitance of soil layer $s$ |
 | $VHC_{soil,s}$ | $J \cdot m^{-3} \cdot K^{-1}$ | | Volumetric heat capacity of soil in layer $s$|
+
+## Forest hydrology
+
+| Symbol | Units | R | Description                        |
+|--------|-------|---------|------------------------------------|
+| $P_G$ | $mm$ | | Amount of rainfall needed to saturate the canopy for a given event |
+| $S_{canopy}$ | $mm$ | `Cm` | Canopy water storage capacity |
+| $ER_{ratio}$ | (unitless) |  | Ratio between evaporation rate and rainfall rate |  
+| $C_{canopy}$ | [0-1] | | Canopy cover | 
+| $PE_{soil}$ | $mm$ | | Evaporation demand from the soil |
+| $SE_{soil}$ | $mm$ | | Evaporation supply from the soil |
+| $t_{soil}$ | $day$ | | Time needed to evaporate the current water deficit in the first soil layer |
 
 ## Plant hydraulics
 
