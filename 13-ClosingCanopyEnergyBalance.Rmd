@@ -12,15 +12,24 @@ H_{cs} &=& \frac{\rho_{canopy} \cdot c_p}{r_{cs}}\cdot (T_{canopy} - T_{soil})
 where $\rho_{atm}$ and $\rho_{canopy}$ are the air density above-canopy and inside-canopy, respectively, calculated from the corresponding temperatures (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in meteoland reference manual); $c_{p}$ = 1013.86 $J·kg^{-1}·C^{-1}$ is the specific heat capacity of the air. $r_{ca}$ and $r_{cs}$ are the atmosphere-canopy and canopy-soil aerodynamic resistances (in $s·m^{-1}$). These, in turn, are calculated using the FAO56 calculation procedure and canopy height, total LAI and above-canopy and below-canopy wind speeds. Wind speed below the canopy is calculated as explained in \@ref(windextinctionprofile) assuming a height of 2 m.
 
 ## Latent heat
-As mentioned above, the canopy exchanges of latent heat include latent heat exchanged from plant transpiration and evaporation of rain intercepted by the canopy. After determining stomatal regulation and transpiration for each plant cohort, latent heat exchange for the canopy is calculated as:
-\begin{equation}
-LE_{ca} = \lambda_v(T_{canopy}) \left(In_{step} + \sum_{i}{E_i} \right)
-\end{equation}
-where $\lambda_v(T_{canopy})$ is the latent heat of vaporization at temperature $T_{canopy}$ (in $J·kg^{-1}$), $E_i$ is the instanteous transpiration flux calculated for cohort $i$ and $In_{step}$ is amount of water intercepted by the canopy for the current time step (total daily interception $In$ is divided into timesteps according to the proportion of shortwave radiation absorbed by the canopy at each time step).
 
-The latent heat exchange between the soil and the atmosphere ($LE_{sa}$) comes either from water evaporated from the soil surface or snow melting. They do not occur simultaneously, but can be expressed in the same equation:
+The canopy exchanges of latent heat include latent heat exchanged from plant transpiration and evaporation of rain intercepted by the canopy. In the single-layer canopy energy balance, latent heat exchange for the whole canopy ($LE_{can}$) is calculated as:
 \begin{equation}
-LE_{sa} = \lambda_v(T_{soil}) \cdot Es_{step} + \lambda_{f} \cdot Sm_{step}
+LE_{can} = \lambda_v(T_{can}) \left(In_{step} + \sum_{i}{E_i} \right)
+\end{equation}
+where $\lambda_v(T_{can})$ is the latent heat of vaporization at temperature $T_{can}$ (in $J·kg^{-1}$), $E_i$ is the instanteous transpiration flux calculated for cohort $i$ and $In_{step}$ is the instantaneous amount of intercepted water evaporated from the canopy for the current time step (total daily interception $In$ is divided into timesteps according to the proportion of shortwave radiation absorbed by the canopy at each time step). In a multi-layer canopy energy balance, the latent heat for a given layer $j$ is:
+\begin{equation}
+LE_{j} = \lambda_v(T_{air,j}) \left(In_{step,j} + \sum_{i}{E_{i,j}} \right)
+\end{equation}
+where $\lambda_v(T_{air,j})$ is the latent heat of vaporization at temperature $T_{air,j}$ (in $J·kg^{-1}$), $In_{step,j}$ is the instantaneous amount of intercepted water evaporated from the canopy layer, determined dividing $In_{step}$ among canopy layers:
+\begin{equation}
+In_{step, j} = In_{step} \cdot \frac{\sum_{i=1}{LAI_{i,j}^{\phi}}}{LAI^{\phi}_{stand}}
+\end{equation}
+
+
+The latent heat exchange between the soil and the atmosphere ($LE_{soil}$) comes either from water evaporated from the soil surface or snow melting. They do not occur simultaneously, but can be expressed in the same equation:
+\begin{equation}
+LE_{soil} = \lambda_v(T_{soil}) \cdot Es_{step} + \lambda_{f} \cdot Sm_{step}
 \end{equation}
 where $\lambda_v(T_{soil})$ is the latent heat of vaporization at temperature $T_{soil}$ and $\lambda_{f} = 0.33355J·kg^{-1}$ is the latent heat of fusion. As before, daily evaporation from bare soil ($Es$) and snow melt water equivalent ($Sm$) are divided into time steps according to the proportion of shortwave radiation absorbed by the soil layer each step.
 
