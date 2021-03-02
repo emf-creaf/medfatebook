@@ -1,16 +1,10 @@
-# Closing canopy and soil energy balances {#closecanopysoilenergybalance}
+# Closing energy balances {#closecanopysoilenergybalance}
 
-In chapter \@ref(radiationbalance) we described the details of radiation energy exchanges. Plant transpiration is an important latent heat component of the canopy energy balance, and the details of how plant transpiration is determined were given in chapters \@ref(planthydraulics), \@ref(plantphotosynthesis) and \@ref(transpirationsperry). We devote the first part of the current chapter to describe the calculations of convective and latent heat energy exchanges. These are the remaining energy exchange components to close the energy balance of the canopy (eq. \@ref(eq:canopyenergybalance)) and of soil layers (eqs. \@ref(eq:soilenergybalance) and \@ref(eq:deepsoilenergybalance)). Temperature changes applied to the canopy and soil layers are also described here.
+In chapter \@ref(radiationbalance) we described the details of radiation energy transfer. Transpiration is an important latent heat component of the energy balance, and the details of how plant transpiration is determined were given in chapters \@ref(planthydraulics), \@ref(plantphotosynthesis) and \@ref(transpirationsperry). This chapter explains how to calculate the remaining components of the canopy energy balance, while distinguishing between assuming a single-layer canopy or considering a multiple-layer canopy.
 
-## Single-layer canopy energy balance
-### Convective energy
+## Single-layer canopy
 
-Convective energy fluxes between atmosphere and the canopy ($H_{ca}$) and between the canopy and the soil ($H_{cs}$) are determined as follows:
-\begin{eqnarray}
-H_{ca} &=& \frac{\rho_{atm} \cdot c_p}{r_{ca}}\cdot (T_{canopy} - T_{atm}) \\
-H_{cs} &=& \frac{\rho_{canopy} \cdot c_p}{r_{cs}}\cdot (T_{canopy} - T_{soil})
-\end{eqnarray}
-where $\rho_{atm}$ and $\rho_{canopy}$ are the air density above-canopy and inside-canopy, respectively, calculated from the corresponding temperatures (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in meteoland reference manual); $c_{p}$ = 1013.86 $J·kg^{-1}·C^{-1}$ is the specific heat capacity of the air. $r_{ca}$ and $r_{cs}$ are the atmosphere-canopy and canopy-soil aerodynamic resistances (in $s·m^{-1}$). These, in turn, are calculated using the FAO56 calculation procedure and canopy height, total LAI and above-canopy and below-canopy wind speeds. Wind speed below the canopy is calculated as explained in \@ref(windextinctionprofile) assuming a height of 2 m.
+The first part of the section describes the calculation of latent heat and convective energy exchanges between the soil, canopy and atmosphere layers. These are the remaining energy components that are needed to close the energy balances of the canopy (eq. \@ref(eq:canopyenergybalance)) and soil layers (eqs. \@ref(eq:soilenergybalance) and \@ref(eq:deepsoilenergybalance)). Temperature changes applied to the canopy and soil layers are also described.
 
 ### Latent heat
 
@@ -26,11 +20,21 @@ LE_{soil} = \lambda_v(T_{soil}) \cdot Es_{step} + \lambda_{f} \cdot Sm_{step}
 \end{equation}
 where $\lambda_v(T_{soil})$ is the latent heat of vaporization at temperature $T_{soil}$ and $\lambda_{f} = 0.33355J·kg^{-1}$ is the latent heat of fusion. As before, daily evaporation from bare soil ($Es$) and snow melt water equivalent ($Sm$) are divided into time steps according to the proportion of shortwave radiation absorbed by the soil layer each step.
 
+### Convective energy
+
+Convective energy fluxes between atmosphere and the canopy ($H_{can, atm}$) and between the canopy and the soil ($H_{can, soil}$) are determined as follows:
+\begin{eqnarray}
+H_{can,atm} &=& \frac{\rho_{atm} \cdot c_p}{r_{can,atm}}\cdot (T_{can} - T_{atm}) \\
+H_{can,soil} &=& \frac{\rho_{can} \cdot c_p}{r_{can,soil}}\cdot (T_{can} - T_{soil})
+\end{eqnarray}
+where $\rho_{atm}$ and $\rho_{can}$ are the air density above-canopy and inside-canopy, respectively, calculated from the corresponding temperatures (see [utility functions](http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils) in meteoland reference manual); $c_{p}$ = 1013.86 $J·kg^{-1}·C^{-1}$ is the specific heat capacity of the air. $r_{can,atm}$ and $r_{can,soil}$ are the atmosphere-canopy and canopy-soil aerodynamic resistances (in $s·m^{-1}$). These, in turn, are calculated using the FAO56 calculation procedure and canopy height, total LAI and above-canopy and below-canopy wind speeds. Wind speed below the canopy is calculated as explained in \@ref(windextinctionprofile) assuming a height of 2 m.
+
+
 ### Canopy temperature changes {#canopycapacitancetemperature}
 
 After evaluating the canopy energy balance equation \@ref(eq:canopyenergybalance) one has to translate energy balance into temperature variation of the canopy. Rearranging the same equation and expressing it in discrete time steps we have:
 \begin{equation}
-\Delta T_{can} =  \Delta t_{step} \cdot \frac{K_{abs,can} + L_{net,ca} - LE_{can} - H_{ca} - H_{cs}}{TC_{can}}
+\Delta T_{can} =  \Delta t_{step} \cdot \frac{K_{abs,can} + L_{net,can} - LE_{can} - H_{can,atm} - H_{can,soil}}{TC_{can}}
 \end{equation}
 where $TC_{can}$ is the canopy thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$) and $\Delta t_{step} = 86400/n_t$ is the size of the time step in seconds. Canopy thermal capacitance depends on the leaf area index of the stand:
 \begin{equation}
@@ -45,7 +49,7 @@ Analogously to the canopy, the change in temperature for a given soil layer $s$ 
 \end{equation}
 where the energy balance on each soil layer $s$ depends on the balance between energy coming from above ($G_{s-1,s}$) and energy going to below ($G_{s,s+1}$) and $C_{soil,s}$, the thermal capacitance of soil layer $s$. Energy inflow to the first (uppermost) layer (i.e. $G_{0,1}$) is the result of energy exchanges between the soil layer and the canopy and atmosphere, i.e. from eq. \@ref(eq:soilenergybalance):
 \begin{equation}
-G_{0,1} =  K_{soil} + L_{net,soil} + H_{cs} - LE_{soil}
+G_{0,1} =  K_{soil} + L_{net,soil} + H_{can,soil} - LE_{soil}
 \end{equation}
 Heat conduction between layers $s$ and $s+1$ (i.e. $G_{s,s+1}$) depend on the soil temperature gradient (see function `soil_temperatureGradient()`:
 \begin{equation}
@@ -61,8 +65,10 @@ where $d_s$ is the soil width of layer $s$ (expressed in $m$) and $VTC_{s}$ is t
 
 ## Multi-layer canopy energy balance
 
+A multi-layer canopy energy balance requires the calculation of sensible heat and latent heat exchanges between the air in each canopy layer and the leaves it contains. In addition, one has to consider sensible heat exchanges between each layer and the ones below/above, derived from turbulent flow.
+
 ### Latent heat
-In a multi-layer canopy energy balance, the latent heat for a given layer $j$ is:
+The latent heat for a given canopy layer $j$ is:
 \begin{equation}
 LE_{j} = \lambda_v(T_{air,j}) \left(In_{step,j} + \sum_{i=1}^{c}{E_{i,j}} \right)
 \end{equation}
@@ -73,4 +79,49 @@ In_{step, j} = In_{step} \cdot \frac{\sum_{i=1}{LAI_{i,j}^{\phi}}}{LAI^{\phi}_{s
 Similarly, $E_{i,j}$ is determined by dividing $E_{i}$ among the canopy layers according to the LAI of cohort $i$:
 \begin{equation}
 E_{i, j} = E_{i} \cdot \frac{LAI_{i,j}^{\phi}}{LAI_{i}^{\phi}}
+\end{equation}
+
+### Sensible heat from leaves
+The sensible heat exchanged between the air of canopy layer $j$ and the leaves within it ($H_{leaf,j}$; $W\cdot m^{-2}$) is obtained using:
+\begin{equation}
+H_{leaf,j} = \sum_{i=1}^c { LAI^{sunlit}_{i,j} \cdot H^{sunlit}_{i,j}  + LAI^{shade}_{i,j} \cdot H^{shade}_{i,j}}
+\end{equation}
+where $LAI^{sunlit}_{i,j}$ and $LAI^{shade}_{i,j}$ are the leaf are index of sunlit and shade leaves of plant cohort $i$ in layer $j$, respectively (see eq. \@ref(eq:sunlitshadelai)). $H^{sunlit}_{i,j}$ and $H^{shade}_{i,j}$ are the sensible heat exchange between layer $j$ and sunlit or shade leaves of cohort $i$ [@Ma2019]:
+\begin{eqnarray}
+H^{sunlit}_{i,j} &=& -2 \cdot C_p \cdot (T^{sunlit}_{leaf,i} - T_{air,j})\cdot g_{Ha,i}\\
+H^{shade}_{i,j} &=& -2\cdot C_p \cdot (T^{shade}_{leaf,i} - T_{air,j})\cdot g_{Ha,i}
+\end{eqnarray}
+where $T^{sunlit}_{leaf,i}$ and $T^{shade}_{leaf,i}$ are, respectively, the sunlit and shade leaf temperatures for cohort $i$ (determined using eq. \@ref(eq:leaftemperatureequation)); $T_{air,j}$ is the current air temperature in canopy layer $j$, $C_p = 29.37152\,J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure; and $g_{Ha,i}$ is the leaf boundary layer conductance for heat ($mol \cdot m^{-2} \cdot s^{-1}$) for leaves of cohort $i$ (see eq. \@ref(eq:leafboundaryconductances)).
+
+### Turbulent heat and scalar flows
+
+Turbulent heat exchanges occur between the soil and the lowest canopy layer (i.e. $j=1$):
+\begin{equation}
+H_{1,soil} =\frac{\rho_{1} \cdot c_p}{r_{1,soil}}\cdot (T_{air,1} - T_{soil})
+\end{equation}
+This lowest layer also have turbulent heat exchanges with the layer above, so that the turbulent heat balance for the layer is:
+\begin{equation}
+H_{wind,1} = -c_p \cdot  \rho_{1} (T_{air,2} - T_{air,1})\cdot \frac{\bar{uw}_1}{(\delta u/\delta z)_1} -H_{1,soil}
+\end{equation}
+For all intermediate layers (i.e. $1<j<l$) we have:
+\begin{equation}
+H_{wind,j} = - c_p \cdot \rho_{j} \cdot (T_{air,j+1} - T_{air,j-1})\cdot \frac{\bar{uw}_j}{(\delta u/\delta z)_j}
+\end{equation}
+And, finally, the topmost layer has turbulent heat exchanges with the layer below and the atmosphere:
+\begin{equation}
+H_{wind,l} = - c_p \cdot \rho_{l} \cdot (T_{atm} - T_{air,l-1})\cdot \frac{\bar{uw}_l}{(\delta u/\delta z)_l}
+\end{equation}
+
+### Canopy and soil temperature changes
+
+\begin{equation}
+\Delta T_{air,j} =  \Delta t_{substep} \cdot \frac{K_{abs,j} + L_{net,j} - LE_{j} + H_{leaf,j} + H_{wind,j}}{TC_{j}}
+\end{equation}
+
+\begin{equation}
+\Delta T_{soil,s} = \Delta t_{substep} \cdot \frac{G_{s-1,s} - G_{s,s+1}}{C_{soil,s}}
+\end{equation}
+
+\begin{equation}
+G_{0,1} =  K_{soil} + L_{net,soil} + H_{1,soil} - LE_{soil}
 \end{equation}
