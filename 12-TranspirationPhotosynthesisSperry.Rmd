@@ -613,24 +613,27 @@ The average instantaneous flow rate ($E_i^{average}$, in $mmol\, H_2O \cdot s^{-
 \begin{equation}
  E_i^{average} = \frac{E_{i}^{shade} \cdot LAI_i^{sunlit} + E_{i}^{shade} \cdot LAI_i^{shade}}{LAI_i^{\phi}}
 \end{equation}
-where $LAI_i^{sunlit}$ and $LAI_i^{shade}$ are the cohorts LAI values for sunlit and shade leaves, from eq. \@ref(eq:sunlitshadelai), and $LAI_i^{\phi}$ is the leaf area index of plant cohort $i$. The model then uses the hydraulic supply function to find the transpiration rate $E_i$ numerically closest to $E_i^{average}$ (remember that the supply function is build in discrete steps). Finding the $E_i$ value numerically closest to $E_i^{average}$ also leads to setting values for the current time step of several other variables, such as water potentials ($\Psi_{leaf, i, t}$, $\Psi_{stem, i, t}$, $\Psi_{rootcrown, i,t}$, ...), the slope of the supply function ($d E/d\Psi_{i,t}$), and instantaneous soil water extraction rates ($E_{i,s,t}$).
+where $LAI_i^{sunlit}$ and $LAI_i^{shade}$ are the cohorts LAI values for sunlit and shade leaves, from eq. \@ref(eq:sunlitshadelai), and $LAI_i^{\phi}$ is the leaf area index of plant cohort $i$. The model then uses the hydraulic supply function to find the transpiration rate $E_i$ numerically closest to $E_i^{average}$ (remember that the supply function is build in discrete steps). Finding the $E_i$ value numerically closest to $E_i^{average}$ determines the $E_{i,t}$ the instantaneous transpiration flow for current time step $t$, and also leads to setting values for $t$ of several other variables, such as water potentials ($\Psi_{leaf, i,t}$, $\Psi_{stem, i,t}$, $\Psi_{rootcrown, i,t}$, ...), the slope of the supply function ($(d E/d\Psi_{i})_t$), and instantaneous soil water extraction rates ($E_{i,s,t}$).
 
-The transpiration of the plant cohort for the current time step ($E_{i,t}$, in $l \cdot m^{-2}$ of ground area, i.e. in $mm$) is:
+The amount of transpiration from the plant cohort in a given time step $t$ ($Tr_{i,t}$, in $l \cdot m^{-2}$ of ground area, i.e. in $mm$) is:
 \begin{equation}
-Tr_{i,t} = E_i \cdot LAI_i^{\phi} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t
+Tr_{i,t} = E_{i,t} \cdot LAI_i^{\phi} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
+(\#eq:cohorttranspiration)
 \end{equation}
 where $0.01802$ is the molar weight (in $kg = l$) of water and $\Delta t_{step} = 86400/n_t$ the size of the time step in seconds, being $n_t$ the number of time steps. Soil extraction rates ($Ex$) are scaled to the cohort level as done for transpiration:
 \begin{equation}
-Ex_{i,s,t} = E_{i,s} \cdot LAI_i^{\phi} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t
+Ex_{i,s,t} = E_{i,s,t} \cdot LAI_i^{\phi} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
+(\#eq:cohortextraction)
 \end{equation}
 If plant water storage is not considered, one should have that soil extraction equals transpiration:
 \begin{equation}
 Tr_{i,t} = Ex_{i,t} = \sum_s {Ex_{i,s,t}}
 \end{equation}
 
-Instantaneous net photosynthesis per leaf area of sunlit and shade leaves (i.e. $A_{n,i}^{sunlit}$ and $A_{n,i}^{shade}$) is also aggregated into a net photosynthesis of the plant cohort $i$, in $g\,C \cdot m^{-2}$ of ground area:
+Instantaneous net photosynthesis per leaf area of sunlit and shade leaves in a given time step $t$ (i.e. $A_{n,i,t}^{sunlit}$ and $A_{n,i,t}^{shade}$) are also aggregated into $A_{n,i,t}$, the net photosynthesis of the plant cohort $i$ for the time step $t$, in $g\,C \cdot m^{-2}$ of ground area:
 \begin{equation}
- A_{n,i, t} = (A_{n,i}^{sunlit} \cdot LAI_i^{sunlit} + A_{n,i}^{shade} \cdot LAI_i^{shade}) \cdot 10^{-6} \cdot 12.01017 \cdot \Delta t
+ A_{n,i,t} = (A_{n,i,t}^{sunlit} \cdot LAI_i^{sunlit} + A_{n,i,t}^{shade} \cdot LAI_i^{shade}) \cdot 10^{-6} \cdot 12.01017 \cdot \Delta t_{step}
+ (\#eq:cohortnetphotosynthesis)
 \end{equation}
 
 

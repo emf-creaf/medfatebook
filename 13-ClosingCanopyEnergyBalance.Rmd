@@ -10,14 +10,14 @@ The first part of the section describes the calculation of latent heat and conve
 
 Canopy exchanges of latent heat include latent heat exchanged from plant transpiration and evaporation of rain intercepted by the canopy. In the single-layer canopy energy balance, latent heat exchange for the whole canopy ($LE_{can}$) is calculated as:
 \begin{equation}
-LE_{can} = \lambda_v(T_{can}) \left(In_{step} + \sum_{i=1}^{c}{E_i} \right)
+LE_{can} = \lambda_v(T_{can}) \left(\frac{In_{t} + \sum_{i=1}^{c}{Tr_{i,t}}}{\Delta_{step}} \right)
 (\#eq:canopylatentheat)
 \end{equation}
-where $\lambda_v(T_{can})$ is the latent heat of vaporization at temperature $T_{can}$ (in $J·kg^{-1}$), $E_i$ is the instantaneous transpiration flux calculated for cohort $i$ and $In_{step}$ is the instantaneous amount of intercepted water evaporated from the canopy for the current time step (total daily interception $In$ is divided into timesteps according to the proportion of shortwave radiation absorbed by the canopy at each time step).
+where $\lambda_v(T_{can})$ is the latent heat of vaporization at temperature $T_{can}$ (in $J·kg^{-1}$), $E_{i,t}$ is the transpiration calculated for cohort $i$ during time step $t$ \@ref(eq:cohorttranspiration),  and $In_{t}$ is the amount of intercepted water evaporated from the canopy for time step $t$ (total daily interception $In$ is divided into timesteps according to the proportion of shortwave radiation absorbed by the canopy at each time step).
 
 The latent heat exchange between the soil and the atmosphere ($LE_{soil}$) comes either from water evaporated from the soil surface or snow melting. They do not occur simultaneously, but can be expressed in the same equation:
 \begin{equation}
-LE_{soil} = \lambda_v(T_{soil}) \cdot Es_{step} + \lambda_{f} \cdot Sm_{step}
+LE_{soil} = \lambda_v(T_{soil}) \cdot \left( \frac{Es_{t} + \lambda_{f} \cdot Sm_{t}}{\Delta_{step}} \right)
 (\#eq:soillatentheat)
 \end{equation}
 where $\lambda_v(T_{soil})$ is the latent heat of vaporization at temperature $T_{soil}$ and $\lambda_{f} = 0.33355J·kg^{-1}$ is the latent heat of fusion. As before, daily evaporation from bare soil ($Es$) and snow melt water equivalent ($Sm$) are divided into time steps according to the proportion of shortwave radiation absorbed by the soil layer each step.
@@ -141,3 +141,25 @@ Soil temperature changes are estimated in the same way as for single-canopy ener
 
 ### Within-canopy changes in water vapor and $CO_2$
 
+$CO_2$ concentration in $mg \cdot m^{-3}$ and $H_2O$ concentration in $kg\cdot m^{-3}$ are obtained from $C_{air,j}$ and $e_{air,j}$ using:
+\begin{eqnarray}
+[CO_2]_j &=& 0.409\cdot 44.01 \cdot C_{air,j} \\
+[H_2O]_j &=& 0.622 \cdot \frac{e_{air,j} \cdot \rho_j}{P_{atm}}
+\end{eqnarray}
+
+Scalar conservation equations [@Lai2000] 
+\begin{equation}
+(\delta [CO_{2}]/\delta t)_j = (\delta F_{[CO_2]}/\delta z)_j + S_{[CO_2],j}
+\end{equation}
+\begin{equation}
+(\delta [H_2O]/\delta t)_j = (\delta F_{[H_2O]}/\delta z)_j + S_{[H_2O],j}
+\end{equation}
+where $S_{[H_2O],j}$ and $S_{[CO_2],j}$ are the source strengths for $[H_2O]$ (in $kg\cdot m^{-3} \cdot s^{-1}$) and $[CO_2]$ (in $mg \cdot m^{-3} \cdot s^{-1}$), respectively which derive from transpiration and photosynthesis:
+\begin{eqnarray}
+S_{[H_2O],j} &=&  \frac{In_{step,j} + \sum_{i=1}^{c}{E_{i,j}}}{\Delta z} \\
+S_{[CO_2],j} &=& - \frac{1000\cdot (44.01/12.0) \cdot \sum_{i=1}^c{A_{n,i,j}}}{\Delta z}
+\end{eqnarray}
+where
+\begin{equation}
+A_{n,i, j} = A_{n,i} \cdot \frac{LAI_{i,j}^{\phi}}{LAI_{i}^{\phi}}
+\end{equation}
