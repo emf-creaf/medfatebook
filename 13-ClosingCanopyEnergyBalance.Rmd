@@ -106,24 +106,25 @@ Turbulent heat exchanges occur between the soil and the bottom canopy layer (i.e
 \begin{equation}
 H_{1,soil} =\frac{\rho_{1} \cdot c_p}{r_{1,soil}}\cdot (T_{air,1} - T_{soil,1})
 \end{equation}
-where $c_{p} = 1013.86\,J·kg^{-1}·C^{-1}$ is the specific heat capacity of the air, $\rho_{1}$ is the air density at $j=1$, $T_{air,1}$ is the air temperature of layer 1, $T_{soil,1}$ is the temperature of the top soil layer and $r_{1,soil}$ is the aerodynamic resistance between the soil and canopy layer 1 (in $s·m^{-1}$). The bottom layer also have turbulent heat exchanges with the layer above, determined by the canopy turbulence model. The turbulent heat balance for layer $j=1$ is:
+where $c_{p} = 1013.86\,J·kg^{-1}·C^{-1}$ is the specific heat capacity of the air, $\rho_{1}$ is the air density at $j=1$, $T_{air,1}$ is the air temperature of layer 1, $T_{soil,1}$ is the temperature of the top soil layer and $r_{1,soil}$ is the aerodynamic resistance between the soil and canopy layer 1 (in $s·m^{-1}$). The bottom layer also have turbulent heat exchanges with the layer above, determined by the canopy turbulence model. The turbulent heat flux gradient for layer $j=1$ is:
 \begin{equation}
-H_{wind,1} = -c_p \cdot  \rho_{1} (T_{air,2} - T_{air,1})\cdot \frac{\bar{uw}_1}{(\delta u/\delta z)_1} -H_{1,soil}
+(\delta F_{H}/\delta z)_1  = \frac{-c_p \cdot  \rho_{1} \cdot (T_{air,2} - T_{air,1})\cdot \bar{uw}_1}{\Delta z \cdot (\delta u/\delta z)_1} -H_{1,soil}
 \end{equation}
-where $(\delta u/\delta z)_1$ and $\bar{uw}_1$ are the wind speed gradient and Reynolds stress at $j=1$.
-For all intermediate layers (i.e. $1<j<l$) we have turbulent exchanges with the neighboring layers $j-1$ and $j+1$, which results in:
+where $\Delta z$ is the size of vertical layers (in $m$); and $(\delta u/\delta z)_1$ and $\bar{uw}_1$ are the wind speed gradient and Reynolds stress at $j=1$.
+
+For all intermediate layers (i.e. $1<j<l$) we have turbulent exchanges with the neighboring layers $j-1$ and $j+1$, which results in the following turbulent heat flux gradient:
 \begin{equation}
-H_{wind,j} = - c_p \cdot \rho_{j} \cdot (T_{air,j+1} - T_{air,j-1})\cdot \frac{\bar{uw}_j}{(\delta u/\delta z)_j}
+(\delta F_{H}/\delta z)_j  = \frac{- c_p \cdot \rho_{j} \cdot (T_{air,j+1} - T_{air,j-1})\cdot \bar{uw}_j}{2 \cdot \Delta z \cdot (\delta u/\delta z)_j}
 \end{equation}
-And, finally, the topmost layer (i.e. $j=l$) has turbulent heat exchanges with the layer below $l-1$ and the atmosphere:
+And, finally, the topmost layer (i.e. $j=l$) has turbulent heat exchanges with the layer below $l-1$ and the atmosphere, so that:
 \begin{equation}
-H_{wind,l} = - c_p \cdot \rho_{l} \cdot (T_{atm} - T_{air,l-1})\cdot \frac{\bar{uw}_l}{(\delta u/\delta z)_l}
+(\delta F_{H}/\delta z)_l = \frac{- c_p \cdot \rho_{l} \cdot (T_{atm} - T_{air,l-1})\cdot \bar{uw}_l}{2 \cdot \Delta z \cdot (\delta u/\delta z)_l}
 \end{equation}
 
 ### Canopy and soil temperature changes
-Evaluation of the canopy layer energy balance equation \@ref(eq:canopylayerenergybalance) is done taking into account that sensible heat exchange for a given layer $j$ includes heat exchange with leaves ($H_{leaf,j}$) and turbulent heat exchange ($H_{wind,j}$), so that the variation of air temperature in layer $j$ for a given time interval $\Delta t_{substep}$ is: 
+Evaluation of the canopy layer energy balance equation \@ref(eq:canopylayerenergybalance) is done taking into account that sensible heat exchange for a given layer $j$ includes heat exchange with leaves (i.e. $H_{leaf,j}$) and the turbulent heat flux gradient (i.e. $(\delta F_{H}/\delta z)_j$), so that the variation of air temperature in layer $j$ for a given time interval $\Delta t_{substep}$ is: 
 \begin{equation}
-\Delta T_{air,j} =  \Delta t_{substep} \cdot \frac{K_{abs,j} + L_{net,j} - LE_{j} + H_{leaf,j} + H_{wind,j}}{TC_{j}}
+\Delta T_{air,j} =  \Delta t_{substep} \cdot \frac{K_{abs,j} + L_{net,j} - LE_{j} + H_{leaf,j} + (\delta F_{H}/\delta z)_j}{TC_{j}}
 \end{equation}
 where $TC_{j}$ is the  thermal capacitance of canopy layer $j$ (in $J \cdot m^{-2} \cdot K^{-1}$), found analogously to $TC_{can}$ (eq. \@ref(eq:canopythermalcapacitance)):
 \begin{equation}
@@ -142,28 +143,27 @@ Soil temperature changes are estimated in the same way as for single-canopy ener
 
 ### Within-canopy changes in water vapor and $CO_2$
 
-Multi-layer canopy energy balance also entails the possibility of considering gradients of scalars such as water vapor or $CO_2$. Analogously to the turbulent heat exchange, wind turbulence changes the concentration of water vapor or $CO_2$ within the canopy. In addition, plant physiology also alters the concentration of these gases through transpiration in photosynthesis. To model changes in these scalars for canopy layers, we first have to estimate $CO_2$ concentration in $mg \cdot m^{-3}$ and $H_2O$ concentration in $kg\cdot m^{-3}$ from $C_{air,j}$ ($ppm$) and $e_{air,j}$ ($kPa$) using:
+Multi-layer canopy energy balance also entails the possibility of considering gradients of scalars such as water vapor or $CO_2$. Analogously to the turbulent heat exchange, wind turbulence leads to changes in concentration of water vapor or $CO_2$ within canopy layers. In addition, plant physiology also alters the concentration of these gases through transpiration in photosynthesis. To model temporal changes in these scalars for canopy layers, we first have to estimate $CO_2$ concentration in $mg \cdot m^{-3}$ and $H_2O$ concentration in $kg\cdot m^{-3}$ from $C_{air,j}$ ($ppm$) and $e_{air,j}$ ($kPa$) using:
 \begin{eqnarray}
 [CO_2]_j &=& 0.409\cdot 44.01 \cdot C_{air,j} \\
 [H_2O]_j &=& 0.622 \cdot \frac{e_{air,j} \cdot \rho_j}{P_{atm}}
 \end{eqnarray}
 The one-dimensional scalar flux balance for an homogeneous turbulent flow can be described by the following conservation equations [@Lai2000]: 
-\begin{equation}
-(\delta [CO_{2}]/\delta t)_j = (\delta F_{[CO_2]}/\delta z)_j + S_{[CO_2],j}
-\end{equation}
-\begin{equation}
-(\delta [H_2O]/\delta t)_j = (\delta F_{[H_2O]}/\delta z)_j + S_{[H_2O],j}
-\end{equation}
-where $(\delta F_{[CO_2]}/\delta z)_j$ and $(\delta F_{[H_2O]}/\delta z)_j$ are the gradient of vertical flux of $CO_2$ or $H_2O$ in layer $j$, respectively; $S_{[H_2O],j}$ and $S_{[CO_2],j}$ are the source strengths for $[H_2O]$ (in $kg\cdot m^{-3} \cdot s^{-1}$) and $[CO_2]$ (in $mg \cdot m^{-3} \cdot s^{-1}$) in layer $j$, respectively, which derive from transpiration and photosynthesis:
+\begin{eqnarray}
+(\delta [CO_{2}]/\delta t)_j &=& (\delta F_{[CO_2]}/\delta z)_j + S_{[CO_2],j} \\
+(\delta [H_2O]/\delta t)_j &=& (\delta F_{[H_2O]}/\delta z)_j + S_{[H_2O],j}
+(\#eq:scalarconservation)
+\end{eqnarray}
+where $(\delta F_{[CO_2]}/\delta z)_j$ and $(\delta F_{[H_2O]}/\delta z)_j$ are the gradients of vertical flux of $CO_2$ and $H_2O$ in layer $j$, respectively; and $S_{[H_2O],j}$ and $S_{[CO_2],j}$ are the source strengths for $[H_2O]$ (in $kg\cdot m^{-3} \cdot s^{-1}$) and $[CO_2]$ (in $mg \cdot m^{-3} \cdot s^{-1}$) in layer $j$, respectively, which derive from transpiration (source of water) and photosynthesis (sink of $CO_2$):
 \begin{eqnarray}
 S_{[H_2O],j} &=&  \frac{In_{j,t} + \sum_{i=1}^{c}{Tr_{i,j,t}}}{\Delta t \cdot \Delta z} \\
 S_{[CO_2],j} &=& - \frac{1000\cdot (44.01/12.0) \cdot \sum_{i=1}^c{A_{n,i,j,t}}}{\Delta t \cdot \Delta z}
 \end{eqnarray}
-where $Tr_{i,j,t}$ and $A_{n,i,j,t}$ are the transpiration and photosynthesis for cohort $i$ in layer $j$. The former is defined in eq. \@ref(eq:cohortlayertranspiration) whereas the latter is defined analogously:
+where $Tr_{i,j,t}$ and $A_{n,i,j,t}$ are the transpiration and photosynthesis for cohort $i$ in layer $j$. The former was already defined in eq. \@ref(eq:cohortlayertranspiration), whereas the latter is defined analogously:
 \begin{equation}
 A_{n,i, j,t} = A_{n,i,t} \cdot \frac{LAI_{i,j}^{\phi}}{LAI_{i}^{\phi}}
 \end{equation}
-being $A_{n,i,t}$ the amount of photosynthesis ($gC\cdot m^{-2}$) of cohort $i$ during time step $t$ \@ref(eq:cohortnetphotosynthesis).
+being $A_{n,i,t}$ the amount of photosynthesis ($gC\cdot m^{-2}$) of cohort $i$ during time step $t$ (see \@ref(eq:cohortnetphotosynthesis)).
 
 For any layer $1<j<l$ the gradients of vertical scalar fluxes are found using: 
 \begin{eqnarray}
@@ -180,3 +180,5 @@ and for the top layer ($j=l$) we have:
 (\delta F_{[H_2O]}/\delta z)_l = - \frac{c_p \cdot \rho_{l} \cdot ([H_2O]_{atm} - [H_2O]_{l-1})\cdot \bar{uw}_l}{2 \cdot \Delta z \cdot (\delta u/\delta z)_l} \\
 (\delta F_{[CO_2]}/\delta z)_l = - \frac{c_p \cdot \rho_{j} \cdot ([CO_2]_{atm} - [CO_2]_{l-1})\cdot \bar{uw}_l}{2 \cdot \Delta z \cdot (\delta u/\delta z)_l}
 \end{eqnarray}
+
+Equation \@ref(eq:scalarconservation) is solved via discretization both in terms of space (vertical layers) and time, the latter using $\Delta t_{substep}$ as for the energy balance.
