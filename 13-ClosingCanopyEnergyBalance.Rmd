@@ -10,14 +10,14 @@ The first part of the section describes the calculation of latent heat and conve
 
 Canopy exchanges of latent heat include latent heat exchanged from plant transpiration and evaporation of rain intercepted by the canopy. In the single-layer canopy energy balance, latent heat exchange for the whole canopy ($LE_{can}$; in $W\cdot m^{-2}$) is calculated as:
 \begin{equation}
-LE_{can} = \lambda_v(T_{can}) \cdot \left(\frac{In_{t} + \sum_{i=1}^{c}{Tr_{i,t}}}{\Delta_{step}} \right)
+LE_{can} = \lambda_v(T_{can}) \cdot \left(\frac{In_{t} + \sum_{i=1}^{c}{Tr_{i,t}}}{\Delta t_{step}} \right)
 (\#eq:canopylatentheat)
 \end{equation}
 where $\lambda_v(T_{can})$ is the latent heat of vaporization at temperature $T_{can}$ (in $J·kg^{-1}$), $Tr_{i,t}$ is the amount (in $mm = kg \cdot m^{-2}$) of transpiration for cohort $i$ during time step $t$ \@ref(eq:cohorttranspiration),  and $In_{t}$ is the amount of intercepted water evaporated from the canopy for time step $t$ (total daily interception $In$ is divided into timesteps according to the proportion of shortwave radiation absorbed by the canopy at each time step).
 
 The latent heat exchange between the soil and the atmosphere ($LE_{soil}$; in $W\cdot m^{-2}$) comes either from water evaporated from the soil surface or snow melting (both in $mm = kg \cdot m^{-2}$). They do not occur simultaneously, but can be expressed in the same equation:
 \begin{equation}
-LE_{soil} = \lambda_v(T_{soil}) \cdot \left( \frac{Es_{t} + \lambda_{f} \cdot Sm_{t}}{\Delta_{step}} \right)
+LE_{soil} = \lambda_v(T_{soil}) \cdot \left( \frac{Es_{t} + \lambda_{f} \cdot Sm_{t}}{\Delta t_{step}} \right)
 (\#eq:soillatentheat)
 \end{equation}
 where $\lambda_v(T_{soil})$ is the latent heat of vaporization at temperature $T_{soil}$ and $\lambda_{f} = 0.33355J·kg^{-1}$ is the latent heat of fusion. As before, daily evaporation from bare soil ($Es$) and snow melt water equivalent ($Sm$) are divided into time steps according to the proportion of shortwave radiation absorbed by the soil layer each step.
@@ -74,17 +74,18 @@ A multi-layer canopy energy balance requires the calculation of sensible heat an
 ### Latent heat
 The latent heat for a given canopy layer $j$ ($LE_{j}$; in $W\cdot m^{-2}$) includes transpiration and evaporation of intercepted rain, and is estimated analogously to the single-canopy case (eq. \@ref(eq:canopylatentheat)):
 \begin{equation}
-LE_{j} = \lambda_v(T_{air,j}) \cdot \left(\frac{In_{j,t} + \sum_{i=1}^{c}{Tr_{i,j,t}}}{\Delta t} \right)
+LE_{j} = \lambda_v(T_{air,j}) \cdot \left(\frac{In_{j,t}}{\Delta t_{step}} + E_{j,t}\right)
 \end{equation}
-where $\lambda_v(T_{air,j})$ is the latent heat of vaporization at temperature $T_{air,j}$ (in $J·kg^{-1}$), $In_{j,t}$ is the intercepted water that is evaporated from the canopy layer and $Tr_{i,j,t}$ is the transpiration for cohort $i$ in layer $j$. $In_{j,t}$ is determined by dividing $In_{t}$ among canopy layers according to the fraction of total LAI in each one:
+where $\lambda_v(T_{air,j})$ is the latent heat of vaporization at temperature $T_{air,j}$ (in $J·kg^{-1}$), $In_{j,t}$ is the intercepted water that is evaporated from the canopy layer, determined by dividing $In_{t}$ among canopy layers according to the fraction of total LAI in each one:
 \begin{equation}
 In_{j,t} = In_{t} \cdot \frac{\sum_{i=1}{LAI_{i,j}^{\phi}}}{LAI^{\phi}_{stand}}
 \end{equation}
-Similarly, $Tr_{i,j,t}$ is determined by dividing the transpiration of cohort $i$, $Tr_{i,t}$, among the canopy layers according to the proportion cohort's LAI in each one:
+and $E_{j,t}$ is the instantaneous transpiration rate in layer $j$ (in $kg\,H_2O\cdot m^{-2}\cdot s^{-1}$), given by:
 \begin{equation}
-Tr_{i, j,t} = Tr_{i,t} \cdot \frac{LAI_{i,j}^{\phi}}{LAI_{i}^{\phi}}
+E_{j,t} = 10^{-3} \cdot 0.01802\cdot \sum_{i=1}^{c}{E_{i,t}^{sunlit}\cdot LAI_{i,j}^{sunlit} + E_{i,t}^{shade}\cdot LAI_{i,j}^{shade}} 
 (\#eq:cohortlayertranspiration)
 \end{equation}
+where $E_{i,t}^{sunlit}$ and $E_{i,t}^{shade}$ are the instantaneous transpiration rates (in $mmol\,H_2O\cdot m^{-2}\cdot s^{-1}$) of sunlit and shade leaves, respectively, of cohort $i$ during time step $t$; and $LAI_{i,j}^{sunlit}$ and $LAI_{i,j}^{shade}$ are the leaf area index of sunlit and shade leaves, respectively, of cohort $i$ in layer $j$ \@ref(eq:sunlitshadelai).
 
 Latent heat derived from soil water evaporation of snow melting ($LE_{soil}$; in $W\cdot m^{-2}$) is estimated as in the single-canopy case, using eq. \@ref(eq:soillatentheat).
 
@@ -154,16 +155,19 @@ The one-dimensional scalar flux balance for an homogeneous turbulent flow can be
 (\delta [H_2O]/\delta t)_j &=& (\delta F_{[H_2O]}/\delta z)_j + S_{[H_2O],j}
 (\#eq:scalarconservation)
 \end{eqnarray}
-where $(\delta F_{[CO_2]}/\delta z)_j$ and $(\delta F_{[H_2O]}/\delta z)_j$ are the gradients of vertical flux of $CO_2$ and $H_2O$ in layer $j$, respectively; and $S_{[H_2O],j}$ and $S_{[CO_2],j}$ are the source strengths for $[H_2O]$ (in $kg\cdot m^{-3} \cdot s^{-1}$) and $[CO_2]$ (in $mg \cdot m^{-3} \cdot s^{-1}$) in layer $j$, respectively, which derive from transpiration (source of water) and photosynthesis (sink of $CO_2$):
+where $(\delta F_{[CO_2]}/\delta z)_j$ and $(\delta F_{[H_2O]}/\delta z)_j$ are the gradients of vertical flux of $CO_2$ and $H_2O$ in layer $j$, respectively; and $S_{[H_2O],j}$ and $S_{[CO_2],j}$ are the source strengths for $[H_2O]$ (in $kg\,H_2O\cdot m^{-3} \cdot s^{-1}$) and $[CO_2]$ (in $mg\,CO_2 \cdot m^{-3} \cdot s^{-1}$) in layer $j$, respectively, which derive from transpiration (source of water) and photosynthesis (sink of $CO_2$):
 \begin{eqnarray}
-S_{[H_2O],j} &=&  \frac{In_{j,t} + \sum_{i=1}^{c}{Tr_{i,j,t}}}{\Delta t \cdot \Delta z} \\
-S_{[CO_2],j} &=& - \frac{1000\cdot (44.01/12.0) \cdot \sum_{i=1}^c{A_{n,i,j,t}}}{\Delta t \cdot \Delta z}
+S_{[H_2O],j} &=&  \frac{(In_{j,t}/\Delta t) + E_{j,t}}{\Delta z} \\
+S_{[CO_2],j} &=& - \frac{A_{n, j,t}}{\Delta z}
 \end{eqnarray}
-where $Tr_{i,j,t}$ and $A_{n,i,j,t}$ are the transpiration and photosynthesis for cohort $i$ in layer $j$. The former was already defined in eq. \@ref(eq:cohortlayertranspiration), whereas the latter is defined analogously:
+where $E_{j,t}$ and $A_{n,j,t}$ are the instantaneous transpiration and photosynthesis rates in layer $j$. The former was already defined in eq. \@ref(eq:cohortlayertranspiration), whereas the latter ($A_{n, j,t}$; in $mg\,CO_2\cdot m^{-2} \cdot s^{-1}$) is defined analogously:
 \begin{equation}
-A_{n,i, j,t} = A_{n,i,t} \cdot \frac{LAI_{i,j}^{\phi}}{LAI_{i}^{\phi}}
+A_{n, j,t} = 10^{-3} \cdot 44.01 \cdot \sum_{i=1}^{c}{A_{n,i,t}^{sunlit}\cdot LAI_{i,j}^{sunlit} + A_{n,i,t}^{shade}\cdot LAI_{i,j}^{shade}}
 \end{equation}
-being $A_{n,i,t}$ the amount of photosynthesis ($gC\cdot m^{-2}$) of cohort $i$ during time step $t$ (see \@ref(eq:cohortnetphotosynthesis)).
+where $A_{n,i,t}^{sunlit}$ and $A_{n,i,t}^{shade}$ are the instantaneous net photosynthesis rates (in $\mu mol\, CO_2\cdot m^{-2}\cdot s^{-1}$) of sunlit and shade leaves, respectively, of cohort $i$ during time step $t$; and $LAI_{i,j}^{sunlit}$ and $LAI_{i,j}^{shade}$ are the leaf area index of sunlit and shade leaves, respectively of cohort $i$ in layer $j$ \@ref(eq:sunlitshadelai). For the special case of the lowest canopy layer, water vapor needs to include the evaporation from soil, i.e.:
+\begin{equation}
+S_{[H_2O],1} =  \frac{((In_{1,t}+Es_{t})/\Delta t) + E_{1,t}}{\Delta z}
+\end{equation}
 
 For any layer $1<j<l$ the gradients of vertical scalar fluxes are found using: 
 \begin{eqnarray}

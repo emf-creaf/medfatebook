@@ -129,7 +129,7 @@ For every day to be simulated, the model performs the following steps:
     + Scale transpiration ($Tr$) and net photosynthesis ($A_n$) from sunlit/shade leaves to the plant cohort level (section \@ref(scalingtranspirationphotosynthesis)).
     + If plant capacitance effects are considered perform water balance of plant compartments at high temporal resolution (1 second steps), while re-estimating the flow from the soil to the stem at each step according to changes in stem water potential (see \@ref(hydraulicswithcompartments)). 
     + Scale water extraction from soil layers ($Ex$) to the plant cohort level.
-    + Complete energy balance of the canopy and the soil, after translating plant transpiration, evaporation from bare soil, snow melt and interception loss to latent heat and calculating convective heat exchange for both the canopy and the soil. Alternatively, perform energy balance for individual canopy layers (at 1-min steps), while including turbulent heat exchange and turbulent transport of water vapor and $CO_2$ between layers (chapter \@ref(closecanopysoilenergybalance)).
+    + Complete energy balance of the canopy and the soil, after translating plant transpiration, evaporation from bare soil, snow melt and interception loss to latent heat and calculating convective heat exchange for both the canopy and the soil. Alternatively, perform energy balance for individual canopy layers, while including turbulent heat exchange and turbulent transport of water vapor and $CO_2$ between layers (chapter \@ref(closecanopysoilenergybalance)).
 10. Determine day-level photosynthesis and transpiration from instantaneous rates and update soil moisture (section \@ref(daylevelphototransp)), effectively closing the soil water balance at the daily scale.
 11. Determine drought stress for each plant cohort (section \@ref(advanceddroughtstress)).
 
@@ -219,8 +219,9 @@ Control parameters modulate the overall behaviour of water balance simulations (
 
 1. `transpirationMode` defines the transpiration model, which in turn defines the complexity of the water balance model. If `transpirationMode = "Sperry"` then the advanced water balance model is run. In this model, the water retention curve model is forced to be that of Van Genuchten, i.e. `soilFunctions = "VG"` (see section \@ref(waterretentioncurves)). 
 2. `capacitance` defines whether plant capacitance (hence, plant water balance) is considered. By default it is set to `capacitance = FALSE`.
-3. `ndailysteps` defines the number of daily substeps. By default `ndailysteps = 24`, so that substeps are hours, but users can increase the temporal resolution, for example to half hour substeps by setting `ndailysteps = 48`.
+3. `ndailysteps` defines the number of daily steps. By default `ndailysteps = 24`, so that steps are hours, but users can increase the temporal resolution, for example to half hour substeps by setting `ndailysteps = 48`.
 4. `multiLayerBalance` is a boolean flag to indicate that multi-layer energy balance is desired (by default `multiLayerBalance = FALSE`).
+5. `nsubsteps`  defines the number of substeps for multi-layer energy balance calculations. By default `nsubsteps = 3600`, so that substeps are 1 sec if `ndailysteps = 24`.
 
 The other control parameters relevant for the advanced water balance model are:
 
