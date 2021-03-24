@@ -220,6 +220,7 @@ A first set of parameters refers to anatomical features (`paramsAnatomy`):
 | $\rho_{leaf,i}$ | $g \cdot cm^{-3}$ | `LeafDensity` | Leaf tissue density |
 | $\rho_{wood,i}$ | $g \cdot cm^{-3}$ | `WoodDensity` | Wood tissue density |
 | $\rho_{fineroot,i}$ | $g \cdot cm^{-3}$ | `FineRootDensity` | Fine root tissue density |
+| $f_{conduits}$ | [0-1] | `conduit2sapwood` | Proportion of sapwood corresponding to xylem conduits (the remaining corresponds to parenchymatic tissues) |
 | $SRL$ | $cm \cdot g^{-1}$ | `SRL` | Specific root length |
 | $RLD$ | $cm \cdot cm^{-3}$ | `RLD` | Fine root length density (i.e. density of root length per soil volume) |
 | $r_{6.35}$ | | `r635` | Ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm |
@@ -237,7 +238,12 @@ A third set of parameters refers to growth parameters (`paramsGrowth`).
 
 | Symbol       | Units | R param       | Description                      |
 |--------------|-------|---------------|----------------------------------|
-| $RGR_{sapwood, max}$ | $cm^2 \cdot cm^{-2}$| `RGRsapwoodmax` | Maximum daily relative growth rate (in sapwood area basis) |
+| $MR_{leaf}$ | $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$ | `RERleaf` | Leaf respiration rate at 20 ºC |
+| $MR_{sapwood}$ | $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$ | `RERsapwood` | Living sapwood (parenchymatic tissue) respiration rate at 20 ºC |
+| $MR_{fineroot}$ | $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$ | `RERfineroot` | Fine root respiration rate at 20 ºC |
+| $RGR_{leaf, max}$ | $m^2 \cdot cm^{-2} \cdot day^{-1}$| `RGRleafmax` | Maximum leaf area daily growth rate, relative to sapwood area |
+| $RGR_{sapwood, max}$ | $cm^2 \cdot cm^{-2} \cdot day^{-1}$| `RGRsapwoodmax` | Maximum daily sapwood relative growth rate (in sapwood area basis) |
+| $RGR_{fineroot, max}$ | $g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$| `RGRfinerootmax` | Maximum daily fine root relative growth rate |
 | $f_{HD,min}$ | $cm \cdot cm^{-1}$ | `fHDmin` | Minimum height-to-diameter ratio |
 | $f_{HD,max}$ | $cm \cdot cm^{-1}$ | `fHDmax` | Maximum height-to-diameter ratio |
 
@@ -253,10 +259,10 @@ Control parameters modulate the overall behaviour of growth simulations (see sec
 + `nonSugarConcentration [=0.3]`: A constant specifying non-sugar (inorganic) solute concentration ($mol \cdot L^{-1}$) in cells.
 + `equilibriumOsmoticConcentration [= c(leaf = 0.8, sapwood = 0.6)]`: Equilibrium osmotic concentrations ($mol \cdot L^{-1}$) for leaf and sapwood cells. 
 + `minimumSugarForGrowth [= c(leaf = 0.25, sapwood=0.25, fineroot = 0.25)]`:  Minimum concentration of sugars ($mol \cdot L^{-1}$) for growth to occur in different tissues (in the case of sapwood, the threshold applies to starch concentrations). 
-+ `respirationRates [= c(leaf = 0.00260274, sapwood = 6.849315e-05, fineroot = 0.002054795)]`: Maintenance respiration rates for different tissues (in $g\,gluc \cdot g\, dry^{-1} · day^{-1}$).
++ `respirationRates [= c(leaf = 0.00260274, sapwood = 6.849315e-05, fineroot = 0.002054795)]`: Maintenance respiration rates for different tissues (in $g\,gluc \cdot g\, dry^{-1} · day^{-1}$). These are default values used when maintenance respiration rates are not specified via species-specific `SpParams`.
 + `turnoverRates [= c(sapwood = 0.0001261398, fineroot = 0.001897231)]`: Relative turnover rates ($day^{-1}$) for sapwood and fine roots. Default are equivalent to 4.5% and 50% annual turnover for sapwood and fine roots, respectively. Leaf turnover rates depend on leaf lifespan (i.e. leaf duration) for evergreen species.
 + `constructionCosts [= c(leaf = 1.5, sapwood = 1.47, fineroot = 1.30)]`: Construction costs, including respiration and structural carbon, per dry weight of new tissue ($g\,gluc \cdot g\,dry^{-1}$).
-+ `maximumRelativeGrowthRates [= c(leaf = 0.01, sapwood = 0.001, fineroot = 0.1)]`: Maximum leaf growth rate relative to sapwood area ($m^{2}\cdot cm^{-2} \cdot day^{-1}$), maximum sapwood relative growth rate ($cm^{2}\cdot cm^{-2} \cdot day^{-1}$) and maximum fine root growth rate relative to sapwood area ($g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$). Values for leaves and fine roots are used for all species, whereas the value for sapwood is the default used when relative growth rate is not specified via `SpParams`.
++ `maximumRelativeGrowthRates [= c(leaf = 0.01, sapwood = 0.001, fineroot = 0.1)]`: Maximum leaf growth rate relative to sapwood area ($m^{2}\cdot cm^{-2} \cdot day^{-1}$), maximum sapwood relative growth rate ($cm^{2}\cdot cm^{-2} \cdot day^{-1}$) and maximum fine root growth rate relative to sapwood area ($g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$). These are default values used when relative growth rates are not specified via species-specific `SpParams`.
 
 ### Model output {#forestgrowthoutput}
 

@@ -40,11 +40,15 @@ where $SA$ is sapwood area, $H$ is plant height, $FRP_{s}$ is the proportion of 
 \begin{equation}
 B_{sapwood} = 1000 \cdot V_{sapwood} \cdot\rho_{wood}
 \end{equation}
-While $B_{sapwood}$ represents the structural sapwood biomass and can be used to estimate maintenance respiration costs (assuming empirical coefficients are determined for units of sapwood dry weight), the volume available for metabolic or storage carbon within sapwood is limited by wood porosity (i.e. $(1 - (\rho_{wood}/1.54))$) and the fact that sapwood contains vessels, which are dead cells. Sapwood storage volume ($V_{storage, sapwood}$; in $L \cdot ind^{-1}$) is:
+While $B_{sapwood}$ represents the structural sapwood biomass, it cannot be used to estimate sapwood respiration, since only xylem axial or radial parenchymatic rays (and not dead cells like tracheids or vessels) contribute to sapwood respiration. Hence, it is useful to estimate sapwood living biomass using:
 \begin{equation}
-V_{storage, sapwood} = V_{sapwood} \cdot (1 - (\rho_{wood}/1.54)) \cdot (1 - p_{vessels})
+B_{living, sapwood} = 1000 \cdot V_{sapwood} \cdot\rho_{wood} \cdot (1 - f_{conduits})
 \end{equation}
-where $p_{vessels} = 0.5$ is the proportion of vessels, assumed to be 50\% (hence 50\% of parenchymatic cells). Analogously to leaf carbon, $V_{storage, sapwood}$ is used to estimate the biomass of metabolic (sugars) or storage (starch) from the concentration of these substances in sapwood ($SS_{sapwood}$ and $ST_{sapwood}$, which are expressed in $mol\,gluc \cdot L^{-1}$), and conversely. For example:
+where $f_{conduits}$ is the fraction of sapwood volume that corresponds to dead conducts, being the complement of the fraction of parenchymatic tissue. The volume available for metabolic or storage carbon within sapwood is limited by both the sapwood fraction that corresponds to parenchyma and wood porosity (i.e. $(1 - (\rho_{wood}/1.54))$). Sapwood storage volume ($V_{storage, sapwood}$; in $L \cdot ind^{-1}$) is:
+\begin{equation}
+V_{storage, sapwood} = V_{sapwood} \cdot (1 - (\rho_{wood}/1.54)) \cdot (1 - f_{conduits})
+\end{equation}
+Analogously to leaf carbon, $V_{storage, sapwood}$ is used to estimate the biomass of metabolic (sugars) or storage (starch) from the concentration of these substances in sapwood ($SS_{sapwood}$ and $ST_{sapwood}$, which are expressed in $mol\,gluc \cdot L^{-1}$), and conversely. For example:
 \begin{equation}
 B_{sugar,sapwood} = SS_{sapwood} \cdot V_{storage, sapwood} \cdot m_{gluc}
 \end{equation}
@@ -70,9 +74,10 @@ FRA_{s} = 10^{-4}\cdot B_{fineroot,s} \cdot 2.0 \cdot \frac{\pi \cdot SRL}{\rho_
 where $\rho_{fineroot}$ is fine root tissue density ($g\,dry \cdot cm^{-3}$).
 
 ### Total living biomass
-Total living biomass per individual (i.e. not accounting for heartwood) is:
+Total living biomass per individual (i.e. not accounting for heartwood or xylem conduits) is:
 \begin{equation}
-B_{total} = B_{leaf} + B_{sapwood} + B_{fineroot} + B_{sugar,leaf} + B_{starch,leaf}+ B_{sugar,sapwood} + B_{starch,sapwood}
+B_{total} = B_{leaf} + B_{living, sapwood} + B_{fineroot} + \\
+            B_{sugar,leaf} + B_{starch,leaf}+ B_{sugar,sapwood} + B_{starch,sapwood}
 \end{equation}
 $B_{total}$ is used to express carbon balance components per dry weight of living biomass in the model output, which allows a better comparison across plant cohorts of different size and species.
 
@@ -89,10 +94,10 @@ A = \frac{10000 \cdot A_g}{N} \cdot \frac{m_{gluc}}{m_{carbon} \cdot 6}
 where $N$ is the density of individuals per hectare, $m_{gluc}$ is the glucose molar mass and $m_{carbon}$ is the carbon molar mass.
 
 ### Maintenance respiration
-Maintenance respiration (in $g\,gluc·ind^{-1}$) is calculated for each of the three compartments (leaves, sapwood, and fine roots) individually [@Mouillot2001].  The model uses a $Q_{10}$ relationship with temperature, which means that for every 10 ºC change in temperature there is a $Q_{10}$ factor change in respiration. Baseline maintenance respiration rates per dry biomass ($MR_{leaf}$, $MR_{sapwood}$ and $MR_{fineroot}$ for leaves, sapwood and fine roots, respectively; in $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$) are specified as control parameters (i.e. they are not species-specific) and should refer to 20 ºC:
+Maintenance respiration (in $g\,gluc·ind^{-1}$) is calculated for each of the three compartments (leaves, sapwood, and fine roots) individually [@Mouillot2001].  The model uses a $Q_{10}$ relationship with temperature, which means that for every 10 ºC change in temperature there is a $Q_{10}$ factor change in respiration. Baseline maintenance respiration rates per dry biomass ($MR_{leaf}$, $MR_{sapwood}$ and $MR_{fineroot}$ for leaves, parenchymatic sapwood and fine roots, respectively; in $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$) are can be specified via control parameters (defaults for all species) or via species-specific parameters and should refer to 20 ºC:
 \begin{eqnarray}
 M_{leaf} &=& (B_{leaf} + B_{sugar,leaf}) \cdot MR_{leaf} \cdot Q_{10}^{(T_{mean}-20)/10} \\
-M_{sapwood} &=& (B_{sapwood} + B_{sugar,sapwood}) \cdot MR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
+M_{sapwood} &=& (B_{living,sapwood} + B_{sugar,sapwood}) \cdot MR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
 M_{fineroot} &=& B_{fineroot} \cdot MR_{fineroot} \cdot Q_{10}^{(T_{mean}-20)/10} 
 \end{eqnarray}
 where $T_{mean}$ is the average daily temperature (in ºC). The same equations are used for growth simulations with the basic or advanced water model, the only differences being that in the latter the daily rates are divided by the number of subdaily steps and, hence, subdaily temperature variation is taken into account.
