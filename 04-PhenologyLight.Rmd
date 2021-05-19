@@ -6,7 +6,13 @@ Leaf phenology determines seasonal variations in the surface area of leaves, hen
 
 ### Phenological types and leaf expanded area
 
-Plant species can have either *evergreen* or *winter-deciduous* leaf phenology. The former are assumed to shed old leaves at the same time as new leaves  appear, so that the leaf area remains constant throughout the year. In winter-deciduous plants, leaf shedding and leaf bud formation occurs in autumn. Buds remain under dormancy until spring, when budburst and unfolding occurs. Evergreen plants thus maintain constant leaf area over the year, whereas in deciduous plants leaf-expanded status is updated daily, represented by $\phi_i$, the fraction of maximum leaf area:
+Plant species can have either *progressive evergreen*, *one-flush evergreen*, *winter-deciduous* or *winter semi-deciduous* leaf phenology (see Fig. 4.1). Progressive evergreen plants are assumed to shed old leaves at the same time as new leaves appear, so that the leaf area remains constant throughout the year. One-flush evergreen plants concentrate leaf unfolding and leaf senescence during similar periods, so that leaf area is also approximately constant year-round. In winter-deciduous plants, leaf shedding and leaf bud formation occurs in autumn. Buds remain under dormancy until spring, when budburst and unfolding occurs. The difference between semi-deciduous and deciduous plants is that the former retain dead leaves in the plant until next season unfolding period, so that leaf fall is retarded.
+
+```{r, out.width='80%', fig.align="center", fig.cap="Schematic representation of leaf phenology types", echo=FALSE}
+knitr::include_graphics("leaf_phenology.png")
+```
+
+Evergreen plants thus maintain constant leaf area over the year, whereas in deciduous plants leaf-expanded status is updated daily, represented by $\phi_i$, the fraction of maximum leaf area:
 
 \begin{equation}
 LAI_{i}^{\phi}=LAI^{live}_i\,\cdot\phi_i
@@ -19,7 +25,7 @@ S_{n,d} = \sum_{d_{n-1}}^{d_n} R_{n,d} = S_n^*
 \end{equation}
 where $S_{n,d}$ is the state of development on day $d$ in phase $n$, and $d_{n-1}$ is the end of the previous phase. $R_{n,d}$ is the rate of development during phase $n$ on day $d$, which depends on environmental variables (temperature, photoperiod,...) and $S_n^*$ is the critical threshold to achieve the change of phase. 
 
-In the water balance model leaf area index ($LAI$) values of winter-deciduous plants are adjusted for leaf phenology following a leaf development model in spring and a leaf senescence model in autumn. Function `pheno_updateLeaves()` updates the status of expanded leaves and dead leaves in a simulation object.
+In the water balance model leaf area index ($LAI$) values of winter (semi-)deciduous plants are adjusted for leaf phenology following a leaf development model in spring and a leaf senescence model in autumn. Function `pheno_updateLeaves()` updates the status of expanded leaves and dead leaves in a simulation object.
 
 ### Bud burst and leaf unfolding
 Transition from ecodormancy to bud burst is estimated using a very simple one-phase ecodormancy model (also called the spring warming model) implemented in function `pheno_leafDevelopmentStatus()`. Given a base temperature ($T_{eco}$, in $^{\circ}\mathrm{C}$), the rate of development during the ecodormancy phase ($R_{eco}$, in $^{\circ} \mathrm{C}$) is zero for those days where mean temperature $T_{mean}$ is below $T_{eco}$ and  $T_{mean} - T_{eco})$ for those days where temperatures become warmer than this threshold:
