@@ -202,3 +202,26 @@ While leaf area target depends on the allocation strategy, the target of fine ro
 ## Plant mortality thresholds {#plantmortality}
 
 Plant cohorts can die from either *starvation* (if metabolic carbon is exhausted) or *dessication* (tissue dehydration). When simulating growth with the basic water balance submodel, starvation occurs if $SS_{sapwood} \leq 0$ and, since plant water balance is not explicitly modelled, dessication is determined if $PLC_{stem} \geq 0.5$.  When simulating growth with the advanced water balance submodel, starvation occurs also if $SS_{sapwood} \leq 0$, but in this case a better indicator of dehydration can be used, the stem symplastic relative water content $RWC_{stem, symp}$. Dessication is determined in this case if $RWC_{stem, symp} \leq 0.5$. 
+
+
+```{r, fig=TRUE, echo=FALSE}
+WD = seq(0.2, 1, by=.01)
+psi_lethal05 = rep(NA, length(WD))
+psi_lethal04 = rep(NA, length(WD))
+psi_lethal03 = rep(NA, length(WD))
+psi_lethal02 = rep(NA, length(WD))
+for(i in 1:length(WD)) {
+  psi_lethal05[i] = moisture_symplasticPsi(0.5, 0.52-4.16*WD[i], sqrt(1.02*exp(8.5*WD[i])-2.89))
+  psi_lethal04[i] = moisture_symplasticPsi(0.4, 0.52-4.16*WD[i], sqrt(1.02*exp(8.5*WD[i])-2.89))
+  psi_lethal03[i] = moisture_symplasticPsi(0.3, 0.52-4.16*WD[i], sqrt(1.02*exp(8.5*WD[i])-2.89))
+  psi_lethal02[i] = moisture_symplasticPsi(0.2, 0.52-4.16*WD[i], sqrt(1.02*exp(8.5*WD[i])-2.89))
+}
+plot(WD, psi_lethal02, type="l", 
+     ylim=c(-15,0), xlab="Wood density", ylab="Stem water potential (-MPa)")
+lines(WD, psi_lethal03, col="green")
+lines(WD, psi_lethal04, col="red")
+lines(WD, psi_lethal05, col="blue")
+legend("bottomleft", legend=c("RWC = 20%", "RWC = 30%", "RWC = 40%", "RWC = 50%"),
+       lty=1, col=c("black", "green","red", "blue"), bty="n")
+```
+
