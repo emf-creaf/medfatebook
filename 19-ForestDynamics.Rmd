@@ -15,33 +15,88 @@ This chapter provides an overview of a forest dynamics model, which builds on th
 
 ## Inputs and outputs
 
+An important difference between `fordyn` and the previous simulation functions is that it does not require a specific input object, as in `spwb`or `growth`. In other words, soil, vegetation, meteorology and control parameters are directly introduced to the model function call.
+
 ### Soil, vegetation and meteorology
 
 **Soil**
 
-Soil input requirements are the same as for the basic water balance model and were fully described in section \@ref(soilinput). @Genuchten1980 water retention curves are forced for this model, because rhizosphere conductance is modelled using van Genuchten hydraulic equations (see subsection \@ref(vulnerabilitycurves)).
+Soil input requirements are the same as for the former models and were fully described in section \@ref(soilinput).
 
 **Vegetation**
 
+Unlike the former models, vegetation input for `fordyn` are objects of the class `forest`, which were described in section \@ref(forestobjects).
+
 **Metereological input**
+
+Weather input data must include variables calculated at the **daily** scale. The variables required by function `fordyn()` depend on the transpiration mode, similarly to the previous simulation model functions. We recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018].
 
 ### Vegetation functional parameters
 
+The forest dynamics model requires many functional parameters to be specified for plant cohorts. Some of them depend on whether the basic or advanced water balance is adopted, whereas others are inherited from the growth model. Here we report functional parameters needed in addition to those necessary for the growth model (see \@ref(growthvegetationparameters)). 
+
+All of them concern the simulation of recruitment and are specified in the species parameter table (i.e. `SpParams`).
+
+| Symbol | Units | R  | Description                                  | 
+|--------|-------|----| ---------------------------------------------|
+| $H_{seed,i}$  | $cm$ | `SeedProductionHeight` | Minimum height for seed production |
+| $T_{min,recr,i}$  | $^{\circ} \mathrm{C}$ | `MinTempRecr` |  Minimum average temperature (Celsius) of the coldest month for successful recruitment |
+| $MI_{min,recr,i}$  |  | `MinMoistureRecr` |  Minimum value of the moisture index (annual precipitation over annual PET) for successful recruitment |
+| $FPAR_{min,recr,i}$  | \% | `MinFPARRecr` | Minimum percentage of PAR at the ground level for successful recruitment |
+| $DBH_{recr,i}$  | $cm$  | `RecrTreeDBH` | Recruitment DBH for trees |
+| $H_{tree, recr,i}$  | $cm$  | `RecrTreeHeight` | Recruitment height for trees |
+| $N_{tree, recr,i}$  | $ind \cdot ha^{-1}$  | `RecrTreeDensity` | Recruitment density for trees |
+| $Cover_{shrub, recr,i}$  | %  | `RecrShrubCover` | Recruitment cover for shrubs |
+| $H_{shrub, recr,i}$  | $cm$  | `RecrShrubHeight` | Recruitment height for shrubs |
+| $Z50_{recr,i}$  | $mm$  | `RecrZ50` | Soil depth corresponding to 50% of fine roots for recruitment |
+| $Z95_{recr,i}$  | $mm$  | `RecrZ95` | Soil depth corresponding to 95% of fine roots for recruitment |
+
 ### Control parameters
 
-Control parameters modulate the overall behaviour of growth simulations (see section \@ref(controlparameters)).
+Control parameters modulate the overall behavior of `fordyn` simulations, which extend the parameters used for growth simulations (see section \@ref(forestgrowthcontrol)). First, there are parameters that regulate the application of recruiment and the removal of cohorts with few individuals:
+
++ `recruitmentMode [= "deterministic"]`: String describing how recruitment is applied. Current accepted values are "deterministic" or "stochastic".
++ `removeDeadCohorts [= TRUE]`: Boolean flag to indicate the removal of cohorts whose density is too low.
++ `minimumCohortDensity [= 1]`: Threshold of density resulting in cohort removal.
+
+Next, a few parameters control the production of seeds in a qualitative way:
+
++ `seedRain [= NULL]`: Vector of species codes whose seed rain is to be simulated. If `NULL` the species identity of seed rain is taken from species currently present in the forest stand and with minimum size (see below).
++ `seedProductionTreeHeight [= 300]`: Default minimum tree height for producing seeds (when species parameter `SeedProductionHeight` is missing).
++ `seedProductionShrubHeight [= 30]`: Default minimum shrub height for producing seeds (when species parameter `SeedProductionHeight` is missing).
+
+Then we have default parameters determining whether recruitment occurs:
+
++ `minTempRecr [= 0]`: Default threshold of minimum average temperature of the coldest month necessary for recruiting (when species parameter `MinTempRecr` is missing).
++ `minMoistureRecr [= 0.3]`: Default threshold of minimum moisture index (annual precipitation over annual ETP) necessary for recruiting (when species parameter `MinMoistureRecr` is missing).
++ `minFPARRecr [= 30]`: Default threshold of minimum fraction of PAR (in %) reaching the ground necessary for recruiting (when species parameter `MinFPARRecr` is missing).
+
+Finally, there are a set of parameters specifying default values for recruited cohort attributes:
+
++ `recrTreeDBH [= 1]`: Default DBH (cm) for recruited trees (when species parameter `RecrTreeDBH` is missing).
++ `recrTreeDensity [= 100]`: Default density (ind·ha-1) for recruited trees (when species parameter `RecrTreeDensity` is missing).
++ `recrTreeHeight [= 100]`: Default height (cm) for recruited trees (when species parameter `RecrTreeHeight` is missing).
++ `recrShrubCover [= 1]`: Default cover (%) for recruited shrubs (when species parameter `RecrShrubCover` is missing).
++ `recrShrubHeight [= 100]`: Default height (cm) for recruited shrubs (when species parameter `RecrShrubHeight` is missing).
++ `recrTreeZ50 [= 100]`: Default value for Z50 (mm) in recruited trees (when species parameter `RecrZ50` is missing).
++ `recrShrubZ50 [= 50]`: Default value for Z50 (mm) in recruited shrubs (when species parameter `RecrZ50` is missing).
++ `recrTreeZ95 [= 1000]`: Default value for Z95 (mm) in recruited trees (when species parameter `RecrZ50` is missing).
++ `recrShrubZ50 [= 500]`: Default value for Z95 (mm) in recruited shrubs (when species parameter `RecrZ50` is missing).
 
 ### Model output {#forestdynamicsoutput}
-
-#### Annual output
 
 
 | Element | Description                                                |
 |---------|------------------------------------------------------------|
-| `StandSummary`| Stand-level summaries (leaf area index, tree basal area, tree density, shrub cover, etc.) at the beginning of the simulation and after each simulated year. |
-| `ForestStructures`| A list with the aboveground structure of the stand at the beginning of the simulation and after each simulated year. |
+| `StandSummary`| A data frame with stand-level summaries (leaf area index, tree basal area, tree density, shrub cover, etc.) at the beginning of the simulation and after each simulated year. |
+| `SpeciesSummary`| A data frame with species-level summaries (leaf area index, tree basal area, tree density, shrub cover, etc.) at the beginning of the simulation and after each simulated year. |
+| `CohortSummary`| A data frame with cohort-level summaries (leaf area index, tree basal area, tree density, shrub cover, etc.) at the beginning of the simulation and after each simulated year. |
+| `TreeTable`| A data frame with tree-cohort data (species, density, diameter, height, etc.) at the beginning of the simulation (if any) and after each simulated year. |
+| `DeadTreeTable`| A data frame with dead tree-cohort data (species, density, diameter, height, etc.) at the beginning of the simulation and after each simulated year. |
+| `ShrubTable`| A data frame with shrub-cohort data (species, density, cover, height, etc.) at the beginning of the simulation and after each simulated year. |
+| `DeadShrubTable`| A data frame with dead shrub-cohort data (species, density, cover, height, etc.) at the beginning of the simulation (if any) and after each simulated year. |
+| `ForestStructures`| A list with the `forest` object of the stand at the beginning of the simulation and after each simulated year. |
+| `GrowthResults`| A list with the results of calling function `growth` (i.e., see \@ref(forestgrowthoutput)) for each simulated year. |
 
-#### Growth output
+### Process details
 
-
-## Applications
