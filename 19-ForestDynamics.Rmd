@@ -2,20 +2,28 @@
 
 # Forest dynamics model {#dynamicsmodelling}
 
-This chapter provides an overview of a forest dynamics model, which builds on the previous models and allows simulating 
+This chapter provides an overview of a forest dynamics model, which builds on the previous models and allows simulating the recruitment, growth and mortality of woody plant cohorts in a forest stand. The model is run using function `fordyn()` for a set of years.
 
 ## Design principles
 
+TO BE WRITTEN
 
 ## State variables
 
+The main state variables of the forest dynamic model are those conforming the structure and composition of the forest stand, i.e. the set of woody cohorts (either trees or shrubs) and their attributes (height, density, DBH, cover, etc.). Since the model performs calls to the `growth()` model, many other state variables are defined for intra-annual simulations (see \@ref(growthscheduling)).
 
 ## Process scheduling
 
+The `fordyn()` model divides the period to be simulated in years, which is the top-level time step of simulations. For each year to be simulated the model performs the following steps:
+
+ 1. Calls function `growth()` to simulate daily water/carbon balance, growth and mortality processes (subdaily processes may also be involved in `transpirationMode = "Sperry"`). 
+ 2. Simulates recruitment (for species present in the stand or specified via control parameter `seedRain`).
+ 3. Prepares the input of function `growth()` for the next annual time step.
+ 4. Store forest status and summaries.
 
 ## Inputs and outputs
 
-An important difference between `fordyn` and the previous simulation functions is that it does not require a specific input object, as in `spwb`or `growth`. In other words, soil, vegetation, meteorology and control parameters are directly introduced to the model function call.
+An important difference between `fordyn()` and the previous simulation functions is that it does not require a specific input object, as in `spwb()`or `growth()` functions. In other words, soil, vegetation, meteorology and control inputs are directly introduced as parameters to the function call to `fordyn()`.
 
 ### Soil, vegetation and meteorology
 
@@ -98,5 +106,6 @@ Finally, there are a set of parameters specifying default values for recruited c
 | `ForestStructures`| A list with the `forest` object of the stand at the beginning of the simulation and after each simulated year. |
 | `GrowthResults`| A list with the results of calling function `growth` (i.e., see \@ref(forestgrowthoutput)) for each simulated year. |
 
-### Process details
+## Process details
 
+TO BE WRITTEN
