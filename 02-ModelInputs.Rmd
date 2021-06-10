@@ -292,6 +292,12 @@ names(defaultControl())
 
 
 
-Not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), but there is an important control parameter called `transpirationMode`, because it allows the user to switch between the *basic* and *advanced* water balance models (chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). Another relevant control parameter is `plantWaterPools`, which allows considering plant water pools as explained in \@ref(plantwaterpools).
+Not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters). However, there are a set of parameters that apply to all simulations:
 
-Control parameters are employed when initializing vegetation inputs and state variables using functions `spwbInput()` and `growthInput()`, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as `spwb()` or `growth()`.
++ `verbose [=TRUE]`: Whether extra console output is desired during simulations.
++ `modifyInput [= TRUE]`: Boolean flag to indicate that simulations will modify the input object. If set to `FALSE`, simulations will not modify the input R object but return the current (modified) state variables within the output. In function `fordyn()` option `modifyInput` is always set to FALSE.
++ `subdailyResults [=FALSE]`: Boolean flag to force subdaily results to be stored in calls to `spwb()`. Subdaily results are returned as a list called `subdaily` of `spwb_day` objects, one by simulated date. In function `fordyn()` option `subdailyResults` is always set to `FALSE` and, hence, subdaily results are not possible.
+
+In addition, there is an important control parameter called `transpirationMode`, because it allows the user to switch between the *basic* and *advanced* water balance models (chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). Another relevant control parameter is `plantWaterPools`, which allows considering plant water pools as explained in \@ref(plantwaterpools).
+
+Control parameters are employed when initializing vegetation inputs and state variables using functions `spwbInput()` and `growthInput()`, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as `spwb()` or `growth()`. Function `fordyn()` is different than the other simulation functions, because the list control parameters is directly passed to the function.

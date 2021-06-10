@@ -3,7 +3,7 @@
 This chapter describes how daily plant transpiration is modelled in the basic water balance model, completing the flows needed to evaluate eq. \@ref(eq:basicwaterbalanceequation). The model uses the approach of BILJOU [@Granier1999] to estimate stand maximum transpiration, and then divides this value among the contribution of plant cohorts and estimate actual transpiration depending on soil moisture and cohort functional parameters, which determine plant drought. The chapter also describes how is daily photosynthesis estimated, a process that in this model does not influence transpiration but is necessary for growth calculations (chapter \@ref(growthmodelling)). 
 
 ## Plant transpiration and photosynthesis
-### Maximum transpiration
+### Maximum transpiration {#maximumtranspiration}
 
 Potential evapotranspiration ($PET$, in $mm$) is assumed to represent open water evaporation potential. Maximum canopy transpiration $Tr_{\max}$ depends on both $PET$ and the amount of transpirating surface, i.e. the current cumulative $LAI$ of the stand, $LAI^{\phi}_{stand}$. To estimate $Tr_{\max}$ the model uses the empirical equation of @Granier1999, where $Tr_{\max}/PET$ is a function of $LAI^{\phi}_{stand}$:
 
@@ -20,6 +20,12 @@ LAIc = seq(0,10, by=0.01)
 TmaxPET = -0.006*(LAIc^2) + 0.134*LAIc + 0.036
 plot(LAIc, TmaxPET, type="l", ylab="Tr_max/PET", xlab="LAIstand", ylim=c(0,1))
 ```
+
+Since medfate's **ver. 2.1**, empirical coefficients can be species-specific and @Granier1999 empirical equation has been generalized to:
+\begin{equation}
+\frac{Tr_{\max}}{PET}=  T_{max,LAI} \cdot LAI^{\phi}_{stand} + T_{max,sqLAI} \cdot (LAI^{\phi}_{stand})^2 
+\end{equation}
+where $T_{max,LAI}$ and $T_{max,sqLAI}$ are species-specific parameters (if missing, they are given default values 0.134 and -0.006, respectively). 
 
 The maximum transpiration for a given plant cohort $i$ is calculated as the portion of $Tr_{\max}$ defined by $f_i$ the fraction of total absorbed SWR that is due
 to cohort $i$ (see section \@ref(basiclightextinction)):

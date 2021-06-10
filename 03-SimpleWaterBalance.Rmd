@@ -90,13 +90,20 @@ A second set refers to leaf phenology (`paramsPhenology`):
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
-| $S_{GDD,i}$ | $^{\circ} \mathrm{C}$ | `Sgdd` | Growth degree days corresponding to leave budburst (see section \@ref(leafphenology)). If $S_{GDD,i} = 0$ the cohort is considered evergreen. |
-
+|        |       |  `PhenologyType`  | Leaf phenology type (oneflush-evergreen, progressive-evergreen, winter-deciduous, winter-semideciduous)|
+| $LD$ | years  | `LeafDuration` | Average duration of leaves (in years). |
+| $S^*_{eco,i}$ | $^{\circ} \mathrm{C}$ | `Sgdd` | Degree days corresponding to leaf budburst (see section \@ref(leafphenobudburst)). |
+| $T_{eco}$ | $^{\circ} \mathrm{C}$ | `Tbgdd` | Base temperature for the calculation of degree days to leaf budburst (see section \@ref(leafphenobudburst)). |
+| $S^*_{sen,i}$ | $^{\circ} \mathrm{C}$ | `Ssen` | Degree days corresponding to leaf senescence (see section \@ref(leafphenosenescence)). |
+| $Ph_{sen}$ | hours | `Phsen` | Photoperiod corresponding to start counting senescence degree-days (see section \@ref(leafphenosenescence)). |
+| $T_{sen}$ | $^{\circ} \mathrm{C}$ | `Tbsen` | Base temperature for the calculation of degree days to leaf senescence (see section \@ref(leafphenosenescence)). |
 
 A second set of parameters are related to transpiration and photosynthesis (`paramsTranspiration`):
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
+| $T_{max, LAI}$ |       | `Tmax_LAI` | Empirical coefficient relating LAI with the ratio of maximum transpiration over potential evapotranspiration (see section \@ref(maximumtranspiration)). |
+| $T_{max, sqLAI}$ |       | `Tmax_LAIsq` | Empirical coefficient relating squared LAI with the ratio of maximum transpiration over potential evapotranspiration (see section \@ref(maximumtranspiration)). |
 | $\Psi_{extract,i}$ | $MPa$ | `Psi_Extract` |  The water potential at which plant transpiration is 50% of its maximum (see section \@ref(actualtranspiration)).|
 | $\Psi_{critic,i}$ | $MPa$ | `Psi_Critic` |  The water potential corresponding to 50% of  cavitation (see section \@ref(irreversiblecavitation)).|
 | $WUE_{\max,i}$ | $g\, C \cdot mm^{-1}$ |  `WUE` |  Maximum water use efficency (see section \@ref(basicphotosynthesis)).  |
@@ -108,18 +115,22 @@ Vegetation functional attributes are normally filled for each cohort $i$ by func
 
 Control parameters modulate the overall behaviour of water balance simulations (see section \@ref(controlparameters)). Most importantly, `transpirationMode` defines the transpiration model, which in turn defines the complexity of the water balance model. If `transpirationMode = "Granier"` (the default value) then the basic water balance model is used. 
 
-The other control parameters relevant for the basic water balance model are:
+The other control parameters for the basic water balance model are:
 
-+ `verbose [=TRUE]`: Whether extra console output is desired during simulations.
-+ `soilFunctions [= "SX"]`: Water retention curve model, either "SX" (for Saxton) or "VG" (for Van Genuchten) (see section \@ref(waterretentioncurves)).
-+ `leafPhenology [= TRUE]`:  Whether leaf phenology is simulated (see section \@ref(leafphenology)). If `FALSE` then all species are assumed to be evergreen.
-+ `snowpack [= TRUE]`:  Whether dynamics of snow pack are included (see section \@ref(snowpack)).
-+ `rockyLayerDrainage [= TRUE]`:  Whether water exceeding the field capacity of the deepest layer can be drained via macropore flow towards a non-reachable compartment, only for layers with > 95\% rocks (see section \@ref(runoff)).
-+ `verticalLayerSize [= 100]`: The size of vertical layers (in $cm$) for leaf area distribution and light extinction calculations (see section \@ref(leafdistribution)).
++ `soilFunctions [="SX"]`: Soil water retention curve and conductivity functions, either 'SX' (for Saxton) or 'VG' (for Van Genuchten). 
 + `defaultWindSpeed [= 2.5]`: Default value for wind speed (in $m \cdot s^{-1}$) when this is missing (only used for leaf fall, see section \@ref(leafphenology)).
-+ `cavitationRefill [= "total"]`: Controls recovery from cavitation. If `"total"` cavitation is completely reversible. If `"none"` the model operates in a irreversible cavitation mode. Finally, if `"annual"` plants are assumed to recover from previous drought at the first day of the year (see section \@ref(irreversiblecavitation)).
++ `snowpack [= TRUE]`:  Whether dynamics of snow pack are included (see section \@ref(snowpack)).
++ `leafPhenology [ = TRUE]`:  Whether leaf phenology is simulated (see section \@ref(leafphenology)). If `FALSE` then all species are assumed to be evergreen.
++ `rockyLayerDrainage [= TRUE]`:  Whether water exceeding the field capacity of the deepest layer can be drained via macropore flow towards a non-reachable compartment, only for layers with > 95\% rocks (see section \@ref(runoff)).
 + `unlimitedSoilWater [=FALSE]`: Boolean flag to indicate the simulation of plant transpiration assuming that soil water is always at field capacity.
++ `unfoldingDD [= 300]`: Degree-days for complete leaf unfolding after budburst has occurred ($S_{unf}^*$; see section \@ref(leafphenobudburst)).
 + `plantWaterPools [=FALSE]`: Boolean flag to indicate the simulation of water balance assuming that each cohort has its own water pools.
++ `verticalLayerSize [= 100]`: Size of vertical layers (in cm) for the calculation of light extinction (see section \@ref(leafdistribution)).
++ `windMeasurementHeight [ = 200]`: Height (in cm) over the canopy corresponding to wind measurements.
++ `cavitationRefill [= "total"]`: A string indicating how refilling of embolized conduits is done  (see section \@ref(irreversiblecavitation). Allowed values are: 
+  + `"none"` - no refilling.
+  + `"annual"` - every first day of the year.
+  + `"total"` - instantaneous complete refilling.
 
 ### Model output {#basicwaterbalanceoutput}
 
