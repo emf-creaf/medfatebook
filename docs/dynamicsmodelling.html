@@ -697,19 +697,19 @@ div.csl-indent {
 <td>Minimum height for seed production</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(T_{min,recr,i}\)</span></td>
+<td><span class="math inline">\(TCM_{recr,i}\)</span></td>
 <td><span class="math inline">\(^{\circ} \mathrm{C}\)</span></td>
 <td><code>MinTempRecr</code></td>
 <td>Minimum average temperature (Celsius) of the coldest month for successful recruitment</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(MI_{min,recr,i}\)</span></td>
+<td><span class="math inline">\(MI_{recr,i}\)</span></td>
 <td></td>
 <td><code>MinMoistureRecr</code></td>
 <td>Minimum value of the moisture index (annual precipitation over annual PET) for successful recruitment</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(FPAR_{min,recr,i}\)</span></td>
+<td><span class="math inline">\(FPAR_{recr,i}\)</span></td>
 <td>%</td>
 <td><code>MinFPARRecr</code></td>
 <td>Minimum percentage of PAR at the ground level for successful recruitment</td>
@@ -848,7 +848,9 @@ div.csl-indent {
 </div>
 <div id="process-details" class="section level2" number="19.5">
 <h2><span class="header-section-number">19.5</span> Process details</h2>
-<p>TO BE WRITTEN</p>
+<p>At the end of a given year, the model first determines the <em>seed rain</em> in the stand by determining which cohorts have heights above maturity thresholds for trees (control parameter <code>seedProductionTreeHeight</code>) and shrubs (control parameter <code>seedProductionShrubHeight</code>). Additionally, the user can impose a seed rain arriving to the stand via dispersal processes, which are not explicitly modelled.</p>
+<p>Actual <em>sapling recruitment</em> depends on environmental conditions in the stand. Specifically, the model calculates, for the year that ended, the mean temperature of the coldest month (<span class="math inline">\(TCM\)</span>), the moisture index (<span class="math inline">\(MI\)</span>) and the fraction of photosynthetic active radiation reaching the ground, given the current structure (<span class="math inline">\(FPAR\)</span>). These values are compared to species specific parameter thresholds <span class="math inline">\(TCM_{recr}\)</span>, <span class="math inline">\(MI_{recr}\)</span> and <span class="math inline">\(FPAR_{recr}\)</span>. More specifically, a given species <span class="math inline">\(i\)</span> will recruit if and only if <span class="math inline">\(TCM &gt; TCM_{recr, i}\)</span>, <span class="math inline">\(MI &gt; MI_{recr, i}\)</span> and <span class="math inline">\(FPAR &gt; FPAR_{recr, i}\)</span>.</p>
+<p>Tree recruitment density, diameter and height are determined by control parameters <code>recrTreeDensity</code>, <code>recrTreeDBH</code> and <code>recrTreeHeight</code>, respectively; whereas cover and height of shrub recruiment is determined by control parameters <code>recrShrubCover</code> and <code>recrShrubHeight</code>. If stochastic simulation of recruitment is requested, then density values are considered mean values of a Poisson distribution.</p>
 
 </div>
 </div>
