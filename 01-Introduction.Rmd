@@ -68,12 +68,17 @@ Package **medfate** deals with simulations at stand level and, hence, the data s
 
 ### Dynamic simulation functions
 
-Dynamic simulation functions in **medfate** include three nested simulation levels:
+Dynamic simulation functions in **medfate** include three nested simulation levels (Fig. \@ref(fig:models)):
 
-  1. Forest water and energy balance can be studied for a given forest stand using function `spwb()` (soil-plant-water-balance). This function allows simulating vertical hydrological processes (rainfall interception, soil infiltration, percolation and evapotranspiration) and plant physiological processes related to plant transpiration (hydraulics, photosynthesis and stomatal regulation). The same function is used to run two models of different degree of complexity, from which the user should choose depending on the intended application and data availability. Most processes are implemented at the daily scale, although some operate at subdaily time steps. Function `spwb()` has a closely related function `spwb.day()` that allows focusing on subdaily processes. Finally, one can simulate plant physiological processes only, while having soil moisture as a dynamic input like weather, using function `pwb()` (plant-water-balance).
+  1. Forest water and energy balance can be studied for a given forest stand using function `spwb()` (soil-plant-water-balance). This function allows simulating vertical hydrological processes (rainfall interception, soil infiltration, percolation and evapotranspiration) and plant physiological processes related to plant transpiration (hydraulics, photosynthesis and stomatal regulation). The same function is used to run two models of different degree of complexity (*basic* or *advanced*; see Fig. \@ref(fig:models)), from which the user should choose depending on the intended application and data availability. Most processes are implemented at the daily scale, although some operate at subdaily time steps. Function `spwb()` has a closely related function `spwb.day()` that allows focusing on subdaily processes. Finally, one can simulate plant physiological processes only, while having soil moisture as a dynamic input like weather, using function `pwb()` (plant-water-balance).
   2. Changes in primary (leaf area) and secondary (wood) growth are key to evaluate the influence of climatic conditions on plant and forest structure and function. Function `growth()` extends the previous models because it allows simulating growth and mortality of a set of plant cohorts competing for light and water in a given forest stand. It can be used to forecast temporal variation in water fluxes and soil water content in forest stands while taking into account plant acclimation. Analogously to the simulation of water balance, `growth()` has a closely related function `growth.day()` that allows focusing on subdaily processes (i.e. carbon balance). 
   3. Finally, function `fordyn()` complements growth and mortality processes are with recruitment (from seeds), thus completing the minimum set of processes needed to simulate forest dynamics. The function splits the period to be simulated by years and makes internal calls to `growth()` for the simulation of growth and mortality. `fordyn()` is suited to simulate the interannual variation in forest structure and composition, while accounting for the biophysical and ecophysiological processes provided by the former models.
   
+  ```{r models, out.width='100%', fig.align="center", fig.cap="Nested relationships between simulation functions and  processes included in each model", echo=FALSE}
+knitr::include_graphics("models.png")
+
+```
+
 Importantly, `growth()` and `fordyn()` functions and the processes that they implements are still **under development**.
 
 ### Sub-model functions
