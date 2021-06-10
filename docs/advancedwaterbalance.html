@@ -1087,30 +1087,29 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 </ol>
 <p>The other control parameters relevant for the advanced water balance model are:</p>
 <ul>
-<li><code>snowpack [= TRUE]</code>: Whether dynamics of snow pack are included (see section <a href="hydrology.html#snowpack">5.2</a>).</li>
-<li><code>rockyLayerDrainage [= TRUE]</code>: Whether water exceeding the field capacity of the deepest layer can be drained via macropore flow towards a non-reachable compartment, only for layers with &gt; 95% rocks (see section <a href="hydrology.html#runoff">5.4</a>).</li>
-<li><code>leafPhenology [= TRUE]</code>: Whether leaf phenology is simulated for winter-deciduous species (see section <a href="leafphenologylight.html#leafphenology">4.1</a>). If <code>FALSE</code> then all species are assumed to be evergreen.</li>
-<li><code>defaultWindSpeed [= 2.5]</code>: Default value for wind speed (in <span class="math inline">\(m \cdot s^{-1}\)</span>) when this is missing.</li>
-<li><code>windMeasurementHeight [= 200]</code>: Distance (in cm) above the top of the canopy corresponding to the measurement of wind speed.</li>
-<li><code>boundaryLayerSize [= 2000]</code>: Size of the canopy boundary layer (in cm). The boundary layer causes the model to define vertical layers above the top of the canopy. The parameter is only relevant when multi-layer canopy energy balance is performed.</li>
-<li><code>unlimitedSoilWater [=FALSE]</code>: Boolean flag to indicate the simulation of plant transpiration assuming that soil water is always at field capacity.</li>
-<li><code>plantWaterPools [=FALSE]</code>: Boolean flag to indicate the simulation of water balance assuming that each cohort has its own water pools.</li>
-<li><code>costModifier, gainModifier [= 1]</code>: Modifiers (exponents) of the gain and cost functions defined in Sperry et al. (2016) (see section <a href="transpirationsperry.html#stomatalregulation">12.2</a>).</li>
-<li><code>cuticularTranspiration [=TRUE]</code>: Boolean flag to indicate the simulation of cuticular transpiration (at night or when stomata are fully closed) according to minimum stomatal conductance (see section <a href="transpirationsperry.html#stomatalregulation">12.2</a>).</li>
-<li><code>thermalCapacityLAI [= 1000000]</code>: Canopy thermal capacitance per LAI unit (see section <a href="closecanopysoilenergybalance.html#canopycapacitancetemperature">13.1.3</a>).</li>
-<li><code>verticalLayerSize [= 100]</code>: The size of vertical layers (in <span class="math inline">\(cm\)</span>) for leaf area distribution and light extinction calculations (see section <a href="model-inputs.html#leafdistribution">2.3.3</a>).</li>
-<li><code>cavitationRefill [= "total"]</code>: Controls recovery from cavitation. If <code>"total"</code> cavitation is completely reversible. If <code>"none"</code> the model operates in a irreversible cavitation mode. If <code>"annual"</code> plants are assumed to recover from previous drought at the first day of the year and, finally, if <code>"rate"</code> cavitation recovery follows a daily recovery rate (see section <a href="transpirationsperry.html#cavitationrefill">12.4</a>).</li>
-<li><code>refillMaximumRate [= 0.05]</code>: Maximum rate of conduit refilling (see section <a href="transpirationsperry.html#cavitationrefill">12.4</a>).</li>
-<li><code>klatstem [= 0.01]</code>: Stem symplastic-apoplastic lateral conductance (in <span class="math inline">\(mmol·s^{-1}·m^{-2}·MPa^{-1}\)</span>). Only relevant when <code>capacitance = TRUE</code> (see section <a href="planthydraulics.html#hydraulicswithcompartments">10.4</a>).</li>
-<li><code>klatleaf [= 0.01]</code>: Leaf symplastic-apoplastic lateral conductance (in <span class="math inline">\(mmol·s^{-1}·m^{-2}·MPa^{-1}\)</span>). Only relevant when <code>capacitance = TRUE</code> (see section <a href="planthydraulics.html#hydraulicswithcompartments">10.4</a>).</li>
-<li><code>numericParams</code>: A list with params for numerical approximation routines.</li>
-<li><code>Catm [=386]</code>: Atmospheric <span class="math inline">\(CO_2\)</span> concentration (in micromol <span class="math inline">\(CO_2 \cdot mol^{-1}\)</span> = ppm).</li>
-</ul>
-<p>In addition, a number of control parameters are used to modify how hydraulic parameters are estimated when calling function <code>spwbInput()</code>:</p>
-<ul>
-<li><code>taper [= TRUE]</code>: Whether taper of xylem conduits is accounted for when estimating aboveground stem conductance from xylem conductivity.</li>
-<li><code>fracRootResistance [= 0.40]</code>: Fraction of plant total resistance (leaf+stem+root) that corresponds to root system.</li>
-<li><code>averageFracRhizosphereResistance [= 0.15]</code>: Fraction to total continuum (stem+root+rhizosphere) resistance that corresponds to rhizosphere (averaged across soil water potential values).</li>
+<li><p><code>snowpack [= TRUE]</code>: Whether dynamics of snow pack are included (see section <a href="hydrology.html#snowpack">5.2</a>).</p></li>
+<li><p><code>rockyLayerDrainage [= TRUE]</code>: Whether water exceeding the field capacity of the deepest layer can be drained via macropore flow towards a non-reachable compartment, only for layers with &gt; 95% rocks (see section <a href="hydrology.html#runoff">5.4</a>).</p></li>
+<li><p><code>leafPhenology [= TRUE]</code>: Whether leaf phenology is simulated for winter-deciduous species (see section <a href="leafphenologylight.html#leafphenology">4.1</a>). If <code>FALSE</code> then all species are assumed to be evergreen.</p></li>
+<li><p><code>defaultWindSpeed [= 2.5]</code>: Default value for wind speed (in <span class="math inline">\(m \cdot s^{-1}\)</span>) when this is missing.</p></li>
+<li><p><code>windMeasurementHeight [= 200]</code>: Distance (in cm) above the top of the canopy corresponding to the measurement of wind speed.</p></li>
+<li><p><code>boundaryLayerSize [= 2000]</code>: Size of the canopy boundary layer (in cm). The boundary layer causes the model to define vertical layers above the top of the canopy. The parameter is only relevant when multi-layer canopy energy balance is performed.</p></li>
+<li><p><code>unlimitedSoilWater [=FALSE]</code>: Boolean flag to indicate the simulation of plant transpiration assuming that soil water is always at field capacity.</p></li>
+<li><p><code>plantWaterPools [=FALSE]</code>: Boolean flag to indicate the simulation of water balance assuming that each cohort has its own water pools.</p></li>
+<li><p><code>costModifier, gainModifier [= 1]</code>: Modifiers (exponents) of the gain and cost functions defined in Sperry et al. (2016) (see section <a href="transpirationsperry.html#stomatalregulation">12.2</a>).</p></li>
+<li><p><code>cuticularTranspiration [=TRUE]</code>: Boolean flag to indicate the simulation of cuticular transpiration (at night or when stomata are fully closed) according to minimum stomatal conductance (see section <a href="transpirationsperry.html#stomatalregulation">12.2</a>).</p></li>
+<li><p><code>thermalCapacityLAI [= 1000000]</code>: Canopy thermal capacitance per LAI unit (see section <a href="closecanopysoilenergybalance.html#canopycapacitancetemperature">13.1.3</a>).</p></li>
+<li><p><code>verticalLayerSize [= 100]</code>: The size of vertical layers (in <span class="math inline">\(cm\)</span>) for leaf area distribution and light extinction calculations (see section <a href="model-inputs.html#leafdistribution">2.3.3</a>).</p></li>
+<li><p><code>cavitationRefill [= "total"]</code>: Controls recovery from cavitation. If <code>"total"</code> cavitation is completely reversible. If <code>"none"</code> the model operates in a irreversible cavitation mode. If <code>"annual"</code> plants are assumed to recover from previous drought at the first day of the year and, finally, if <code>"rate"</code> cavitation recovery follows a daily recovery rate (see section <a href="transpirationsperry.html#cavitationrefill">12.4</a>).</p></li>
+<li><p><code>refillMaximumRate [= 0.05]</code>: Maximum rate of conduit refilling (see section <a href="transpirationsperry.html#cavitationrefill">12.4</a>).</p></li>
+<li><p><code>klatstem [= 0.01]</code>: Stem symplastic-apoplastic lateral conductance (in <span class="math inline">\(mmol·s^{-1}·m^{-2}·MPa^{-1}\)</span>). Only relevant when <code>capacitance = TRUE</code> (see section <a href="planthydraulics.html#hydraulicswithcompartments">10.4</a>).</p></li>
+<li><p><code>klatleaf [= 0.01]</code>: Leaf symplastic-apoplastic lateral conductance (in <span class="math inline">\(mmol·s^{-1}·m^{-2}·MPa^{-1}\)</span>). Only relevant when <code>capacitance = TRUE</code> (see section <a href="planthydraulics.html#hydraulicswithcompartments">10.4</a>).</p></li>
+<li><p><code>numericParams</code>: A list with params for numerical approximation routines.</p></li>
+<li><p><code>Catm [=386]</code>: Atmospheric <span class="math inline">\(CO_2\)</span> concentration (in micromol <span class="math inline">\(CO_2 \cdot mol^{-1}\)</span> = ppm).</p></li>
+<li><p><code>cochard [=FALSE]</code>: Boolean flag to indicate the stomatal closure when leaf water potential is below turgor loss point so that transpiration depends on cuticular properties <span class="citation">(<a href="#ref-Martin-StPaul2017" role="doc-biblioref">Martin-StPaul, Delzon, and Cochard 2017</a>)</span>.
+In addition, a number of control parameters are used to modify how hydraulic parameters are estimated when calling function <code>spwbInput()</code>:</p></li>
+<li><p><code>taper [= TRUE]</code>: Whether taper of xylem conduits is accounted for when estimating aboveground stem conductance from xylem conductivity.</p></li>
+<li><p><code>fracRootResistance [= 0.40]</code>: Fraction of plant total resistance (leaf+stem+root) that corresponds to root system.</p></li>
+<li><p><code>averageFracRhizosphereResistance [= 0.15]</code>: Fraction to total continuum (stem+root+rhizosphere) resistance that corresponds to rhizosphere (averaged across soil water potential values).</p></li>
 </ul>
 </div>
 <div id="advancedwaterbalanceoutput" class="section level3" number="7.5.4">
@@ -1390,6 +1389,9 @@ Katul, Gabriel G., Larry Mahrt, Davide Poggi, and Christophe Sanz. 2004. <span>�
 </div>
 <div id="ref-Ma2019" class="csl-entry">
 Ma, Yulong, and Heping Liu. 2019. <span>“<span class="nocase">An Advanced Multiple-Layer Canopy Model in the WRF Model With Large-Eddy Simulations to Simulate Canopy Flows and Scalar Transport Under Different Stability Conditions</span>.”</span> <em>Journal of Advances in Modeling Earth Systems</em> 11 (7): 2330–51. <a href="https://doi.org/10.1029/2018MS001347">https://doi.org/10.1029/2018MS001347</a>.
+</div>
+<div id="ref-Martin-StPaul2017" class="csl-entry">
+Martin-StPaul, Nicolas, Sylvain Delzon, and Hervé Cochard. 2017. <span>“<span class="nocase">Plant resistance to drought depends on timely stomatal closure</span>.”</span> <em>Ecology Letters</em> 20 (11): 1437–47. <a href="https://doi.org/10.1111/ele.12851">https://doi.org/10.1111/ele.12851</a>.
 </div>
 <div id="ref-Ritchie1972" class="csl-entry">
 Ritchie, JT. 1972. <span>“<span class="nocase">Model for predicting evaporation from a row crop with incomplete cover</span>.”</span> <em>Water Resources Research</em> 8: 1204–13. <a href="http://onlinelibrary.wiley.com/doi/10.1029/WR008i005p01204/full">http://onlinelibrary.wiley.com/doi/10.1029/WR008i005p01204/full</a>.
