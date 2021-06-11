@@ -27,7 +27,7 @@ As mentioned above, interception loss is only modelled for liquid precipitation 
 \begin{equation}
 P_G = - \frac{S_{canopy}/C_{canopy}}{ER_{ratio}} \cdot \ln(1-ER_{ratio})
 \end{equation}
-where $S_{canopy}$ is the canopy water storage capacity (in $mm$) –  i.e. the minimum amount of water needed to saturate the canopy –, $C_{canopy}$ is the canopy cover and $ER_{ratio}$ is the ratio of evaporation rate to rainfall rate during the rainfall event. Although interception models are normally applied to single-canopy stands, we apply the sparse Gash model to the whole stand (including shrubs). Moreover, in our implementation stem interception is lumped with canopy interception, so that $S_{canopy}$ represents both. Following @Watanabe1996 we estimate $S_{canopy}$, the canopy water storage capacity, from adjusted LAI values:
+where $S_{canopy}$ is the canopy water storage capacity (in mm) –  i.e. the minimum amount of water needed to saturate the canopy –, $C_{canopy}$ is the canopy cover and $ER_{ratio}$ is the ratio of evaporation rate to rainfall rate during the rainfall event. Although interception models are normally applied to single-canopy stands, we apply the sparse Gash model to the whole stand (including shrubs). Moreover, in our implementation stem interception is lumped with canopy interception, so that $S_{canopy}$ represents both. Following @Watanabe1996 we estimate $S_{canopy}$, the canopy water storage capacity, from adjusted LAI values:
 \begin{equation}
 S_{canopy}=\sum_{i}{s_{water,i}\cdot LAI_{i}^{\phi}}
 \end{equation}
@@ -35,12 +35,12 @@ where $s_{water,i}$ is the depth of water that can be retained by leaves, branch
 
 Simplifying assumptions are made to determine $ER_{ratio}$. Values of the evaporation-to-rainfall ratio are calculated from daily potential evapotranspiration and rainfall, while accounting for seasonal variation in rainfall intensity ($mm \cdot h^{-1}$). Minimum values for rainfall intensity are assumed for convective storms ($5.6\,mm \cdot h^{-1}$) and synoptic storms ($1.5\,mm \cdot h^{-1}$) from @Miralles2010. Synoptic storms are assumed between December and June, and convective storms are assumed for the remaining months, as typical in the Mediterranean Basin.
 
-The amount of water evaporated from interception ($In$, in $mm$), is calculated as:
+The amount of water evaporated from interception ($In$, in mm), is calculated as:
 \begin{eqnarray}
 In = C_{canopy}\cdot P_G+C_{canopy}\cdot ER_{ratio}\cdot(Pr-P_G) \: {if}\: Pr > P_G \\
 In = C_{canopy}\cdot Pr\: {if}\: Pr \leq P_G
 \end{eqnarray}
-where $Pr$ is the daily gross rainfall (in $mm$). Net rainfall ($Pr_{net}$, also in $mm$) includes throughfall and stemflow, and is calculated as the difference between gross rainfall and interception loss. Fig. \@ref(fig:interception) below shows examples of relative throughfall (including stemflow), calculated according to the Gash et al [-@Gash1995]  interception model, under different situations (see function `hydrology_rainInterception()`). 
+where $Pr$ is the daily gross rainfall (in mm). Net rainfall ($Pr_{net}$, also in mm) includes throughfall and stemflow, and is calculated as the difference between gross rainfall and interception loss. Fig. \@ref(fig:interception) below shows examples of relative throughfall (including stemflow), calculated according to the Gash et al [-@Gash1995]  interception model, under different situations (see function `hydrology_rainInterception()`). 
 
 (ref:interception-cap) Examples of canopy interception with different $S_{canopy}$ (canopy water storage capacity), $ER_{ratio}$ (ratio between evaporation and rainfall rates) and $p$ (throughfall coefficient; $p = 1 - C_{canopy}$).
 
@@ -91,7 +91,7 @@ legend("bottomright",lty=1:length(Cm), legend=paste("S =",Cm), bty="n")
 
 ## Runoff, infiltration and percolation {#runoff}
 
-The amount of water that reaches the soil is the sum of net rainfall ($Pr_{net}$), runon ($Ro$, in $mm$) and melted snow ($Sm$). The amount of water infiltrating into the soil is $Pr_{net} + Sm + Ro - Ru$, where $Ru$ (in $mm$) is the water lost by surface runoff (see function `hydrology_infiltrationAmount()`). 
+The amount of water that reaches the soil is the sum of net rainfall ($Pr_{net}$), runon ($Ro$, in mm) and melted snow ($Sm$). The amount of water infiltrating into the soil is $Pr_{net} + Sm + Ro - Ru$, where $Ru$ (in mm) is the water lost by surface runoff (see function `hydrology_infiltrationAmount()`). 
 
 Surface runoff, is calculated using the USDA SCS curve number method, as in @Boughton1989:
 \begin{equation}

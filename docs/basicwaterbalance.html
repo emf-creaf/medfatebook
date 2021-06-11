@@ -237,7 +237,7 @@ div.csl-indent {
 <li class="chapter" data-level="4.1.1" data-path="leafphenologylight.html"><a href="leafphenologylight.html#phenological-types-and-leaf-expanded-area"><i class="fa fa-check"></i><b>4.1.1</b> Phenological types and leaf expanded area</a></li>
 <li class="chapter" data-level="4.1.2" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafphenobudburst"><i class="fa fa-check"></i><b>4.1.2</b> Bud burst and leaf unfolding</a></li>
 <li class="chapter" data-level="4.1.3" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafphenosenescence"><i class="fa fa-check"></i><b>4.1.3</b> Leaf senescence</a></li>
-<li class="chapter" data-level="4.1.4" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leaf-absission"><i class="fa fa-check"></i><b>4.1.4</b> Leaf absission</a></li>
+<li class="chapter" data-level="4.1.4" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leaf-abscission"><i class="fa fa-check"></i><b>4.1.4</b> Leaf abscission</a></li>
 </ul></li>
 <li class="chapter" data-level="4.2" data-path="leafphenologylight.html"><a href="leafphenologylight.html#basiclightextinction"><i class="fa fa-check"></i><b>4.2</b> Light extinction</a></li>
 </ul></li>
@@ -284,7 +284,6 @@ div.csl-indent {
 <li class="chapter" data-level="7.5.3" data-path="advancedwaterbalance.html"><a href="advancedwaterbalance.html#advancedwaterbalancecontrol"><i class="fa fa-check"></i><b>7.5.3</b> Control parameters</a></li>
 <li class="chapter" data-level="7.5.4" data-path="advancedwaterbalance.html"><a href="advancedwaterbalance.html#advancedwaterbalanceoutput"><i class="fa fa-check"></i><b>7.5.4</b> Model output</a></li>
 </ul></li>
-<li class="chapter" data-level="7.6" data-path="advancedwaterbalance.html"><a href="advancedwaterbalance.html#applications"><i class="fa fa-check"></i><b>7.6</b> Applications</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="subdailytemplight.html"><a href="subdailytemplight.html"><i class="fa fa-check"></i><b>8</b> Subdaily atmospheric temperature and radiation variation</a>
 <ul>
@@ -416,7 +415,7 @@ div.csl-indent {
 <li class="chapter" data-level="15.5.3" data-path="growthmodelling.html"><a href="growthmodelling.html#forestgrowthcontrol"><i class="fa fa-check"></i><b>15.5.3</b> Control parameters</a></li>
 <li class="chapter" data-level="15.5.4" data-path="growthmodelling.html"><a href="growthmodelling.html#forestgrowthoutput"><i class="fa fa-check"></i><b>15.5.4</b> Model output</a></li>
 </ul></li>
-<li class="chapter" data-level="15.6" data-path="growthmodelling.html"><a href="growthmodelling.html#applications-1"><i class="fa fa-check"></i><b>15.6</b> Applications</a></li>
+<li class="chapter" data-level="15.6" data-path="growthmodelling.html"><a href="growthmodelling.html#applications"><i class="fa fa-check"></i><b>15.6</b> Applications</a></li>
 </ul></li>
 <li class="chapter" data-level="16" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html"><i class="fa fa-check"></i><b>16</b> Carbon pools and components of carbon balance</a>
 <ul>
@@ -644,19 +643,19 @@ div.csl-indent {
 <h2><span class="header-section-number">3.2</span> State variables</h2>
 <p>The following are state variables in the model under all simulations:</p>
 <ul>
-<li>Cumulative growth degree days, <span class="math inline">\(GDD\)</span> (in <span class="math inline">\(^\circ C\)</span>), are tracked by the model and determine leaf phenological status of winter deciduous species.</li>
+<li>Cumulative degree days (a) to budburst, (b) to complete unfolding or (c) to senescence (<span class="math inline">\(S_{eco,d}\)</span>, <span class="math inline">\(S_{unf,d}\)</span> or <span class="math inline">\(S_{sen,d}\)</span>; all in <span class="math inline">\(^\circ C\)</span>), are tracked by the model to determine leaf phenological status (see <a href="leafphenologylight.html#leafphenology">4.1</a>).</li>
 <li>Soil moisture content dynamics on each layer <span class="math inline">\(s\)</span> are tracked daily using <span class="math inline">\(W_s = \theta_s(\Psi)/ \theta_{fc,s}\)</span>, the <em>proportion of soil moisture in relation to field capacity</em>, where moisture at field capacity, <span class="math inline">\(\theta_{fc,s}\)</span>, is assumed to correspond to <span class="math inline">\(\Psi_{fc} = -0.033\)</span> MPa. Note that <span class="math inline">\(W_s\)</span> values larger than one are possible if the soil is between field capacity and saturation (which can happen if deep drainage is not allowed).</li>
 </ul>
 <p>Additional state variables depend on the activation of specific control flags:</p>
 <ul>
 <li><em>If snow accumulation/melting is considered</em>, the model tracks <span class="math inline">\(S_{snow}\)</span>, the snow water equivalent (in mm) of the snow pack storage over the surface.</li>
-<li><em>If stem cavitation is not completely reversible</em>, the model tracks <span class="math inline">\(PLC_{i}\)</span>, the proportion of conductivity lost (representing the maximum value of daily drought stress so far experienced) by plants of cohort <span class="math inline">\(i\)</span>.</li>
-<li><em>If plant water pools are considered</em>, the model also tracks <span class="math inline">\(W_{i,s}\)</span>, the proportion of soil moisture in relation to field capacity for layer <span class="math inline">\(s\)</span> within fraction of stand area covered by cohort <span class="math inline">\(i\)</span>.</li>
+<li><em>If stem cavitation is not completely reversible</em>, the model tracks <span class="math inline">\(PLC_{i}\)</span>, the proportion of stem conductivity lost by plants of cohort <span class="math inline">\(i\)</span>.</li>
+<li><em>If plant water pools are considered</em>, the model also tracks <span class="math inline">\(W_{i,s}\)</span>, the proportion of soil moisture in relation to field capacity for layer <span class="math inline">\(s\)</span> within the areal fraction of the stand covered by cohort <span class="math inline">\(i\)</span>.</li>
 </ul>
 </div>
 <div id="soilwaterbalance" class="section level2" number="3.3">
 <h2><span class="header-section-number">3.3</span> Water balance</h2>
-<p>Daily variations in soil water content (<span class="math inline">\(\Delta{V_{soil}}\)</span> in <span class="math inline">\(mm\)</span>) can be summarized as:</p>
+<p>Daily variations in soil water content (<span class="math inline">\(\Delta{V_{soil}}\)</span> in mm) can be summarized as:</p>
 <p><span class="math display" id="eq:basicwaterbalanceequation">\[\begin{equation}
 \Delta{V_{soil}} = Pr + Sm - In - Ru - Dd - Es -Tr
 \tag{3.1}
@@ -664,7 +663,7 @@ div.csl-indent {
 <p>where <span class="math inline">\(Pr\)</span> is precipitation as rainfall, <span class="math inline">\(Sm\)</span> is water from melting the snow pack (if considered), <span class="math inline">\(In\)</span> is the interception loss (i.e., water evaporated after being intercepted by the canopy), <span class="math inline">\(Ru\)</span> is surface runoff, <span class="math inline">\(Dd\)</span> is deep drainage (i.e. water percolated to layers beyond soil depth), <span class="math inline">\(Es\)</span> is evaporation from soil and <span class="math inline">\(Tr\)</span> is plant transpiration.</p>
 <p>While the above describes the default water balance equation, variations can occur depending on specific control flags:</p>
 <ol style="list-style-type: lower-alpha">
-<li><em>If snow dynamics are considered</em>, the water balance of the snow pack (<span class="math inline">\(\Delta{S_{snow}}\)</span> in <span class="math inline">\(mm\)</span> of snow water equivalents) is defined as:
+<li><em>If snow dynamics are considered</em>, the water balance of the snow pack (<span class="math inline">\(\Delta{S_{snow}}\)</span> in mm of snow water equivalents) is defined as:
 <span class="math display" id="eq:snowbalanceequation">\[\begin{equation}
 \Delta{S_{snow}} = Ps - Sm
 \tag{3.2}
@@ -936,7 +935,7 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <tr class="odd">
 <td><code>Transpiration</code></td>
 <td><span class="math inline">\(Tr_{i}\)</span></td>
-<td><span class="math inline">\(mm\)</span></td>
+<td>mm</td>
 <td>Transpiration per ground area.</td>
 </tr>
 <tr class="even">

@@ -237,7 +237,7 @@ div.csl-indent {
 <li class="chapter" data-level="4.1.1" data-path="leafphenologylight.html"><a href="leafphenologylight.html#phenological-types-and-leaf-expanded-area"><i class="fa fa-check"></i><b>4.1.1</b> Phenological types and leaf expanded area</a></li>
 <li class="chapter" data-level="4.1.2" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafphenobudburst"><i class="fa fa-check"></i><b>4.1.2</b> Bud burst and leaf unfolding</a></li>
 <li class="chapter" data-level="4.1.3" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafphenosenescence"><i class="fa fa-check"></i><b>4.1.3</b> Leaf senescence</a></li>
-<li class="chapter" data-level="4.1.4" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leaf-absission"><i class="fa fa-check"></i><b>4.1.4</b> Leaf absission</a></li>
+<li class="chapter" data-level="4.1.4" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leaf-abscission"><i class="fa fa-check"></i><b>4.1.4</b> Leaf abscission</a></li>
 </ul></li>
 <li class="chapter" data-level="4.2" data-path="leafphenologylight.html"><a href="leafphenologylight.html#basiclightextinction"><i class="fa fa-check"></i><b>4.2</b> Light extinction</a></li>
 </ul></li>
@@ -284,7 +284,6 @@ div.csl-indent {
 <li class="chapter" data-level="7.5.3" data-path="advancedwaterbalance.html"><a href="advancedwaterbalance.html#advancedwaterbalancecontrol"><i class="fa fa-check"></i><b>7.5.3</b> Control parameters</a></li>
 <li class="chapter" data-level="7.5.4" data-path="advancedwaterbalance.html"><a href="advancedwaterbalance.html#advancedwaterbalanceoutput"><i class="fa fa-check"></i><b>7.5.4</b> Model output</a></li>
 </ul></li>
-<li class="chapter" data-level="7.6" data-path="advancedwaterbalance.html"><a href="advancedwaterbalance.html#applications"><i class="fa fa-check"></i><b>7.6</b> Applications</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="subdailytemplight.html"><a href="subdailytemplight.html"><i class="fa fa-check"></i><b>8</b> Subdaily atmospheric temperature and radiation variation</a>
 <ul>
@@ -416,7 +415,7 @@ div.csl-indent {
 <li class="chapter" data-level="15.5.3" data-path="growthmodelling.html"><a href="growthmodelling.html#forestgrowthcontrol"><i class="fa fa-check"></i><b>15.5.3</b> Control parameters</a></li>
 <li class="chapter" data-level="15.5.4" data-path="growthmodelling.html"><a href="growthmodelling.html#forestgrowthoutput"><i class="fa fa-check"></i><b>15.5.4</b> Model output</a></li>
 </ul></li>
-<li class="chapter" data-level="15.6" data-path="growthmodelling.html"><a href="growthmodelling.html#applications-1"><i class="fa fa-check"></i><b>15.6</b> Applications</a></li>
+<li class="chapter" data-level="15.6" data-path="growthmodelling.html"><a href="growthmodelling.html#applications"><i class="fa fa-check"></i><b>15.6</b> Applications</a></li>
 </ul></li>
 <li class="chapter" data-level="16" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html"><i class="fa fa-check"></i><b>16</b> Carbon pools and components of carbon balance</a>
 <ul>
@@ -649,7 +648,7 @@ div.csl-indent {
 <h2><span class="header-section-number">7.2</span> State variables</h2>
 <p>The following are state variables in the model under all simulations:</p>
 <ul>
-<li>Cumulative growth degree days, <span class="math inline">\(GDD\)</span>, are tracked by the model and determine leaf phenological status (i.e. <span class="math inline">\(LAI\)</span> values) of winter deciduous species.</li>
+<li>Cumulative degree days (a) to budburst, (b) to complete unfolding or (c) to senescence (<span class="math inline">\(S_{eco,d}\)</span>, <span class="math inline">\(S_{unf,d}\)</span> or <span class="math inline">\(S_{sen,d}\)</span>; all in <span class="math inline">\(^\circ C\)</span>), are tracked by the model to determine leaf phenological status (see <a href="leafphenologylight.html#leafphenology">4.1</a>).</li>
 <li>Daily soil moisture content dynamics on each layer <span class="math inline">\(s\)</span> are tracked using <span class="math inline">\(W_s = \theta_s(\Psi_s)/ \theta_{fc,s}\)</span>, the <em>proportion of soil moisture in relation to field capacity</em>, where moisture at field capacity, <span class="math inline">\(\theta_{fc,s}\)</span>, is assumed to correspond to <span class="math inline">\(\Psi_{fc} = -0.033\)</span> MPa. Note that <span class="math inline">\(W_s\)</span> values larger than one are possible if the soil is between field capacity and saturation (which can happen if deep drainage is not allowed).</li>
 <li>The air temperature within the canopy (<span class="math inline">\(T_{can}\)</span>; ºC) and the temperature of each soil layer <span class="math inline">\(s\)</span> (<span class="math inline">\(T_{soil,s}\)</span>; ºC) are tracked for every subdaily step.</li>
 </ul>
@@ -657,7 +656,7 @@ div.csl-indent {
 <ul>
 <li><em>If plant capacitance effects are considered</em>, the model also tracks <span class="math inline">\(\Psi_{apo, stem,i}\)</span>, the water potential of the stem apoplastic compartment, as well as the water potential of stem and leaf symplastic compartments, <span class="math inline">\(\Psi_{symp, stem,i}\)</span> and <span class="math inline">\(\Psi_{symp, leaf,i}\)</span> respectively.</li>
 <li><em>If cavitation is not completely reversible</em>, the proportion of stem hydraulic conductance loss for each plant cohort <span class="math inline">\(i\)</span>, <span class="math inline">\(PLC_{stem,i}\)</span>, becomes a state variable.</li>
-<li><em>If plant water pools are considered</em>, the model also tracks <span class="math inline">\(W_{i,s}\)</span>, the proportion of soil moisture in relation to field capacity for layer <span class="math inline">\(s\)</span> within fraction of stand area covered by cohort <span class="math inline">\(i\)</span>.</li>
+<li><em>If plant water pools are considered</em>, the model also tracks <span class="math inline">\(W_{i,s}\)</span>, the proportion of soil moisture in relation to field capacity for layer <span class="math inline">\(s\)</span> within the areal fraction of stand covered by cohort <span class="math inline">\(i\)</span>.</li>
 <li><em>If multi-layer canopy energy balance is activated</em>, the model tracks for each vertical layer <span class="math inline">\(j \in \{1,l\}\)</span>:
 <ol style="list-style-type: lower-alpha">
 <li>Air temperature, <span class="math inline">\(T_{air,j}\)</span></li>
@@ -670,7 +669,7 @@ div.csl-indent {
 <h2><span class="header-section-number">7.3</span> Water and energy balances</h2>
 <div id="water-balance" class="section level3" number="7.3.1">
 <h3><span class="header-section-number">7.3.1</span> Water balance</h3>
-<p>Daily variations in soil water content (<span class="math inline">\(\Delta{V_{soil}}\)</span> in <span class="math inline">\(mm\)</span>) can be summarized as:</p>
+<p>Daily variations in soil water content (<span class="math inline">\(\Delta{V_{soil}}\)</span> in mm) can be summarized as:</p>
 <p><span class="math display" id="eq:advancedwaterbalanceequation">\[\begin{equation}
 \Delta{V_{soil}} = Pr + Sm - In - Ru - Dd - Es - Ex
 \tag{7.1}
@@ -1201,7 +1200,7 @@ In addition, a number of control parameters are used to modify how hydraulic par
 <tr class="even">
 <td><code>Transpiration</code></td>
 <td><span class="math inline">\(Tr_{i}\)</span></td>
-<td><span class="math inline">\(mm\)</span></td>
+<td>mm</td>
 <td>Transpiration per ground area.</td>
 </tr>
 <tr class="odd">
@@ -1225,7 +1224,7 @@ In addition, a number of control parameters are used to modify how hydraulic par
 <tr class="even">
 <td><code>PlantWaterBalance</code></td>
 <td></td>
-<td><span class="math inline">\(mm\)</span></td>
+<td>mm</td>
 <td>Internal daily plant water balance (balance of soil extraction and transpiration).</td>
 </tr>
 <tr class="odd">
@@ -1337,22 +1336,9 @@ In addition, a number of control parameters are used to modify how hydraulic par
 <div id="subdaily-output" class="section level4" number="7.5.4.2">
 <h4><span class="header-section-number">7.5.4.2</span> Subdaily output</h4>
 <p>Calling function <code>spwb_day()</code> with the advanced water balance model results in subdaily results for the simulated date. When running the advanced water balance model with function <code>spwb()</code> one can request subdaily results to be included with the function output. This is done via setting <code>subdailyResults = TRUE</code> in the control parameter list. In that case, the output list of <code>spwb()</code> will include an element <code>subdaily</code>, whose subelements correspond to the results of <code>spwb_day()</code> for each date simulated. Refer to the documentation of functions <code>spwb_day()</code> and <code>transp_transpirationSperry()</code> for details of subdaily output.</p>
-</div>
-</div>
-</div>
-<div id="applications" class="section level2" number="7.6">
-<h2><span class="header-section-number">7.6</span> Applications</h2>
-<p>All the applications mentioned in section <a href="basicwaterbalance.html#basicwaterbalanceapplications">3.6</a> for the basic water balance model would be, in principle, valid for the advanced model. However, the difference in model complexity and the corresponding increase in parametrization make the advanced model less appealing for the average user. To our experience, its estimates of soil moisture dynamics are only slighly more accurate than those of the basic model. The advanced water balance model is, however, justified whenever:</p>
-<ol style="list-style-type: decimal">
-<li>Precise estimates are desired for the transpiration flows and/or water potential values of each plant cohort, taking into account their vertical position within the stand.</li>
-<li>One is interested in modelling subdaily variation of plant processes such as photosynthesis, transpiration and water use efficiency.</li>
-<li>One is interested in canopy and/or soil energy balances (note that these model outputs have not yet been contrasted against observations), or the plant water balance.<br />
-</li>
-<li>Hydraulic redistribution is believed to be a key process in soil moisture dynamics.</li>
-<li>To generate predictions for meta-modelling studies, for example to improve certain processes of another model, such as our basic water balance model.</li>
-</ol>
-<p>These model uses belong mostly to eco-hydrological research rather than to applications intended to provide information for forest management. For this reason, we believe the advanced model to be useful to researchers.</p>
 
+</div>
+</div>
 </div>
 </div>
 <h3>Bibliography</h3>

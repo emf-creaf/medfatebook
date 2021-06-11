@@ -18,18 +18,18 @@ By default, the model assumes that soil moisture under all plant cohorts is the 
 
 The following are state variables in the model under all simulations:
 
-+ Cumulative growth degree days, $GDD$ (in $^\circ C$), are tracked by the model and determine leaf phenological status of winter deciduous species.
++ Cumulative degree days (a) to budburst, (b) to complete unfolding or (c) to senescence ($S_{eco,d}$, $S_{unf,d}$ or $S_{sen,d}$; all in $^\circ C$), are tracked by the model to determine leaf phenological status (see \@ref(leafphenology)).
 + Soil moisture content dynamics on each layer $s$ are tracked daily using $W_s = \theta_s(\Psi)/ \theta_{fc,s}$, the *proportion of soil moisture in relation to field capacity*, where moisture at field capacity, $\theta_{fc,s}$, is assumed to correspond to $\Psi_{fc} = -0.033$ MPa. Note that $W_s$ values larger than one are possible if the soil is between field capacity and saturation (which can happen if deep drainage is not allowed).
 
 Additional state variables depend on the activation of specific control flags:
 
 + *If snow accumulation/melting is considered*, the model tracks $S_{snow}$, the snow water equivalent (in mm) of the snow pack storage over the surface.
-+ *If stem cavitation is not completely reversible*, the model tracks $PLC_{i}$, the proportion of conductivity lost (representing the maximum value of daily drought stress so far experienced) by plants of cohort $i$.
-+ *If plant water pools are considered*, the model also tracks $W_{i,s}$, the proportion of soil moisture in relation to field capacity for layer $s$ within fraction of stand area covered by cohort $i$.
++ *If stem cavitation is not completely reversible*, the model tracks $PLC_{i}$, the proportion of stem conductivity lost by plants of cohort $i$.
++ *If plant water pools are considered*, the model also tracks $W_{i,s}$, the proportion of soil moisture in relation to field capacity for layer $s$ within the areal fraction of the stand covered by cohort $i$.
 
 ## Water balance {#soilwaterbalance}
 
-Daily variations in soil water content ($\Delta{V_{soil}}$ in $mm$) can be summarized as:
+Daily variations in soil water content ($\Delta{V_{soil}}$ in mm) can be summarized as:
 
 \begin{equation}
 \Delta{V_{soil}} = Pr + Sm - In - Ru - Dd - Es -Tr
@@ -40,7 +40,7 @@ where $Pr$ is precipitation as rainfall, $Sm$ is water from melting the snow pac
 
 While the above describes the default water balance equation, variations can occur depending on specific control flags: 
 
-a. *If snow dynamics are considered*, the water balance of the snow pack ($\Delta{S_{snow}}$ in $mm$ of snow water equivalents) is defined as:
+a. *If snow dynamics are considered*, the water balance of the snow pack ($\Delta{S_{snow}}$ in mm of snow water equivalents) is defined as:
 \begin{equation}
 \Delta{S_{snow}} = Ps - Sm
 (\#eq:snowbalanceequation)
@@ -149,7 +149,7 @@ Elements `WaterBalance`, `Soil` and `Stand` are data frame with dates in rows an
 |---------|--------|-------|-------------------------------------------|
 |`LAI`| $LAI^{\phi}_i$ | $m^2 \cdot m^{-2}$ | Leaf area index (expanded).|
 |`AbsorbedSWRFraction` | $f_i$ | [0-1] | Fraction of shortwave radiation absorbed.|
-|`Transpiration`| $Tr_{i}$ | $mm$ | Transpiration per ground area.|
+|`Transpiration`| $Tr_{i}$ | mm | Transpiration per ground area.|
 |`Photosynthesis`| $A_{n,i}$ | $g\,C \cdot m^{-2}$ | Net photosynthesis per ground area.|
 |`PlantPsi` | $\Psi_{leaf,i}$ | $MPa$ | Plant water potential.|
 |`StemPLC` | $PLC_{i}$ | [0-1] | Degree of stem embolisation.|

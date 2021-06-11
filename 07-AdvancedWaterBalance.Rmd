@@ -28,7 +28,7 @@ Like in the basic water model, the advanced model assumes by default that soil m
 
 The following are state variables in the model under all simulations:
 
-+ Cumulative growth degree days, $GDD$, are tracked by the model and determine leaf phenological status (i.e. $LAI$ values) of winter deciduous species.
++ Cumulative degree days (a) to budburst, (b) to complete unfolding or (c) to senescence ($S_{eco,d}$, $S_{unf,d}$ or $S_{sen,d}$; all in $^\circ C$), are tracked by the model to determine leaf phenological status (see \@ref(leafphenology)).
 + Daily soil moisture content dynamics on each layer $s$ are tracked using $W_s = \theta_s(\Psi_s)/ \theta_{fc,s}$, the *proportion of soil moisture in relation to field capacity*, where moisture at field capacity, $\theta_{fc,s}$, is assumed to correspond to $\Psi_{fc} = -0.033$ MPa. Note that $W_s$ values larger than one are possible if the soil is between field capacity and saturation (which can happen if deep drainage is not allowed).
 + The air temperature within the canopy ($T_{can}$; ºC) and the temperature of each soil layer $s$ ($T_{soil,s}$; ºC) are tracked for every subdaily step.
 
@@ -36,7 +36,7 @@ Additional state variables depend on the activation of specific control flags (s
 
 + *If plant capacitance effects are considered*, the model also tracks $\Psi_{apo, stem,i}$, the water potential of the stem apoplastic compartment, as well as the water potential of stem and leaf symplastic compartments, $\Psi_{symp, stem,i}$ and $\Psi_{symp, leaf,i}$ respectively.
 + *If cavitation is not completely reversible*, the proportion of stem hydraulic conductance loss for each plant cohort $i$, $PLC_{stem,i}$, becomes a state variable.
-+ *If plant water pools are considered*, the model also tracks $W_{i,s}$, the proportion of soil moisture in relation to field capacity for layer $s$ within fraction of stand area covered by cohort $i$.
++ *If plant water pools are considered*, the model also tracks $W_{i,s}$, the proportion of soil moisture in relation to field capacity for layer $s$ within the areal fraction of stand covered by cohort $i$.
 + *If multi-layer canopy energy balance is activated*, the model tracks for each vertical layer $j \in \{1,l\}$: 
   a. Air temperature, $T_{air,j}$
   b. Water vapor pressure, $e_{air,j}$
@@ -46,7 +46,7 @@ Additional state variables depend on the activation of specific control flags (s
 
 ### Water balance
 
-Daily variations in soil water content ($\Delta{V_{soil}}$ in $mm$) can be summarized as:
+Daily variations in soil water content ($\Delta{V_{soil}}$ in mm) can be summarized as:
 
 \begin{equation}
 \Delta{V_{soil}} = Pr + Sm - In - Ru - Dd - Es - Ex
@@ -281,11 +281,11 @@ Compared to the output of the basic water balance \@ref(basicwaterbalanceoutput)
 |`LAI`| $LAI^{\phi}_i$ | $m^2 \cdot m^{-2}$ | Leaf area index (expanded).|
 |`AbsorbedSWR` |  | MJ | Shortwave radiation absorbed per ground area.|
 |`AbsorbedLWR` |  | MJ | Longwave radiation absorbed per ground area.|
-|`Transpiration`| $Tr_{i}$ | $mm$ | Transpiration per ground area.|
+|`Transpiration`| $Tr_{i}$ | mm | Transpiration per ground area.|
 |`GrossPhotosynthesis`| $A_{g,i}$ | $g\,C \cdot m^{-2}$ | Gross photosynthesis per ground area.|
 |`NetPhotosynthesis`| $A_{n,i}$ | $g\,C \cdot m^{-2}$ | Net photosynthesis per ground area.|
 | `dEdP` | $dE/d\Psi_{i}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | Derivative of the (aboveground) supply function. |
-| `PlantWaterBalance` | | $mm$ | Internal daily plant water balance (balance of soil extraction and transpiration). |
+| `PlantWaterBalance` | | mm | Internal daily plant water balance (balance of soil extraction and transpiration). |
 | `LeafPsiMin`| $\Psi_{md, i}$ | MPa | Minimum (midday) 'average leaf' water potential. |
 | `LeafPsiMax`| $\Psi_{pd, i}$ | MPa | Maximum (predawn) 'average leaf' water potential. |
 | `StemPsi`| $\Psi_{stem, i}$ | MPa | Minimum stem water potential. |
@@ -310,16 +310,3 @@ The following table describes the child elements of `SunlitLeaves` and `ShadeLea
 #### Subdaily output
 
 Calling function `spwb_day()` with the advanced water balance model results in subdaily results for the simulated date. When running the advanced water balance model with function `spwb()` one can request subdaily results to be included with the function output. This is done via setting  `subdailyResults = TRUE` in the control parameter list. In that case, the output list of `spwb()` will include an element `subdaily`, whose subelements correspond to the results of `spwb_day()` for each date simulated. Refer to the documentation of functions `spwb_day()` and `transp_transpirationSperry()` for details of subdaily output.
-
-
-## Applications
-
-All the applications mentioned in section \@ref(basicwaterbalanceapplications) for the basic water balance model would be, in principle, valid for the advanced model. However, the difference in model complexity and the corresponding increase in parametrization make the advanced model less appealing for the average user. To our experience, its estimates of soil moisture dynamics are only slighly more accurate than those of the basic model. The advanced water balance model is, however, justified whenever:
-
-1. Precise estimates are desired for the transpiration flows and/or water potential values of each plant cohort, taking into account their vertical position within the stand.
-2. One is interested in modelling subdaily variation of plant processes such as photosynthesis, transpiration and water use efficiency.
-3. One is interested in canopy and/or soil energy balances (note that these model outputs have not yet been contrasted against observations), or the plant water balance.  
-4. Hydraulic redistribution is believed to be a key process in soil moisture dynamics.
-5. To generate predictions for meta-modelling studies, for example to improve certain processes of another model, such as our basic water balance model.
-
-These model uses belong mostly to eco-hydrological research rather than to applications intended to provide information for forest management. For this reason, we believe the advanced model to be useful to researchers. 

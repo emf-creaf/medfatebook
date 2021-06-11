@@ -45,7 +45,7 @@ and then defining an unfolding development status $S_{unf,d} = \sum_{d,eco}^{d} 
 \begin{equation}
 \phi_{i,d} = S_{unf,d}/S_{unf}^*
 \end{equation}
-until $S_{unf}^*$ is reached and the unfolding process ends, where $S_{unf}^*$ is a simulation control parameter `unfoldingDD`.
+until $S_{unf,d} \geq S_{unf}^*$ and the unfolding process ends, where $S_{unf}^*$ is a simulation control parameter `unfoldingDD`.
 
 ### Leaf senescence {#leafphenosenescence}
 Leaf senescence follows the models developed by @Delpierre2009. The daily rate of development of senescence $R_{sen,d}$ is defined on the basis of daily photoperiod ($Ph_{d}$, in hours) and temperature ($T_d$, in $^{\circ} \mathrm{C}$):
@@ -59,9 +59,9 @@ where $Ph_{sen}$ is the maximum photoperiod to start counting the senescence. Th
 \begin{equation} 
 S_{sen,d} = \sum R_{sen,d}
 \end{equation}
-and when $S_{sen,d} = S_{sen}^*$ then expanded leaves are assumed to suddenly die. This model is implemented in function `pheno_leafSenescenceStatus()` and returns $\phi_{i,d}=1$ for all days until $S_{sen,d} = S_{sen}^*$ when it returns $\phi_{i,d}=0$. Parameters $T_{sen}$, $Ph_{sen}$ and $S_{sen}^*$ are plant-specific parameters in `spwbInput`.  
+and when $S_{sen,d}  \geq  S_{sen}^*$ then expanded leaves are assumed to suddenly die. This model is implemented in function `pheno_leafSenescenceStatus()` and returns $\phi_{i,d}=1$ for all days until $S_{sen,d}  \geq  S_{sen}^*$ when it returns $\phi_{i,d}=0$. Parameters $T_{sen}$, $Ph_{sen}$ and $S_{sen}^*$ are plant-specific parameters in `spwbInput`.  
 
-### Leaf absission
+### Leaf abscission
 The drop of $\phi_i$ causes live expanded leaves to become dead leaves. To avoid a sudden decrease of leaf area, dead leaves are kept in the canopy and they are reduced daily using a negative exponential function of wind speed:
 \begin{equation}
 LAI^{dead}_i=LAI^{dead}_i\,\cdot e^{- u/10}

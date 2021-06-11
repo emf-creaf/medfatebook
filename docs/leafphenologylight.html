@@ -237,7 +237,7 @@ div.csl-indent {
 <li class="chapter" data-level="4.1.1" data-path="leafphenologylight.html"><a href="leafphenologylight.html#phenological-types-and-leaf-expanded-area"><i class="fa fa-check"></i><b>4.1.1</b> Phenological types and leaf expanded area</a></li>
 <li class="chapter" data-level="4.1.2" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafphenobudburst"><i class="fa fa-check"></i><b>4.1.2</b> Bud burst and leaf unfolding</a></li>
 <li class="chapter" data-level="4.1.3" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafphenosenescence"><i class="fa fa-check"></i><b>4.1.3</b> Leaf senescence</a></li>
-<li class="chapter" data-level="4.1.4" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leaf-absission"><i class="fa fa-check"></i><b>4.1.4</b> Leaf absission</a></li>
+<li class="chapter" data-level="4.1.4" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leaf-abscission"><i class="fa fa-check"></i><b>4.1.4</b> Leaf abscission</a></li>
 </ul></li>
 <li class="chapter" data-level="4.2" data-path="leafphenologylight.html"><a href="leafphenologylight.html#basiclightextinction"><i class="fa fa-check"></i><b>4.2</b> Light extinction</a></li>
 </ul></li>
@@ -284,7 +284,6 @@ div.csl-indent {
 <li class="chapter" data-level="7.5.3" data-path="advancedwaterbalance.html"><a href="advancedwaterbalance.html#advancedwaterbalancecontrol"><i class="fa fa-check"></i><b>7.5.3</b> Control parameters</a></li>
 <li class="chapter" data-level="7.5.4" data-path="advancedwaterbalance.html"><a href="advancedwaterbalance.html#advancedwaterbalanceoutput"><i class="fa fa-check"></i><b>7.5.4</b> Model output</a></li>
 </ul></li>
-<li class="chapter" data-level="7.6" data-path="advancedwaterbalance.html"><a href="advancedwaterbalance.html#applications"><i class="fa fa-check"></i><b>7.6</b> Applications</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="subdailytemplight.html"><a href="subdailytemplight.html"><i class="fa fa-check"></i><b>8</b> Subdaily atmospheric temperature and radiation variation</a>
 <ul>
@@ -416,7 +415,7 @@ div.csl-indent {
 <li class="chapter" data-level="15.5.3" data-path="growthmodelling.html"><a href="growthmodelling.html#forestgrowthcontrol"><i class="fa fa-check"></i><b>15.5.3</b> Control parameters</a></li>
 <li class="chapter" data-level="15.5.4" data-path="growthmodelling.html"><a href="growthmodelling.html#forestgrowthoutput"><i class="fa fa-check"></i><b>15.5.4</b> Model output</a></li>
 </ul></li>
-<li class="chapter" data-level="15.6" data-path="growthmodelling.html"><a href="growthmodelling.html#applications-1"><i class="fa fa-check"></i><b>15.6</b> Applications</a></li>
+<li class="chapter" data-level="15.6" data-path="growthmodelling.html"><a href="growthmodelling.html#applications"><i class="fa fa-check"></i><b>15.6</b> Applications</a></li>
 </ul></li>
 <li class="chapter" data-level="16" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html"><i class="fa fa-check"></i><b>16</b> Carbon pools and components of carbon balance</a>
 <ul>
@@ -674,7 +673,7 @@ and then defining an unfolding development status <span class="math inline">\(S_
 <span class="math display">\[\begin{equation}
 \phi_{i,d} = S_{unf,d}/S_{unf}^*
 \end{equation}\]</span>
-until <span class="math inline">\(S_{unf}^*\)</span> is reached and the unfolding process ends, where <span class="math inline">\(S_{unf}^*\)</span> is a simulation control parameter <code>unfoldingDD</code>.</p>
+until <span class="math inline">\(S_{unf,d} \geq S_{unf}^*\)</span> and the unfolding process ends, where <span class="math inline">\(S_{unf}^*\)</span> is a simulation control parameter <code>unfoldingDD</code>.</p>
 </div>
 <div id="leafphenosenescence" class="section level3" number="4.1.3">
 <h3><span class="header-section-number">4.1.3</span> Leaf senescence</h3>
@@ -689,10 +688,10 @@ where <span class="math inline">\(Ph_{sen}\)</span> is the maximum photoperiod t
 <span class="math display">\[\begin{equation} 
 S_{sen,d} = \sum R_{sen,d}
 \end{equation}\]</span>
-and when <span class="math inline">\(S_{sen,d} = S_{sen}^*\)</span> then expanded leaves are assumed to suddenly die. This model is implemented in function <code>pheno_leafSenescenceStatus()</code> and returns <span class="math inline">\(\phi_{i,d}=1\)</span> for all days until <span class="math inline">\(S_{sen,d} = S_{sen}^*\)</span> when it returns <span class="math inline">\(\phi_{i,d}=0\)</span>. Parameters <span class="math inline">\(T_{sen}\)</span>, <span class="math inline">\(Ph_{sen}\)</span> and <span class="math inline">\(S_{sen}^*\)</span> are plant-specific parameters in <code>spwbInput</code>.</p>
+and when <span class="math inline">\(S_{sen,d} \geq S_{sen}^*\)</span> then expanded leaves are assumed to suddenly die. This model is implemented in function <code>pheno_leafSenescenceStatus()</code> and returns <span class="math inline">\(\phi_{i,d}=1\)</span> for all days until <span class="math inline">\(S_{sen,d} \geq S_{sen}^*\)</span> when it returns <span class="math inline">\(\phi_{i,d}=0\)</span>. Parameters <span class="math inline">\(T_{sen}\)</span>, <span class="math inline">\(Ph_{sen}\)</span> and <span class="math inline">\(S_{sen}^*\)</span> are plant-specific parameters in <code>spwbInput</code>.</p>
 </div>
-<div id="leaf-absission" class="section level3" number="4.1.4">
-<h3><span class="header-section-number">4.1.4</span> Leaf absission</h3>
+<div id="leaf-abscission" class="section level3" number="4.1.4">
+<h3><span class="header-section-number">4.1.4</span> Leaf abscission</h3>
 <p>The drop of <span class="math inline">\(\phi_i\)</span> causes live expanded leaves to become dead leaves. To avoid a sudden decrease of leaf area, dead leaves are kept in the canopy and they are reduced daily using a negative exponential function of wind speed:
 <span class="math display">\[\begin{equation}
 LAI^{dead}_i=LAI^{dead}_i\,\cdot e^{- u/10}
