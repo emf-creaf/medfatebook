@@ -632,15 +632,15 @@ div.csl-indent {
             <section class="normal" id="section-">
 <div id="model-inputs" class="section level1" number="2">
 <h1><span class="header-section-number">Chapter 2</span> Model inputs</h1>
-<p>Data input for simulation models can be grouped into four conceptually distinct categories. First, a description of the <strong>vegetation</strong> existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in <code>spwb()</code> calls, but becomes dynamic in calls to <code>growth()</code>. Hence, in this latter case the input vegetation describes to the starting point. Second, <strong>soil</strong> information is also required, because underground water resources are important for the processes included in the model. While soil features are considered static parameters in model simulations, <strong>weather</strong> is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur. Finally, <strong>topographic and geographic information</strong> is often required, since internal calculations of some physical variables (such as atmospheric pressure or potential radiation) require them.</p>
-<p>This chapter describes the requirements of <strong>medfate</strong> package with respect to each of these data input categories. The last section describes additional parameters that are used to specify global options of simulation functions (i.e., <code>spwb()</code>, <code>pwb()</code>, <code>growth()</code> and daily simulation functions).</p>
+<p>Data input for simulation models can be grouped into four categories. First, a description of the <strong>vegetation</strong> existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in <code>spwb()</code> calls, but becomes dynamic in calls to <code>growth()</code>. Hence, in this latter case the input vegetation describes to the starting point. Second, <strong>soil</strong> information is also required, because underground water resources are important for the processes included in the model. While soil features are considered static parameters in model simulations, <strong>weather</strong> is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur. Finally, <strong>topographic and geographic information</strong> is often required, since internal calculations of some physical variables (such as atmospheric pressure or radiation) require them.</p>
+<p>This chapter describes the requirements of <strong>medfate</strong> package with respect to each of these data input categories. The last section describes additional parameters that are used to specify global options of simulation functions (i.e., <code>spwb()</code>, <code>pwb()</code>, <code>growth()</code>, <code>fordyn()</code> and daily simulation functions).</p>
 <div id="topoinput" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Latitude and topography</h2>
 <p>Topography has a relatively small direct influence in <strong>medfate</strong> simulations, because most topographic effects are assumed to be taken into account in the estimation of weather input. Nonetheless, <em>elevation</em> in meters is needed to estimate atmospheric pressure and air density (see <a href="model-inputs.html#meteoinput">2.4</a>), whereas <em>aspect</em> (in degrees from North) and <em>slope</em> (also in degrees) are needed in addition to <em>latitude</em> (also in degrees North) to estimate sunrise/sunset hours and potential radiation. Topographic variables should be readily accessible for users having access to a digital elevation model.</p>
 </div>
 <div id="soilinput" class="section level2" number="2.2">
 <h2><span class="header-section-number">2.2</span> Soil description</h2>
-<p>Soils can be described in <strong>medfate</strong> using <span class="math inline">\(S &gt; 1\)</span> different soil layers (<span class="math inline">\(s \in \{1, 2, ..., S\}\)</span>). Here the word <em>soil</em> refers to depths that plant rooting systems can reach (critical zone), including cracks within the bedrock. The number and size of soil layers may reflect changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties. Most soil properties are considered <em>static</em> parameters in simulations, except soil moisture content, variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered in simulations.</p>
+<p>Soils are described in <strong>medfate</strong> using <span class="math inline">\(S &gt; 1\)</span> different soil layers (<span class="math inline">\(s \in \{1, 2, ..., S\}\)</span>). Here the word <em>soil</em> refers to depths that plant rooting systems can reach (i.e., the critical zone), including cracks within the bedrock. The number and size of soil layers may reflect changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties. Most soil properties are considered <em>static</em> parameters in simulations, except soil moisture content, variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered in simulations.</p>
 <div id="soil-physical-properties" class="section level3" number="2.2.1">
 <h3><span class="header-section-number">2.2.1</span> Soil physical properties</h3>
 <p>Soil physical properties, such as <em>texture</em> (i.e. volume percent of sand, silt and clay), <em>organic matter content</em>, <em>bulk density</em> or <em>rock fragment content</em>, can differ between soil layers, and this has important consequences for soil water retention capacity and soil hydraulics. Specifying layers with an elevated rock fragment content (e.g. layers of weathered rock where soil particles are scarce) may be important in seasonally-arid climates like the Mediterranean, because plants often extend their roots into cracks existing in the parent rock to access water during summer <span class="citation">(<a href="#ref-Ruffault2013" role="doc-biblioref">Ruffault et al. 2013</a>)</span>.</p>
@@ -712,9 +712,9 @@ And the overall <em>soil depth</em> (<span class="math inline">\(Z_{soil}\)</spa
 <p>The water retention curve of a soil is the relationship between <em>volumetric soil moisture content</em> (<span class="math inline">\(\theta\)</span>, in <span class="math inline">\(m^3 \cdot m^{-3}\)</span> of soil, excluding rock fragments) and the corresponding <em>soil water potential</em> (<span class="math inline">\(\Psi\)</span>, in MPa), i.e. the amount of work that must be done per unit quantity of pure water in order to transport reversibly and isothermally an infinitesimal quantity of water from a reference pool. The shape of the water retention curve (also called the <em>soil moisture characteristic curve</em>) depends on physical properties (mainly texture and bulk density, but also organic matter content). Since soil layers usually differ in their physical properties they also normally have different water retention curves.</p>
 <p>Two water retention curve models are available in <strong>medfate</strong> (fig. <a href="model-inputs.html#fig:retention-curves">2.1</a>):</p>
 <ol style="list-style-type: decimal">
-<li><em>Saxton model</em>: In this model, volumetric soil moisture <span class="math inline">\(\theta(\Psi)\)</span> corresponding to a given water potential <span class="math inline">\(\Psi\)</span> (in MPa) below <span class="math inline">\(\Psi_{fc}\)</span> is calculated using:
+<li><em>Saxton model</em>: In this model, volumetric soil moisture <span class="math inline">\(\theta(\Psi)\)</span> corresponding to a given water potential <span class="math inline">\(\Psi\)</span> (in MPa) below field capacity (i.e., <span class="math inline">\(\Psi &lt; \Psi_{fc}\)</span>) is calculated using:
 <span class="math display">\[\begin{equation}\theta(\Psi) = (\Psi/A)^{(1/B)}\end{equation}\]</span>
-where <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> depend on the texture and, if available, organic matter in the soil. If organic matter is available, <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> are calculated from <span class="math inline">\(P_{clay}\)</span>, <span class="math inline">\(P_{sand}\)</span> and <span class="math inline">\(OM\)</span> following <span class="citation"><a href="#ref-Saxton2006" role="doc-biblioref">Saxton and Rawls</a> (<a href="#ref-Saxton2006" role="doc-biblioref">2006</a>)</span>. Otherwise, they are calculated from <span class="math inline">\(P_{clay}\)</span> and <span class="math inline">\(P_{sand}\)</span> as indicated in <span class="citation"><a href="#ref-Saxton1986" role="doc-biblioref">Saxton et al.</a> (<a href="#ref-Saxton1986" role="doc-biblioref">1986</a>)</span>. Volumetric changes between field capacity and saturation are estimated using a linear function.</li>
+where <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> depend on the texture and, if available, organic matter in the soil. If organic matter is available, <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> are calculated from <span class="math inline">\(P_{clay}\)</span>, <span class="math inline">\(P_{sand}\)</span> and <span class="math inline">\(OM\)</span> following <span class="citation"><a href="#ref-Saxton2006" role="doc-biblioref">Saxton and Rawls</a> (<a href="#ref-Saxton2006" role="doc-biblioref">2006</a>)</span>. Otherwise, they are calculated from <span class="math inline">\(P_{clay}\)</span> and <span class="math inline">\(P_{sand}\)</span> as indicated in <span class="citation"><a href="#ref-Saxton1986" role="doc-biblioref">Saxton et al.</a> (<a href="#ref-Saxton1986" role="doc-biblioref">1986</a>)</span>. Volumetric changes between field capacity and saturation (i.e., <span class="math inline">\(\Psi_{fc} \leq \Psi &lt; 0\)</span>) are estimated using a linear function.</li>
 <li><em>Van Genuchten model</em>: The well known van Genuchten <span class="citation">(<a href="#ref-Genuchten1980" role="doc-biblioref">1980</a>)</span> model is:
 <span class="math display">\[\begin{equation}\theta(\Psi) = \theta_{res}+\frac{\theta_{sat}-\theta_{res}}{\left[1+ (\alpha \cdot \Psi)^n \right]^{1-1/n}}\end{equation}\]</span>
 where <span class="math inline">\(\theta(\psi)\)</span> is the water retention, <span class="math inline">\(\theta_{sat}\)</span> is the saturated water content, <span class="math inline">\(\theta_{res}\)</span> is the residual water content, <span class="math inline">\(\alpha\)</span> is related to the inverse of the air entry pressure, and <span class="math inline">\(n\)</span> is a measure of the pore-size distribution.</li>
@@ -729,7 +729,8 @@ Figure 2.1: Water retention curves under the Saxton and Van Genuchten models, fo
 </div>
 <div id="soilinitialization" class="section level3" number="2.2.3">
 <h3><span class="header-section-number">2.2.3</span> Soil initialization</h3>
-<p>Soil initialization is needed to estimate soil hydrological parameters for each soil layer <span class="math inline">\(s\)</span> from their physical attributes. Initialization is done using function <code>soil()</code>, which returns an object of a class with the same name. Function <code>soil()</code> adds the following information to the physical soil description:</p>
+<p>Soil initialization is needed to estimate soil hydrological parameters for each soil layer <span class="math inline">\(s\)</span> from their physical attributes. Initialization is done using function <code>soil()</code>, which returns an object of a S3 class with the same name. Simulation functions in <strong>medfate</strong> need an object of class <code>soil</code> to be run.</p>
+<p>Function <code>soil()</code> adds the following information to the physical soil description:</p>
 <table>
 <colgroup>
 <col width="13%" />
@@ -807,7 +808,8 @@ Figure 2.1: Water retention curves under the Saxton and Van Genuchten models, fo
 <li>Using the USDA texture classification and the average texture class parameters given by <span class="citation"><a href="#ref-Carsel1988" role="doc-biblioref">Carsel and Parrish</a> (<a href="#ref-Carsel1988" role="doc-biblioref">1988</a>)</span>.</li>
 <li>Directly from the soil texture, organic matter and bulk density, using the pedotransfer functions in <span class="citation"><a href="#ref-Toth2015" role="doc-biblioref">Tóth et al.</a> (<a href="#ref-Toth2015" role="doc-biblioref">2015</a>)</span>.</li>
 </ol>
-<p>Saturated soil conductivity values are estimated using <span class="citation"><a href="#ref-Saxton2006" role="doc-biblioref">Saxton and Rawls</a> (<a href="#ref-Saxton2006" role="doc-biblioref">2006</a>)</span> or <span class="citation"><a href="#ref-Saxton1986" role="doc-biblioref">Saxton et al.</a> (<a href="#ref-Saxton1986" role="doc-biblioref">1986</a>)</span>, depending on whether an estimate of organic mater is available. Besides defining soil parameters, function <code>soil()</code> also initializes <em>soil state variables</em>: soil moisture content, soil temperature (although set to a missing value) and water table depth. All simulation functions need an object of class <code>soil</code> to be run. Users can edit the <code>soil</code> object manually (it is actually a <code>list</code>), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements. <span class="math inline">\(K_{drain}\)</span> is currently initialized from soil saturated conductivity in the deepest soil layer, but should be defined depending on the permeability of the bedrock material.</p>
+<p>Soil layer saturated conductivity (<span class="math inline">\(K_{sat,s}\)</span>) is estimated using <span class="citation"><a href="#ref-Saxton2006" role="doc-biblioref">Saxton and Rawls</a> (<a href="#ref-Saxton2006" role="doc-biblioref">2006</a>)</span> or <span class="citation"><a href="#ref-Saxton1986" role="doc-biblioref">Saxton et al.</a> (<a href="#ref-Saxton1986" role="doc-biblioref">1986</a>)</span>, depending on whether an estimate of organic mater is available. <span class="math inline">\(K_{drain}\)</span> is currently initialized from soil saturated conductivity in the deepest soil layer, but should be defined depending on the permeability of the bedrock material.</p>
+<p>Besides defining soil parameters, function <code>soil()</code> also initializes <em>soil state variables</em>: soil moisture content, soil temperature (although set to a missing value) and water table depth. Users can edit the <code>soil</code> object manually (it is actually a <code>list</code>), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements.</p>
 </div>
 <div id="water-content-and-water-table-depth" class="section level3" number="2.2.4">
 <h3><span class="header-section-number">2.2.4</span> Water content and water table depth</h3>
@@ -821,16 +823,16 @@ V_{soil} = \sum_{s=1}^S{V_s(\Psi_s)}
 \end{equation}\]</span></p>
 <p>A number of fixed water volumes (and their corresponding moisture) are important to remember:</p>
 <ul>
-<li><em>Water holding capacity</em> (<span class="math inline">\(V_{fc, s}\)</span>, in mm) of the soil layer <span class="math inline">\(s\)</span> is defined as the volume of water at field capacity, i.e. -0.033 MPa:
+<li><em>Water holding capacity</em> (<span class="math inline">\(V_{fc, s}\)</span>, in mm) of the soil layer <span class="math inline">\(s\)</span> is defined as the volume of water at <em>field capacity</em>, i.e. at <span class="math inline">\(\Psi_{fc} = -0.033\)</span> MPa, the amount of water held in the soil after gravitational water has drained away:
 <span class="math display">\[\begin{equation}
 V_{fc,s} = V_{s}(-0.033) = d_s\cdot ((100-P_{rocks,s})/100)\cdot\theta_{fc,s}
 \end{equation}\]</span>
-where <span class="math inline">\(\theta_{fc,s} = \theta_s(-0.033)\)</span> is the corresponding moisture at <em>field capacity</em>, the amount of soil moisture held in soil after excess water has drained away.</li>
-<li><em>Water content at saturation</em> is calculated anagolously, but replacing <span class="math inline">\(\theta_{fc,s}\)</span> by <span class="math inline">\(\theta_{sat, s} = \theta_s(0)\)</span>, the moisture at <em>saturation</em>, the amount of soil moisture when all easily drained spaces between soil particles (i.e. macropores) are also filled with water.</li>
-<li><em>Water content at wilting point</em> (-1.5 MPa) is calculated replacing <span class="math inline">\(\theta_{fc,s}\)</span> by <span class="math inline">\(\theta_{wp,s} = \theta_s(-1.5)\)</span>, the moisture at <em>wilting point</em>, a conventional amount of soil moisture beyond which plants are assumed have problems extracting water and start to wilt. In reality, however, many plants can extract water from much drier soils.</li>
-<li>The <em>amount of extractable water</em> is the difference between water content at field capacity and the water content at a conventional minimum water potential, which can be set at wilting point or lower values (by default at -5 MPa in <strong>medfate</strong>).</li>
+where <span class="math inline">\(\theta_{fc,s} = \theta_s(-0.033)\)</span> is the corresponding moisture at field capacity.</li>
+<li><em>Water content at saturation</em> (<span class="math inline">\(V_{sat, s}\)</span>, in mm) is calculated anagolously, but replacing <span class="math inline">\(\theta_{fc,s}\)</span> by <span class="math inline">\(\theta_{sat, s} = \theta_s(0)\)</span>, the moisture at <em>saturation</em>, the amount of soil moisture when all easily drained spaces between soil particles (i.e. macropores) are also filled with water.</li>
+<li><em>Water content at wilting point</em> (<span class="math inline">\(V_{wp, s}\)</span>, in mm) is calculated replacing <span class="math inline">\(\theta_{fc,s}\)</span> by <span class="math inline">\(\theta_{wp,s} = \theta_s(-1.5)\)</span>, the moisture at <em>wilting point</em>, i.e. at <span class="math inline">\(\Psi_{fc} = -1.5\)</span> MPa, a conventional amount of soil moisture beyond which plants are assumed have problems extracting water and start to wilt. However, plants can often extract water from much drier soils.</li>
+<li>The <em>amount of extractable water</em> (in mm) is the difference between water content at field capacity and the water content at a conventional minimum water potential, which can be set at wilting point or lower values (by default at -5 MPa in <strong>medfate</strong>).</li>
 </ul>
-<p>The depth of water table is the depth of saturated soil (in <span class="math inline">\(mm\)</span>). In medfate, <em>water table depth</em> (<span class="math inline">\(Z_{wt}\)</span>, in mm) equals soil depth (i.e. <span class="math inline">\(Z_{soil}\)</span>) when all soil layers are below field capacity. When some layers are between field capacity and saturation, water table depth is calculated as:
+<p>The depth of water table is the depth of saturated soil (in mm). In medfate, <em>water table depth</em> (<span class="math inline">\(Z_{wt}\)</span>, in mm) equals soil depth (i.e. <span class="math inline">\(Z_{soil}\)</span>) when all soil layers are below field capacity. When some layers are between field capacity and saturation, water table depth is calculated as:
 <span class="math display">\[\begin{equation}
 Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\theta_{sat,s}-\theta_{fc,s})\right]}
 \end{equation}\]</span></p>
@@ -838,17 +840,18 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 </div>
 <div id="vegetationinput" class="section level2" number="2.3">
 <h2><span class="header-section-number">2.3</span> Vegetation description</h2>
-<p>The representation of plants within a target plot is done in <strong>medfate</strong> by means of <strong>cohorts</strong> of woody plants (i.e. trees and shrubs). A plant cohort respresents a set of plants that belong to the same species (or functional group) and are more or less of the same <em>size</em>. For example, trees in a stand may be grouped by species and diameter class. This representation is chosen so that package functions can be easily applied to forest plot data, for example from national forest inventories. The description of plant cohorts includes a measure of <em>abundance</em> of the cohort in the stand, which in the case of trees is <em>density</em> as stems per hectare and for shrubs is <em>percent cover</em> (shrubs are often multi-stemmed). This different abundance measure is the main motivation for distinguishing between tree cohorts and shrub cohorts, rather than their height.</p>
+<p>The representation of plants within a target plot is done in <strong>medfate</strong> by means of <strong>cohorts</strong> of woody plants (i.e. trees and shrubs). A plant cohort respresents a set of plants that belong to the same species (or functional group) and are more or less of the same <em>size</em>. For example, trees in a stand may be grouped by species and diameter class. This representation is chosen so that package functions can be easily applied to <strong>forest inventory data</strong>, for example from national forest surveys. The description of plant cohorts includes a measure of <em>abundance</em> of the cohort in the stand, which in the case of trees is <em>density</em> as stems per hectare and for shrubs is <em>percent cover</em> (shrubs are often multi-stemmed). The difference in measurement units for abundance is the main motivation for distinguishing between tree cohorts and shrub cohorts, rather than their size or growth form.</p>
 <p>Note that one limitation of the representation of vegetation in <strong>medfate</strong> is that it is not spatially-explicit (i.e. plants cannot have explicit coordinates within forest stands) and hence spatial (horizontal) interactions between plant cannot be taken into account explicitly (but see <a href="model-inputs.html#plantwaterpools">2.3.5</a>).</p>
 <div id="structural-attributes-of-plant-cohorts" class="section level3" number="2.3.1">
 <h3><span class="header-section-number">2.3.1</span> Structural attributes of plant cohorts</h3>
-<p>A plant cohort <span class="math inline">\(i\)</span> is either a <em>tree cohort</em> or a <em>shrub cohort</em>, and is defined using a set of structural attributes shown in the following table, where columns <strong>spwb</strong> and <strong>growth</strong> indicate whether attributes are required by simulation functions <code>spwb()/pwb()</code> and <code>growth()</code>, respectively:</p>
-<table>
+<p>A plant cohort <span class="math inline">\(i\)</span> is either a <em>tree cohort</em> or a <em>shrub cohort</em>, and is defined using a set of structural attributes shown in the following table, where columns <strong>spwb</strong>, <strong>growth</strong> and <strong>fordyn</strong> indicate whether attributes are required by simulation functions <code>spwb()/pwb()</code>, <code>growth()</code> and <code>fordyn()</code>, respectively:</p>
+<table style="width:100%;">
 <colgroup>
-<col width="12%" />
+<col width="11%" />
 <col width="10%" />
-<col width="6%" />
-<col width="55%" />
+<col width="5%" />
+<col width="51%" />
+<col width="7%" />
 <col width="7%" />
 <col width="7%" />
 </colgroup>
@@ -860,6 +863,7 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 <th>Description</th>
 <th>spwb</th>
 <th>growth</th>
+<th>fordyn</th>
 </tr>
 </thead>
 <tbody>
@@ -870,12 +874,14 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 <td>Species identity</td>
 <td>Y</td>
 <td>Y</td>
+<td>Y</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(H_i\)</span></td>
 <td><span class="math inline">\(cm\)</span></td>
 <td><code>Height</code></td>
 <td>Average tree or shrub height</td>
+<td>Y</td>
 <td>Y</td>
 <td>Y</td>
 </tr>
@@ -886,6 +892,7 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 <td>Crown ratio (i.e. ratio between crown length and plant height)</td>
 <td>Y</td>
 <td>Y</td>
+<td>N</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(N_i\)</span></td>
@@ -893,6 +900,7 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 <td><code>N</code></td>
 <td>Density of tree individuals</td>
 <td>N</td>
+<td>Y</td>
 <td>Y</td>
 </tr>
 <tr class="odd">
@@ -902,6 +910,7 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 <td>Tree diameter at breast height</td>
 <td>N</td>
 <td>Y</td>
+<td>Y</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(Cover_i\)</span></td>
@@ -909,6 +918,7 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 <td><code>Cover</code></td>
 <td>Shrub percent cover</td>
 <td>N</td>
+<td>Y</td>
 <td>Y</td>
 </tr>
 <tr class="odd">
@@ -918,6 +928,7 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 <td>(Maximum) leaf area index</td>
 <td>Y</td>
 <td>Y</td>
+<td>N</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(LAI^{dead}_i\)</span></td>
@@ -926,6 +937,7 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 <td>Dead leaf area index</td>
 <td>Y</td>
 <td>Y</td>
+<td>N</td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(LAI^{\phi}_i\)</span></td>
@@ -934,6 +946,7 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 <td>Current expanded leaf area index</td>
 <td>Y</td>
 <td>Y</td>
+<td>N</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(Z_{50,i}\)</span></td>
@@ -942,12 +955,14 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 <td>Depth above which 50% of the fine root mass is located</td>
 <td>Y</td>
 <td>Y</td>
+<td>Y</td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(Z_{95,i}\)</span></td>
 <td>mm</td>
 <td><code>Z95</code></td>
 <td>Depth above which 95% of the fine root mass is located</td>
+<td>Y</td>
 <td>Y</td>
 <td>Y</td>
 </tr>
@@ -965,8 +980,7 @@ LAI^{live}_{stand} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{live}} \\
 LAI^{\phi}_{stand} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{\phi}} \\
 LAI^{dead}_{stand} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{dead}} \\
 LAI^{all}_{stand} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{all}} = LAI^{\phi}_{stand}+LAI^{dead}_{stand}
-\end{eqnarray}\]</span>
-For evergreen species, <span class="math inline">\(LAI_{i}^{live} = LAI_{i}^{\phi}\)</span> and the distinction does not exist.</p>
+\end{eqnarray}\]</span></p>
 </div>
 <div id="forestobjects" class="section level3" number="2.3.2">
 <h3><span class="header-section-number">2.3.2</span> Forest plot objects</h3>
@@ -997,24 +1011,25 @@ For evergreen species, <span class="math inline">\(LAI_{i}^{live} = LAI_{i}^{\ph
 ## attr(,&quot;class&quot;)
 ## [1] &quot;forest&quot; &quot;list&quot;</code></pre>
 <p>Among them, the most important items are two data frames, <code>treeData</code> (for trees) and <code>shrubData</code> for shrubs. Information about herbs is currently only used for fire hazard calculations. Elements <code>ID</code> and <code>patchsize</code> are only relevant when using medfate functions in a spatial context.</p>
-<p>While not strictly necessary, forest objects are a convenient format to start calculations with <strong>medfate</strong>, because there are many static functions that take forest objects as input and calculate leaf area index for each plant cohort. Another pathway to obtain LAI estimations is by specifying foliar biomass values as additional columns of forest objects. The package also includes functions to facilitate mapping user data in into tables <code>treeData</code> and <code>shrubData</code> (see function <code>forest_mapWoodyTables()</code>).</p>
+<p>While not strictly necessary (except for <code>fordyn()</code>), <code>forest</code> objects are a convenient format to start calculations with <strong>medfate</strong>, because there are many static functions that take forest objects as input and calculate leaf area index for each plant cohort. Another pathway to obtain LAI estimations is by specifying foliar biomass values as additional columns of forest objects.</p>
+<p>With the aim to help users in the task of constructing <code>forest</code> objects, the package also includes functions initialize empty forests and to map user data in into tables <code>treeData</code> and <code>shrubData</code> (see function <code>forest_mapWoodyTables()</code>).</p>
 </div>
 <div id="leafdistribution" class="section level3" number="2.3.3">
 <h3><span class="header-section-number">2.3.3</span> Vertical leaf distribution</h3>
-<p>The vegetation inputs for height, leaf area index and crown ratio allow the package to determine the vertical distribution of leaves in the stand. The leaf area of any plant cohort is assumed to be distributed vertically following a <strong>truncated Gaussian function</strong> whose standardized values -1.5 and 1.5 correspond to crown base height (<span class="math inline">\(H_{crown,i}\)</span>; in <span class="math inline">\(cm\)</span>) and total plant height (<span class="math inline">\(H_i\)</span>), respectively. Crown base height (<span class="math inline">\(H_{crown,i}\)</span>) of cohort <span class="math inline">\(i\)</span> is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort (<span class="math inline">\(CR_i\)</span>; a proportion between 0 and 1), i.e. the ratio between plant crown length and total height (see eq. <a href="allometricmodels.html#eq:CrownHeight">(21.5)</a>).</p>
-<p>Simulation models in <strong>medfate</strong> divide the vertical dimension into vertical layers (by default are 1m width, but see control parameter <code>verticalLayerSize</code>). Let us define <span class="math inline">\(LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}\)</span> as the leaf area index of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> including both functional leaves and dead leaves standing on branches. The truncated Gaussian distribution defines the <span class="math inline">\(LAI_{i,j}^{\phi}\)</span> and <span class="math inline">\(LAI_{i,j}^{dead}\)</span> for all plant cohorts and vertical layers.</p>
-<p>Dividing the leaf area of a given layer by its width, one obtains the <em>leaf area density</em> (<span class="math inline">\(LAD\)</span> in <span class="math inline">\(m^2 \cdot m^{-3}\)</span>). Figure <a href="model-inputs.html#fig:leafareadensity">2.2</a> illustrates the leaf area density profile (see function <code>vprofile_leafAreaDensity()</code>) corresponding to the forest stand described in the <code>forest</code> object that we showed above.</p>
+<p>The vegetation inputs for height, leaf area index and crown ratio allow the package to determine the vertical distribution of leaves in the stand. The leaf area of any plant cohort is assumed to be distributed vertically following a <strong>truncated Gaussian function</strong> whose standardized values -1.5 and 1.5 correspond to crown base height (<span class="math inline">\(H_{crown,i}\)</span>; in <span class="math inline">\(cm\)</span>) and total plant height (<span class="math inline">\(H_i\)</span>), respectively. Crown base height is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort (<span class="math inline">\(CR_i\)</span>; a proportion between 0 and 1), which in turn can be estimated as explained in <a href="allometricmodels.html#eq:CrownHeight">(21.5)</a>.</p>
+<p>Simulation models in <strong>medfate</strong> divide the vertical dimension into vertical layers (by default are 100 cm width, but see control parameter <code>verticalLayerSize</code>). Let us define <span class="math inline">\(LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}\)</span> as the leaf area index of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> including both functional leaves and dead leaves standing on branches. The truncated Gaussian distribution defines the <span class="math inline">\(LAI_{i,j}^{\phi}\)</span> and <span class="math inline">\(LAI_{i,j}^{dead}\)</span> for all plant cohorts and vertical layers.</p>
+<p>Dividing the leaf area of a given layer by its width, one obtains the <em>leaf area density</em> (<span class="math inline">\(LAD\)</span> in <span class="math inline">\(m^2 \cdot m^{-3}\)</span>). Figure <a href="model-inputs.html#fig:leafareadensity">2.2</a> illustrates the leaf area density profile (see function <code>vprofile_leafAreaDensity()</code>) corresponding to the forest stand described in the example <code>forest</code> object that we showed above.</p>
 <div class="figure" style="text-align: center"><span id="fig:leafareadensity"></span>
 <img src="medfatebook_files/figure-html/leafareadensity-1.png" alt="Leaf area density distribution in a forest stand. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution." width="768" />
 <p class="caption">
 Figure 2.2: Leaf area density distribution in a forest stand. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution.
 </p>
 </div>
-<p>The leaf area density profile determines the extinction rates of light through the forest canopy. The same truncated Gaussian distribution is used to distribute leaf and small branch biomass along the vertical dimension.</p>
+<p>The leaf area density profile determines the ligth extinction rates through the forest canopy. The same truncated Gaussian distribution is used to distribute leaf and small branch biomass along the vertical dimension.</p>
 </div>
 <div id="rootdistribution" class="section level3" number="2.3.4">
 <h3><span class="header-section-number">2.3.4</span> Vertical root distribution</h3>
-<p>Roots can be distinguished functionally into two different organs. Coarse roots are responsible for transport of water and nutrients towards the stem, whereas fine roots, which are responsible for absorbing water and nutrients.</p>
+<p>Roots can be distinguished functionally into two different organs: <strong>coarse roots</strong> are responsible for mechanical support and transport of water and nutrients towards the stem, whereas <strong>fine roots</strong> are responsible for absorbing water and nutrients.</p>
 <p>Analogously to the aboveground vegetation parameters, inputs describing depths corresponding to 50% and 95% of fine roots (<span class="math inline">\(Z_{50,i}\)</span> and <span class="math inline">\(Z_{95,i}\)</span>) are used to completely specify the distribution of roots across soil layers. The root system of each plant cohort <span class="math inline">\(i\)</span> is described using <span class="math inline">\(FRP_{i,s}\)</span>, the proportion of fine roots (with respect to the whole plant) in each soil layer <span class="math inline">\(s\)</span>. <span class="math inline">\(FRP_{i,s}\)</span> values are normally defined using the linear dose response model <span class="citation">(<a href="#ref-Schenk2002" role="doc-biblioref">Schenk and Jackson 2002</a>; <a href="#ref-Collins2007" role="doc-biblioref">Collins and Bras 2007</a>)</span>:
 <span class="math display">\[\begin{eqnarray}
 FRP_{i,s} &amp;=&amp; Y_i(Z_s) - Y_i(Z_{s-1}) \\
@@ -1028,11 +1043,11 @@ where <span class="math inline">\(Y_i(z)\)</span> is the cumulative fraction of 
 Figure 2.3: Examples of root density profile according to the linear dose response model.
 </p>
 </div>
-<p>The actual input to simulation functions is the matrix of <span class="math inline">\(FRP_{i,s}\)</span> values - not <span class="math inline">\(Z_{50,i}\)</span> and <span class="math inline">\(Z_{95,i}\)</span> -, which means that the proportions of fine roots can be modified manually or be defined by another model. In fact, <strong>medfate</strong> also allows calculating <span class="math inline">\(FRP_{i,s}\)</span> values assuming a conic distribution of fine roots (see <code>root_conicDistribution()</code>).</p>
+<p>The actual input to simulation functions <code>spwb()</code>, <code>growth()</code> and alike, describes fine root distribution using the matrix of <span class="math inline">\(FRP_{i,s}\)</span> values - not <span class="math inline">\(Z_{50,i}\)</span> and <span class="math inline">\(Z_{95,i}\)</span> -, which means that the proportions of fine roots can be modified manually or be defined by another model. In fact, <strong>medfate</strong> also allows calculating <span class="math inline">\(FRP_{i,s}\)</span> values assuming a conic distribution of fine roots (see <code>root_conicDistribution()</code>).</p>
 </div>
 <div id="plantwaterpools" class="section level3" number="2.3.5">
 <h3><span class="header-section-number">2.3.5</span> Plant water pools and root horizontal distribution</h3>
-<p>By default, models in <strong>medfate</strong> assume that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can also be simulated if required by the user. Considering plant water pools involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many plant water pools as plant cohorts, with proportions defined by their LAI values:
+<p>By default, models in <strong>medfate</strong> assume that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can also be simulated if required by the user. Considering plant <strong>water pools</strong> involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many plant water pools as plant cohorts, with proportions defined by their LAI values:
 <span class="math display">\[\begin{equation}
 f_{pool,i} = \frac{LAI^{live}_i}{LAI^{live}_{stand}}
 \end{equation}\]</span>
@@ -1040,7 +1055,7 @@ Models assume that the rhizosphere of each plant cohort occupies its own water p
 <span class="math display">\[\begin{equation}
 \sum_{j}{fr_{i,s,j}} = 1 \,\, \forall i,s
 \end{equation}\]</span>
-It is important to realize that proper estimation of <span class="math inline">\(fr_{i,s,j}\)</span> is challenging when we do not have explicit plant coordinates, root lateral widths, etc. At this point, we will assume we have a reasonable estimate of the soil volume <span class="math inline">\(Vol_{i}\)</span> explored by coarse roots of an individual of cohort <span class="math inline">\(i\)</span>. Assuming that the proportion of fine roots in each layer is proportional to the proportion of total soil volume explored by coarse roots that corresponds to the same layer we have.
+It is important to realize that proper estimation of <span class="math inline">\(fr_{i,s,j}\)</span> is challenging when we do not have explicit plant coordinates, root lateral widths, etc. At this point, let us assume we have a reasonable estimate of <span class="math inline">\(Vol_{i}\)</span>, the <strong>soil volume explored by coarse roots</strong> of an individual of cohort <span class="math inline">\(i\)</span>. Assuming that the proportion of fine roots in each layer is proportional to the proportion of total soil volume explored by coarse roots that corresponds to the same layer we have that <span class="math inline">\(Vol_{i,s}\)</span>, the soil volume explored by coarse roots in layer <span class="math inline">\(s\)</span> is:
 <span class="math display">\[\begin{equation}
 Vol_{i,s} = FRP_{i,s}\cdot Vol_{i}
 \end{equation}\]</span>
@@ -1048,7 +1063,7 @@ In <strong>medfate</strong>, coarse roots are represented by <em>axial</em> and 
 <span class="math display">\[\begin{equation}
 Vol_{i,s} = \pi \cdot L_{radial,i,s}^2 \cdot L_{axial, i, s}
 \end{equation}\]</span>
-and substituting the soil volume <span class="math inline">\(Vol_{i,s}\)</span> we can isolate <span class="math inline">\(L_{radial,i,s}\)</span> (see function <code>root_coarseRootLengthsFromVolume()</code>). Once we have the radial component we can estimate the area (<span class="math inline">\(m^2\)</span>) covered by coarse roots of an individual of the cohort in a given layer <span class="math inline">\(s\)</span>:
+and substituting the soil volume <span class="math inline">\(Vol_{i,s}\)</span> in the equation above we can isolate <span class="math inline">\(L_{radial,i,s}\)</span> (see function <code>root_coarseRootLengthsFromVolume()</code>). Once we have the radial component we can estimate the area (<span class="math inline">\(m^2\)</span>) covered by coarse roots of an individual of the cohort in a given layer <span class="math inline">\(s\)</span>:
 <span class="math display">\[\begin{equation}
 Area_{i,s} = \pi \cdot L_{radial,i,s}^2
 \end{equation}\]</span>
@@ -1066,8 +1081,8 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 </div>
 <div id="update-of-structural-variables-during-simulations" class="section level3" number="2.3.7">
 <h3><span class="header-section-number">2.3.7</span> Update of structural variables during simulations</h3>
-<p>Vegetation characteristics stay constant during simulations using functions <code>spwb()</code> or <code>pwb()</code>, although the actual (unfolded) leaf area and dead leaf area may vary if the species is winter deciduous.</p>
-<p>In contrast, growth simulation requires updating the structure of vegetation, i.e. heights, tree diameters and shrub cover. Function <code>growth()</code> can modify any of the vegetation attributes.</p>
+<p>Vegetation characteristics stay constant during simulations using functions <code>spwb()</code> or <code>pwb()</code>, although the actual (unfolded) leaf area and dead leaf area may vary depending on leaf phenology.</p>
+<p>In contrast, growth simulation requires updating the structure of vegetation, i.e. heights, tree diameters and shrub cover. Function <code>growth()</code> can modify any of the vegetation attributes. Finally, function <code>fordyn()</code> modifies not only structural variables of the initial cohorts but also involves the recruitment of new woody cohorts during simulations.</p>
 </div>
 </div>
 <div id="meteoinput" class="section level2" number="2.4">
@@ -1168,8 +1183,8 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 </tbody>
 </table>
 <p>Dates are needed in <strong>medfate</strong> to estimate parameters like solar declination or the day of the year (<span class="math inline">\(DOY\)</span>). Importantly, <em>dates</em> should be included as row names (in format <em>year-month-day</em>) of the input meteorology data frame. Since it allows producing data frames with appropiate variable units and row/column names, we recommend meteorological input to be generated using package <strong>meteoland</strong> <span class="citation">(<a href="#ref-DeCaceres2018" role="doc-biblioref">De Cáceres et al. 2018</a>)</span>, but many other sources are possible.</p>
-<p>Not all simulation models require all weather variables (see rightmost columns in the previous table). In particular, basic water balance modelling (chapter <a href="basicwaterbalance.html#basicwaterbalance">3</a>) requires much less information than advance water balance modelling (chapter <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>). The weather input requirements for growth modelling (chapter <a href="growthmodelling.html#growthmodelling">15</a>) depend on the complexity of the water balance model used within it.</p>
-<p>Whereas the weather variables listed in the table above are input requirements, <strong>medfate</strong> derives other atmospheric variables from them, using also topographic information (see <a href="http://vegmod.ctfc.cat/meteolandbook/miscellaneous.html#physicalutils">utility functions</a> of the <strong>meteoland</strong> reference manual):</p>
+<p>Not all simulation models require all weather variables (see rightmost columns in the previous table). In particular, basic water balance modelling (chapter <a href="basicwaterbalance.html#basicwaterbalance">3</a>) requires much less information than advance water balance modelling (chapter <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>). The weather input requirements for modelling growth (chapter <a href="growthmodelling.html#growthmodelling">15</a>) or forest dynamics (chapter <a href="dynamicsmodelling.html#dynamicsmodelling">19</a>) depend on the complexity of the water balance model used within it.</p>
+<p>Whereas the weather variables listed in the table above are input requirements, <strong>medfate</strong> derives other atmospheric variables from them, using also topographic information (see <a href="http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils">utility functions</a> of the <strong>meteoland</strong> reference manual):</p>
 <table>
 <thead>
 <tr class="header">
@@ -1205,42 +1220,30 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <h2><span class="header-section-number">2.5</span> Control parameters</h2>
 <p>Control parameters are a list of global parameter values, initialized using function <code>defaultControl()</code>, that the user can modify to change the general behavior of simulation functions. Here is the set of global control parameters currently accepted in <strong>medfate</strong>:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="model-inputs.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
-<pre><code>##  [1] &quot;modifyInput&quot;                         &quot;verbose&quot;                            
-##  [3] &quot;subdailyResults&quot;                     &quot;transpirationMode&quot;                  
-##  [5] &quot;soilFunctions&quot;                       &quot;defaultWindSpeed&quot;                   
-##  [7] &quot;snowpack&quot;                            &quot;leafPhenology&quot;                      
-##  [9] &quot;rockyLayerDrainage&quot;                  &quot;unlimitedSoilWater&quot;                 
-## [11] &quot;plantWaterPools&quot;                     &quot;unfoldingDD&quot;                        
-## [13] &quot;verticalLayerSize&quot;                   &quot;windMeasurementHeight&quot;              
-## [15] &quot;cavitationRefill&quot;                    &quot;ndailysteps&quot;                        
-## [17] &quot;nsubsteps&quot;                           &quot;cochard&quot;                            
-## [19] &quot;capacitance&quot;                         &quot;taper&quot;                              
-## [21] &quot;multiLayerBalance&quot;                   &quot;gainModifier&quot;                       
-## [23] &quot;costModifier&quot;                        &quot;costWater&quot;                          
-## [25] &quot;klatstem&quot;                            &quot;klatleaf&quot;                           
-## [27] &quot;numericParams&quot;                       &quot;fracLeafResistance&quot;                 
-## [29] &quot;fracRootResistance&quot;                  &quot;averageFracRhizosphereResistance&quot;   
-## [31] &quot;Catm&quot;                                &quot;thermalCapacityLAI&quot;                 
-## [33] &quot;boundaryLayerSize&quot;                   &quot;refillMaximumRate&quot;                  
-## [35] &quot;allowDessication&quot;                    &quot;allowStarvation&quot;                    
-## [37] &quot;allowDefoliation&quot;                    &quot;sinkLimitation&quot;                     
-## [39] &quot;shrubDynamics&quot;                       &quot;allocationStrategy&quot;                 
-## [41] &quot;nonStomatalPhotosynthesisLimitation&quot; &quot;phloemConductanceFactor&quot;            
-## [43] &quot;nonSugarConcentration&quot;               &quot;equilibriumOsmoticConcentration&quot;    
-## [45] &quot;minimumRelativeSugarForGrowth&quot;       &quot;respirationRates&quot;                   
-## [47] &quot;turnoverRates&quot;                       &quot;constructionCosts&quot;                  
-## [49] &quot;maximumRelativeGrowthRates&quot;          &quot;mortalityMode&quot;                      
-## [51] &quot;mortalityBaselineRate&quot;               &quot;mortalityRelativeSugarThreshold&quot;    
-## [53] &quot;mortalityRWCThreshold&quot;               &quot;recruitmentMode&quot;                    
-## [55] &quot;removeDeadCohorts&quot;                   &quot;minimumCohortDensity&quot;               
-## [57] &quot;seedRain&quot;                            &quot;seedProductionTreeHeight&quot;           
-## [59] &quot;seedProductionShrubHeight&quot;           &quot;minTempRecr&quot;                        
-## [61] &quot;minMoistureRecr&quot;                     &quot;minFPARRecr&quot;                        
-## [63] &quot;recrTreeDBH&quot;                         &quot;recrTreeDensity&quot;                    
-## [65] &quot;recrTreeHeight&quot;                      &quot;recrShrubCover&quot;                     
-## [67] &quot;recrShrubHeight&quot;                     &quot;recrTreeZ50&quot;                        
-## [69] &quot;recrShrubZ50&quot;                        &quot;recrTreeZ95&quot;                        
-## [71] &quot;recrShrubZ95&quot;</code></pre>
+<pre><code>##  [1] &quot;modifyInput&quot;                         &quot;verbose&quot;                             &quot;subdailyResults&quot;                    
+##  [4] &quot;transpirationMode&quot;                   &quot;soilFunctions&quot;                       &quot;defaultWindSpeed&quot;                   
+##  [7] &quot;snowpack&quot;                            &quot;leafPhenology&quot;                       &quot;rockyLayerDrainage&quot;                 
+## [10] &quot;unlimitedSoilWater&quot;                  &quot;plantWaterPools&quot;                     &quot;unfoldingDD&quot;                        
+## [13] &quot;verticalLayerSize&quot;                   &quot;windMeasurementHeight&quot;               &quot;cavitationRefill&quot;                   
+## [16] &quot;ndailysteps&quot;                         &quot;nsubsteps&quot;                           &quot;cochard&quot;                            
+## [19] &quot;capacitance&quot;                         &quot;taper&quot;                               &quot;multiLayerBalance&quot;                  
+## [22] &quot;gainModifier&quot;                        &quot;costModifier&quot;                        &quot;costWater&quot;                          
+## [25] &quot;klatstem&quot;                            &quot;klatleaf&quot;                            &quot;numericParams&quot;                      
+## [28] &quot;fracLeafResistance&quot;                  &quot;fracRootResistance&quot;                  &quot;averageFracRhizosphereResistance&quot;   
+## [31] &quot;Catm&quot;                                &quot;thermalCapacityLAI&quot;                  &quot;boundaryLayerSize&quot;                  
+## [34] &quot;refillMaximumRate&quot;                   &quot;allowDessication&quot;                    &quot;allowStarvation&quot;                    
+## [37] &quot;allowDefoliation&quot;                    &quot;sinkLimitation&quot;                      &quot;shrubDynamics&quot;                      
+## [40] &quot;allocationStrategy&quot;                  &quot;nonStomatalPhotosynthesisLimitation&quot; &quot;phloemConductanceFactor&quot;            
+## [43] &quot;nonSugarConcentration&quot;               &quot;equilibriumOsmoticConcentration&quot;     &quot;minimumRelativeSugarForGrowth&quot;      
+## [46] &quot;respirationRates&quot;                    &quot;turnoverRates&quot;                       &quot;constructionCosts&quot;                  
+## [49] &quot;maximumRelativeGrowthRates&quot;          &quot;mortalityMode&quot;                       &quot;mortalityBaselineRate&quot;              
+## [52] &quot;mortalityRelativeSugarThreshold&quot;     &quot;mortalityRWCThreshold&quot;               &quot;recruitmentMode&quot;                    
+## [55] &quot;removeDeadCohorts&quot;                   &quot;minimumCohortDensity&quot;                &quot;seedRain&quot;                           
+## [58] &quot;seedProductionTreeHeight&quot;            &quot;seedProductionShrubHeight&quot;           &quot;minTempRecr&quot;                        
+## [61] &quot;minMoistureRecr&quot;                     &quot;minFPARRecr&quot;                         &quot;recrTreeDBH&quot;                        
+## [64] &quot;recrTreeDensity&quot;                     &quot;recrTreeHeight&quot;                      &quot;recrShrubCover&quot;                     
+## [67] &quot;recrShrubHeight&quot;                     &quot;recrTreeZ50&quot;                         &quot;recrShrubZ50&quot;                       
+## [70] &quot;recrTreeZ95&quot;                         &quot;recrShrubZ95&quot;</code></pre>
 <p>Not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters). However, there are a set of parameters that apply to all simulations:</p>
 <ul>
 <li><code>verbose [=TRUE]</code>: Whether extra console output is desired during simulations.</li>
