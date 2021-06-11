@@ -659,15 +659,17 @@ where <span class="math inline">\(S_{n,d}\)</span> is the state of development o
 <div id="leafphenobudburst" class="section level3" number="4.1.2">
 <h3><span class="header-section-number">4.1.2</span> Bud burst and leaf unfolding</h3>
 <p>Transition from ecodormancy to bud burst is estimated using a very simple one-phase ecodormancy model (also called the spring warming model) implemented in function <code>pheno_leafDevelopmentStatus()</code>. Given a base temperature (<span class="math inline">\(T_{eco}\)</span>, in <span class="math inline">\(^{\circ}\mathrm{C}\)</span>), the rate of development during the ecodormancy phase (<span class="math inline">\(R_{eco}\)</span>, in <span class="math inline">\(^{\circ} \mathrm{C}\)</span>) is zero for those days where mean temperature <span class="math inline">\(T_{mean}\)</span> is below <span class="math inline">\(T_{eco}\)</span> and <span class="math inline">\(T_{mean} - T_{eco})\)</span> for those days where temperatures become warmer than this threshold:
-<span class="math display">\[\begin{eqnarray}
-R_{eco,d}(T_d) &amp;=&amp; 0  \,\, &amp;if&amp; \,\, T_d \leq T_{eco} \\
-              &amp;=&amp; T_d - T_{eco}  \,\, &amp;if&amp; \,\, T_d &gt; T_{eco} \\
-\end{eqnarray}\]</span>
+<span class="math display">\[\begin{equation}
+R_{eco,d}(T_d) = \begin{cases} 
+                      0  &amp; T_d \leq T_{eco} \\
+                      T_d - T_{eco}  &amp; T_d &gt; T_{eco}
+                 \end{cases}
+\end{equation}\]</span>
 Daily <span class="math inline">\(R_{eco,d}\)</span> values are added to the cumulative sum <span class="math inline">\(S_{eco,d}\)</span> and budburst occurs when <span class="math inline">\(S_{eco,d} &gt; S_{eco}^*\)</span>. Both <span class="math inline">\(T_{eco}\)</span> and <span class="math inline">\(S_{eco}^*\)</span> are plant-specific parameters in <code>spwbInput</code>.</p>
 <p>After budburst, we model progressive leaf unfolding in a similar manner, by accumulating degree days using the same definition as for <span class="math inline">\(R_{eco,d}\)</span>:
-<span class="math display">\[\begin{eqnarray}
-R_{unf,d} &amp;=&amp; R_{eco,d} \\
-\end{eqnarray}\]</span>
+<span class="math display">\[\begin{equation}
+R_{unf,d} = R_{eco,d}
+\end{equation}\]</span>
 and then defining an unfolding development status <span class="math inline">\(S_{unf,d} = \sum_{d,eco}^{d} R_{unf,d}\)</span>, which we use to determine <span class="math inline">\(\phi_{i,d}\)</span>, the degree of leaf expansion of cohort <span class="math inline">\(i\)</span> at day <span class="math inline">\(d\)</span>:
 <span class="math display">\[\begin{equation}
 \phi_{i,d} = S_{unf,d}/S_{unf}^*
@@ -677,10 +679,12 @@ until <span class="math inline">\(S_{unf}^*\)</span> is reached and the unfoldin
 <div id="leafphenosenescence" class="section level3" number="4.1.3">
 <h3><span class="header-section-number">4.1.3</span> Leaf senescence</h3>
 <p>Leaf senescence follows the models developed by <span class="citation"><a href="#ref-Delpierre2009" role="doc-biblioref">Delpierre et al.</a> (<a href="#ref-Delpierre2009" role="doc-biblioref">2009</a>)</span>. The daily rate of development of senescence <span class="math inline">\(R_{sen,d}\)</span> is defined on the basis of daily photoperiod (<span class="math inline">\(Ph_{d}\)</span>, in hours) and temperature (<span class="math inline">\(T_d\)</span>, in <span class="math inline">\(^{\circ} \mathrm{C}\)</span>):
-<span class="math display">\[\begin{eqnarray}
-R_{sen,d}(Ph_d, T_d) &amp;=&amp; 0  \,\, &amp;if&amp; \,\, T_d \geq T_{sen} \,\, or \,\, Ph_d&gt;Ph_{sen} \\
-              &amp;=&amp; (T_d - T_{sen})^2 \cdot (Ph_d/Ph_{sen})^2  \,\, &amp;if&amp; \,\, T_d &lt; T_{sen} \,\,and \,\, Ph_d&lt;Ph_{sen}\\
-\end{eqnarray}\]</span>
+<span class="math display">\[\begin{equation}
+R_{sen,d}(Ph_d, T_d) = \begin{cases} 
+                            0  &amp; T_d \geq T_{sen} \,\, or \,\, Ph_d&gt;Ph_{sen} \\
+                           (T_d - T_{sen})^2 \cdot (Ph_d/Ph_{sen})^2  &amp; T_d &lt; T_{sen} \,\,and \,\, Ph_d&lt;Ph_{sen}
+                       \end{cases}
+\end{equation}\]</span>
 where <span class="math inline">\(Ph_{sen}\)</span> is the maximum photoperiod to start counting the senescence. The state of development of senescence <span class="math inline">\(S_{sen,d}\)</span> is defined
 <span class="math display">\[\begin{equation} 
 S_{sen,d} = \sum R_{sen,d}

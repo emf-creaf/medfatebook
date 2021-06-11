@@ -29,16 +29,18 @@ In the water balance model leaf area index ($LAI$) values of winter (semi-)decid
 
 ### Bud burst and leaf unfolding {#leafphenobudburst}
 Transition from ecodormancy to bud burst is estimated using a very simple one-phase ecodormancy model (also called the spring warming model) implemented in function `pheno_leafDevelopmentStatus()`. Given a base temperature ($T_{eco}$, in $^{\circ}\mathrm{C}$), the rate of development during the ecodormancy phase ($R_{eco}$, in $^{\circ} \mathrm{C}$) is zero for those days where mean temperature $T_{mean}$ is below $T_{eco}$ and  $T_{mean} - T_{eco})$ for those days where temperatures become warmer than this threshold:
-\begin{eqnarray}
-R_{eco,d}(T_d) &=& 0  \,\, &if& \,\, T_d \leq T_{eco} \\
-              &=& T_d - T_{eco}  \,\, &if& \,\, T_d > T_{eco} \\
-\end{eqnarray}
+\begin{equation}
+R_{eco,d}(T_d) = \begin{cases} 
+                      0  & T_d \leq T_{eco} \\
+                      T_d - T_{eco}  & T_d > T_{eco}
+                 \end{cases}
+\end{equation}
 Daily $R_{eco,d}$ values are added to the cumulative sum $S_{eco,d}$ and budburst occurs when $S_{eco,d} > S_{eco}^*$. Both $T_{eco}$ and $S_{eco}^*$ are plant-specific parameters in `spwbInput`. 
 
 After budburst, we model progressive leaf unfolding in a similar manner, by accumulating degree days using the same definition as for $R_{eco,d}$:
-\begin{eqnarray}
-R_{unf,d} &=& R_{eco,d} \\
-\end{eqnarray}
+\begin{equation}
+R_{unf,d} = R_{eco,d}
+\end{equation}
 and then defining an unfolding development status $S_{unf,d} = \sum_{d,eco}^{d} R_{unf,d}$, which we use to determine $\phi_{i,d}$, the degree of leaf expansion of cohort $i$ at day $d$:
 \begin{equation}
 \phi_{i,d} = S_{unf,d}/S_{unf}^*
@@ -47,10 +49,12 @@ until $S_{unf}^*$ is reached and the unfolding process ends, where $S_{unf}^*$ i
 
 ### Leaf senescence {#leafphenosenescence}
 Leaf senescence follows the models developed by @Delpierre2009. The daily rate of development of senescence $R_{sen,d}$ is defined on the basis of daily photoperiod ($Ph_{d}$, in hours) and temperature ($T_d$, in $^{\circ} \mathrm{C}$):
-\begin{eqnarray}
-R_{sen,d}(Ph_d, T_d) &=& 0  \,\, &if& \,\, T_d \geq T_{sen} \,\, or \,\, Ph_d>Ph_{sen} \\
-              &=& (T_d - T_{sen})^2 \cdot (Ph_d/Ph_{sen})^2  \,\, &if& \,\, T_d < T_{sen} \,\,and \,\, Ph_d<Ph_{sen}\\
-\end{eqnarray}
+\begin{equation}
+R_{sen,d}(Ph_d, T_d) = \begin{cases} 
+                            0  & T_d \geq T_{sen} \,\, or \,\, Ph_d>Ph_{sen} \\
+                           (T_d - T_{sen})^2 \cdot (Ph_d/Ph_{sen})^2  & T_d < T_{sen} \,\,and \,\, Ph_d<Ph_{sen}
+                       \end{cases}
+\end{equation}
 where $Ph_{sen}$ is the maximum photoperiod to start counting the senescence. The state of development of senescence $S_{sen,d}$ is defined
 \begin{equation} 
 S_{sen,d} = \sum R_{sen,d}
