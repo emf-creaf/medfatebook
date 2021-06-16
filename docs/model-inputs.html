@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2021-06-11" />
+<meta name="date" content="2021-06-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -415,7 +415,6 @@ div.csl-indent {
 <li class="chapter" data-level="15.5.3" data-path="growthmodelling.html"><a href="growthmodelling.html#forestgrowthcontrol"><i class="fa fa-check"></i><b>15.5.3</b> Control parameters</a></li>
 <li class="chapter" data-level="15.5.4" data-path="growthmodelling.html"><a href="growthmodelling.html#forestgrowthoutput"><i class="fa fa-check"></i><b>15.5.4</b> Model output</a></li>
 </ul></li>
-<li class="chapter" data-level="15.6" data-path="growthmodelling.html"><a href="growthmodelling.html#applications"><i class="fa fa-check"></i><b>15.6</b> Applications</a></li>
 </ul></li>
 <li class="chapter" data-level="16" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html"><i class="fa fa-check"></i><b>16</b> Carbon pools and components of carbon balance</a>
 <ul>
@@ -633,6 +632,7 @@ div.csl-indent {
 <h1><span class="header-section-number">Chapter 2</span> Model inputs</h1>
 <p>Data input for simulation models can be grouped into four categories. First, a description of the <strong>vegetation</strong> existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in <code>spwb()</code> calls, but becomes dynamic in calls to <code>growth()</code>. Hence, in this latter case the input vegetation describes to the starting point. Second, <strong>soil</strong> information is also required, because underground water resources are important for the processes included in the model. While soil features are considered static parameters in model simulations, <strong>weather</strong> is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur. Finally, <strong>topographic and geographic information</strong> is often required, since internal calculations of some physical variables (such as atmospheric pressure or radiation) require them.</p>
 <p>This chapter describes the requirements of <strong>medfate</strong> package with respect to each of these data input categories. The last section describes additional parameters that are used to specify global options of simulation functions (i.e., <code>spwb()</code>, <code>pwb()</code>, <code>growth()</code>, <code>fordyn()</code> and daily simulation functions).</p>
+<p>Since preparing inputs for simulations can be hard, package <a href="https://github.com/emf-creaf/medfateutils"><strong>medfateutils</strong></a> provides a set of utility functions aimed at facilitating this task.</p>
 <div id="topoinput" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Latitude and topography</h2>
 <p>Topography has a relatively small direct influence in <strong>medfate</strong> simulations, because most topographic effects are assumed to be taken into account in the estimation of weather input. Nonetheless, <em>elevation</em> in meters is needed to estimate atmospheric pressure and air density (see <a href="model-inputs.html#meteoinput">2.4</a>), whereas <em>aspect</em> (in degrees from North) and <em>slope</em> (also in degrees) are needed in addition to <em>latitude</em> (also in degrees North) to estimate sunrise/sunset hours and potential radiation. Topographic variables should be readily accessible for users having access to a digital elevation model.</p>
@@ -699,7 +699,7 @@ div.csl-indent {
 </tbody>
 </table>
 <p>The percent volume of silt is 100% minus the percent volume of clay and sand. Whenever possible, soil physical properties should be measured in soil profiles conducted at the target forest plot (although soil profiles rarely reach rooting depths of deeply-rooted plants). Soil input data should be arranged in a <code>data.frame</code> with soil layers in rows and physical variables in columns (see function <code>defaultSoilParams()</code>).</p>
-<p>The package includes function <code>soilgridsParams()</code> to fetch soil information from <a href="https://soilgrids.org/">SoilGrids.org</a>, a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.</p>
+<p>Package <a href="https://github.com/emf-creaf/medfateutils"><strong>medfateutils</strong></a> includes a function <code>soilgridsParams()</code> to fetch soil information from <a href="https://soilgrids.org/">SoilGrids.org</a>, a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.</p>
 <p>The depth of a given soil layer <span class="math inline">\(s\)</span> (<span class="math inline">\(Z_s\)</span>; in mm) is defined as the sum of layer widths from the surface to the target layer:
 <span class="math display">\[\begin{equation}
 Z_s = \sum_{i=1}^s{d_s}

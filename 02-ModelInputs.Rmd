@@ -4,6 +4,8 @@ Data input for simulation models can be grouped into four categories. First, a d
 
 This chapter describes the requirements of **medfate** package with respect to each of these data input categories. The last section describes additional parameters that are used to specify global options of simulation functions (i.e., `spwb()`, `pwb()`, `growth()`, `fordyn()` and daily simulation functions).
 
+Since preparing inputs for simulations can be hard, package [**medfateutils**](https://github.com/emf-creaf/medfateutils) provides a set of utility functions aimed at facilitating this task.
+
 ## Latitude and topography {#topoinput}
 
 Topography has a relatively small direct influence in **medfate** simulations, because most topographic effects are assumed to be taken into account in the estimation of weather input. Nonetheless, *elevation* in meters is needed to estimate atmospheric pressure and air density (see \@ref(meteoinput)), whereas *aspect* (in degrees from North) and *slope* (also in degrees) are needed in addition to *latitude* (also in degrees North) to estimate sunrise/sunset hours and potential radiation. Topographic variables should be readily accessible for users having access to a digital elevation model.
@@ -29,7 +31,7 @@ For each soil layer $s$, the following physical parameters are needed:
 
 The percent volume of silt is 100\% minus the percent volume of clay and sand. Whenever possible, soil physical properties should be measured in soil profiles conducted at the target forest plot (although soil profiles rarely reach rooting depths of deeply-rooted plants). Soil input data should be arranged in a `data.frame` with soil layers in rows and physical variables in columns (see function `defaultSoilParams()`). 
 
-The package includes function `soilgridsParams()` to fetch soil information from [SoilGrids.org](https://soilgrids.org/), a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.
+Package [**medfateutils**](https://github.com/emf-creaf/medfateutils) includes a function `soilgridsParams()` to fetch soil information from [SoilGrids.org](https://soilgrids.org/), a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.
 
 The depth of a given soil layer $s$ ($Z_s$; in mm) is defined as the sum of layer widths from the surface to the target layer:
 \begin{equation}
