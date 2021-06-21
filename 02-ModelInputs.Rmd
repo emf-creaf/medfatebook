@@ -167,7 +167,7 @@ Among them, the most important items are two data frames, `treeData` (for trees)
 
 While not strictly necessary (except for `fordyn()`), `forest` objects are a convenient format to start calculations with **medfate**, because there are many static functions that take forest objects as input and calculate leaf area index for each plant cohort. Another pathway to obtain LAI estimations is by specifying foliar biomass values as additional columns of forest objects. 
 
-With the aim to help users in the task of constructing `forest` objects, the package also includes functions initialize empty forests and to map user data in into tables `treeData` and `shrubData` (see function `forest_mapWoodyTables()`).
+With the aim to help users in the task of constructing `forest` objects, package [**medfateutils**](https://github.com/emf-creaf/medfateutils) includes functions to map user data in into tables `treeData` and `shrubData`.
 
 
 ### Vertical leaf distribution {#leafdistribution}
@@ -278,23 +278,21 @@ Whereas the weather variables listed in the table above are input requirements, 
 | $e_{atm}$ | $kPa$ | | Atmospheric water vapor pressure |
 
 
+## Simulation control {#controlparameters}
 
-
-## Control parameters {#controlparameters}
-
-Control parameters are a list of global parameter values, initialized using function `defaultControl()`, that the user can modify to change the general behavior of simulation functions. Here is the set of global control parameters currently accepted in **medfate**:
+Simulation control parameters are a list of global parameter values, initialized using function `defaultControl()`, that the user can modify to change the general behavior of simulation functions. Here is the set of global control parameters currently accepted in **medfate**:
 ```{r}
 names(defaultControl())
 ```
 
 
+Control parameters are employed when initializing vegetation inputs and state variables using functions `spwbInput()` and `growthInput()`, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as `spwb()` or `growth()`. Function `fordyn()` is different than the other simulation functions, because the list control parameters is directly passed to the function.
 
 Not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters). However, there are a set of parameters that apply to all simulations:
 
 + `verbose [=TRUE]`: Whether extra console output is desired during simulations.
 + `modifyInput [= TRUE]`: Boolean flag to indicate that simulations will modify the input object. If set to `FALSE`, simulations will not modify the input R object but return the current (modified) state variables within the output. In function `fordyn()` option `modifyInput` is always set to FALSE.
++ `fillMissingSpParams [=TRUE]`: Boolean flag to indicate that functions ` spwbInput()` and `growthInput()` should provide estimates for functional parameters if these are lacking in the species parameter table `SpParams`. Note that if `fillMissingSpParams` is set to `FALSE` then simulations may fail if the user does not provide values for required parameters.
 + `subdailyResults [=FALSE]`: Boolean flag to force subdaily results to be stored in calls to `spwb()`. Subdaily results are returned as a list called `subdaily` of `spwb_day` objects, one by simulated date. In function `fordyn()` option `subdailyResults` is always set to `FALSE` and, hence, subdaily results are not possible.
 
 In addition, there is an important control parameter called `transpirationMode`, because it allows the user to switch between the *basic* and *advanced* water balance models (chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). Another relevant control parameter is `plantWaterPools`, which allows considering plant water pools as explained in \@ref(plantwaterpools).
-
-Control parameters are employed when initializing vegetation inputs and state variables using functions `spwbInput()` and `growthInput()`, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as `spwb()` or `growth()`. Function `fordyn()` is different than the other simulation functions, because the list control parameters is directly passed to the function.
