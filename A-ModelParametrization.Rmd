@@ -1,57 +1,298 @@
 # (APPENDIX) Appendices {-}
 
-# Model parametrization {#modelparametrization}
+# Inbuilt parameter estimation {#modelparametrization}
 
-Package **medfate** provides routines to estimate them from a minimum set of input parameters. The whole process of estimation of those parameters is done automatically in functions `spwbInput()` and `forest2spwbInput()`, with the user controlling the process through the species parameter table input (e.g., `SpParamsMED`) an object `control` (see default values in `defaultControl()`). In the following we detail the calculations and present individual functions that perform partial calculations.
+## Introduction
 
-## Horizontal root overlap {#horizontalrootoverlap}
-### Basic water balance
-A given plant cohort $i$ will have its roots in layer $s$ partitioned among different water pools. We thus need to define $fr_{i,s,j}$, the (horizontal) proportion of fine roots of cohort $i$ in layer $s$ of the water pool $j$, with the restriction that: 
+Package **medfate** has been designed to allow simulations requiring a minimum set of vegetation functional parameters. This entails that several other parameters have to be estimated automatically (via inbuilt procedures) before starting simulations. Inbuilt parameter estimation is done in functions `spwbInput()` and `forest2spwbInput()`, with the user controlling the process through the species parameter table input (e.g., `SpParamsMED`) and the object `control` (see default control values in `defaultControl()`).
+
+Different kinds of vegetation functional parameters can be distinguished according to whether inbuilt parameter estimation is possible and how it is conducted:
+
+ + **Strictly-required parameters** are those for which there are no inbuilt estimation procedures implemented in the initialization functions. Hence, either values in the species parameter table input are non-missing or suitable values need to be specified before running simulation models.
+ + **Scaled parameters** are functional parameters that cannot be defined at the species level, because they need to be estimated taking into account the size and structure of the plant cohort. These are not normally defined at the level of species parameter table. Specific `control` parameters are used to determine how scaling is performed.
+ + **Imputable parameters** parameters are those for which the initialization routines can provide default values or estimations derived from relationships with other parameters. Parameter imputation is conducted if control parameter `fillMissingSpParams = TRUE`. Sometimes, default parameter values are also specified in the `control` object.
+ 
+The following tables describe how the different functional parameters are dealt with, grouped by function. Links are given to the chapter subsections where scaling and/or imputation procedures are described. 
+
+**Plant anatomy**
+
+| Symbol | R    | Description                          | Strict | Scaled | Imputable |
+|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
+| $H_{max}$  | `Hmed` | Maximum plant height | Yes | No | No |
+| $H_{med}$  | `Hmed` | Median plant height | Yes | No | No |
+| $1/H_{v}$  |  `Al2As` | Ratio of leaf area to sapwood area | No | No | \@ref(imputationHv) | 
+|  $LW$   | `LeafWidth` | Leaf width | Yes | No | No |
+| $SLA$  |  `SLA` | Specific leaf area | Yes | No | No |
+| $\rho_{leaf}$ |  `LeafDensity` | Leaf tissue density | No | No | \@ref(imputationtissuedensity) |
+| $\rho_{wood}$ |  `WoodDensity` | Wood tissue density | No | No | \@ref(imputationtissuedensity) |
+| $\rho_{fineroot}$ | `FineRootDensity` | Fine root tissue density | No | No | \@ref(imputationtissuedensity) |
+| $f_{conduits}$ |`conduit2sapwood` | Proportion of sapwood corresponding to xylem conduits | No | No | \@ref(imputationcond2sap) |
+| $SRL$ |  `SRL` | Specific fine root length | No | No | \@ref(imputationSRLRLD) |
+| $RLD$ | `RLD` | Fine root length density | No | No | \@ref(imputationSRLRLD) |
+| $r_{6.35}$ | `r635` | Ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm | Yes | No | No |
+
+**Leaf phenology**
+
+| Symbol | R    | Description                          | Strict | Scaled | Imputable |
+|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
+|        |  `PhenologyType`  | Leaf phenology type    | Yes | No | No |
+| $LD$ | `LeafDuration` | Average duration of leaves | Yes | No | No |
+| $S^*_{eco}$ | `Sgdd` | Degree days corresponding to leaf budburst | Yes | No | No |
+| $T_{eco}$ |  `Tbgdd` | Base temperature for the calculation of degree days to leaf budburst | No | No | \@ref(imputationphenology) |
+| $S^*_{sen}$ | `Ssen` | Degree days corresponding to leaf senescence  | No | No | \@ref(imputationphenology) |
+| $Ph_{sen}$ | `Phsen` | Photoperiod corresponding to start counting senescence degree-days | No | No | \@ref(imputationphenology) |
+| $T_{sen}$ | `Tbsen` | Base temperature for the calculation of degree days to leaf senescence | No | No | \@ref(imputationphenology) |
+
+**Radiation balance and water interception**
+
+| Symbol | R    | Description                          | Strict | Scaled | Imputable | 
+|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
+| $k_{PAR}$ | `kPAR` | PAR extinction coefficient   | Yes | No | No |
+| $\alpha_{SWR}$ | `alphaSWR` | Short-wave radiation leaf absorbance coefficient | Yes | No | No |
+| $\gamma_{SWR}$ | `gammaSWR` | Short-wave radiation leaf reflectance (albedo) |   Yes | No | No |
+| $s_{water}$ | `g` | Crown water storage capacity | Yes | No | No |
+
+
+**Hydraulics, transpiration, photosynthesis**
+
+| Symbol | R    | Description                          | Strict | Scaled | Imputable |
+|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
+| $T_{max, LAI}$ | `Tmax_LAI` | Empirical coefficient relating LAI with the ratio of maximum transpiration over potential evapotranspiration | No | No | \@ref(imputationtranspwue) |
+| $T_{max, sqLAI}$ | `Tmax_LAIsq` | Empirical coefficient relating squared LAI with the ratio of maximum transpiration over potential evapotranspiration | No | No | \@ref(imputationtranspwue) |
+| $WUE_{\max}$ | `WUE` |  Water use efficiency  | No | No | \@ref(imputationtranspwue) |
+| $\Psi_{extract}$ | `Psi_Extract` |  The water potential at which plant transpiration is 50% of its maximum | Yes | No | No |
+| $\Psi_{critic,i}$ | `Psi_Critic` |  The water potential corresponding to 50% of stem xylem cavitation |  Yes | No | No |
+| $K_{rootdisc}$ | `pRootDisc` |  Whole-plant relative transpiration corresponding to hydraulic disconnection from the soil  | No |  No | \@ref(imputationsoildisconnection) |
+| $g_{swmin}$ | `Gwmin` | Minimum stomatal conductance to water vapour | No | No | \@ref(imputationstomatalconductance) |
+| $g_{swmax}$ | `Gwmax` | Maximum stomatal conductance to water vapour | No | No | \@ref(imputationstomatalconductance) |
+| $J_{max, 298}$ | `Jmax298` | Maximum rate of electron transport at 298K | No | No | \@ref(imputationphotosynthesis) |
+| $V_{max, 298}$ | `Vmax298` | Rubisco's maximum carboxylation rate at 298K | No | No | \@ref(imputationphotosynthesis) |
+| $K_{stem,max,ref}$ | `Kmax_stemxylem` | Maximum stem sapwood reference conductivity per leaf area unit | No | No | \@ref(imputationKstemKroot) |
+| $K_{root,max,ref}$ | `Kmax_rootxylem` | Maximum root sapwood reference conductivity per leaf area unit | No | No | \@ref(imputationKstemKroot) |
+| $k_{leaf, \max}$ | `VCleaf_kmax` | Maximum leaf hydraulic conductance | No | \@ref(scalingkleaf) | \@ref(imputationkleaf) |
+| $k_{stem, \max}$ | `VCstem_kmax` | Maximum stem hydraulic conductance | No | \@ref(scalingkstem) | No |
+| $k_{root, \max,s}$ | `VCroot_kmax` | Maximum root hydraulic conductance for each soil layer | No | \@ref(scalingkroot) | No |
+|$k_{rhizo,\max, s}$ |  `VGrhizo_kmax` | Maximum hydraulic conductance of the rhizosphere for each soil layer | No | \@ref(scalingkrhizo) | No |
+| $c_{leaf}$, $d_{leaf}$ | `VCleaf_c`, `VCleaf_d` | Parameters of the vulnerability curve for leaves | No | No | \@ref(imputationVCs) |
+| $c_{stem}$, $d_{stem}$ | `VCstem_c`, `VCstem_d` | Parameters of the vulnerability curve for stem xylem | No | No | \@ref(imputationVCs) |
+| $c_{root}$, $d_{root}$ | `VCroot_c`, `VCroot_d` | Parameters of the vulnerability curve for root xylem | No | No | \@ref(imputationVCs) |
+
+
+**Plant water storage**
+
+| Symbol | R    | Description                          | Strict | Scaled | Imputable |
+|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
+| $\epsilon_{leaf}$ | `LeafEPS` | Modulus of elasticity of leaves | No | No | \@ref(inputationPV) |
+| $\epsilon_{stem}$ | `StemEPS` | Modulus of elasticity of symplastic xylem tissue | No | No | \@ref(inputationPV) |
+| $\pi_{0,leaf}$ | `LeafPI0` | Osmotic potential at full turgor of leaves | No | No | \@ref(inputationPV) |
+| $\pi_{0,stem}$ | `StemPI0` | Osmotic potential at full turgor of symplastic xylem tissue | No | No | \@ref(inputationPV) |
+| $f_{apo,leaf}$ |  `LeafAF` | Apoplastic fraction in leaf tissues | No | No | \@ref(inputationPV) |
+| $f_{apo,stem}$ |  `StemAF` | Apoplastic fraction in stem tissues | No | No | \@ref(inputationPV) |
+| $V_{leaf}$ |  `Vleaf` | Leaf water capacity per leaf area unit | No | \@ref(plantwaterstoragecapacity) | No |
+| $V_{sapwood}$ |  `Vsapwood` | Sapwood water capacity per leaf area unit | No | \@ref(plantwaterstoragecapacity) | No |
+
+**Allometric coefficients**
+
+| Symbol | R    | Description                          | Strict | Scaled | Imputable |
+|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
+| $a_{ash}$ | `Aash` | Coefficient relating the square of shrub height with shrub area | Yes | No | No |
+| $a_{bsh}$, $b_{bsh}$ | `Absh`, `Bbsh` | Coefficients relating crown volume with dry weight of shrub individuals | Yes | No | No |
+| $a_{cr}$, $b_{1cr}$, $b_{2cr}$, $b_{3cr}$, $c_{1cr}$, $c_{2cr}$ | `B1cr`, `B2cr`, `B3cr`, `C1cr`, `C2cr` | Coefficients to calculate crown ratio of trees | Yes | No | No |
+| $a_{cw}$, $b_{cw}$ | `Acw`, `Bcw` | Regression coefficients used to calculate the crown width of trees | Yes | No | No |
+
+**Growth**
+
+| Symbol | R    | Description                          | Strict | Scaled | Imputable |
+|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
+| $MR_{leaf}$ | `RERleaf` | Leaf respiration rate at 20 ºC | No | No | \@ref(imputationRER) |
+| $MR_{sapwood}$ | `RERsapwood` | Living sapwood (parenchymatic tissue) respiration rate at 20 ºC | No | No | \@ref(imputationRER) |
+| $MR_{fineroot}$ | `RERfineroot` | Fine root respiration rate at 20 ºC | No | No | \@ref(imputationRER) |
+| $RGR_{leaf, max}$ | `RGRleafmax` | Maximum leaf area daily growth rate, relative to sapwood area | No | No | \@ref(imputationRGR) |
+| $RGR_{sapwood, max}$ | `RGRsapwoodmax` | Maximum daily sapwood relative growth rate (in sapwood area basis) | No | No | \@ref(imputationRGR) |
+| $RGR_{fineroot, max}$ | `RGRfinerootmax` | Maximum daily fine root relative growth rate | No | No | \@ref(imputationRGR) |
+| $f_{HD,min}$ | `fHDmin` | Minimum height-to-diameter ratio | Yes | No | No 
+| $f_{HD,max}$ | `fHDmax` | Maximum height-to-diameter ratio | Yes | No | No |
+| $C_{wood}$ | `WoodC` | Wood carbon content per dry weight  | No | No | \@ref(imputationCwood) |
+
+
+**Recruitment**
+
+| Symbol | R    | Description                          | Strict | Scaled | Imputable |
+|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
+| $H_{seed}$  | `SeedProductionHeight` | Minimum height for seed production | No | No | \@ref(imputationrecruitment) |
+| $TCM_{recr}$  |  `MinTempRecr` |  Minimum average temperature (Celsius) of the coldest month for successful recruitment | No | No | \@ref(imputationrecruitment) |
+| $MI_{recr}$  | `MinMoistureRecr` |  Minimum value of the moisture index for successful recruitment | No | No | \@ref(imputationrecruitment) |
+| $FPAR_{recr}$  |  `MinFPARRecr` | Minimum percentage of PAR at the ground level for successful recruitment | No | No | \@ref(imputationrecruitment) |
+| $DBH_{recr}$  | `RecrTreeDBH` | Recruitment DBH for trees | No | No | \@ref(imputationrecruitment) |
+| $H_{tree, recr}$  | `RecrTreeHeight` | Recruitment height for trees | No | No | \@ref(imputationrecruitment) |
+| $N_{tree, recr}$  | `RecrTreeDensity` | Recruitment density for trees | No | No | \@ref(imputationrecruitment) |
+| $Cover_{shrub, recr}$  | `RecrShrubCover` | Recruitment cover for shrubs | No | No | \@ref(imputationrecruitment) |
+| $H_{shrub, recr}$  |  `RecrShrubHeight` | Recruitment height for shrubs | No | No | \@ref(imputationrecruitment) |
+| $Z50_{recr}$  | `RecrZ50` | Soil depth corresponding to 50% of fine roots for recruitment | No | No | \@ref(imputationrecruitment) |
+| $Z95_{recr}$  | `RecrZ95` | Soil depth corresponding to 95% of fine roots for recruitment | No | No | \@ref(imputationrecruitment) |
+
+## Imputation of missing values
+
+### Huber value {#imputationHv}
+
+When missing from species parameter table, the ratio of leaf area to sapwood area (i.e. the inverse of Huber value) is set to a default value $1/Hv = 2500$ (i.e. $Hv = 4 \,cm·m^{-2}$). [JUSTIFICATION MISSING]
+
+### Tissue density {#imputationtissuedensity}
+
+Default values for the dry weight density of tissue (in $g \cdot cm^{-3}$) are $\rho_{leaf} = 0.7$, $\rho_{wood} = 0.652$ and $\rho_{fineroot} = 0.165$, respectively. [JUSTIFICATION MISSING]
+
+### Ratio of conduits to sapwood {#imputationcond2sap}
+
+According to @Plavcova2015, default values for the fraction of sapwood corresponding to conduits are $f_{conduits} = 0.7$ (i.e. 30\% of parenchyma) for angiosperms, and $f_{conduits} = 0.925$ (i.e. 7.5\% of parenchyma) for gymnosperms.
+
+### Specific root length and root length density {#imputationSRLRLD}
+
+Default values for specific fine root length and fine root length density are $3870\, cm \cdot g^{-1}$  and $10\, cm \cdot cm^{-3}$, respectively. [JUSTIFICATION MISSING]
+
+### Leaf phenology {#imputationphenology}
+
+At present, default values for phenological parameters are the same regardless of the leaf phenology type:
+
+|  Phenology type | `Tbgdd` |  `Ssen` |  `Phsen` |  `Tbsen` |
+|:--------------- |:-----:|:-----:|:-----:|:-----:|
+| One-flush evergreen | 5 | 8268 | 12.5 | 28.5 |
+| Winter deciduous | 5 | 8268 | 12.5 | 28.5 |
+| Winter semi-deciduous | 5 | 8268 | 12.5 | 28.5 |
+
+Leaf senescence values were derived for deciduous broad-leaved forests by @Delpierre2009.
+
+### Basic transpiration and water-use efficiency {#imputationtranspwue}
+
+When the basic soil water balance model is used, $T_{max,LAI}$ and $T_{max,sqLAI}$ are species-specific parameters that regulate the maximum transpiration of plant cohorts (see \@ref(maximumtranspiration)). When these parameters are missing from `SpParams` table, they are given default values $T_{max,LAI} = 0.134$ and $T_{max,sqLAI} = -0.006$, according to @Granier1999.  Similarly, when water use efficiency coefficient is missing, it is set to a default value: $WUE_{i} = 4$.
+
+
+### Disconnection from the soil {#imputationsoildisconnection}
+
+When missing, the relative whole-plant conductance corresponding to disconnection from the soil is set to $K_{rootdisc,i} = 0$, its default value.
+
+### Stem and root maximum hydraulic conductivity {#imputationKstemKroot}
+
+Tissue-level maximum conductivity parameters (i.e. $K_{stem,max,ref}$ and $K_{root,max,ref}$) are not direct parameters to simulation functions. Instead, theay are scaled to estimate stem- and root-level hydraulic conductances (i.e. $k_{stem, \max}$ and $k_{root, \max}$) using plant size (see \@ref(scalingkstem) and \@ref(scalingkroot) for details). $K_{stem,max,ref}$ and $K_{root,max,ref}$ are supplied via species parameter table and missing values can therefore occur. 
+
+Using data obtained from @Maherali2004, suitable $K_{stem,max,ref}$ values are decided according to combinations of taxon group (either Angiosperm or Gymnosperm), growth form (either tree or shrub) and leaf phenology:
+
+| Group | Growth form | Leaf phenology | $K_{stem,max,ref}$ |
+|:-------- |:-------- |:-------- |:--------:|
+| Angiosperm | Tree | Winter-(semi)deciduous | 1.58 |
+| Angiosperm | Shrub | Winter-(semi)deciduous | 1.55 |
+| Angiosperm | Tree/Shrub | Evergreen | 2.43 |
+| Gymnosperm | Tree | any | 0.48 |
+| Gymnosperm | Shrub | any | 0.24 |
+
+Following @Oliveras2003, missing values for $K_{root,max,ref}$ are assumed to be four-times the values given or estimated for $K_{stem,max,ref}$.
+
+### Leaf maximum hydraulic conductance {#imputationkleaf}
+Leaf maximum hydraulic conductance ($k_{l, max}$, in $mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}$) is an input parameter that should be provided for each species. When missing, leaf maximum hydraulic conductance is assumed $k_{l, max}=6$ for conifers and $k_{l, max}=8$ for angiosperms [@Sack2006].
+
+### Xylem vulnerability curves {#imputationVCs}
+Vulnerability curves in **medfate** need to be specified for leaves, stem and root segments via the two parameters of the Weibull function (see \@ref(vulnerabilitycurves)). 
+
+When any of the parameters of the stem vulnerability curve is missing, A suitable estimate of $\Psi_{50,stem}$ the water potencial corresponding to 50\% of conductance loss, can be obtained from @Maherali2004 according to combinations of taxon group (either Angiosperm or Gymnosperm), growth form (either tree or shrub) and leaf phenology:
+
+| Group | Growth form | Leaf phenology | $\Psi_{50,stem}$ |
+|:-------- |:-------- |:-------- |:--------:|
+| Angiosperm | Tree/Shrub | Winter-(semi)deciduous | -2.34 |
+| Angiosperm | Tree | Evergreen | -1.51 |
+| Angiosperm | Shrub | Evergreen | -5.09 |
+| Gymnosperm | Tree | any | -4.17 |
+| Gymnosperm | Shrub | any | -8.95 |
+
+A regression equation using data from @Choat2012 can be used to estimate $\Psi_{88,stem}$ from $\Psi_{50,stem}$:
 \begin{equation}
-\sum_{j}{fr_{i,s,j}} = 1 \,\, \forall i,s
+\Psi_{88,stem} = -1.4264 + 1.2593 \cdot \Psi_{50,stem}
 \end{equation}
-It is important to realize that proper estimation of $fr_{i,s,j}$ is challenging when we do not have explicit plant coordinates, root lateral widths, etc. For this reason, an intuitive approach is followed here based on the following two premises:
 
- + The amount of overlap between roots of different plants should monotonically increase along with the LAI of the stand (i.e. $LAI^{live}_{stand}$).
- + The amount of overlap between roots of different plants at a given soil depth should increase/decrease with the vertical proportion of roots at that depth.
+Finally, estimates for $c_{stem}$ and $d_{stem}$ are obtained from $\Psi_{50,stem}$ and $\Psi_{88,stem}$ via function `hydraulics_psi2Weibull()`.
 
-The specific formulation we chose for $fr_{i,s,j}$ is:
+Vulnerability curves for root xylem are less common than for stem xylem. If these values are missing, $\Psi_{50,stem}$ is first estimated according to its definition and the stem vulnerability curve parameters, $c_{stem}$ and $d_{stem}$. Then, a relationship from @Bartlett2012 is used to estimate $\Psi_{50, root}$ from $\Psi_{50,stem}$:
 \begin{equation}
-fr_{i,s,j}  = f_{pool,j} \cdot (1 - \exp(- f_{overlap} \cdot LAI^{live}_{stand}))  \cdot \left( \frac{\sqrt{FRP_{i,s} \cdot FRP_{j,s}}}{\max_{s}(FRP_{i,s})} \right)
+\Psi_{50, root} = 0.4892 + 0.742 \cdot \Psi_{50,stem}
 \end{equation}
-for all $j \neq i$, where $f_{overlap}$ is an overlap factor (a control parameter called `poolOverlapFactor`). For $j=i$ then we simply have: 
+Finally, $\Psi_{88,stem}$ and the Weibull vulnerability parameters are obtained as explained for stems.
+
+When leaf vulnerability curves are missing, estimate for $c_{leaf}$ is the same value as $c_{stem}$, whereas $d_{leaf}$ is set to 66\% of $d_{stem}$ [@Sperry2016]. 
+
+### Pressure-volume curves {#inputationPV}
+
+Parameters of the pressure-volume curve (i.e. $\pi_{0,stem}$ and $\epsilon_{stem}$) for leaf and stem symplastic tissue are required for each species. 
+
+When parameters for stem tissue are missing, **medfate** estimates them from wood density following @Christoffersen2016:
 \begin{equation}
-fr_{i,s,i}  =  1 - \sum_{j}{fr_{i,s,j}}
+\pi_{0,stem} = 0.52 - 4.16 \cdot \rho_{wood}
 \end{equation}
-Note that if $f_{overlap} = 0$ then $fr_{i,s,j} = 1$ if $j=i$ and zero otherwise (i.e. plants exploit their corresponding water pools only. For very large values of $LAI^{live}_{stand}$ and/or $f_{overlap}$ we have that $(1 - \exp(- f_{overlap} \cdot LAI^{live}_{stand})) = 0$ and $fr_{i,s,j} = f_{pool,j}$ (neglecting vertical differences), so that plants exploit the each water pool in the same proportion as the fraction of stand occupied by the pool (i.e. overlap is maximum).
 
-
-## Plant Hydraulics
-### Vulnerability curves
-Leaf and xylem vulnerability curves are often described using $\Psi_{50}$, the water potential at which hydraulic conductance is half of maximum. As noted above, parameter $d$ in eq. \@ref(eq:xylemvulnerability) is the water potential $\Psi$ at which $k_{x}(\Psi)/k_{x,max} = e^{-1} = 0.367$ (and the same for eq. \@ref(eq:leafvulnerability)). Hence, the two definitions do not match. Using the definition of $\Psi_{50}$ in eq. \@ref(eq:xylemvulnerability) we have:
 \begin{equation}
-0.5 = e^{-((\Psi_{50}/d)^c)}
+\epsilon_{stem} = \sqrt{1.02 \cdot e^{8.5\cdot \rho_{wood}}-2.89}
 \end{equation}
-from which we obtain that the value for parameter $d$ should be:
+while the apoplastic fraction of stem is assumed to be 80\%, i.e. $f_{apo,stem} = 0.8$.
+
+Following @Bartlett2012, average values for Mediterranean climate leaves are taken as defaults for missing leaf pressure-volume parameters, i.e. $\pi_{leaf} = -2$ MPa, $\epsilon_{leaf} = 17$, whereas a 29\% leaf apoplastic fraction is assumed (i.e. $f_{apo,leaf} = 0.29$).
+
+### Stomatal conductance {#imputationstomatalconductance}
+When species-specific values are missing for maximum stomatal conductance ($g_{swmax}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$), the following relation with maximum leaf hydraulic conductance ($k_{l, max}$) is used [@Mencuccini2003]:
 \begin{equation}
-d = \frac{\Psi_{50}}{(-ln(0.5))^{1/c}}= \frac{\Psi_{50}}{0.69314^{1/c}}
+g_{swmax} = e^{4.797 + 0.633\cdot \log(k_{l, max})}
 \end{equation}
-Hence, this operation should be used when specifying this parameter from $\Psi_{50}$. Vulnerability curves for root xylem are less common than for stem xylem. If these values are missing, functions `spwbInput()` and `forest2spwbInput()` will use for $c$ the same value as in stems, and for $d$ half the value of that of stems [@Sperry2016]. If the values for leaves are missing, initialization functions will use for $c$ the same value as in stems, and for $d$ 66% of the value for stems.
+Note that values for $k_{l, max}$ may also be imputed (see \@ref(imputationsoildisconnection)).
 
-Rhizosphere conductance is regulated in the model using the van Genuchten function given in eq. \@ref(eq:rhizovulnerability), and parameters $n$ and $\alpha$ for each soil layer were already available from soil initialization (i.e. function `soil()`):
-```{r}
-s = soil(defaultSoilParams(3))
-s$VG_n
-s$VG_alpha
-```
+Default values for minimum stomatal conductance ($g_{swmin}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) were defined depending on taxonomic order, from @Duursma2018:
+
+| Order       | $g_{swmin}$ |
+| :----------- |:-----------:|
+| Pinales | 0.003 |
+| Araucariales | 0.003 |
+| Ericales | 0.004 |
+| Fagales | 0.0045 |
+| Rosales | 0.0045 |
+| Cupressales | 0.0045 |
+| Lamiales | 0.0055 |
+| Fabales | 0.0065 |
+| Myrtales | 0.0075 |
+| Poales | 0.0110 |
+| Other | 0.0049 |
+
+### Photosynthesis rates {#imputationphotosynthesis}
+
+Rubisco's maximum carboxylation rate at 25ºC ($V_{max, 298}$, in $\mu mol CO_2 \cdot s^{-1} \cdot m^{-2}$) is a required input parameter for each species (`Vmax298`). When missing, the work by @Walker2014 suggests that suitable estimates can be derived from $SLA$ and $N_{area}$, the latter being the nitrogen concentration per leaf area:
+\begin{equation}
+V_{max, 298} = e^{1.993 + 2.555\cdot \log(N_{area}) - 0.372 \cdot \log(SLA) + 0.422 \cdot \log(N_{area})\cdot \log(SLA) }
+\end{equation}
+
+If $N_{area}$ and $SLA$ values are not available, a default value of 100 $\mu mol CO_2 \cdot s^{-1} \cdot m^{-2}$ is used for $V_{max, 298}$ imputation. 
+
+When the maximum rate of electron transport at the same temperature ($J_{max, 298}$) is not provided by the user, it can be estimated from $V_{max, 298}$ using [@Walker2014]:
+
+\begin{equation}
+J_{max, 298} = e^{1.197 + 0.847\cdot \log(V_{max,298})}
+\end{equation}
+
+### Maintenance respiration rates {#imputationRER}
+
+When missing at the species parameter table, maintenance respiration rates for leaves, sapwood and fine roots are taken from `control` parameters (all values in $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$). Default values ($MR_{leaf} = 0.00260274$), sapwood ($MR_{sapwood} = 6.849315e-05$) and fine roots ($MR_{fineroot} 0.002054795$) were derived from @Ogle2009.
+
+### Relative growth rates {#imputationRGR}
+
+When missing at the species parameter table, maximum relative growth rates for leaves, sapwood and fine roots are taken from `control` parameters. [JUSTIFICATION MISSING]
 
 
-Aboveground and belowground stem maximum conductance values at the plant level ($k_{s, max}$ and $k_{r, max}$) will not be normally available and the same for the rhizosphere ($k_{rh, max}$). 
+### Wood carbon {#imputationCwood}
 
-### Leaf maximum conductance
-Leaf maximum conductance ($k_{l, max}$, in $mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}$) is an input parameter that should be provided for each species. When missing, leaf maximum hydraulic conductance is assumed $k_{l, max}=6$ for conifers and $k_{l, max}=8$ for angiosperms [@Sack2006].
+A default value of $C_{wood} = 0.5\,g\,C\cdot g\,dry^{-1}$ is used for species with missing values for this parameter.
 
-### Stem xylem maximum conductance
+### Recruitment {#imputationrecruitment}
+
+Imputation of missing values for recruitment is specified via `control` parameters. Default values are provided in \@ref(forestdynamicscontrol)
+
+
+## Scaling size-related parameters
+
+
+### Stem xylem maximum conductance {#scalingkstem}
 Estimation of maximum stem conductance ($k_{s,max}$, in $mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}$) is done by function `hydraulics_maximumStemHydraulicConductance()` and follows the work by @Savage2010, @Olson2014 and @Christoffersen2016. Calculations are based on tree height and two species-specific parameters: maximum sapwood reference conductivity ($K_{s,max,ref}$) and the ratio of leaf area to sapwood area ($A_{l}/A_{s}$; `Al2As` in `SpParamsMED`), i.e. the inverse of the Huber value $H_v$.
 
 The reference value for maximum sapwood conductivity $K_{s,max,ref}$ is assumed to have been measured on a *terminal branch* of a plant of known height $H_{ref}$. If our target plant is very different in height, the conduits of terminal branches will have different radius and hence conductivity. We correct the reference conductivity to the target plant height using the following empirical relationship, developed by @Olson2014 between tree height and diameter of conduits for angiosperms and the equation described by @Christoffersen2016:
@@ -165,7 +406,10 @@ lines(Hs/100, qi_no_tap, lty = 2)
 legend('topright', legend = c('Taper', 'No taper'), lty = 1:2, bty="n")
 ```
 
-### Root xylem maximum hydraulic conductance
+
+### Leaf maximum hydraulic conductance {#scalingkleaf}
+
+### Root xylem maximum hydraulic conductance {#scalingkroot}
 To obtain maximum root xylem conductance ($k_{r, max}$, in $mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}$), one option taken by @Christoffersen2016 is to assume that minimum stem resistance (inverse of maximum conductance) represents a fixed proportion of the minimum total tree (stem+root) resistance. A value 0.625 (i.e. 62.5%) suggested by these authors leads to maximum total tree conductance for our *Q. ilex* tree being:
 ```{r}
 ktot = kstemmax*0.625
@@ -180,6 +424,7 @@ krootmax
 
 Now, we need to divide total maximum conductance of the root system xylem among soil layers we need weights inversely proportional to the length of transport distances [@Sperry2016]. Vertical transport lengths can be calculated from soil depths and radial spread can be calculated assuming cylinders with volume proportional to the proportions of fine root biomass. Let's assume a soil with three layers:
 ```{r}
+s = soil(defaultSoilParams(3))
 d = s$dVec
 d
 ```
@@ -239,8 +484,7 @@ abline(h=62.5, col="gray")
 
 where the horizontal gray line indicates the value of 62.5%. Of course rooting depth also increases with tree age, but young trees have higher root-to-shoot ratios than older ones. Hence, a root maximum conductance that is not fixed but increases with age seems a priori more realistic. Moreover, @Christoffersen2016 justify the value of 62.5% from a study which quantified total aboveground and belowground resistance in tropical trees [@Fisher2006] under near-saturated (wet season) conditions, but values of belowground resistance reported in this study for wet conditions and trees of 30 m height are around 13%, which equals to 87% fraction of aboveground resistance. On the other hand, while rooting depths are limited by soil depth, lateral root length increases with age and, hence, the model could be made more realistic if this is taken into account and the curve above would probably saturate at lower percentages.
 
-
-### Rhizosphere maximum hydraulic conductance
+### Rhizosphere maximum hydraulic conductance {#scalingkrhizo}
 Maximum rhizosphere conductance ($k_{rh, max}$, in $mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}$) is difficult to measure directly, as it depends on the rhizosphere (i.e. fine root) surface in each soil layer, and will probably always be a parameter to be calibrated. Instead of trying to estimate rhizosphere surface from root architecture [@Sperry1998], we follow @Sperry2016a and determine the maximum rhizosphere conductance in each layer from an inputed 'average percentage rhizosphere resistance'. The percentage of continuum resistance corresponding to the rhizosphere is calculated from the vulnerability curves of stem, root and rhizosphere at the same water potential. The average resistance is found by evaluating the percentage for water potential values between 0 and $\Psi_{crit}$. The following figure illustrates how the supply function, for different soil water potentials, is affected by increasing values of the average percentage of rhizosphere resistance:
 
 ```{r, fig.width=4.5, fig.height=4.5, fig.align='center', echo=FALSE}
@@ -334,16 +578,6 @@ The values are the same because the texture of the three layers is the same in t
 krmax*v1
 ```
 
-### Pressure-volume curves
-
-Parameters of the pressure-volume curve (i.e. $\pi_{0,stem}$ and $\epsilon_{stem}$) for leaf and stem symplastic tissue are required for each species. When parameters for stem tissue are missing, **medfate** estimates them from wood density following @Christoffersen2016:
-\begin{equation}
-\pi_{0,stem} = 0.52 - 4.16 \cdot \rho_{wood}
-\end{equation}
-
-\begin{equation}
-\epsilon_{stem} = \sqrt{1.02 \cdot e^{8.5\cdot \rho_{wood}}-2.89}
-\end{equation}
 
 ### Plant water storage capacity {#plantwaterstoragecapacity}
 The water storage capacity of sapwood tissue per leaf area unit ($V_{sapwood}$; in $l \cdot m^{-2}$) can be estimated as the product of stem height ($H$ in m) and Huber value ($H_v$; ratio of sapwood area to leaf area in $m^2 \cdot m^{-2}$) times a factor to account for the non-cylindrical shape (http://www.fao.org/forestry/17109/en/):
@@ -378,22 +612,24 @@ SLA = 5.870
 hydraulics_leafWaterCapacity(SLA, ld)
 ```
 
-
-## Stomatal regulation and photosynthesis
-
-### Stomatal conductance
-Maximum stomatal conductance ($g_{swmax}$) is an input parameter for each species. When species-specific values are missing, the following relation with maximum leaf hydraulic conductance ($k_{l, max}$) is used [@Mencuccini2003]:
+### Horizontal root overlap {#horizontalrootoverlap}
+#### Basic water balance
+A given plant cohort $i$ will have its roots in layer $s$ partitioned among different water pools. We thus need to define $fr_{i,s,j}$, the (horizontal) proportion of fine roots of cohort $i$ in layer $s$ of the water pool $j$, with the restriction that: 
 \begin{equation}
-g_{swmax} = e^{4.797 + 0.633\cdot \log(k_{l, max})}
+\sum_{j}{fr_{i,s,j}} = 1 \,\, \forall i,s
 \end{equation}
+It is important to realize that proper estimation of $fr_{i,s,j}$ is challenging when we do not have explicit plant coordinates, root lateral widths, etc. For this reason, an intuitive approach is followed here based on the following two premises:
 
-Species values for $g_{swmin}$ were taken from @Duursma2018. Following the same authors, a value of $g_{swmin}$ = 0.0045 $mol H_2O \cdot s^{-1} \cdot m^{-2}$ is taken as default, when species-specific values are missing.
+ + The amount of overlap between roots of different plants should monotonically increase along with the LAI of the stand (i.e. $LAI^{live}_{stand}$).
+ + The amount of overlap between roots of different plants at a given soil depth should increase/decrease with the vertical proportion of roots at that depth.
 
-### Photosynthesis
-
-Rubisco's maximum carboxylation rate at 25ºC ($V_{max, 298}$, in $\mu mol CO_2 \cdot s^{-1} \cdot m^{-2}$) is a required input parameter for each species (`Vmax298`), and if its value is missing a default value of 100 $\mu mol CO_2 \cdot s^{-1} \cdot m^{-2}$ is used. The maximum rate of electron transport at the same temperature ($J_{max, 298}$) can be provided by the user (`Jmax298`) but, if not, it is estimated from $V_{max, 298}$ using @Walker2014:
-
+The specific formulation we chose for $fr_{i,s,j}$ is:
 \begin{equation}
-J_{max, 298} = e^{1.197 + 0.847\cdot \log(V_{max,298})}
+fr_{i,s,j}  = f_{pool,j} \cdot (1 - \exp(- f_{overlap} \cdot LAI^{live}_{stand}))  \cdot \left( \frac{\sqrt{FRP_{i,s} \cdot FRP_{j,s}}}{\max_{s}(FRP_{i,s})} \right)
 \end{equation}
+for all $j \neq i$, where $f_{overlap}$ is an overlap factor (a control parameter called `poolOverlapFactor`). For $j=i$ then we simply have: 
+\begin{equation}
+fr_{i,s,i}  =  1 - \sum_{j}{fr_{i,s,j}}
+\end{equation}
+Note that if $f_{overlap} = 0$ then $fr_{i,s,j} = 1$ if $j=i$ and zero otherwise (i.e. plants exploit their corresponding water pools only. For very large values of $LAI^{live}_{stand}$ and/or $f_{overlap}$ we have that $(1 - \exp(- f_{overlap} \cdot LAI^{live}_{stand})) = 0$ and $fr_{i,s,j} = f_{pool,j}$ (neglecting vertical differences), so that plants exploit the each water pool in the same proportion as the fraction of stand occupied by the pool (i.e. overlap is maximum).
 
