@@ -571,7 +571,7 @@ div.csl-indent {
 <li class="chapter" data-level="A.1" data-path="modelparametrization.html"><a href="modelparametrization.html#introduction"><i class="fa fa-check"></i><b>A.1</b> Introduction</a></li>
 <li class="chapter" data-level="A.2" data-path="modelparametrization.html"><a href="modelparametrization.html#imputation-of-missing-values"><i class="fa fa-check"></i><b>A.2</b> Imputation of missing values</a>
 <ul>
-<li class="chapter" data-level="A.2.1" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationHv"><i class="fa fa-check"></i><b>A.2.1</b> Huber value</a></li>
+<li class="chapter" data-level="A.2.1" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationLWSLAHv"><i class="fa fa-check"></i><b>A.2.1</b> Leaf width, specific leaf area and Huber value</a></li>
 <li class="chapter" data-level="A.2.2" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationtissuedensity"><i class="fa fa-check"></i><b>A.2.2</b> Tissue density</a></li>
 <li class="chapter" data-level="A.2.3" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationcond2sap"><i class="fa fa-check"></i><b>A.2.3</b> Ratio of conduits to sapwood</a></li>
 <li class="chapter" data-level="A.2.4" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationSRLRLD"><i class="fa fa-check"></i><b>A.2.4</b> Specific root length and root length density</a></li>
@@ -694,23 +694,23 @@ div.csl-indent {
 <td align="left">Ratio of leaf area to sapwood area</td>
 <td align="center">No</td>
 <td align="center">No</td>
-<td align="center"><a href="modelparametrization.html#imputationHv">A.2.1</a></td>
+<td align="center"><a href="modelparametrization.html#imputationLWSLAHv">A.2.1</a></td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(LW\)</span></td>
 <td><code>LeafWidth</code></td>
 <td align="left">Leaf width</td>
-<td align="center">Yes</td>
 <td align="center">No</td>
 <td align="center">No</td>
+<td align="center"><a href="modelparametrization.html#imputationLWSLAHv">A.2.1</a></td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(SLA\)</span></td>
 <td><code>SLA</code></td>
 <td align="left">Specific leaf area</td>
-<td align="center">Yes</td>
 <td align="center">No</td>
 <td align="center">No</td>
+<td align="center"><a href="modelparametrization.html#imputationLWSLAHv">A.2.1</a></td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(\rho_{leaf}\)</span></td>
@@ -1430,9 +1430,79 @@ div.csl-indent {
 </div>
 <div id="imputation-of-missing-values" class="section level2" number="25.2">
 <h2><span class="header-section-number">A.2</span> Imputation of missing values</h2>
-<div id="imputationHv" class="section level3" number="25.2.1">
-<h3><span class="header-section-number">A.2.1</span> Huber value</h3>
-<p>When missing from species parameter table, the ratio of leaf area to sapwood area (i.e. the inverse of Huber value) is set to a default value <span class="math inline">\(1/Hv = 2500\)</span> (i.e. <span class="math inline">\(Hv = 4 \,cm·m^{-2}\)</span>). [JUSTIFICATION MISSING]</p>
+<div id="imputationLWSLAHv" class="section level3" number="25.2.1">
+<h3><span class="header-section-number">A.2.1</span> Leaf width, specific leaf area and Huber value</h3>
+<p>Leaf width (<span class="math inline">\(LW\)</span>), specific leaf area (<span class="math inline">\(SLA\)</span>) and the inverse of the Huber value (<span class="math inline">\(1/Hv\)</span>) are key anatomical parameters. When missing from species parameter table, default estimates for these parameters are obtained from combinations of leaf shape and leaf size:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Leaf shape</th>
+<th align="center">Leaf size</th>
+<th align="center"><span class="math inline">\(SLA\)</span></th>
+<th align="center"><span class="math inline">\(LW\)</span></th>
+<th align="center"><span class="math inline">\(1/Hv\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Broad</td>
+<td align="center">Large</td>
+<td align="center">16.039</td>
+<td align="center">6.898</td>
+<td align="center">4768.7</td>
+</tr>
+<tr class="even">
+<td align="left">Broad</td>
+<td align="center">Medium</td>
+<td align="center">11.499</td>
+<td align="center">3.054</td>
+<td align="center">2446.1</td>
+</tr>
+<tr class="odd">
+<td align="left">Broad</td>
+<td align="center">Small</td>
+<td align="center">9.540</td>
+<td align="center">0.644</td>
+<td align="center">2284.9</td>
+</tr>
+<tr class="even">
+<td align="left">Linear</td>
+<td align="center">Large</td>
+<td align="center">5.522</td>
+<td align="center">0.639</td>
+<td align="center">2156.0</td>
+</tr>
+<tr class="odd">
+<td align="left">Linear</td>
+<td align="center">Medium</td>
+<td align="center">4.144</td>
+<td align="center">0.639</td>
+<td align="center">2156.0</td>
+</tr>
+<tr class="even">
+<td align="left">Linear</td>
+<td align="center">Small</td>
+<td align="center">13.189</td>
+<td align="center">0.639</td>
+<td align="center">2156.0</td>
+</tr>
+<tr class="odd">
+<td align="left">Needle</td>
+<td align="center">[any]</td>
+<td align="center">9.024</td>
+<td align="center">0.379</td>
+<td align="center">2751.7</td>
+</tr>
+<tr class="even">
+<td align="left">Scale</td>
+<td align="center">[any]</td>
+<td align="center">4.544</td>
+<td align="center">0.101</td>
+<td align="center">1696.6</td>
+</tr>
+</tbody>
+</table>
+<p>These estimates have been obtained by averaging species-level values across combinations of the categorical variables.</p>
 </div>
 <div id="imputationtissuedensity" class="section level3" number="25.2.2">
 <h3><span class="header-section-number">A.2.2</span> Tissue density</h3>

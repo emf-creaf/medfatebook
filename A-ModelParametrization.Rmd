@@ -20,9 +20,9 @@ The following tables describe how the different functional parameters are dealt 
 |--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
 | $H_{max}$  | `Hmed` | Maximum plant height | Yes | No | No |
 | $H_{med}$  | `Hmed` | Median plant height | Yes | No | No |
-| $1/H_{v}$  |  `Al2As` | Ratio of leaf area to sapwood area | No | No | \@ref(imputationHv) | 
-|  $LW$   | `LeafWidth` | Leaf width | Yes | No | No |
-| $SLA$  |  `SLA` | Specific leaf area | Yes | No | No |
+| $1/H_{v}$  |  `Al2As` | Ratio of leaf area to sapwood area | No | No | \@ref(imputationLWSLAHv) | 
+|  $LW$   | `LeafWidth` | Leaf width | No | No | \@ref(imputationLWSLAHv) |
+| $SLA$  |  `SLA` | Specific leaf area | No |  No |\@ref(imputationLWSLAHv) |
 | $\rho_{leaf}$ |  `LeafDensity` | Leaf tissue density | No | No | \@ref(imputationtissuedensity) |
 | $\rho_{wood}$ |  `WoodDensity` | Wood tissue density | No | No | \@ref(imputationtissuedensity) |
 | $\rho_{fineroot}$ | `FineRootDensity` | Fine root tissue density | No | No | \@ref(imputationtissuedensity) |
@@ -133,9 +133,22 @@ The following tables describe how the different functional parameters are dealt 
 
 ## Imputation of missing values
 
-### Huber value {#imputationHv}
+### Leaf width, specific leaf area and Huber value {#imputationLWSLAHv}
 
-When missing from species parameter table, the ratio of leaf area to sapwood area (i.e. the inverse of Huber value) is set to a default value $1/Hv = 2500$ (i.e. $Hv = 4 \,cm·m^{-2}$). [JUSTIFICATION MISSING]
+Leaf width ($LW$), specific leaf area ($SLA$) and the inverse of the Huber value ($1/Hv$) are key anatomical parameters. When missing from species parameter table, default estimates for these parameters are obtained from combinations of leaf shape and leaf size:
+
+|  Leaf shape | Leaf size |  $SLA$ |  $LW$ | $1/Hv$ | 
+|:--------------- |:-----:|:-----:|:-----:|:-----:|
+| Broad | Large |   16.039   |  6.898    | 4768.7 |
+| Broad | Medium |   11.499   |  3.054    | 2446.1 |
+| Broad | Small |   9.540   |   0.644   | 2284.9 |
+| Linear | Large |   5.522   |   0.639   | 2156.0 |
+| Linear | Medium |   4.144    |  0.639    | 2156.0 |
+| Linear | Small |   13.189   |  0.639    | 2156.0 |
+| Needle | [any] |  9.024    |    0.379  | 2751.7 |
+| Scale | [any] |   4.544   |   0.101   | 1696.6 |
+
+These estimates have been obtained by averaging species-level values across combinations of the categorical variables.
 
 ### Tissue density {#imputationtissuedensity}
 
