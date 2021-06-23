@@ -131,6 +131,16 @@ The following tables describe how the different functional parameters are dealt 
 | $Z50_{recr}$  | `RecrZ50` | Soil depth corresponding to 50% of fine roots for recruitment | No | No | \@ref(imputationrecruitment) |
 | $Z95_{recr}$  | `RecrZ95` | Soil depth corresponding to 95% of fine roots for recruitment | No | No | \@ref(imputationrecruitment) |
 
+
+**Flammability** 
+
+| Symbol | R    | Description                          | Strict | Scaled | Imputable |
+|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
+| $\rho_{p}$ | `PD` | Density of fuel particles |  No | No | \@ref(imputationflammability) |
+| $\sigma$ | `SAV`| Surface-area-to-volume ratio of the small fuel (1h) fraction (leaves and branches < 6.35mm) | No | No | \@ref(imputationflammability) |
+| $h$ |  `HeatContent`| High fuel heat content.| No | No |  \@ref(imputationflammability) |
+| $LI$ | `PercentLignin`|  Percentage of lignin in leaves | No | No | \@ref(imputationflammability)|
+
 ## Imputation of missing values
 
 ### Leaf width, specific leaf area and Huber value {#imputationLWSLAHv}
@@ -301,6 +311,23 @@ A default value of $C_{wood} = 0.5\,g\,C\cdot g\,dry^{-1}$ is used for species w
 
 Imputation of missing values for recruitment is specified via `control` parameters. Default values are provided in \@ref(forestdynamicscontrol)
 
+### Flammability {#imputationflammability}
+
+Default values for the surface-area-to-volume ratio ($\sigma$) and fuel heat content ($h$) are defined from leaf size and leaf shape as follows:
+
+|  Leaf shape | Leaf size |  $\sigma$ |  $h$ |
+|:--------------- |:-----:|:-----:|:-----:|
+| Broad | Large |   5740   |  19740    |
+| Broad | Medium |   4039   |  19825    |
+| Broad | Small |   4386   |   20062   |
+| Linear/Needle | Large |   3620   |   18250   | 
+| Linear/Needle | Medium |   4758    |  21182    |
+| Linear/Needle | Small |   6697   |  21888    |
+| Spines | [any] |   6750   |   20433   |
+| Scale | [any] |   1120   |   20504   |
+
+
+When missing from the species parameter table, the percent of lignin ($LI$) is assumed equal to 20\%. Default value for the density of fuel particles ($\rho_p$) is 400 $kg\cdot m^{-3}$.
 
 ## Scaling size-related parameters
 

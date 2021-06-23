@@ -38,13 +38,20 @@ Fire behaviour functions require data in form of a `forest` object (see section 
 
 ### Species parameters
 
-+ $r_{6.35}(SP_i)$ [`r635`]: Ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm.
-+ $\rho_p(SP_i)$ [`PD`]: Particle density.
-+ $\sigma(SP_i)$ [`SAV`]: Surface-area-to-volume ratio of the small fuel (1h) fraction (leaves and branches < 6.35mm).
-+ $h(SP_i)$ [`HeatContent`]: High fuel heat content.
-+ $\eta_{F}(SP_i)$ [`Flammability`]: Flammability value (either 1 or 2 for normal or high, respectively).
-+ $LD(SP_i)$ [`LeafDuration`]: Leaf duration (in years).
-+ $LI(SP_i)$ [`PercentLignin`]: Percentage of lignin in leaves.
+The following functional parameters are required for each species:
+
+| Symbol | Units | R  | Description                        |
+|--------|-------|----| ------------------------------------|
+| $L_{shape}$   | Categorical | `LeafShape` | Leaf shape: "Broad", "Needle", "Linear", "Scale", "Spines" or "Succulent" |
+| $L_{size}$   | Categorical | `LeafSize` | Leaf size: "Small" (< 225 mm), "Medium" (> 225 mm & < 2025 mm) or "Large" (> 2025 mm) |
+| $r_{6.35,i}$ | | `r635` | Ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm |
+| $\rho_{p,i}$ | $kg \cdot m^{-3}$ | `PD` | Density of fuel particles |
+| $\sigma_{i}$ | $m^2 \cdot m^{-3}$| `SAV`| Surface-area-to-volume ratio of the small fuel (1h) fraction (leaves and branches < 6.35mm) |
+| $h_i$ | $kJ \cdot kg^{-1}$ | `HeatContent`| High fuel heat content.|
+| $LD_i$| years | `LeafDuration` | Leaf duration (in years) |
+| $LI_i$ | \% | `PercentLignin`|  Percentage of lignin in leaves |
+
+Leaf shape and size categories are used to determine leaf litter fuel types.
 
 ### Other inputs
 Other inputs may be given by expert opinion or they may be calculated from another model. Specifically, for each plant cohort (and for any day of application) the fire behaviour model requires:
@@ -311,17 +318,6 @@ h_{sh, def} &=& \frac{\sum_{i}{w_{i,sh} \cdot h(SP_i)}}{\sum_{i}{w_{i,sh}}}
 \end{eqnarray}
 where $h(SP_i)$ is a species-specific low heat content value.
 
-#### Flammability index ($\eta_{F}$)
-Flammability index ($\eta_{F} \in [1, 2]$) is a multiplier of reaction efficiency based on expert opinion applied to species that burn with more intensity than others, resulting from differences in fuel chemistry. Flammability index of canopy and shrub strata are the result of averaging the flammability of cohorts using loading as weights:
-\begin{eqnarray}
-\eta_{F, ca} &=& \frac{\sum_{i}{w_{i,ca} \cdot \eta_{F}(SP_i)}}{\sum_{i}{w_{i,ca}}}\\
-\eta_{F, sh} &=& \frac{\sum_{i}{w_{i,sh} \cdot \eta_{F}(SP_i)}}{\sum_{i}{w_{i,sh}}}
-\end{eqnarray}
-where $\eta_{F}(SP_i)$ is a species-specific flammability value. Flamability index for other strata are set to default values: 
-\begin{eqnarray}
-\eta_{F, he} &=& \eta_{F, li} = 1.5 \\
-\eta_{F, wo} &=& 1.0
-\end{eqnarray}
 
 #### Reactive volume ($RV$)
 The volume per surface unit ($m^3\cdot m^{-2}$) that would be involved in flaming combustion. 
@@ -384,14 +380,14 @@ I_{R,litter} &=& I_{R, li}
 
 Each component reaction intensity is calculated using:
 \begin{eqnarray} 
-I_{R,sh} &=& (\eta_{\beta_{allsurf}'})^{A_{sh}}\cdot \Gamma_{\max, sh}'\cdot w_{sh} \cdot h_{sh} \cdot \eta_{M,sh}\cdot \eta_{K,sh}\cdot \eta_{F,sh}\\
-I_{R,he} &=& (\eta_{\beta_{lowsurf}'})^{A_{he}}\cdot \Gamma_{\max, he}'\cdot w_{he} \cdot h_{he} \cdot \eta_{M,he}\cdot \eta_{K,he}\cdot \eta_{F,he}\\
-I_{R,wo} &=& (\eta_{\beta_{lowsurf}'})^{A_{wo}}\cdot \Gamma_{\max, wo}'\cdot w_{wo} \cdot h_{wo} \cdot \eta_{M,wo}\cdot \eta_{K,wo}\cdot \eta_{F,wo}\\
-I_{R,li} &=& (\eta_{\beta_{litter}'})^{A_{li}}\cdot \Gamma_{\max, li}'\cdot w_{li} \cdot h_{li} \cdot \eta_{M,li}\cdot \eta_{K,li}\cdot \eta_{F,li}
+I_{R,sh} &=& (\eta_{\beta_{allsurf}'})^{A_{sh}}\cdot \Gamma_{\max, sh}'\cdot w_{sh} \cdot h_{sh} \cdot \eta_{M,sh}\cdot \eta_{K,sh}\\
+I_{R,he} &=& (\eta_{\beta_{lowsurf}'})^{A_{he}}\cdot \Gamma_{\max, he}'\cdot w_{he} \cdot h_{he} \cdot \eta_{M,he}\cdot \eta_{K,he}\\
+I_{R,wo} &=& (\eta_{\beta_{lowsurf}'})^{A_{wo}}\cdot \Gamma_{\max, wo}'\cdot w_{wo} \cdot h_{wo} \cdot \eta_{M,wo}\cdot \eta_{K,wo}\\
+I_{R,li} &=& (\eta_{\beta_{litter}'})^{A_{li}}\cdot \Gamma_{\max, li}'\cdot w_{li} \cdot h_{li} \cdot \eta_{M,li}\cdot \eta_{K,li}
 (\#eq:reactintensitycomp)
 \end{eqnarray}
 
-In the above equations, $w_{sh}$, $w_{he}$, $w_{wo}$ and $w_{li}$ are the loadings of the corresponding shrub, herb, woody and litter strata, respectively. These quantities were defined in previous sections, as were the corresponding low heat fuel contents ($h_{sh}$, $h_{he}$, $h_{wo}$ and $h_{li}$) and flammability indices ($\eta_{F,sh}$, $\eta_{F,he}$, $\eta_{F,wo}$ and $\eta_{F,li}$). Mineral damping coefficient ($\eta_{K}$; dimensionless) is set to the same value (corresponding to the conventional value for silica-free ash content of 1%) for all strata:
+In the above equations, $w_{sh}$, $w_{he}$, $w_{wo}$ and $w_{li}$ are the loadings of the corresponding shrub, herb, woody and litter strata, respectively. These quantities were defined in previous sections, as were the corresponding low heat fuel contents ($h_{sh}$, $h_{he}$, $h_{wo}$ and $h_{li}$). Mineral damping coefficient ($\eta_{K}$; dimensionless) is set to the same value (corresponding to the conventional value for silica-free ash content of 1%) for all strata:
 \begin{equation}
 \eta_{K,sh} = \eta_{K,he} =\eta_{K,wo} = \eta_{K,li} = 0.42
 \end{equation}
@@ -595,9 +591,9 @@ The following two subsections detail the calculation of canopy reaction intensit
 ### Canopy reaction intensity ($I_{R, ca}$)
 Reaction intensity of canopy fuels (in $Btu \cdot ft^{-2} \cdot min^{-1}$) is estimated as:
 \begin{equation}
-I_{R,ca} = (\eta_{\beta_{ca}'})^{A_{ca}}\cdot \Gamma_{\max, ca}'\cdot w_{ca} \cdot h_{ca} \cdot \eta_{M,ca}\cdot \eta_{K,ca}\cdot \eta_{F,ca}
+I_{R,ca} = (\eta_{\beta_{ca}'})^{A_{ca}}\cdot \Gamma_{\max, ca}'\cdot w_{ca} \cdot h_{ca} \cdot \eta_{M,ca}\cdot \eta_{K,ca}
 \end{equation}
-where $A_{ca} = 133\cdot \sigma_{ca}^{-0.7913}$ is Rothermel's A coefficient,  $\Gamma_{\max, ca}' = 15 min^{-1}$ is the maximum reaction velocity of the canopy, $w_{ca}$ is the loading of canopy fuels (in $lb \cdot ft^{-2}$), $h_{ca}$ is the heat content of the canopy fuels (in $Btu \cdot lb^{-1}$), $\eta_{K,ca}=0.42$ is the mineral damping coefficient and $\eta_{F,ca}$ is the flammability index of the canopy stratum. Moisture damping coefficient for the canopy ($\eta_{M,ca}$) is estimated as done for shrub and herb strata:
+where $A_{ca} = 133\cdot \sigma_{ca}^{-0.7913}$ is Rothermel's A coefficient,  $\Gamma_{\max, ca}' = 15 min^{-1}$ is the maximum reaction velocity of the canopy, $w_{ca}$ is the loading of canopy fuels (in $lb \cdot ft^{-2}$), $h_{ca}$ is the heat content of the canopy fuels (in $Btu \cdot lb^{-1}$) and $\eta_{K,ca}=0.42$ is the mineral damping coefficient of the canopy stratum. Moisture damping coefficient for the canopy ($\eta_{M,ca}$) is estimated as done for shrub and herb strata:
 \begin{eqnarray}
 \eta_{M, live, ca} &=& \left[1-2.59\cdot \left(\frac{M_{live, ca}}{X_{live, ca}}\right)\right] +\left[ 5.11\cdot \left(\frac{M_{live, ca}}{X_{live, ca}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{M_{live, ca}}{X_{live, ca}}\right)^3\right] \\
 \eta_{M, dead, ca} &=& \left[1-2.59\cdot \left(\frac{M_{dead, ca}}{X_{dead, ca}}\right)\right] +\left[ 5.11\cdot \left(\frac{M_{dead, ca}}{X_{dead, ca}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{M_{dead, ca}}{X_{dead, ca}}\right)^3\right] \\
