@@ -14,12 +14,48 @@ Different kinds of vegetation functional parameters can be distinguished accordi
  
 The following tables describe how the different functional parameters are dealt with, grouped by function. Links are given to the chapter subsections where scaling and/or imputation procedures are described. 
 
-**Plant anatomy**
+**Plant/leaf classification**
+
+| Symbol | R    | Description                          | Strict | Scaled | Imputable |
+|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
+|        |  `LeafShape`  | Leaf type (Linear, Needle, Broad, Scale, Spines)    | Yes | No | No |
+|        |  `LeafSize`  | Leaf size (Small, Medium, Large)   | Yes | No | No |
+|        |  `LifeForm`  | Raunkiaer life form    | Yes | No | No |
+|        |  `PhenologyType`  | Leaf phenology type    | Yes | No | No |
+
+**Plant size**
 
 | Symbol | R    | Description                          | Strict | Scaled | Imputable |
 |--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
 | $H_{max}$  | `Hmed` | Maximum plant height | Yes | No | No |
 | $H_{med}$  | `Hmed` | Median plant height | Yes | No | No |
+| $f_{HD,min}$ | `fHDmin` | Minimum height-to-diameter ratio | Yes | No | No 
+| $f_{HD,max}$ | `fHDmax` | Maximum height-to-diameter ratio | Yes | No | No |
+
+**Allometric coefficients**
+
+| Symbol | R    | Description                          | Strict | Scaled | Imputable |
+|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
+| $a_{ash}$ | `Aash` | Coefficient relating the square of shrub height with shrub area | Yes | No | No |
+| $a_{bsh}$, $b_{bsh}$ | `Absh`, `Bbsh` | Coefficients relating crown volume with dry weight of shrub individuals | Yes | No | No |
+| $a_{cr}$, $b_{1cr}$, $b_{2cr}$, $b_{3cr}$, $c_{1cr}$, $c_{2cr}$ | `B1cr`, `B2cr`, `B3cr`, `C1cr`, `C2cr` | Coefficients to calculate crown ratio of trees | Yes | No | No |
+| $a_{cw}$, $b_{cw}$ | `Acw`, `Bcw` | Regression coefficients used to calculate the crown width of trees | Yes | No | No |
+
+**Leaf phenology**
+
+| Symbol | R    | Description                          | Strict | Scaled | Imputable |
+|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
+| $LD$ | `LeafDuration` | Average duration of leaves | Yes | No | No |
+| $S^*_{eco}$ | `Sgdd` | Degree days corresponding to leaf budburst | Yes | No | No |
+| $T_{eco}$ |  `Tbgdd` | Base temperature for the calculation of degree days to leaf budburst | No | No | \@ref(imputationphenology) |
+| $S^*_{sen}$ | `Ssen` | Degree days corresponding to leaf senescence  | No | No | \@ref(imputationphenology) |
+| $Ph_{sen}$ | `Phsen` | Photoperiod corresponding to start counting senescence degree-days | No | No | \@ref(imputationphenology) |
+| $T_{sen}$ | `Tbsen` | Base temperature for the calculation of degree days to leaf senescence | No | No | \@ref(imputationphenology) |
+
+**Plant anatomy**
+
+| Symbol | R    | Description                          | Strict | Scaled | Imputable |
+|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
 | $1/H_{v}$  |  `Al2As` | Ratio of leaf area to sapwood area | No | No | \@ref(imputationLWSLAHv) | 
 |  $LW$   | `LeafWidth` | Leaf width | No | No | \@ref(imputationLWSLAHv) |
 | $SLA$  |  `SLA` | Specific leaf area | No |  No |\@ref(imputationLWSLAHv) |
@@ -29,28 +65,16 @@ The following tables describe how the different functional parameters are dealt 
 | $f_{conduits}$ |`conduit2sapwood` | Proportion of sapwood corresponding to xylem conduits | No | No | \@ref(imputationcond2sap) |
 | $SRL$ |  `SRL` | Specific fine root length | No | No | \@ref(imputationSRLRLD) |
 | $RLD$ | `RLD` | Fine root length density | No | No | \@ref(imputationSRLRLD) |
-| $r_{6.35}$ | `r635` | Ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm | Yes | No | No |
-
-**Leaf phenology**
-
-| Symbol | R    | Description                          | Strict | Scaled | Imputable |
-|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
-|        |  `PhenologyType`  | Leaf phenology type    | Yes | No | No |
-| $LD$ | `LeafDuration` | Average duration of leaves | Yes | No | No |
-| $S^*_{eco}$ | `Sgdd` | Degree days corresponding to leaf budburst | Yes | No | No |
-| $T_{eco}$ |  `Tbgdd` | Base temperature for the calculation of degree days to leaf budburst | No | No | \@ref(imputationphenology) |
-| $S^*_{sen}$ | `Ssen` | Degree days corresponding to leaf senescence  | No | No | \@ref(imputationphenology) |
-| $Ph_{sen}$ | `Phsen` | Photoperiod corresponding to start counting senescence degree-days | No | No | \@ref(imputationphenology) |
-| $T_{sen}$ | `Tbsen` | Base temperature for the calculation of degree days to leaf senescence | No | No | \@ref(imputationphenology) |
+| $r_{6.35}$ | `r635` | Ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm | No | No | \@ref(imputationr635) |
 
 **Radiation balance and water interception**
 
 | Symbol | R    | Description                          | Strict | Scaled | Imputable | 
 |--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
-| $k_{PAR}$ | `kPAR` | PAR extinction coefficient   | Yes | No | No |
-| $\alpha_{SWR}$ | `alphaSWR` | Short-wave radiation leaf absorbance coefficient | Yes | No | No |
-| $\gamma_{SWR}$ | `gammaSWR` | Short-wave radiation leaf reflectance (albedo) |   Yes | No | No |
-| $s_{water}$ | `g` | Crown water storage capacity | Yes | No | No |
+| $k_{PAR}$ | `kPAR` | PAR extinction coefficient   | No | No | \@ref(imputationLEWI) |
+| $\alpha_{SWR}$ | `alphaSWR` | Short-wave radiation leaf absorbance coefficient | No | No | \@ref(imputationLEWI) |
+| $\gamma_{SWR}$ | `gammaSWR` | Short-wave radiation leaf reflectance (albedo) |   No | No | \@ref(imputationLEWI) |
+| $s_{water}$ | `g` | Crown water storage capacity | No | No | \@ref(imputationLEWI) |
 
 
 **Hydraulics, transpiration, photosynthesis**
@@ -77,7 +101,6 @@ The following tables describe how the different functional parameters are dealt 
 | $c_{stem}$, $d_{stem}$ | `VCstem_c`, `VCstem_d` | Parameters of the vulnerability curve for stem xylem | No | No | \@ref(imputationVCs) |
 | $c_{root}$, $d_{root}$ | `VCroot_c`, `VCroot_d` | Parameters of the vulnerability curve for root xylem | No | No | \@ref(imputationVCs) |
 
-
 **Plant water storage**
 
 | Symbol | R    | Description                          | Strict | Scaled | Imputable |
@@ -91,15 +114,6 @@ The following tables describe how the different functional parameters are dealt 
 | $V_{leaf}$ |  `Vleaf` | Leaf water capacity per leaf area unit | No | \@ref(plantwaterstoragecapacity) | No |
 | $V_{sapwood}$ |  `Vsapwood` | Sapwood water capacity per leaf area unit | No | \@ref(plantwaterstoragecapacity) | No |
 
-**Allometric coefficients**
-
-| Symbol | R    | Description                          | Strict | Scaled | Imputable |
-|--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
-| $a_{ash}$ | `Aash` | Coefficient relating the square of shrub height with shrub area | Yes | No | No |
-| $a_{bsh}$, $b_{bsh}$ | `Absh`, `Bbsh` | Coefficients relating crown volume with dry weight of shrub individuals | Yes | No | No |
-| $a_{cr}$, $b_{1cr}$, $b_{2cr}$, $b_{3cr}$, $c_{1cr}$, $c_{2cr}$ | `B1cr`, `B2cr`, `B3cr`, `C1cr`, `C2cr` | Coefficients to calculate crown ratio of trees | Yes | No | No |
-| $a_{cw}$, $b_{cw}$ | `Acw`, `Bcw` | Regression coefficients used to calculate the crown width of trees | Yes | No | No |
-
 **Growth**
 
 | Symbol | R    | Description                          | Strict | Scaled | Imputable |
@@ -110,8 +124,6 @@ The following tables describe how the different functional parameters are dealt 
 | $RGR_{leaf, max}$ | `RGRleafmax` | Maximum leaf area daily growth rate, relative to sapwood area | No | No | \@ref(imputationRGR) |
 | $RGR_{sapwood, max}$ | `RGRsapwoodmax` | Maximum daily sapwood relative growth rate (in sapwood area basis) | No | No | \@ref(imputationRGR) |
 | $RGR_{fineroot, max}$ | `RGRfinerootmax` | Maximum daily fine root relative growth rate | No | No | \@ref(imputationRGR) |
-| $f_{HD,min}$ | `fHDmin` | Minimum height-to-diameter ratio | Yes | No | No 
-| $f_{HD,max}$ | `fHDmax` | Maximum height-to-diameter ratio | Yes | No | No |
 | $C_{wood}$ | `WoodC` | Wood carbon content per dry weight  | No | No | \@ref(imputationCwood) |
 
 
@@ -172,6 +184,19 @@ According to @Plavcova2015, default values for the fraction of sapwood correspon
 
 Default values for specific fine root length and fine root length density are $3870\, cm \cdot g^{-1}$  and $10\, cm \cdot cm^{-3}$, respectively. [JUSTIFICATION MISSING]
 
+### Fine foliar ratio {#imputationr635}
+
+The ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm ($r_{6.35}$) is given the following default values depending on leaf shape and leaf size:
+
+|  Leaf shape | Leaf size |  $r_{6.35}$  |
+|:--------------- |:-----:|:-----:|
+| Broad | Large |   2.278   |
+| Broad | Medium |   2.359   | 
+| Broad | Small |   3.026   |
+| Linear | [any] |   3.261   |
+| Needle | [any] |  1.716    |
+| Scale | [any] |   1.483   |
+
 ### Leaf phenology {#imputationphenology}
 
 At present, default values for phenological parameters are the same regardless of the leaf phenology type:
@@ -188,6 +213,17 @@ Leaf senescence values were derived for deciduous broad-leaved forests by @Delpi
 
 When the basic soil water balance model is used, $T_{max,LAI}$ and $T_{max,sqLAI}$ are species-specific parameters that regulate the maximum transpiration of plant cohorts (see \@ref(maximumtranspiration)). When these parameters are missing from `SpParams` table, they are given default values $T_{max,LAI} = 0.134$ and $T_{max,sqLAI} = -0.006$, according to @Granier1999.  Similarly, when water use efficiency coefficient is missing, it is set to a default value: $WUE_{i} = 4$.
 
+### Radiation balance and water interception {#imputationLEWI}
+
+Default values for radiation extinction and water interception parameters depend on the leaf shape:
+
+|  Leaf shape | $k_{PAR}$ |  $\alpha_{SWR}$ |  $\gamma_{SWR}$ |  $s_{water}$ |
+|:--------------- |:-----:|:-----:|:-----:|:-----:|
+| Broad | 0.55 | 0.70 | 0.18 | 0.5 |
+| Linear | 0.45 | 0.70 | 0.15 | 0.8 |
+| Needle/Scale | 0.50 | 0.70 | 0.14 | 1.0 |
+
+where $k_{PAR}$ is the PAR extinction coefficient, $\alpha_{SWR}$ is the short-wave radiation leaf absorbance coefficient, $\gamma_{SWR}$ is the short-wave radiation leaf reflectance (albedo) and $s_{water}$ is the crown water storage capacity per LAI unit.
 
 ### Disconnection from the soil {#imputationsoildisconnection}
 
