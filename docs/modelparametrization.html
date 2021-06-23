@@ -582,7 +582,7 @@ div.csl-indent {
 <li class="chapter" data-level="A.2.9" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationsoildisconnection"><i class="fa fa-check"></i><b>A.2.9</b> Disconnection from the soil</a></li>
 <li class="chapter" data-level="A.2.10" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationKstemKroot"><i class="fa fa-check"></i><b>A.2.10</b> Stem and root maximum hydraulic conductivity</a></li>
 <li class="chapter" data-level="A.2.11" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationkleaf"><i class="fa fa-check"></i><b>A.2.11</b> Leaf maximum hydraulic conductance</a></li>
-<li class="chapter" data-level="A.2.12" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationVCs"><i class="fa fa-check"></i><b>A.2.12</b> Xylem vulnerability curves</a></li>
+<li class="chapter" data-level="A.2.12" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationVCs"><i class="fa fa-check"></i><b>A.2.12</b> Xylem vulnerability</a></li>
 <li class="chapter" data-level="A.2.13" data-path="modelparametrization.html"><a href="modelparametrization.html#inputationPV"><i class="fa fa-check"></i><b>A.2.13</b> Pressure-volume curves</a></li>
 <li class="chapter" data-level="A.2.14" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationstomatalconductance"><i class="fa fa-check"></i><b>A.2.14</b> Stomatal conductance</a></li>
 <li class="chapter" data-level="A.2.15" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationphotosynthesis"><i class="fa fa-check"></i><b>A.2.15</b> Photosynthesis rates</a></li>
@@ -1087,12 +1087,12 @@ div.csl-indent {
 <td align="center">No</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(\Psi_{critic,i}\)</span></td>
+<td><span class="math inline">\(\Psi_{critic}\)</span></td>
 <td><code>Psi_Critic</code></td>
 <td align="left">The water potential corresponding to 50% of stem xylem cavitation</td>
-<td align="center">Yes</td>
 <td align="center">No</td>
 <td align="center">No</td>
+<td align="center"><a href="modelparametrization.html#imputationVCs">A.2.12</a></td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(K_{rootdisc}\)</span></td>
@@ -1813,9 +1813,8 @@ div.csl-indent {
 <p>Leaf maximum hydraulic conductance (<span class="math inline">\(k_{l, max}\)</span>, in <span class="math inline">\(mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}\)</span>) is an input parameter that should be provided for each species. When missing, leaf maximum hydraulic conductance is assumed <span class="math inline">\(k_{l, max}=6\)</span> for conifers and <span class="math inline">\(k_{l, max}=8\)</span> for angiosperms <span class="citation">(<a href="#ref-Sack2006" role="doc-biblioref">Sack &amp; Holbrook 2006</a>)</span>.</p>
 </div>
 <div id="imputationVCs" class="section level3" number="25.2.12">
-<h3><span class="header-section-number">A.2.12</span> Xylem vulnerability curves</h3>
-<p>Vulnerability curves in <strong>medfate</strong> need to be specified for leaves, stem and root segments via the two parameters of the Weibull function (see <a href="planthydraulics.html#vulnerabilitycurves">10.1</a>).</p>
-<p>When any of the parameters of the stem vulnerability curve is missing, A suitable estimate of <span class="math inline">\(\Psi_{50,stem}\)</span> the water potencial corresponding to 50% of conductance loss, can be obtained from <span class="citation"><a href="#ref-Maherali2004" role="doc-biblioref">Maherali <em>et al.</em></a> (<a href="#ref-Maherali2004" role="doc-biblioref">2004</a>)</span> according to combinations of taxon group (either Angiosperm or Gymnosperm), growth form (either tree or shrub) and leaf phenology:</p>
+<h3><span class="header-section-number">A.2.12</span> Xylem vulnerability</h3>
+<p>A suitable estimate of <span class="math inline">\(\Psi_{50,stem}\)</span> the water potencial corresponding to 50% of conductance loss, can be obtained from <span class="citation"><a href="#ref-Maherali2004" role="doc-biblioref">Maherali <em>et al.</em></a> (<a href="#ref-Maherali2004" role="doc-biblioref">2004</a>)</span> according to combinations of taxon group (either Angiosperm or Gymnosperm), growth form (either tree or shrub) and leaf phenology:</p>
 <table>
 <thead>
 <tr class="header">
@@ -1858,7 +1857,8 @@ div.csl-indent {
 </tr>
 </tbody>
 </table>
-<p>A regression equation using data from <span class="citation"><a href="#ref-Choat2012" role="doc-biblioref">Choat <em>et al.</em></a> (<a href="#ref-Choat2012" role="doc-biblioref">2012</a>)</span> can be used to estimate <span class="math inline">\(\Psi_{88,stem}\)</span> from <span class="math inline">\(\Psi_{50,stem}\)</span>:
+<p><span class="math inline">\(\Psi_{50,stem}\)</span> estimates can be taken as valid for parameter <span class="math inline">\(\Psi_{critic}\)</span>, in the case of the basic water balance model.</p>
+<p>Vulnerability curves in the advanced model need to be specified for leaves, stem and root segments via the two parameters of the Weibull function (see <a href="planthydraulics.html#vulnerabilitycurves">10.1</a>). When any of the parameters of the stem vulnerability curve is missing, a regression equation using data from <span class="citation"><a href="#ref-Choat2012" role="doc-biblioref">Choat <em>et al.</em></a> (<a href="#ref-Choat2012" role="doc-biblioref">2012</a>)</span> can be used to estimate <span class="math inline">\(\Psi_{88,stem}\)</span> from <span class="math inline">\(\Psi_{50,stem}\)</span>:
 <span class="math display">\[\begin{equation}
 \Psi_{88,stem} = -1.4264 + 1.2593 \cdot \Psi_{50,stem}
 \end{equation}\]</span></p>

@@ -85,7 +85,7 @@ The following tables describe how the different functional parameters are dealt 
 | $T_{max, sqLAI}$ | `Tmax_LAIsq` | Empirical coefficient relating squared LAI with the ratio of maximum transpiration over potential evapotranspiration | No | No | \@ref(imputationtranspwue) |
 | $WUE_{\max}$ | `WUE` |  Water use efficiency  | No | No | \@ref(imputationtranspwue) |
 | $\Psi_{extract}$ | `Psi_Extract` |  The water potential at which plant transpiration is 50% of its maximum | Yes | No | No |
-| $\Psi_{critic,i}$ | `Psi_Critic` |  The water potential corresponding to 50% of stem xylem cavitation |  Yes | No | No |
+| $\Psi_{critic}$ | `Psi_Critic` |  The water potential corresponding to 50% of stem xylem cavitation |  No | No | \@ref(imputationVCs) |
 | $K_{rootdisc}$ | `pRootDisc` |  Whole-plant relative transpiration corresponding to hydraulic disconnection from the soil  | No |  No | \@ref(imputationsoildisconnection) |
 | $g_{swmin}$ | `Gwmin` | Minimum stomatal conductance to water vapour | No | No | \@ref(imputationstomatalconductance) |
 | $g_{swmax}$ | `Gwmax` | Maximum stomatal conductance to water vapour | No | No | \@ref(imputationstomatalconductance) |
@@ -248,10 +248,8 @@ Following @Oliveras2003, missing values for $K_{root,max,ref}$ are assumed to be
 ### Leaf maximum hydraulic conductance {#imputationkleaf}
 Leaf maximum hydraulic conductance ($k_{l, max}$, in $mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}$) is an input parameter that should be provided for each species. When missing, leaf maximum hydraulic conductance is assumed $k_{l, max}=6$ for conifers and $k_{l, max}=8$ for angiosperms [@Sack2006].
 
-### Xylem vulnerability curves {#imputationVCs}
-Vulnerability curves in **medfate** need to be specified for leaves, stem and root segments via the two parameters of the Weibull function (see \@ref(vulnerabilitycurves)). 
-
-When any of the parameters of the stem vulnerability curve is missing, A suitable estimate of $\Psi_{50,stem}$ the water potencial corresponding to 50\% of conductance loss, can be obtained from @Maherali2004 according to combinations of taxon group (either Angiosperm or Gymnosperm), growth form (either tree or shrub) and leaf phenology:
+### Xylem vulnerability  {#imputationVCs}
+ A suitable estimate of $\Psi_{50,stem}$ the water potencial corresponding to 50\% of conductance loss, can be obtained from @Maherali2004 according to combinations of taxon group (either Angiosperm or Gymnosperm), growth form (either tree or shrub) and leaf phenology:
 
 | Group | Growth form | Leaf phenology | $\Psi_{50,stem}$ |
 |:-------- |:-------- |:-------- |:--------:|
@@ -261,7 +259,9 @@ When any of the parameters of the stem vulnerability curve is missing, A suitabl
 | Gymnosperm | Tree | any | -4.17 |
 | Gymnosperm | Shrub | any | -8.95 |
 
-A regression equation using data from @Choat2012 can be used to estimate $\Psi_{88,stem}$ from $\Psi_{50,stem}$:
+$\Psi_{50,stem}$ estimates can be taken as valid for parameter $\Psi_{critic}$, in the case of the basic water balance model. 
+
+Vulnerability curves in the advanced model need to be specified for leaves, stem and root segments via the two parameters of the Weibull function (see \@ref(vulnerabilitycurves)). When any of the parameters of the stem vulnerability curve is missing, a regression equation using data from @Choat2012 can be used to estimate $\Psi_{88,stem}$ from $\Psi_{50,stem}$:
 \begin{equation}
 \Psi_{88,stem} = -1.4264 + 1.2593 \cdot \Psi_{50,stem}
 \end{equation}
