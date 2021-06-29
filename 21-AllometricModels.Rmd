@@ -28,7 +28,7 @@ The following table shows the allometric coefficients needed for the calculation
 | Symbol       | Units | R param       | Description                      |
 |--------------|-------|---------------|----------------------------------|
 | $a_{fbt}$, $b_{fbt}$, $c_{fbt}$, $d_{fbt}$ | | `a_fbt`, `b_fbt`, `c_fbt`, `d_fbt` | Coefficients to calculate foliar biomass of an individual tree  |
-| $a_{ash}$ | | `a_ash` | Coefficient relating the square of shrub height with shrub area |
+| $a_{ash}$, $b_{ash}$ | | `a_ash`, `b_ash` | Coefficients relating the square of shrub height with shrub area |
 | $a_{bsh}$, $b_{bsh}$ | | `a_bsh`, `b_bsh` | Coefficients relating crown volume with dry weight of shrub individuals |
 | $a_{cr}$, $b_{1cr}$, $b_{2cr}$, $b_{3cr}$, $c_{1cr}$, $c_{2cr}$ | | `a_cr`, `b_1cr`, `b_2cr`, `b_3cr`, `c_1cr`, `c_2cr` | Coefficients to calculate crown ratio of trees |
 | $cr$ | [0-1] | `cr` | Ratio between crown length and total height for shrubs |
@@ -56,11 +56,11 @@ FB_{i} = FB_{tree,i}\cdot (N_{i}/10000)
 
 **Shrub cohorts**
 
-To calculate the leaf biomass of a shrub cohort, we first determine $A_{sh,i}$, the area (in $cm^2$) occupied by one average individual of height $H_{i}$ (in $cm$), using the quadratic relationship: 
+To calculate the leaf biomass of a shrub cohort, we first determine $A_{sh,i}$, the area (in $cm^2$) occupied by one average individual of height $H_{i}$ (in $cm$), using the relationship: 
 \begin{equation}
-A_{sh,i} = a_{ash} \cdot H_{i}^2
+A_{sh,i} = a_{ash} \cdot H_{i}^{b_{ash}}
 \end{equation}
-where $a_{ash}$ is a species-specific parameter. The model then estimates the dry weight of leaves and branches up to 6.35mm in diameter ($B_{sh,i}$, in kg) of this average individual (i.e. fine fuel biomass), using an allometric relationship with shrub crown phytovolume assuming a cylinder (in $cm^3$):
+where $a_{ash}$ and $b_{ash}$ are species-specific parameters. The model then estimates the dry weight of leaves and branches up to 6.35mm in diameter ($B_{sh,i}$, in kg) of this average individual (i.e. fine fuel biomass), using an allometric relationship with shrub crown phytovolume assuming a cylinder (in $cm^3$):
 \begin{equation}
 B_{sh,i} = a_{bsh} \cdot (A_{sh,i}\cdot H_{i}\cdot cr_i)^{b_{bsh}}
 \end{equation}
