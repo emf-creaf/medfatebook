@@ -87,7 +87,7 @@ The following tables describe how the different functional parameters are dealt 
 | $T_{max, LAI}$ | `Tmax_LAI` | Empirical coefficient relating LAI with the ratio of maximum transpiration over potential evapotranspiration | No | No | \@ref(imputationtranspwue) |
 | $T_{max, sqLAI}$ | `Tmax_LAIsq` | Empirical coefficient relating squared LAI with the ratio of maximum transpiration over potential evapotranspiration | No | No | \@ref(imputationtranspwue) |
 | $WUE_{\max}$ | `WUE` |  Water use efficiency  | No | No | \@ref(imputationtranspwue) |
-| $\Psi_{extract}$ | `Psi_Extract` |  The water potential at which plant transpiration is 50% of its maximum | Yes | No | No |
+| $\Psi_{extract}$ | `Psi_Extract` |  The water potential at which plant transpiration is 50% of its maximum | No | No |  \@ref(imputationtranspwue) |
 | $\Psi_{critic}$ | `Psi_Critic` |  The water potential corresponding to 50% of stem xylem cavitation |  No | No | \@ref(imputationVCs) |
 | $K_{rootdisc}$ | `pRootDisc` |  Whole-plant relative transpiration corresponding to hydraulic disconnection from the soil  | No |  No | \@ref(imputationsoildisconnection) |
 | $g_{swmin}$ | `Gwmin` | Minimum stomatal conductance to water vapour | No | No | \@ref(imputationstomatalconductance) |
@@ -259,6 +259,8 @@ When water use efficiency coefficient is missing, the following default values a
 | Needle | [any] |  3.707    |
 | Scale | [any] |   1.665   |
 
+When missing, the water potential corresponding to 50\% of transpiration ($\Psi_{extract}$) is estimated by calculating the water potential corresponding to the loss leaf turgor ($\Psi_{tlp}$), using equation \@ref(eq:turgorlosspoint) from @Bartlett2012. The parameters of the leaf pressure-volume curve needed for applying equation \@ref(eq:turgorlosspoint) may be themselves estimated (see \@ref(inputationPV)). Note that $\Psi_{tlp}$ has been found to be highly correlated to $\Psi_{gs50}$, the water potential corresponding to 50\% of stomatal conductance [@Bartlett2016].
+
 
 ### Radiation balance and water interception {#imputationLEWI}
 
@@ -295,8 +297,9 @@ Following @Oliveras2003, missing values for $K_{root,max,ref}$ are assumed to be
 ### Leaf maximum hydraulic conductance {#imputationkleaf}
 Leaf maximum hydraulic conductance ($k_{l, max}$, in $mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}$) is an input parameter that should be provided for each species. When missing, leaf maximum hydraulic conductance is assumed $k_{l, max}=6$ for conifers and $k_{l, max}=8$ for angiosperms [@Sack2006].
 
+
 ### Xylem vulnerability  {#imputationVCs}
- A suitable estimate of $\Psi_{50,stem}$ the water potencial corresponding to 50\% of conductance loss, can be obtained from @Maherali2004 according to combinations of taxon group (either Angiosperm or Gymnosperm), growth form (either tree or shrub) and leaf phenology:
+ A suitable estimate of $\Psi_{50,stem}$ the water potential corresponding to 50\% of conductance loss, can be obtained from @Maherali2004 according to combinations of taxon group (either Angiosperm or Gymnosperm), growth form (either tree or shrub) and leaf phenology:
 
 | Group | Growth form | Leaf phenology | $\Psi_{50,stem}$ |
 |:-------- |:-------- |:-------- |:--------:|
