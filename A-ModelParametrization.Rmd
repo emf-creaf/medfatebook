@@ -6,9 +6,11 @@
 
 Package **medfate** has been designed to allow simulations requiring a minimum set of vegetation functional parameters. This entails that several other parameters have to be estimated automatically (via inbuilt procedures) before starting simulations. Inbuilt parameter estimation is done in functions `spwbInput()` and `forest2spwbInput()`, with the user controlling the process through the species parameter table input (e.g., `SpParamsMED`) and the object `control` (see default control values in `defaultControl()`).
 
+## Strict, scaled and imputable parameters
+
 Different kinds of vegetation functional parameters can be distinguished according to whether inbuilt parameter estimation is possible and how it is conducted:
 
- + **Strictly-required parameters** are those for which there are no inbuilt estimation procedures implemented in the initialization functions. Hence, either values in the species parameter table input are non-missing or suitable values need to be specified before running simulation models.
+ + **Strictly-required parameters** are those for which there are no inbuilt estimation procedures implemented in the initialization functions. Hence, either values in the species parameter table input are non-missing or suitable values need to be specified before running simulation models. Since **medfate ver. 2.3**, only plant/leaf classification parameters and plant size parameters are strict. The remaining ones can be estimated from other parameters. This facilitates having a functional species parameter table, because only a set of parameters have to be strictly filled, from either soft trait databases or forest inventory data.
  + **Scaled parameters** are functional parameters that cannot be defined at the species level, because they need to be estimated taking into account the size and structure of the plant cohort. These are not normally defined at the level of species parameter table. Specific `control` parameters are used to determine how scaling is performed.
  + **Imputable parameters** parameters are those for which the initialization routines can provide default values or estimations derived from relationships with other parameters. Parameter imputation is conducted if control parameter `fillMissingSpParams = TRUE`. Sometimes, default parameter values are also specified in the `control` object.
  
@@ -48,8 +50,8 @@ The following tables describe how the different functional parameters are dealt 
 
 | Symbol | R    | Description                          | Strict | Scaled | Imputable |
 |--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
-| $LD$ | `LeafDuration` | Average duration of leaves | Yes | No | No |
-| $S^*_{eco}$ | `Sgdd` | Degree days corresponding to leaf budburst | Yes | No | No |
+| $LD$ | `LeafDuration` | Average duration of leaves | No | No | \@ref(imputationphenology) |
+| $S^*_{eco}$ | `Sgdd` | Degree days corresponding to leaf budburst | No | No | \@ref(imputationphenology) |
 | $T_{eco}$ |  `Tbgdd` | Base temperature for the calculation of degree days to leaf budburst | No | No | \@ref(imputationphenology) |
 | $S^*_{sen}$ | `Ssen` | Degree days corresponding to leaf senescence  | No | No | \@ref(imputationphenology) |
 | $Ph_{sen}$ | `Phsen` | Photoperiod corresponding to start counting senescence degree-days | No | No | \@ref(imputationphenology) |
@@ -234,13 +236,16 @@ The ratio between the weight of leaves plus branches and the weight of leaves al
 
 ### Leaf phenology {#imputationphenology}
 
-At present, default values for phenological parameters are the same regardless of the leaf phenology type:
+When missing, leaf duration is assigned a value of 1 year for winter-deciduous species and 2.41 years for the remaining leaf phenology types. 
 
-|  Phenology type | `Tbgdd` |  `Ssen` |  `Phsen` |  `Tbsen` |
-|:--------------- |:-----:|:-----:|:-----:|:-----:|
-| One-flush evergreen | 5 | 8268 | 12.5 | 28.5 |
-| Winter deciduous | 5 | 8268 | 12.5 | 28.5 |
-| Winter semi-deciduous | 5 | 8268 | 12.5 | 28.5 |
+Default values for leaf phenological parameters are the same regardless of the leaf phenology type:
+
+|  Phenology type | `Sgdd` | `Tbgdd` |  `Ssen` |  `Phsen` |  `Tbsen` |
+|:--------------- |:-----:|:-----:|:-----:|:-----:|:-----:|
+| One-flush evergreen | 200 | 5 | 8268 | 12.5 | 28.5 |
+| Winter deciduous | 200 |  5 | 8268 | 12.5 | 28.5 |
+| Winter semi-deciduous | 200 |  5 | 8268 | 12.5 | 28.5 |
+| Drought deciduous | 200 |  5 | 8268 | 12.5 | 28.5 |
 
 Leaf senescence values were derived for deciduous broad-leaved forests by @Delpierre2009.
 
