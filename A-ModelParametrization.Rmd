@@ -210,8 +210,15 @@ Leaf width ($LW$), specific leaf area ($SLA$) and the inverse of the Huber value
 These estimates have been obtained by averaging species-level values across combinations of the categorical variables.
 
 ### Tissue density {#imputationtissuedensity}
+Default values for the dry weight density of leaves and wood (in $g \cdot cm^{-3}$) are determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
+```{r echo = FALSE}
+tfm = medfate:::trait_family_means
+knitr::kable(tfm[!is.na(tfm$LeafDensity) | !is.na(tfm$WoodDensity),
+                 c("LeafDensity", "WoodDensity"),drop=FALSE],
+             caption = 'Default leaf density and wood density values by taxonomic family.')
+```
 
-Default values for the dry weight density of tissue (in $g \cdot cm^{-3}$) are $\rho_{leaf} = 0.7$, $\rho_{wood} = 0.652$ and $\rho_{fineroot} = 0.165$, respectively. [JUSTIFICATION MISSING]
+If the family is not any of those in the table, default values  are $\rho_{leaf} = 0.7$ and $\rho_{wood} = 0.652$. The default value for fine root density is always $\rho_{fineroot} = 0.165$.
 
 ### Ratio of conduits to sapwood {#imputationcond2sap}
 
@@ -345,7 +352,14 @@ When parameters for stem tissue are missing, **medfate** estimates them from woo
 \end{equation}
 while the apoplastic fraction of stem is assumed to be 80\%, i.e. $f_{apo,stem} = 0.8$.
 
-Following @Bartlett2012, average values for Mediterranean climate leaves are taken as defaults for missing leaf pressure-volume parameters, i.e. $\pi_{leaf} = -2$ MPa, $\epsilon_{leaf} = 17$, whereas a 29\% leaf apoplastic fraction is assumed (i.e. $f_{apo,leaf} = 0.29$).
+Default values for leaf pressure-volume parameters, i.e. $\pi_{leaf}$, $\epsilon_{leaf}$ and $f_{apo,leaf}$, are determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
+```{r echo = FALSE}
+tfm = medfate:::trait_family_means
+knitr::kable(tfm[!is.na(tfm$LeafPI0) | !is.na(tfm$LeafEPS) | !is.na(tfm$LeafAF), c("LeafPI0", "LeafEPS", "LeafAF"),drop=FALSE],
+             caption = 'Default leaf pressure-volume parameters by taxonomic family.')
+```
+
+If family-level values are missing, following @Bartlett2012 average values for Mediterranean climate leaves are taken as defaults, i.e. $\pi_{leaf} = -2$ MPa, $\epsilon_{leaf} = 17$, whereas a 29\% leaf apoplastic fraction is assumed (i.e. $f_{apo,leaf} = 0.29$).
 
 ### Stomatal conductance {#imputationstomatalconductance}
 When species-specific values are missing for maximum stomatal conductance ($g_{swmax}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$), the following relation with maximum leaf hydraulic conductance ($k_{l, max}$) is used [@Mencuccini2003]:
