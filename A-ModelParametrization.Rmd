@@ -290,6 +290,29 @@ where $k_{PAR}$ is the PAR extinction coefficient, $\alpha_{SWR}$ is the short-w
 
 When missing, the relative whole-plant conductance corresponding to disconnection from the soil is set to $K_{rootdisc,i} = 0$, its default value.
 
+### Pressure-volume curves {#inputationPV}
+
+Parameters of the pressure-volume curve (i.e. $\pi_{0,stem}$ and $\epsilon_{stem}$) for leaf and stem symplastic tissue are required for each species. 
+
+When parameters for stem tissue are missing, **medfate** estimates them from wood density following @Christoffersen2016:
+\begin{equation}
+\pi_{0,stem} = 0.52 - 4.16 \cdot \rho_{wood}
+\end{equation}
+
+\begin{equation}
+\epsilon_{stem} = \sqrt{1.02 \cdot e^{8.5\cdot \rho_{wood}}-2.89}
+\end{equation}
+while the apoplastic fraction of stem is assumed to be 80\%, i.e. $f_{apo,stem} = 0.8$.
+
+Default values for leaf pressure-volume parameters, i.e. $\pi_{leaf}$, $\epsilon_{leaf}$ and $f_{apo,leaf}$, are determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
+```{r echo = FALSE}
+tfm = medfate:::trait_family_means
+knitr::kable(tfm[!is.na(tfm$LeafPI0) | !is.na(tfm$LeafEPS) | !is.na(tfm$LeafAF), c("LeafPI0", "LeafEPS", "LeafAF"),drop=FALSE],
+             caption = 'Default leaf pressure-volume parameters by taxonomic family.')
+```
+
+If family-level values are missing, following @Bartlett2012 average values for Mediterranean climate leaves are taken as defaults, i.e. $\pi_{leaf} = -2$ MPa, $\epsilon_{leaf} = 17$, whereas a 29\% leaf apoplastic fraction is assumed (i.e. $f_{apo,leaf} = 0.29$).
+
 ### Stem and root maximum hydraulic conductivity {#imputationKstemKroot}
 
 Tissue-level maximum conductivity parameters (i.e. $K_{stem,max,ref}$ and $K_{root,max,ref}$) are not direct parameters to simulation functions. Instead, theay are scaled to estimate stem- and root-level hydraulic conductances (i.e. $k_{stem, \max}$ and $k_{root, \max}$) using plant size (see \@ref(scalingkstem) and \@ref(scalingkroot) for details). $K_{stem,max,ref}$ and $K_{root,max,ref}$ are supplied via species parameter table and missing values can therefore occur. 
@@ -330,36 +353,18 @@ Vulnerability curves in the advanced model need to be specified for leaves, stem
 
 Finally, estimates for $c_{stem}$ and $d_{stem}$ are obtained from $\Psi_{50,stem}$ and $\Psi_{88,stem}$ via function `hydraulics_psi2Weibull()`.
 
-Vulnerability curves for root xylem are less common than for stem xylem. If these values are missing, $\Psi_{50,stem}$ is first estimated according to its definition and the stem vulnerability curve parameters, $c_{stem}$ and $d_{stem}$. Then, a relationship from @Bartlett2012 is used to estimate $\Psi_{50, root}$ from $\Psi_{50,stem}$:
+Vulnerability curves for root xylem are less common than for stem xylem. If these values are missing, $\Psi_{50,stem}$ is first estimated according to its definition and the stem vulnerability curve parameters, $c_{stem}$ and $d_{stem}$. Then, a relationship from @Bartlett2016 is used to estimate $\Psi_{50, root}$ from $\Psi_{50,stem}$:
 \begin{equation}
 \Psi_{50, root} = 0.4892 + 0.742 \cdot \Psi_{50,stem}
 \end{equation}
 Finally, $\Psi_{88,stem}$ and the Weibull vulnerability parameters are obtained as explained for stems.
 
-When leaf vulnerability curves are missing, estimate for $c_{leaf}$ is the same value as $c_{stem}$, whereas $d_{leaf}$ is set to 66\% of $d_{stem}$ [@Sperry2016]. 
-
-### Pressure-volume curves {#inputationPV}
-
-Parameters of the pressure-volume curve (i.e. $\pi_{0,stem}$ and $\epsilon_{stem}$) for leaf and stem symplastic tissue are required for each species. 
-
-When parameters for stem tissue are missing, **medfate** estimates them from wood density following @Christoffersen2016:
+Vulnerability curves for leaf xylem are also less common than for stem xylem. If these values are missing, the water potential at turgor los point $\Psi_{tlp}$ is first estimated from $\pi_{leaf}$ and $\epsilon_{leaf}$ according to eq. \@ref(eq:turgorlosspoint). Then, a relationship calibrated with data from @Bartlett2016 is used to estimate $\Psi_{50, leaf}$ from $\Psi_{tlp}$:
 \begin{equation}
-\pi_{0,stem} = 0.52 - 4.16 \cdot \rho_{wood}
+\Psi_{50, leaf} = 0.2486 + 0.9944 \cdot \Psi_{tlp}
 \end{equation}
+Finally, $\Psi_{88,leaf}$ and the Weibull vulnerability parameters are obtained as explained for stems.
 
-\begin{equation}
-\epsilon_{stem} = \sqrt{1.02 \cdot e^{8.5\cdot \rho_{wood}}-2.89}
-\end{equation}
-while the apoplastic fraction of stem is assumed to be 80\%, i.e. $f_{apo,stem} = 0.8$.
-
-Default values for leaf pressure-volume parameters, i.e. $\pi_{leaf}$, $\epsilon_{leaf}$ and $f_{apo,leaf}$, are determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
-```{r echo = FALSE}
-tfm = medfate:::trait_family_means
-knitr::kable(tfm[!is.na(tfm$LeafPI0) | !is.na(tfm$LeafEPS) | !is.na(tfm$LeafAF), c("LeafPI0", "LeafEPS", "LeafAF"),drop=FALSE],
-             caption = 'Default leaf pressure-volume parameters by taxonomic family.')
-```
-
-If family-level values are missing, following @Bartlett2012 average values for Mediterranean climate leaves are taken as defaults, i.e. $\pi_{leaf} = -2$ MPa, $\epsilon_{leaf} = 17$, whereas a 29\% leaf apoplastic fraction is assumed (i.e. $f_{apo,leaf} = 0.29$).
 
 ### Stomatal conductance {#imputationstomatalconductance}
 When species-specific values are missing for maximum stomatal conductance ($g_{swmax}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$), the following relation with maximum leaf hydraulic conductance ($k_{l, max}$) is used [@Mencuccini2003]:
