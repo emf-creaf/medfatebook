@@ -290,6 +290,17 @@ where $k_{PAR}$ is the PAR extinction coefficient, $\alpha_{SWR}$ is the short-w
 
 When missing, the relative whole-plant conductance corresponding to disconnection from the soil is set to $K_{rootdisc,i} = 0$, its default value.
 
+### Stomatal conductance {#imputationstomatalconductance}
+
+Default values for minimum and maximum conductance to water vapour ($g_{swmin}$ and $g_{swmax}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) were defined depending on taxonomic family, from @Duursma2018 and @Hoshika2018, and stored in an internal data set (`medfate:::trait_family_means`):
+```{r echo = FALSE}
+tfm = medfate:::trait_family_means
+knitr::kable(tfm[!is.na(tfm$Gswmin) | !is.na(tfm$Gswmax),
+                 c("Gswmin", "Gswmax"),drop=FALSE],
+             caption = 'Default minimum and maximum conductance to water vapour by taxonomic family.')
+```
+
+
 ### Pressure-volume curves {#inputationPV}
 
 Parameters of the pressure-volume curve (i.e. $\pi_{0,stem}$ and $\epsilon_{stem}$) for leaf and stem symplastic tissue are required for each species. 
@@ -330,7 +341,11 @@ Using data obtained from @Maherali2004, suitable $K_{stem,max,ref}$ values are d
 Following @Oliveras2003, missing values for $K_{root,max,ref}$ are assumed to be four-times the values given or estimated for $K_{stem,max,ref}$.
 
 ### Leaf maximum hydraulic conductance {#imputationkleaf}
-Leaf maximum hydraulic conductance ($k_{l, max}$, in $mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}$) is an input parameter that should be provided for each species. When missing, leaf maximum hydraulic conductance is assumed $k_{l, max}=6$ for conifers and $k_{l, max}=8$ for angiosperms [@Sack2006].
+Leaf maximum hydraulic conductance ($k_{l, max}$, in $mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}$) is an input parameter that should be provided for each species. When missing, leaf maximum hydraulic conductance can be estimated from maximum stomatal conductance ($g_{swmax}$), following @Franks2006 (original coefficients were modified for better fit):
+\begin{equation}
+k_{l, max} = (g_{swmax}/0.015)^{1/1.3}
+\end{equation}
+Note that values for $g_{swmax}$ may also be imputed (see \@ref(imputationstomatalconductance)).
 
 
 ### Xylem vulnerability  {#imputationVCs}
@@ -365,29 +380,6 @@ Vulnerability curves for leaf xylem are also less common than for stem xylem. If
 \end{equation}
 Finally, $\Psi_{88,leaf}$ and the Weibull vulnerability parameters are obtained as explained for stems.
 
-
-### Stomatal conductance {#imputationstomatalconductance}
-When species-specific values are missing for maximum stomatal conductance ($g_{swmax}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$), the following relation with maximum leaf hydraulic conductance ($k_{l, max}$) is used [@Mencuccini2003]:
-\begin{equation}
-g_{swmax} = e^{4.797 + 0.633\cdot \log(k_{l, max})}
-\end{equation}
-Note that values for $k_{l, max}$ may also be imputed (see \@ref(imputationsoildisconnection)).
-
-Default values for minimum stomatal conductance ($g_{swmin}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) were defined depending on taxonomic order, from @Duursma2018:
-
-| Order       | $g_{swmin}$ |
-| :----------- |:-----------:|
-| Pinales | 0.003 |
-| Araucariales | 0.003 |
-| Ericales | 0.004 |
-| Fagales | 0.0045 |
-| Rosales | 0.0045 |
-| Cupressales | 0.0045 |
-| Lamiales | 0.0055 |
-| Fabales | 0.0065 |
-| Myrtales | 0.0075 |
-| Poales | 0.0110 |
-| Other | 0.0049 |
 
 ### Photosynthesis rates {#imputationphotosynthesis}
 
