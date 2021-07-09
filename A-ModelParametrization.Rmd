@@ -20,11 +20,11 @@ The following tables describe how the different functional parameters are dealt 
 
 | Symbol | R    | Description                          | Strict | Scaled | Imputable |
 |--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
-|        | `GrowthForm` |  Growth form, defined depending on the treatment in forest inventory plots (Tree, Shrub or Tree/Shrub)    | Yes | No | No |
-|        |  `LeafShape`  | Leaf type (Linear, Needle, Broad, Scale, Spines)    | Yes | No | No |
-|        |  `LeafSize`  | Leaf size (Small, Medium, Large)   | Yes | No | No |
-|        |  `LifeForm`  | Raunkiaer life form    | Yes | No | No |
-|        |  `PhenologyType`  | Leaf phenology type    | Yes | No | No |
+|  $GF$   | `GrowthForm` |  Growth form, defined depending on the treatment in forest inventory plots (Tree, Shrub or Tree/Shrub)    | Yes | No | No |
+|   $LF$     |  `LifeForm`  | Raunkiaer life form    | Yes | No | No |
+|  $L_{shape}$   |  `LeafShape`  | Leaf type (Linear, Needle, Broad, Scale, Spines or Succulent)    | Yes | No | No |
+| $L_{size}$  |  `LeafSize`  | Leaf size (Small, Medium, Large)   | Yes | No | No |
+| $L_{pheno}$     |  `PhenologyType`  | Leaf phenology type    | Yes | No | No |
 
 **Plant size**
 
@@ -51,11 +51,14 @@ The following tables describe how the different functional parameters are dealt 
 | Symbol | R    | Description                          | Strict | Scaled | Imputable |
 |--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
 | $LD$ | `LeafDuration` | Average duration of leaves | No | No | \@ref(imputationphenology) |
+| $t_{0,eco}$ | `t0gdd` | Degree days corresponding to leaf budburst | No | No | \@ref(imputationphenology) |
 | $S^*_{eco}$ | `Sgdd` | Degree days corresponding to leaf budburst | No | No | \@ref(imputationphenology) |
 | $T_{eco}$ |  `Tbgdd` | Base temperature for the calculation of degree days to leaf budburst | No | No | \@ref(imputationphenology) |
 | $S^*_{sen}$ | `Ssen` | Degree days corresponding to leaf senescence  | No | No | \@ref(imputationphenology) |
 | $Ph_{sen}$ | `Phsen` | Photoperiod corresponding to start counting senescence degree-days | No | No | \@ref(imputationphenology) |
 | $T_{sen}$ | `Tbsen` | Base temperature for the calculation of degree days to leaf senescence | No | No | \@ref(imputationphenology) |
+| $x_{sen}$ | `xsen` | Discrete values, to allow for any absent/proportional/more than proportional effects of temperature on senescence | No | No | \@ref(imputationphenology) |
+| $y_{sen}$ | `ysen` | Discrete values, to allow for any absent/proportional/more than proportional effects of photoperiod on senescence | No | No | \@ref(imputationphenology) |
 
 **Plant anatomy**
 
@@ -265,12 +268,12 @@ When missing, leaf duration is assigned a value of 1 year for winter-deciduous s
 
 Default values for leaf phenological parameters are the same regardless of the leaf phenology type:
 
-|  Phenology type | `Sgdd` | `Tbgdd` |  `Ssen` |  `Phsen` |  `Tbsen` |
-|:--------------- |:-----:|:-----:|:-----:|:-----:|:-----:|
-| One-flush evergreen | 200 | 5 | 8268 | 12.5 | 28.5 |
-| Winter deciduous | 200 |  5 | 8268 | 12.5 | 28.5 |
-| Winter semi-deciduous | 200 |  5 | 8268 | 12.5 | 28.5 |
-| Drought deciduous | 200 |  5 | 8268 | 12.5 | 28.5 |
+|  Phenology type | `t0gdd` | `Sgdd` | `Tbgdd` |  `Ssen` |  `Phsen` |  `Tbsen` |  `xsen` | `ysen` |
+|:--------------- |:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+| One-flush evergreen | 50 | 200 | 0 | 8268 | 12.5 | 28.5 | 2 | 2 |
+| Winter deciduous | 50 |  200 |  0 | 8268 | 12.5 | 28.5 | 2 | 2 |
+| Winter semi-deciduous |  50 | 200 |  0 | 8268 | 12.5 | 28.5 | 2 | 2 |
+| Drought deciduous | 50 |  200 |  0 | 8268 | 12.5 | 28.5 | 2 | 2 |
 
 Leaf senescence values were derived for deciduous broad-leaved forests by @Delpierre2009.
 

@@ -6,7 +6,7 @@ Leaf phenology determines seasonal variations in the surface area of leaves, hen
 
 ### Phenological types and leaf expanded area
 
-Plant species can have either *progressive evergreen*, *one-flush evergreen*, *winter-deciduous* or *winter semi-deciduous* leaf phenology (see Fig. 4.1). Progressive evergreen plants are assumed to shed old leaves at the same time as new leaves appear, so that the leaf area remains constant throughout the year. One-flush evergreen plants concentrate leaf unfolding and leaf senescence during similar periods, so that leaf area is also approximately constant year-round. In winter-deciduous plants, leaf shedding and leaf bud formation occurs in autumn. Buds remain under dormancy until spring, when budburst and unfolding occurs. The difference between semi-deciduous and deciduous plants is that the former retain dead leaves in the plant until next season unfolding period, so that leaf fall is retarded.
+Plant species can have either *progressive evergreen*, *one-flush evergreen*, *winter-deciduous*, *winter semi-deciduous* or *drought-deciduous* leaf phenology (see Fig. 4.1). Progressive evergreen plants are assumed to shed old leaves at the same time as new leaves appear, so that the leaf area remains constant throughout the year. One-flush evergreen plants concentrate leaf unfolding and leaf senescence during similar periods, so that leaf area is also approximately constant year-round. In winter-deciduous plants, leaf shedding and leaf bud formation occurs in autumn. Buds remain under dormancy until spring, when budburst and unfolding occurs. The difference between semi-deciduous and deciduous plants is that the former retain dead leaves in the plant until next season unfolding period, so that leaf fall is retarded. Finally, drought-deciduous plants behave like progressive-evergreen plants except that they can shed their leaves in response to drought.
 
 ```{r, out.width='80%', fig.align="center", fig.cap="Schematic representation of leaf phenology types", echo=FALSE}
 knitr::include_graphics("leaf_phenology.png")
@@ -35,7 +35,7 @@ R_{eco,d}(T_d) = \begin{cases}
                       T_d - T_{eco}  & T_d > T_{eco}
                  \end{cases}
 \end{equation}
-Daily $R_{eco,d}$ values are added to the cumulative sum $S_{eco,d}$ and budburst occurs when $S_{eco,d} > S_{eco}^*$. Both $T_{eco}$ and $S_{eco}^*$ are plant-specific parameters in `spwbInput`. 
+Degree accumulation starts after the year date surpasses parameter $t_{0,eco}$. If $DOY > t_{0,eco}$, daily $R_{eco,d}$ values are added to the cumulative sum $S_{eco,d}$ and budburst occurs when $S_{eco,d} > S_{eco}^*$. Both $T_{eco}$ and $S_{eco}^*$ are plant-specific parameters in `spwbInput`. 
 
 After budburst, we model progressive leaf unfolding in a similar manner, by accumulating degree days using the same definition as for $R_{eco,d}$:
 \begin{equation}
@@ -52,10 +52,10 @@ Leaf senescence follows the models developed by @Delpierre2009. The daily rate o
 \begin{equation}
 R_{sen,d}(Ph_d, T_d) = \begin{cases} 
                             0  & T_d \geq T_{sen} \,\, or \,\, Ph_d>Ph_{sen} \\
-                           (T_d - T_{sen})^2 \cdot (Ph_d/Ph_{sen})^2  & T_d < T_{sen} \,\,and \,\, Ph_d<Ph_{sen}
+                           (T_d - T_{sen})^{x_{sen}} \cdot (Ph_d/Ph_{sen})^{y_{sen}}  & T_d < T_{sen} \,\,and \,\, Ph_d<Ph_{sen}
                        \end{cases}
 \end{equation}
-where $Ph_{sen}$ is the maximum photoperiod to start counting the senescence. The state of development of senescence $S_{sen,d}$ is defined
+where $Ph_{sen}$ is the maximum photoperiod to start counting the senescence; ${x_{sen}}$ and ${y_{sen}}$ are exponents regulating the importance of temperature and photoperiod on leaf senescence. The state of development of senescence $S_{sen,d}$ is defined
 \begin{equation} 
 S_{sen,d} = \sum R_{sen,d}
 \end{equation}

@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2021-07-08" />
+<meta name="date" content="2021-07-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -771,37 +771,43 @@ div.csl-indent {
 <td>Leaf size: “Small” (&lt; 225 mm), “Medium” (&gt; 225 mm &amp; &lt; 2025 mm) or “Large” (&gt; 2025 mm)</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(r_{6.35,i}\)</span></td>
+<td><span class="math inline">\(r_{6.35}\)</span></td>
 <td></td>
 <td><code>r635</code></td>
 <td>Ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(\rho_{p,i}\)</span></td>
-<td><span class="math inline">\(kg \cdot m^{-3}\)</span></td>
-<td><code>PD</code></td>
-<td>Density of fuel particles</td>
+<td><span class="math inline">\(\rho_{wood}\)</span></td>
+<td><span class="math inline">\(g \cdot cm^{-3}\)</span></td>
+<td><code>WoodDensity</code></td>
+<td>Density of wood tissue</td>
 </tr>
 <tr class="odd">
+<td><span class="math inline">\(\rho_{leaf}\)</span></td>
+<td><span class="math inline">\(g \cdot cm^{-3}\)</span></td>
+<td><code>LeafDensity</code></td>
+<td>Density of leaf tissue</td>
+</tr>
+<tr class="even">
 <td><span class="math inline">\(\sigma_{i}\)</span></td>
 <td><span class="math inline">\(m^2 \cdot m^{-3}\)</span></td>
 <td><code>SAV</code></td>
 <td>Surface-area-to-volume ratio of the small fuel (1h) fraction (leaves and branches &lt; 6.35mm)</td>
 </tr>
-<tr class="even">
-<td><span class="math inline">\(h_i\)</span></td>
+<tr class="odd">
+<td><span class="math inline">\(h\)</span></td>
 <td><span class="math inline">\(kJ \cdot kg^{-1}\)</span></td>
 <td><code>HeatContent</code></td>
 <td>High fuel heat content.</td>
 </tr>
-<tr class="odd">
-<td><span class="math inline">\(LD_i\)</span></td>
+<tr class="even">
+<td><span class="math inline">\(LD\)</span></td>
 <td>years</td>
 <td><code>LeafDuration</code></td>
 <td>Leaf duration (in years)</td>
 </tr>
-<tr class="even">
-<td><span class="math inline">\(LI_i\)</span></td>
+<tr class="odd">
+<td><span class="math inline">\(LI\)</span></td>
 <td>%</td>
 <td><code>PercentLignin</code></td>
 <td>Percentage of lignin in leaves</td>
@@ -814,17 +820,17 @@ div.csl-indent {
 <h3><span class="header-section-number">24.2.3</span> Other inputs</h3>
 <p>Other inputs may be given by expert opinion or they may be calculated from another model. Specifically, for each plant cohort (and for any day of application) the fire behaviour model requires:</p>
 <ul>
-<li><span class="math inline">\(P_{dead,i}\)</span>: Proportion of the plant that is dead.</li>
-<li><span class="math inline">\(M_i\)</span>: Foliar moisture value (in percent of dry weight).</li>
+<li><span class="math inline">\(P_{dead}\)</span>: Proportion of the plant that is dead.</li>
+<li><span class="math inline">\(FMC\)</span>: Fuel moisture content (in percent of dry weight).</li>
 </ul>
 <p>Analogously, the same variables are needed for the herbaceous stratum.</p>
 <ul>
 <li><span class="math inline">\(P_{dead,he}\)</span>: Proportion of herb fuels that respond to humidity changes as 1-h dead fuels.</li>
-<li><span class="math inline">\(M_{live,he}\)</span>: Foliar moisture value of live herb fuels (in percent of dry weight).</li>
+<li><span class="math inline">\(FMC_{live,he}\)</span>: Fuel moisture content of live herb fuels (in percent of dry weight).</li>
 </ul>
 <p>The model also needs the following input parameters:</p>
 <ul>
-<li><span class="math inline">\(M_{dead}\)</span>: the moisture of 1-h dead fuels (in percent of dry weight).</li>
+<li><span class="math inline">\(FMC_{dead}\)</span>: the moisture content of 1-h dead fuels (in percent of dry weight).</li>
 <li><span class="math inline">\(U\)</span>: Midflame windspeed (in <span class="math inline">\(m\cdot s^{-1}\)</span>).</li>
 <li><span class="math inline">\(S\)</span>: Slope (in percent).</li>
 </ul>
@@ -977,7 +983,20 @@ where <span class="math inline">\(k\)</span> indicates litter type. The bulk den
 \rho_{p, sh} &amp;= \frac{\sum_{i}{w_{i,sh} \cdot \rho_p(SP_i)}}{\sum_{i}{w_{i,sh}}}\\
 \rho_{p, ca} &amp;= \frac{\sum_{i}{w_{i,ca} \cdot \rho_p(SP_i)}}{\sum_{i}{w_{i,ca}}}
 \end{eqnarray}\]</span>
-where <span class="math inline">\(\rho_p(SP_i)\)</span> is the species-specific particle density. <span class="math inline">\(\rho_{p, he}\)</span>, <span class="math inline">\(\rho_{p, wo}\)</span> and <span class="math inline">\(\rho_{p, li}\)</span> are all set to a default value <span class="math inline">\(\rho_{p} = 400 kg\cdot m^{-3}= 25 lb\cdot ft^{-3}\)</span> <span class="citation">(<a href="#ref-Prichard2013" role="doc-biblioref">Prichard <em>et al.</em> 2013</a>)</span>.</p>
+where <span class="math inline">\(\rho_p(SP_i)\)</span> is the species-specific particle density (in <span class="math inline">\(kg\cdot m^{-3}\)</span>), which can be obtained from wood tissue (<span class="math inline">\(\rho_{wood}\)</span>) and leaf tissue (<span class="math inline">\(\rho_{leaf}\)</span>) densities, using <span class="math inline">\(r_{6.35}\)</span> to weight them:
+<span class="math display">\[\begin{equation}
+\rho_p(SP_i) = 1000 \cdot (\rho_{leaf}(SP_i)\cdot f_{leaves,vol} + \rho_{wood}(SP_i)\cdot (1 - f_{leaves,vol}))
+\end{equation}\]</span>
+where <span class="math inline">\(f_{leaves,vol}\)</span> is the volumetric fraction of leaves with respect to branchlets:
+<span class="math display">\[\begin{equation}
+f_{leaves,vol} = \left[1.0 +(r_{6.35}(SP_i) - 1.0) \cdot \frac{\rho_{wood}(SP_i)}{\rho_{leaf}(SP_i)} \right]^{-1} 
+\end{equation}\]</span></p>
+<p>Dead woody and litter particle densities, i.e. <span class="math inline">\(\rho_{p, wo}\)</span> and <span class="math inline">\(\rho_{p, li}\)</span>, are obtained averaging wood tissue and leaf tissue densities across cohorts:
+<span class="math display">\[\begin{eqnarray}
+\rho_{p, wo} &amp;= \frac{\sum_{i}{w_{i} \cdot \rho_{wood}(SP_i)}}{\sum_{i}{w_{i}}}\\
+\rho_{p, li} &amp;= \frac{\sum_{i}{w_{i} \cdot \rho_{leaf}(SP_i)}}{\sum_{i}{w_{i}}}\\
+\end{eqnarray}\]</span>
+Finally, herb particle density, <span class="math inline">\(\rho_{p, he}\)</span>, is set to a default value <span class="math inline">\(\rho_{p,he} = 400 kg\cdot m^{-3}= 25 lb\cdot ft^{-3}\)</span> <span class="citation">(<a href="#ref-Prichard2013" role="doc-biblioref">Prichard <em>et al.</em> 2013</a>)</span>.</p>
 </div>
 <div id="particle-volume-pv" class="section level4" number="24.3.6.2">
 <h4><span class="header-section-number">24.3.6.2</span> Particle volume (<span class="math inline">\(PV\)</span>)</h4>
@@ -1048,14 +1067,14 @@ For the litter layer, FAI is calculated as a sum of FAI for litter components:
 FAI_{li} = \sum_{k}{FAI_{li,k}} = \sum_{k}{PV_{li,k} \cdot \sigma_{k}}
 \end{equation}\]</span></p>
 </div>
-<div id="moisture-m" class="section level4" number="24.3.6.6">
-<h4><span class="header-section-number">24.3.6.6</span> Moisture (<span class="math inline">\(M\)</span>)</h4>
-<p>Live foliar moisture (in percent of dry weight) is also averaged across cohorts composing the shrub or canopy strata:
+<div id="moisture-content-fmc" class="section level4" number="24.3.6.6">
+<h4><span class="header-section-number">24.3.6.6</span> Moisture content (<span class="math inline">\(FMC\)</span>)</h4>
+<p>Fuel moisture content (<span class="math inline">\(FMC\)</span> in percent of dry weight) is averaged across cohorts composing the shrub or canopy strata, to obtain <span class="math inline">\(FMC_{live, sh}\)</span> and <span class="math inline">\(FMC_{live, ca}\)</span> :
 <span class="math display">\[\begin{eqnarray}
-M_{live, sh} &amp;=&amp; \frac{\sum_{i}{w_{i,sh} \cdot M_i}}{\sum_{i}{w_{i,sh}}} \\
-M_{live, ca} &amp;=&amp; \frac{\sum_{i}{w_{i,ca} \cdot M_i}}{\sum_{i}{w_{i,ca}}}
+FMC_{live, sh} &amp;=&amp; \frac{\sum_{i}{w_{i,sh} \cdot FMC_i}}{\sum_{i}{w_{i,sh}}} \\
+FMC_{live, ca} &amp;=&amp; \frac{\sum_{i}{w_{i,ca} \cdot FMC_i}}{\sum_{i}{w_{i,ca}}}
 \end{eqnarray}\]</span>
-Live foliar moisture of herb stratum (<span class="math inline">\(M_{live, he}\)</span>) is an input. The moisture of dead plant in the canopy and shrub layers (<span class="math inline">\(M_{dead, ca}\)</span> and <span class="math inline">\(M_{dead, sh}\)</span>), the moisture of dead herbs (<span class="math inline">\(M_{dead, he}\)</span>), as well as that of litter (<span class="math inline">\(M_{li}\)</span>) and woody (<span class="math inline">\(M_{wo}\)</span>) strata are all assumed equal to the moisture of 1-h dead fuels, which is an input of the model.</p>
+Live fuel moisture of herb stratum (<span class="math inline">\(FMC_{live, he}\)</span>) is an input. The moisture of dead plant in the canopy and shrub layers (<span class="math inline">\(FMC_{dead, ca}\)</span> and <span class="math inline">\(FMC_{dead, sh}\)</span>), the moisture of dead herbs (<span class="math inline">\(FMC_{dead, he}\)</span>), as well as that of litter (<span class="math inline">\(FMC_{li}\)</span>) and woody (<span class="math inline">\(FMC_{wo}\)</span>) strata are all assumed equal to the moisture of 1-h dead fuels, which is an input of the model.</p>
 </div>
 <div id="proportion-of-dead-fuel-p_dead" class="section level4" number="24.3.6.7">
 <h4><span class="header-section-number">24.3.6.7</span> Proportion of dead fuel (<span class="math inline">\(P_{dead}\)</span>)</h4>
@@ -1144,17 +1163,17 @@ I_{R,litter} &amp;=&amp; I_{R, li}
 \end{eqnarray}\]</span></p>
 <p>Each component reaction intensity is calculated using:
 <span class="math display" id="eq:reactintensitycomp">\[\begin{eqnarray} 
-I_{R,sh} &amp;=&amp; (\eta_{\beta_{allsurf}&#39;})^{A_{sh}}\cdot \Gamma_{\max, sh}&#39;\cdot w_{sh} \cdot h_{sh} \cdot \eta_{M,sh}\cdot \eta_{K,sh}\\
-I_{R,he} &amp;=&amp; (\eta_{\beta_{lowsurf}&#39;})^{A_{he}}\cdot \Gamma_{\max, he}&#39;\cdot w_{he} \cdot h_{he} \cdot \eta_{M,he}\cdot \eta_{K,he}\\
-I_{R,wo} &amp;=&amp; (\eta_{\beta_{lowsurf}&#39;})^{A_{wo}}\cdot \Gamma_{\max, wo}&#39;\cdot w_{wo} \cdot h_{wo} \cdot \eta_{M,wo}\cdot \eta_{K,wo}\\
-I_{R,li} &amp;=&amp; (\eta_{\beta_{litter}&#39;})^{A_{li}}\cdot \Gamma_{\max, li}&#39;\cdot w_{li} \cdot h_{li} \cdot \eta_{M,li}\cdot \eta_{K,li}
+I_{R,sh} &amp;=&amp; (\eta_{\beta_{allsurf}&#39;})^{A_{sh}}\cdot \Gamma_{\max, sh}&#39;\cdot w_{sh} \cdot h_{sh} \cdot \eta_{FMC,sh}\cdot \eta_{K,sh}\\
+I_{R,he} &amp;=&amp; (\eta_{\beta_{lowsurf}&#39;})^{A_{he}}\cdot \Gamma_{\max, he}&#39;\cdot w_{he} \cdot h_{he} \cdot \eta_{FMC,he}\cdot \eta_{K,he}\\
+I_{R,wo} &amp;=&amp; (\eta_{\beta_{lowsurf}&#39;})^{A_{wo}}\cdot \Gamma_{\max, wo}&#39;\cdot w_{wo} \cdot h_{wo} \cdot \eta_{FMC,wo}\cdot \eta_{K,wo}\\
+I_{R,li} &amp;=&amp; (\eta_{\beta_{litter}&#39;})^{A_{li}}\cdot \Gamma_{\max, li}&#39;\cdot w_{li} \cdot h_{li} \cdot \eta_{FMC,li}\cdot \eta_{K,li}
 \tag{24.3}
 \end{eqnarray}\]</span></p>
 <p>In the above equations, <span class="math inline">\(w_{sh}\)</span>, <span class="math inline">\(w_{he}\)</span>, <span class="math inline">\(w_{wo}\)</span> and <span class="math inline">\(w_{li}\)</span> are the loadings of the corresponding shrub, herb, woody and litter strata, respectively. These quantities were defined in previous sections, as were the corresponding low heat fuel contents (<span class="math inline">\(h_{sh}\)</span>, <span class="math inline">\(h_{he}\)</span>, <span class="math inline">\(h_{wo}\)</span> and <span class="math inline">\(h_{li}\)</span>). Mineral damping coefficient (<span class="math inline">\(\eta_{K}\)</span>; dimensionless) is set to the same value (corresponding to the conventional value for silica-free ash content of 1%) for all strata:
 <span class="math display">\[\begin{equation}
 \eta_{K,sh} = \eta_{K,he} =\eta_{K,wo} = \eta_{K,li} = 0.42
 \end{equation}\]</span>
-In the following subsections, we describe the calculation of the remaining variables for each stratum: reaction efficiency (<span class="math inline">\(\eta_{\beta&#39;}\)</span>), Rothermel’s <span class="math inline">\(A\)</span> parameter, maximum reaction velocity (<span class="math inline">\(\Gamma_{\max}&#39;\)</span>) and moisture damping coefficient (<span class="math inline">\(\eta_{M}\)</span>).</p>
+In the following subsections, we describe the calculation of the remaining variables for each stratum: reaction efficiency (<span class="math inline">\(\eta_{\beta&#39;}\)</span>), Rothermel’s <span class="math inline">\(A\)</span> parameter, maximum reaction velocity (<span class="math inline">\(\Gamma_{\max}&#39;\)</span>) and moisture damping coefficient (<span class="math inline">\(\eta_{FMC}\)</span>).</p>
 </div>
 <div id="reaction-efficiency-eta_beta" class="section level4" number="24.4.1.2">
 <h4><span class="header-section-number">24.4.1.2</span> Reaction efficiency (<span class="math inline">\(\eta_{\beta&#39;}\)</span>)</h4>
@@ -1223,22 +1242,22 @@ where <span class="math inline">\(\sigma_{sh}\)</span> and <span class="math inl
 \end{eqnarray}\]</span>
 where <span class="math inline">\(\sigma_{wo} = 488 ft^2\cdot ft^{-3} = 1601.05 m^2\cdot m^{-3}\)</span> is the surface-to-area-volume ratio typical of small woody fuels. In <span class="citation"><a href="#ref-Prichard2013" role="doc-biblioref">Prichard <em>et al.</em></a> (<a href="#ref-Prichard2013" role="doc-biblioref">2013</a>)</span> <span class="math inline">\(\sigma_{sh}\)</span> is defined as the average of shrub foliar surface-to-area-volume ratio and <span class="math inline">\(\sigma_{wo}\)</span>, but in our case <span class="math inline">\(\sigma_(SP_i)\)</span> for each species includes both leaves and small branches. Eq. <a href="fuel-characteristics-and-fire-behaviour.html#eq:maxreactvel">(24.6)</a> represent a significant departure from <span class="citation"><a href="#ref-Rothermel1972" role="doc-biblioref">Rothermel</a> (<a href="#ref-Rothermel1972" role="doc-biblioref">1972</a>)</span> maximum reaction velocity, and are also different from <span class="citation"><a href="#ref-Sandberg2007" role="doc-biblioref">Sandberg <em>et al.</em></a> (<a href="#ref-Sandberg2007" role="doc-biblioref">2007</a>)</span>.</p>
 </div>
-<div id="moisture-damping-coefficient-eta_m" class="section level4" number="24.4.1.5">
-<h4><span class="header-section-number">24.4.1.5</span> Moisture damping coefficient (<span class="math inline">\(\eta_M\)</span>)</h4>
+<div id="moisture-damping-coefficient-eta_fmc" class="section level4" number="24.4.1.5">
+<h4><span class="header-section-number">24.4.1.5</span> Moisture damping coefficient (<span class="math inline">\(\eta_{FMC}\)</span>)</h4>
 <p>Moisture damping reduces reaction velocity and hence reaction intensity (eq. <a href="fuel-characteristics-and-fire-behaviour.html#eq:reactintensity">(24.2)</a>). It is calculated for each stratum using the following regression equations:
 <span class="math display" id="eq:moistdamp">\[\begin{eqnarray}
-\eta_{M, live, sh} &amp;=&amp; \left[1-2.59\cdot \left(\frac{M_{live, sh}}{X_{live, sh}}\right)\right] +\left[ 5.11\cdot \left(\frac{M_{live, sh}}{X_{live, sh}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{M_{live, sh}}{X_{live, sh}}\right)^3\right] \\
-\eta_{M, dead, sh} &amp;=&amp; \left[1-2.59\cdot \left(\frac{M_{dead, sh}}{X_{dead, sh}}\right)\right] +\left[ 5.11\cdot \left(\frac{M_{dead, sh}}{X_{dead, sh}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{M_{dead, sh}}{X_{dead, sh}}\right)^3\right] \\
-\eta_{M, live, he} &amp;=&amp; \left[1-2.59\cdot \left(\frac{M_{live, he}}{X_{live, he}}\right)\right] +\left[ 5.11\cdot \left(\frac{M_{live, he}}{X_{live, he}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{M_{live, he}}{X_{live, he}}\right)^3\right] \\
-\eta_{M, dead, he} &amp;=&amp; \left[1-2.59\cdot \left(\frac{M_{dead, he}}{X_{dead, he}}\right)\right] +\left[ 5.11\cdot \left(\frac{M_{dead, he}}{X_{dead, he}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{M_{dead, he}}{X_{dead, he}}\right)^3\right] \\
-\eta_{M, wo} &amp;=&amp; \left[1-2.59\cdot \left(\frac{M_{wo}}{X_{wo}}\right)\right] +\left[ 5.11\cdot \left(\frac{M_{wo}}{X_{wo}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{M_{wo}}{X_{wo}}\right)^3\right] \\
-\eta_{M, li} &amp;=&amp; \left[1-2.59\cdot \left(\frac{M_{li}}{X_{li}}\right)\right] +\left[ 5.11\cdot \left(\frac{M_{li}}{X_{li}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{M_{li}}{X_{li}}\right)^3\right] 
+\eta_{FMC, live, sh} &amp;=&amp; \left[1-2.59\cdot \left(\frac{FMC_{live, sh}}{X_{live, sh}}\right)\right] +\left[ 5.11\cdot \left(\frac{FMC_{live, sh}}{X_{live, sh}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{FMC_{live, sh}}{X_{live, sh}}\right)^3\right] \\
+\eta_{FMC, dead, sh} &amp;=&amp; \left[1-2.59\cdot \left(\frac{FMC_{dead, sh}}{X_{dead, sh}}\right)\right] +\left[ 5.11\cdot \left(\frac{FMC_{dead, sh}}{X_{dead, sh}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{FMC_{dead, sh}}{X_{dead, sh}}\right)^3\right] \\
+\eta_{FMC, live, he} &amp;=&amp; \left[1-2.59\cdot \left(\frac{FMC_{live, he}}{X_{live, he}}\right)\right] +\left[ 5.11\cdot \left(\frac{FMC_{live, he}}{X_{live, he}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{FMC_{live, he}}{X_{live, he}}\right)^3\right] \\
+\eta_{FMC, dead, he} &amp;=&amp; \left[1-2.59\cdot \left(\frac{FMC_{dead, he}}{X_{dead, he}}\right)\right] +\left[ 5.11\cdot \left(\frac{FMC_{dead, he}}{X_{dead, he}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{FMC_{dead, he}}{X_{dead, he}}\right)^3\right] \\
+\eta_{FMC, wo} &amp;=&amp; \left[1-2.59\cdot \left(\frac{FMC_{wo}}{X_{wo}}\right)\right] +\left[ 5.11\cdot \left(\frac{FMC_{wo}}{X_{wo}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{FMC_{wo}}{X_{wo}}\right)^3\right] \\
+\eta_{FMC, li} &amp;=&amp; \left[1-2.59\cdot \left(\frac{FMC_{li}}{X_{li}}\right)\right] +\left[ 5.11\cdot \left(\frac{FMC_{li}}{X_{li}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{FMC_{li}}{X_{li}}\right)^3\right] 
 \tag{24.7}
 \end{eqnarray}\]</span>
 where moisture contents of extinctions were arbitrarily set to <span class="math inline">\(X_{dead, sh} = X_{dead, he} X_{wo} = X_{li} = 25\)</span>, <span class="math inline">\(X_{live, sh} = 180\)</span> and <span class="math inline">\(X_{live, he} = 120\)</span> in Sandberg et al. (2007). As it can be seen in the equations above, in the case of shrub and herb strata, moisture damping of live and dead fuels are differentiated. Average values are found after accounting for the proportion of live and dead material:
 <span class="math display">\[\begin{eqnarray}
-\eta_{M, sh} &amp;=&amp; \eta_{M, live, sh} \cdot (1 - P_{dead, sh})+ \eta_{M, dead, sh} \cdot P_{dead, sh}\\
-\eta_{M, he} &amp;=&amp; \eta_{M, live, he} \cdot (1 - P_{dead, he})+ \eta_{M, dead, he} \cdot P_{dead, he}
+\eta_{FMC, sh} &amp;=&amp; \eta_{FMC, live, sh} \cdot (1 - P_{dead, sh})+ \eta_{FMC, dead, sh} \cdot P_{dead, sh}\\
+\eta_{FMC, he} &amp;=&amp; \eta_{FMC, live, he} \cdot (1 - P_{dead, he})+ \eta_{FMC, dead, he} \cdot P_{dead, he}
 \end{eqnarray}\]</span></p>
 </div>
 <div id="propagating-flux-ratio-xi" class="section level4" number="24.4.1.6">
@@ -1351,13 +1370,13 @@ where <span class="math inline">\(U\)</span> is the input (midflame) windspeed (
 <h3><span class="header-section-number">24.5.1</span> Canopy reaction intensity (<span class="math inline">\(I_{R, ca}\)</span>)</h3>
 <p>Reaction intensity of canopy fuels (in <span class="math inline">\(Btu \cdot ft^{-2} \cdot min^{-1}\)</span>) is estimated as:
 <span class="math display">\[\begin{equation}
-I_{R,ca} = (\eta_{\beta_{ca}&#39;})^{A_{ca}}\cdot \Gamma_{\max, ca}&#39;\cdot w_{ca} \cdot h_{ca} \cdot \eta_{M,ca}\cdot \eta_{K,ca}
+I_{R,ca} = (\eta_{\beta_{ca}&#39;})^{A_{ca}}\cdot \Gamma_{\max, ca}&#39;\cdot w_{ca} \cdot h_{ca} \cdot \eta_{FMC,ca}\cdot \eta_{K,ca}
 \end{equation}\]</span>
-where <span class="math inline">\(A_{ca} = 133\cdot \sigma_{ca}^{-0.7913}\)</span> is Rothermel’s A coefficient, <span class="math inline">\(\Gamma_{\max, ca}&#39; = 15 min^{-1}\)</span> is the maximum reaction velocity of the canopy, <span class="math inline">\(w_{ca}\)</span> is the loading of canopy fuels (in <span class="math inline">\(lb \cdot ft^{-2}\)</span>), <span class="math inline">\(h_{ca}\)</span> is the heat content of the canopy fuels (in <span class="math inline">\(Btu \cdot lb^{-1}\)</span>) and <span class="math inline">\(\eta_{K,ca}=0.42\)</span> is the mineral damping coefficient of the canopy stratum. Moisture damping coefficient for the canopy (<span class="math inline">\(\eta_{M,ca}\)</span>) is estimated as done for shrub and herb strata:
+where <span class="math inline">\(A_{ca} = 133\cdot \sigma_{ca}^{-0.7913}\)</span> is Rothermel’s A coefficient, <span class="math inline">\(\Gamma_{\max, ca}&#39; = 15 min^{-1}\)</span> is the maximum reaction velocity of the canopy, <span class="math inline">\(w_{ca}\)</span> is the loading of canopy fuels (in <span class="math inline">\(lb \cdot ft^{-2}\)</span>), <span class="math inline">\(h_{ca}\)</span> is the heat content of the canopy fuels (in <span class="math inline">\(Btu \cdot lb^{-1}\)</span>) and <span class="math inline">\(\eta_{K,ca}=0.42\)</span> is the mineral damping coefficient of the canopy stratum. Moisture damping coefficient for the canopy (<span class="math inline">\(\eta_{FMC,ca}\)</span>) is estimated as done for shrub and herb strata:
 <span class="math display">\[\begin{eqnarray}
-\eta_{M, live, ca} &amp;=&amp; \left[1-2.59\cdot \left(\frac{M_{live, ca}}{X_{live, ca}}\right)\right] +\left[ 5.11\cdot \left(\frac{M_{live, ca}}{X_{live, ca}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{M_{live, ca}}{X_{live, ca}}\right)^3\right] \\
-\eta_{M, dead, ca} &amp;=&amp; \left[1-2.59\cdot \left(\frac{M_{dead, ca}}{X_{dead, ca}}\right)\right] +\left[ 5.11\cdot \left(\frac{M_{dead, ca}}{X_{dead, ca}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{M_{dead, ca}}{X_{dead, ca}}\right)^3\right] \\
-\eta_{M, ca} &amp;=&amp; \eta_{M, live, ca} \cdot (1 - P_{dead, ca})+ \eta_{M, dead, ca} \cdot P_{dead, ca}
+\eta_{FMC, live, ca} &amp;=&amp; \left[1-2.59\cdot \left(\frac{FMC_{live, ca}}{X_{live, ca}}\right)\right] +\left[ 5.11\cdot \left(\frac{FMC_{live, ca}}{X_{live, ca}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{FMC_{live, ca}}{X_{live, ca}}\right)^3\right] \\
+\eta_{FMC, dead, ca} &amp;=&amp; \left[1-2.59\cdot \left(\frac{FMC_{dead, ca}}{X_{dead, ca}}\right)\right] +\left[ 5.11\cdot \left(\frac{FMC_{dead, ca}}{X_{dead, ca}}\right)^2\right]-\left[ 3.52\cdot \left(\frac{FMC_{dead, ca}}{X_{dead, ca}}\right)^3\right] \\
+\eta_{FMC, ca} &amp;=&amp; \eta_{FMC, live, ca} \cdot (1 - P_{dead, ca})+ \eta_{M, dead, ca} \cdot P_{dead, ca}
 \end{eqnarray}\]</span>
 where moisture contents of extinctions were arbitrarily set to <span class="math inline">\(X_{dead, ca} = 25\)</span> and <span class="math inline">\(X_{live, ca} = 180\)</span>.</p>
 <p>The reaction efficiency in the canopy (<span class="math inline">\(\eta_{\beta_{canopy}&#39;}\)</span>) represents the damping effect of inefficiently packed fuels in the canopy:
