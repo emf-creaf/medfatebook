@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2021-07-19" />
+<meta name="date" content="2021-07-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -591,9 +591,10 @@ div.csl-indent {
 <li class="chapter" data-level="A.3.17" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationphotosynthesis"><i class="fa fa-check"></i><b>A.3.17</b> Photosynthesis rates</a></li>
 <li class="chapter" data-level="A.3.18" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationRER"><i class="fa fa-check"></i><b>A.3.18</b> Maintenance respiration rates</a></li>
 <li class="chapter" data-level="A.3.19" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationRGR"><i class="fa fa-check"></i><b>A.3.19</b> Relative growth rates</a></li>
-<li class="chapter" data-level="A.3.20" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationCwood"><i class="fa fa-check"></i><b>A.3.20</b> Wood carbon</a></li>
-<li class="chapter" data-level="A.3.21" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationrecruitment"><i class="fa fa-check"></i><b>A.3.21</b> Recruitment</a></li>
-<li class="chapter" data-level="A.3.22" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationflammability"><i class="fa fa-check"></i><b>A.3.22</b> Flammability</a></li>
+<li class="chapter" data-level="A.3.20" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationSR"><i class="fa fa-check"></i><b>A.3.20</b> Senescence rates</a></li>
+<li class="chapter" data-level="A.3.21" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationCwood"><i class="fa fa-check"></i><b>A.3.21</b> Wood carbon</a></li>
+<li class="chapter" data-level="A.3.22" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationrecruitment"><i class="fa fa-check"></i><b>A.3.22</b> Recruitment</a></li>
+<li class="chapter" data-level="A.3.23" data-path="modelparametrization.html"><a href="modelparametrization.html#imputationflammability"><i class="fa fa-check"></i><b>A.3.23</b> Flammability</a></li>
 </ul></li>
 <li class="chapter" data-level="A.4" data-path="modelparametrization.html"><a href="modelparametrization.html#scaling-size-related-parameters"><i class="fa fa-check"></i><b>A.4</b> Scaling size-related parameters</a>
 <ul>
@@ -1042,6 +1043,18 @@ where <span class="math inline">\(M = M_{leaf} + M_{sapwood} + M_{fineroot}\)</s
 <td>Maximum daily fine root relative growth rate</td>
 </tr>
 <tr class="odd">
+<td><span class="math inline">\(SR_{sapwood}\)</span></td>
+<td><span class="math inline">\(day^{-1}\)</span></td>
+<td><code>SRsapwood</code></td>
+<td>Daily sapwood senescence rate</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(SR_{fineroot}\)</span></td>
+<td><span class="math inline">\(day^{-1}\)</span></td>
+<td><code>SRfineroot</code></td>
+<td>Daily fine root senescence rate</td>
+</tr>
+<tr class="odd">
 <td><span class="math inline">\(f_{HD,min}\)</span></td>
 <td><span class="math inline">\(cm \cdot cm^{-1}\)</span></td>
 <td><code>fHDmin</code></td>
@@ -1080,9 +1093,9 @@ where <span class="math inline">\(M = M_{leaf} + M_{sapwood} + M_{fineroot}\)</s
 <li><code>equilibriumOsmoticConcentration [= c(leaf = 0.8, sapwood = 0.6)]</code>: Equilibrium osmotic concentrations (<span class="math inline">\(mol \cdot L^{-1}\)</span>) for leaf and sapwood cells. The difference between leaf and sapwood values helps maintaining phloem transport. The equilibrium sugar concentration is found using <code>equilibriumOsmoticConcentration - nonSugarConcentration</code> and defaults to <code>[= c(leaf = 0.55, sapwood = 0.35)]</code>.</li>
 <li><code>minimumRelativeSugarForGrowth [= 0.25]</code>: Minimum concentration of metabolic sugar relative to equilibrium sugar concentration for growth to occur in different tissues. This value (by default 50%) should always be larger than <code>mortalityRelativeSugarThreshold [= 0.3]</code>, so that growth stops before starvation, and smaller than 1 (i.e. 100%), so that growth occurs under normal metabolic status.</li>
 <li><code>respirationRates [= c(leaf = 0.00260274, sapwood = 6.849315e-05, fineroot = 0.002054795)]</code>: Maintenance respiration rates for different tissues (in <span class="math inline">\(g\,gluc \cdot g\, dry^{-1} · day^{-1}\)</span>). These are default values used when maintenance respiration rates are not specified via species-specific <code>SpParams</code>.</li>
-<li><code>turnoverRates [= c(sapwood = 0.0001261398, fineroot = 0.001897231)]</code>: Relative turnover rates (<span class="math inline">\(day^{-1}\)</span>) for sapwood and fine roots. Default are equivalent to 4.5% and 50% annual turnover for sapwood and fine roots, respectively. Leaf turnover rates depend on leaf lifespan (i.e. leaf duration) for evergreen species.</li>
+<li><code>senescenceRates [= c(sapwood = 0.0001261398, fineroot = 0.001897231)]</code>: Relative senescence rates (<span class="math inline">\(day^{-1}\)</span>) for sapwood and fine roots. Default are equivalent to 4.5% and 50% annual turnover for sapwood and fine roots, respectively. Leaf senescence rates depend on leaf lifespan (i.e. leaf duration) for evergreen species.</li>
 <li><code>constructionCosts [= c(leaf = 1.5, sapwood = 1.47, fineroot = 1.30)]</code>: Construction costs, including respiration and structural carbon, per dry weight of new tissue (<span class="math inline">\(g\,gluc \cdot g\,dry^{-1}\)</span>).</li>
-<li><code>maximumRelativeGrowthRates [= c(leaf = 0.01, sapwood = 0.02, fineroot = 0.1)]</code>: Maximum leaf growth rate relative to sapwood area (<span class="math inline">\(m^{2}\cdot cm^{-2} \cdot day^{-1}\)</span>), maximum sapwood relative growth rate (<span class="math inline">\(cm^{2}\cdot cm^{-2} \cdot day^{-1}\)</span>) and maximum fine root growth rate relative to sapwood area (<span class="math inline">\(g\,dry \cdot g\,dry^{-1} \cdot day^{-1}\)</span>). These are default values used when relative growth rates are not specified via species-specific <code>SpParams</code>.</li>
+<li><code>maximumRelativeGrowthRates [= c(leaf = 0.01, sapwood = 0.002, fineroot = 0.1)]</code>: Maximum leaf growth rate relative to sapwood area (<span class="math inline">\(m^{2}\cdot cm^{-2} \cdot day^{-1}\)</span>), maximum sapwood relative growth rate (<span class="math inline">\(cm^{2}\cdot cm^{-2} \cdot day^{-1}\)</span>) and maximum fine root growth rate relative to sapwood area (<span class="math inline">\(g\,dry \cdot g\,dry^{-1} \cdot day^{-1}\)</span>). These are default values used when relative growth rates are not specified via species-specific <code>SpParams</code>.</li>
 </ul>
 <p>Finally, we have the following options regarding mortality:</p>
 <ul>
