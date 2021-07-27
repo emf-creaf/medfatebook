@@ -70,7 +70,7 @@ The following tables describe how the different functional parameters are dealt 
 | $\rho_{leaf}$ |  `LeafDensity` | Leaf tissue density | No | No | \@ref(imputationtissuedensity) |
 | $\rho_{wood}$ |  `WoodDensity` | Wood tissue density | No | No | \@ref(imputationtissuedensity) |
 | $\rho_{fineroot}$ | `FineRootDensity` | Fine root tissue density | No | No | \@ref(imputationtissuedensity) |
-| $f_{conduits}$ |`conduit2sapwood` | Proportion of sapwood corresponding to xylem conduits | No | No | \@ref(imputationcond2sap) |
+| $f_{conduits}$ |`conduit2sapwood` | Proportion of sapwood corresponding to xylem conduits | No | No | \@ref(imputationAl2As) |
 | $SRL$ |  `SRL` | Specific fine root length | No | No | \@ref(imputationSRLRLD) |
 | $RLD$ | `RLD` | Fine root length density | No | No | \@ref(imputationSRLRLD) |
 | $r_{6.35}$ | `r635` | Ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm | No | No | \@ref(imputationLWSLA) |
@@ -232,26 +232,22 @@ knitr::kable(tfm[!is.na(tfm$LeafDensity) | !is.na(tfm$WoodDensity),
 
 If the family is not any of those in the table, default values  are $\rho_{leaf} = 0.7$ and $\rho_{wood} = 0.652$. The default value for fine root density is always $\rho_{fineroot} = 0.165$.
 
-### Ratio of conduits to sapwood {#imputationcond2sap}
-
-According to @Plavcova2015, default values for the fraction of sapwood corresponding to conduits are $f_{conduits} = 0.7$ (i.e. 30\% of parenchyma) for angiosperms, and $f_{conduits} = 0.925$ (i.e. 7.5\% of parenchyma) for gymnosperms.
 
 ### Specific root length and root length density {#imputationSRLRLD}
 
 Default values for specific fine root length and fine root length density are $3870\, cm \cdot g^{-1}$  and $10\, cm \cdot cm^{-3}$, respectively. [JUSTIFICATION MISSING]
 
-### Huber value {#imputationAl2As}
+### Huber value and ratio of conduits to sapwood {#imputationAl2As}
 Missing values for `Al2As`, the inverse of the Huber value ($1/Hv$) are determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
 ```{r echo = FALSE}
 tfm = medfate:::trait_family_means
 tfm$Hv = 10000/tfm$Al2As
-knitr::kable(tfm[!is.na(tfm$Al2As),
-                 c("Al2As", "Hv"),drop=FALSE],
-             caption = 'Default leaf area to sapwood area (m2/m2) / Huber value (cm2/m2) by taxonomic family.')
+knitr::kable(tfm[!is.na(tfm$Al2As) | !is.na(tfm$conduit2sapwood),
+                 c("Al2As", "Hv", "conduit2sapwood"),drop=FALSE],
+             caption = 'Default leaf area to sapwood area (m2/m2) / Huber value (cm2/m2) and fraction of sapwood corresponding to conduits by taxonomic family.')
 ```
 
-
-If there is no information derived from taxonomic family, a default value is given depending on leaf shape and leaf size:
+If there is no information derived from taxonomic family for `Al2As`, a default value is given depending on leaf shape and leaf size:
 
 |  Leaf shape | Leaf size | `Al2As` | 
 |:--------------- |:-----:|:-----:|
@@ -263,6 +259,8 @@ If there is no information derived from taxonomic family, a default value is giv
 | Linear | Small |  2156.0 |
 | Needle | [any] | 2751.7 |
 | Scale | [any] | 1696.6 |
+
+Missing values for $f_{conduits}$, the fraction of sapwood corresponding to conduits are derived from taxonomic family (see table above). If information from taxonomic family is missing, default values are $f_{conduits} = 0.7$ (i.e. 30\% of parenchyma) for angiosperms, and $f_{conduits} = 0.925$ (i.e. 7.5\% of parenchyma) for gymnosperms [@Plavcova2015].
 
 ### Leaf phenology {#imputationphenology}
 
@@ -345,7 +343,7 @@ When parameters for stem tissue are missing, **medfate** estimates them from woo
 \begin{equation}
 \epsilon_{stem} = \sqrt{1.02 \cdot e^{8.5\cdot \rho_{wood}}-2.89}
 \end{equation}
-while the apoplastic fraction of stem is assumed $f_{apo,stem} = f_{conduits}$ (see \@ref(imputationcond2sap)).
+while the apoplastic fraction of stem is assumed $f_{apo,stem} = f_{conduits}$ (see \@ref(imputationAl2As)).
 
 Default values for leaf pressure-volume parameters, i.e. $\pi_{0,leaf}$, $\epsilon_{leaf}$ and $f_{apo,leaf}$, are determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
 ```{r echo = FALSE}
