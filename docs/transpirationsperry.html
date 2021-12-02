@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 12 Transpiration and photosynthesis under Sperry’s model | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 12 Transpiration and photosynthesis under Sperry’s model | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2021-07-27" />
+<meta name="date" content="2021-12-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -32,8 +32,9 @@
   
 <link rel="prev" href="plantphotosynthesis.html"/>
 <link rel="next" href="closecanopysoilenergybalance.html"/>
-<script src="libs/header-attrs-2.9/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -41,7 +42,6 @@
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
-
 
 
 
@@ -667,7 +667,7 @@ div.csl-indent {
 where <span class="math inline">\(k_c(\Psi_{leaf}) = dE/d\Psi(\Psi)\)</span> is the slope of the supply function corresponding to (leaf) water potential <span class="math inline">\(\Psi_{leaf}\)</span>, <span class="math inline">\(k_{c,max}\)</span> is the maximum slope of the supply function (which occurs when <span class="math inline">\(E_{leaf}=0\)</span>), i.e. the maximum whole-plant conductance for the current soil moisture conditions, and <span class="math inline">\(k_{crit} = k_c(\Psi_{crit})\)</span> is the slope of the supply function at <span class="math inline">\(E_{leaf} = E_{crit}\)</span> the critical flow beyond which hydraulic failure occurs. <span class="math inline">\(a_{\theta}\)</span> is an exponent that modifies the cost function, specified as a control parameter. In <span class="citation"><a href="#ref-Sperry2016a" role="doc-biblioref">Sperry <em>et al.</em></a> (<a href="#ref-Sperry2016a" role="doc-biblioref">2016</a>)</span>, this exponent was missing (i.e. <span class="math inline">\(a_{\theta} = 1.0\)</span>), and this is the default in <strong>medfate</strong>, but we introduced it to allow some flexibility in the gain/cost comparison (see below).</p>
 <p>The following figures illustrate the <span class="math inline">\(\theta(\Psi_{leaf})\)</span> curves corresponding to the supply functions:</p>
 
-<div class="figure" style="text-align: center"><span id="fig:costfunction"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:costfunction"></span>
 <img src="medfatebook_files/figure-html/costfunction-1.png" alt="Cost functions (i.e. \(\theta(\Psi_{leaf})\)) obtained for a hydraulic network, corresponding to fig. 10.14 and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. In all cases \(a_{\theta}=0\)." width="768" />
 <p class="caption">
 Figure 12.1: Cost functions (i.e. <span class="math inline">\(\theta(\Psi_{leaf})\)</span>) obtained for a hydraulic network, corresponding to fig. <a href="planthydraulics.html#fig:supplynetwork">10.14</a> and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. In all cases <span class="math inline">\(a_{\theta}=0\)</span>.
@@ -680,7 +680,7 @@ Figure 12.1: Cost functions (i.e. <span class="math inline">\(\theta(\Psi_{leaf
 where <span class="math inline">\(A_{max}\)</span> is the instantaneous maximum (gross) assimilation rate estimated over the full <span class="math inline">\(\Psi_{leaf}\)</span> range (including values that imply a stomatal conductance larger than the maximum). Similarly to the cost function, <span class="math inline">\(a_{\beta}\)</span> is an exponent that modifies the gain function, specified as a control parameter. In <span class="citation"><a href="#ref-Sperry2016a" role="doc-biblioref">Sperry <em>et al.</em></a> (<a href="#ref-Sperry2016a" role="doc-biblioref">2016</a>)</span>, this exponent was missing (i.e. <span class="math inline">\(a_{\beta} = 1.0\)</span>), and this is the default in <strong>medfate</strong>, but we introduced it to allow some flexibility in the gain/cost comparison.</p>
 <p>The following figures illustrate the <span class="math inline">\(\beta(\Psi_{leaf})\)</span> curves corresponding to the supply and assimilation functions, for either <span class="math inline">\(a_{\beta} = 1.0\)</span> (top row) or <span class="math inline">\(a_{\beta} = 0.5\)</span> (bottom row):</p>
 
-<div class="figure" style="text-align: center"><span id="fig:gainfunction"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:gainfunction"></span>
 <img src="medfatebook_files/figure-html/gainfunction-1.png" alt="Gain function (\(\beta(\Psi_{leaf})\)) obtained for a hydraulic network, corresponding to fig. 10.14 and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. Top and bottom panels correspond to \(a_{\beta}=1.0\) and \(a_{\beta}=0.5\), respectively." width="768" />
 <p class="caption">
 Figure 12.2: Gain function (<span class="math inline">\(\beta(\Psi_{leaf})\)</span>) obtained for a hydraulic network, corresponding to fig. <a href="planthydraulics.html#fig:supplynetwork">10.14</a> and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. Top and bottom panels correspond to <span class="math inline">\(a_{\beta}=1.0\)</span> and <span class="math inline">\(a_{\beta}=0.5\)</span>, respectively.
@@ -701,7 +701,7 @@ The maximization is achieved when the slopes of the gain and cost functions are 
 Instantaneous profit maximization assumes a ‘use it or lose it’ reality with regards to available soil water. Because the gain function accelerates more quickly from zero and reaches 1 sooner than the cost functiion, their maximum difference occurs at intermediate <span class="math inline">\(\Psi_{leaf}\)</span> values. Once <span class="math inline">\(\Psi_{leaf}\)</span> that maximizes profit is determined, the values of the remaining variables are also determined. At this point, it may happen that <span class="math inline">\(g_{sw}(\Psi_{leaf})\)</span> is lower than the minimum (i.e. cuticular) water vapor conductance (<span class="math inline">\(g_{sw,\min}\)</span>) or larger than the maximum water vapor conductance (<span class="math inline">\(g_{sw,\max}\)</span>). These thresholds need to be taken into account when determining the maximum of the profit function.</p>
 <p>The following figures illustrate the <span class="math inline">\(Profit(\Psi_{leaf})\)</span> curves of corresponding to the previous cost and gain curves:</p>
 
-<div class="figure" style="text-align: center"><span id="fig:profitfunction"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:profitfunction"></span>
 <img src="medfatebook_files/figure-html/profitfunction-1.png" alt="Profit functions (i.e. \(Profit(\Psi_{leaf})\)) obtained for a hydraulic network, corresponding to fig. 10.14 and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. Top and bottom panels correspond to \(a_{\beta}=1.0\) and \(a_{\beta}=0.5\), respectively." width="768" />
 <p class="caption">
 Figure 12.3: Profit functions (i.e. <span class="math inline">\(Profit(\Psi_{leaf})\)</span>) obtained for a hydraulic network, corresponding to fig. <a href="planthydraulics.html#fig:supplynetwork">10.14</a> and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. Top and bottom panels correspond to <span class="math inline">\(a_{\beta}=1.0\)</span> and <span class="math inline">\(a_{\beta}=0.5\)</span>, respectively.
@@ -710,7 +710,7 @@ Figure 12.3: Profit functions (i.e. <span class="math inline">\(Profit(\Psi_{le
 <p>Squares in the previous figures indicate the maximum profit points in each situation. The drier the soil, the closer is the maximum profit <span class="math inline">\(\Psi_{leaf}\)</span> to soil water potential as one would expect intuitively (i.e. a smaller drop in water potential along the hydraulic pathway). Note that when the soil is very dry the squares are to the right of the true maximum. This is because the <code>transp_profitMaximization()</code> function takes into account the minimum and maximum stomatal conductance and, in this case, does not allow optimum stomatal conductances below the minimum (cuticular) value.</p>
 <p>Differences between <span class="math inline">\(a_{\beta}=1.0\)</span> and <span class="math inline">\(a_{\beta}=0.5\)</span> can be more easily seen when plotting directly the optima in terms of both canopy sap pressure and flow rate:</p>
 
-<div class="figure" style="text-align: center"><span id="fig:compprofit"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:compprofit"></span>
 <img src="medfatebook_files/figure-html/compprofit-1.png" alt="Comparison of optimum flow and water potential values under profit functions built using \(a_{\beta}=1.0\) and \(a_{\beta}=0.5\), from the results of fig. 12.3." width="480" />
 <p class="caption">
 Figure 12.4: Comparison of optimum flow and water potential values under profit functions built using <span class="math inline">\(a_{\beta}=1.0\)</span> and <span class="math inline">\(a_{\beta}=0.5\)</span>, from the results of fig. <a href="transpirationsperry.html#fig:profitfunction">12.3</a>.
@@ -719,7 +719,7 @@ Figure 12.4: Comparison of optimum flow and water potential values under profit 
 <p>When changing from <span class="math inline">\(a_{\beta}=1.0\)</span> to <span class="math inline">\(a_{\beta}=0.5\)</span> the optimum values are shifted towards less negative water potentials and, accordingly, lower transpiration rates. Hence, <span class="math inline">\(a_{\beta}\)</span> allows modifying the relative weight of gains and costs.</p>
 <p>Note that <span class="math inline">\(\theta\)</span>, <span class="math inline">\(\beta\)</span> and <span class="math inline">\(Profit\)</span> functions can be expressed as a function of stomatal conductance, instead of leaf water potential. This allows visualizing more clearly the effect of <span class="math inline">\(g_{sw,\min}\)</span> and <span class="math inline">\(g_{sw,\max}\)</span> thresholds on the maximum profit optimization strategy, as illustrated in the following figures.</p>
 
-<div class="figure" style="text-align: center"><span id="fig:profitfunction-gs"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:profitfunction-gs"></span>
 <img src="medfatebook_files/figure-html/profitfunction-gs-1.png" alt="Profit function as a function of stomatal conductance, corresponding to fig. 12.3 and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. Top and bottom panels correspond to \(a_{\beta}=1.0\) and \(a_{\beta}=0.5\), respectively." width="768" />
 <p class="caption">
 Figure 12.5: Profit function as a function of stomatal conductance, corresponding to fig. <a href="transpirationsperry.html#fig:profitfunction">12.3</a> and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. Top and bottom panels correspond to <span class="math inline">\(a_{\beta}=1.0\)</span> and <span class="math inline">\(a_{\beta}=0.5\)</span>, respectively.
@@ -805,7 +805,6 @@ Wolf, A., Anderegg, W.R.L. &amp; Pacala, S.W. (2016). <span class="nocase">Optim
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -845,6 +844,10 @@ gitbook.start({
 "text": null
 },
 "download": ["medfatebook.pdf", "medfatebook.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": "section"
 }

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 10 Plant hydraulics | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 10 Plant hydraulics | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2021-07-27" />
+<meta name="date" content="2021-12-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -32,8 +32,9 @@
   
 <link rel="prev" href="radiationbalance.html"/>
 <link rel="next" href="plantphotosynthesis.html"/>
-<script src="libs/header-attrs-2.9/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -41,7 +42,6 @@
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
-
 
 
 
@@ -681,7 +681,7 @@ where <span class="math inline">\(k_{leaf,max}\)</span> is the leaf maximum hydr
 <span id="cb16-2"><a href="planthydraulics.html#cb16-2" aria-hidden="true" tabindex="-1"></a>leafc <span class="ot">=</span> <span class="dv">2</span></span>
 <span id="cb16-3"><a href="planthydraulics.html#cb16-3" aria-hidden="true" tabindex="-1"></a>leafd <span class="ot">=</span> <span class="sc">-</span><span class="dv">2</span></span></code></pre></div>
 With these parameter values, the vulnerability curves for root, stem and leaf are (see <code>hydraulics_xylemConductance()</code> and <code>hydraulics_vulnerabilityCurvePlot()</code>):
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-16"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-16"></span>
 <img src="medfatebook_files/figure-html/unnamed-chunk-16-1.png" alt="Example vulnerability curves corresponding to the parameters defined above for stem, root and leaf segments." width="480" />
 <p class="caption">
 Figure 10.1: Example vulnerability curves corresponding to the parameters defined above for stem, root and leaf segments.
@@ -749,7 +749,7 @@ where <span class="math inline">\(k_{rhizo,max}\)</span> is the maximum rhizosph
 <span id="cb30-5"><a href="planthydraulics.html#cb30-5" aria-hidden="true" tabindex="-1"></a>krmax3</span></code></pre></div>
 <pre><code>## [1] 36831905</code></pre>
 With these parameters, the resulting <span class="math inline">\(k_{rhizo}(\Psi)\)</span> functions can be displayed using the function <code>hydraulics_vanGenuchtenConductance()</code>:
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-20"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-20"></span>
 <img src="medfatebook_files/figure-html/unnamed-chunk-20-1.png" alt="Example rhizosphere vulnerability curves (i.e. Van Genuchten functions) for three different soil textures." width="384" />
 <p class="caption">
 Figure 10.2: Example rhizosphere vulnerability curves (i.e. Van Genuchten functions) for three different soil textures.
@@ -782,7 +782,7 @@ where <span class="math inline">\(\Psi_{up}\)</span> and <span class="math inlin
 <h3><span class="header-section-number">10.2.1</span> Supply function for a single xylem element</h3>
 <p>In the case of a single xylem element, the supply function describes the steady-state flow rate as a function of pressure at the stem top (<span class="math inline">\(\Psi_{canopy}\)</span>). It can be calculated by numerical integration or aproximated using an <em>incomplete gamma function</em>. The shape of the supply function starting at different root crown water potential values (<span class="math inline">\(\Psi_{rootcrown}\)</span>) is (see function <code>hydraulics_EXylem()</code>):</p>
 
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-21"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-21"></span>
 <img src="medfatebook_files/figure-html/unnamed-chunk-21-1.png" alt="Supply function of a single xylem element starting at different root crown water potential values. Left pane shows the uncavitated supply functions and right pane shows the supply functions that are obtained in the case of a cavitated xylem (i.e. without refilling), assuming that the minimum water potential experienced so far was -2.5 MPa. Note the linear part of the flow rate between \(\Psi_{rootcrown}\) and this limit." width="768" />
 <p class="caption">
 Figure 10.3: Supply function of a single xylem element starting at different root crown water potential values. Left pane shows the uncavitated supply functions and right pane shows the supply functions that are obtained in the case of a cavitated xylem (i.e. without refilling), assuming that the minimum water potential experienced so far was -2.5 MPa. Note the linear part of the flow rate between <span class="math inline">\(\Psi_{rootcrown}\)</span> and this limit.
@@ -790,7 +790,7 @@ Figure 10.3: Supply function of a single xylem element starting at different roo
 </div>
 <p>The supply function of a <em>rhizosphere</em> element relates the steady-state flow rate to the pressure inside the roots (<span class="math inline">\(\Psi_{root}\)</span>). It is calculated by numerical integration of the van Genuchten function, for which we use the analytical approximation of <span class="citation"><a href="#ref-VanLier2009" role="doc-biblioref">Van Lier <em>et al.</em></a> (<a href="#ref-VanLier2009" role="doc-biblioref">2009</a>)</span> (see function <code>hydraulics_EVanGenuchten()</code>). In the figure below, we draw examples of the supply function for the rhizosphere. The nearly vertical lines indicate that for many values of <span class="math inline">\(E_i\)</span> the corresponding drop in water potential through the rhizosphere will be negligible. Only for increasingly negative soil water potential values the decrease in water potential through the rhizosphere becomes relevant. Both in the case of a xylem element or a rhyzosphere element the derivative <span class="math inline">\(dE_i/d\Psi\)</span> of the supply function is equal to the corresponding vulnerability curve.</p>
 
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-22"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-22"></span>
 <img src="medfatebook_files/figure-html/unnamed-chunk-22-1.png" alt="Supply functions of the rhizosphere starting at the four different values of bulk soil pressure (\(\Psi_{soil}\)) and for the same three texture types used for vulnerability curves." width="384" />
 <p class="caption">
 Figure 10.4: Supply functions of the rhizosphere starting at the four different values of bulk soil pressure (<span class="math inline">\(\Psi_{soil}\)</span>) and for the same three texture types used for vulnerability curves.
@@ -801,7 +801,7 @@ Figure 10.4: Supply functions of the rhizosphere starting at the four different 
 <h3><span class="header-section-number">10.2.2</span> Supply function of two elements in series</h3>
 <p>Let us describe the soil-plant continuum is represented using <em>two</em> elements in series (rhizosphere + stem xylem). In this case, the supply function has to be calculated by using the previous supply functions sequentially. The <span class="math inline">\(E_i\)</span> is identical for each element and equal to the canopy <span class="math inline">\(E\)</span>. Since <span class="math inline">\(\Psi_{soil}\)</span> is known, one first inverts the supply function of the rhizosphere to find <span class="math inline">\(\Psi_{root}\)</span> (see function <code>hydraulics_E2psiVanGenuchten()</code>) and then inverts the supply function of the xylem to find <span class="math inline">\(\Psi_{canopy}\)</span> (see function <code>hydraulics_E2psiXylem()</code>). The two operations can be summarized in a single supply function describing the potential rate of water supply for transpiration (<span class="math inline">\(E\)</span>) as function of the canopy xylem pressure (<span class="math inline">\(\Psi_{canopy}\)</span>), starting from different bulk soil (<span class="math inline">\(\Psi_{soil}\)</span>) values (see function <code>hydraulics_supplyFunctionTwoElements()</code>):</p>
 
-<div class="figure" style="text-align: center"><span id="fig:supplytwo"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:supplytwo"></span>
 <img src="medfatebook_files/figure-html/supplytwo-1.png" alt="Example of two-element supply functions describing the potential rate of water supply for transpiration (\(E\)) as function of the canopy xylem pressure (\(\Psi_{canopy}\)), starting from different bulk soil (\(\Psi_{soil}\)) values and for different soil textures. Left/right panel shows uncavitated/cavitated supply functions." width="768" />
 <p class="caption">
 Figure 10.5: Example of two-element supply functions describing the potential rate of water supply for transpiration (<span class="math inline">\(E\)</span>) as function of the canopy xylem pressure (<span class="math inline">\(\Psi_{canopy}\)</span>), starting from different bulk soil (<span class="math inline">\(\Psi_{soil}\)</span>) values and for different soil textures. Left/right panel shows uncavitated/cavitated supply functions.
@@ -810,7 +810,7 @@ Figure 10.5: Example of two-element supply functions describing the potential ra
 <p>The supply function for the whole continuum contains much information. The <span class="math inline">\(\Psi\)</span> intercept at <span class="math inline">\(E=0\)</span> represents the (predawn) canopy sap pressure which integrates the rooted soil moisture profile. As <span class="math inline">\(E\)</span> increments from zero, the disproportionately greater drop in <span class="math inline">\(\Psi_{canopy}\)</span> results from the loss of conductance. As the soil dries the differences in flow due to soil texture become more apparent.</p>
 <p>The derivative of the whole continuum supply function, <span class="math inline">\(dE/d\Psi\)</span>, is not equal to either of the vulnerability curves and it has to be obtained numerically. The derivative functions corresponding to the supply functions shown in the previous figure are:</p>
 
-<div class="figure" style="text-align: center"><span id="fig:supplytwoderivative"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:supplytwoderivative"></span>
 <img src="medfatebook_files/figure-html/supplytwoderivative-1.png" alt="Derivatives of two-element supply functions corresponding to figure 10.5. Left/right panel shows the derivatives of uncavitated/cavitated supply functions." width="768" />
 <p class="caption">
 Figure 10.6: Derivatives of two-element supply functions corresponding to figure <a href="planthydraulics.html#fig:supplytwo">10.5</a>. Left/right panel shows the derivatives of uncavitated/cavitated supply functions.
@@ -833,7 +833,7 @@ Figure 10.6: Derivatives of two-element supply functions corresponding to figure
 <pre><code>## [1] 3.333333</code></pre>
 <p>As before, the supply function has to be calculated <em>sequentially</em>, knowing that <span class="math inline">\(E_i\)</span> is identical through each element. Since <span class="math inline">\(\Psi_{soil}\)</span> is known, one first inverts the supply function of the rhizosphere to find <span class="math inline">\(\Psi_{root}\)</span> and then inverts the supply function of the xylem to find <span class="math inline">\(\Psi_{stem}\)</span>. Finally, one inverts the supply function of the leaf element to find <span class="math inline">\(\Psi_{leaf}\)</span>. As before, the three operations can be summarized in a single supply function describing the potential rate of water supply for transpiration (<span class="math inline">\(E\)</span>) as function of the leaf pressure (<span class="math inline">\(\Psi_{leaf}\)</span>), starting from different bulk soil (<span class="math inline">\(\Psi_{soil}\)</span>) values (see function <code>hydraulics_supplyFunctionThreeElements()</code>):</p>
 
-<div class="figure" style="text-align: center"><span id="fig:supplythree"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:supplythree"></span>
 <img src="medfatebook_files/figure-html/supplythree-1.png" alt="Example of three-element supply functions describing the potential rate of water supply for transpiration (\(E\)) as function of the leaf pressure (\(\Psi_{leaf}\)), starting from different bulk soil (\(\Psi_{soil}\)) values and for different soil textures. Left/right panel shows uncavitated/cavitated supply functions." width="768" />
 <p class="caption">
 Figure 10.7: Example of three-element supply functions describing the potential rate of water supply for transpiration (<span class="math inline">\(E\)</span>) as function of the leaf pressure (<span class="math inline">\(\Psi_{leaf}\)</span>), starting from different bulk soil (<span class="math inline">\(\Psi_{soil}\)</span>) values and for different soil textures. Left/right panel shows uncavitated/cavitated supply functions.
@@ -841,7 +841,7 @@ Figure 10.7: Example of three-element supply functions describing the potential 
 </div>
 <p>Note that overall conductance and the maximum flow of the supply function are smaller in this case than in the representation using two elements in series, because we added a new resistance (leaves). While the rhizosphere component only adds a significant resistance when the soil dries, considering the leaf segment (or a root xylem segment) substantially increases the overall resistance of the continuum. Higher vulnerability of leaves also makes the curve to saturate for less negative soil water potentials. The derivative functions corresponding to the supply functions shown in the previous figure are (note the highest value being equal to the overall maximum conductance):</p>
 
-<div class="figure" style="text-align: center"><span id="fig:supplythtreederivative"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:supplythtreederivative"></span>
 <img src="medfatebook_files/figure-html/supplythtreederivative-1.png" alt="Derivatives of three-element supply functions corresponding to figure 10.7. Left/right panel shows the derivatives of uncavitated/cavitated supply functions." width="768" />
 <p class="caption">
 Figure 10.8: Derivatives of three-element supply functions corresponding to figure <a href="planthydraulics.html#fig:supplythree">10.7</a>. Left/right panel shows the derivatives of uncavitated/cavitated supply functions.
@@ -857,7 +857,7 @@ Figure 10.8: Derivatives of three-element supply functions corresponding to figu
    \sum_{s=1}^{S}{E_{root,s}}-E &amp;=&amp; 0
 \end{eqnarray}\]</span>
 where <span class="math inline">\(E_{rhizo,s}\)</span> and <span class="math inline">\(E_{root,s}\)</span> are steady-state supply flows calculated using the integrals of either van Genuchten or Weibull function as vulnerability curves, respectively. In the case of rhizosphere elements, <span class="math inline">\(\Psi_{up}=\Psi_{soil,s}\)</span> and in the case of root elements <span class="math inline">\(\Psi_{up}=\Psi_{rootsurf,s}\)</span>. Solving the steady-state equations also provides values for flow across each of the parallel paths <span class="math inline">\(E_{rhizo,s} = E_{root,s}\)</span>.</p>
-<div class="figure" style="text-align: center"><span id="fig:rootsystem"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:rootsystem"></span>
 <img src="hydraulics_rs.jpg" alt="Schematic representation of hydraulics in a root network" width="80%" />
 <p class="caption">
 Figure 10.9: Schematic representation of hydraulics in a root network
@@ -895,7 +895,7 @@ Figure 10.9: Schematic representation of hydraulics in a root network
 <pre><code>## [1] 2.191987 1.675640 2.732373</code></pre>
 <p>Having all these maximum conductances, we can now build the supply functions for each soil texture and starting from the different soil water potential configurations (see function <code>hydraulics_supplyFunctionBelowground()</code>):</p>
 
-<div class="figure" style="text-align: center"><span id="fig:supplyrootsystem"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:supplyrootsystem"></span>
 <img src="medfatebook_files/figure-html/supplyrootsystem-1.png" alt="Example of supply function for a root system (left) and its derivative (right) under different soil textures and starting from different soil water potential vectors." width="768" />
 <p class="caption">
 Figure 10.10: Example of supply function for a root system (left) and its derivative (right) under different soil textures and starting from different soil water potential vectors.
@@ -904,7 +904,7 @@ Figure 10.10: Example of supply function for a root system (left) and its deriva
 <p>The derivative of <span class="math inline">\(dE/d\Psi_{rootcrown}\)</span> for the supply function of the root system is again obtained numerically.</p>
 <p>Solving the previous system of equations provides the water potentials in different points of the root system. Here we plot them for the results of silt loam texture and the first and last soil potential vectors defined above:</p>
 
-<div class="figure" style="text-align: center"><span id="fig:supplyrootelements"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:supplyrootelements"></span>
 <img src="medfatebook_files/figure-html/supplyrootelements-1.png" alt="Water potentials inside fine roots and at the root crown, for overall flow rates corresponding to fig. 10.10." width="768" />
 <p class="caption">
 Figure 10.11: Water potentials inside fine roots and at the root crown, for overall flow rates corresponding to fig. <a href="planthydraulics.html#fig:supplyrootsystem">10.10</a>.
@@ -913,7 +913,7 @@ Figure 10.11: Water potentials inside fine roots and at the root crown, for over
 <p>Note that when soil is not dry (first situation) pressure drop in the rhizosphere is negligible, but not the pressure drop in the root xylem. For drier soils rhizosphere becomes more relevant.</p>
 <p>We can also plot the flow rates across each of the parallel paths (again corresponding to the results of silt loam texture and for the four soil potential vectors):</p>
 
-<div class="figure" style="text-align: center"><span id="fig:supplyrootelements2"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:supplyrootelements2"></span>
 <img src="medfatebook_files/figure-html/supplyrootelements2-1.png" alt="Flow rates inside roots corresponding to each soil layer, for overall flow rates corresponding to fig. 10.10." width="768" />
 <p class="caption">
 Figure 10.12: Flow rates inside roots corresponding to each soil layer, for overall flow rates corresponding to fig. <a href="planthydraulics.html#fig:supplyrootsystem">10.10</a>.
@@ -925,7 +925,7 @@ Figure 10.12: Flow rates inside roots corresponding to each soil layer, for over
 <h3><span class="header-section-number">10.2.5</span> Supply function of the soil-plant continuum</h3>
 <p>As mentioned above, <strong>medfate</strong> uses a hydraulic network of <span class="math inline">\((S \times 2 + 2 + 1)\)</span> resistance elements to represent the soil-plant continuum, with soil being represented in <span class="math inline">\(S\)</span> different layers. As before, the <span class="math inline">\(S\)</span> soil layers are in parallel up to the root crown and each soil layer requires at least a rhizosphere and a root segment. From the root crown there are two stem xylem elements in series and a final leaf element. The whole hydraulic network is illustrated in the figure below.</p>
 <p>To build the supply function for the network, we proceed by calculating water potentials in the network for each value of flow. For any given <span class="math inline">\(E\)</span> value we start by calculating flows and potentials within the root system. After that, the water potential at the mid of the stem (<span class="math inline">\(\Psi_{stem,1}\)</span>) is obtained using the inverse of the stem supply function and setting <span class="math inline">\(\Psi_{up}=\Psi_{rootcrown}\)</span>, and the water potential at the upper end of the stem, <span class="math inline">\(\Psi_{stem, 2}\)</span>, is obtained similarly but setting <span class="math inline">\(\Psi_{up}=\Psi_{stem,1}\)</span>. In both cases the maximum conductance for segments equal to <span class="math inline">\(2 \cdot k_{stem,\max,i}\)</span>. Leaf water potential (<span class="math inline">\(\Psi_{leaf}\)</span>) is finaly obtained using the inverse of the leaf supply function and setting <span class="math inline">\(\Psi_{up}=\Psi_{stem, 2}\)</span> and assuming a steady-state flow <span class="math inline">\(E\)</span>. The whole supply function <span class="math inline">\(E(\Psi_{leaf}\)</span>) is obtained repeating these operations from <span class="math inline">\(E=0\)</span> to a critical value <span class="math inline">\(E_{crit}\)</span>.</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-30"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-30"></span>
 <img src="hydraulics_network.jpg" alt="Schematic representation of hydraulics in a whole-plant network" width="80%" />
 <p class="caption">
 Figure 10.13: Schematic representation of hydraulics in a whole-plant network
@@ -933,7 +933,7 @@ Figure 10.13: Schematic representation of hydraulics in a whole-plant network
 </div>
 <p>The following figure shows network supply functions for each soil texture and starting from the different soil water potential configurations (see function <code>hydraulics_supplyFunctionNetwork()</code>):</p>
 
-<div class="figure" style="text-align: center"><span id="fig:supplynetwork"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:supplynetwork"></span>
 <img src="medfatebook_files/figure-html/supplynetwork-1.png" alt="Examples of supply functions for a hydraulic network describing the potential rate of water supply for transpiration (\(E\)) as function of the leaf pressure (\(\Psi_{leaf}\)), starting from different bulk soil (\(\Psi_{soil}\)) values and for different soil textures. Left/right panel shows uncavitated/cavitated supply functions." width="768" />
 <p class="caption">
 Figure 10.14: Examples of supply functions for a hydraulic network describing the potential rate of water supply for transpiration (<span class="math inline">\(E\)</span>) as function of the leaf pressure (<span class="math inline">\(\Psi_{leaf}\)</span>), starting from different bulk soil (<span class="math inline">\(\Psi_{soil}\)</span>) values and for different soil textures. Left/right panel shows uncavitated/cavitated supply functions.
@@ -941,7 +941,7 @@ Figure 10.14: Examples of supply functions for a hydraulic network describing th
 </div>
 <p>As with previous representations of the soil-plant continuum, the derivative of <span class="math inline">\(dE/d\Psi_{leaf}\)</span> for the network topology is obtained numerically:</p>
 
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-31"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-31"></span>
 <img src="medfatebook_files/figure-html/unnamed-chunk-31-1.png" alt="Derivatives of supply functions corresponding to figure 10.14. Left/right panel shows the derivatives of uncavitated/cavitated supply functions." width="768" />
 <p class="caption">
 Figure 10.15: Derivatives of supply functions corresponding to figure <a href="planthydraulics.html#fig:supplynetwork">10.14</a>. Left/right panel shows the derivatives of uncavitated/cavitated supply functions.
@@ -949,7 +949,7 @@ Figure 10.15: Derivatives of supply functions corresponding to figure <a href="p
 </div>
 <p>As with the root system, we can know the water potentials in different points of the continuum. Here we plot them for the results of silt loam texture and the first and last soil potential vectors defined above:</p>
 
-<div class="figure" style="text-align: center"><span id="fig:supplynetworkelements"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:supplynetworkelements"></span>
 <img src="medfatebook_files/figure-html/supplynetworkelements-1.png" alt="Water potential in network elements corresponding to overall flow rates of figure 10.14. Left/right panel shows the derivatives of uncavitated/cavitated supply functions." width="768" />
 <p class="caption">
 Figure 10.16: Water potential in network elements corresponding to overall flow rates of figure <a href="planthydraulics.html#fig:supplynetwork">10.14</a>. Left/right panel shows the derivatives of uncavitated/cavitated supply functions.
@@ -1021,7 +1021,7 @@ RWC = RWC_{apo} \cdot f_{apo} + RWC_{sym} \cdot (1 - f_{apo})
 <li>The second supply is made of (<span class="math inline">\(1+2+1\)</span>) elements (representing plant resistances) and is used to determine the rate of water flowing from stem up to the leaves for transpiration and photosynthesis, as in the model without water comparments. It defines the transpirational flow <span class="math inline">\(E_{leaf, out}\)</span>. It needs to be build from <span class="math inline">\(\Psi_{rootsurf}\)</span> to <span class="math inline">\(\Psi_{leaf}\)</span> (and not from <span class="math inline">\(\Psi_{stem,1}\)</span> to <span class="math inline">\(\Psi_{leaf}\)</span> only) because all plant resistances are needed to determine the relationship between <span class="math inline">\(E_{leaf, out}\)</span> and <span class="math inline">\(\Psi_{leaf}\)</span>.</li>
 </ol>
 <p>This division of water input and output from the stem allows considering the intermediate node, <span class="math inline">\(\Psi_{stem,1}\)</span>, as the water potential of an explicit xylem water compartment from which water is drawn towards the leaves (<span class="math inline">\(E_{stem, out}\)</span>) and where soil water is poured (<span class="math inline">\(E_{stem, in}\)</span>). Following <span class="citation"><a href="#ref-Holtta2009" role="doc-biblioref">Hölttä <em>et al.</em></a> (<a href="#ref-Holtta2009" role="doc-biblioref">2009</a>)</span>, the xylem water compartment can be a source of water for transpiration when cavitation occurs. Following <span class="citation"><a href="#ref-Steppe2006" role="doc-biblioref">Steppe <em>et al.</em></a> (<a href="#ref-Steppe2006" role="doc-biblioref">2006</a>)</span>, two symplasmic water reserve compartments are also included, which can also provide water for transpiration. The xylem compartment is hydraulically connected with a stem symplastic compartment (whose moisture level is represented by the state variable <span class="math inline">\(\Psi_{symp, stem}\)</span>). Another symplasmic compartment is considered at the leaf level (whose moisture level is represented by <span class="math inline">\(\Psi_{symp, leaf}\)</span>) that adds or withdraws water from the transpirational stream depending on differences between leaf xylem and symplastic water potentials. As the supply function #2 assumes a steady state flow from the stem to the leaves and atmosphere, the leaf symplastic water compartment is used to modulate how much of the steady-state flow will actually be drawn from the stem xylem compartment. In other words, the leaf lateral flow simply modifies the water demand from the leaves to the stem (i.e., it makes <span class="math inline">\(E_{stem, out}\)</span> different from <span class="math inline">\(E_{leaf, out}\)</span>).</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-34"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-34"></span>
 <img src="hydraulics_compartments.jpg" alt="Schematic representation of hydraulics in a whole-plant network with water storage compartments" width="80%" />
 <p class="caption">
 Figure 10.17: Schematic representation of hydraulics in a whole-plant network with water storage compartments
@@ -1123,7 +1123,6 @@ Van Lier, Q.D.J., Neto, D.D. &amp; Metselaar, K. (2009). <span class="nocase">Mo
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -1163,6 +1162,10 @@ gitbook.start({
 "text": null
 },
 "download": ["medfatebook.pdf", "medfatebook.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": "section"
 }

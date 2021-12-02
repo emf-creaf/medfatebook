@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 9 Radiation transfer | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 9 Radiation transfer | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2021-07-27" />
+<meta name="date" content="2021-12-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -32,8 +32,9 @@
   
 <link rel="prev" href="subdailytemplight.html"/>
 <link rel="next" href="planthydraulics.html"/>
-<script src="libs/header-attrs-2.9/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -41,7 +42,6 @@
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
-
 
 
 
@@ -689,7 +689,7 @@ LAI^{shade}_{i,j} &amp;=&amp; (1 - f_{SL,j}) \cdot LAI^{\phi}_{i,j}
 <span id="cb12-12"><a href="radiationbalance.html#cb12-12" aria-hidden="true" tabindex="-1"></a>alpha_SWR <span class="ot">=</span> <span class="fl">0.7</span></span></code></pre></div>
 <p>This canopy definition leads to a percentage of the above-canopy irradiance reaching each layer <span class="citation">(<a href="#ref-Anten2016" role="doc-biblioref">Anten &amp; Bastiaans 2016</a>)</span>. Extinction of direct radiation also defines the proportion of leaves of each layer that are affected by sunflecks (i.e. the proportion of sunlit leaves). Both outcomes are illustrated in the figure below:</p>
 
-<div class="figure" style="text-align: center"><span id="fig:irradianceperlayer"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:irradianceperlayer"></span>
 <img src="medfatebook_files/figure-html/irradianceperlayer-1.png" alt="The left panel shows irradiance per layer of diffuse and direct PAR and SWR assuming a LAI of 2 equally distributed among layers (see function light_layerIrradianceFraction()). The right panel shows the corresponding proportions of sunlit and shade leaves in each layer (see function light_layerSunlitFraction())." width="768" />
 <p class="caption">
 Figure 9.1: The left panel shows irradiance per layer of diffuse and direct PAR and SWR assuming a LAI of 2 equally distributed among layers (see function <code>light_layerIrradianceFraction()</code>). The right panel shows the corresponding proportions of sunlit and shade leaves in each layer (see function <code>light_layerSunlitFraction()</code>).
@@ -726,7 +726,7 @@ where <span class="math inline">\(\beta\)</span> is the solar elevation angle in
 <span id="cb13-5"><a href="radiationbalance.html#cb13-5" aria-hidden="true" tabindex="-1"></a>PAR_diffuse <span class="ot">=</span> <span class="dv">150</span></span></code></pre></div>
 <p>Solar elevation is the angle between the sun and the horizon (i.e. the complement of the zenith angle). Under these conditions, and for the same canopy used for fig. <a href="radiationbalance.html#fig:irradianceperlayer">9.1</a>, the amount of PAR and SWR absorbed per unit of leaf area at each canopy layer is <span class="citation">(<a href="#ref-Anten2016" role="doc-biblioref">Anten &amp; Bastiaans 2016</a>)</span>:</p>
 
-<div class="figure" style="text-align: center"><span id="fig:absorbanceperlayer"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:absorbanceperlayer"></span>
 <img src="medfatebook_files/figure-html/absorbanceperlayer-1.png" alt="PAR (left) and SWR (right) absorbed per unit of sunlit/shade leaf area at each canopy layer (\(I^{sunlit}_{i,j}\) and \(I^{shade}_{i,j}\), respectively;see function light_cohortSunlitShadeAbsorbedRadiation())." width="672" />
 <p class="caption">
 Figure 9.2: PAR (left) and SWR (right) absorbed per unit of sunlit/shade leaf area at each canopy layer (<span class="math inline">\(I^{sunlit}_{i,j}\)</span> and <span class="math inline">\(I^{shade}_{i,j}\)</span>, respectively;see function <code>light_cohortSunlitShadeAbsorbedRadiation()</code>).
@@ -837,7 +837,6 @@ Flerchinger, G.N., Xiao, W., Sauer, T.J. &amp; Yu, Q. (2009). <span class="nocas
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -877,6 +876,10 @@ gitbook.start({
 "text": null
 },
 "download": ["medfatebook.pdf", "medfatebook.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": "section"
 }

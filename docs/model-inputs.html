@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 2 Model inputs | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 2 Model inputs | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2021-07-27" />
+<meta name="date" content="2021-12-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -32,8 +32,9 @@
   
 <link rel="prev" href="intro.html"/>
 <link rel="next" href="basicwaterbalance.html"/>
-<script src="libs/header-attrs-2.9/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -41,7 +42,6 @@
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
-
 
 
 
@@ -737,7 +737,7 @@ where <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)
 where <span class="math inline">\(\theta(\psi)\)</span> is the water retention, <span class="math inline">\(\theta_{sat}\)</span> is the saturated water content, <span class="math inline">\(\theta_{res}\)</span> is the residual water content, <span class="math inline">\(\alpha\)</span> is related to the inverse of the air entry pressure, and <span class="math inline">\(n\)</span> is a measure of the pore-size distribution.</li>
 </ol>
 
-<div class="figure" style="text-align: center"><span id="fig:retention-curves"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:retention-curves"></span>
 <img src="medfatebook_files/figure-html/retention-curves-1.png" alt="Water retention curves under the Saxton and Van Genuchten models, for the same physical attributes (25% sand, 25% clay, 50% silt and bulk density of \(1.5 g \cdot cm^{-3}\)). Parameters of the Van Genuchten curve have been estimated using pedotransfer functions given in Tóth et al. (2015)." width="384" />
 <p class="caption">
 Figure 2.1: Water retention curves under the Saxton and Van Genuchten models, for the same physical attributes (25% sand, 25% clay, 50% silt and bulk density of <span class="math inline">\(1.5 g \cdot cm^{-3}\)</span>). Parameters of the Van Genuchten curve have been estimated using pedotransfer functions given in <span class="citation"><a href="#ref-Toth2015" role="doc-biblioref">Tóth <em>et al.</em></a> (<a href="#ref-Toth2015" role="doc-biblioref">2015</a>)</span>.
@@ -1036,7 +1036,7 @@ LAI^{all}_{stand} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{all}} = LAI^{\phi}_{stand}+L
 <p>The vegetation inputs for height, leaf area index and crown ratio allow the package to determine the vertical distribution of leaves in the stand. The leaf area of any plant cohort is assumed to be distributed vertically following a <strong>truncated Gaussian function</strong> whose standardized values -1.5 and 1.5 correspond to crown base height (<span class="math inline">\(H_{crown,i}\)</span>; in <span class="math inline">\(cm\)</span>) and total plant height (<span class="math inline">\(H_i\)</span>), respectively. Crown base height is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort (<span class="math inline">\(CR_i\)</span>; a proportion between 0 and 1), which in turn can be estimated as explained in <a href="allometricmodels.html#eq:CrownHeight">(21.5)</a>.</p>
 <p>Simulation models in <strong>medfate</strong> divide the vertical dimension into vertical layers (by default are 100 cm width, but see control parameter <code>verticalLayerSize</code>). Let us define <span class="math inline">\(LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}\)</span> as the leaf area index of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> including both functional leaves and dead leaves standing on branches. The truncated Gaussian distribution defines the <span class="math inline">\(LAI_{i,j}^{\phi}\)</span> and <span class="math inline">\(LAI_{i,j}^{dead}\)</span> for all plant cohorts and vertical layers.</p>
 <p>Dividing the leaf area of a given layer by its width, one obtains the <em>leaf area density</em> (<span class="math inline">\(LAD\)</span> in <span class="math inline">\(m^2 \cdot m^{-3}\)</span>). Figure <a href="model-inputs.html#fig:leafareadensity">2.2</a> illustrates the leaf area density profile (see function <code>vprofile_leafAreaDensity()</code>) corresponding to the forest stand described in the example <code>forest</code> object that we showed above.</p>
-<div class="figure" style="text-align: center"><span id="fig:leafareadensity"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:leafareadensity"></span>
 <img src="medfatebook_files/figure-html/leafareadensity-1.png" alt="Leaf area density distribution in a forest stand. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution." width="768" />
 <p class="caption">
 Figure 2.2: Leaf area density distribution in a forest stand. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution.
@@ -1054,7 +1054,7 @@ Y_i(z) &amp;=&amp; \frac{1}{1+(z/Z_{50,i})^{c_i}}
 \end{eqnarray}\]</span>
 where <span class="math inline">\(Y_i(z)\)</span> is the cumulative fraction of fine root mass located between surface and depth <span class="math inline">\(z\)</span>; <span class="math inline">\(Z_{50,i}\)</span> is the depth (in mm) above which 50% of the root mass is located; and <span class="math inline">\(c_i\)</span> is a shape parameter related to <span class="math inline">\(Z_{50,i}\)</span> and <span class="math inline">\(Z_{95,i}\)</span> as <span class="math inline">\(c_i = 2.94 / \ln(Z_{50,i} / Z_{95,i})\)</span>.</p>
 <p>The linear dose response model is quite flexible with respect to fine root distribution (see function <code>root_ldrDistribution()</code>). The following figure shows the fine root distribution profile of the same cohorts as in fig. <a href="model-inputs.html#fig:leafareadensity">2.2</a> (see <code>vprofile_rootDistribution()</code>):</p>
-<div class="figure" style="text-align: center"><span id="fig:root-distribution"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:root-distribution"></span>
 <img src="medfatebook_files/figure-html/root-distribution-1.png" alt="Examples of root density profile according to the linear dose response model." width="480" />
 <p class="caption">
 Figure 2.3: Examples of root density profile according to the linear dose response model.
@@ -1197,6 +1197,14 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <td>Y</td>
 <td>Y</td>
 </tr>
+<tr class="even">
+<td><span class="math inline">\(C_{atm}\)</span></td>
+<td><span class="math inline">\(ppm\)</span></td>
+<td><code>CO2</code></td>
+<td>Atmospheric (above-canopy) <span class="math inline">\(CO_2\)</span> concentration</td>
+<td>N</td>
+<td>Y</td>
+</tr>
 </tbody>
 </table>
 <p>Dates are needed in <strong>medfate</strong> to estimate parameters like solar declination or the day of the year (<span class="math inline">\(DOY\)</span>). Importantly, <em>dates</em> should be included as row names (in format <em>year-month-day</em>) of the input meteorology data frame. Since it allows producing data frames with appropiate variable units and row/column names, we recommend meteorological input to be generated using package <strong>meteoland</strong> <span class="citation">(<a href="#ref-DeCaceres2018" role="doc-biblioref">De Cáceres <em>et al.</em> 2018</a>)</span>, but many other sources are possible.</p>
@@ -1331,7 +1339,6 @@ Tóth, B., Weynants, M., Nemes, A., Makó, A., Bilas, G. &amp; Tóth, G. (2015).
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -1371,6 +1378,10 @@ gitbook.start({
 "text": null
 },
 "download": ["medfatebook.pdf", "medfatebook.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": "section"
 }

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 5 Forest hydrology | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 5 Forest hydrology | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2021-07-27" />
+<meta name="date" content="2021-12-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -32,8 +32,9 @@
   
 <link rel="prev" href="leafphenologylight.html"/>
 <link rel="next" href="transpirationgranier.html"/>
-<script src="libs/header-attrs-2.9/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -41,7 +42,6 @@
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
-
 
 
 
@@ -685,7 +685,7 @@ In = C_{canopy}\cdot Pr\: {if}\: Pr \leq P_G
 \end{eqnarray}\]</span>
 where <span class="math inline">\(Pr\)</span> is the daily gross rainfall (in mm). Net rainfall (<span class="math inline">\(Pr_{net}\)</span>, also in mm) includes throughfall and stemflow, and is calculated as the difference between gross rainfall and interception loss. Fig. <a href="hydrology.html#fig:interception">5.1</a> below shows examples of relative throughfall (including stemflow), calculated according to the Gash et al <span class="citation">(<a href="#ref-Gash1995" role="doc-biblioref">1995</a>)</span> interception model, under different situations (see function <code>hydrology_rainInterception()</code>).</p>
 
-<div class="figure" style="text-align: center"><span id="fig:interception"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:interception"></span>
 <img src="medfatebook_files/figure-html/interception-1.png" alt="Examples of canopy interception with different \(S_{canopy}\) (canopy water storage capacity), \(ER_{ratio}\) (ratio between evaporation and rainfall rates) and \(p\) (throughfall coefficient; \(p = 1 - C_{canopy}\))." width="768" />
 <p class="caption">
 Figure 5.1: Examples of canopy interception with different <span class="math inline">\(S_{canopy}\)</span> (canopy water storage capacity), <span class="math inline">\(ER_{ratio}\)</span> (ratio between evaporation and rainfall rates) and <span class="math inline">\(p\)</span> (throughfall coefficient; <span class="math inline">\(p = 1 - C_{canopy}\)</span>).
@@ -702,7 +702,7 @@ Ru=\frac{(Pr_{net} + Ro + Sm - 0.2 \cdot V_{fc, soil})^2}{(Pr_{net} + Ro + Sm - 
 where <span class="math inline">\(V_{fc, soil}\)</span> (in mm) is the overall soil water retention capacity.</p>
 <p>Following <span class="citation"><a href="#ref-Granier1999" role="doc-biblioref">Granier <em>et al.</em></a> (<a href="#ref-Granier1999" role="doc-biblioref">1999</a>)</span>, part of the water reaching one soil layer percolates quickly through the macropores. The amount of water reaching each layer through macropores is modelled using an extinction function that depends on macroporosity (see function <code>hydrology_infiltrationRepartition</code>). The remaining water is retained by the micropores refilling the current soil layer. When this soil layer reaches its field capacity the excess of water also percolates to the soil layer below.</p>
 
-<div class="figure" style="text-align: center"><span id="fig:infiltration"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:infiltration"></span>
 <img src="medfatebook_files/figure-html/infiltration-1.png" alt="Examples of infiltration/runoff calculation for different values of net rainfall and overall retention capacity, \(V_{soil}\), calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively." width="768" />
 <p class="caption">
 Figure 5.2: Examples of infiltration/runoff calculation for different values of net rainfall and overall retention capacity, <span class="math inline">\(V_{soil}\)</span>, calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively.
@@ -732,7 +732,7 @@ Es = \min(PE_{soil}, SE_{soil})
 \end{equation}\]</span></p>
 <p>Finally, <span class="math inline">\(Es\)</span> is distributed along the soil profile according to an exponential decay function with an extinction coefficient <span class="math inline">\(\kappa_{soil}\)</span> <span class="citation">(<a href="#ref-Mouillot2001" role="doc-biblioref">Mouillot <em>et al.</em> 2001</a>)</span>. Figure <a href="hydrology.html#fig:soilevaporation">5.3</a> shows the cumulative evaporation from soils for different values of maximum evaporation rate and extinction coefficient. When the extinction coefficient is smaller a higher proportion of the evaporated water is removed from the subsoil and less from the topsoil. This causes more water being available to calculate <span class="math inline">\(t\)</span> in the next step.</p>
 
-<div class="figure" style="text-align: center"><span id="fig:soilevaporation"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:soilevaporation"></span>
 <img src="medfatebook_files/figure-html/soilevaporation-1.png" alt="Cumulative bare soil evaporation for different values of maximum evaporation rate (\(\gamma_{soil}\)) and extinction coefficient (\(\kappa_{soil}\)). Three soil layers (0 – 30 cm; 30 – 150 cm; 150 – 400 cm) are initialized at field capacity (\(V_1 = 50 mm\); \(V_2 = 201 mm\); \(V_3 = 35 mm\)). \(PE_{soil}\) was assumed not to be limiting." width="480" />
 <p class="caption">
 Figure 5.3: Cumulative bare soil evaporation for different values of maximum evaporation rate (<span class="math inline">\(\gamma_{soil}\)</span>) and extinction coefficient (<span class="math inline">\(\kappa_{soil}\)</span>). Three soil layers (0 – 30 cm; 30 – 150 cm; 150 – 400 cm) are initialized at field capacity (<span class="math inline">\(V_1 = 50 mm\)</span>; <span class="math inline">\(V_2 = 201 mm\)</span>; <span class="math inline">\(V_3 = 35 mm\)</span>). <span class="math inline">\(PE_{soil}\)</span> was assumed not to be limiting.
@@ -784,7 +784,6 @@ Watanabe, T. &amp; Mizutani, K. (1996). <span class="nocase">Model study on micr
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -824,6 +823,10 @@ gitbook.start({
 "text": null
 },
 "download": ["medfatebook.pdf", "medfatebook.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": "section"
 }

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 11 Plant photosynthesis | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 11 Plant photosynthesis | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2021-07-27" />
+<meta name="date" content="2021-12-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -32,8 +32,9 @@
   
 <link rel="prev" href="planthydraulics.html"/>
 <link rel="next" href="transpirationsperry.html"/>
-<script src="libs/header-attrs-2.9/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -41,7 +42,6 @@
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
-
 
 
 
@@ -668,7 +668,7 @@ g_{Ha} &amp;=&amp; 0.189 \cdot (u_{leaf}/d)^{0.5}
 where <span class="math inline">\(u_{leaf}\)</span> is the leaf-level wind speed (in <span class="math inline">\(m \cdot s^{-1}\)</span>) and <span class="math inline">\(d\)</span> is 0.72 times the leaf width (species parameter <code>LeafWidth</code> in <span class="math inline">\(cm\)</span>). As before, <span class="math inline">\(u_{leaf}\)</span> corresponds to <span class="math inline">\(u_j\)</span>, the wind-speed at the canopy layer <span class="math inline">\(j\)</span> where the leaf is located (see <a href="windextinction.html#windextinctionprofile">23.2</a>).</p>
 <p>By inspecting eq. <a href="plantphotosynthesis.html#eq:leaftemperatureequation">(11.1)</a>, we can conclude that transpiration flow decreases leaf temperature, whereas radiation increases it and wind speed makes it more similar to the temperature of the surrounding air. The following figures illustrate the effect of varying wind speed and flow rate on <span class="math inline">\(T_{leaf}\)</span> for two contrasted leaf widths (see function <code>biophysics_leafTemperature</code>):</p>
 
-<div class="figure" style="text-align: center"><span id="fig:leaftemperaturewind"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:leaftemperaturewind"></span>
 <img src="medfatebook_files/figure-html/leaftemperaturewind-1.png" alt="Values of \(T_{leaf}\) for two leaf widths and varying values of wind speed and flow rate, calculated for 24ºC air temperature and 740 \(W \cdot m^{-2}\) instantaneous absorbed radiation (including SWR and LWR)." width="768" />
 <p class="caption">
 Figure 11.1: Values of <span class="math inline">\(T_{leaf}\)</span> for two leaf widths and varying values of wind speed and flow rate, calculated for 24ºC air temperature and 740 <span class="math inline">\(W \cdot m^{-2}\)</span> instantaneous absorbed radiation (including SWR and LWR).
@@ -676,7 +676,7 @@ Figure 11.1: Values of <span class="math inline">\(T_{leaf}\)</span> for two lea
 </div>
 <p>Let us now fix wind speed at the leaf leavel to <span class="math inline">\(u_{leaf} = 2\)</span> m/s. The application of the above equations to the <span class="math inline">\(E(\Psi_{leaf})\)</span> curves corresponding to the complete hydraulic network (<a href="planthydraulics.html#supplycontinuum">10.2.5</a>) yields the following <span class="math inline">\(T_{leaf}(\Psi_{leaf})\)</span> curves:</p>
 
-<div class="figure" style="text-align: center"><span id="fig:leaftemperaturefunction"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:leaftemperaturefunction"></span>
 <img src="medfatebook_files/figure-html/leaftemperaturefunction-1.png" alt="Examples of leaf temperature functions for a hydraulic network, corresponding to fig. 10.14 and for different soil textures. Left/right panel shows values for uncavitated/cavitated supply functions." width="768" />
 <p class="caption">
 Figure 11.2: Examples of leaf temperature functions for a hydraulic network, corresponding to fig. <a href="planthydraulics.html#fig:supplynetwork">10.14</a> and for different soil textures. Left/right panel shows values for uncavitated/cavitated supply functions.
@@ -703,7 +703,7 @@ where <span class="math inline">\(e_{sat}(T)\)</span> is a function giving the s
 <pre><code>## [1] 1.912181</code></pre>
 <p>The application of the above equation to the <span class="math inline">\(T_{leaf}(\Psi_{leaf})\)</span> curves of fig. <a href="plantphotosynthesis.html#fig:leaftemperaturefunction">11.2</a> yields the following <span class="math inline">\(VPD_{leaf}(\Psi_{leaf})\)</span> curves:</p>
 
-<div class="figure" style="text-align: center"><span id="fig:leafVPDfunction"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:leafVPDfunction"></span>
 <img src="medfatebook_files/figure-html/leafVPDfunction-1.png" alt="Examples of leaf vapour pressure deficit (\(VPD_{leaf}\)) functions for a hydraulic network, corresponding to fig. 10.14 and for different soil textures. Left/right panel shows values for uncavitated/cavitated supply functions." width="768" />
 <p class="caption">
 Figure 11.3: Examples of leaf vapour pressure deficit (<span class="math inline">\(VPD_{leaf}\)</span>) functions for a hydraulic network, corresponding to fig. <a href="planthydraulics.html#fig:supplynetwork">10.14</a> and for different soil textures. Left/right panel shows values for uncavitated/cavitated supply functions.
@@ -728,7 +728,7 @@ g_{sw}^{-1} = g_{w}^{-1} - g_{bw}^{-1}
 \end{equation}\]</span>
 Ensuring here that <span class="math inline">\(g_{w} \leq g_{bw}\)</span> so that <span class="math inline">\(g_{w}^{-1} \geq g_{bw}^{-1}\)</span>. The application of equations for <span class="math inline">\(g_{w}\)</span>, <span class="math inline">\(g_{bw}\)</span> and <span class="math inline">\(g_{sw}\)</span> to the <span class="math inline">\(VPD_{leaf}(\Psi_{leaf})\)</span> curves yields the following stomatal conductance <span class="math inline">\(g_{sw}(\Psi_{leaf})\)</span> curves:</p>
 
-<div class="figure" style="text-align: center"><span id="fig:leafGWfunction"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:leafGWfunction"></span>
 <img src="medfatebook_files/figure-html/leafGWfunction-1.png" alt="Examples of stomatal conductance to water vapour (\(g_{sw}\)) functions for a hydraulic network, corresponding to fig. 10.14 and for different soil textures. Left/right panel shows values for uncavitated/cavitated supply functions. Minimum and maximum conductance values (\(g_{sw,\min} = 0.0045\) and \(g_{sw,\max} = 0.3\)) are indicated using dashed lines." width="768" />
 <p class="caption">
 Figure 11.4: Examples of stomatal conductance to water vapour (<span class="math inline">\(g_{sw}\)</span>) functions for a hydraulic network, corresponding to fig. <a href="planthydraulics.html#fig:supplynetwork">10.14</a> and for different soil textures. Left/right panel shows values for uncavitated/cavitated supply functions. Minimum and maximum conductance values (<span class="math inline">\(g_{sw,\min} = 0.0045\)</span> and <span class="math inline">\(g_{sw,\max} = 0.3\)</span>) are indicated using dashed lines.
@@ -767,14 +767,14 @@ where <span class="math inline">\(c&#39;=0.98\)</span> is a curvature factor. Th
 <span class="math display">\[\begin{equation}
 A = g_{c} \cdot (C_{air}-C_i)
 \end{equation}\]</span>
-where <span class="math inline">\(C_{air}\)</span> is the <span class="math inline">\(CO_{2}\)</span> concentration (in <span class="math inline">\(\mu mol \cdot mol^{-1}\)</span>) in the air surrounding the leaf (beyond the leaf boundary layer). If a single-layer canopy energy balance is used then <span class="math inline">\(C_{air}=C_{atm}\)</span>, the atmospheric <span class="math inline">\(CO_{2}\)</span> concentration (see parameter  in function <code>defaultControl()</code>), whereas if a multi-layer canopy energy balance is used <span class="math inline">\(C_{air}\)</span> corresponds to <span class="math inline">\(C_{air,j}\)</span>, the <span class="math inline">\(CO_2\)</span> concentration in the canopy layer <span class="math inline">\(j\)</span> where the leaf occurs, analogously to <span class="math inline">\(T_{air}\)</span> and <span class="math inline">\(e_{air}\)</span>. Combining the two equations for <span class="math inline">\(A\)</span> and finding the root of the resulting equation using Newton-Raphson method allows determining <span class="math inline">\(C_i\)</span> and therefore <span class="math inline">\(A\)</span>. Thus, after defining PAR photon flux density, atmosphere <span class="math inline">\(CO_{2}\)</span> concentration and maximum rate parameters:</p>
+where <span class="math inline">\(C_{air}\)</span> is the <span class="math inline">\(CO_{2}\)</span> concentration (in <span class="math inline">\(\mu mol \cdot mol^{-1}\)</span>) in the air surrounding the leaf (beyond the leaf boundary layer). If a single-layer canopy energy balance is used then <span class="math inline">\(C_{air}=C_{atm}\)</span>, the atmospheric <span class="math inline">\(CO_{2}\)</span> concentration (see weather input and parameter  in function <code>defaultControl()</code>), whereas if a multi-layer canopy energy balance is used <span class="math inline">\(C_{air}\)</span> corresponds to <span class="math inline">\(C_{air,j}\)</span>, the <span class="math inline">\(CO_2\)</span> concentration in the canopy layer <span class="math inline">\(j\)</span> where the leaf occurs, analogously to <span class="math inline">\(T_{air}\)</span> and <span class="math inline">\(e_{air}\)</span>. Combining the two equations for <span class="math inline">\(A\)</span> and finding the root of the resulting equation using Newton-Raphson method allows determining <span class="math inline">\(C_i\)</span> and therefore <span class="math inline">\(A\)</span>. Thus, after defining PAR photon flux density, atmosphere <span class="math inline">\(CO_{2}\)</span> concentration and maximum rate parameters:</p>
 <div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="plantphotosynthesis.html#cb48-1" aria-hidden="true" tabindex="-1"></a>Q <span class="ot">=</span> <span class="dv">2000</span></span>
 <span id="cb48-2"><a href="plantphotosynthesis.html#cb48-2" aria-hidden="true" tabindex="-1"></a>Catm <span class="ot">=</span> <span class="dv">386</span></span>
 <span id="cb48-3"><a href="plantphotosynthesis.html#cb48-3" aria-hidden="true" tabindex="-1"></a>Vmax298 <span class="ot">=</span> <span class="dv">100</span></span>
 <span id="cb48-4"><a href="plantphotosynthesis.html#cb48-4" aria-hidden="true" tabindex="-1"></a>Jmax298 <span class="ot">=</span> <span class="fl">1.67</span><span class="sc">*</span>Vmax298</span></code></pre></div>
 <p>one can obtain the following <span class="math inline">\(A(\Psi_{leaf})\)</span> curves from <span class="math inline">\(T_{leaf}(\Psi_{leaf})\)</span> and <span class="math inline">\(g_{sw}(\Psi_{leaf})\)</span>:</p>
 
-<div class="figure" style="text-align: center"><span id="fig:leafphotosynthesisfunction"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:leafphotosynthesisfunction"></span>
 <img src="medfatebook_files/figure-html/leafphotosynthesisfunction-1.png" alt="Examples of gross photosynthesis (\(A\)) functions for a hydraulic network, corresponding to fig. 10.14 and for different soil textures. Left/right panel shows values for uncavitated/cavitated supply functions." width="768" />
 <p class="caption">
 Figure 11.5: Examples of gross photosynthesis (<span class="math inline">\(A\)</span>) functions for a hydraulic network, corresponding to fig. <a href="planthydraulics.html#fig:supplynetwork">10.14</a> and for different soil textures. Left/right panel shows values for uncavitated/cavitated supply functions.
@@ -798,7 +798,7 @@ V_{max,298,i,j} &amp;=&amp; V_{max,298,i}\cdot \exp(-0.713\cdot \sum_{h&gt;i}{LA
 J_{max,298,i,j} &amp;=&amp; J_{max,298,i}\cdot \exp(-0.713\cdot \sum_{h&gt;i}{LAI^{\phi}_{h,j}}/LAI_i^{\phi})    
 \end{eqnarray}\]</span>
 where <span class="math inline">\(LAI^{\phi}_{i,j}\)</span> is the LAI value of the plant cohort <span class="math inline">\(i\)</span> at a given canopy layer <span class="math inline">\(j\)</span> and <span class="math inline">\(LAI_i^{\phi}\)</span> is the expanded LAI of the plant cohort. The following figure illustrate this decrease for the single-species canopy example of section <a href="radiationbalance.html#shortwaveradiationcanopyabs">9.1.3</a>:</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-39"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-39"></span>
 <img src="medfatebook_files/figure-html/unnamed-chunk-39-1.png" alt="Decrease of Rubisco maximum carboxilation rate across the canopy" width="480" />
 <p class="caption">
 Figure 11.6: Decrease of Rubisco maximum carboxilation rate across the canopy
@@ -838,7 +838,7 @@ V^{shade}_{max,298,i} &amp;=&amp; \frac{\sum_{j=1}^{l}{V_{max,298,i,j} \cdot LAI
 <h3><span class="header-section-number">11.2.4</span> Comparison of big-leaf, sun-shade and multi-canopy photosynthesis models</h3>
 <p>The figure below provides the canopy photosynthesis functions obtained using the multi-layer canopy photosynthesis model (top), a sunshade canopy photosynthesis model (center) or a big-leaf photosynthesis model (bottom). These were generated using functions <code>photo_multilayerPhotosynthesisFunction()</code>, <code>photo_sunshadePhotosynthesisFunction()</code> and <code>photo_leafPhotosynthesisFunction()</code>, respectively, and assuming homogeneous wind, temperature and water vapor pressure through the canopy. Thus, only absorbed radiation varied across layers and leaf types. Note the coincidence between the multi-layer and the sun-shade models.</p>
 
-<div class="figure" style="text-align: center"><span id="fig:canopyphoto"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:canopyphoto"></span>
 <img src="medfatebook_files/figure-html/canopyphoto-1.png" alt="Whole-canopy photosynthesis functions obtained for a hydraulic network, corresponding to fig. 10.14 and different soil textures, using the multi-layer canopy photosynthesis model (top), a sunshade canopy photosynthesis model (center) or a big-leaf photosynthesis model (bottom). Left/right panel shows values for uncavitated/cavitated supply functions." width="672" />
 <p class="caption">
 Figure 11.7: Whole-canopy photosynthesis functions obtained for a hydraulic network, corresponding to fig. <a href="planthydraulics.html#fig:supplynetwork">10.14</a> and different soil textures, using the multi-layer canopy photosynthesis model (top), a sunshade canopy photosynthesis model (center) or a big-leaf photosynthesis model (bottom). Left/right panel shows values for uncavitated/cavitated supply functions.
@@ -892,7 +892,6 @@ Sperry, J.S., Wang, Y., Wolfe, B.T., Mackay, D.S., Anderegg, W.R.L., Mcdowell, N
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -932,6 +931,10 @@ gitbook.start({
 "text": null
 },
 "download": ["medfatebook.pdf", "medfatebook.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": "section"
 }
