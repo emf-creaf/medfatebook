@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2021-12-02" />
+<meta name="date" content="2021-12-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -465,7 +465,11 @@ div.csl-indent {
 <li class="part"><span><b>V Forest dynamics modelling</b></span></li>
 <li class="chapter" data-level="19" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html"><i class="fa fa-check"></i><b>19</b> Forest dynamics model</a>
 <ul>
-<li class="chapter" data-level="19.1" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#design-principles"><i class="fa fa-check"></i><b>19.1</b> Design principles</a></li>
+<li class="chapter" data-level="19.1" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#design-principles"><i class="fa fa-check"></i><b>19.1</b> Design principles</a>
+<ul>
+<li class="chapter" data-level="19.1.1" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#recruitment"><i class="fa fa-check"></i><b>19.1.1</b> Recruitment</a></li>
+<li class="chapter" data-level="19.1.2" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#forest-management"><i class="fa fa-check"></i><b>19.1.2</b> Forest management</a></li>
+</ul></li>
 <li class="chapter" data-level="19.2" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#state-variables-1"><i class="fa fa-check"></i><b>19.2</b> State variables</a></li>
 <li class="chapter" data-level="19.3" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#process-scheduling"><i class="fa fa-check"></i><b>19.3</b> Process scheduling</a></li>
 <li class="chapter" data-level="19.4" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#inputs-and-outputs-2"><i class="fa fa-check"></i><b>19.4</b> Inputs and outputs</a>
@@ -648,10 +652,13 @@ div.csl-indent {
             <section class="normal" id="section-">
 <div id="dynamicsmodelling" class="section level1" number="19">
 <h1><span class="header-section-number">Chapter 19</span> Forest dynamics model</h1>
-<p>This chapter provides an overview of a forest dynamics model, which builds on the previous models and allows simulating the recruitment, growth and mortality of woody plant cohorts in a forest stand. The model is run using function <code>fordyn()</code> for a set of years.</p>
+<p>This chapter provides an overview of a forest dynamics model, which builds on the previous models and allows simulating the recruitment, growth, mortality and management of woody plant cohorts in a forest stand. The model is run using function <code>fordyn()</code> for a set of years.</p>
 <div id="design-principles" class="section level2" number="19.1">
 <h2><span class="header-section-number">19.1</span> Design principles</h2>
-<p>The design of the forest dynamics model is to a large degree inherited from the water balance and growth models it builds on. Readers should refer to former sections to learn the design of the basic water balance (see <a href="basicwaterbalance.html#basicdesign">3.1</a>), advanced water/energy balance (see <a href="advancedwaterbalance.html#advanceddesign">7.1</a>) or growth/mortality processes (see <a href="growthmodelling.html#growthdesign">15.1</a>). Recruitment is explicitly simulated at the level of <code>fordyn()</code> and hence will be the focus of this section. Recruitment of saplings involves a number of processes (flowering and polinisation, fruit/seed production, dispersal, storage, seed predation, germination, seedling establishment and survival until the sapling stage). All these processes have their own biotic and abiotic drivers <span class="citation">(<a href="#ref-Price2001" role="doc-biblioref">Price <em>et al.</em> 2001</a>)</span>, so that modelling becomes a challenging task. Processes leading to recruiment are frequently extremely simplified or their mechanisms ignored in many forest models <span class="citation">(<a href="#ref-Price2001" role="doc-biblioref">Price <em>et al.</em> 2001</a>)</span>. The design of the forest dynamics model with respect to recruitment follows that of many gap models. Local seed production is considered in a binary way, where plants are considered fertile and able to produce viable seeds if they reach a given height (different for shrubs and trees). Alternatively, the user can specify a set of species whose seeds arrive to the target stand via dispersal processes. Actual recruitment depends on a set of regeneration <em>thresholds</em> are used to determine whether recruitment of new saplings occurs. Typically, regeneration thresholds concern environmental conditions, although some models also consider ungulate browsing <span class="citation">(<a href="#ref-Wehrli2007" role="doc-biblioref">Wehrli <em>et al.</em> 2007</a>)</span>. In our case we focus on three environmental drivers limiting the transition from seedlings to saplings:</p>
+<p>The design of the forest dynamics model is to a large degree inherited from the water balance and growth models it builds on. Readers should refer to former sections to learn the design of the basic water balance (see <a href="basicwaterbalance.html#basicdesign">3.1</a>), advanced water/energy balance (see <a href="advancedwaterbalance.html#advanceddesign">7.1</a>) or growth/mortality processes (see <a href="growthmodelling.html#growthdesign">15.1</a>). Recruitment and forest management are explicitly simulated at the level of <code>fordyn()</code> and hence will be the focus of this section.</p>
+<div id="recruitment" class="section level3" number="19.1.1">
+<h3><span class="header-section-number">19.1.1</span> Recruitment</h3>
+<p>Recruitment of saplings involves a number of processes (flowering and polinisation, fruit/seed production, dispersal, storage, seed predation, germination, seedling establishment and survival until the sapling stage). All these processes have their own biotic and abiotic drivers <span class="citation">(<a href="#ref-Price2001" role="doc-biblioref">Price <em>et al.</em> 2001</a>)</span>, so that modelling becomes a challenging task. Processes leading to recruiment are frequently extremely simplified or their mechanisms ignored in many forest models <span class="citation">(<a href="#ref-Price2001" role="doc-biblioref">Price <em>et al.</em> 2001</a>)</span>. The design of the forest dynamics model with respect to recruitment follows that of many gap models. Local seed production is considered in a binary way, where plants are considered fertile and able to produce viable seeds if they reach a given height (different for shrubs and trees). Alternatively, the user can specify a set of species whose seeds arrive to the target stand via dispersal processes. Actual recruitment depends on a set of regeneration <em>thresholds</em> are used to determine whether recruitment of new saplings occurs. Typically, regeneration thresholds concern environmental conditions, although some models also consider ungulate browsing <span class="citation">(<a href="#ref-Wehrli2007" role="doc-biblioref">Wehrli <em>et al.</em> 2007</a>)</span>. In our case we focus on three environmental drivers limiting the transition from seedlings to saplings:</p>
 <ol style="list-style-type: decimal">
 <li>Tolerance to low temperatures, indicated by the mean temperature of the coldest month.</li>
 <li>Drought tolerance, indicated by the annual moisture index (annual precipitation divided by annual evapotranspiration).</li>
@@ -659,16 +666,28 @@ div.csl-indent {
 </ol>
 <p>A target species will recruit on a given year if current conditions for all three environmental indicators are above the species tolerance thresholds. Recruitment densities and plant size of recruited individuals are specified via species parameters.</p>
 </div>
+<div id="forest-management" class="section level3" number="19.1.2">
+<h3><span class="header-section-number">19.1.2</span> Forest management</h3>
+<p>Forest management is an optional process in <code>fordyn()</code> simulations. Furthermore, management actions need to be defined in an external function to be supplied by the user. This design was chosen because there are multiple potential management strategies, and different traditions are followed in different countries. To work properly within <code>fordyn()</code> simulations, the supplied management function needs to accept a <code>forest</code> object as input, as well as a list of management parameters, and it has to return the reduction in tree density, the reduction in shrub cover and the management parameters to be applied in subsequent calls.</p>
+<p>Although the former design allows users to tailor management functions to their simulation needs, the package includes <code>defaultManagementFunction()</code> to facilitate the simulation of these process in many situations, and which is briefly described here. The function implements two different management models:</p>
+<ul>
+<li><em>Irregular management</em>: An uneven-aged stand is managed using thinning operations each time a threshold value of a chosen stand-level metric (such as basal area or Hart-Becking index) is trespassed. Thinning operations can focus on trees of specific diameter classes.</li>
+<li><em>Regular management</em>: An even-aged (monospecific) stand is managed in cycles where thinning (preparatory) cuts are followed by final (regeneration) cuts. Thinning operations are similar as those of irregular management. One or several final cuts can be scheduled, the first starting whenever mean diameter surpasses a chosen threshold, and the following after a chosen number of years. Optionally, tree planting (of a chosen species) can be scheduled to occur after the last final cut.</li>
+</ul>
+<p>The former models apply cuts on tree cohorts irrespective of their species. The default management function applies shrub clearing each time there is an operation on trees, resulting in removal of any shrub cover above a given maximum value.</p>
+</div>
+</div>
 <div id="state-variables-1" class="section level2" number="19.2">
 <h2><span class="header-section-number">19.2</span> State variables</h2>
-<p>The main state variables of the forest dynamic model are those conforming the structure and composition of the forest stand, i.e. the set of woody cohorts (either trees or shrubs) and their attributes (height, density, DBH, cover, etc.). Since the model performs calls to the <code>growth()</code> model, many other state variables are defined for intra-annual simulations (see <a href="growthmodelling.html#growthscheduling">15.4</a>).</p>
+<p>The main state variables of the forest dynamic model are those conforming the structure and composition of the forest stand, i.e. the set of woody cohorts (either trees or shrubs) and their attributes (height, density, DBH, cover, etc.). Since the model performs calls to the <code>growth()</code> model, many other state variables are defined for intra-annual simulations (see <a href="growthmodelling.html#growthscheduling">15.4</a>). When including forest management action, additional state variables may be defined as management parameters.</p>
 </div>
 <div id="process-scheduling" class="section level2" number="19.3">
 <h2><span class="header-section-number">19.3</span> Process scheduling</h2>
 <p>The <code>fordyn()</code> model divides the period to be simulated in years, which is the top-level time step of simulations. Given an input <code>forest</code> object, the function first initializes the input for function <code>growth()</code>. For each year to be simulated the model the performs the following steps:</p>
 <ol style="list-style-type: decimal">
 <li>Calls function <code>growth()</code> to simulate daily water/carbon balance, growth and mortality processes (subdaily processes may also be involved in <code>transpirationMode = "Sperry"</code>). See section <a href="growthmodelling.html#growthscheduling">15.4</a> for details of growth scheduling.</li>
-<li>Removes plant cohorts whose density (ind. per hectare) is lower than a specified threshold (see control parameter <code>minimumCohortDensity</code>).</li>
+<li>If a management function is supplied, calls this function and apply the resulting reductions in tree density and shrub cover.</li>
+<li>Removes plant cohorts whose remaining density (ind. per hectare) is lower than a specified threshold (see control parameter <code>minimumCohortDensity</code>).</li>
 <li>Simulates recruitment (for species present in the stand or specified via control parameter <code>seedRain</code>).</li>
 <li>Merges surviving cohorts with recruitment in the <code>forest</code> object and prepares the input of function <code>growth()</code> for the next annual time step.</li>
 <li>Store current status of the <code>forest</code> object and update output tables/summaries.</li>
@@ -843,12 +862,20 @@ div.csl-indent {
 <td>A data frame with dead tree-cohort data (species, density, diameter, height, etc.) at the beginning of the simulation and after each simulated year.</td>
 </tr>
 <tr class="even">
+<td><code>CutTreeTable</code></td>
+<td>A data frame with cut tree-cohort data (species, density, diameter, height, etc.) per each simulated year.</td>
+</tr>
+<tr class="odd">
 <td><code>ShrubTable</code></td>
 <td>A data frame with shrub-cohort data (species, density, cover, height, etc.) at the beginning of the simulation and after each simulated year.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>DeadShrubTable</code></td>
 <td>A data frame with dead shrub-cohort data (species, density, cover, height, etc.) at the beginning of the simulation (if any) and after each simulated year.</td>
+</tr>
+<tr class="odd">
+<td><code>CutShrubTable</code></td>
+<td>A data frame with cut shrub-cohort data (species, density, cover, height, etc.) per each simulated year.</td>
 </tr>
 <tr class="even">
 <td><code>ForestStructures</code></td>
@@ -857,6 +884,10 @@ div.csl-indent {
 <tr class="odd">
 <td><code>GrowthResults</code></td>
 <td>A list with the results of calling function <code>growth</code> (i.e., see <a href="growthmodelling.html#forestgrowthoutput">15.5.4</a>) for each simulated year.</td>
+</tr>
+<tr class="even">
+<td><code>ManagementArgs</code></td>
+<td>If management is considered, a list of management arguments to be used in another call to <code>fordyn()</code>.</td>
 </tr>
 </tbody>
 </table>

@@ -2,11 +2,15 @@
 
 # Forest dynamics model {#dynamicsmodelling}
 
-This chapter provides an overview of a forest dynamics model, which builds on the previous models and allows simulating the recruitment, growth and mortality of woody plant cohorts in a forest stand. The model is run using function `fordyn()` for a set of years.
+This chapter provides an overview of a forest dynamics model, which builds on the previous models and allows simulating the recruitment, growth, mortality and management of woody plant cohorts in a forest stand. The model is run using function `fordyn()` for a set of years.
 
 ## Design principles
 
-The design of the forest dynamics model is to a large degree inherited from the water balance and growth models it builds on. Readers should refer to former sections to learn the design of the basic water balance (see \@ref(basicdesign)), advanced water/energy balance (see \@ref(advanceddesign)) or growth/mortality processes (see \@ref(growthdesign)). Recruitment is explicitly simulated at the level of `fordyn()` and hence will be the focus of this section. Recruitment of saplings involves a number of processes (flowering and polinisation, fruit/seed production, dispersal, storage, seed predation, germination, seedling establishment and survival until the sapling stage). All these processes have their own biotic and abiotic drivers [@Price2001], so that modelling becomes a challenging task. Processes leading to recruiment are frequently extremely simplified or their mechanisms ignored in many forest models [@Price2001]. The design of the forest dynamics model with respect to recruitment follows that of many gap models. Local seed production is considered in a binary way, where plants are considered fertile and able to produce viable seeds if they reach a given height (different for shrubs and trees). Alternatively, the user can specify a set of species whose seeds arrive to the target stand via dispersal processes. Actual recruitment depends on a set of regeneration *thresholds* are used to determine whether recruitment of new saplings occurs. Typically, regeneration thresholds concern environmental conditions, although some models also consider ungulate browsing [@Wehrli2007]. In our case we focus on three environmental drivers limiting the transition from seedlings to saplings: 
+The design of the forest dynamics model is to a large degree inherited from the water balance and growth models it builds on. Readers should refer to former sections to learn the design of the basic water balance (see \@ref(basicdesign)), advanced water/energy balance (see \@ref(advanceddesign)) or growth/mortality processes (see \@ref(growthdesign)). Recruitment and forest management are explicitly simulated at the level of `fordyn()` and hence will be the focus of this section. 
+
+### Recruitment
+
+Recruitment of saplings involves a number of processes (flowering and polinisation, fruit/seed production, dispersal, storage, seed predation, germination, seedling establishment and survival until the sapling stage). All these processes have their own biotic and abiotic drivers [@Price2001], so that modelling becomes a challenging task. Processes leading to recruiment are frequently extremely simplified or their mechanisms ignored in many forest models [@Price2001]. The design of the forest dynamics model with respect to recruitment follows that of many gap models. Local seed production is considered in a binary way, where plants are considered fertile and able to produce viable seeds if they reach a given height (different for shrubs and trees). Alternatively, the user can specify a set of species whose seeds arrive to the target stand via dispersal processes. Actual recruitment depends on a set of regeneration *thresholds* are used to determine whether recruitment of new saplings occurs. Typically, regeneration thresholds concern environmental conditions, although some models also consider ungulate browsing [@Wehrli2007]. In our case we focus on three environmental drivers limiting the transition from seedlings to saplings: 
 
   1. Tolerance to low temperatures, indicated by the mean temperature of the coldest month.
   2. Drought tolerance, indicated by the annual moisture index (annual precipitation divided by annual evapotranspiration).
@@ -14,19 +18,32 @@ The design of the forest dynamics model is to a large degree inherited from the 
 
 A target species will recruit on a given year if current conditions for all three environmental indicators are above the species tolerance thresholds. Recruitment densities and plant size of recruited individuals are specified via species parameters.
 
+### Forest management
+
+Forest management is an optional process in `fordyn()` simulations. Furthermore, management actions need to be defined in an external function to be supplied by the user. This design was chosen because there are multiple potential management strategies, and different traditions are followed in different countries. To work properly within `fordyn()` simulations, the supplied management function needs to accept a `forest` object as input, as well as a list of management parameters, and it has to return the reduction in tree density, the reduction in shrub cover and the management parameters to be applied in subsequent calls. 
+
+Although the former design allows users to tailor management functions to their simulation needs, the package includes `defaultManagementFunction()` to facilitate the simulation of these process in many situations, and which is briefly described here. The function implements two different management models:
+
+ + *Irregular management*: An uneven-aged stand is managed using thinning operations each time a threshold value of a chosen stand-level metric (such as basal area or Hart-Becking index) is trespassed. Thinning operations can focus on trees of specific diameter classes.
+ + *Regular management*: An even-aged (monospecific) stand is managed in cycles where thinning (preparatory) cuts are followed by final (regeneration) cuts. Thinning operations are similar as those of irregular management. One or several final cuts can be scheduled, the first starting whenever mean diameter surpasses a chosen threshold, and the following after a chosen number of years. Optionally, tree planting (of a chosen species) can be scheduled to occur after the last final cut.
+
+The former models apply cuts on tree cohorts irrespective of their species. The default management function applies shrub clearing each time there is an operation on trees, resulting in removal of any shrub cover above a given maximum value. 
+
+
 ## State variables
 
-The main state variables of the forest dynamic model are those conforming the structure and composition of the forest stand, i.e. the set of woody cohorts (either trees or shrubs) and their attributes (height, density, DBH, cover, etc.). Since the model performs calls to the `growth()` model, many other state variables are defined for intra-annual simulations (see \@ref(growthscheduling)).
+The main state variables of the forest dynamic model are those conforming the structure and composition of the forest stand, i.e. the set of woody cohorts (either trees or shrubs) and their attributes (height, density, DBH, cover, etc.). Since the model performs calls to the `growth()` model, many other state variables are defined for intra-annual simulations (see \@ref(growthscheduling)). When including forest management action, additional state variables may be defined as management parameters.
 
 ## Process scheduling
 
 The `fordyn()` model divides the period to be simulated in years, which is the top-level time step of simulations. Given an input `forest` object, the function first initializes the input for function `growth()`. For each year to be simulated the model the performs the following steps:
 
  1. Calls function `growth()` to simulate daily water/carbon balance, growth and mortality processes (subdaily processes may also be involved in `transpirationMode = "Sperry"`). See section \@ref(growthscheduling) for details of growth scheduling.
- 2. Removes plant cohorts whose density (ind. per hectare) is lower than a specified threshold (see control parameter `minimumCohortDensity`).
- 3. Simulates recruitment (for species present in the stand or specified via control parameter `seedRain`).
- 4. Merges surviving cohorts with recruitment in the `forest` object and prepares the input of function `growth()` for the next annual time step.
- 5. Store current status of the `forest` object and update output tables/summaries.
+ 2. If a management function is supplied, calls this function and apply the resulting reductions in tree density and shrub cover.
+ 3. Removes plant cohorts whose remaining density (ind. per hectare) is lower than a specified threshold (see control parameter `minimumCohortDensity`).
+ 4. Simulates recruitment (for species present in the stand or specified via control parameter `seedRain`).
+ 5. Merges surviving cohorts with recruitment in the `forest` object and prepares the input of function `growth()` for the next annual time step.
+ 6. Store current status of the `forest` object and update output tables/summaries.
 
 ## Inputs and outputs
 
@@ -108,10 +125,14 @@ Finally, there are a set of parameters specifying default values for recruited c
 | `CohortSummary`| A data frame with cohort-level summaries (leaf area index, tree basal area, tree density, shrub cover, etc.) at the beginning of the simulation and after each simulated year. |
 | `TreeTable`| A data frame with tree-cohort data (species, density, diameter, height, etc.) at the beginning of the simulation (if any) and after each simulated year. |
 | `DeadTreeTable`| A data frame with dead tree-cohort data (species, density, diameter, height, etc.) at the beginning of the simulation and after each simulated year. |
+| `CutTreeTable`| A data frame with cut tree-cohort data (species, density, diameter, height, etc.) per each simulated year. |
 | `ShrubTable`| A data frame with shrub-cohort data (species, density, cover, height, etc.) at the beginning of the simulation and after each simulated year. |
 | `DeadShrubTable`| A data frame with dead shrub-cohort data (species, density, cover, height, etc.) at the beginning of the simulation (if any) and after each simulated year. |
+| `CutShrubTable`| A data frame with cut shrub-cohort data (species, density, cover, height, etc.) per each simulated year. |
 | `ForestStructures`| A list with the `forest` object of the stand at the beginning of the simulation and after each simulated year. |
 | `GrowthResults`| A list with the results of calling function `growth` (i.e., see \@ref(forestgrowthoutput)) for each simulated year. |
+| `ManagementArgs`| If management is considered, a list of management arguments to be used in another call to `fordyn()`. |
+
 
 ## Process details
 
