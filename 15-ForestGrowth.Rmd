@@ -67,8 +67,8 @@ Further details and formulation of growth, senescence and allocation are given i
 When using the advanced water balance submodel, the growth model allows coordinating several aspects of carbon and water balances through different state variables (Fig. \@ref(fig:carbonwaterlinks)):
 
  a. Transpiration and photosynthesis are coordinated via the *stomatal regulation* submodel (see chapter \@ref(plantphotosynthesis)).
- b. Leaf water potential of symplastic tissues determines the turgor pressure necessary for growth (\@ref(leafgrowth)), while (metabolic) sugar concentration in the leaf tissues determines changes in osmotic potential at full turgor and hence, the relative water content of symplasmic tissue.
- c. Analogously, water potential of stem symplastic tissues determines the turgor in the cambium and the sapwood formation rate (\@ref(sapwoodgrowth)), while the sugar concentration in the sapwood determines the osmotic potential at full turgor of stem symplastic tissues.
+ b. Hydrostatic water potential of leaf symplastic tissues influences the turgor pressure necessary for leaf growth (\@ref(leafgrowth)), while (metabolic) leaf sugar concentration determines changes in osmotic potential at full turgor and hence, the relative water content of leaf symplasmic tissue.
+ c. Analogously, water potential of stem symplastic tissues determines the turgor in the cambium and the sapwood formation rate (\@ref(sapwoodgrowth)), while the sugar concentration in the sapwood determines the osmotic potential at full turgor of stem symplastic tissues and its relative water content.
  d. Leaf growth and senescence influence hydraulic conductances of several tissues (fine roots, coarse root sapwood and stem sapwood), as they are defined on a leaf area basis (\@ref(updateplanttraits)).
  e. Sapwood growth and senescence influence hydraulic conductance of stems via changes in sapwood area, and indirectly those of coarse roots and the rhizosphere (\@ref(updateplanttraits)).
  f. Fine root biomass dynamics determines fine root distribution and rhizosphere conductance across soil layers (\@ref(updateplanttraits)).
@@ -132,9 +132,13 @@ Note that $LA_i$ is the same state variable as $LAI^{live}_i$, but expressed at 
 
 Belowground variables (fine root biomass, fine root distribution and radial length of coarse roots) are only considered dynamic when simulating growth with advance water balance.
  
-## Carbon balance
+## Mass and energy balances
 
-Since the growth model builds on soil and plant water balances models, the water and energy balances explained in sections \@ref(soilwaterbalance) or \@ref(waterenergybalances) (depending on `transpirationMode`) also hold for this model.
+### Water and energy balance 
+
+Since the growth model builds on soil and plant water balance models, the water and energy balances explained in sections \@ref(soilwaterbalance) or \@ref(waterenergybalances) (depending on `transpirationMode`) also hold for this model.
+
+### Labile carbon balance 
 
 The model performs daily carbon balance of *labile carbon* in leaves and sapwood (stem, branches and coarse roots) for each plant cohort. In each of these two compartments carbon balance is performed for the two labile carbon forms, dissolved sugars (i.e. *metabolic carbon*) and starch (i.e. *storage carbon*). In the following all carbon flows (i.e. the components of right hand side of equations) are assumed to be in units of $g\,gluc \cdot day^{-1}$. At the leaf level, the carbon balance equations for dissolved sugars and starch are ($i$ subscripts omitted):
 
@@ -156,20 +160,47 @@ The corresponding carbon balance equations for sapwood dissolved sugars and star
 where $F_{phloem}$ is the sugar inflow via phloem transport, $M_{sapwood}$ is the sum of maintenance respiration of branches, stem and coarse roots, $M_{fineroot}$ is the maintenance respiration of fine roots, $G_{leaf}$, $G_{sapwood}$ and $G_{fineroot}$ are the carbon costs of forming new leaves, sapwood or fine roots (respectively), $SC_{sapwood}$ is the conversion of sapwood sugar to sapwood starch, $TS_{sapwood}$ is the translocation of sapwood sugars into starch during leaf senescence and $RE_{sapwood}$ is the root exudation of sapwood carbon. 
 
 
-If we define $S_{plant}$ as the total amount of labile carbon in the plant (in $g\,gluc$):
+If we define $S_{labile}$ as the total amount of labile carbon in the plant (in $g\,gluc$):
 \begin{equation}
-S_{plant} = (SS_{leaf} + ST_{leaf}) \cdot V_{storage,leaf} + (SS_{sapwood} + ST_{sapwood}) \cdot V_{storage,sapwood}
+S_{labile} = (SS_{leaf} + ST_{leaf}) \cdot V_{storage,leaf} + (SS_{sapwood} + ST_{sapwood}) \cdot V_{storage,sapwood}
 \end{equation}
-then carbon balance at the plant level reduces to:
+then labile carbon balance at the plant level reduces to:
 \begin{equation}
-\Delta{S_{plant}} = A - M - G - RE
+\Delta{S_{labile}} = A - M - G - RE
 (\#eq:plantcarbonbalanceequation)
 \end{equation}
 where $M = M_{leaf} + M_{sapwood} + M_{fineroot}$ is plant-level maintenance respiration,  $G = G_{leaf} + G_{sapwood} + G_{fineroot}$ is plant-level growth costs and $RE = RE_{leaf} + RE_{sapwood}$ is plant-level root exudation.
 
+### Biomass balance
+
+In addition to changes in labile carbon pools, the model also implements changes in the size of carbon compartments (leaves, sapwood and fine roots), as a result of the interplay between growth and senescence processes. Hence, we can define the following structural equations:
+\begin{eqnarray}
+\Delta{B_{leaves}} &=& B_{leaves, growth} - B_{leaves, senescence}\\
+\Delta{B_{sapwood}} &=& B_{sapwood, growth} - B_{sapwood, senescence}\\
+\Delta{B_{fineroot}} &=& B_{fineroot, growth} -  B_{fineroot, senescence}
+\end{eqnarray}
+where all variables would be in units of $g\,dry \cdot day^{-1}$. And the following equation defines the structural biomass balance at the plant level:
+\begin{equation}
+\Delta{B_{structure}} = \Delta{B_{leaves}} + \Delta{B_{sapwood}} +  \Delta{B_{fineroot}}
+\end{equation}
+The biomass balance at the **individual level** is completed if we add the labile biomass balance to the structural biomass balance:
+\begin{equation}
+\Delta{B_{plant}} = \Delta{B_{structure}} + \Delta{S_{labile}} 
+\end{equation}
+At the **cohort level**, however, we need to take into account that some individuals will die, so that the biomass balance needs to incorporate mortality losses:
+\begin{equation}
+\Delta{B_{cohort}} = \Delta{B_{plant}} \cdot N_{cohort} - B_{mortality} 
+\end{equation}
+where $N_{cohort}$ is the initial cohort density (before mortality occurred) and $B_{mortality}$ is the biomass loss due to mortality of individuals, which in order to close the balance has to be defined as:
+\begin{equation}
+ B_{mortality} = (B_{plant} + \Delta{B_{plant}}) \cdot N_{dead} 
+\end{equation}
+where $N_{dead}$ is the density of dead individuals and $B_{plant}$ is the initial plant biomass.
+
+
 ## Process scheduling {#growthscheduling}
 
-Growth simulations are conducted in **daily** time steps. Depending on the transpiration mode (`Granier` or `Sperry`) the actual steps conducted are different (see subsections below). At the end of each year (or at the end of the simulated period) the model translates cumulative sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover), as explained in chapter \@ref(structuralupdate). 
+Growth simulations are conducted in **daily** time steps. Depending on the transpiration mode (`Granier` or `Sperry`) the actual steps conducted are different (see subsections below). 
 
 ### Basic scheduling
 For every day to be simulated, first executes soil water balance, transpiration and photosynthesis calculations by calling the basic water balance model (\@ref(basicwaterbalancescheduling)). After that, the model performs the following steps for each plant cohort:
@@ -179,18 +210,17 @@ For every day to be simulated, first executes soil water balance, transpiration 
 3. If phenology indicates leaf unfolding, evaluate leaf temperature and turgor sink limitations, growth costs ($G_{leaf}$) and leaf area increase (\@ref(leafgrowth)). 
 4. If sapwood growth is permitted, evaluate sapwood temperature and turgor sink limitations, growth costs ($G_{sapwood}$) and sapwood area increase (\@ref(sapwoodgrowth)). 
 5. Update changes in sugar and starch compartments due to photosynthesis, maintenance respiration and growth. Apply transfer from leaf metabolic to sapwood metabolic carbon (\@ref(phloemtransport)) and conversions between storage and metabolic carbon (\@ref(sugarstarchdynamics)).  
-6. Determine leaf senescence due to carbon starvation (\@ref(leafsenescence)).
-7. Determine leaf senescence due to aging or cavitation effects (\@ref(leafsenescence)). 
-8. Determine sapwood area senescence by aging (\@ref(sapwoodsenescence)).
-9. Evaluate labile carbon translocation due to senescence ($TS_{leaf}$, $TT_{leaf}$ and $TS_{sapwood}$), adding the resulting carbon to the starch sapwood pool.
-10. Move any surplus in storage carbon to root exudation ($RE_{leaf}$ and $RE_{sapwood}$). This completes the daily carbon balance for leaf labile pools \@ref(eq:leafcarbonbalanceequations), sapwood labile pools \@ref(eq:sapwoodcarbonbalanceequations), and plant-level labile carbon \@ref(eq:plantcarbonbalanceequation).
-11. Update leaf area, sapwood area, storage volumes and the concentration of labile pools. 
-12. Determine if plant death by starvation or desiccation occurred (\@ref(plantmortality)).
-13. Update derived variables (e.g., leaf area index and Huber value) (\@ref(updateplanttraits)).
-14. If phenology indicates bud formation, update the leaf area target (\@ref(updateallocationtargets)).
+6. Determine leaf senescence due to aging or cavitation effects (\@ref(leafsenescence)). 
+7. Determine sapwood area senescence by aging (\@ref(sapwoodsenescence)).
+8. Evaluate labile carbon translocation due to senescence ($TS_{leaf}$, $TT_{leaf}$ and $TS_{sapwood}$), adding the resulting carbon to the starch sapwood pool.
+9. Move any surplus in storage carbon to root exudation ($RE_{leaf}$ and $RE_{sapwood}$). This completes the daily carbon balance for leaf labile pools \@ref(eq:leafcarbonbalanceequations), sapwood labile pools \@ref(eq:sapwoodcarbonbalanceequations), and plant-level labile carbon \@ref(eq:plantcarbonbalanceequation).
+10. Update leaf area, sapwood area and derived variables (e.g., leaf area index and Huber value) (\@ref(updateplanttraits)). 
+11. Determine if plant death by starvation or desiccation occurred (\@ref(plantmortality)).
+12. If phenology indicates bud formation, update the leaf area target (\@ref(updateallocationtargets)).
+13. Translate sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover), (\@ref(structuralupdate)) and update storage volumes and the concentration of labile pools.
 
 ### Advanced scheduling
-For every day to be simulated, the model first executes soil water balance, energy balance, transpiration and photosynthesis calculations in subdaily times steps, by calling the advanced water balance model (\@ref(advancedwaterbalancescheduling)).After that, the model performs the following steps for each plant cohort:
+For every day to be simulated, the model first executes soil water balance, energy balance, transpiration and photosynthesis calculations in subdaily times steps, by calling the advanced water balance model (\@ref(advancedwaterbalancescheduling)). After that, the model performs the following steps for each plant cohort:
 
 1. Determine the amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and storage capacity (\@ref(estimationcarbonpools)). 
 2. For every **subdaily** step, perform carbon balance as follows:
@@ -198,17 +228,15 @@ For every day to be simulated, the model first executes soil water balance, ener
     b. If phenology indicates leaf unfolding, evaluate temperature and turgor sink limitations for growth of leaves, estimate growth costs ($G_{leaf}$) and record leaf area increases (\@ref(leafgrowth)). 
     c. If sapwood growth is permitted, evaluate temperature and turgor sink limitations for growth of sapwood, estimate growth costs ($G_{sapwood}$) and record sapwood area increases (\@ref(sapwoodgrowth)). 
     d. Evaluate temperature and turgor sink limitations for growth of fine roots, estimate growth costs ($G_{fineroot}$) and record fine root biomass increases (\@ref(finerootgrowth)). 
-    e. Evaluate phloem transport ($F_{phloem}$) and sugar-starch dynamics in the leaf and sapwood compartments **at 1s time steps** (\@ref(phloemtransport)), including photosynthesis, maintenance respiration and growth respiration as well as diversion towards root exudation if maximum leaf or sapwood starch capacity is attained ($RE_{leaf}$ and $RE_{sapwood}$). 
-    f. Determine leaf senescence due to negative carbon balance (\@ref(leafsenescence)). This completes the sub-daily carbon balance for plant-level labile carbon \@ref(eq:plantcarbonbalanceequation).
+    e. Evaluate phloem transport ($F_{phloem}$) and sugar-starch dynamics in the leaf and sapwood compartments **at 1s time steps** (\@ref(phloemtransport)), including photosynthesis, maintenance respiration and growth respiration as well as diversion towards root exudation if maximum leaf or sapwood starch capacity is attained ($RE_{leaf}$ and $RE_{sapwood}$). This completes the sub-daily carbon balance for plant-level labile carbon \@ref(eq:plantcarbonbalanceequation).
 4. Determine leaf senescence due to aging or cavitation effects (\@ref(leafsenescence)). 
 5. Determine sapwood area senescence by aging (\@ref(sapwoodsenescence)).
 6. Evaluate labile carbon translocation due to senescence ($TS_{leaf}$, $TT_{leaf}$ and $TS_{sapwood}$), adding the resulting carbon to the starch sapwood pool. This completes the daily carbon balance for leaf labile pools \@ref(eq:leafcarbonbalanceequations), sapwood labile pools \@ref(eq:sapwoodcarbonbalanceequations).
-7. Apply fine root biomass growth and senescence (\@ref(finerootsenescence)).
-8. Update leaf area, sapwood area, storage volumes and the concentration of labile pools. 
+7. Apply  growth and senescence (\@ref(finerootsenescence)).
+8. Update leaf area, sapwood area, fine root biomass and distribution. Update derived variables (e.g., leaf area index, Huber values, hydraulic conductance of stems, roots and rhizosphere, osmotic potential at full turgor of leaves and sapwood) (\@ref(updateplanttraits)).
 9. Determine if plant death by starvation or desiccation occurred (\@ref(plantmortality)).
-10. Update derived variables (e.g., leaf area index, Huber values, hydraulic conductance of stems, roots and rhizosphere, osmotic potential at full turgor of leaves and sapwood) (\@ref(updateplanttraits)).
-11. If phenology indicates bud formation, update the leaf area target (\@ref(updateallocationtargets)).
-12. Update the fine root biomass target, according to the hydraulic conductance in the rhizosphere (\@ref(updateallocationtargets)).
+10. If phenology indicates bud formation, update the leaf area target (\@ref(updateallocationtargets)). Update the fine root biomass target, according to the hydraulic conductance in the rhizosphere (\@ref(updateallocationtargets)).
+11. Translate sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover), (\@ref(structuralupdate)) and update storage volumes and the concentration of labile pools.
 
 
 ## Inputs and outputs
@@ -300,12 +328,12 @@ A number of control parameters regulate carbon balance:
 + `respirationRates [= c(leaf = 0.00260274, sapwood = 6.849315e-05, fineroot = 0.002054795)]`: Maintenance respiration rates for different tissues (in $g\,gluc \cdot g\, dry^{-1} · day^{-1}$). These are default values used when maintenance respiration rates are not specified via species-specific `SpParams`.
 + `senescenceRates [= c(sapwood = 0.0001261398, fineroot = 0.001897231)]`: Relative senescence rates ($day^{-1}$) for sapwood and fine roots. Default are equivalent to 4.5% and 50% annual turnover for sapwood and fine roots, respectively. Leaf senescence rates depend on leaf lifespan (i.e. leaf duration) for evergreen species.
 + `constructionCosts [= c(leaf = 1.5, sapwood = 1.47, fineroot = 1.30)]`: Construction costs, including respiration and structural carbon, per dry weight of new tissue ($g\,gluc \cdot g\,dry^{-1}$).
-+ `maximumRelativeGrowthRates [= c(leaf = 0.01, sapwood = 0.002, fineroot = 0.1)]`: Maximum leaf growth rate relative to sapwood area ($m^{2}\cdot cm^{-2} \cdot day^{-1}$), maximum sapwood relative growth rate ($cm^{2}\cdot cm^{-2} \cdot day^{-1}$) and maximum fine root growth rate relative to sapwood area ($g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$). These are default values used when relative growth rates are not specified via species-specific `SpParams`.
++ `maximumRelativeGrowthRates [= c(leaf = 0.01, sapwood = 0.005, fineroot = 0.1)]`: Maximum leaf growth rate relative to sapwood area ($m^{2}\cdot cm^{-2} \cdot day^{-1}$), maximum sapwood relative growth rate ($cm^{2}\cdot cm^{-2} \cdot day^{-1}$) and maximum fine root growth rate relative to sapwood area ($g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$). These are default values used when relative growth rates are not specified via species-specific `SpParams`.
 
 Finally, we have the following options regarding mortality:
 
 + `mortalityMode [= "density/deterministic"]`: String describing how mortality is applied. Current accepted values are combinations of `"cohort"` vs `"density"` (for whole-cohort mortality vs reduction of stem density) and `"deterministic"` vs. `"stochastic"`.
-+ `mortalityBaselineRate [= 0.01]`: Deterministic proportion or probability specifying the baseline reduction of cohort's density occurring in a year (for `mortalityMode = "density/deterministic"` or `"density/stochastic"`).
++ `mortalityBaselineRate [= 0.005]`: Deterministic proportion or probability specifying the baseline reduction of cohort's density occurring in a year (for `mortalityMode = "density/deterministic"` or `"density/stochastic"`).
 + `mortalityRelativeSugarThreshold [= 0.3]`: Threshold of stem sugar concentration relative to equilibrium values (by default 30\%), resulting in an increased mortality rate/probability whenever levels are below.
 + `mortalityRWCThreshold [= 0.3]`: Threshold of stem relative water content resulting in increased mortality rate/probability whenever levels are below.
 
@@ -320,20 +348,22 @@ Function `growth` returns a list object with the following elements:
 |---------|------------------------------------------------------------|
 | `WaterBalance`| Climatic input and water balance flows (i.e. net precipitation, infiltration, runoff, transpiration...). All of them in $mm = L \cdot m^{-2}$. |
 | `EnergyBalance` | Energy balance components (instantaneous values) for the soil and the canopy |
+| `BiomassBalance` | Stand-level biomass balance components |
 | `Temperature` | Minimum and maximum temperature values for topsoil, canopy and atmosphere |
 | `Soil`| Soil variables for each soil layer: Moisture relative to field capacity ($W_s$), water potential ($\Psi_s$) and volumetric water content ($V_s$). |
 | `Stand`| Stand-level variables, such as $LAI^{\phi}_{stand} = LAI^{live}_{stand}$, $LAI^{dead}_{stand}$, the water retention capacity of the canopy ($S_{canopy}$) or the fraction of light reaching the ground ($L^{PAR}_{ground}$ and $L^{SWR}_{ground}$).|
 | `Plants`| Plant-level variables, such as $LAI^{phi}_i$, plant transpiration, plant water potential, etc. |
 | `SunlitLeaves` | Leaf-level output variables for sunlit leaves (`transpirationMode = "Sperry"`). |
 | `ShadeLeaves` | Leaf-level output variables for shade leaves (`transpirationMode = "Sperry"`). |
-| `PlantCarbonBalance`| A list with the daily results of carbon balance components and carbon pools. |
+| `LabileCarbonBalance`| A list with the daily results of labile carbon balance components and carbon pools. |
+| `PlantBiomassBalance`| A list with the daily results of biomass balance components for plant cohorts. |
 | `PlantStructure`| A list with daily results of plant compartment sizes, in terms of area and biomass. |
 | `PlantGrowth`| A list with daily results of growth rates for leaf, sapwood and fine roots. |
 
 
 Elements `WaterBalance` to `ShadeLeaves` are equal to the output of function `spwb` and were described in previous chapters (see \@ref(basicwaterbalanceoutput) and \@ref(advancedwaterbalanceoutput)). 
 
-The following table describes the child elements of `PlantCarbonBalance`, each of them a data frame with dates in rows and plant cohorts in columns:
+The following table describes the child elements of `LabileCarbonBalance`, each of them a data frame with dates in rows and plant cohorts in columns:
 
 | Element | Symbol | Units | Description                               |
 |---------|--------|-------|-------------------------------------------|
@@ -341,7 +371,7 @@ The following table describes the child elements of `PlantCarbonBalance`, each o
 | `MaintentanceRespiration`|$M_{i}/B_{i}$ | $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$ | Daily maintenance respiration (including leaves, sapwood and fine roots) per dry weight of living biomass. |
 | `GrowthCosts`|$G_{i}/B_{i}$ | $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$ | Daily growth costs  (including leaves, sapwood and fine roots) per dry weight of living biomass. |
 | `RootExudation`|$RE_{i}$ | $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$ | Daily root exudation per dry weight of living biomass. |
-| `CarbonBalance`|$\Delta S_{i}/B_{i}$ | $g\,gluc \cdot g\,dry^{-1}$ | Daily plant carbon balance (eq. \@ref(eq:plantcarbonbalanceequation)) per dry weight of living biomass. |
+| `CarbonBalance`|$\Delta S_{i}/B_{i}$ | $g\,gluc \cdot g\,dry^{-1}$ | Daily labile carbon balance (eq. \@ref(eq:plantcarbonbalanceequation)) per dry weight of living biomass. |
 | `SugarLeaf`|$SS_{leaf,i}$ | $mol\,gluc \cdot L^{-1}$ | Sugar concentration in leaves. |
 | `StarchLeaf`|$ST_{leaf,i}$ | $mol\,gluc \cdot L^{-1}$ | Starch concentration in leaves. |
 | `SugarSapwood`|$SS_{sapwood,i}$ | $mol\,gluc \cdot L^{-1}$ | Sugar concentration in sapwood. |
@@ -349,6 +379,16 @@ The following table describes the child elements of `PlantCarbonBalance`, each o
 | `SugarTransport`| $F_{phloem}$| $mol\,gluc \cdot s^{-1}$ | Average instantaneous rate of carbon transferred between leaves and stem compartments via phloem. |
 | `LeafPI0`|$\pi_{0,leaf,i}$ | $MPa$ | Osmotic potential at full turgor of symplastic leaf tissue. |
 | `StemPI0`|$\pi_{0,stem,i}$ | $MPa$ | Osmotic potential at full turgor of symplastic stem tissue. |
+
+The following table describes the child elements of `PlantCarbonBalance`, each of them a data frame with dates in rows and plant cohorts in columns:
+
+| Element | Symbol | Units | Description                               |
+|---------|--------|-------|-------------------------------------------|
+| `StructuralBiomassBalance`|  | $g\,dry \cdot m^{-2} \cdot day^{-1}$ | Daily structural biomass balance. |
+| `LabileBiomassBalance`|  | $g\,dry \cdot m^{-2} \cdot day^{-1}$ | Daily labile biomass balance. |
+| `PlantBiomassBalance`|  | $g\,dry \cdot m^{-2} \cdot day^{-1}$ | Daily plant biomass balance. |
+| `MortalityBiomassLoss`|  | $g\,dry \cdot m^{-2} \cdot day^{-1}$ | Daily biomass loss due to mortality. |
+| `CohortBiomassBalance`|  | $g\,dry \cdot m^{-2} \cdot day^{-1}$ | Daily cohort biomass balance (includes plant biomass balance and mortality). |
 
 
 The following table describes the child elements of `PlantStructure`, again each of them a data frame with dates in rows and plant cohorts in columns:
@@ -358,12 +398,7 @@ The following table describes the child elements of `PlantStructure`, again each
 | `LeafArea`|$LA_{i}$ | $m^{2}$ | Daily amount of leaf area for an average individual. |
 | `SapwoodArea`|$SA_{i}$ | $cm^{2}$ | Daily amount of sapwood area for an average individual. |
 | `FineRootArea`|$FRA_{i}$ | $m^{2}$ | Daily amount of fine root area for an average individual. |
-| `LeafBiomass`|$B_{leaf,i}$ | $g\,dry \cdot ind^{-1}$ | Daily leaf biomass for an average individual. |
-| `SapwoodBiomass`|$B_{sapwood, i}$ | $g\,dry \cdot ind^{-1}$ | Daily sapwood biomass for an average individual. |
 | `FineRootBiomass`|$B_{fineroot,i}$ | $g\,dry \cdot ind^{-1}$ | Daily fine root biomass for an average individual. |
-| `LabileBiomass`|$B_{sugar,i}+B_{starch,i}$ | $g\,dry \cdot ind^{-1}$ | Daily labile carbon biomass for an average individual. |
-| `TotalLivingBiomass`|$B_{total,i}$ | $g\,dry \cdot ind^{-1}$ | Daily total living biomass for an average individual. |
-
 
 The following table describes the child elements of `PlantGrowth`, again each of them a data frame with dates in rows and plant cohorts in columns:
 
