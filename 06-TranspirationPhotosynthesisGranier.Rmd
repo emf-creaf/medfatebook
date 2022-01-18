@@ -104,11 +104,16 @@ Tr_{i,s} = \sum_{j}{f_{pool,j} \cdot Tr_{i,s,j}}
 
 ### Plant photosynthesis {#basicphotosynthesis}
 
-Because it is useful for growth, and for compatibility with the 'Sperry' transpiration mode (chapter \@ref(advancedwaterbalance)), the water balance model using 'Granier' transpiration mode also calculates net assimilated carbon. Assuming a constant maximum water use efficiency ($WUE_{\max}$), net photosynthesis for a given plant cohort $i$ (in $g\,C \cdot m^{-2}$) is estimated as a function of transpiration [@Mouillot2001]:
+Because it is useful for growth, and for compatibility with the 'Sperry' transpiration mode (chapter \@ref(advancedwaterbalance)), the water balance model using 'Granier' transpiration mode also calculates gross assimilated carbon. Assuming a constant maximum water use efficiency ($WUE_{\max}$), gross photosynthesis for a given plant cohort $i$ (in $g\,C \cdot m^{-2}$) is estimated as a function of transpiration:
 \begin{equation}
-A_{n,i} = \alpha_{WUE} \cdot WUE_{\max,i} \cdot Tr_i
+A_{g,i} = Tr_i \cdot WUE_{\max,i} \cdot (L^{PAR}_i/100)^{0.2893}
 \end{equation}
-where $Tr_i$ is the transpiration of plant cohort $i$, $WUE_{\max,i}$ is the maximum water use efficiency of the cohort (in $g\,C \cdot mm^{-1}$) and $\alpha_{WUE} = T_{mean}/20$ is bounded between 0 and 1.
+where $Tr_i$ is the transpiration of plant cohort $i$, $WUE_{\max,i}$ is the maximum water use efficiency of the cohort (in $g\,C \cdot mm^{-1}$) - a species-specific parameter where WUE assumed to be estimated under conditions of no water stress and maximum light availability - and $L^{PAR}_i$ is the percentage of photosynthetically-active radiation available a the mid-crown of cohort $i$, according to the Beer-Lambert extinction model. The dependency of photosynthesis on drought stress is represented in the $Tr_i$ term, whereas the reduction of photosynthesis due to low light availability (for cohorts in the understory) is represented by the reduction of relative WUE given by low values of $L^{PAR}_i$:
+
+```{r WUErelationship, out.width='100%', fig.align="center", fig.cap="Relationship between the percentage of PAR available to a cohort and the water use efficiency, fitted using a meta-modelling approach between the advanced and basic water balance models.", echo=FALSE}
+knitr::include_graphics("WUE_relationship.png")
+```
+
 
 ## Plant drought stress
 

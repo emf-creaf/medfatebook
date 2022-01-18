@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2022-01-16" />
+<meta name="date" content="2022-01-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -748,11 +748,17 @@ Tr_{i,s} = \sum_{j}{f_{pool,j} \cdot Tr_{i,s,j}}
 </div>
 <div id="basicphotosynthesis" class="section level3" number="6.1.4">
 <h3><span class="header-section-number">6.1.4</span> Plant photosynthesis</h3>
-<p>Because it is useful for growth, and for compatibility with the ‘Sperry’ transpiration mode (chapter <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>), the water balance model using ‘Granier’ transpiration mode also calculates net assimilated carbon. Assuming a constant maximum water use efficiency (<span class="math inline">\(WUE_{\max}\)</span>), net photosynthesis for a given plant cohort <span class="math inline">\(i\)</span> (in <span class="math inline">\(g\,C \cdot m^{-2}\)</span>) is estimated as a function of transpiration <span class="citation">(<a href="#ref-Mouillot2001" role="doc-biblioref">Mouillot <em>et al.</em> 2001</a>)</span>:
+<p>Because it is useful for growth, and for compatibility with the ‘Sperry’ transpiration mode (chapter <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>), the water balance model using ‘Granier’ transpiration mode also calculates gross assimilated carbon. Assuming a constant maximum water use efficiency (<span class="math inline">\(WUE_{\max}\)</span>), gross photosynthesis for a given plant cohort <span class="math inline">\(i\)</span> (in <span class="math inline">\(g\,C \cdot m^{-2}\)</span>) is estimated as a function of transpiration:
 <span class="math display">\[\begin{equation}
-A_{n,i} = \alpha_{WUE} \cdot WUE_{\max,i} \cdot Tr_i
+A_{g,i} = Tr_i \cdot WUE_{\max,i} \cdot (L^{PAR}_i/100)^{0.2893}
 \end{equation}\]</span>
-where <span class="math inline">\(Tr_i\)</span> is the transpiration of plant cohort <span class="math inline">\(i\)</span>, <span class="math inline">\(WUE_{\max,i}\)</span> is the maximum water use efficiency of the cohort (in <span class="math inline">\(g\,C \cdot mm^{-1}\)</span>) and <span class="math inline">\(\alpha_{WUE} = T_{mean}/20\)</span> is bounded between 0 and 1.</p>
+where <span class="math inline">\(Tr_i\)</span> is the transpiration of plant cohort <span class="math inline">\(i\)</span>, <span class="math inline">\(WUE_{\max,i}\)</span> is the maximum water use efficiency of the cohort (in <span class="math inline">\(g\,C \cdot mm^{-1}\)</span>) - a species-specific parameter where WUE assumed to be estimated under conditions of no water stress and maximum light availability - and <span class="math inline">\(L^{PAR}_i\)</span> is the percentage of photosynthetically-active radiation available a the mid-crown of cohort <span class="math inline">\(i\)</span>, according to the Beer-Lambert extinction model. The dependency of photosynthesis on drought stress is represented in the <span class="math inline">\(Tr_i\)</span> term, whereas the reduction of photosynthesis due to low light availability (for cohorts in the understory) is represented by the reduction of relative WUE given by low values of <span class="math inline">\(L^{PAR}_i\)</span>:</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:WUErelationship"></span>
+<img src="WUE_relationship.png" alt="Relationship between the percentage of PAR available to a cohort and the water use efficiency, fitted using a meta-modelling approach between the advanced and basic water balance models." width="100%" />
+<p class="caption">
+Figure 6.3: Relationship between the percentage of PAR available to a cohort and the water use efficiency, fitted using a meta-modelling approach between the advanced and basic water balance models.
+</p>
+</div>
 </div>
 </div>
 <div id="plant-drought-stress" class="section level2" number="6.2">
