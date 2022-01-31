@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2022-01-19" />
+<meta name="date" content="2022-01-31" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -742,13 +742,13 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\(k_{PAR,i}\)</span></td>
+<td><span class="math inline">\(k_{PAR}\)</span></td>
 <td></td>
 <td><code>kPAR</code></td>
 <td>PAR extinction coefficient (see section <a href="leafphenologylight.html#basiclightextinction">4.2</a>).</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(s_{water, i}\)</span></td>
+<td><span class="math inline">\(s_{water}\)</span></td>
 <td><span class="math inline">\(mm\,H_2O·LAI^{-1}\)</span></td>
 <td><code>g</code></td>
 <td>Crown water storage capacity (i.e. depth of water that can be retained by leaves and branches) per LAI unit (see section <a href="hydrology.html#interception">5.3</a>).</td>
@@ -791,7 +791,7 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <td>Date to start the accumulation of degree days.</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(S^*_{eco,i}\)</span></td>
+<td><span class="math inline">\(S^*_{eco}\)</span></td>
 <td><span class="math inline">\(^{\circ} \mathrm{C}\)</span></td>
 <td><code>Sgdd</code></td>
 <td>Degree days corresponding to leaf budburst (see section <a href="leafphenologylight.html#leafphenobudburst">4.1.2</a>).</td>
@@ -803,7 +803,7 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <td>Base temperature for the calculation of degree days to leaf budburst (see section <a href="leafphenologylight.html#leafphenobudburst">4.1.2</a>).</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(S^*_{sen,i}\)</span></td>
+<td><span class="math inline">\(S^*_{sen}\)</span></td>
 <td><span class="math inline">\(^{\circ} \mathrm{C}\)</span></td>
 <td><code>Ssen</code></td>
 <td>Degree days corresponding to leaf senescence (see section <a href="leafphenologylight.html#leafphenosenescence">4.1.3</a>).</td>
@@ -864,25 +864,31 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <td>Empirical coefficient relating squared LAI with the ratio of maximum transpiration over potential evapotranspiration (see section <a href="transpirationgranier.html#maximumtranspiration">6.1.1</a>).</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(\Psi_{extract,i}\)</span></td>
+<td><span class="math inline">\(\Psi_{extract}\)</span></td>
 <td><span class="math inline">\(MPa\)</span></td>
 <td><code>Psi_Extract</code></td>
 <td>The water potential at which plant transpiration is 50% of its maximum (see section <a href="transpirationgranier.html#actualtranspiration">6.1.2</a>).</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(\Psi_{critic,i}\)</span></td>
+<td><span class="math inline">\(\Psi_{critic}\)</span></td>
 <td><span class="math inline">\(MPa\)</span></td>
 <td><code>Psi_Critic</code></td>
 <td>The water potential corresponding to 50% of cavitation (see section <a href="transpirationgranier.html#irreversiblecavitation">6.2.2</a>).</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(WUE_{\max,i}\)</span></td>
+<td><span class="math inline">\(WUE_{\max}\)</span></td>
 <td><span class="math inline">\(g\, C \cdot mm^{-1}\)</span></td>
 <td><code>WUE</code></td>
-<td>Water use efficency (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.4</a>).</td>
+<td>Maximum water use efficiency under full light and no water limitations (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.4</a>).</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(K_{rootdisc,i}\)</span></td>
+<td><span class="math inline">\(WUE_{decay}\)</span></td>
+<td></td>
+<td><code>WUE_decay</code></td>
+<td>Exponent describing the decay of water use efficiency with low light levels (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.4</a>).</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(K_{rootdisc}\)</span></td>
 <td>[0-1]</td>
 <td><code>pRootDisc</code></td>
 <td>Whole-plant relative transpiration corresponding to hydraulic disconnection from the soil (see section <a href="transpirationgranier.html#irreversiblecavitation">6.2.2</a>).</td>
@@ -980,13 +986,13 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <td><code>Transpiration</code></td>
 <td><span class="math inline">\(Tr_{i}\)</span></td>
 <td>mm</td>
-<td>Transpiration per ground area.</td>
+<td>Transpiration per unit ground area.</td>
 </tr>
 <tr class="even">
-<td><code>Photosynthesis</code></td>
+<td><code>GrossPhotosynthesis</code></td>
 <td><span class="math inline">\(A_{n,i}\)</span></td>
 <td><span class="math inline">\(g\,C \cdot m^{-2}\)</span></td>
-<td>Net photosynthesis per ground area.</td>
+<td>Gross photosynthesis per unit ground area.</td>
 </tr>
 <tr class="odd">
 <td><code>PlantPsi</code></td>

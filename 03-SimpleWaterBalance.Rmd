@@ -83,8 +83,8 @@ A relatively small set of functional parameters should be supplied for each plan
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
-| $k_{PAR,i}$ | | `kPAR` | PAR extinction coefficient (see section \@ref(basiclightextinction)). |
-| $s_{water, i}$ | $mm\,H_2O·LAI^{-1}$ | `g` | Crown water storage capacity (i.e. depth of water that can be retained by leaves and branches) per LAI unit (see section \@ref(interception)). |
+| $k_{PAR}$ | | `kPAR` | PAR extinction coefficient (see section \@ref(basiclightextinction)). |
+| $s_{water}$ | $mm\,H_2O·LAI^{-1}$ | `g` | Crown water storage capacity (i.e. depth of water that can be retained by leaves and branches) per LAI unit (see section \@ref(interception)). |
 
 A second set refers to leaf phenology (`paramsPhenology`):
 
@@ -93,9 +93,9 @@ A second set refers to leaf phenology (`paramsPhenology`):
 |        |       |  `PhenologyType`  | Leaf phenology type (oneflush-evergreen, progressive-evergreen, winter-deciduous, winter-semideciduous)|
 | $LD$ | years  | `LeafDuration` | Average duration of leaves (in years). |
 | $t_{0,eco}$ | days | `t0gdd` | Date to start the accumulation of degree days. |
-| $S^*_{eco,i}$ | $^{\circ} \mathrm{C}$ | `Sgdd` | Degree days corresponding to leaf budburst (see section \@ref(leafphenobudburst)). |
+| $S^*_{eco}$ | $^{\circ} \mathrm{C}$ | `Sgdd` | Degree days corresponding to leaf budburst (see section \@ref(leafphenobudburst)). |
 | $T_{eco}$ | $^{\circ} \mathrm{C}$ | `Tbgdd` | Base temperature for the calculation of degree days to leaf budburst (see section \@ref(leafphenobudburst)). |
-| $S^*_{sen,i}$ | $^{\circ} \mathrm{C}$ | `Ssen` | Degree days corresponding to leaf senescence (see section \@ref(leafphenosenescence)). |
+| $S^*_{sen}$ | $^{\circ} \mathrm{C}$ | `Ssen` | Degree days corresponding to leaf senescence (see section \@ref(leafphenosenescence)). |
 | $Ph_{sen}$ | hours | `Phsen` | Photoperiod corresponding to start counting senescence degree-days (see section \@ref(leafphenosenescence)). |
 | $T_{sen}$ | $^{\circ} \mathrm{C}$ | `Tbsen` | Base temperature for the calculation of degree days to leaf senescence (see section \@ref(leafphenosenescence)). |
 | $x_{sen}$ | {0,1,2}  | `xsen` | Discrete values, to allow for any absent/proportional/more than proportional effects of temperature on senescence (see section \@ref(leafphenosenescence)). |
@@ -107,10 +107,11 @@ A second set of parameters are related to transpiration and photosynthesis (`par
 |--------|-------|----| ---------------------------------------------|
 | $T_{max, LAI}$ |       | `Tmax_LAI` | Empirical coefficient relating LAI with the ratio of maximum transpiration over potential evapotranspiration (see section \@ref(maximumtranspiration)). |
 | $T_{max, sqLAI}$ |       | `Tmax_LAIsq` | Empirical coefficient relating squared LAI with the ratio of maximum transpiration over potential evapotranspiration (see section \@ref(maximumtranspiration)). |
-| $\Psi_{extract,i}$ | $MPa$ | `Psi_Extract` |  The water potential at which plant transpiration is 50% of its maximum (see section \@ref(actualtranspiration)).|
-| $\Psi_{critic,i}$ | $MPa$ | `Psi_Critic` |  The water potential corresponding to 50% of  cavitation (see section \@ref(irreversiblecavitation)).|
-| $WUE_{\max,i}$ | $g\, C \cdot mm^{-1}$ |  `WUE` |  Water use efficency (see section \@ref(basicphotosynthesis)).  |
-| $K_{rootdisc,i}$ | [0-1] |  `pRootDisc` |  Whole-plant relative transpiration corresponding to hydraulic disconnection from the soil (see section \@ref(irreversiblecavitation)).  |
+| $\Psi_{extract}$ | $MPa$ | `Psi_Extract` |  The water potential at which plant transpiration is 50% of its maximum (see section \@ref(actualtranspiration)).|
+| $\Psi_{critic}$ | $MPa$ | `Psi_Critic` |  The water potential corresponding to 50% of  cavitation (see section \@ref(irreversiblecavitation)).|
+| $WUE_{\max}$ | $g\, C \cdot mm^{-1}$ |  `WUE` |  Maximum water use efficiency under full light and no water limitations (see section \@ref(basicphotosynthesis)).  |
+| $WUE_{decay}$ |  |  `WUE_decay` |  Exponent describing the decay of water use efficiency with low light levels (see section \@ref(basicphotosynthesis)).  |
+| $K_{rootdisc}$ | [0-1] |  `pRootDisc` |  Whole-plant relative transpiration corresponding to hydraulic disconnection from the soil (see section \@ref(irreversiblecavitation)).  |
 
 Vegetation functional attributes are normally filled for each cohort $i$ by function `spwbInput()` or `forest2spwbInput()` from species identity (i.e. $SP_i$). However, different parameters can be specified for different cohorts of the same species if desired (see section \@ref(functionaltraits)). 
 
@@ -152,8 +153,8 @@ Elements `WaterBalance`, `Soil` and `Stand` are data frame with dates in rows an
 |---------|--------|-------|-------------------------------------------|
 |`LAI`| $LAI^{\phi}_i$ | $m^2 \cdot m^{-2}$ | Leaf area index (expanded).|
 |`AbsorbedSWRFraction` | $f_i$ | [0-1] | Fraction of shortwave radiation absorbed.|
-|`Transpiration`| $Tr_{i}$ | mm | Transpiration per ground area.|
-|`Photosynthesis`| $A_{n,i}$ | $g\,C \cdot m^{-2}$ | Net photosynthesis per ground area.|
+|`Transpiration`| $Tr_{i}$ | mm | Transpiration per unit ground area.|
+|`GrossPhotosynthesis`| $A_{n,i}$ | $g\,C \cdot m^{-2}$ | Gross photosynthesis per unit ground area.|
 |`PlantPsi` | $\Psi_{leaf,i}$ | $MPa$ | Plant water potential.|
 |`StemPLC` | $PLC_{i}$ | [0-1] | Degree of stem embolisation.|
 |`PlantStress` | $DDS_i$ | [0-1] | Drought stress level suffered by each plant cohort (relative whole-plant transpiration).|

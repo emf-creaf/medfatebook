@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2022-01-19" />
+<meta name="date" content="2022-01-31" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -679,11 +679,12 @@ Figure 6.1: Empirical relationship between <span class="math inline">\(Tr_{\max}
 \frac{Tr_{\max}}{PET}=  T_{max,LAI} \cdot LAI^{\phi}_{stand} + T_{max,sqLAI} \cdot (LAI^{\phi}_{stand})^2 
 \end{equation}\]</span>
 where <span class="math inline">\(T_{max,LAI}\)</span> and <span class="math inline">\(T_{max,sqLAI}\)</span> are species-specific parameters (if missing, they are given default values 0.134 and -0.006, respectively).</p>
-<p>The maximum transpiration for a given plant cohort <span class="math inline">\(i\)</span> is calculated as the portion of <span class="math inline">\(Tr_{\max}\)</span> defined by <span class="math inline">\(f_i\)</span> the fraction of total absorbed SWR that is due
+<p>The maximum transpiration for a given plant cohort <span class="math inline">\(i\)</span> is calculated using the portion of <span class="math inline">\(Tr_{\max}\)</span> defined by <span class="math inline">\(f_i\)</span> the fraction of total absorbed SWR that is due
 to cohort <span class="math inline">\(i\)</span> (see section <a href="leafphenologylight.html#basiclightextinction">4.2</a>):
 <span class="math display">\[\begin{equation}
-Tr_{\max, i} = Tr_{\max} \cdot \frac{f_i}{\sum_{j}{f_j}}
-\end{equation}\]</span></p>
+Tr_{\max, i} = Tr_{\max} \cdot \frac{f_i^{0.75}}{\sum_{j}{f_j^{0.75}}}
+\end{equation}\]</span>
+Before <strong>ver 2.5.0</strong> <span class="math inline">\(Tr_{\max, i}\)</span> was linearly related to <span class="math inline">\(f_i\)</span>, but an exponent 0.75 is now used to decrease <em>ad hoc</em> the proportion of transpiration corresponding to cohorts absorbing high SWR fractions with respect to those absorbing low amounts of SWR, which has been found to better match the transpiration predicted using the advanced transpiration model. Note that the actual amount of radiation energy absorbed by plants is much more difficult to determine, involving diffuse and direct radiation, as well as net long-wave radiation (see chapter <a href="radiationbalance.html#radiationbalance">9</a>).</p>
 </div>
 <div id="actualtranspiration" class="section level3" number="6.1.2">
 <h3><span class="header-section-number">6.1.2</span> Actual plant transpiration</h3>
@@ -702,11 +703,15 @@ is used to ensure that <span class="math inline">\(K_{i}(\Psi_{extract,i}) = 0.5
 Figure 6.2: Whole-plant relative water conductance functions for different water potential values (<span class="math inline">\(r = 3\)</span> in all cases)
 </p>
 </div>
-<p>Actual transpiration of plant cohort <span class="math inline">\(i\)</span> from a given soil layer <span class="math inline">\(s\)</span>, <span class="math inline">\(Tr_{i,s}\)</span>,
-is defined as the product of <span class="citation">(<a href="#ref-Mouillot2001" role="doc-biblioref">Mouillot <em>et al.</em> 2001</a>)</span>: the maximum transpiration of the plant cohort (<span class="math inline">\(Tr_{\max,i}\)</span>), the relative whole-plant transpiration (<span class="math inline">\(K_{i,s}\)</span>) corresponding to the species and water potential in layer <span class="math inline">\(s\)</span>, and the proportion of plant fine roots in layer <span class="math inline">\(s\)</span>, <span class="math inline">\(FRP_{i,s}\)</span>:
+<p>Until <strong>ver 2.5.0</strong>, actual transpiration of plant cohort <span class="math inline">\(i\)</span> from a given soil layer <span class="math inline">\(s\)</span>, <span class="math inline">\(Tr_{i,s}\)</span>, was defined as the product of <span class="citation">(<a href="#ref-Mouillot2001" role="doc-biblioref">Mouillot <em>et al.</em> 2001</a>)</span>: the maximum transpiration of the plant cohort (<span class="math inline">\(Tr_{\max,i}\)</span>), the relative whole-plant transpiration (<span class="math inline">\(K_{i,s}\)</span>) corresponding to the species and water potential in layer <span class="math inline">\(s\)</span>, and the proportion of plant fine roots in layer <span class="math inline">\(s\)</span>, <span class="math inline">\(FRP_{i,s}\)</span>:
 <span class="math display">\[\begin{equation}
 Tr_{i,s} =  Tr_{\max,i} \cdot K_{i,s} \cdot FRP_{i,s}
-\end{equation}\]</span></p>
+\end{equation}\]</span>
+Since <strong>ver 2.5.0</strong>, this equation has been slightly modified and is now:
+<span class="math display">\[\begin{equation}
+Tr_{i,s} =  Tr_{\max,i} \cdot K_{i,s} \cdot \frac{K_{unsat,s}^{0.5} \cdot FRP_{i,s}}{\sum_r{K_{unsat,r}^{0.5} \cdot FRP_{i,r}}}
+\end{equation}\]</span>
+where <span class="math inline">\(K_{unsat,s}\)</span> is the unsaturated soil conductivity of layer <span class="math inline">\(s\)</span>. This modification was introduced to allow the plant to increase the amount of water drawn from layers with higher levels of moisture in seasons where the usual water pools are depleted. This formulation decreases the differences in soil moisture between soil layers, which in the advanced model is achieved thanks to hydraulic redistribution process.</p>
 <p>The total amount of water transpired by plants, <span class="math inline">\(Tr\)</span> (in mm), is the sum of <span class="math inline">\(Tr_{i,s}\)</span> values over all plant cohorts and soil layers:
 <span class="math display">\[\begin{equation}
 Tr =\sum_{s}\sum_{i}{Tr_{i,s}}
@@ -750,9 +755,9 @@ Tr_{i,s} = \sum_{j}{f_{pool,j} \cdot Tr_{i,s,j}}
 <h3><span class="header-section-number">6.1.4</span> Plant photosynthesis</h3>
 <p>Because it is useful for growth, and for compatibility with the ‘Sperry’ transpiration mode (chapter <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>), the water balance model using ‘Granier’ transpiration mode also calculates gross assimilated carbon. Assuming a constant maximum water use efficiency (<span class="math inline">\(WUE_{\max}\)</span>), gross photosynthesis for a given plant cohort <span class="math inline">\(i\)</span> (in <span class="math inline">\(g\,C \cdot m^{-2}\)</span>) is estimated as a function of transpiration:
 <span class="math display">\[\begin{equation}
-A_{g,i} = Tr_i \cdot WUE_{\max,i} \cdot (L^{PAR}_i)^{0.2893}
+A_{g,i} = Tr_i \cdot WUE_{\max,i} \cdot (L^{PAR}_i)^{WUE_{decay,i}}
 \end{equation}\]</span>
-where <span class="math inline">\(Tr_i\)</span> is the transpiration of plant cohort <span class="math inline">\(i\)</span>, <span class="math inline">\(WUE_{\max,i}\)</span> is the maximum water use efficiency of the cohort (in <span class="math inline">\(g\,C \cdot mm^{-1}\)</span>) - a species-specific parameter where WUE assumed to be estimated under conditions of no water stress and maximum light availability - and <span class="math inline">\(L^{PAR}_i\)</span> is the proportion of photosynthetically-active radiation available at the mid-crown of cohort <span class="math inline">\(i\)</span>, according to the Beer-Lambert extinction model. The dependency of photosynthesis on drought stress is represented in the <span class="math inline">\(Tr_i\)</span> term, whereas the reduction of photosynthesis due to low light availability (for cohorts in the understory) is represented by the reduction of relative WUE given by low values of <span class="math inline">\(L^{PAR}_i\)</span>:</p>
+where <span class="math inline">\(Tr_i\)</span> is the transpiration of plant cohort <span class="math inline">\(i\)</span>, <span class="math inline">\(WUE_{\max,i}\)</span> is the maximum water use efficiency of the cohort (in <span class="math inline">\(g\,C \cdot mm^{-1}\)</span>) - a species-specific parameter where WUE assumed to be estimated under conditions of no water stress and maximum light availability -, <span class="math inline">\(L^{PAR}_i\)</span> is the proportion of photosynthetically-active radiation available at the mid-crown of cohort <span class="math inline">\(i\)</span>, according to the Beer-Lambert extinction model, and <span class="math inline">\(WUE_{decay,i}\)</span> is a species-specific exponent indicating how relative WUE decreases with lower light levels. The dependency of photosynthesis on drought stress is represented in the <span class="math inline">\(Tr_i\)</span> term, whereas the reduction of photosynthesis due to low light availability (for cohorts in the understory) is represented by the reduction of relative WUE given by low values of <span class="math inline">\(L^{PAR}_i\)</span>:</p>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:WUErelationship"></span>
 <img src="WUE_relationship.png" alt="Relationship between the percentage of PAR available to a cohort and the water use efficiency (left) or the water use efficiency relative to the maximum value observed in the stand for the same species (right). WUE values were estimated using the advanced water balance model and a non-linear regression was fitted." width="100%" />
 <p class="caption">
