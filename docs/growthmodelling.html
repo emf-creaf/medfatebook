@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2022-01-31" />
+<meta name="date" content="2022-02-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -683,8 +683,8 @@ Figure 15.1: Schematic representation of carbon compartments, carbon pools and c
 </div>
 <p>Different processes contribute to the carbon balance of structural and labile compartments:</p>
 <ul>
-<li>Carbon balance of <strong>labile carbon pools</strong> is performed by considering <strong>photosynthesis</strong>, <strong>maintenance respiration</strong> , <strong>growth costs</strong>, <strong>sugar-starch conversion</strong>, <strong>root exudation</strong> and <strong>phloem transport</strong>. Photosynthesis estimates come from the water balance submodel. Growth carbon costs and maintenance respiration rates are calculated at the individual level, by estimating the respiration of leaves, sapwood and fine root compartments. Maintenance respiration of leaves and sapwood depends on both structural and metabolic carbon, whereas only structural carbon counts for fine root maintenance respiration because they lack labile carbon pools. Sapwood maintenance respiration and growth costs depend on sapwood area, stem height and coarse root length. Any surplus in leaf or sapwood storage carbon is assumed to be diverted towards <strong>root exudation</strong>. Hence, root exudation is not a process competing for metabolic carbon, but only a consequence of plant C storage capacity being surpassed <span class="citation">(<a href="#ref-Prescott2020" role="doc-biblioref">Prescott <em>et al.</em> 2020</a>)</span>.</li>
-<li>Biomass balance in <strong>structural pools</strong> comes from the interplay between <strong>growth</strong> (i.e. new tissue formation) and <strong>senescence</strong> (see below). Structural growth rates are lower than growth costs for labile pools, since growth costs also include growth respiration costs. During leaf senescence it is assumed that non-structural carbon sources (i.e. labile carbon pools) are recycled and relocated to sapwood storage. Analogously, when sapwood is converted into heartwood, labile carbon in the protoplasm of parenchyma cells is assumed to be re-absorbed by neighboring living cells as storage <span class="citation">(<a href="#ref-Spicer2005" role="doc-biblioref">Spicer 2005</a>)</span>.</li>
+<li>Carbon balance of <strong>labile carbon pools</strong> is performed by considering <strong>photosynthesis</strong>, <strong>maintenance respiration</strong> , <strong>growth costs</strong>, <strong>sugar-starch conversion</strong>, <strong>root exudation</strong> and <strong>phloem transport</strong>. Photosynthesis estimates come from the water balance submodel. Growth carbon costs and maintenance respiration rates are calculated at the individual level. Maintenance respiration demand of leaves and sapwood depends on both structural and metabolic carbon, whereas only structural carbon counts for fine root maintenance respiration because they lack labile carbon pools. Growth costs include the carbon cost of building new structures as well as the respiration expenses of growth. Sugar-starch conversion is designed to maintain an equilibrium in the concentration of metabolic sugar. Any surplus in leaf or sapwood storage carbon over storage capacity is assumed to be diverted towards root exudation. Hence, root exudation is not modeled as a process actively competing for metabolic carbon, but only a consequence of plant C storage capacity being surpassed <span class="citation">(<a href="#ref-Prescott2020" role="doc-biblioref">Prescott <em>et al.</em> 2020</a>)</span>.</li>
+<li>Biomass balance in <strong>structural pools</strong> comes from the interplay between <strong>growth</strong> (i.e. new tissue formation) and <strong>senescence</strong> (see below). Structural growth rates are lower than growth costs for labile pools, since growth costs also include growth respiration expenses. During leaf senescence it is assumed that non-structural carbon sources (i.e. labile carbon pools) are recycled and relocated to sapwood storage. Analogously, when sapwood is converted into heartwood, labile carbon in the protoplasm of parenchyma cells is assumed to be re-absorbed by neighboring living cells as storage <span class="citation">(<a href="#ref-Spicer2005" role="doc-biblioref">Spicer 2005</a>)</span>.</li>
 </ul>
 <p>Further design details and formulation regarding the estimation of carbon pool sizes and carbon balance components are given in chapter <a href="carbonpoolsbalance.html#carbonpoolsbalance">16</a>.</p>
 </div>
@@ -693,25 +693,25 @@ Figure 15.1: Schematic representation of carbon compartments, carbon pools and c
 <p>The forest growth model allows simulating the variation of leaf area, sapwood area and fine root area via the following processes:</p>
 <ol style="list-style-type: lower-roman">
 <li><strong>Leaf growth</strong>: Whereas in the water balance models expanded leaf area corresponded to the portion of live leaf area that was unfolded according to the phenological status (see <a href="leafphenologylight.html#leafphenology">4.1</a>), in the growth model expanded leaf area results from explicit simulation of growth. However, leaf phenology submodel still controls the duration of phenophases corresponding budburst, leaf development and senescence. Leaf area growth occurs during <em>leaf unfolding</em> periods only, whereas <em>bud formation</em> periods are required to update the target leaf area (in accordance to an allocation strategy, see below).</li>
-<li><strong>Leaf senescence</strong>: Leaf senescence (and the corresponding increases in dead leaf area) can occur in the model due to <em>leaf aging</em> in evergreen species, due to <em>programmed leaf senescence</em> in deciduous species, due to a <em>negative leaf metabolic carbon balance</em> or due to <em>leaf dessication</em> (i.e. low leaf relative water content).</li>
-<li><strong>Sapwood growth</strong>: Formation of sapwood area can only occur if unfolded leaves are present, assuming that hormonal signals controlling cambium division are mainly synthesized within leaves. Sapwood formation is modelled as a radial file of cells issued from cambium cell divisions and which progressively undergo enlargement and maturation <span class="citation">(<a href="#ref-Friend2019" role="doc-biblioref">Friend <em>et al.</em> 2019</a>)</span>. Volume increases of cells in the radial file are translated into ring area increases and, after comparing them to maximum ring area increases, are ultimately translated into sapwood area increases (see <a href="growthsenescencemortality.html#sapwoodgrowth">17.1.3</a>).</li>
+<li><strong>Leaf senescence</strong>: Leaf senescence (and the corresponding increases in dead leaf area) can occur in the model due to <em>leaf aging</em> in evergreen species, due to <em>programmed leaf senescence</em> in deciduous species, or due to <em>leaf dessication</em> (i.e. low leaf relative water content).</li>
+<li><strong>Sapwood growth</strong>: Formation of new sapwood can only occur if unfolded leaves are present, assuming that hormonal signals controlling cambium division are mainly synthesized within leaves. Sapwood formation corresponds to secondary growth, and is only allowed if storage carbon levels are above a given threshold (e.g. 25%). This design was chosen to stop secondary growth before emptying storage carbon, so that maintenance respiration can be sustained longer if photosynthesis is low. Sapwood formation is modelled as a radial file of cells issued from cambium cell divisions and which progressively undergo enlargement and maturation <span class="citation">(<a href="#ref-Friend2019" role="doc-biblioref">Friend <em>et al.</em> 2019</a>)</span>. Volume increases of cells in the radial file are translated into ring area increases and, after comparing them to maximum ring area increases, are ultimately translated into sapwood area increases (see <a href="growthsenescencemortality.html#sapwoodgrowth">17.1.3</a>).</li>
 <li><strong>Sapwood senescence</strong>: Losses in sapwood area (i.e. conversion to heartwood) can occur via tissue <em>aging</em> (i.e. assuming a daily rate of conversion) or stem <em>cavitation</em>, which also reduces the area of sapwood that is effectively functional for water transport. Similarly to 3-PG <span class="citation">(<a href="#ref-Landsberg1997" role="doc-biblioref">Landsberg &amp; Waring 1997</a>)</span> we assume that the relative turnover rate of sapwood is smallest for young plants, and it increases up to a maximum value. However, recent reviews indicate that heartwood formation should be viewed as an active developmental program during which a conductive but vulnerable sapwood is transformed in a non-conductive but durable heartwood <span class="citation">(<a href="#ref-Spicer2005" role="doc-biblioref">Spicer 2005</a>)</span>.</li>
-<li><strong>Fine root growth</strong>: Fine root growth can in principle occur any time of the year (i.e. the model does not explicitly consider root phenology), but since fine root biomass targets depend on leaf area, seasonal fine root area patterns will follow phenological changes in leaf area.</li>
+<li><strong>Fine root growth</strong>: Fine root growth can in principle occur any time of the year (i.e. the model does not explicitly consider root phenology), but since fine root biomass targets depend on leaf area, seasonal fine root area patterns may follow phenological changes in leaf area.</li>
 <li><strong>Fine root senescence</strong>: Fine root senescence occurs via <em>aging</em> with a turnover rate depending on soil temperature.</li>
 </ol>
-<p>Formation of new leaf, sapwood and fine root tissues is determined taking into account both source (i.e. sapwood storage carbon availability) and sink (i.e. biophysical constraints on plant tissue expansion) limitations <span class="citation">(<a href="#ref-Fatichi2014" role="doc-biblioref">Fatichi <em>et al.</em> 2014</a>; <a href="#ref-Guillemot2015" role="doc-biblioref">Guillemot <em>et al.</em> 2015</a>; <a href="#ref-Korner2015" role="doc-biblioref">Körner 2015</a>)</span>. Temperature and turgor sink limitations are implemented following <span class="citation"><a href="#ref-Cabon2019" role="doc-biblioref">Cabon <em>et al.</em></a> (<a href="#ref-Cabon2019" role="doc-biblioref">2020a</a>)</span> and <span class="citation"><a href="#ref-Cabon2020" role="doc-biblioref">Cabon <em>et al.</em></a> (<a href="#ref-Cabon2020" role="doc-biblioref">2020b</a>)</span>. These authors developed their approach for tracheid production and enlargement only, whereas we apply it to different kinds of tissues. Growth controls include also the effect of detecting low levels of metabolic carbon in the stem (by default 50% of equilibrium concentration), which allows stopping growth to use available carbon for maintenance respiration.</p>
+<p>Formation of new leaf, sapwood and fine root tissues is determined taking into account both source (i.e. carbon availability) and sink (i.e. biophysical constraints on plant tissue expansion) limitations <span class="citation">(<a href="#ref-Fatichi2014" role="doc-biblioref">Fatichi <em>et al.</em> 2014</a>; <a href="#ref-Guillemot2015" role="doc-biblioref">Guillemot <em>et al.</em> 2015</a>; <a href="#ref-Korner2015" role="doc-biblioref">Körner 2015</a>)</span>. Temperature and turgor sink limitations are implemented following <span class="citation"><a href="#ref-Cabon2019" role="doc-biblioref">Cabon <em>et al.</em></a> (<a href="#ref-Cabon2019" role="doc-biblioref">2020a</a>)</span> and <span class="citation"><a href="#ref-Cabon2020" role="doc-biblioref">Cabon <em>et al.</em></a> (<a href="#ref-Cabon2020" role="doc-biblioref">2020b</a>)</span>. These authors developed their approach for tracheid production and enlargement only, whereas we apply it to different kinds of tissues. In the case of fine roots, differences in soil water potential between layers can lead to different degrees of turgor limitation for the growth of fine roots, resulting in adaptation of fine root distribution.</p>
 <p>Two options are possible regarding the <strong>allocation</strong> of new structural carbon to leaves vs sapwood:</p>
 <ol style="list-style-type: decimal">
 <li><em>Stable Huber value</em>: In this strategy, growth of leaf area and sapwood area need are coordinated so that the ratio of sapwood area to leave area (i.e. Huber value) is in dynamic equilibrium around its initial value. To this aim, increases in leaf area are scheduled whenever the current Huber value is larger than the target (i.e. there is an excess of sapwood area). This approach is similar to the LPG model <span class="citation">(<a href="#ref-Sitch2003" role="doc-biblioref">Sitch <em>et al.</em> 2003</a>)</span>, where different turnover rates are applied for different tissues, but then the model tries to satisfy the pipe model <span class="citation">(<a href="#ref-Shinozaki1964" role="doc-biblioref">Shinozaki <em>et al.</em> 1964</a>)</span> by allocating C where it is more limiting. Note that in this strategy the whole-plant conductance will progressively decrease with the increase in plant height, because of the increase in the length of stem xylem pathway.</li>
 <li><em>Stable whole-plant conductance</em>: Ratios of sapwood area to leaf area (i.e. Huber values) can vary within species, due to environmental conditions <span class="citation">(<a href="#ref-Mencuccini1995" role="doc-biblioref">Mencuccini &amp; Grace 1995</a>)</span>. In this allocation strategy, growth of leaf area, sapwood area and height needs to be coordinated so that whole-plant conductance (i.e. from roots to leaves) is in dynamic equilibrium around its initial value. Increases in leaf area are scheduled whenever the current whole-plant conductance is above the target value. In this strategy, the Huber value will tend to increase with the increase in plant height, thereby increasing the sapwood respiratory demands.</li>
 </ol>
-<p>Pursuing a stable Huber value is the only strategy available when running the growth model along with the basic water balance submodel, but the two strategies are possible when simulating growth along with the advance water balance. Fine root area growth is only modelled when simulating growth with advance water balance. Fine root area growth is coordinated with the formation of the other tissues via the need to ensure an <em>average resistance fraction in the rhizosphere</em>, which is used to define the fine root area target and, hence, the allocation to fine roots.</p>
+<p>When running the growth model along with the basic water balance submodel, a stable Huber value is the only strategy available and fine root area growth also follows the need to achieve a stable ratio between leaf area and fine root area. In contrast, the two strategies are possible when simulating growth along with the advance water balance. In this case, fine root area growth is coordinated with the formation of the other tissues via the need to ensure an <em>average resistance fraction in the rhizosphere</em>, which is used to define the fine root area target and, hence, the allocation to fine roots.</p>
 <p>The growth rates in all three compartments are modulated by parameters specifying <em>maximum daily growth rates relative to the amount of sapwood area</em>. However, since leaf and fine root area targets are constrained by the amount of sapwood area via allocation rules, the relative growth rate for sapwood area also indirectly determines the growth rates of leaves and fine roots at seasonal and annual scales, hence determining the whole-plant growth rate.</p>
 <p>Further details and formulation of growth, senescence and allocation are given in chapter <a href="growthsenescencemortality.html#growthsenescencemortality">17</a>.</p>
 </div>
 <div id="carbonwaterlinks" class="section level3" number="15.1.4">
 <h3><span class="header-section-number">15.1.4</span> Coordination between water and carbon balances</h3>
-<p>When using the advanced water balance submodel, the growth model allows coordinating several aspects of carbon and water balances through different state variables (Fig. <a href="growthmodelling.html#fig:carbonwaterlinks">15.2</a>):</p>
+<p>The growth model allows coordinating several aspects of carbon and water balances through different state variables (Fig. <a href="growthmodelling.html#fig:carbonwaterlinks">15.2</a>), most of them applying to the simulation using the advanced transpiration model:</p>
 <ol style="list-style-type: lower-alpha">
 <li>Transpiration and photosynthesis are coordinated via the <em>stomatal regulation</em> submodel (see chapter <a href="plantphotosynthesis.html#plantphotosynthesis">11</a>).</li>
 <li>Hydrostatic water potential of leaf symplastic tissues influences the turgor pressure necessary for leaf growth (<a href="growthsenescencemortality.html#leafgrowth">17.1.2</a>), while (metabolic) leaf sugar concentration determines changes in osmotic potential at full turgor and hence, the relative water content of leaf symplasmic tissue.</li>
@@ -732,13 +732,13 @@ Figure 15.2: Schematic representation of relationships between water balance (ad
 <p>Multiple mechanisms determine plant survival or mortality under drought <span class="citation">(<a href="#ref-McDowell2008" role="doc-biblioref">McDowell <em>et al.</em> 2008</a>)</span>. However, hydraulic failure is widely recognized as one of the key mechanisms of drought-induced mortality in woody plants. Lethal water potential have been defined as a critical threshold beyond which trees are unable to recover from drought, even after rewatering. Experimental work by <span class="citation"><a href="#ref-Urli2013" role="doc-biblioref">Urli <em>et al.</em></a> (<a href="#ref-Urli2013" role="doc-biblioref">2013</a>)</span> determined that irreversible damage in angiosperm saplings occurred only after 88% losses in stem hydraulic conductance. Similarly, <span class="citation"><a href="#ref-Hammond2019" role="doc-biblioref">Hammond <em>et al.</em></a> (<a href="#ref-Hammond2019" role="doc-biblioref">2019</a>)</span> found probability of mortality to strongly increase beyond 80% of loss in hydraulic conductivity in saplings a gymnosperm species. In a multi-species synthesis, <span class="citation"><a href="#ref-Adams2017" role="doc-biblioref">Adams <em>et al.</em></a> (<a href="#ref-Adams2017" role="doc-biblioref">2017</a>)</span> assessed found that all studied species showed at least 60% or higher loss of xylem hydraulic conductivity, whereas evidence for carbon starvation was more common for gymnosperms. While loss of hydraulic function seems ubiquitous in drought-related mortality, not all researchers agree that hydraulic failure be the primary cause of mortality. <span class="citation"><a href="#ref-Korner2019" role="doc-biblioref">Körner</a> (<a href="#ref-Korner2019" role="doc-biblioref">2019</a>)</span> argued that hydraulic failure often correlates with a critical degree of tree dehydration and that the disruption of capillary continuum from soil to the root because of soil dehydration is more important because it forces trees to drop their leaves and rely on their own water reserves. Trees will die when the symplast surpasses its dehydration tolerance, and <span class="citation"><a href="#ref-Korner2019" role="doc-biblioref">Körner</a> (<a href="#ref-Korner2019" role="doc-biblioref">2019</a>)</span> considers xylem embolism as a byproduct rather than the cause of critical tree dehydration under severe drought, so that mechanistic models should focus on the dehydration process. Other authors have stressed the importance of the interplay between water reserves and water loss rates through cuticule after stomatal closure <span class="citation">(<a href="#ref-Blackman2016" role="doc-biblioref">Blackman <em>et al.</em> 2016</a>; <a href="#ref-Martin-StPaul2017" role="doc-biblioref">Martin-StPaul <em>et al.</em> 2017</a>)</span>. Regardless of causality, loss of hydraulic function could still be a good indicator of mortality likelihood. However, recently <span class="citation"><a href="#ref-Martinez-Vilalta2019" role="doc-biblioref">Martínez-Vilalta <em>et al.</em></a> (<a href="#ref-Martinez-Vilalta2019" role="doc-biblioref">2019</a>)</span> suggested use the relative water content as an indicator of mortality risk, as it integrates several aspects related to hydraulics, stomatal responses and carbon economy during drought.</p>
 <p>Dynamic vegetation models implement mortality processes in very different ways, from purely-empirical to process-based <span class="citation">(<a href="#ref-Hawkes2000" role="doc-biblioref">Hawkes 2000</a>; <a href="#ref-Keane2001" role="doc-biblioref">Keane <em>et al.</em> 2001</a>; <a href="#ref-Bugmann2019" role="doc-biblioref">Bugmann <em>et al.</em> 2019</a>)</span>. The fact that proximal causes of mortality are complex, co-occurring, interrelated and variable has prompted the question of whether a mechanistic approach will improve prediction ability <span class="citation">(<a href="#ref-Adams2013" role="doc-biblioref">Adams <em>et al.</em> 2013</a>)</span>. In medfate, woody plants are assumed to die at a constant basal rate due to processes not included in the model (e.g. biotic attacks). Importantly, mortality rates are assumed to increase whenever physiological thresholds presumed to lead to plant mortality are surpassed <span class="citation">(<a href="#ref-Hawkes2000" role="doc-biblioref">Hawkes 2000</a>)</span>. The model allows plants to die from either <em>starvation</em> (if metabolic carbon is exhausted) or <em>dessication</em> (tissue dehydration) <span class="citation">(<a href="#ref-McDowell2008" role="doc-biblioref">McDowell <em>et al.</em> 2008</a>; <a href="#ref-McDowell2011" role="doc-biblioref">McDowell 2011</a>)</span>. Allowing for starvation is important to simulate death due to shading by other plant cohorts, whereas plant dessication is important to deal with drought impacts.</p>
 <p>Following <span class="citation"><a href="#ref-Martinez-Vilalta2019" role="doc-biblioref">Martínez-Vilalta <em>et al.</em></a> (<a href="#ref-Martinez-Vilalta2019" role="doc-biblioref">2019</a>)</span>, we use the relative water content (RWC) in the stem symplastic tissues as the stress variable increasing mortality likelihood under drought. Whereas the stem symplastic pressure-volume curve is always used to determine RWC from the stem water potential, in the basic water balance model the latter is assumed to be equal to the estimated plant water potential (i.e. <span class="math inline">\(\Psi_{sym, stem} = \Psi_{plant}\)</span>; see <a href="transpirationgranier.html#dailystressbasicwater">6.2.1</a>). Moreover, in the advanced water balance model there is no distinction between stem apoplastic and symplastic (i.e. parenchymatic) water potentials (i.e. <span class="math inline">\(\Psi_{sym, stem} = \Psi_{apo, stem}\)</span>) unless plant water compartments are explicitly simulated. The critical threshold is specified in the control variable <code>mortalityRWCThreshold</code>, set to 30% by default. Note that most studies focus on leaf RWC, for which <span class="citation"><a href="#ref-Kursar2009" role="doc-biblioref">Kursar <em>et al.</em></a> (<a href="#ref-Kursar2009" role="doc-biblioref">2009</a>)</span> indicate ranges between 16% and 61%, and <span class="citation"><a href="#ref-Korner2019" role="doc-biblioref">Körner</a> (<a href="#ref-Korner2019" role="doc-biblioref">2019</a>)</span> advocates for values around 50%.</p>
-<p>We use the amount of metabolic sugar in the stem as indicator of starvation. <span class="citation"><a href="#ref-Martinez-Vilalta2016" role="doc-biblioref">Martínez-Vilalta <em>et al.</em></a> (<a href="#ref-Martinez-Vilalta2016" role="doc-biblioref">2016</a>)</span> found that plants can have very distinct amounts of non-structural carbon concentration but minimum seasonal values are around 46% of maximum values. Accordingly, we define the indicator of starvation in relative terms (see control variable <code>mortalityRelativeSugarThreshold</code>, set to 30% by default) with respect to the stem equilibrium sugar concentration.</p>
+<p>We use the amount of metabolic sugar in the stem as indicator of carbon starvation. <span class="citation"><a href="#ref-Martinez-Vilalta2016" role="doc-biblioref">Martínez-Vilalta <em>et al.</em></a> (<a href="#ref-Martinez-Vilalta2016" role="doc-biblioref">2016</a>)</span> found that plants can have very distinct amounts of non-structural carbon concentration but minimum seasonal values are around 46% of maximum values. Accordingly, we define the indicator of starvation in relative terms (see control variable <code>mortalityRelativeSugarThreshold</code>, set to 30% by default) with respect to the stem equilibrium sugar concentration.</p>
 <p>With respect to intra-cohort variability, the model can be run assuming that all individuals within plant cohorts are functionally equal, so that mortality applies to the entire plant cohort. Alternatively, mortality can be applied to a fraction of the plant cohort, in proportion to the mortality likelihood, which implicitly acknowledges intra-cohort differences. As common in other models, mortality process can be simulated in a deterministic or stochastic fashion.</p>
 <p>Details of the implementation of plant mortality are given in chapter <a href="growthsenescencemortality.html#growthsenescencemortality">17</a>.</p>
 </div>
 <div id="tree-diameter-tree-height-and-shrub-cover-updates" class="section level3" number="15.1.6">
 <h3><span class="header-section-number">15.1.6</span> Tree diameter, tree height and shrub cover updates</h3>
-<p>Update of stand structure is conducted once every simulated year. Tree diameter increment follows the creation of sapwood area, whereas sapwood area decreases do not affect diameter, as they imply conversion to heartwood. Tree height increments are estimated from diameter increments following diameter-height ratios that are modulated by the proportion of light available to the plant cohort, as frequently done in forest gap models <span class="citation">(<a href="#ref-Lindner1997" role="doc-biblioref">Lindner <em>et al.</em> 1997</a>)</span>. Tree crown ratios are updated using static allometric relationships, whereas shrub height and cover are estimated from new leaf area values by inverting static leaf biomass allometries.</p>
+<p>Tree diameter increment follows the creation of sapwood area, whereas sapwood area decreases do not affect diameter, as they imply conversion to heartwood. Tree height increments are estimated from diameter increments following diameter-height ratios that are modulated by the proportion of light available to the plant cohort, as frequently done in forest gap models <span class="citation">(<a href="#ref-Lindner1997" role="doc-biblioref">Lindner <em>et al.</em> 1997</a>)</span>. Tree crown ratios are updated using static allometric relationships, whereas shrub height and cover are estimated from new leaf area values by inverting static leaf biomass allometries.</p>
 <p>Further details and formulation of structural update are given in chapter <a href="growthsenescencemortality.html#structuralupdate">17.5</a>.</p>
 </div>
 </div>
@@ -746,9 +746,10 @@ Figure 15.2: Schematic representation of relationships between water balance (ad
 <h2><span class="header-section-number">15.2</span> State variables</h2>
 <p>Many state variables are inherited by the corresponding water balance model and depend on its level of complexity (see <a href="basicwaterbalance.html#statevariablesbasic">3.2</a> and <a href="advancedwaterbalance.html#statevariablesadvanced">7.2</a>). Several <em>cohort-level state variables</em> were treated as fixed parameters in the water balance models. For each plant cohort <span class="math inline">\(i\)</span>:</p>
 <ul>
-<li>Leaf area index of live leaves, <span class="math inline">\(LAI^{live}_i\)</span>.</li>
+<li>Leaf area index of live leaves, <span class="math inline">\(LAI^{live}_i\)</span>, and the actual expanded leaf area, <span class="math inline">\(LAI^{\phi}_i\)</span>.</li>
 <li>Diameter at breast height for trees, <span class="math inline">\(DBH_i\)</span> (cohort average).</li>
 <li>Percent cover of shrubs, <span class="math inline">\(Cover_i\)</span>.</li>
+<li>Density of individuals in the plant cohort, <span class="math inline">\(N_i\)</span>.</li>
 <li>Plant height, <span class="math inline">\(H_i\)</span> (cohort average).</li>
 <li>Crown ratio, <span class="math inline">\(CR_i\)</span>.</li>
 <li>The proportion of fine roots, <span class="math inline">\(FRP_{i,s}\)</span>, in each soil layer <span class="math inline">\(s\)</span>.</li>
@@ -764,7 +765,7 @@ Figure 15.2: Schematic representation of relationships between water balance (ad
 <li>Sugar concentration in sapwood (stem, branches and coarse roots), <span class="math inline">\(SS_{sapwood,i}\)</span> (<span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span>).</li>
 <li>Starch concentration in sapwood (stem, branches and coarse roots), <span class="math inline">\(ST_{sapwood,i}\)</span> (<span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span>).</li>
 </ul>
-<p>Note that <span class="math inline">\(LA_i\)</span> is the same state variable as <span class="math inline">\(LAI^{live}_i\)</span>, but expressed at the individual level, because the density of individuals in the cohort does not change during the simulation. Other functional variables can be derived from the previous state variables and, hence, hence do not need to be treated as state variables themselves:</p>
+<p>Note that <span class="math inline">\(LA_i\)</span> is the same state variable as <span class="math inline">\(LAI^{\phi}_i\)</span>, but expressed at the individual level. Other functional variables can be derived from the previous state variables and, hence, hence do not need to be treated as state variables themselves:</p>
 <ul>
 <li>Leaf biomass (<span class="math inline">\(B_{leaf,i}\)</span>;in <span class="math inline">\(g\,dry\)</span>) from <span class="math inline">\(LA_i\)</span>.</li>
 <li>Sapwood biomass (<span class="math inline">\(B_{sapwood,i}\)</span>; in <span class="math inline">\(g\,dry\)</span>) from <span class="math inline">\(SA_i\)</span>, <span class="math inline">\(H_i\)</span> and <span class="math inline">\(FRP_{i,s}\)</span> and <span class="math inline">\(L_{radial,i,s}\)</span>.</li>
@@ -772,7 +773,7 @@ Figure 15.2: Schematic representation of relationships between water balance (ad
 <li>Sapwood storage volume (<span class="math inline">\(V_{storage, sapwood,i}\)</span>; in <span class="math inline">\(L\)</span>) from <span class="math inline">\(SA_i\)</span>, <span class="math inline">\(H_i\)</span> and <span class="math inline">\(FRP_{i,s}\)</span> and <span class="math inline">\(L_{radial,i,s}\)</span>.</li>
 <li>Fine root area (<span class="math inline">\(FRA_{i,s}\)</span>; in <span class="math inline">\(m^2\)</span>) in each soil layer <span class="math inline">\(s\)</span>, from <span class="math inline">\(B_{fineroot,i,s}\)</span>.</li>
 </ul>
-<p>Belowground variables (fine root biomass, fine root distribution and radial length of coarse roots) are only considered dynamic when simulating growth with advance water balance.</p>
+<p>Some belowground variables (such as the radial length of coarse roots) are only considered dynamic when simulating growth with advance water balance.</p>
 </div>
 <div id="mass-and-energy-balances" class="section level2" number="15.3">
 <h2><span class="header-section-number">15.3</span> Mass and energy balances</h2>
@@ -791,10 +792,10 @@ Figure 15.2: Schematic representation of relationships between water balance (ad
 where <span class="math inline">\(A\)</span> is (gross) photosynthesis, <span class="math inline">\(M_{leaf}\)</span> is leaf maintenance respiration, <span class="math inline">\(F_{phloem}\)</span> is the sugar flow via phloem towards the stem and roots, <span class="math inline">\(SC_{leaf}\)</span> is the conversion from leaf sugar to leaf starch, <span class="math inline">\(TS_{leaf}\)</span> and <span class="math inline">\(TT_{leaf}\)</span> are the translocation of leaf sugars and starch into sapwood storage, respectively, during leaf senescence (see <a href="growthmodelling.html#eq:sapwoodcarbonbalanceequations">(15.2)</a> below) and <span class="math inline">\(RE_{leaf}\)</span> is the root exudation of leaf carbon.</p>
 <p>The corresponding carbon balance equations for sapwood dissolved sugars and starch are:
 <span class="math display" id="eq:sapwoodcarbonbalanceequations">\[\begin{eqnarray}
-\Delta{SS_{sapwood}} \cdot V_{storage,sapwood} &amp;=&amp; F_{phloem} - M_{sapwood} - M_{fineroot}  - G_{leaf} - G_{fineroot} \\
+\Delta{SS_{sapwood}} \cdot V_{storage,sapwood} &amp;=&amp; F_{phloem} - M_{sapwood} - M_{fineroot} \\
 &amp; &amp; - SC_{sapwood}  - TS_{sapwood} \\
 \Delta{ST_{sapwood}} \cdot V_{storage,sapwood} &amp;=&amp; SC_{sapwood} + TS_{leaf} + TT_{leaf} + TS_{sapwood} \\
-&amp; &amp; - G_{sapwood} - RE_{sapwood}
+&amp; &amp; - G_{sapwood} - G_{leaf} - G_{fineroot} - RE_{sapwood}
 \tag{15.2}
 \end{eqnarray}\]</span>
 where <span class="math inline">\(F_{phloem}\)</span> is the sugar inflow via phloem transport, <span class="math inline">\(M_{sapwood}\)</span> is the sum of maintenance respiration of branches, stem and coarse roots, <span class="math inline">\(M_{fineroot}\)</span> is the maintenance respiration of fine roots, <span class="math inline">\(G_{leaf}\)</span>, <span class="math inline">\(G_{sapwood}\)</span> and <span class="math inline">\(G_{fineroot}\)</span> are the carbon costs of forming new leaves, sapwood or fine roots (respectively), <span class="math inline">\(SC_{sapwood}\)</span> is the conversion of sapwood sugar to sapwood starch, <span class="math inline">\(TS_{sapwood}\)</span> is the translocation of sapwood sugars into starch during leaf senescence and <span class="math inline">\(RE_{sapwood}\)</span> is the root exudation of sapwood carbon.</p>
@@ -847,15 +848,17 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 <li>Calculate gross photosynthesis per individual (<span class="math inline">\(A\)</span>), maintenance respiration for leaves (<span class="math inline">\(M_{leaf}\)</span>), sapwood (<span class="math inline">\(M_{sapwood}\)</span>) and fine roots (<span class="math inline">\(M_{fineroot}\)</span>) (<a href="carbonpoolsbalance.html#carbonbalancecomponents">16.2</a>).</li>
 <li>If phenology indicates leaf unfolding, evaluate leaf temperature and turgor sink limitations, growth costs (<span class="math inline">\(G_{leaf}\)</span>) and leaf area increase (<a href="growthsenescencemortality.html#leafgrowth">17.1.2</a>).</li>
 <li>If sapwood growth is permitted, evaluate sapwood temperature and turgor sink limitations, growth costs (<span class="math inline">\(G_{sapwood}\)</span>) and sapwood area increase (<a href="growthsenescencemortality.html#sapwoodgrowth">17.1.3</a>).</li>
+<li>Evaluate fineroot temperature and turgor sink limitations, growth costs (<span class="math inline">\(G_{fineroot}\)</span>) and fineroot biomass increase (<a href="growthsenescencemortality.html#finerootgrowth">17.1.4</a>).</li>
 <li>Update changes in sugar and starch compartments due to photosynthesis, maintenance respiration and growth. Apply transfer from leaf metabolic to sapwood metabolic carbon (<a href="carbonpoolsbalance.html#phloemtransport">16.2.4</a>) and conversions between storage and metabolic carbon (<a href="carbonpoolsbalance.html#sugarstarchdynamics">16.2.5</a>).<br />
 </li>
 <li>Determine leaf senescence due to aging or cavitation effects (<a href="growthsenescencemortality.html#leafsenescence">17.2.1</a>).</li>
 <li>Determine sapwood area senescence by aging (<a href="growthsenescencemortality.html#sapwoodsenescence">17.2.2</a>).</li>
-<li>Evaluate labile carbon translocation due to senescence (<span class="math inline">\(TS_{leaf}\)</span>, <span class="math inline">\(TT_{leaf}\)</span> and <span class="math inline">\(TS_{sapwood}\)</span>), adding the resulting carbon to the starch sapwood pool.</li>
-<li>Move any surplus in storage carbon to root exudation (<span class="math inline">\(RE_{leaf}\)</span> and <span class="math inline">\(RE_{sapwood}\)</span>). This completes the daily carbon balance for leaf labile pools <a href="growthmodelling.html#eq:leafcarbonbalanceequations">(15.1)</a>, sapwood labile pools <a href="growthmodelling.html#eq:sapwoodcarbonbalanceequations">(15.2)</a>, and plant-level labile carbon <a href="growthmodelling.html#eq:plantcarbonbalanceequation">(15.3)</a>.</li>
-<li>Update leaf area, sapwood area and derived variables (e.g., leaf area index and Huber value) (<a href="growthsenescencemortality.html#updateplanttraits">17.3.1</a>).</li>
+<li>Determine fine root senescence by aging (<a href="growthsenescencemortality.html#finerootsenescence">17.2.3</a>).</li>
+<li>Evaluate labile carbon translocation due to leaf and sapwood senescence (<span class="math inline">\(TS_{leaf}\)</span>, <span class="math inline">\(TT_{leaf}\)</span> and <span class="math inline">\(TS_{sapwood}\)</span>), adding the resulting carbon to the starch sapwood pool.</li>
+<li>Move any surplus in storage carbon to root exudation (<span class="math inline">\(RE_{leaf}\)</span> and <span class="math inline">\(RE_{sapwood}\)</span>). This completes the daily carbon balance for leaf labile pools <a href="growthmodelling.html#eq:leafcarbonbalanceequations">(15.1)</a>, sapwood labile pools <a href="growthmodelling.html#eq:sapwoodcarbonbalanceequations">(15.2)</a>, and plant-level labile carbon. <a href="growthmodelling.html#eq:plantcarbonbalanceequation">(15.3)</a>.</li>
+<li>Update leaf area, sapwood area, fine root area and derived variables (e.g., leaf area index and Huber value) (<a href="growthsenescencemortality.html#updateplanttraits">17.3.1</a>).</li>
 <li>Determine if plant death by starvation or desiccation occurred (<a href="growthsenescencemortality.html#plantmortality">17.4</a>).</li>
-<li>If phenology indicates bud formation, update the leaf area target (<a href="growthsenescencemortality.html#updateallocationtargets">17.3.2</a>).</li>
+<li>Update fine root area target and, if phenology indicates bud formation, update the leaf area target (<a href="growthsenescencemortality.html#updateallocationtargets">17.3.2</a>).</li>
 <li>Translate sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover), (<a href="growthsenescencemortality.html#structuralupdate">17.5</a>) and update storage volumes and the concentration of labile pools.</li>
 </ol>
 </div>
@@ -874,8 +877,8 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 </ol></li>
 <li>Determine leaf senescence due to aging or cavitation effects (<a href="growthsenescencemortality.html#leafsenescence">17.2.1</a>).</li>
 <li>Determine sapwood area senescence by aging (<a href="growthsenescencemortality.html#sapwoodsenescence">17.2.2</a>).</li>
-<li>Evaluate labile carbon translocation due to senescence (<span class="math inline">\(TS_{leaf}\)</span>, <span class="math inline">\(TT_{leaf}\)</span> and <span class="math inline">\(TS_{sapwood}\)</span>), adding the resulting carbon to the starch sapwood pool. This completes the daily carbon balance for leaf labile pools <a href="growthmodelling.html#eq:leafcarbonbalanceequations">(15.1)</a>, sapwood labile pools <a href="growthmodelling.html#eq:sapwoodcarbonbalanceequations">(15.2)</a>.</li>
-<li>Apply growth and senescence (<a href="growthsenescencemortality.html#finerootsenescence">17.2.3</a>).</li>
+<li>Determine fine root senescence by aging (<a href="growthsenescencemortality.html#finerootsenescence">17.2.3</a>).</li>
+<li>Evaluate labile carbon translocation due to leaf and sapwood senescence (<span class="math inline">\(TS_{leaf}\)</span>, <span class="math inline">\(TT_{leaf}\)</span> and <span class="math inline">\(TS_{sapwood}\)</span>), adding the resulting carbon to the starch sapwood pool. This completes the daily carbon balance for leaf labile pools <a href="growthmodelling.html#eq:leafcarbonbalanceequations">(15.1)</a>, sapwood labile pools <a href="growthmodelling.html#eq:sapwoodcarbonbalanceequations">(15.2)</a>, and plant-level labile carbon.</li>
 <li>Update leaf area, sapwood area, fine root biomass and distribution. Update derived variables (e.g., leaf area index, Huber values, hydraulic conductance of stems, roots and rhizosphere, osmotic potential at full turgor of leaves and sapwood) (<a href="growthsenescencemortality.html#updateplanttraits">17.3.1</a>).</li>
 <li>Determine if plant death by starvation or desiccation occurred (<a href="growthsenescencemortality.html#plantmortality">17.4</a>).</li>
 <li>If phenology indicates bud formation, update the leaf area target (<a href="growthsenescencemortality.html#updateallocationtargets">17.3.2</a>). Update the fine root biomass target, according to the hydraulic conductance in the rhizosphere (<a href="growthsenescencemortality.html#updateallocationtargets">17.3.2</a>).</li>
@@ -915,72 +918,78 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\(H_{max,i}\)</span></td>
+<td><span class="math inline">\(H_{max}\)</span></td>
 <td><span class="math inline">\(cm\)</span></td>
 <td><code>Hmax</code></td>
 <td>Maximum plant height</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(H_{med,i}\)</span></td>
+<td><span class="math inline">\(H_{med}\)</span></td>
 <td><span class="math inline">\(cm\)</span></td>
 <td><code>Hmed</code></td>
 <td>Median plant height</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(1/H_{v,i}\)</span></td>
+<td><span class="math inline">\(1/H_{v}\)</span></td>
 <td><span class="math inline">\(m^2 \cdot m^{-2}\)</span></td>
 <td><code>Al2As</code></td>
 <td>Leaf area to sapwood area ratio</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(SLA_i\)</span></td>
+<td><span class="math inline">\(RA/SA\)</span></td>
+<td><span class="math inline">\(m^2 \cdot m^{-2}\)</span></td>
+<td><code>Ar2Al</code></td>
+<td>Fine root area to leaf area ratio</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(SLA\)</span></td>
 <td><span class="math inline">\(m^2 \cdot kg^{-1}\)</span></td>
 <td><code>SLA</code></td>
 <td>Specific leaf area</td>
 </tr>
-<tr class="odd">
-<td><span class="math inline">\(LW_i\)</span></td>
+<tr class="even">
+<td><span class="math inline">\(LW\)</span></td>
 <td><span class="math inline">\(cm\)</span></td>
 <td><code>LeafWidth</code></td>
 <td>Leaf width</td>
 </tr>
-<tr class="even">
-<td><span class="math inline">\(\rho_{leaf,i}\)</span></td>
+<tr class="odd">
+<td><span class="math inline">\(\rho_{leaf}\)</span></td>
 <td><span class="math inline">\(g \cdot cm^{-3}\)</span></td>
 <td><code>LeafDensity</code></td>
 <td>Leaf tissue density</td>
 </tr>
-<tr class="odd">
-<td><span class="math inline">\(\rho_{wood,i}\)</span></td>
+<tr class="even">
+<td><span class="math inline">\(\rho_{wood}\)</span></td>
 <td><span class="math inline">\(g \cdot cm^{-3}\)</span></td>
 <td><code>WoodDensity</code></td>
 <td>Wood tissue density</td>
 </tr>
-<tr class="even">
-<td><span class="math inline">\(\rho_{fineroot,i}\)</span></td>
+<tr class="odd">
+<td><span class="math inline">\(\rho_{fineroot}\)</span></td>
 <td><span class="math inline">\(g \cdot cm^{-3}\)</span></td>
 <td><code>FineRootDensity</code></td>
 <td>Fine root tissue density</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(f_{conduits}\)</span></td>
 <td>[0-1]</td>
 <td><code>conduit2sapwood</code></td>
 <td>Proportion of sapwood corresponding to xylem conduits (the remaining corresponds to parenchymatic tissues)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(SRL\)</span></td>
 <td><span class="math inline">\(cm \cdot g^{-1}\)</span></td>
 <td><code>SRL</code></td>
 <td>Specific root length</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(RLD\)</span></td>
 <td><span class="math inline">\(cm \cdot cm^{-3}\)</span></td>
 <td><code>RLD</code></td>
 <td>Fine root length density (i.e. density of root length per soil volume)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(r_{6.35}\)</span></td>
 <td></td>
 <td><code>r635</code></td>
@@ -1085,24 +1094,42 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 <td>Maximum daily fine root relative growth rate</td>
 </tr>
 <tr class="odd">
+<td><span class="math inline">\(CC_{leaf}\)</span></td>
+<td><span class="math inline">\(g\,gluc\cdot g\,dry^{-1}\)</span></td>
+<td><code>CCleaf</code></td>
+<td>Leaf construction cost</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(CC_{sapwood}\)</span></td>
+<td><span class="math inline">\(g\,gluc\cdot g\,dry^{-1}\)</span></td>
+<td><code>CCsapwood</code></td>
+<td>Sapwood construction cost</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(CC_{fineroot}\)</span></td>
+<td><span class="math inline">\(g\,gluc\cdot g\,dry^{-1}\)</span></td>
+<td><code>CCfineroot</code></td>
+<td>Fine root construction cost</td>
+</tr>
+<tr class="even">
 <td><span class="math inline">\(SR_{sapwood}\)</span></td>
 <td><span class="math inline">\(day^{-1}\)</span></td>
 <td><code>SRsapwood</code></td>
 <td>Daily sapwood senescence rate</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(SR_{fineroot}\)</span></td>
 <td><span class="math inline">\(day^{-1}\)</span></td>
 <td><code>SRfineroot</code></td>
 <td>Daily fine root senescence rate</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(f_{HD,min}\)</span></td>
 <td><span class="math inline">\(cm \cdot cm^{-1}\)</span></td>
 <td><code>fHDmin</code></td>
 <td>Minimum height-to-diameter ratio</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(f_{HD,max}\)</span></td>
 <td><span class="math inline">\(cm \cdot cm^{-1}\)</span></td>
 <td><code>fHDmax</code></td>
@@ -1133,11 +1160,11 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 <li><code>phloemConductanceFactor [= 0.2]</code>: Factor to transform stem xylem conductance to phloem conductance (only for <code>transpirationMode = "Sperry"</code>).</li>
 <li><code>nonSugarConcentration [=0.25]</code>: A constant specifying non-sugar (inorganic) solute concentration (<span class="math inline">\(mol \cdot L^{-1}\)</span>) in cells.</li>
 <li><code>equilibriumOsmoticConcentration [= c(leaf = 0.8, sapwood = 0.6)]</code>: Equilibrium osmotic concentrations (<span class="math inline">\(mol \cdot L^{-1}\)</span>) for leaf and sapwood cells. The difference between leaf and sapwood values helps maintaining phloem transport. The equilibrium sugar concentration is found using <code>equilibriumOsmoticConcentration - nonSugarConcentration</code> and defaults to <code>[= c(leaf = 0.55, sapwood = 0.35)]</code>.</li>
-<li><code>minimumRelativeSugarForGrowth [= 0.25]</code>: Minimum concentration of metabolic sugar relative to equilibrium sugar concentration for growth to occur in different tissues. This value (by default 50%) should always be larger than <code>mortalityRelativeSugarThreshold [= 0.3]</code>, so that growth stops before starvation, and smaller than 1 (i.e. 100%), so that growth occurs under normal metabolic status.</li>
+<li><code>minimumRelativeStarchForGrowth [= 0.25]</code>: Minimum concentration of storage carbon, relative to maximum storage capacity, for secondary growth (sapwood formation) to occur.</li>
 <li><code>respirationRates [= c(leaf = 0.00260274, sapwood = 6.849315e-05, fineroot = 0.002054795)]</code>: Maintenance respiration rates for different tissues (in <span class="math inline">\(g\,gluc \cdot g\, dry^{-1} · day^{-1}\)</span>). These are default values used when maintenance respiration rates are not specified via species-specific <code>SpParams</code>.</li>
-<li><code>senescenceRates [= c(sapwood = 0.0001261398, fineroot = 0.001897231)]</code>: Relative senescence rates (<span class="math inline">\(day^{-1}\)</span>) for sapwood and fine roots. Default are equivalent to 4.5% and 50% annual turnover for sapwood and fine roots, respectively. Leaf senescence rates depend on leaf lifespan (i.e. leaf duration) for evergreen species.</li>
-<li><code>constructionCosts [= c(leaf = 1.5, sapwood = 1.47, fineroot = 1.30)]</code>: Construction costs, including respiration and structural carbon, per dry weight of new tissue (<span class="math inline">\(g\,gluc \cdot g\,dry^{-1}\)</span>).</li>
-<li><code>maximumRelativeGrowthRates [= c(leaf = 0.01, sapwood = 0.005, fineroot = 0.1)]</code>: Maximum leaf growth rate relative to sapwood area (<span class="math inline">\(m^{2}\cdot cm^{-2} \cdot day^{-1}\)</span>), maximum sapwood relative growth rate (<span class="math inline">\(cm^{2}\cdot cm^{-2} \cdot day^{-1}\)</span>) and maximum fine root growth rate relative to sapwood area (<span class="math inline">\(g\,dry \cdot g\,dry^{-1} \cdot day^{-1}\)</span>). These are default values used when relative growth rates are not specified via species-specific <code>SpParams</code>.</li>
+<li><code>senescenceRates [= c(sapwood = 0.0001261398, fineroot = 0.001897231)]</code>: Relative senescence rates (<span class="math inline">\(day^{-1}\)</span>) for sapwood and fine roots. Default are equivalent to 4.5% and 50% annual turnover for sapwood and fine roots, respectively. Leaf senescence rates depend on leaf lifespan (i.e. leaf duration) for evergreen species. These are default values used when relative growth rates are not specified via species-specific <code>SpParams</code>.</li>
+<li><code>constructionCosts [= c(leaf = 1.5, sapwood = 1.47, fineroot = 1.30)]</code>: Default construction costs, including respiration and structural carbon, per dry weight of new tissue (<span class="math inline">\(g\,gluc \cdot g\,dry^{-1}\)</span>). These are default values used when relative growth rates are not specified via species-specific <code>SpParams</code>.</li>
+<li><code>maximumRelativeGrowthRates [= c(leaf = 0.01, sapwood = 0.005, fineroot = 0.1)]</code>: Default maximum leaf growth rate relative to sapwood area (<span class="math inline">\(m^{2}\cdot cm^{-2} \cdot day^{-1}\)</span>), maximum sapwood relative growth rate (<span class="math inline">\(cm^{2}\cdot cm^{-2} \cdot day^{-1}\)</span>) and maximum fine root growth rate relative to sapwood area (<span class="math inline">\(g\,dry \cdot g\,dry^{-1} \cdot day^{-1}\)</span>). These are default values used when relative growth rates are not specified via species-specific <code>SpParams</code>.</li>
 </ul>
 <p>Finally, we have the following options regarding mortality:</p>
 <ul>
@@ -1213,8 +1240,8 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 <td>A list with daily results of plant compartment sizes, in terms of area and biomass.</td>
 </tr>
 <tr class="odd">
-<td><code>PlantGrowth</code></td>
-<td>A list with daily results of growth rates for leaf, sapwood and fine roots.</td>
+<td><code>GrowthMortality</code></td>
+<td>A list with daily results of growth rates for leaf, sapwood and fine roots; as well as daily mortality rates.</td>
 </tr>
 </tbody>
 </table>
@@ -1400,9 +1427,21 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 <td><span class="math inline">\(g\,dry \cdot ind^{-1}\)</span></td>
 <td>Daily fine root biomass for an average individual.</td>
 </tr>
+<tr class="odd">
+<td><code>DBH</code></td>
+<td><span class="math inline">\(DBH_{i}\)</span></td>
+<td><span class="math inline">\(cm\)</span></td>
+<td>Daily diameter at breast height for an average individual.</td>
+</tr>
+<tr class="even">
+<td><code>Height</code></td>
+<td><span class="math inline">\(H_{i}\)</span></td>
+<td><span class="math inline">\(cm\)</span></td>
+<td>Daily total height for an average individual.</td>
+</tr>
 </tbody>
 </table>
-<p>The following table describes the child elements of <code>PlantGrowth</code>, again each of them a data frame with dates in rows and plant cohorts in columns:</p>
+<p>The following table describes the child elements of <code>GrowthMortality</code>, again each of them a data frame with dates in rows and plant cohorts in columns:</p>
 <table>
 <colgroup>
 <col width="13%" />
@@ -1435,14 +1474,32 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 <td><code>FRAgrowth</code></td>
 <td><span class="math inline">\(\Delta FRA_{i}/SA_i\)</span></td>
 <td><span class="math inline">\(m^{2}\cdot cm^{-2} \cdot day^{-1}\)</span></td>
-<td>Fine root area growth relative to sapwood area for an average individual (only for <code>transpirationMode = "Sperry"</code>).</td>
+<td>Fine root area growth relative to sapwood area for an average individual.</td>
+</tr>
+<tr class="even">
+<td><code>StarvationRate</code></td>
+<td></td>
+<td><span class="math inline">\(ind \cdot ind^{-1} \cdot day^{-1}\)</span></td>
+<td>Daily mortality rate from starvation.</td>
+</tr>
+<tr class="odd">
+<td><code>DessicationRate</code></td>
+<td></td>
+<td><span class="math inline">\(ind \cdot ind^{-1} \cdot day^{-1}\)</span></td>
+<td>Daily mortality rate from dessication.</td>
+</tr>
+<tr class="even">
+<td><code>MortalityRate</code></td>
+<td></td>
+<td><span class="math inline">\(ind \cdot ind^{-1} \cdot day^{-1}\)</span></td>
+<td>Daily mortality rate (any cause).</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div id="subdaily-output-1" class="section level4" number="15.5.4.2">
 <h4><span class="header-section-number">15.5.4.2</span> Subdaily output</h4>
-<p>As with function <code>spwb()</code>, subdaily output can also be generated with function <code>growth()</code>. This is done via setting <code>subdailyResults = TRUE</code> in the control parameter list. In that case, the output list of <code>growth()</code> will include an element <code>subdaily</code>, whose subelements correspond to the results of <code>growth_day()</code> for each date simulated. Refer to the documentation of functions <code>growth_day()</code> for details of subdaily output.</p>
+<p>As with function <code>spwb()</code>, subdaily output can also be generated with function <code>growth()</code>. This is done via setting <code>subdailyResults = TRUE</code> in the control parameter list. In that case, the output list of <code>growth()</code> will include an element <code>subdaily</code>, whose subelements correspond to the results of <code>growth_day()</code> for each date simulated. Refer to the documentation of function <code>growth_day()</code> for details of subdaily output.</p>
 
 </div>
 </div>
