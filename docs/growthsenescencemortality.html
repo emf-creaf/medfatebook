@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2022-02-03" />
+<meta name="date" content="2022-02-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -427,7 +427,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="16.1.1" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#leaf-structural-metabolic-and-storage-biomass"><i class="fa fa-check"></i><b>16.1.1</b> Leaf structural, metabolic and storage biomass</a></li>
 <li class="chapter" data-level="16.1.2" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#sapwood-structural-metabolic-and-storage-biomass"><i class="fa fa-check"></i><b>16.1.2</b> Sapwood structural, metabolic and storage biomass</a></li>
-<li class="chapter" data-level="16.1.3" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#fine-root-structural-biomass"><i class="fa fa-check"></i><b>16.1.3</b> Fine root structural biomass</a></li>
+<li class="chapter" data-level="16.1.3" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#fine-root-area-and-biomass"><i class="fa fa-check"></i><b>16.1.3</b> Fine root area and biomass</a></li>
 <li class="chapter" data-level="16.1.4" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#total-living-biomass"><i class="fa fa-check"></i><b>16.1.4</b> Total living biomass</a></li>
 </ul></li>
 <li class="chapter" data-level="16.2" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#carbonbalancecomponents"><i class="fa fa-check"></i><b>16.2</b> Components of labile carbon balance</a>
@@ -688,16 +688,16 @@ where <span class="math inline">\(R^n\)</span> is the ideal gas constant, <span 
 <span class="math display">\[\begin{equation}
 \Delta LA = \min( \Delta LA_{alloc}, \Delta LA_{source}, \Delta LA_{sink})
 \end{equation}\]</span>
-First, <span class="math inline">\(\Delta LA_{alloc}\)</span> is the maximum leaf area increment allowed by the leaf area target set by the allocation rule, <span class="math inline">\(LA^{target}\)</span>, in comparison with current leaf area <span class="math inline">\(LA^{live}\)</span>:
+First, <span class="math inline">\(\Delta LA_{alloc}\)</span> is the maximum leaf area increment allowed by the leaf area target set by the allocation rule, <span class="math inline">\(LA^{target}\)</span>, in comparison with current leaf area <span class="math inline">\(LA^{\phi}\)</span>:
 <span class="math display">\[\begin{equation}
-\Delta LA_{alloc} = \max(LA^{target} - LA^{live},0)
+\Delta LA_{alloc} = \max(LA^{target} - LA^{\phi},0)
 \end{equation}\]</span>
 Remember that leaf area target is updated during <em>bud formation</em> (see <a href="growthsenescencemortality.html#updateallocationtargets">17.3.2</a>).</p>
 <p>Second, <span class="math inline">\(\Delta LA_{source}\)</span> represents the leaf area increment expected given carbon source limitations and is calculated:
 <span class="math display">\[\begin{equation}
-\Delta LA_{source} = \frac{\max(SS_{sapwood}-SS_{leaf,growth},0)\cdot m_{gluc}\cdot V_{sapwood,leaf}}{1000 \cdot CC_{leaf} / SLA}
+\Delta LA_{source} = \frac{ST_{sapwood}\cdot m_{gluc}\cdot V_{sapwood,leaf}}{1000 \cdot CC_{leaf} / SLA}
 \end{equation}\]</span>
-where <span class="math inline">\(SS_{sapwood}\)</span> is the current concentration of sapwood metabolic sugar, <span class="math inline">\(SS_{leaf,growth}\)</span> is the minimum concentration required for growth (specified in control vector <code>minimumSugarForGrowth</code>), <span class="math inline">\(V_{storage,sapwood}\)</span> is the sapwood storage volume, <span class="math inline">\(m_{gluc}\)</span> is glucose molar mass and the denominator contains the construction costs per leaf area unit, see eq. <a href="carbonpoolsbalance.html#eq:leafconstructioncost">(16.2)</a>.</p>
+where <span class="math inline">\(ST_{sapwood}\)</span> is the current concentration of sapwood storage carbon (starch), <span class="math inline">\(V_{storage,sapwood}\)</span> is the sapwood storage volume and <span class="math inline">\(m_{gluc}\)</span> is glucose molar mass and the denominator contains the construction costs per leaf area unit, see eq. <a href="carbonpoolsbalance.html#eq:leafconstructioncost">(16.2)</a>.</p>
 <p>Finally, <span class="math inline">\(\Delta LA_{sink}\)</span> represents the leaf area increment expected by taking into account the maximum leaf tissue growth rate relative to sapwood area (<span class="math inline">\(RGR_{leaf, max}\)</span>; in <span class="math inline">\(m^2 \cdot cm^{-2} \cdot day^{-1}\)</span>) and the relative cell expansion rate given <span class="math inline">\(T_{day}\)</span>, <span class="math inline">\(\Psi_{symp,leaf}\)</span> and <span class="math inline">\(\pi_{0,leaf}\)</span>:
 <span class="math display">\[\begin{equation}
 \Delta LA_{sink} = SA \cdot RGR_{leaf, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{symp,leaf}, \pi_{0,leaf})}{r_{cell,max}}
@@ -706,15 +706,15 @@ where cell relative expansion rate is divided by the maximum relative cell expan
 </div>
 <div id="sapwoodgrowth" class="section level3" number="17.1.3">
 <h3><span class="header-section-number">17.1.3</span> Sapwood growth</h3>
-<p>Sapwood area increment <span class="math inline">\(\Delta SA\)</span> can only occur if <span class="math inline">\(LA^{live}&gt;0\)</span>. Unlike leaf area or fine root biomass, it is not explicitly constrained by any allocation rule. However, newly assimilated carbon is preferentially allocated to leaves and fine roots because sapwood growth depends on storage reserves and not on metabolic carbon. <span class="math inline">\(\Delta SA\)</span> is defined as the minimum of two values expressing source and sink constraints:
+<p>Sapwood area increment <span class="math inline">\(\Delta SA\)</span> can only occur if <span class="math inline">\(LA^{live}&gt;0\)</span>. Unlike leaf area or fine root biomass, it is not explicitly constrained by any allocation rule. However, newly assimilated carbon is preferentially allocated to leaves and fine roots whenever storage levels are low. <span class="math inline">\(\Delta SA\)</span> is defined as the minimum of two values expressing source and sink constraints:
 <span class="math display">\[\begin{equation}
 \Delta SA = \min(\Delta SA_{source}, \Delta SA_{sink})
 \end{equation}\]</span>
 <span class="math inline">\(\Delta SA_{source}\)</span> represents the sapwood area increment expected given carbon source limitations and is calculated using:
 <span class="math display">\[\begin{equation}
-\Delta SA_{source} = \frac{\max(ST_{sapwood}-SS_{sapwood,growth},0)\cdot m_{gluc}\cdot V_{storage,sapwood}}{CC_{sapwood} \cdot (H + \sum_{s}{FRP_s \cdot L_s}) \cdot \rho_{wood}}
+\Delta SA_{source} = \frac{\max(ST_{sapwood}-ST_{sapwood,growth},0)\cdot m_{gluc}\cdot V_{storage,sapwood}}{CC_{sapwood} \cdot (H + \sum_{s}{FRP_s \cdot L_s}) \cdot \rho_{wood}}
 \end{equation}\]</span>
-where <span class="math inline">\(ST_{sapwood}\)</span> is the current starch concentration, <span class="math inline">\(SS_{sapwood,growth}\)</span> is the minimum concentration required for growth (specified in control vector <code>minimumSugarForGrowth</code>), <span class="math inline">\(V_{storage,sapwood}\)</span> is the sapwood storage volume, <span class="math inline">\(m_{gluc}\)</span> is glucose molar mass and the denominator contains the construction costs per sapwood area unit, see eq. <a href="carbonpoolsbalance.html#eq:sapwoodconstructioncost">(16.3)</a>.</p>
+where <span class="math inline">\(ST_{sapwood}\)</span> is the current starch concentration, <span class="math inline">\(ST_{sapwood,growth}\)</span> is the minimum starch concentration required for secondary growth (specified, relative to storage capacity, via the control variable <code>minimumRelativeStarchForGrowth</code>), <span class="math inline">\(V_{storage,sapwood}\)</span> is the sapwood storage volume, <span class="math inline">\(m_{gluc}\)</span> is glucose molar mass and the denominator contains the construction costs per sapwood area unit, see eq. <a href="carbonpoolsbalance.html#eq:sapwoodconstructioncost">(16.3)</a>.</p>
 <p>Sink limitations to sapwood growth are simulated using a set of <span class="math inline">\(N_c = 10\)</span> cambium cells that undergo division and the new cells are added to a ring (i.e. a vector) of vessels that later suffer enlargement and maturation <span class="citation">(<a href="#ref-Friend2019" role="doc-biblioref">Friend <em>et al.</em> 2019</a>)</span>. Assuming that cambium cell volume must double before division, that cell-doubling time is the variable limiting cell division and that each division instantly results in a cell exiting the cambium and initiating differentiation into a vessel, production rate (<span class="math inline">\(PR_{cambium}\)</span>) of new vessels cells can be related to the cambial cell expansion rate <span class="math inline">\(r_{cambium}\)</span> such that <span class="citation">(<a href="#ref-Cabon2020" role="doc-biblioref">Cabon <em>et al.</em> 2020b</a>)</span>:
 <span class="math display">\[\begin{equation}
 PR_{cambium} = \frac{N_c}{ln(2)}\cdot r_{cambium}
@@ -731,7 +731,6 @@ where <span class="math inline">\(\Delta A_{ring,max} = N_c \cdot 950\,\mu m^{2}
 </div>
 <div id="finerootgrowth" class="section level3" number="17.1.4">
 <h3><span class="header-section-number">17.1.4</span> Fine root growth</h3>
-<p>Fine root growth is only modelled when simulating growth with the advanced water balance submodel (when using the basic water balance submodel fine root respiration costs are proportional to leaf respiration costs).</p>
 <p>Fine root biomass increment is modelled for each soil layer separately, and is defined analogously to leaf area increment:
 <span class="math display">\[\begin{equation}
 \Delta B_{fineroot} = \min( \Delta B_{fineroot,alloc}, \Delta B_{fineroot,source}, \Delta B_{fineroot,sink})
@@ -740,11 +739,11 @@ First, <span class="math inline">\(\Delta B_{fineroot,alloc}\)</span> is the max
 <span class="math display">\[\begin{equation}
 \Delta B_{fineroot,alloc} = \max(B_{fineroot,target} - B_{fineroot},0)
 \end{equation}\]</span></p>
-<p>Second, <span class="math inline">\(\Delta B_{fineroot,source}\)</span> represents the biomass increment expected given carbon source limitations and is calculated:
+<p>Second, <span class="math inline">\(\Delta B_{fineroot,source}\)</span> represents the biomass increment expected given the available storage carbon (starch):
 <span class="math display">\[\begin{equation}
-\Delta B_{fineroot,source} = \frac{\max(SS_{sapwood}-SS_{fineroot,growth},0)\cdot m_{gluc}\cdot V_{storage,sapwood}}{CC_{fineroot}}
+\Delta B_{fineroot,source} = \frac{ST_{sapwood} \cdot m_{gluc}\cdot V_{storage,sapwood}}{CC_{fineroot}}
 \end{equation}\]</span>
-where <span class="math inline">\(SS_{sapwood}\)</span> is the current sapwood concentration of metabolic sugar, <span class="math inline">\(SS_{fineroot,growth}\)</span> is the minimum concentration required for fine root growth (specified in control vector <code>minimumSugarForGrowth</code>), <span class="math inline">\(V_{storage,sapwood}\)</span> is the sapwood storage volume, <span class="math inline">\(m_{gluc}\)</span> is glucose molar mass and <span class="math inline">\(CC_{fineroot}\)</span> is the construction costs per fine root biomass unit.</p>
+where <span class="math inline">\(ST_{sapwood}\)</span> is the current sapwood concentration of storage carbon, <span class="math inline">\(V_{storage,sapwood}\)</span> is the sapwood storage volume, <span class="math inline">\(m_{gluc}\)</span> is glucose molar mass and <span class="math inline">\(CC_{fineroot}\)</span> is the construction costs per fine root biomass unit.</p>
 <p>Finally, <span class="math inline">\(\Delta B_{fineroot,sink}\)</span> represents the biomass increment expected by taking into account maximum tissue growth rate (<span class="math inline">\(RGR_{fineroot, max}\)</span>; in <span class="math inline">\(g\,dry \cdot g\,dry^{-1} \cdot day^{-1}\)</span>) and the relative cell expansion rate given temperature (<span class="math inline">\(T_{day}\)</span>), water potential in the rhizosphere (<span class="math inline">\(\Psi_{rhizo,s}\)</span>) and the stem osmotic potential at full turgor(<span class="math inline">\(\pi_{0,stem}\)</span>):
 <span class="math display">\[\begin{equation}
 \Delta B_{fineroot,sink} = B_{fineroot} \cdot RGR_{fineroot, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{rhizo,s}, \pi_{0,stem})}{r_{cell,max}}
@@ -764,27 +763,27 @@ Senescence due to drought effects occurs as a consequence of stem cavitation. Th
 <span class="math display">\[\begin{equation}
 LA^{cavitation} = (1 - PLC_{stem}) \cdot LA^{target}
 \end{equation}\]</span>
-if <span class="math inline">\(LA^{cavitation} &lt; LA^{live}\)</span> then the corresponding proportion <span class="math inline">\(p_{cavitation, leaf}\)</span> is estimated. The maximum of <span class="math inline">\(p_{aging,leaf}\)</span> and <span class="math inline">\(p_{cavitation, leaf}\)</span> is applied as a reduction of leaf area. If growth is simulated using the advanced water model, it also checks whether the relative water content in leaves becomes less than 50% (i.e. <span class="math inline">\(RWC_{leaf} &lt; 0.5\)</span>) and, if this happens, the plant cohort is completely defoliated.</p>
+if <span class="math inline">\(LA^{cavitation} &lt; LA^{\phi}\)</span> then the corresponding proportion <span class="math inline">\(p_{cavitation, leaf}\)</span> is estimated. The maximum of <span class="math inline">\(p_{aging,leaf}\)</span> and <span class="math inline">\(p_{cavitation, leaf}\)</span> is applied as a reduction of leaf area. If growth is simulated using the advanced water model, it also checks whether the relative water content in leaves becomes less than 50% (i.e. <span class="math inline">\(RWC_{leaf} &lt; 0.5\)</span>) and, if this happens, the plant cohort is completely defoliated.</p>
 </div>
 <div id="sapwoodsenescence" class="section level3" number="17.2.2">
 <h3><span class="header-section-number">17.2.2</span> Sapwood senescence</h3>
-<p><span class="citation"><a href="#ref-Prentice1993" role="doc-biblioref">Prentice <em>et al.</em></a> (<a href="#ref-Prentice1993" role="doc-biblioref">1993</a>)</span> assumed a constant annual rate of 4% for the conversion from sapwood to heartwood. Similarly, <span class="citation"><a href="#ref-Sitch2003" role="doc-biblioref">Sitch <em>et al.</em></a> (<a href="#ref-Sitch2003" role="doc-biblioref">2003</a>)</span> assumed a sapwood annual turnover rate of 5% for all biomes. A reasonable value for maximum daily senescence rate would be (assuming an annual rate 4.5%):
+<p>The daily rate of sapwood senescence is specified via the species-specific parameter <span class="math inline">\(SR_{sapwood}\)</span> or, when missing, via a control parameter. <span class="citation"><a href="#ref-Prentice1993" role="doc-biblioref">Prentice <em>et al.</em></a> (<a href="#ref-Prentice1993" role="doc-biblioref">1993</a>)</span> assumed a constant annual rate of 4% for the conversion from sapwood to heartwood. Similarly, <span class="citation"><a href="#ref-Sitch2003" role="doc-biblioref">Sitch <em>et al.</em></a> (<a href="#ref-Sitch2003" role="doc-biblioref">2003</a>)</span> assumed a sapwood annual turnover rate of 5% for all biomes. A reasonable value for maximum daily senescence rate would be (assuming an annual rate of 4.5%):
 <span class="math display">\[\begin{equation}
-1-0.955^{(1/365)} = 0.0001261398
+SR_{sapwood}  = 1-0.955^{(1/365)} = 0.0001261398
 \end{equation}\]</span>
 The actual proportion of sapwood area that is transformed into heartwood daily is:
 <span class="math display">\[\begin{equation}
-p_{aging, sapwood} = \frac{0.0001261398}{1+15\cdot e^{-0.01\cdot H}}
+p_{aging, sapwood} = \frac{SR_{sapwood}}{1+15\cdot e^{-0.01\cdot H}}
 \end{equation}\]</span>
-where 0.01 is a constant causing shorter plants to have slower senescence rates. It is important to mention that, while stem cavitation <span class="math inline">\(PLC_{stem}\)</span> reduces the amount of functional sapwood in with respect to hydraulics, it does not increase the rate of sapwood senescence, because xylem vessels are already dead cells. Hence, when xylem embolism occurs air bubbles are formed within vessels but surrounding parenchymatic cells (as well as the storage carbon they contain) are unaffected.</p>
+where 0.01 is a constant causing shorter plants to have slower senescence rates. It is important to mention that, while stem cavitation <span class="math inline">\(PLC_{stem}\)</span> reduces the amount of functional sapwood in with respect to hydraulics (and therefore transpiration and photosynthesis), it does not increase the rate of sapwood senescence, because xylem vessels are already dead cells. Hence, when xylem embolism occurs air bubbles are formed within vessels but surrounding parenchymatic cells (as well as the storage carbon they contain) are assumed unaffected.</p>
 </div>
 <div id="finerootsenescence" class="section level3" number="17.2.3">
 <h3><span class="header-section-number">17.2.3</span> Fine root senescence</h3>
-<p>Fine root senescence only occurs when modelling growth with the advanced water balance. Aging is the only process leading to fine root senescence. Default daily turnover proportion for fine roots, <span class="math inline">\(p_{aging,fineroot,25}\)</span> is specified via the control parameters <code>turnoverRates</code>, which are assumed to correspond to a temperature of 25 ºC. Actual turnover proportion for a given soil layer (<span class="math inline">\(p_{aging,fineroot}\)</span>) decreases linearly with soil temperature down to zero at 5 ºC:
+<p>Aging is the only process leading to fine root senescence. Default daily turnover proportion for fine roots (<span class="math inline">\(SR_{fineroot}\)</span>), which is assumed to correspond to a temperature of 25 ºC, is specified via species-specific parameters or the control parameters <code>turnoverRates</code>. Actual turnover proportion for a given soil layer (<span class="math inline">\(p_{aging,fineroot}\)</span>) decreases linearly with soil temperature down to zero at 5 ºC:
 <span class="math display">\[\begin{equation}
-p_{aging,fineroot} = p_{aging,fineroot,25} \cdot \frac{\max(T_{soil,s}-5,0)}{20}
+p_{aging,fineroot} = SR_{fineroot} \cdot \frac{\max(T_{soil,s}-5,0)}{20}
 \end{equation}\]</span>
-Default values for <span class="math inline">\(p_{aging,fineroot,25}\)</span> are set to produce an annual 50% turnover of fine roots.</p>
+Default control value for <span class="math inline">\(SR_{fineroot}\)</span> is set to produce an annual 50% turnover of fine roots.</p>
 </div>
 </div>
 <div id="update-of-plant-traits-and-allocation-targets" class="section level2" number="17.3">
@@ -792,18 +791,17 @@ Default values for <span class="math inline">\(p_{aging,fineroot,25}\)</span> ar
 <div id="updateplanttraits" class="section level3" number="17.3.1">
 <h3><span class="header-section-number">17.3.1</span> Plant traits</h3>
 <p>Multiple anatomic and physiological parameters are updated every day after applying changes in the size of leaf, sapwood and fine root compartments, which creates a feedback to those hydraulic and physiological processes simulated in the water balance submodel (<a href="growthmodelling.html#carbonwaterlinks">15.1.4</a>). Hence, the growth model allows emulating plant acclimation to environmental cues, mediated by growth and senescence of plant tissues.</p>
-<p>First leaf area index (<span class="math inline">\(LAI^{live}\)</span>) is updated from leaf area (<span class="math inline">\(LA^{live}\)</span>) inverting eq. <a href="carbonpoolsbalance.html#eq:leafarea">(16.1)</a>. The Huber value (<span class="math inline">\(H_v\)</span>, the sapwood area to leaf area ratio; in <span class="math inline">\(m^{2}\cdot m^{-2}\)</span>) is affected by changes in <span class="math inline">\(LA^{live}\)</span> and sapwood area <span class="math inline">\(SA\)</span>:
+<p>First leaf area index (<span class="math inline">\(LAI^{\phi}\)</span>) is updated from leaf area (<span class="math inline">\(LA^{\phi}\)</span>) inverting eq. <a href="carbonpoolsbalance.html#eq:leafarea">(16.1)</a>. The Huber value (<span class="math inline">\(H_v\)</span>, the sapwood area to leaf area ratio; in <span class="math inline">\(m^{2}\cdot m^{-2}\)</span>) is affected by changes in <span class="math inline">\(LA^{live} = LA_{target}\)</span> and sapwood area <span class="math inline">\(SA\)</span>:
 <span class="math display">\[\begin{equation}
 H_v = \frac{SA/10000}{LA^{live}}
 \end{equation}\]</span>
-When simulating growth with the basic water balance model, leaf area index and Huber value are the only plant traits affected by changes in the size of carbon compartments. It is only when we simulate growth with the advanced water balance model that we get a real sense of plant acclimation.</p>
-<p>By definition, fine root biomass changes in each soil layer (<span class="math inline">\(B_{fineroot,s}\)</span>) lead to updates in the proportion of fine roots in each layer (<span class="math inline">\(FRP_s\)</span>):
+Note that we specify <span class="math inline">\(LA^{live} = LA_{target}\)</span> and not <span class="math inline">\(LA^{\phi}\)</span> to avoid variations in Huber value due to leaf phenology. By definition, fine root biomass changes in each soil layer (<span class="math inline">\(B_{fineroot,s}\)</span>) lead to updates in the proportion of fine roots in each layer (<span class="math inline">\(FRP_s\)</span>):
 <span class="math display">\[\begin{equation}
 FRP_s = \frac{B_{fineroot,s}}{\sum_{l}{B_{fineroot,l}}}
 \end{equation}\]</span></p>
-<p>Stem maximum conductance per leaf area unit (<span class="math inline">\(k_{stem, max}\)</span>; in <span class="math inline">\(mmol \cdot m^{-2}\cdot s^{-1} \cdot MPa^{-1}\)</span>) is determined as a function of species-specific xylem conductivity (<span class="math inline">\(K_{xylem, max}\)</span>; in <span class="math inline">\(kg \cdot m^{-1} \cdot s^{-1} \cdot MPa^{-1}\)</span>), leaf area, sapwood area and tree height <span class="citation">(<a href="#ref-Christoffersen2016" role="doc-biblioref">Christoffersen <em>et al.</em> 2016</a>)</span>:
+<p>When we simulate growth with the advanced water balance model other parameters are subject to acclimation. Stem maximum conductance per leaf area unit (<span class="math inline">\(k_{stem, max}\)</span>; in <span class="math inline">\(mmol \cdot m^{-2}\cdot s^{-1} \cdot MPa^{-1}\)</span>) is determined as a function of species-specific xylem conductivity (<span class="math inline">\(K_{xylem, max}\)</span>; in <span class="math inline">\(kg \cdot m^{-1} \cdot s^{-1} \cdot MPa^{-1}\)</span>), leaf area, sapwood area and tree height <span class="citation">(<a href="#ref-Christoffersen2016" role="doc-biblioref">Christoffersen <em>et al.</em> 2016</a>)</span>:
 <span class="math display">\[\begin{equation}
-k_{stem, max} = \frac{1000}{0.018} \cdot \frac{K_{xylem, max} \cdot (SA/10000)}{(H/100) \cdot LA^{live}} \cdot \chi_{taper}
+k_{stem, max} = \frac{1000}{0.018} \cdot \frac{K_{xylem, max} \cdot H_v}{(H/100)} \cdot \chi_{taper}
 \end{equation}\]</span>
 where <span class="math inline">\(\chi_{taper}\)</span> is a factor to account for taper of xylem conduit with height <span class="citation">(<a href="#ref-Savage2010" role="doc-biblioref">Savage <em>et al.</em> 2010</a>; <a href="#ref-Christoffersen2016" role="doc-biblioref">Christoffersen <em>et al.</em> 2016</a>)</span>, 0.018 is the molar weight of water (in <span class="math inline">\(kg\cdot mol^{-1}\)</span>). Both an increase in <span class="math inline">\(SA\)</span> or a decrease in <span class="math inline">\(LA^{live}\)</span> (i.e. an increase in <span class="math inline">\(H_v\)</span>) increase <span class="math inline">\(k_{stem, max}\)</span> and, hence, alleviate drought effects (i.e. a lower decrease in water potential across the stem for the same flow). In contrast, an increase in plant height will decrease stem conductance and increase drought stress. Changes in stem maximum conductance has cascade effects on root maximum conductance. First, coarse root minimum resistance is defined as a fixed proportion of whole-plant minimum resistance, so an increase in stem maximum conductance will increase whole-plant conductance and coarse root conductance, <span class="math inline">\(k_{root,max}\)</span>.</p>
 <p>Rhizosphere maximum conductance per leaf area unit in a given soil layer <span class="math inline">\(s\)</span> (<span class="math inline">\(k_{rhizo, max, s}\)</span>; in <span class="math inline">\(mmol \cdot m^{-2}\cdot s^{-1} \cdot MPa^{-1}\)</span>) depends on fine root biomass in this layer (<span class="math inline">\(B_{fineroot,s}\)</span>) and on leaf area (i.e. <span class="math inline">\(LA^{live}\)</span>). The equations regulating these relationships are modulated by several soil and species parameters, such as soil saturated hydraulic conductance, species-specific root length, root length density and density of fine roots.</p>
@@ -822,12 +820,16 @@ where <span class="math inline">\(SI\)</span> is the concentration of inorganic 
 </div>
 <div id="updateallocationtargets" class="section level3" number="17.3.2">
 <h3><span class="header-section-number">17.3.2</span> Leaf area and fine root biomass targets</h3>
-<p>Leaf area target (<span class="math inline">\(LA_{target}\)</span>) is updated when phenological phase is <em>bud formation</em>. If the allocation strategy pursues a <em>stable Huber value</em>, the model tries to bring <span class="math inline">\(H_{v}\)</span> close to an initial value <span class="math inline">\(H_{v,target}\)</span>, and the leaf area target is defined as:
+<p>Leaf area target (<span class="math inline">\(LA^{live} = LA_{target}\)</span>) is updated when phenological phase is <em>bud formation</em>. If the allocation strategy pursues a <strong>stable Huber value</strong>, the model tries to bring <span class="math inline">\(H_{v}\)</span> close to an initial value <span class="math inline">\(H_{v,target}\)</span>, and the leaf area target is defined as:
 <span class="math display">\[\begin{equation}
-LA_{target} = \frac{SA}{10000 \cdot H_{v,target}}
+LA^{live} = LA_{target} = \frac{SA}{10000 \cdot H_{v,target}}
 \end{equation}\]</span>
-Note that the specification of <span class="math inline">\(LA_{target}\)</span> will cause sapwood area increases to be followed by leaf area increases, as long as <span class="math inline">\(H_{v} &gt; H_{v,target}\)</span>. On the contrary, if <span class="math inline">\(H_{v} &lt; H_{v,target}\)</span> then leaf area growth is inhibited and sapwood area growth will progressively increase <span class="math inline">\(H_{v}\)</span>.</p>
-<p>If the allocation strategy pursues a <em>stable whole-plant conductance</em>, the model tries to keep <span class="math inline">\(k_{plant}\)</span> close to an initial value <span class="math inline">\(k_{plant,target}\)</span>, and here the leaf area target is defined as:
+Note that the specification of <span class="math inline">\(LA_{target}\)</span> will cause sapwood area increases to be followed by leaf area increases, as long as <span class="math inline">\(H_{v} &gt; H_{v,target}\)</span>. On the contrary, if <span class="math inline">\(H_{v} &lt; H_{v,target}\)</span> then leaf area growth is inhibited and sapwood area growth will progressively increase <span class="math inline">\(H_{v}\)</span>. Fine root biomass target is set using:
+<span class="math display">\[\begin{equation}
+B_{fineroot,target} =  \frac{10^{4}\cdot LA_{target} \cdot RLR}{2.0 \cdot \sqrt{\frac{\pi \cdot SRL}{\rho_{fineroot}}}}
+\end{equation}\]</span>
+where <span class="math inline">\(RLR\)</span> is the root area to leaf area ratio, <span class="math inline">\(\rho_{fineroot}\)</span> is fine root tissue density (<span class="math inline">\(g\,dry \cdot cm^{-3}\)</span>) and <span class="math inline">\(SRL\)</span> (<span class="math inline">\(cm \cdot g\,dry^{-1}\)</span>) is the specific root length.</p>
+<p>If the allocation strategy pursues a <strong>stable whole-plant conductance</strong>, the model tries to keep <span class="math inline">\(k_{plant}\)</span> close to an initial value <span class="math inline">\(k_{plant,target}\)</span>, and here the leaf area target is defined as:
 <span class="math display">\[\begin{equation}
 LA_{target} = LA^{live} \cdot \frac{k_{plant,max}}{k_{plant,target}}
 \end{equation}\]</span>

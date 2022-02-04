@@ -33,17 +33,17 @@ Leaf area increment $\Delta LA$ only occurs when phenological state is *unfoldin
 \begin{equation}
 \Delta LA = \min( \Delta LA_{alloc}, \Delta LA_{source}, \Delta LA_{sink})
 \end{equation}
-First, $\Delta LA_{alloc}$ is the maximum leaf area increment allowed by the leaf area target set by the allocation rule, $LA^{target}$, in comparison with current leaf area $LA^{live}$:
+First, $\Delta LA_{alloc}$ is the maximum leaf area increment allowed by the leaf area target set by the allocation rule, $LA^{target}$, in comparison with current leaf area $LA^{\phi}$:
 \begin{equation}
-\Delta LA_{alloc} = \max(LA^{target} - LA^{live},0)
+\Delta LA_{alloc} = \max(LA^{target} - LA^{\phi},0)
 \end{equation}
 Remember that leaf area target is updated during *bud formation* (see \@ref(updateallocationtargets)). 
 
 Second, $\Delta LA_{source}$ represents the leaf area increment expected given carbon source limitations and is calculated:
 \begin{equation}
-\Delta LA_{source} = \frac{\max(SS_{sapwood}-SS_{leaf,growth},0)\cdot m_{gluc}\cdot V_{sapwood,leaf}}{1000 \cdot CC_{leaf} / SLA}
+\Delta LA_{source} = \frac{ST_{sapwood}\cdot m_{gluc}\cdot V_{sapwood,leaf}}{1000 \cdot CC_{leaf} / SLA}
 \end{equation}
-where $SS_{sapwood}$ is the current concentration of sapwood metabolic sugar, $SS_{leaf,growth}$ is the minimum concentration required for growth (specified in control vector `minimumSugarForGrowth`), $V_{storage,sapwood}$ is the sapwood storage volume, $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per leaf area unit, see eq. \@ref(eq:leafconstructioncost). 
+where $ST_{sapwood}$ is the current concentration of sapwood storage carbon (starch), $V_{storage,sapwood}$ is the sapwood storage volume and $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per leaf area unit, see eq. \@ref(eq:leafconstructioncost). 
 
 Finally, $\Delta LA_{sink}$ represents the leaf area increment expected by taking into account the maximum leaf tissue growth rate relative to sapwood area ($RGR_{leaf, max}$; in $m^2 \cdot cm^{-2} \cdot day^{-1}$) and the relative cell expansion rate given $T_{day}$, $\Psi_{symp,leaf}$ and $\pi_{0,leaf}$: 
 \begin{equation}
@@ -53,15 +53,15 @@ where cell relative expansion rate is divided by the maximum relative cell expan
 
 ### Sapwood growth {#sapwoodgrowth}
 
-Sapwood area increment $\Delta SA$ can only occur if $LA^{live}>0$. Unlike leaf area or fine root biomass, it is not explicitly constrained by any allocation rule. However, newly assimilated carbon is preferentially allocated to leaves and fine roots because sapwood growth depends on storage reserves and not on metabolic carbon. $\Delta SA$ is defined as the minimum of two values expressing source and sink constraints:
+Sapwood area increment $\Delta SA$ can only occur if $LA^{live}>0$. Unlike leaf area or fine root biomass, it is not explicitly constrained by any allocation rule. However, newly assimilated carbon is preferentially allocated to leaves and fine roots whenever storage levels are low. $\Delta SA$ is defined as the minimum of two values expressing source and sink constraints:
 \begin{equation}
 \Delta SA = \min(\Delta SA_{source}, \Delta SA_{sink})
 \end{equation}
 $\Delta SA_{source}$ represents the sapwood area increment expected given carbon source limitations and is calculated using:
 \begin{equation}
-\Delta SA_{source} = \frac{\max(ST_{sapwood}-SS_{sapwood,growth},0)\cdot m_{gluc}\cdot V_{storage,sapwood}}{CC_{sapwood} \cdot (H + \sum_{s}{FRP_s \cdot L_s}) \cdot \rho_{wood}}
+\Delta SA_{source} = \frac{\max(ST_{sapwood}-ST_{sapwood,growth},0)\cdot m_{gluc}\cdot V_{storage,sapwood}}{CC_{sapwood} \cdot (H + \sum_{s}{FRP_s \cdot L_s}) \cdot \rho_{wood}}
 \end{equation}
-where $ST_{sapwood}$ is the current starch concentration, $SS_{sapwood,growth}$ is the minimum concentration required for growth (specified in control vector `minimumSugarForGrowth`), $V_{storage,sapwood}$ is the sapwood storage volume, $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per sapwood area unit, see eq. \@ref(eq:sapwoodconstructioncost).
+where $ST_{sapwood}$ is the current starch concentration, $ST_{sapwood,growth}$ is the minimum starch concentration required for secondary growth (specified, relative to storage capacity, via the control variable `minimumRelativeStarchForGrowth`), $V_{storage,sapwood}$ is the sapwood storage volume, $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per sapwood area unit, see eq. \@ref(eq:sapwoodconstructioncost).
 
 Sink limitations to sapwood growth are simulated using a set of $N_c = 10$ cambium cells that undergo division and the new cells are added to a ring (i.e. a vector) of vessels that later suffer enlargement and maturation [@Friend2019]. Assuming that cambium cell volume must double before division, that cell-doubling time is the variable limiting cell division and that each division instantly results in a cell exiting the cambium and initiating differentiation into a vessel, production rate ($PR_{cambium}$) of new vessels cells can be related to the cambial cell expansion rate $r_{cambium}$ such that [@Cabon2020]:
 \begin{equation}
@@ -79,8 +79,6 @@ where $\Delta A_{ring,max} = N_c \cdot 950\,\mu m^{2} \cdot day^{-1}$, which was
 
 ### Fine root growth {#finerootgrowth}
 
-Fine root growth is only modelled when simulating growth with the advanced water balance submodel (when using the basic water balance submodel fine root respiration costs are proportional to leaf respiration costs). 
-
 Fine root biomass increment is modelled for each soil layer separately, and is defined analogously to leaf area increment: 
 \begin{equation}
 \Delta B_{fineroot} = \min( \Delta B_{fineroot,alloc}, \Delta B_{fineroot,source}, \Delta B_{fineroot,sink})
@@ -90,11 +88,11 @@ First, $\Delta B_{fineroot,alloc}$ is the maximum fine root biomass increment al
 \Delta B_{fineroot,alloc} = \max(B_{fineroot,target} - B_{fineroot},0)
 \end{equation}
 
-Second, $\Delta B_{fineroot,source}$ represents the biomass increment expected given carbon source limitations and is calculated:
+Second, $\Delta B_{fineroot,source}$ represents the biomass increment expected given the available storage carbon (starch):
 \begin{equation}
-\Delta B_{fineroot,source} = \frac{\max(SS_{sapwood}-SS_{fineroot,growth},0)\cdot m_{gluc}\cdot V_{storage,sapwood}}{CC_{fineroot}}
+\Delta B_{fineroot,source} = \frac{ST_{sapwood} \cdot m_{gluc}\cdot V_{storage,sapwood}}{CC_{fineroot}}
 \end{equation}
-where $SS_{sapwood}$ is the current sapwood concentration of metabolic sugar, $SS_{fineroot,growth}$ is the minimum concentration required for fine root growth (specified in control vector `minimumSugarForGrowth`), $V_{storage,sapwood}$ is the sapwood storage volume, $m_{gluc}$ is glucose molar mass and $CC_{fineroot}$ is the construction costs per fine root biomass unit.
+where $ST_{sapwood}$ is the current sapwood concentration of storage carbon,  $V_{storage,sapwood}$ is the sapwood storage volume, $m_{gluc}$ is glucose molar mass and $CC_{fineroot}$ is the construction costs per fine root biomass unit.
 
 Finally, $\Delta B_{fineroot,sink}$ represents the biomass increment expected by taking into account maximum  tissue growth rate ($RGR_{fineroot, max}$; in $g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$) and the relative cell expansion rate given temperature ($T_{day}$), water potential in the rhizosphere ($\Psi_{rhizo,s}$) and the stem osmotic potential at full turgor($\pi_{0,stem}$): 
 \begin{equation}
@@ -115,27 +113,27 @@ Senescence due to drought effects occurs as a consequence of stem cavitation. Th
 \begin{equation}
 LA^{cavitation} = (1 - PLC_{stem}) \cdot LA^{target}
 \end{equation}
-if $LA^{cavitation} < LA^{live}$ then the corresponding proportion $p_{cavitation, leaf}$ is estimated. The maximum of $p_{aging,leaf}$ and $p_{cavitation, leaf}$ is applied as a reduction of leaf area. If growth is simulated using the advanced water model, it also checks whether the relative water content in leaves becomes less than 50\% (i.e. $RWC_{leaf} < 0.5$) and, if this happens, the plant cohort is completely defoliated.
+if $LA^{cavitation} < LA^{\phi}$ then the corresponding proportion $p_{cavitation, leaf}$ is estimated. The maximum of $p_{aging,leaf}$ and $p_{cavitation, leaf}$ is applied as a reduction of leaf area. If growth is simulated using the advanced water model, it also checks whether the relative water content in leaves becomes less than 50\% (i.e. $RWC_{leaf} < 0.5$) and, if this happens, the plant cohort is completely defoliated.
 
 ### Sapwood senescence {#sapwoodsenescence}
 
-@Prentice1993 assumed a constant annual rate of 4% for the conversion from sapwood to heartwood. Similarly, @Sitch2003 assumed a sapwood annual turnover rate of 5% for all biomes. A reasonable value for maximum daily senescence rate would be (assuming an annual rate 4.5%):
+The daily rate of sapwood senescence is specified via the species-specific parameter $SR_{sapwood}$ or, when missing, via a control parameter. @Prentice1993 assumed a constant annual rate of 4% for the conversion from sapwood to heartwood. Similarly, @Sitch2003 assumed a sapwood annual turnover rate of 5% for all biomes. A reasonable value for maximum daily senescence rate would be (assuming an annual rate of 4.5%):
 \begin{equation}
-1-0.955^{(1/365)} = 0.0001261398
+SR_{sapwood}  = 1-0.955^{(1/365)} = 0.0001261398
 \end{equation}
 The actual proportion of sapwood area that is transformed into heartwood daily is:
 \begin{equation}
-p_{aging, sapwood} = \frac{0.0001261398}{1+15\cdot e^{-0.01\cdot H}}
+p_{aging, sapwood} = \frac{SR_{sapwood}}{1+15\cdot e^{-0.01\cdot H}}
 \end{equation}
-where 0.01 is a constant causing shorter plants to have slower senescence rates. It is important to mention that, while stem cavitation $PLC_{stem}$ reduces the amount of functional sapwood in with respect to hydraulics, it does not increase the rate of sapwood senescence, because xylem vessels are already dead cells. Hence, when xylem embolism occurs air bubbles are formed within vessels but surrounding parenchymatic cells (as well as the storage carbon they contain) are unaffected. 
+where 0.01 is a constant causing shorter plants to have slower senescence rates. It is important to mention that, while stem cavitation $PLC_{stem}$ reduces the amount of functional sapwood in with respect to hydraulics (and therefore transpiration and photosynthesis), it does not increase the rate of sapwood senescence, because xylem vessels are already dead cells. Hence, when xylem embolism occurs air bubbles are formed within vessels but surrounding parenchymatic cells (as well as the storage carbon they contain) are assumed unaffected. 
 
 ### Fine root senescence {#finerootsenescence}
 
-Fine root senescence only occurs when modelling growth with the advanced water balance. Aging is the only process leading to fine root senescence. Default daily turnover proportion for fine roots, $p_{aging,fineroot,25}$ is specified via the control parameters `turnoverRates`, which are assumed to correspond to a temperature of 25 ºC. Actual turnover proportion for a given soil layer ($p_{aging,fineroot}$) decreases linearly with soil temperature down to zero at 5 ºC:
+Aging is the only process leading to fine root senescence. Default daily turnover proportion for fine roots ($SR_{fineroot}$), which is assumed to correspond to a temperature of 25 ºC, is specified via species-specific parameters or the control parameters `turnoverRates`. Actual turnover proportion for a given soil layer ($p_{aging,fineroot}$) decreases linearly with soil temperature down to zero at 5 ºC:
 \begin{equation}
-p_{aging,fineroot} = p_{aging,fineroot,25} \cdot \frac{\max(T_{soil,s}-5,0)}{20}
+p_{aging,fineroot} = SR_{fineroot} \cdot \frac{\max(T_{soil,s}-5,0)}{20}
 \end{equation}
-Default values for $p_{aging,fineroot,25}$ are set to produce an annual 50\% turnover of fine roots.
+Default control value for $SR_{fineroot}$ is set to produce an annual 50\% turnover of fine roots.
 
 ## Update of plant traits and allocation targets
 
@@ -143,20 +141,18 @@ Default values for $p_{aging,fineroot,25}$ are set to produce an annual 50\% tur
 
 Multiple anatomic and physiological parameters are updated every day after applying changes in the size of leaf, sapwood and fine root compartments, which creates a feedback to those hydraulic and physiological processes simulated in the water balance submodel (\@ref(carbonwaterlinks)). Hence, the growth model allows emulating plant acclimation to environmental cues, mediated by growth and senescence of plant tissues.
 
-First leaf area index ($LAI^{live}$) is updated from leaf area ($LA^{live}$) inverting eq. \@ref(eq:leafarea). The Huber value ($H_v$, the sapwood area to leaf area ratio; in $m^{2}\cdot m^{-2}$) is affected by changes in $LA^{live}$ and sapwood area $SA$:
+First leaf area index ($LAI^{\phi}$) is updated from leaf area ($LA^{\phi}$) inverting eq. \@ref(eq:leafarea). The Huber value ($H_v$, the sapwood area to leaf area ratio; in $m^{2}\cdot m^{-2}$) is affected by changes in $LA^{live} = LA_{target}$ and sapwood area $SA$:
 \begin{equation}
 H_v = \frac{SA/10000}{LA^{live}}
 \end{equation}
-When simulating growth with the basic water balance model, leaf area index and Huber value are the only plant traits affected by changes in the size of carbon compartments. It is only when we simulate growth with the advanced water balance model that we get a real sense of plant acclimation. 
-
-By definition, fine root biomass changes in each soil layer ($B_{fineroot,s}$) lead to updates in the proportion of fine roots in each layer ($FRP_s$):
+Note that we specify $LA^{live} = LA_{target}$ and not $LA^{\phi}$ to avoid variations in Huber value due to leaf phenology. By definition, fine root biomass changes in each soil layer ($B_{fineroot,s}$) lead to updates in the proportion of fine roots in each layer ($FRP_s$):
 \begin{equation}
 FRP_s = \frac{B_{fineroot,s}}{\sum_{l}{B_{fineroot,l}}}
 \end{equation}
 
-Stem maximum conductance per leaf area unit ($k_{stem, max}$; in $mmol \cdot m^{-2}\cdot s^{-1} \cdot MPa^{-1}$) is determined as a function of species-specific xylem conductivity ($K_{xylem, max}$; in $kg \cdot m^{-1} \cdot s^{-1} \cdot MPa^{-1}$), leaf area, sapwood area and tree height [@Christoffersen2016]:
+When we simulate growth with the advanced water balance model other parameters are subject to acclimation. Stem maximum conductance per leaf area unit ($k_{stem, max}$; in $mmol \cdot m^{-2}\cdot s^{-1} \cdot MPa^{-1}$) is determined as a function of species-specific xylem conductivity ($K_{xylem, max}$; in $kg \cdot m^{-1} \cdot s^{-1} \cdot MPa^{-1}$), leaf area, sapwood area and tree height [@Christoffersen2016]:
 \begin{equation}
-k_{stem, max} = \frac{1000}{0.018} \cdot \frac{K_{xylem, max} \cdot (SA/10000)}{(H/100) \cdot LA^{live}} \cdot \chi_{taper}
+k_{stem, max} = \frac{1000}{0.018} \cdot \frac{K_{xylem, max} \cdot H_v}{(H/100)} \cdot \chi_{taper}
 \end{equation}
 where $\chi_{taper}$ is a factor to account for taper of xylem conduit with height [@Savage2010; @Christoffersen2016], 0.018 is the molar weight of water (in $kg\cdot mol^{-1}$). Both an increase in $SA$ or a decrease in $LA^{live}$ (i.e. an increase in $H_v$) increase $k_{stem, max}$ and, hence, alleviate drought effects (i.e. a lower decrease in water potential across the stem for the same flow). In contrast, an increase in plant height will decrease stem conductance and increase drought stress. Changes in stem maximum conductance has cascade effects on root maximum conductance. First, coarse root minimum resistance is defined as a fixed proportion of whole-plant minimum resistance, so an increase in stem maximum conductance will increase whole-plant conductance and coarse root conductance, $k_{root,max}$. 
 
@@ -179,13 +175,17 @@ If photosynthesis limitations are included, the model starts to limit photosynth
 
 ### Leaf area and fine root biomass targets {#updateallocationtargets}
 
-Leaf area target ($LA_{target}$) is updated when phenological phase is *bud formation*. If the allocation strategy pursues a *stable Huber value*, the model tries to bring $H_{v}$ close to an initial value $H_{v,target}$, and the leaf area target is defined as: 
+Leaf area target ($LA^{live} = LA_{target}$) is updated when phenological phase is *bud formation*. If the allocation strategy pursues a **stable Huber value**, the model tries to bring $H_{v}$ close to an initial value $H_{v,target}$, and the leaf area target is defined as: 
 \begin{equation}
-LA_{target} = \frac{SA}{10000 \cdot H_{v,target}}
+LA^{live} = LA_{target} = \frac{SA}{10000 \cdot H_{v,target}}
 \end{equation}
-Note that the specification of $LA_{target}$ will cause sapwood area increases to be followed by leaf area increases, as long as $H_{v} > H_{v,target}$. On the contrary, if $H_{v} < H_{v,target}$ then leaf area growth is inhibited and sapwood area growth will progressively increase $H_{v}$. 
+Note that the specification of $LA_{target}$ will cause sapwood area increases to be followed by leaf area increases, as long as $H_{v} > H_{v,target}$. On the contrary, if $H_{v} < H_{v,target}$ then leaf area growth is inhibited and sapwood area growth will progressively increase $H_{v}$. Fine root biomass target is set using:
+\begin{equation}
+B_{fineroot,target} =  \frac{10^{4}\cdot LA_{target} \cdot RLR}{2.0 \cdot \sqrt{\frac{\pi \cdot SRL}{\rho_{fineroot}}}}
+\end{equation}
+where $RLR$ is the root area to leaf area ratio, $\rho_{fineroot}$ is fine root tissue density ($g\,dry \cdot cm^{-3}$) and $SRL$ ($cm \cdot g\,dry^{-1}$) is the specific root length.
 
-If the allocation strategy pursues a *stable whole-plant conductance*, the model tries to keep $k_{plant}$ close to an initial value $k_{plant,target}$, and here the leaf area target is defined as: 
+If the allocation strategy pursues a **stable whole-plant conductance**, the model tries to keep $k_{plant}$ close to an initial value $k_{plant,target}$, and here the leaf area target is defined as: 
 \begin{equation}
 LA_{target} = LA^{live} \cdot \frac{k_{plant,max}}{k_{plant,target}}
 \end{equation}

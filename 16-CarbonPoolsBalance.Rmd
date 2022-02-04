@@ -9,15 +9,19 @@ Biomass of leaves, sapwood and fine roots is needed in the model to estimate res
 The live leaf area $LA^{live}$ per individual (in $m^2$) is:
 \begin{equation}
 LA^{live} = 10000 \cdot LAI^{live} / N
+\end{equation}
+where $N$ is the density of the cohort and $LAI^{live}$ is the leaf area index. The actual (expanded) leaf area $LA^{\phi}$ is estimated analogously from $LAI^{\phi}$:
+\begin{equation}
+LA^{\phi} = 10000 \cdot LAI^{\phi} / N
 (\#eq:leafarea)
 \end{equation}
-where $N$ is the density of the cohort and $LAI^{live}$ is the leaf area index. Structural leaf biomass per individual ($B_{leaf}$; $g\,dry·ind^{-1}$) is the result of dividing live leaf area by $SLA$ ($m^{2} \cdot kg^{-1}$), the specific leaf area of the species:
+Structural leaf biomass per individual ($B_{leaf}$; $g\,dry·ind^{-1}$) is the result of dividing leaf area by $SLA$ ($m^{2} \cdot kg^{-1}$), the specific leaf area of the species:
 \begin{equation}
-B_{leaf} = 1000 \cdot LA^{live} / SLA
+B_{leaf} = 1000 \cdot LA^{\phi} / SLA
 \end{equation}
 where a factor 1000 is used to convert from kg to g. Hence, only expanded leaf area has respiratory cost (i.e. winter resistance buds do not). Leaf storage volume for an individual ($V_{storage,leaf}$; in $L \cdot ind^{-1}$) is:
 \begin{equation}
-V_{storage, leaf} = LA^{live}  \cdot V_{leaf}
+V_{storage, leaf} = LA^{\phi}  \cdot V_{leaf}
 \end{equation}
 where $V_{leaf}$ is the water storage capacity of leaf tissue per leaf area unit (in $L\cdot m^{-2}$) (see \@ref(plantwaterstoragecapacity)). Leaf storage volume is necessary to estimate the biomass of metabolic (sugars) or storage (starch) from the concentration of these substances in leaves ($SS_{leaf}$ and $ST_{leaf}$, which are expressed in $mol\,gluc \cdot L^{-1}$), and conversely. For example:
 \begin{equation}
@@ -57,21 +61,28 @@ where $m_{gluc}$ is the molar mass of glucose. To estimate sapwood storage capac
 ST^{max}_{sapwood} = 0.5 \cdot 1000 \cdot \frac{V_{storage,sapwood} \cdot \rho_{starch}}{m_{starch}}
 \end{equation}
 
-### Fine root structural biomass
+### Fine root area and biomass
 
-The fine root compartment does not have labile carbon (i.e. the model supplies labile carbon for fine roots from sapwood compartment), so that only the structural biomass of fine roots needs to be estimated. If growth is simulated using the basic water balance model, the biomass of fine roots per individual ($B_{fineroot}$; $g\,dry·ind^{-1}$) is assumed half of biomass:
+The fine root compartment does not have labile carbon (i.e. the model supplies labile carbon for fine roots from sapwood compartment), so that only the structural biomass of fine roots needs to be estimated. If growth is simulated using the *basic* water balance model, the initial area of fine roots ($FRA$, $m^2$) for layer $s$ is estimated from leaf area using:
 \begin{equation}
-B_{fineroot} = B_{leaf}/2
+FRA = FRP_{s} \cdot LA^{\phi} \cdot RLR
 \end{equation}
-Hence, in this model fine-root maintenance respiration costs are also influenced by leaf-phenological status [@Sitch2003]. When growth is simulated using the advanced water balance model, fine root length per area in each soil layer ($FLA_s$; $m \cdot m^{-2}$) is estimated from rhizosphere conductance, assuming a cylindrical flow geometry in the rhizosphere. Then fine root biomass per individual ($g\,dry\cdot ind^{-1}$) is calculated using:
+where $FRP_s$ is the proportion of fine roots in layer $s$ and $RLR$ is the species-specific root area to leaf area ratio. Biomass of fine roots per individual for a given layer $s$ ($B_{fineroot,s}$; $g\,dry·ind^{-1}$) is then estimated from $FRA_s$ using:
 \begin{equation}
-B_{fineroot} = \sum_{s}{B_{fineroot,s}} = \sum_{s}{\frac{10000\cdot FLA_s}{N\cdot 0.01 \cdot SRL}}
+B_{fineroot,s} =  \frac{10^{4}\cdot FRA_s}{2.0 \cdot \sqrt{\frac{\pi \cdot SRL}{\rho_{fineroot}}}}
 \end{equation}
-where $N$ is the density of individuals and $SRL$ ($cm \cdot g\,dry^{-1}$) is the specific root length. One of the model output variables is fine root area in each soil layer ($FRA_s$), which is calculated from $B_{fineroot}$ using:
+where $\rho_{fineroot}$ is fine root tissue density ($g\,dry \cdot cm^{-3}$) and $SRL$ ($cm \cdot g\,dry^{-1}$) is the specific root length. Fine root biomass per individual ($g\,dry\cdot ind^{-1}$) is simply the sum across layers:
 \begin{equation}
-FRA_{s} = 10^{-4}\cdot B_{fineroot,s} \cdot 2.0 \cdot \frac{\pi \cdot SRL}{\rho_{fineroot}}
+B_{fineroot} = \sum_{s}{B_{fineroot,s}}
 \end{equation}
-where $\rho_{fineroot}$ is fine root tissue density ($g\,dry \cdot cm^{-3}$).
+If growth is simulated using the *advanced* water balance model, the initial fine root length per area in each soil layer ($FLA_s$; $m \cdot m^{-2}$) is estimated from rhizosphere conductance, assuming a cylindrical flow geometry in the rhizosphere. The initial fine root biomass for a given layer $s$ ($g\,dry\cdot ind^{-1}$) is then calculated using:
+\begin{equation}
+B_{fineroot,s} = \frac{10000\cdot FLA_s}{N\cdot 0.01 \cdot SRL}
+\end{equation}
+where $N$ is the density of individuals. Finally, initial fine root area in each soil layer ($FRA_s$) is then calculated from $B_{fineroot}$ by inverting the equation presented above:
+\begin{equation}
+FRA_{s} = 10^{-4}\cdot B_{fineroot,s} \cdot 2.0 \cdot \sqrt{\frac{\pi \cdot SRL}{\rho_{fineroot}}}
+\end{equation}
 
 ### Total living biomass
 Total living biomass per individual (i.e. not accounting for heartwood or xylem conduits) is:
@@ -130,9 +141,9 @@ where factor $f_{phloem}$ is specified by the control parameter `phloemConductan
 
 ### Sugar-starch dynamics {#sugarstarchdynamics}
 
-When growth is simulated using the basic water balance submodel, sugar-starch dynamics ($SC_{leaf}$ and $SC_{sapwood}$) are simply defined as the conversion between metabolic and storage carbon needed to keep the sugar concentration equal to an equilibrium required for metabolic functioning, which is specified by control parameters `equilibriumOsmoticConcentration` (including two values, for leaves and sapwood respectively) and `nonSugarConcentration`. For example, if leaf osmotic equilibrium concentration is 0.8 $mol\,gluc \cdot L^{-1}$ and non-sugar concentration is 0.3 $mol\,gluc \cdot L^{-1}$, the model will simulate sugar-starch dynamics to stabilize sugar concentration in leaves to 0.5 $mol\,gluc \cdot L^{-1}$. A lower equilibrium osmotic concentration is required for sapwood, by default 0.6 $mol\,gluc \cdot L^{-1}$, so that sugar equilibrium concentration is 0.1 $mol\,gluc \cdot L^{-1}$. That lower equilibrium concentrations are required for sapwood than for leaves is necessary to sustain the phloem transport of sugars from leaves towards sapwood.
+When growth is simulated using the *basic* water balance submodel, sugar-starch dynamics ($SC_{leaf}$ and $SC_{sapwood}$) are simply defined as the conversion between metabolic and storage carbon needed to keep the sugar concentration equal to an equilibrium required for metabolic functioning, which is specified by control parameters `equilibriumOsmoticConcentration` (including two values, for leaves and sapwood respectively) and `nonSugarConcentration`. For example, if leaf osmotic equilibrium concentration is 0.8 $mol\,gluc \cdot L^{-1}$ and non-sugar concentration is 0.3 $mol\,gluc \cdot L^{-1}$, the model will simulate sugar-starch dynamics to stabilize sugar concentration in leaves to 0.5 $mol\,gluc \cdot L^{-1}$. A lower equilibrium osmotic concentration is required for sapwood, by default 0.6 $mol\,gluc \cdot L^{-1}$, so that sugar equilibrium concentration is 0.1 $mol\,gluc \cdot L^{-1}$. That lower equilibrium concentrations are required for sapwood than for leaves is necessary to sustain the phloem transport of sugars from leaves towards sapwood.
 
-When growth is simulated using the basic water balance submodel, sugar-starch dynamics are similar to the previous case, in the sense that equilibrium sugar concentrations are sought for leaves and sapwood. However, instantaneous conversion rates are calculated depending on equations regulating starch synthesis (occurring when sugar concentration is higher than the equilibrium concentration) and starch hydrolysis (occurring when sugar concentration is lower than the equilibrium concentration). Synthesis is modelled as a Michaelis-Menten function, whereas hydrolysis rate is simply a linear function of starch concentration. Maximum synthesis rates and hydrolysis linear factors are larger (i.e. faster sugar-starch dynamics) in leaves than sapwood.
+When growth is simulated using the *advanced* water balance submodel, sugar-starch dynamics are similar to the previous case, in the sense that equilibrium sugar concentrations are sought for leaves and sapwood. However, instantaneous conversion rates are calculated depending on equations regulating starch synthesis (occurring when sugar concentration is higher than the equilibrium concentration) and starch hydrolysis (occurring when sugar concentration is lower than the equilibrium concentration). Synthesis is modelled as a Michaelis-Menten function, whereas hydrolysis rate is simply a linear function of starch concentration. Maximum synthesis rates and hydrolysis linear factors are larger (i.e. faster sugar-starch dynamics) in leaves than sapwood.
 
 ### Root exudation
 
