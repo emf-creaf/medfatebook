@@ -6986,8 +6986,14 @@ J_{max, 298} = e^{1.197 + 0.847\cdot \log(V_{max,298})}
 </div>
 <div id="imputationRER" class="section level3" number="24.3.18">
 <h3><span class="header-section-number">A.3.18</span> Maintenance respiration rates</h3>
-<p>When missing at the species parameter table, maintenance respiration rates for leaves, sapwood and fine roots (<span class="math inline">\(RER_{leaf}\)</span>, <span class="math inline">\(RER_{sapwood}\)</span> and <span class="math inline">\(RER_{fineroot}\)</span>; all in <span class="math inline">\(g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}\)</span>) are estimated from corresponding tissue nitrogen concentrations (<span class="math inline">\(N_{leaf}\)</span>, <span class="math inline">\(N_{sapwood}\)</span> and <span class="math inline">\(N_{fineroot}\)</span>; all in <span class="math inline">\(mg\,N \cdot g\,dry^{-1}\)</span>) following the equations given by <span class="citation"><a href="#ref-Reich2008" role="doc-biblioref">Reich <em>et al.</em></a> (<a href="#ref-Reich2008" role="doc-biblioref">2008</a>)</span> (after appropriate unit conversion).</p>
-<p>In turn, when missing tissue nitrogen concentrations are estimated from taxonomic family using an internal data set (<code>medfate:::trait_family_means</code>):</p>
+<p>When missing at the species parameter table, maintenance respiration rates for leaves, sapwood and fine roots (<span class="math inline">\(RER_{leaf}\)</span>, <span class="math inline">\(RER_{sapwood}\)</span> and <span class="math inline">\(RER_{fineroot}\)</span>; all in <span class="math inline">\(g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}\)</span>) are estimated from corresponding tissue nitrogen concentrations (<span class="math inline">\(N_{leaf}\)</span>, <span class="math inline">\(N_{sapwood}\)</span> and <span class="math inline">\(N_{fineroot}\)</span>; all in <span class="math inline">\(mg\,N \cdot g\,dry^{-1}\)</span>) following the equations given by <span class="citation"><a href="#ref-Reich2008" role="doc-biblioref">Reich <em>et al.</em></a> (<a href="#ref-Reich2008" role="doc-biblioref">2008</a>)</span> (after appropriate unit conversion):
+<span class="math display">\[\begin{eqnarray}
+RER_{leaf} &amp;=&amp; e^{0.691+ 1.639 \cdot \log(N_{leaf}))} \\
+RER_{sapwood} &amp;=&amp; e^{1.024 + 1.344 \cdot \log(N_{sapwood}))} \\
+RER_{fineroot} &amp;=&amp; e^{0.980 + 1.352 \cdot \log(N_{fineroot}))}
+\end{eqnarray}\]</span>
+where in the previous equations nitrogen concentrations are in <span class="math inline">\(mmol\,N\cdot g\,dry^{-1}\)</span> and respiration rates in <span class="math inline">\(nmol\,CO2\cdot g\,dry^{-1}\cdot s^{-1}\)</span>.</p>
+<p>In turn, when tissue nitrogen concentrations are missing they are estimated from taxonomic family using an internal data set (<code>medfate:::trait_family_means</code>):</p>
 <table>
 <caption><span id="tab:unnamed-chunk-52">Table A.8: </span>Default nitrogen concentration per dry mass in different tissues by taxonomic family.</caption>
 <thead>
@@ -9029,7 +9035,7 @@ J_{max, 298} = e^{1.197 + 0.847\cdot \log(V_{max,298})}
 </tr>
 </tbody>
 </table>
-<p>When family values are missing, default nitrogen concentrations are given: <span class="math inline">\(N_{leaf} = 20.088\)</span>, <span class="math inline">\(N_{sapwood} = 3.9791\)</span> and <span class="math inline">\(N_{fineroot} = 12.207\)</span>.</p>
+<p>When family values are also missing, default tissue-averaged nitrogen concentrations are given: <span class="math inline">\(N_{leaf} = 20.088\)</span>, <span class="math inline">\(N_{sapwood} = 3.9791\)</span> and <span class="math inline">\(N_{fineroot} = 12.207\)</span>.</p>
 <p>Default <code>control</code> values (<span class="math inline">\(MR_{leaf} = 0.00260274\)</span>), sapwood (<span class="math inline">\(MR_{sapwood} = 6.849315e-05\)</span>) and fine roots (<span class="math inline">\(MR_{fineroot} 0.002054795\)</span>) were used in previous model versions, derived from <span class="citation"><a href="#ref-Ogle2009" role="doc-biblioref">Ogle &amp; Pacala</a> (<a href="#ref-Ogle2009" role="doc-biblioref">2009</a>)</span>, but these are no longer used because of easier parameterization using tissue nitrogen concentration.</p>
 </div>
 <div id="imputationRGR" class="section level3" number="24.3.19">

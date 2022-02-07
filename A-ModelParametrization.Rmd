@@ -455,9 +455,15 @@ J_{max, 298} = e^{1.197 + 0.847\cdot \log(V_{max,298})}
 
 ### Maintenance respiration rates {#imputationRER}
 
-When missing at the species parameter table, maintenance respiration rates for leaves, sapwood and fine roots ($RER_{leaf}$, $RER_{sapwood}$ and $RER_{fineroot}$; all in $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$) are estimated from corresponding tissue nitrogen concentrations ($N_{leaf}$, $N_{sapwood}$ and $N_{fineroot}$; all in $mg\,N \cdot g\,dry^{-1}$) following the equations given by @Reich2008 (after appropriate unit conversion). 
+When missing at the species parameter table, maintenance respiration rates for leaves, sapwood and fine roots ($RER_{leaf}$, $RER_{sapwood}$ and $RER_{fineroot}$; all in $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$) are estimated from corresponding tissue nitrogen concentrations ($N_{leaf}$, $N_{sapwood}$ and $N_{fineroot}$; all in $mg\,N \cdot g\,dry^{-1}$) following the equations given by @Reich2008 (after appropriate unit conversion):
+\begin{eqnarray}
+RER_{leaf} &=& e^{0.691+ 1.639 \cdot \log(N_{leaf}))} \\
+RER_{sapwood} &=& e^{1.024 + 1.344 \cdot \log(N_{sapwood}))} \\
+RER_{fineroot} &=& e^{0.980 + 1.352 \cdot \log(N_{fineroot}))}
+\end{eqnarray}
+where in the previous equations nitrogen concentrations are in $mmol\,N\cdot g\,dry^{-1}$ and respiration rates in $nmol\,CO2\cdot g\,dry^{-1}\cdot s^{-1}$.
 
-In turn, when missing tissue nitrogen concentrations are estimated from taxonomic family using an internal data set (`medfate:::trait_family_means`):
+In turn, when tissue nitrogen concentrations are missing they are estimated from taxonomic family using an internal data set (`medfate:::trait_family_means`):
 ```{r echo = FALSE}
 tfm = medfate:::trait_family_means
 knitr::kable(tfm[!is.na(tfm$Nleaf),
@@ -465,7 +471,7 @@ knitr::kable(tfm[!is.na(tfm$Nleaf),
              caption = 'Default nitrogen concentration per dry mass in different tissues by taxonomic family.')
 ```
 
-When family values are missing, default nitrogen concentrations are given: $N_{leaf} = 20.088$, $N_{sapwood} = 3.9791$ and $N_{fineroot} = 12.207$.
+When family values are also missing, default tissue-averaged nitrogen concentrations are given: $N_{leaf} = 20.088$, $N_{sapwood} = 3.9791$ and $N_{fineroot} = 12.207$.
 
 Default `control` values ($MR_{leaf} = 0.00260274$), sapwood ($MR_{sapwood} = 6.849315e-05$) and fine roots ($MR_{fineroot} 0.002054795$) were used in previous model versions, derived from @Ogle2009, but these are no longer used because of easier parameterization using tissue nitrogen concentration.
 
