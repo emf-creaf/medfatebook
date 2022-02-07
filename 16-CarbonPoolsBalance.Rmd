@@ -105,13 +105,13 @@ A = \frac{10000 \cdot A_g}{N} \cdot \frac{m_{gluc}}{m_{carbon} \cdot 6}
 where $N$ is the density of individuals per hectare, $m_{gluc}$ is the glucose molar mass and $m_{carbon}$ is the carbon molar mass.
 
 ### Maintenance respiration
-Maintenance respiration (in $g\,gluc·ind^{-1}$) is calculated for each of the three compartments (leaves, sapwood, and fine roots) individually [@Mouillot2001].  The model uses a $Q_{10}$ relationship with temperature, which means that for every 10 ºC change in temperature there is a $Q_{10}$ factor change in respiration. Baseline maintenance respiration rates per dry biomass ($MR_{leaf}$, $MR_{sapwood}$ and $MR_{fineroot}$ for leaves, parenchymatic sapwood and fine roots, respectively; in $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$) are can be specified via control parameters (defaults for all species) or via species-specific parameters and should refer to 20 ºC:
+Maintenance respiration (in $g\,gluc·ind^{-1}$) is calculated for each of the three compartments (leaves, sapwood, and fine roots) individually [@Mouillot2001].  The model uses a $Q_{10}$ relationship with temperature, which means that for every 10 ºC change in temperature there is a $Q_{10}$ factor change in respiration:
 \begin{eqnarray}
 M_{leaf} &=& (B_{leaf} + B_{sugar,leaf}) \cdot MR_{leaf} \cdot Q_{10}^{(T_{mean}-20)/10} \\
 M_{sapwood} &=& (B_{living,sapwood} + B_{sugar,sapwood}) \cdot MR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
 M_{fineroot} &=& B_{fineroot} \cdot MR_{fineroot} \cdot Q_{10}^{(T_{mean}-20)/10} 
 \end{eqnarray}
-where $T_{mean}$ is the average daily temperature (in ºC). Factor $Q_{10}$ has been found to decrease with temperature [@Tjoelker2001]. For example, a 10 °C increase in measurement temperature at low measurement temperatures from 5 to 15 °C results in an approximate 2.8 fold increase in respiration rate, whereas an increase in temperature from 25 to 35 °C results in a less than two-fold (1.8) increase in rate. The general temperature relationship proposed by @Tjoelker2001 is used here:
+where $T_{mean}$ is the average daily temperature (in ºC). Baseline maintenance respiration rates per dry biomass ($MR_{leaf}$, $MR_{sapwood}$ and $MR_{fineroot}$ for leaves, parenchymatic sapwood and fine roots, respectively; in $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$) are can be supplied via species-specific parameters and should refer to 20 ºC. Alternatively, they can be estimated from nitrogen concentration in different tissues, following @Reich2008 (see section \@ref(imputationRER)). Factor $Q_{10}$ has been found to decrease with temperature [@Tjoelker2001]. For example, a 10 °C increase in measurement temperature at low measurement temperatures from 5 to 15 °C results in an approximate 2.8 fold increase in respiration rate, whereas an increase in temperature from 25 to 35 °C results in a less than two-fold (1.8) increase in rate. The general temperature relationship proposed by @Tjoelker2001 is used here:
 \begin{equation}
 Q_{10} = 3.22 - 0.046 \cdot T_{mean}
 \end{equation}
