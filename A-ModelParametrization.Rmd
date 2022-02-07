@@ -65,6 +65,7 @@ The following tables describe how the different functional parameters are dealt 
 | Symbol | R    | Description                          | Strict | Scaled | Imputable |
 |--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
 | $1/H_{v}$  |  `Al2As` | Ratio of leaf area to sapwood area | No | No | \@ref(imputationAl2As) | 
+| $RLR$  | `Ar2Al` | Fine root area to leaf area ratio | No | No | \@ref(imputationAr2Al) |
 |  $LW$   | `LeafWidth` | Leaf width | No | No | \@ref(imputationLWSLA) |
 | $SLA$  |  `SLA` | Specific leaf area | No |  No |\@ref(imputationLWSLA) |
 | $\rho_{leaf}$ |  `LeafDensity` | Leaf tissue density | No | No | \@ref(imputationtissuedensity) |
@@ -92,6 +93,7 @@ The following tables describe how the different functional parameters are dealt 
 | $T_{max, LAI}$ | `Tmax_LAI` | Empirical coefficient relating LAI with the ratio of maximum transpiration over potential evapotranspiration | No | No | \@ref(imputationtranspwue) |
 | $T_{max, sqLAI}$ | `Tmax_LAIsq` | Empirical coefficient relating squared LAI with the ratio of maximum transpiration over potential evapotranspiration | No | No | \@ref(imputationtranspwue) |
 | $WUE_{\max}$ | `WUE` |  Water use efficiency  | No | No | \@ref(imputationtranspwue) |
+| $WUE_{decay}$ | `WUE_decay` |  Exponent describing the decay of water use efficiency with low light levels  | No | No | \@ref(imputationtranspwue) |
 | $\Psi_{extract}$ | `Psi_Extract` |  The water potential at which plant transpiration is 50% of its maximum | No | No |  \@ref(imputationtranspwue) |
 | $\Psi_{critic}$ | `Psi_Critic` |  The water potential corresponding to 50% of stem xylem cavitation |  No | No | \@ref(imputationVCs) |
 | $K_{rootdisc}$ | `pRootDisc` |  Whole-plant relative transpiration corresponding to hydraulic disconnection from the soil  | No |  No | \@ref(imputationsoildisconnection) |
@@ -262,6 +264,11 @@ If there is no information derived from taxonomic family for `Al2As`, a default 
 
 Missing values for $f_{conduits}$, the fraction of sapwood corresponding to conduits are derived from taxonomic family (see table above). If information from taxonomic family is missing, default values are $f_{conduits} = 0.7$ (i.e. 30\% of parenchyma) for angiosperms, and $f_{conduits} = 0.925$ (i.e. 7.5\% of parenchyma) for gymnosperms [@Plavcova2015].
 
+### Fine root to leaf area ratio {#imputationAr2Al}
+
+When missing, the fine root area to leaf area ratio is given a default value of $RLR = 1\; m^2\cdot m^{-2}$.
+
+
 ### Leaf phenology {#imputationphenology}
 
 When missing, leaf duration is assigned a value of 1 year for winter-deciduous species and 2.41 years for the remaining leaf phenology types. 
@@ -281,18 +288,18 @@ Leaf senescence values were derived for deciduous broad-leaved forests by @Delpi
 
 When the basic soil water balance model is used, $T_{max,LAI}$ and $T_{max,sqLAI}$ are species-specific parameters that regulate the maximum transpiration of plant cohorts (see \@ref(maximumtranspiration)). When these parameters are missing from `SpParams` table, they are given default values $T_{max,LAI} = 0.134$ and $T_{max,sqLAI} = -0.006$, according to @Granier1999.  
 
-When water use efficiency coefficient is missing, it is determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
+When maximum water use efficiency ($WUE_{\max}$) is missing, it is determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
 ```{r echo = FALSE}
 tfm = medfate:::trait_family_means
 knitr::kable(tfm[!is.na(tfm$WUE),
                  c("WUE"),drop=FALSE],
-             caption = 'Default water use efficiency by family.')
+             caption = 'Default maximum water use efficiency by family.')
 ```
 
 
 If there is no information derived from taxonomic family, the following default values are assigned depending on leaf shape and leaf size:
 
-|  Leaf shape | Leaf size |  $WUE$  |
+|  Leaf shape | Leaf size |  $WUE_{\max}$  |
 |:--------------- |:-----:|:-----:|
 | Broad | Large |   3.028   |
 | Broad | Medium |   3.982   | 
@@ -300,6 +307,8 @@ If there is no information derived from taxonomic family, the following default 
 | Linear | [any] |   3.707   |
 | Needle | [any] |  3.707    |
 | Scale | [any] |   1.665   |
+
+By default, the coefficient describing the decay of water use efficiency with lower light levels is given a default value of $WUE_{decay} = 0.2812$.
 
 When missing, the water potential corresponding to 50\% of transpiration ($\Psi_{extract}$) is estimated by calculating the water potential corresponding to the loss leaf turgor ($\Psi_{tlp}$), using equation \@ref(eq:turgorlosspoint) from @Bartlett2012. The parameters of the leaf pressure-volume curve needed for applying equation \@ref(eq:turgorlosspoint) may be themselves estimated (see \@ref(inputationPV)). Note that $\Psi_{tlp}$ has been found to be highly correlated to $\Psi_{gs50}$, the water potential corresponding to 50\% of stomatal conductance [@Bartlett2016].
 
