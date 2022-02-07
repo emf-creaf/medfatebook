@@ -128,6 +128,9 @@ The following tables describe how the different functional parameters are dealt 
 
 | Symbol | R    | Description                          | Strict | Scaled | Imputable |
 |--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
+| $N_{leaf}$ | `Nleaf` | Leaf nitrogen concentration per dry mass | No | No | \@ref(imputationRER) |
+| $N_{sapwood}$ | `Nsapwood` | Sapwood nitrogen concentration per dry mass | No | No | \@ref(imputationRER) |
+| $N_{fineroot}$ | `Nfineroot` | Fine root nitrogen concentration per dry mass | No | No | \@ref(imputationRER) |
 | $MR_{leaf}$ | `RERleaf` | Leaf respiration rate at 20 ºC | No | No | \@ref(imputationRER) |
 | $MR_{sapwood}$ | `RERsapwood` | Living sapwood (parenchymatic tissue) respiration rate at 20 ºC | No | No | \@ref(imputationRER) |
 | $MR_{fineroot}$ | `RERfineroot` | Fine root respiration rate at 20 ºC | No | No | \@ref(imputationRER) |
@@ -442,16 +445,7 @@ Rubisco's maximum carboxylation rate at 25ºC ($V_{max, 298}$, in $\mu mol CO_2 
 V_{max, 298} = e^{1.993 + 2.555\cdot \log(N_{area}) - 0.372 \cdot \log(SLA) + 0.422 \cdot \log(N_{area})\cdot \log(SLA) }
 \end{equation}
 
-In turn, imputation for $SLA$ is explained in \@ref(imputationLWSLA), whereas missing values for $N_{area}$ are determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
-```{r echo = FALSE}
-tfm = medfate:::trait_family_means
-knitr::kable(tfm[!is.na(tfm$Narea),
-                 c("Narea"),drop=FALSE],
-             caption = 'Default nitrogen concentration per leaf area by taxonomic family.')
-```
-If family-level values is missing, a default average value $N_{area} = 1.89$ is given. 
-
-Would $N_{area}$ and $SLA$ values be both unavailable, a default value of 100 $\mu mol CO_2 \cdot s^{-1} \cdot m^{-2}$ is used for $V_{max, 298}$ imputation. 
+In turn, imputation for $SLA$ is explained in \@ref(imputationLWSLA), whereas values for $N_{area}$ are determined from $N_{leaf}$ and $SLA$, being $N_{leaf}$ estimated as indicated in \@ref(imputationRER). Would $N_{leaf}$ and $SLA$ values be both unavailable, a default value of 100 $\mu mol CO_2 \cdot s^{-1} \cdot m^{-2}$ is used for $V_{max, 298}$ imputation. 
 
 When the maximum rate of electron transport at the same temperature ($J_{max, 298}$) is not provided by the user, it can be estimated from $V_{max, 298}$ using [@Walker2014]:
 
@@ -461,7 +455,19 @@ J_{max, 298} = e^{1.197 + 0.847\cdot \log(V_{max,298})}
 
 ### Maintenance respiration rates {#imputationRER}
 
-When missing at the species parameter table, maintenance respiration rates for leaves, sapwood and fine roots are taken from `control` parameters (all values in $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$). Default values ($MR_{leaf} = 0.00260274$), sapwood ($MR_{sapwood} = 6.849315e-05$) and fine roots ($MR_{fineroot} 0.002054795$) were derived from @Ogle2009.
+When missing at the species parameter table, maintenance respiration rates for leaves, sapwood and fine roots ($RER_{leaf}$, $RER_{sapwood}$ and $RER_{fineroot}$; all in $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$) are estimated from corresponding tissue nitrogen concentrations ($N_{leaf}$, $N_{sapwood}$ and $N_{fineroot}$; all in $mg\,N \cdot g\,dry^{-1}$) following the equations given by @Reich2008 (after appropriate unit conversion). 
+
+In turn, when missing tissue nitrogen concentrations are estimated from taxonomic family using an internal data set (`medfate:::trait_family_means`):
+```{r echo = FALSE}
+tfm = medfate:::trait_family_means
+knitr::kable(tfm[!is.na(tfm$Nleaf),
+                 c("Nleaf", "Nsapwood", "Nfineroot"),drop=FALSE],
+             caption = 'Default nitrogen concentration per dry mass in different tissues by taxonomic family.')
+```
+
+When family values are missing, default nitrogen concentrations are given: $N_{leaf} = 20.088$, $N_{sapwood} = 3.9791$ and $N_{fineroot} = 12.207$.
+
+Default `control` values ($MR_{leaf} = 0.00260274$), sapwood ($MR_{sapwood} = 6.849315e-05$) and fine roots ($MR_{fineroot} 0.002054795$) were used in previous model versions, derived from @Ogle2009, but these are no longer used because of easier parameterization using tissue nitrogen concentration.
 
 ### Relative growth rates {#imputationRGR}
 

@@ -293,6 +293,12 @@ A third set of parameters refers to growth parameters (`paramsGrowth`).
 
 | Symbol       | Units | R param       | Description                      |
 |--------------|-------|---------------|----------------------------------|
+| $N_{leaf}$ | $mg\,N \cdot g\,dry^{-1}$ | `Nleaf` | Leaf nitrogen concentration per dry mass |
+| $N_{sapwood}$ | $mg\,N \cdot g\,dry^{-1}$ | `Nsapwood` | Sapwood nitrogen concentration per dry mass | 
+| $N_{fineroot}$ | $mg\,N \cdot g\,dry^{-1}$ | `Nfineroot` | Fine root nitrogen concentration per dry mass | 
+| $MR_{leaf}$ | $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$ | `RERleaf` | Leaf respiration rate at 20 ºC. Normally estimated via  $N_{leaf}$. |
+| $MR_{sapwood}$ | $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$ | `RERsapwood` | Living sapwood (parenchymatic tissue) respiration rate at 20 ºC. Normally estimated via  $N_{sapwood}$. |
+| $MR_{fineroot}$ | $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$ | `RERfineroot` | Fine root respiration rate at 20 ºC. Normally estimated via  $N_{fineroot}$. |
 | $MR_{leaf}$ | $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$ | `RERleaf` | Leaf respiration rate at 20 ºC |
 | $MR_{sapwood}$ | $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$ | `RERsapwood` | Living sapwood (parenchymatic tissue) respiration rate at 20 ºC |
 | $MR_{fineroot}$ | $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$ | `RERfineroot` | Fine root respiration rate at 20 ºC |
@@ -332,7 +338,6 @@ A number of control parameters regulate carbon balance:
 + `nonSugarConcentration [=0.25]`: A constant specifying non-sugar (inorganic) solute concentration ($mol \cdot L^{-1}$) in cells.
 + `equilibriumOsmoticConcentration [= c(leaf = 0.8, sapwood = 0.6)]`: Equilibrium osmotic concentrations ($mol \cdot L^{-1}$) for leaf and sapwood cells. The difference between leaf and sapwood values helps maintaining phloem transport. The equilibrium sugar concentration is found using `equilibriumOsmoticConcentration - nonSugarConcentration` and defaults to `[= c(leaf = 0.55, sapwood = 0.35)]`.
 + `minimumRelativeStarchForGrowth [= 0.25]`: Minimum concentration of storage carbon, relative to maximum storage capacity, for secondary growth (sapwood formation) to occur. 
-+ `respirationRates [= c(leaf = 0.00260274, sapwood = 6.849315e-05, fineroot = 0.002054795)]`: Maintenance respiration rates for different tissues (in $g\,gluc \cdot g\, dry^{-1} · day^{-1}$). These are default values used when maintenance respiration rates are not specified via species-specific `SpParams`.
 + `senescenceRates [= c(sapwood = 0.0001261398, fineroot = 0.001897231)]`: Relative senescence rates ($day^{-1}$) for sapwood and fine roots. Default are equivalent to 4.5% and 50% annual turnover for sapwood and fine roots, respectively. Leaf senescence rates depend on leaf lifespan (i.e. leaf duration) for evergreen species. These are default values used when relative growth rates are not specified via species-specific `SpParams`.
 + `constructionCosts [= c(leaf = 1.5, sapwood = 1.47, fineroot = 1.30)]`: Default construction costs, including respiration and structural carbon, per dry weight of new tissue ($g\,gluc \cdot g\,dry^{-1}$). These are default values used when relative growth rates are not specified via species-specific `SpParams`.
 + `maximumRelativeGrowthRates [= c(leaf = 0.01, sapwood = 0.005, fineroot = 0.1)]`: Default maximum leaf growth rate relative to sapwood area ($m^{2}\cdot cm^{-2} \cdot day^{-1}$), maximum sapwood relative growth rate ($cm^{2}\cdot cm^{-2} \cdot day^{-1}$) and maximum fine root growth rate relative to sapwood area ($g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$). These are default values used when relative growth rates are not specified via species-specific `SpParams`.
