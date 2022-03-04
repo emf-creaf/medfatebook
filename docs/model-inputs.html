@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2022-03-01" />
+<meta name="date" content="2022-03-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -658,7 +658,7 @@ div.csl-indent {
             <section class="normal" id="section-">
 <div id="model-inputs" class="section level1" number="2">
 <h1><span class="header-section-number">Chapter 2</span> Model inputs</h1>
-<p>Data input for simulation models can be grouped into four categories. First, a description of the <strong>vegetation</strong> existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in <code>spwb()</code> calls, but becomes dynamic in calls to <code>growth()</code>. Hence, in this latter case the input vegetation describes to the starting point. Second, <strong>soil</strong> information is also required, because underground water resources are important for the processes included in the model. While soil features are considered static parameters in model simulations, <strong>weather</strong> is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur. Finally, <strong>topographic and geographic information</strong> is often required, since internal calculations of some physical variables (such as atmospheric pressure or radiation) require them.</p>
+<p>Data input for simulation models can be grouped into four categories. First, a description of the <strong>vegetation</strong> existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in <code>spwb()</code> calls, but becomes dynamic in calls to <code>growth()</code>. Hence, in this latter case the input vegetation describes the starting point. Second, information on the physical structure of <strong>soil</strong> is also required. While soil physical features are considered static parameters in simulations, <strong>weather</strong> is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur. Finally, <strong>topographic and geographic information</strong> is often required, since internal calculations of some physical variables (such as atmospheric pressure or radiation) require them.</p>
 <p>This chapter describes the requirements of <strong>medfate</strong> package with respect to each of these data input categories. The last section describes additional parameters that are used to specify global options of simulation functions (i.e., <code>spwb()</code>, <code>pwb()</code>, <code>growth()</code>, <code>fordyn()</code> and daily simulation functions).</p>
 <p>Since preparing inputs for simulations can be hard, package <a href="https://github.com/emf-creaf/medfateutils"><strong>medfateutils</strong></a> provides a set of utility functions aimed at facilitating this task.</p>
 <div id="topoinput" class="section level2" number="2.1">
@@ -667,7 +667,7 @@ div.csl-indent {
 </div>
 <div id="soilinput" class="section level2" number="2.2">
 <h2><span class="header-section-number">2.2</span> Soil description</h2>
-<p>Soils are described in <strong>medfate</strong> using <span class="math inline">\(S &gt; 1\)</span> different soil layers (<span class="math inline">\(s \in \{1, 2, ..., S\}\)</span>). Here the word <em>soil</em> refers to depths that plant rooting systems can reach (i.e., the critical zone), including cracks within the bedrock. The number and size of soil layers may reflect changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties. Most soil properties are considered <em>static</em> parameters in simulations, except soil moisture content, variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered in simulations.</p>
+<p>Soils are described in <strong>medfate</strong> using <span class="math inline">\(S &gt; 1\)</span> different soil layers (<span class="math inline">\(s \in \{1, 2, ..., S\}\)</span>). Here the word <em>soil</em> refers to depths that plant rooting systems can reach (i.e., the critical zone), including cracks within the bedrock. The number and size of soil layers may reflect changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties and are considered <em>static</em> parameters in simulations. In contrast, soil moisture content, variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered, are state variables.</p>
 <div id="soil-physical-properties" class="section level3" number="2.2.1">
 <h3><span class="header-section-number">2.2.1</span> Soil physical properties</h3>
 <p>Soil physical properties, such as <em>texture</em> (i.e. volume percent of sand, silt and clay), <em>organic matter content</em>, <em>bulk density</em> or <em>rock fragment content</em>, can differ between soil layers, and this has important consequences for soil water retention capacity and soil hydraulics. Specifying layers with an elevated rock fragment content (e.g. layers of weathered rock where soil particles are scarce) may be important in seasonally-arid climates like the Mediterranean, because plants often extend their roots into cracks existing in the parent rock to access water during summer <span class="citation">(<a href="#ref-Ruffault2013" role="doc-biblioref">Ruffault <em>et al.</em> 2013</a>)</span>.</p>
@@ -1001,7 +1001,8 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 <span class="math display">\[\begin{equation}
 LAI^{all}_{i} = LAI^{\phi}_{i}+LAI^{dead}_{i}
 \end{equation}\]</span></p>
-<p>For simulations not involving growth, winter deciduous phenology is still simulated, and the current level of leaves unfolded may be lower than the maximum (live) amount of leaves. If there are <span class="math inline">\(c\)</span> plant cohorts, the leaf area index of the whole stand can be calculated for living leaves, unfolded leaves, dead leaves and total leaf area as:
+<p>For simulations not involving growth, winter-deciduous phenology is a prognostic variable and the current level of leaves unfolded may be lower than the maximum (live) amount of leaves. In simulations involving growth, both <span class="math inline">\(LAI^{\phi}\)</span> and <span class="math inline">\(LAI^{live}\)</span> can change, the former due to leaf phenology (unfolding is simulated explicitly and has carbon costs) and the latter due to leaf allocation limits during plant development.</p>
+<p>If there are <span class="math inline">\(c\)</span> plant cohorts, the leaf area index of the whole stand can be calculated for living leaves, unfolded leaves, dead leaves and total leaf area as:
 <span class="math display">\[\begin{eqnarray}
 LAI^{live}_{stand} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{live}} \\
 LAI^{\phi}_{stand} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{\phi}} \\
@@ -1022,12 +1023,12 @@ LAI^{all}_{stand} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{all}} = LAI^{\phi}_{stand}+L
 ## 
 ## $treeData
 ##   Species   N   DBH Height Z50  Z95
-## 1     148 168 37.55    800 400 2000
-## 2     168 384 14.60    660 400 2000
+## 1     148 168 37.55    800 100  600
+## 2     168 384 14.60    660 300 1000
 ## 
 ## $shrubData
 ##   Species Cover Height Z50  Z95
-## 1     165  3.75     80 300 1500
+## 1     165  3.75     80 200 1000
 ## 
 ## $herbCover
 ## [1] 10
@@ -1109,7 +1110,7 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <div id="update-of-structural-variables-during-simulations" class="section level3" number="2.3.7">
 <h3><span class="header-section-number">2.3.7</span> Update of structural variables during simulations</h3>
 <p>Vegetation characteristics stay constant during simulations using functions <code>spwb()</code> or <code>pwb()</code>, although the actual (unfolded) leaf area and dead leaf area may vary depending on leaf phenology.</p>
-<p>In contrast, growth simulation requires updating the structure of vegetation, i.e. heights, tree diameters and shrub cover. Function <code>growth()</code> can modify any of the vegetation attributes. Finally, function <code>fordyn()</code> modifies not only structural variables of the initial cohorts but also involves the recruitment of new woody cohorts during simulations.</p>
+<p>In contrast, growth simulation requires updating the structure of vegetation, i.e. plant heights, tree diameters, tree density and shrub cover. Function <code>growth()</code> can modify any of the vegetation attributes. Finally, function <code>fordyn()</code> modifies not only structural variables of the initial cohorts but also involves the recruitment of new woody cohorts during simulations.</p>
 </div>
 </div>
 <div id="meteoinput" class="section level2" number="2.4">
@@ -1148,7 +1149,7 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <td><span class="math inline">\(^{\circ} \mathrm{C}\)</span></td>
 <td><code>MinTemperature</code></td>
 <td>Minimum temperature</td>
-<td>N</td>
+<td>Y</td>
 <td>Y</td>
 </tr>
 <tr class="odd">
@@ -1156,7 +1157,7 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <td><span class="math inline">\(^{\circ} \mathrm{C}\)</span></td>
 <td><code>MaxTemperature</code></td>
 <td>Maximum temperature</td>
-<td>N</td>
+<td>Y</td>
 <td>Y</td>
 </tr>
 <tr class="even">
@@ -1164,7 +1165,7 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <td>%</td>
 <td><code>MinRelativeHumidity</code></td>
 <td>Minimum relative humidity</td>
-<td>N</td>
+<td>Y</td>
 <td>Y</td>
 </tr>
 <tr class="odd">
@@ -1172,7 +1173,7 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <td>%</td>
 <td><code>MaxRelativeHumidity</code></td>
 <td>Maximum relative humidity</td>
-<td>N</td>
+<td>Y</td>
 <td>Y</td>
 </tr>
 <tr class="even">
@@ -1217,9 +1218,9 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 </tr>
 </tbody>
 </table>
-<p>Dates are needed in <strong>medfate</strong> to estimate parameters like solar declination or the day of the year (<span class="math inline">\(DOY\)</span>). Importantly, <em>dates</em> should be included as row names (in format <em>year-month-day</em>) of the input meteorology data frame. Since it allows producing data frames with appropiate variable units and row/column names, we recommend meteorological input to be generated using package <strong>meteoland</strong> <span class="citation">(<a href="#ref-DeCaceres2018" role="doc-biblioref">De Cáceres <em>et al.</em> 2018</a>)</span>, but many other sources are possible.</p>
+<p>Dates are needed in <strong>medfate</strong> to estimate parameters like solar declination or the day of the year (<span class="math inline">\(DOY\)</span>). Importantly, <em>dates</em> should be included as row names (in format <em>year-month-day</em>) of the input meteorology data frame. Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package <strong>meteoland</strong> <span class="citation">(<a href="#ref-DeCaceres2018" role="doc-biblioref">De Cáceres <em>et al.</em> 2018</a>)</span>, but other sources are possible.</p>
 <p>Not all simulation models require all weather variables (see rightmost columns in the previous table). In particular, basic water balance modelling (chapter <a href="basicwaterbalance.html#basicwaterbalance">3</a>) requires much less information than advance water balance modelling (chapter <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>). The weather input requirements for modelling growth (chapter <a href="growthmodelling.html#growthmodelling">15</a>) or forest dynamics (chapter <a href="dynamicsmodelling.html#dynamicsmodelling">18</a>) depend on the complexity of the water balance model used within it.</p>
-<p>Whereas the weather variables listed in the table above are input requirements, <strong>medfate</strong> derives other atmospheric variables from them, using also topographic information (see <a href="http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils">utility functions</a> of the <strong>meteoland</strong> reference manual):</p>
+<p>While the weather variables listed in the table above are input requirements, <strong>medfate</strong> derives other atmospheric variables from them, using also topographic information (see <a href="http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils">utility functions</a> of the <strong>meteoland</strong> reference manual):</p>
 <table>
 <thead>
 <tr class="header">
@@ -1255,42 +1256,30 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <h2><span class="header-section-number">2.5</span> Simulation control</h2>
 <p>Simulation control parameters are a list of global parameter values, initialized using function <code>defaultControl()</code>, that the user can modify to change the general behavior of simulation functions. Here is the set of global control parameters currently accepted in <strong>medfate</strong>:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="model-inputs.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
-<pre><code>##  [1] &quot;fillMissingSpParams&quot;                 &quot;verbose&quot;                            
-##  [3] &quot;subdailyResults&quot;                     &quot;transpirationMode&quot;                  
-##  [5] &quot;soilFunctions&quot;                       &quot;defaultWindSpeed&quot;                   
-##  [7] &quot;snowpack&quot;                            &quot;leafPhenology&quot;                      
-##  [9] &quot;rockyLayerDrainage&quot;                  &quot;unlimitedSoilWater&quot;                 
-## [11] &quot;plantWaterPools&quot;                     &quot;unfoldingDD&quot;                        
-## [13] &quot;verticalLayerSize&quot;                   &quot;windMeasurementHeight&quot;              
-## [15] &quot;cavitationRefill&quot;                    &quot;ndailysteps&quot;                        
-## [17] &quot;nsubsteps&quot;                           &quot;cochard&quot;                            
-## [19] &quot;capacitance&quot;                         &quot;taper&quot;                              
-## [21] &quot;multiLayerBalance&quot;                   &quot;gainModifier&quot;                       
-## [23] &quot;costModifier&quot;                        &quot;costWater&quot;                          
-## [25] &quot;klatstem&quot;                            &quot;klatleaf&quot;                           
-## [27] &quot;numericParams&quot;                       &quot;fracLeafResistance&quot;                 
-## [29] &quot;fracRootResistance&quot;                  &quot;averageFracRhizosphereResistance&quot;   
-## [31] &quot;Catm&quot;                                &quot;thermalCapacityLAI&quot;                 
-## [33] &quot;boundaryLayerSize&quot;                   &quot;refillMaximumRate&quot;                  
-## [35] &quot;allowDessication&quot;                    &quot;allowStarvation&quot;                    
-## [37] &quot;allowDefoliation&quot;                    &quot;sinkLimitation&quot;                     
-## [39] &quot;shrubDynamics&quot;                       &quot;allocationStrategy&quot;                 
-## [41] &quot;nonStomatalPhotosynthesisLimitation&quot; &quot;phloemConductanceFactor&quot;            
-## [43] &quot;nonSugarConcentration&quot;               &quot;equilibriumOsmoticConcentration&quot;    
-## [45] &quot;minimumRelativeStarchForGrowth&quot;      &quot;constructionCosts&quot;                  
-## [47] &quot;senescenceRates&quot;                     &quot;maximumRelativeGrowthRates&quot;         
-## [49] &quot;mortalityMode&quot;                       &quot;mortalityBaselineRate&quot;              
-## [51] &quot;mortalityRelativeSugarThreshold&quot;     &quot;mortalityRWCThreshold&quot;              
-## [53] &quot;allowRecruitment&quot;                    &quot;recruitmentMode&quot;                    
-## [55] &quot;removeEmptyCohorts&quot;                  &quot;minimumCohortDensity&quot;               
-## [57] &quot;seedRain&quot;                            &quot;seedProductionTreeHeight&quot;           
-## [59] &quot;seedProductionShrubHeight&quot;           &quot;minTempRecr&quot;                        
-## [61] &quot;minMoistureRecr&quot;                     &quot;minFPARRecr&quot;                        
-## [63] &quot;recrTreeDBH&quot;                         &quot;recrTreeDensity&quot;                    
-## [65] &quot;recrTreeHeight&quot;                      &quot;recrShrubCover&quot;                     
-## [67] &quot;recrShrubHeight&quot;                     &quot;recrTreeZ50&quot;                        
-## [69] &quot;recrShrubZ50&quot;                        &quot;recrTreeZ95&quot;                        
-## [71] &quot;recrShrubZ95&quot;</code></pre>
+<pre><code>##  [1] &quot;fillMissingSpParams&quot;                 &quot;verbose&quot;                             &quot;subdailyResults&quot;                    
+##  [4] &quot;transpirationMode&quot;                   &quot;soilFunctions&quot;                       &quot;defaultWindSpeed&quot;                   
+##  [7] &quot;snowpack&quot;                            &quot;leafPhenology&quot;                       &quot;rockyLayerDrainage&quot;                 
+## [10] &quot;unlimitedSoilWater&quot;                  &quot;plantWaterPools&quot;                     &quot;unfoldingDD&quot;                        
+## [13] &quot;verticalLayerSize&quot;                   &quot;windMeasurementHeight&quot;               &quot;cavitationRefill&quot;                   
+## [16] &quot;ndailysteps&quot;                         &quot;nsubsteps&quot;                           &quot;cochard&quot;                            
+## [19] &quot;capacitance&quot;                         &quot;taper&quot;                               &quot;multiLayerBalance&quot;                  
+## [22] &quot;gainModifier&quot;                        &quot;costModifier&quot;                        &quot;costWater&quot;                          
+## [25] &quot;klatstem&quot;                            &quot;klatleaf&quot;                            &quot;numericParams&quot;                      
+## [28] &quot;fracLeafResistance&quot;                  &quot;fracRootResistance&quot;                  &quot;averageFracRhizosphereResistance&quot;   
+## [31] &quot;Catm&quot;                                &quot;thermalCapacityLAI&quot;                  &quot;boundaryLayerSize&quot;                  
+## [34] &quot;refillMaximumRate&quot;                   &quot;allowDessication&quot;                    &quot;allowStarvation&quot;                    
+## [37] &quot;allowDefoliation&quot;                    &quot;sinkLimitation&quot;                      &quot;shrubDynamics&quot;                      
+## [40] &quot;allocationStrategy&quot;                  &quot;nonStomatalPhotosynthesisLimitation&quot; &quot;phloemConductanceFactor&quot;            
+## [43] &quot;nonSugarConcentration&quot;               &quot;equilibriumOsmoticConcentration&quot;     &quot;minimumRelativeStarchForGrowth&quot;     
+## [46] &quot;constructionCosts&quot;                   &quot;senescenceRates&quot;                     &quot;maximumRelativeGrowthRates&quot;         
+## [49] &quot;mortalityMode&quot;                       &quot;mortalityBaselineRate&quot;               &quot;mortalityRelativeSugarThreshold&quot;    
+## [52] &quot;mortalityRWCThreshold&quot;               &quot;allowRecruitment&quot;                    &quot;recruitmentMode&quot;                    
+## [55] &quot;removeEmptyCohorts&quot;                  &quot;minimumCohortDensity&quot;                &quot;seedRain&quot;                           
+## [58] &quot;seedProductionTreeHeight&quot;            &quot;seedProductionShrubHeight&quot;           &quot;minTempRecr&quot;                        
+## [61] &quot;minMoistureRecr&quot;                     &quot;minFPARRecr&quot;                         &quot;recrTreeDBH&quot;                        
+## [64] &quot;recrTreeDensity&quot;                     &quot;recrTreeHeight&quot;                      &quot;recrShrubCover&quot;                     
+## [67] &quot;recrShrubHeight&quot;                     &quot;recrTreeZ50&quot;                         &quot;recrShrubZ50&quot;                       
+## [70] &quot;recrTreeZ95&quot;                         &quot;recrShrubZ95&quot;</code></pre>
 <p>Control parameters are employed when initializing vegetation inputs and state variables using functions <code>spwbInput()</code> and <code>growthInput()</code>, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as <code>spwb()</code> or <code>growth()</code>. Function <code>fordyn()</code> is different than the other simulation functions, because the list control parameters is directly passed to the function.</p>
 <p>Not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters). However, there are a set of parameters that apply to all simulations:</p>
 <ul>
