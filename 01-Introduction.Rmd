@@ -29,16 +29,16 @@ Package **medfate** can be found at [CRAN](https://CRAN.R-project.org/package=me
 install.packages("medfate")
 ```
 
-Users can also download and install the latest stable versions GitHub as follows (required package `devtools` should be installed/updated first):
+Users can also download and install the latest stable versions GitHub as follows (required package [**remotes**](https://CRAN.R-project.org/package=remotes) should be installed/updated first):
 
 ```{r installation, eval = FALSE}
-devtools::install_github("emf-creaf/medfate")
+remotes::install_github("emf-creaf/medfate")
 ```
 
 When installing from GitHub, one may force the installation of package vignettes by using: 
 
 ```{r installation vignettes, eval = FALSE}
-devtools::install_github("emf-creaf/medfate", 
+remotes::install_github("emf-creaf/medfate", 
                          build_opts = c("--no-resave-data", "--no-manual"),
                          build_vignettes = TRUE)
 ```
@@ -50,13 +50,13 @@ Among other dependencies, installing **medfate** requires package **meteoland**,
 Since both packages evolve together, installing **medfateland** normally requires an up-to-date version of **medfate**. The package **medfateland** is currently only available at GitHub, and can be installed using: 
 
 ```{r installation medfateland, eval = FALSE}
-devtools::install_github("emf-creaf/medfateland")
+remotes::install_github("emf-creaf/medfateland")
 ```
 
 As with **medfate**, one may force the installation of package vignettes for **medfateland**, by using: 
 
 ```{r medfateland installation vignettes, eval = FALSE}
-devtools::install_github("emf-creaf/medfateland", 
+remotes::install_github("emf-creaf/medfateland", 
                          build_opts = c("--no-resave-data", "--no-manual"),
                          build_vignettes = TRUE)
 ```
@@ -72,9 +72,10 @@ Both packages have a user interface in R, but actual calculations have been impl
 
 Package **medfate** deals with simulations at stand level and, hence, the data structures defined in the package are meant to encapsulate information about a target forest stands and the properties of the soil where it grows:
 
-+ S3 class `soil` is a list of soil physical and hydraulic properties, including both parameters and state variables. Soil objects are described in subsection \@ref(soilinitialization).
++ S3 class `soil` is a list of soil physical properties, including both parameters and state variables. Soil objects are described in subsection \@ref(soilinitialization).
 + S3 class `forest` is a list of forest inventory data (i.e. mainly tree and shrub measurements) corresponding to a single forest stand. Forest plot objects are described in subsection \@ref(forestobjects). 
 + S3 classes `spwbInput` and `growthInput` are lists containing all the vegetation parameters and state variables necessary to run water-balance simulations (function `spwb()` and alike) and forest growth simulations (function `growth()` and alike). Objects of classes `spwbInput` and `growthInput`  can be created using functions whose input includes a `forest` object and a `soil` object. 
+
 
 ### Dynamic simulation functions
 
@@ -95,19 +96,23 @@ Importantly, `growth()` and `fordyn()` functions and the processes that they imp
 
 Many of the sub-models included in **medfate** are implemented as C++ functions and internally called by the simulation functions implementing top-level models. Most sub-models have, however, their corresponding R function to made them directly available to the user. This facilitates understanding the different sub-models and a more creative use of the package. Sub-model functions are grouped by *subject*, which is included in the name of the function. The different sub-model functions are (by subject):
 
-* `biophysics_*`: Physical and biophysical utility functions.
-* `carbon_*`: Structural and non-structural carbon compartments and flows.
-* `hydraulics_*`: Plant hydraulics.
-* `hydrology_*`: Canopy and soil hydrology.
-* `light_*`: Light extinction and absortion.
-* `moisture_*`: Tissue water relations and live tissue moisture.
-* `pheno_*`: Leaf phenology.
-* `photo_*`: Leaf photosynthesis.
-* `root_*`: Root distribution and root/rhizosphere conductance estimation.
-* `soil_*`: Soil hydraulics and thermodynamics.
-* `spwb_*`: Soil water balance routines.
-* `transp_*`: Stomatal regulation and plant transpiration.
-* `wind_*`: Canopy turbulence.
+|  Group    | Description                 |
+| --------- | --------------------------- |
+|  `biophysics_*` | Physics and biophysics |
+|  `carbon_*` | Carbon balance |
+|  `fuel_*`  | Fuel properties |
+|  `fire_*`  | Fire behaviour |
+|  `hydraulics_*` | Plant hydraulics |
+|  `hydrology_*` | Canopy and soil hydrology |
+|  `light_*` | Light extinction and absortion |
+|  `moisture_*` | Live tissue moisture  |
+|  `pheno_*` | Leaf phenology  |
+|  `photo_*` | Leaf photosynthesis  |
+|  `root_*` | Root distribution and conductance calculations  |
+|  `soil_*` | Soil hydraulics and thermodynamics  |
+|  `transp_*` | Stomatal regulation, transpiration and photosynthesis  |
+|  `wind_*` | Canopy turbulence |
+
 
 ### Static functions
 

@@ -1,6 +1,6 @@
 # Model inputs
 
-Data input for simulation models can be grouped into four categories. First, a description of the  **vegetation** existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in `spwb()` calls, but becomes dynamic in calls to `growth()`. Hence, in this latter case the input vegetation describes to the starting point. Second, **soil** information is also required, because underground water resources are important for the processes included in the model. While soil features are considered static parameters in model simulations, **weather** is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur. Finally, **topographic and geographic information** is often required, since internal calculations of some physical variables (such as atmospheric pressure or radiation) require them. 
+Data input for simulation models can be grouped into four categories. First, a description of the  **vegetation** existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in `spwb()` calls, but becomes dynamic in calls to `growth()`. Hence, in this latter case the input vegetation describes the starting point. Second, information on the physical structure of **soil** is also required. While soil physical features are considered static parameters in simulations, **weather** is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur. Finally, **topographic and geographic information** is often required, since internal calculations of some physical variables (such as atmospheric pressure or radiation) require them. 
 
 This chapter describes the requirements of **medfate** package with respect to each of these data input categories. The last section describes additional parameters that are used to specify global options of simulation functions (i.e., `spwb()`, `pwb()`, `growth()`, `fordyn()` and daily simulation functions).
 
@@ -12,7 +12,7 @@ Topography has a relatively small direct influence in **medfate** simulations, b
 
 ## Soil description  {#soilinput}
 
-Soils are described in **medfate** using $S > 1$ different soil layers ($s \in \{1, 2, ..., S\}$). Here the word *soil* refers to depths that plant rooting systems can reach (i.e., the critical zone), including cracks within the bedrock. The number and size of soil layers may reflect changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties. Most soil properties are considered *static* parameters in simulations, except soil moisture content, variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered in simulations.
+Soils are described in **medfate** using $S > 1$ different soil layers ($s \in \{1, 2, ..., S\}$). Here the word *soil* refers to depths that plant rooting systems can reach (i.e., the critical zone), including cracks within the bedrock. The number and size of soil layers may reflect changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties and are considered *static* parameters in simulations. In contrast, soil moisture content, variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered, are state variables.
 
 ### Soil physical properties
 
@@ -147,7 +147,9 @@ $LAI$ variables refer to *one-sided leaf area* of plants in the cohort per surfa
 LAI^{all}_{i} = LAI^{\phi}_{i}+LAI^{dead}_{i}
 \end{equation}
 
-For simulations not involving growth, winter deciduous phenology is still simulated, and the current level of leaves unfolded may be lower than the maximum (live) amount of leaves. If there are $c$ plant cohorts, the leaf area index of the whole stand can be calculated for living leaves, unfolded leaves, dead leaves and total leaf area as:
+For simulations not involving growth, winter-deciduous phenology is a prognostic variable and the current level of leaves unfolded may be lower than the maximum (live) amount of leaves. In simulations involving growth, both $LAI^{\phi}$ and $LAI^{live}$ can change, the former due to leaf phenology (unfolding is  simulated explicitly and has carbon costs) and the latter due to leaf allocation limits during plant development.
+
+If there are $c$ plant cohorts, the leaf area index of the whole stand can be calculated for living leaves, unfolded leaves, dead leaves and total leaf area as:
 \begin{eqnarray}
 LAI^{live}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{live}} \\
 LAI^{\phi}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{\phi}} \\
@@ -246,7 +248,7 @@ The package provides functions `spwbInput()` and `growthInput()` that prepare th
 
 Vegetation characteristics stay constant during simulations using functions `spwb()` or `pwb()`, although the actual (unfolded) leaf area and dead leaf area may vary depending on leaf phenology.
 
-In contrast, growth simulation requires updating the structure of vegetation, i.e. heights, tree diameters and shrub cover. Function `growth()` can modify any of the vegetation attributes. Finally, function `fordyn()` modifies not only structural variables of the initial cohorts but also involves the recruitment of new woody cohorts during simulations.
+In contrast, growth simulation requires updating the structure of vegetation, i.e. plant heights, tree diameters, tree density and shrub cover. Function `growth()` can modify any of the vegetation attributes. Finally, function `fordyn()` modifies not only structural variables of the initial cohorts but also involves the recruitment of new woody cohorts during simulations.
 
 
 ## Metereological input {#meteoinput}
@@ -256,21 +258,21 @@ Weather input data must include variables calculated at the **daily** scale. Wea
 | Symbol | Units | R param | Description                        | Basic | Advanced |
 |--------|-------|---------|------------------------------------|--------|----------|
 | $T_{mean}$ | $^{\circ} \mathrm{C}$ | `MeanTemperature` | Mean temperature | Y | Y |
-| $T_{min}$ | $^{\circ} \mathrm{C}$ | `MinTemperature` | Minimum temperature | N | Y |
-| $T_{max}$ | $^{\circ} \mathrm{C}$ | `MaxTemperature` | Maximum temperature | N | Y |
-| $RH_{min}$ | % | `MinRelativeHumidity` | Minimum relative humidity | N | Y |
-| $RH_{max}$ | % | `MaxRelativeHumidity` | Maximum relative humidity | N | Y |
+| $T_{min}$ | $^{\circ} \mathrm{C}$ | `MinTemperature` | Minimum temperature | Y | Y |
+| $T_{max}$ | $^{\circ} \mathrm{C}$ | `MaxTemperature` | Maximum temperature | Y | Y |
+| $RH_{min}$ | % | `MinRelativeHumidity` | Minimum relative humidity | Y | Y |
+| $RH_{max}$ | % | `MaxRelativeHumidity` | Maximum relative humidity | Y | Y |
 | $P$ | $L \cdot m^{-2} = mm$ | `Precipitation` | Precipitation (either rainfall or snow). | Y | Y |
 | $PET$ | $L \cdot m^{-2} = mm$ | `PET` | Potential evapotranspiration, preferably calculated using Penman's (1948) equation | Y | N |
 | $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds | (opt.) | Y |
 | $u$ | $m \cdot s^{-1}$ | `WindSpeed` | Wind speed | Y | Y |
 | $C_{atm}$ | $ppm$ | `CO2` | Atmospheric (above-canopy) $CO_2$ concentration | N | Y |
 
-Dates are needed in **medfate** to estimate parameters like solar declination or the day of the year ($DOY$). Importantly, *dates* should be included as row names (in format *year-month-day*) of the input meteorology data frame. Since it allows producing data frames with appropiate variable units and row/column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018], but many other sources are possible.
+Dates are needed in **medfate** to estimate parameters like solar declination or the day of the year ($DOY$). Importantly, *dates* should be included as row names (in format *year-month-day*) of the input meteorology data frame. Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018], but other sources are possible.
 
 Not all simulation models require all weather variables (see rightmost columns in the previous table). In particular, basic water balance modelling (chapter \@ref(basicwaterbalance)) requires much less information than advance water balance modelling (chapter \@ref(advancedwaterbalance)). The weather input requirements for modelling growth (chapter \@ref(growthmodelling)) or forest dynamics (chapter \@ref(dynamicsmodelling)) depend on the complexity of the water balance model used within it.
 
-Whereas the weather variables listed in the table above are input requirements, **medfate** derives other atmospheric variables from them, using also topographic information (see [utility functions](http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual):
+While the weather variables listed in the table above are input requirements, **medfate** derives other atmospheric variables from them, using also topographic information (see [utility functions](http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual):
 
 | Symbol | Units | R param | Description                        |
 |--------|-------|---------|------------------------------------|
