@@ -702,11 +702,7 @@ div.csl-indent {
 \tag{7.1}
 \end{equation}\]</span></p>
 <p>where <span class="math inline">\(Pr\)</span> is precipitation as rainfall, <span class="math inline">\(Sm\)</span> is water reaching the soil from snow melt (if snow-pack dynamics are considered), <span class="math inline">\(In\)</span> is the interception loss (i.e., water evaporated after being intercepted by the canopy), <span class="math inline">\(Ru\)</span> is surface runoff, <span class="math inline">\(Dd\)</span> is deep drainage (i.e. water percolated to layers beyond soil depth), <span class="math inline">\(Es\)</span> is evaporation from soil surface and <span class="math inline">\(Ex\)</span> is water extraction by plants.</p>
-<p>Although the advanced water balance model includes hydraulic redistribution, this does not change the total amount of water in the soil, so the water balance equation is is very similar to that of the basic water balance model (eq.<a href="basicwaterbalance.html#eq:basicwaterbalanceequation">(3.1)</a>). The only difference is that here we used plant extraction (<span class="math inline">\(Ex\)</span>) instead of plant transpiration (<span class="math inline">\(Tr\)</span>). The two quantities will be the same (i.e. <span class="math inline">\(Ex = Tr\)</span>) if plant capacitance effects are not considered. Otherwise the amount of water stored in the plant changes according to:</p>
-<p><span class="math display" id="eq:plantwaterbalance">\[\begin{equation}
-\Delta{V_{plant}} = Ex - Tr
-\tag{7.2}
-\end{equation}\]</span></p>
+<p>Although the advanced water balance model includes hydraulic redistribution, this does not change the total amount of water in the soil, so the water balance equation is is very similar to that of the basic water balance model (eq.<a href="basicwaterbalance.html#eq:basicwaterbalanceequation">(3.1)</a>). Soil water extraction (<span class="math inline">\(Ex\)</span>) and plant transpiration (<span class="math inline">\(Tr\)</span>) will be equal if plant capacitance effects are not considered. Otherwise the amount of water stored in the plant changes according to (eq. <a href="basicwaterbalance.html#eq:plantwaterbalance">(3.2)</a>).</p>
 <p>While the above describes the default water balance equation, variations can occur depending on specific control flags:</p>
 <ol style="list-style-type: lower-alpha">
 <li><em>If snow dynamics are considered</em>, the water balance of the snow pack is defined as:
@@ -723,7 +719,7 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <p>For the sake of performing energy balance, the canopy can be considered a single layer that exchanges energy with the soil and the atmosphere <span class="citation">(<a href="#ref-Best2011" role="doc-biblioref">Best <em>et al.</em> 2011</a>)</span>. First, it absorbs shortwave radiation from the atmosphere (<span class="math inline">\(K_{abs,can}\)</span>) and long-wave radiation resulting from net radiation balance (<span class="math inline">\(L_{net,can}\)</span>). Other energy fluxes considered are convective exchanges between the canopy and atmosphere (<span class="math inline">\(H_{can,atm}\)</span>) and between the canopy and the soil (<span class="math inline">\(H_{can,soil}\)</span>). Finally, energy is released from the canopy to the atmosphere through latent heat (<span class="math inline">\(LE_{can}\)</span>) produced via transpiration (<span class="math inline">\(Tr\)</span>) and evaporation of water intercepted by the canopy (<span class="math inline">\(In\)</span>). Combining all energy flows (all of them in <span class="math inline">\(W \cdot m^{-2}\)</span>), the instantaneous energy balance equation for the canopy is:
 <span class="math display" id="eq:canopyenergybalance">\[\begin{equation}
   TC_{can} \cdot \frac{\delta T_{can}}{\delta t} = K_{abs,can} + L_{net,can}  - LE_{can} - H_{can,atm} - H_{can,soil} 
-\tag{7.3}
+\tag{7.2}
 \end{equation}\]</span>
 where <span class="math inline">\(TC_{can}\)</span> is the canopy thermal capacitance (in <span class="math inline">\(J \cdot m^{-2} \cdot K^{-1}\)</span>).</p>
 </div>
@@ -732,7 +728,7 @@ where <span class="math inline">\(TC_{can}\)</span> is the canopy thermal capaci
 <p>Alternatively, the model allows performing an energy balance for each vertical layer in the canopy, including its heat storage capacity <span class="citation">(<a href="#ref-Ma2019" role="doc-biblioref">Ma &amp; Liu 2019</a>)</span>. The energy balance equation for canopy layer <span class="math inline">\(j\)</span> is:
 <span class="math display" id="eq:canopylayerenergybalance">\[\begin{equation}
   TC_{j} \cdot \frac{\delta T_{air,j}}{\delta t} = K_{abs,j} + L_{net,j}  - LE_{j} + H_{j} 
-\tag{7.4}
+\tag{7.3}
 \end{equation}\]</span>
 where <span class="math inline">\(K_{abs,j}\)</span> is the short-wave radiation absorbed by leaves in the layer, <span class="math inline">\(L_{net,j}\)</span> is the net long-wave radiation balance of the layer, <span class="math inline">\(LE_{j}\)</span> is the latent heat flux and <span class="math inline">\(H_j\)</span> is the sensible heat flux, which includes heat coming from leaves or soil surfaces as well as turbulent heat transport from adjacent layers. Finally, <span class="math inline">\(TC_{j}\)</span> is the thermal capacitance (in <span class="math inline">\(J \cdot m^{-2} \cdot K^{-1}\)</span>) of canopy layer <span class="math inline">\(j\)</span>.</p>
 </div>
@@ -741,13 +737,13 @@ where <span class="math inline">\(K_{abs,j}\)</span> is the short-wave radiation
 <p>Like the canopy, the uppermost soil layer absorbs short-wave radiation from the atmosphere (<span class="math inline">\(K_{abs,soil}\)</span>) and has a net long-wave radiation balance (<span class="math inline">\(L_{net,soil}\)</span>). The uppermost soil layer also exchanges heat with the canopy (<span class="math inline">\(H_{can,soil}\)</span>) and releases energy in the form of latent heat (<span class="math inline">\(LE_{soil}\)</span>), which includes snow melt (<span class="math inline">\(Sm\)</span>) and evaporation from the soil surface (<span class="math inline">\(Es\)</span>). Finally, the soil layer exchanges thermal energy by conduction with the layer below (<span class="math inline">\(G_{1,2}\)</span>) The energy balance equation for the uppermost soil layer is:
 <span class="math display" id="eq:soilenergybalance">\[\begin{equation}
   TC_{soil, 1} \cdot \frac{\delta T_{soil, 1}}{\delta t} = K_{abs,soil} + L_{net,soil} + H_{can,soil} - LE_{soil} - G_{1,2}
-\tag{7.5}
+\tag{7.4}
 \end{equation}\]</span>
 where <span class="math inline">\(TC_{soil,1}\)</span> is the thermal capacitance of soil layer 1 (the uppermost layer).</p>
-<p>Instantaneous soil temperature changes on each soil layer depend on the balance between upward and downward energy flows. The downward energy flow for the uppermost soil layer depends on its energy exchanges with the canopy and the atmosphere, as shown in eq. <a href="advancedwaterbalance.html#eq:soilenergybalance">(7.5)</a>, whereas the remaining energy flows are generated by heat conduction and depend on the temperature gradients between soil layers. The energy balance for a soil layer <span class="math inline">\(s&gt;1\)</span> is:
+<p>Instantaneous soil temperature changes on each soil layer depend on the balance between upward and downward energy flows. The downward energy flow for the uppermost soil layer depends on its energy exchanges with the canopy and the atmosphere, as shown in eq. <a href="advancedwaterbalance.html#eq:soilenergybalance">(7.4)</a>, whereas the remaining energy flows are generated by heat conduction and depend on the temperature gradients between soil layers. The energy balance for a soil layer <span class="math inline">\(s&gt;1\)</span> is:
 <span class="math display" id="eq:deepsoilenergybalance">\[\begin{equation}
   TC_{soil, s} \cdot \frac{\delta T_{soil, s}}{\delta t} = G_{s-1,s} - G_{s,s+1}
-\tag{7.6}
+\tag{7.5}
 \end{equation}\]</span>
 where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from layers above, <span class="math inline">\(G_{s,s+1}\)</span> is the energy outflow towards layers below and <span class="math inline">\(TC_{soil,s}\)</span> is the thermal capacitance of soil layer <span class="math inline">\(s\)</span> (in <span class="math inline">\(J \cdot m^{-2} \cdot K^{-1}\)</span>).</p>
 <p>Unlike <span class="citation"><a href="#ref-Best2011" role="doc-biblioref">Best <em>et al.</em></a> (<a href="#ref-Best2011" role="doc-biblioref">2011</a>)</span>, the model considers the snow pack and the uppermost soil layer as a single layer in terms of energy exchange, but treats this layer differently depending on whether snow is present or not. The snow pack absorbs shortwave radiation (section <a href="hydrology.html#snowpack">5.2</a>) and snow melt is included as latent heat in the energy balance, but the snow layer does not exchange long-wave radiation with the soil nor the atmosphere. <span class="math inline">\(K_{abs,soil}\)</span> is set to zero when snow pack is present (because shortwave radiation is absorbed by snow), but the soil layer still exchanges long-wave radiation and convective energy with the canopy and the atmosphere. In addition, remember that bare soil evaporation does not occur when the snow pack is present (section <a href="hydrology.html#soilevaporation">5.5</a>).</p>

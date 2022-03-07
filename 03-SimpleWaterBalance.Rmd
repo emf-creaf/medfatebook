@@ -41,11 +41,10 @@ Daily variations in soil water content ($\Delta{V_{soil}}$ in mm) can be summari
 (\#eq:basicwaterbalanceequation)
 \end{equation}
 
-where $Pr$ is precipitation as rainfall, $Sm$ is water from melting the snow pack (if considered), $In$ is the interception loss (i.e., water evaporated after being intercepted by the canopy), $Ru$ is surface runoff, $Dd$ is deep drainage (i.e. water percolated to layers beyond soil depth), $Es$ is evaporation from soil and $Ex$ is plant soil water extraction. 
-
-Daily variations in plant water content ($\Delta{V_{plant}}$ in mm) can be summarized as:
+where $Pr$ is precipitation as rainfall, $Sm$ is water from melting the snow pack (if considered), $In$ is the interception loss (i.e., water evaporated after being intercepted by the canopy), $Ru$ is surface runoff, $Dd$ is deep drainage (i.e. water percolated to layers beyond soil depth), $Es$ is evaporation from soil and $Ex$ is plant soil water extraction. Daily variations in plant water content ($\Delta{V_{plant}}$ in mm) can be summarized as:
 \begin{equation}
 \Delta{V_{plant}} = Ex - Tr
+(\#eq:plantwaterbalance)
 \end{equation}
 where $Tr$ is plant transpiration. 
 
@@ -68,7 +67,8 @@ For every day to be simulated, the model performs the following steps:
   3. Determine rainfall interception loss ($In$) and net rainfall ($Pr_{net}$) (section \@ref(interception))
   4. Increase soil water content due to net rainfall ($Pr_{net}$), surface runon ($Ro$) and snow melt ($Sm$), after accounting for surface runoff ($Ru$) and deep drainage ($Dd$) (section \@ref(runoff)).
   5. Decrease soil water content due to bare soil evaporation ($Es$), if snow is not present (section \@ref(soilevaporation)).
-  6. Determine transpiration, photosynthesis and drought stress for each plant cohort  and decrease soil water content due to plant transpiration ($Tr$) (chapter \@ref(transpirationgranier)).
+  6. Determine soil water extraction ($Ex$), plant transpiration ($Tr$) and photosynthesis (chapter \@ref(transpirationgranier)).
+  7. Update plant water potential ($\Psi_{plant}$) and plant drought stress for each plant cohort and decrease soil water content due to soil water extraction ($Ex$).
 
 Details of the formulation of each of these processes are provided within the referred chapters and sections. *If plant water pools are considered*, steps 4-5 are performed for each plant water pool separately, step 6 involves extracting water from different plant water pools depending on the proportion of fine roots of each cohort in each pool (see \@ref(transpirationpools)). 
 
@@ -112,10 +112,11 @@ A second set refers to leaf phenology (`paramsPhenology`):
 | $x_{sen}$ | {0,1,2}  | `xsen` | Discrete values, to allow for any absent/proportional/more than proportional effects of temperature on senescence (see section \@ref(leafphenosenescence)). |
 | $y_{sen}$ | {0,1,2}  | `ysen` | Discrete values, to allow for any absent/proportional/more than proportional effects of photoperiod on senescence (see section \@ref(leafphenosenescence)). |
 
-A second set of parameters are related to transpiration and photosynthesis (`paramsTranspiration`):
+A third set of parameters are related to transpiration and photosynthesis (`paramsTranspiration`):
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
+| $g_{swmin,i}$ | $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$ | `Gwmin` | Minimum stomatal conductance to water vapour |
 | $T_{max, LAI}$ |       | `Tmax_LAI` | Empirical coefficient relating LAI with the ratio of maximum transpiration over potential evapotranspiration (see section \@ref(maximumtranspiration)). |
 | $T_{max, sqLAI}$ |       | `Tmax_LAIsq` | Empirical coefficient relating squared LAI with the ratio of maximum transpiration over potential evapotranspiration (see section \@ref(maximumtranspiration)). |
 | $\Psi_{extract}$ | $MPa$ | `Psi_Extract` |  The water potential at which plant transpiration is 50% of its maximum (see section \@ref(actualtranspiration)).|
@@ -123,6 +124,19 @@ A second set of parameters are related to transpiration and photosynthesis (`par
 | $WUE_{\max}$ | $g\, C \cdot mm^{-1}$ |  `WUE` |  Maximum water use efficiency under full light and no water limitations (see section \@ref(basicphotosynthesis)).  |
 | $WUE_{decay}$ |  |  `WUE_decay` |  Exponent describing the decay of water use efficiency with low light levels (see section \@ref(basicphotosynthesis)).  |
 | $K_{rootdisc}$ | [0-1] |  `pRootDisc` |  Whole-plant relative transpiration corresponding to hydraulic disconnection from the soil (see section \@ref(irreversiblecavitation)).  |
+
+A forth (final) set of parameters are related to water storage and water relations in plant tissues (`paramsWaterStorage`):
+
+| Symbol | Units | R  | Description                                  | 
+|--------|-------|----| ---------------------------------------------|
+| $\epsilon_{leaf,i}$ | MPa | `LeafEPS` | Modulus of elasticity of leaves |
+| $\epsilon_{stem,i}$ | MPa | `StemEPS` | Modulus of elasticity of symplastic xylem tissue |
+| $\pi_{0,leaf,i}$ | MPa | `LeafPI0` | Osmotic potential at full turgor of leaves |
+| $\pi_{0,stem,i}$ | MPa | `StemPI0` | Osmotic potential at full turgor of symplastic xylem tissue |
+| $f_{apo,leaf,i}$ | [0-1] | `LeafAF` | Apoplastic fraction in leaf tissues |
+| $f_{apo,stem,i}$ | [0-1] | `StemAF` | Apoplastic fraction in stem tissues |
+| $V_{leaf,i}$ | $l \cdot m^{-2}$ | `Vleaf` | Leaf water capacity per leaf area unit |
+| $V_{sapwood,i}$ | $l \cdot m^{-2}$ | `Vsapwood` | Sapwood water capacity per leaf area unit |
 
 Vegetation functional attributes are normally filled for each cohort $i$ by function `spwbInput()` or `forest2spwbInput()` from species identity (i.e. $SP_i$). However, different parameters can be specified for different cohorts of the same species if desired (see section \@ref(functionaltraits)). 
 
@@ -139,7 +153,10 @@ The other control parameters for the basic water balance model are:
 + `rockyLayerDrainage [= TRUE]`:  Whether water exceeding the field capacity of the deepest layer can be drained via macropore flow towards a non-reachable compartment, only for layers with > 95\% rocks (see section \@ref(runoff)).
 + `unlimitedSoilWater [=FALSE]`: Boolean flag to indicate the simulation of plant transpiration assuming that soil water is always at field capacity.
 + `unfoldingDD [= 300]`: Degree-days for complete leaf unfolding after budburst has occurred ($S_{unf}^*$; see section \@ref(leafphenobudburst)).
-+ `plantWaterPools [=FALSE]`: Boolean flag to indicate the simulation of water balance assuming that each cohort has its own water pools.
++ `rhizosphereOverlap [="total]`: A string indicating the degree of rhizosphere spatial overlap between plant cohorts:
+   + `"none"` - no overlap (independent water pools).
+   + `"partial"` - partial overlap determined by coarse root volume.
+   + `"total"` - total overlap (plants extract from common soil pools).
 + `verticalLayerSize [= 100]`: Size of vertical layers (in cm) for the calculation of light extinction (see section \@ref(leafdistribution)).
 + `windMeasurementHeight [ = 200]`: Height (in cm) over the canopy corresponding to wind measurements.
 + `cavitationRefill [= "total"]`: A string indicating how refilling of embolized conduits is done  (see section \@ref(irreversiblecavitation). Allowed values are: 
