@@ -34,7 +34,9 @@ Tr_{\max, i} = Tr_{\max} \cdot \frac{f_i^{0.75}}{\sum_{j}{f_j^{0.75}}}
 \end{equation} 
 Before **ver 2.5.0** $Tr_{\max, i}$ was linearly related to $f_i$, but an exponent 0.75 is now used to decrease *ad hoc* the proportion of transpiration corresponding to cohorts absorbing high SWR fractions with respect to those absorbing low amounts of SWR, which has been found to better match the transpiration predicted using the advanced transpiration model. Note that the actual amount of radiation energy absorbed by plants is much more difficult to determine, involving diffuse and direct radiation, as well as net long-wave radiation (see chapter \@ref(radiationbalance)). 
 
-### Actual plant transpiration {#actualtranspiration}
+
+
+### Actual plant transpiration and plant water potential {#actualtranspiration}
 
 Actual plant transpiration depends on soil moisture and is calculated for each plant cohort and each soil layer separately. $Tr_{i,s}$ (in mm) represents the transpiration made by cohort $i$ from layer $s$. Actual plant transpiration from a given layer is regulated by soil moisture and the resistance to water flow through the plant. For each plant cohort $i$ and soil layer $s$, the model first estimates the a whole-plant relative water transpiration, $K_{i,s}$, which varies between 0 and 1 depending on $\Psi_{extract,i}$, the potential at which transpiration is 50% of maximum, and $\Psi_s$, the water potential in layer $s$. This relationship is modelled using a Weibull function (see function `hydraulics_psi2K()`):
 \begin{equation}
@@ -79,6 +81,18 @@ Assuming no water limitations (i.e. $K_{i,s} = 1$), we have that $Tr = Tr_{\max}
   b. The cohort has a lower amount of leaf area (it reduces $f_i$ and hence $Tr_{\max,i}$)
   c. The soil layers exploited by the cohort have more negative water potentials (it reduces $K_{i,s}$). 
 
+
+The basic water balance model does not allow estimating a water potential drop from soil to the leaf. Moreover, in a multilayered soil it is difficult to know what would be the water potential of the plant. Despite these limitations, a gross surrogate of  'plant' water potential ($\Psi_{plant, i}$; in MPa) may be obtained averaging whole-plant relative conductance values and inverting the relative transpiration function:
+\begin{equation}
+\Psi_{plant, i}= K_i^{-1}\left(\sum_{s}{K_{i,s}\cdot v_{i,s}}\right)
+\end{equation}
+where $K_i^{-1}$ is the inverse of the relative whole-plant transpiration eq. \@ref(eq:relativewholeplantconductance). The plant water potential is used to determine plant stress levels and cavitation, as explained in \@ref(dailystressbasicwater) and \@ref(irreversiblecavitation). 
+
+Importantly, changes in $\Psi_{plant, i}$ induce changes in plant water content, which may induce a release of water in the transpiration stream or an absorption of water from it.
+
+### Minimum (cuticular) transpiration
+
+
 ### Transpiration with plant water pools {#transpirationpools}
 Considering plant water pools (i.e. setting `plantWaterPools = TRUE` in the control parameters) involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many plant water pools as plant cohorts, with proportions defined by their LAI values:
 \begin{equation}
@@ -107,6 +121,7 @@ It is easy to verify that this definition ensures the fulfillment of an equation
 Tr_{i,s} = \sum_{j}{f_{pool,j} \cdot Tr_{i,s,j}}
 \end{equation}
 
+
 ### Plant photosynthesis {#basicphotosynthesis}
 
 Because it is useful for growth, and for compatibility with the 'Sperry' transpiration mode (chapter \@ref(advancedwaterbalance)), the water balance model using 'Granier' transpiration mode also calculates gross assimilated carbon. Assuming a constant maximum water use efficiency ($WUE_{\max}$), gross photosynthesis for a given plant cohort $i$ (in $g\,C \cdot m^{-2}$) is estimated as a function of transpiration:
@@ -119,13 +134,45 @@ where $Tr_i$ is the transpiration of plant cohort $i$, $WUE_{\max,i}$ is the max
 knitr::include_graphics("WUE_relationship.png")
 ```
 
+## Plant drought stress and cavitation
+
+### Daily drought stress {#dailystressbasicwater}
+
+Similarly to @Mouillot2002, daily drought stress of a given plant cohort $i$, $DDS_i$, is defined as the one-complement of relative whole-plant transpiration (see eq. \@ref(eq:relativewholeplantconductance)) estimated from its plant water potential ($\Psi_{plant,i}$):
+\begin{equation}
+DDS_i=\phi_i \cdot (1-K_{i}(\Psi_{plant,i}))
+\end{equation}
+Leaf-phenological status is included to prevent winter deciduous plants from suffering drought stress during winter. Daily drought stress values can be later used to define other drought stress indices for larger temporal scales.
+ 
+### Cavitation and hydraulic recovery {#irreversiblecavitation}
+The water balance model is normally run assuming that although soil drought may reduce transpiration, embolized xylem conduits are automatically refilled when soil moisture recovers (in other words, cavitation is reversible and `cavitationRefill = "total"`). It is possible to simulate irreversible cavitation by setting `cavitationRefill = "none"`, `cavitationRefill = "rate"` or `cavitation = "annual"` in the control parameters. Any of these options cause the model to keep track of the maximum value of cavitation so far experienced using the proportion of of lost conductance for the plant cohort $i$ ($PLC_i$), which is modelled also using a Weibull function:
+\begin{equation}
+PLC_{i} = \max \left \{PLC_{i}, 1 - \exp \left \{ \ln{(0.5)}\cdot \left[ \frac{\Psi_{plant,i}}{\Psi_{critic,i}} \right] ^r \right \} \right \} 
+\end{equation}
+and then $K_{i,s}$ from eq. \@ref(eq:relativewholeplantconductance) cannot be larger than the one-complement of $PLC_i$ :
+\begin{equation}
+K_{i,s} = \min \{K_{i}(\Psi_s), 1.0 - PLC_{i} \}
+\end{equation}
+
+For simulations of less than one year one can use `cavitationRefill = "none"` to keep track of the maximum cavitation. However, for simulations of several years, it is normally advisable to allow recovery. If `cavitation = "annual"`, $PLC_{i}$ values are set to zero at the beginning of each year, assuming that embolized plants overcome the conductance loss by creating new xylem tissue. Finally, if `cavitationRefill = "rate"` the model simulates stem refilling at daily steps as a function of symplasmic water potential. First, a daily recovery rate ($r_{refill}$; in $cm^2 \cdot m^{-2} \cdot day^{-1}$) is estimated as a function of $\Psi_{plant,i}$:
+\begin{equation}
+r_{refill}(\Psi_{plant,i}) = r_{\max,refill} \cdot \max \{0.0, (\Psi_{plant,i} + 1.5)/1.5\}
+\end{equation}
+Where $r_{\max,refill}$ is the control parameter `refillMaximumRate` indicating a maximum refill rate. The right part of the equation normalizes the water potential, so that $r_{refill} = r_{refill,\max}$ if $\Psi_{plant,i} = 0$ and $r_{refill} = 0$ if $\Psi_{plant,i} <= -1.5MPa$. The proportion of conductance lost is then updated using:
+\begin{equation}
+PLC_{i}= \max \{0.0, PLC_{i} - (r_{refill}/H_v) \}
+\end{equation}
+where $H_v$ is the Huber value in units of $cm^2 \cdot m^{-2}$.
+
+
 ## Water content of plant tissues {#plantwatercontent}
 
-In **medfate** the relative water content of leaves and stems is tracked explicitly. Following @Martin-StPaul2017, we consider two kind of tissues in (leaf and stem) plant segments [@Tyree1990]. The first are conduits (tracheids or vessels), which will release water due to cavitation and may be refilled with water from adjacent living tissue or upstream segments. The second source of water is formed by more elastic living cells (i.e. parenchyma) and can potentially be a large source of water during relatively high water potentials. This source can be described using the relative water content of a symplasmic tissue. When capacitance effects are not considered, the relative water content of both kinds of plant tissues follow the water potential changes dictated by supply functions and stomatal regulation. In contrast, when plant capacitance effects are considered, leaf and stem symplastic tissues have their own water potential as state variable, they exchange water with leaf and stem xylem, respectively.
+Following @Martin-StPaul2017, we consider two kind of tissues in (leaf and stem) plant segments [@Tyree1990]. The first are conduits (tracheids or vessels), which will release water due to cavitation and may be refilled with water from adjacent living tissue or upstream segments. The second source of water is formed by more elastic living cells (i.e. parenchyma) and can potentially be a large source of water. This source can be described using the relative water content of a symplasmic tissue.
 
-A pressure-volume curve of a tissue relates its water potential against its *relative water content* ($RWC$; $kg\,H_2O \cdot kg^{-1}\,H_2O$ at saturation). Pressure-volume theory is usually applied to leaf tissues [@Bartlett2012], but it can also be applied to other tissues such as sapwood or cambium cells. 
 
 ### Relative water content of symplasmic tissues {#pressurevolumecurves}
+
+A pressure-volume curve of a tissue relates its water potential against its *relative water content* ($RWC$; $kg\,H_2O \cdot kg^{-1}\,H_2O$ at saturation). Pressure-volume theory is usually applied to leaf tissues [@Bartlett2012], but it can also be applied to other tissues such as sapwood or cambium cells. 
 
 For living cells, the relationship between $\Psi$ and $RWC$ of the symplasmic fraction ($RWC_{sym}$) is achieved by separating $\Psi$ into osmotic (solute) potential ($\Psi_{S}$) and the turgor potential ($\Psi_{P}$):
 \begin{equation}
@@ -157,7 +204,7 @@ To calculate $RWC_{sym}$ from the water potential of a tissue, the previous equa
 
 ### Relative water content of apoplastic tissues 
 
-In **medfate** it is assumed that apoplastic water fraction of an organ corresponds to the water in its xylem conduits. Xylem conduits consist of inelastic cells that have very small changes of water volume in relation to changes in water potential. However, xylem conduits release their water to the transpiration stream following the formation of emboli. As in @Holtta2009, we equate the relative water content of the apoplastic reservoir of a segment (leaves or stem) to the proportion of conductance lost (relative to the maximum conductance) for a given water potential:
+In **medfate** it is assumed that apoplastic water fraction of an organ corresponds to the water in its xylem conduits. Xylem conduits consist of inelastic cells that have very small changes of water volume in relation to changes in water potential. However, xylem conduits release their water to the transpiration stream following the formation of emboli. As in @Holtta2009, we equate the relative water content of the apoplastic reservoir of a segment (leaves or stem) to the proportion of conductance lost (relative to the maximum conductance) for a given water potential (see \@ref(eq:xylemvulnerability)):
 \begin{equation}
 RWC_{apo}(\Psi_{apo}) = \frac{k(\Psi_{apo})}{k_{max}} = e^{-((\Psi_{apo}/d)^c)}
 \end{equation}
@@ -187,35 +234,3 @@ RWC = RWC_{apo} \cdot f_{apo} + RWC_{sym} \cdot (1 - f_{apo})
 Normally the apoplastic fraction is large (~80%) in the stem and small (~15%) in leaves. Hence, the relative water content in stems will be mostly dictated by the level of cavitation, whereas that of leaves will mostly follow leaf symplastic water potential and the symplastic pressure-volume curve.
 
 
-## Plant drought stress
-
-### Daily drought stress and plant water potential {#dailystressbasicwater}
-
-Similarly to @Mouillot2002, daily drought stress of a given plant cohort $i$, $DDS_i$, is defined as the one-complement of relative whole-plant transpiration estimated from the plant water potential ($\Psi_{plant}$):
-\begin{equation}
-DDS_i=\phi_i \cdot (1-K(\Psi_{plant}))
-\end{equation}
-Leaf-phenological status is included to prevent winter deciduous plants from suffering drought stress during winter. Daily drought stress values can be later used to define drought stress indices for larger temporal scales, as presented in the main text.
-
-Granier's transpiration model does not allow estimating a water potential drop from soil to the leaf. Moreover, in a multilayered soil it is difficult to know what would be the water potential of the plant. Despite these limitations, a gross surrogate of  'plant' water potential ($\Psi_{i}$; in MPa) may be obtained averaging whole-plant relative conductance values and inverting the relative transpiration function:
-\begin{equation}
-\Psi_{i}= K_i^{-1}\left(\sum_{s}{K_{i,s}\cdot v_{i,s}}\right)
-\end{equation}
-where $K_i^{-1}$ is the inverse of the relative whole-plant transpiration eq. \@ref(eq:relativewholeplantconductance) (see function `hydraulics_K2Psi()`). 
- 
-### Cavitation and hydraulic disconnection {#irreversiblecavitation}
-The water balance model is normally run assuming that although soil drought may reduce transpiration, embolized xylem conduits are automatically refilled when soil moisture recovers (in other words, cavitation is reversible and `cavitationRefill = "total"`). It is possible to simulate irreversible cavitation by setting `cavitationRefill = "none"` or `cavitation = "annual"` in the control parameters. Any of these options cause the model to keep track of the maximum value of cavitation so far experienced using the proportion of of lost conductance for the plant cohort $i$ ($PLC_i$), which is modelled also using a Weibull function:
-\begin{equation}
-PLC_{i} = \max \left \{PLC_{i}, 1 - \exp \left \{ \ln{(0.5)}\cdot \left[ \frac{\Psi_i}{\Psi_{critic,i}} \right] ^r \right \} \right \} 
-\end{equation}
-and then $K_{i,s}$ cannot be larger than the one-complement of $PLC_i$:
-\begin{equation}
-K_{i,s} = \min \{K_{i}(\Psi_s), 1.0 - PLC_{i} \}
-\end{equation}
-
-For simulations of less than one year one can use `cavitationRefill = "none"` to keep track of the maximum cavitation. However, for simulations of several years, it is normally advisable to allow recovery. If `cavitation = "annual"`, $PLC_{i}$ values are set to zero at the beginning of each year, assuming that embolized plants overcome the conductance loss by creating new xylem tissue.
-
-Another optional behavior consists in allowing the plant to disconnect from the soil when its potential becomes too negative. This may be advantageous for a cavitation-sensitive plant that is competing for water with another plant with higher extraction capacity. Parameter $K_{rootdisc,i}$ can be used to specify the minimum relative conductance value that the plant will tolerate without disconnecting hydraulically from the soil (by default $K_{rootdisc,i} = 0$). If, after possibly accounting for irreversible cavitation, $K_{i,s}<K_{rootdisc,i}$
-for a given soil layer, then the model assumes that transpiration from this soil
-layer is absent. Moreover, $K_{i,s}$ is assumed equal to $K_{rootdisc,i}$ for the
-sake of determining plant water potential. 
