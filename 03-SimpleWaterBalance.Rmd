@@ -12,11 +12,11 @@ The description of the model presented here conforms to a large extent to the de
 
 The model considers only the vertical spatial dimension of the stand and not the horizontal distribution of plants within it. In other words, the model is not spatially explicit (i.e., plants do not have horizontal coordinates nor interact for space explicitly). Woody vegetation in the stand is divided into groups, here referred to as *plant cohorts* of different species, height and leaf area index ($LAI$). Height and $LAI$ values determine competition for light. $LAI$ values also drive competition for soil water, along with fine root distribution. 
 
-The soil water balance follows the design principles of SIERRA [@Mouillot2001;@Ruffault2014;@Ruffault2013] and BILJOU [@Granier1999;-@Granier2007], although some soil hydrology features are taken from other models [@Kergoat1998]. Hydrological processes include water interception loss [@Gash1995], plant transpiration, evaporation from soil [@Ritchie1972] and the partition between infiltration and runoff [@Boughton1989]. Infiltrated water is either retained by capilarity or percolates through soil layers, depending on macroporosity, and water exceeding soil water holding capacity is lost beyond the rooting zone via deep drainage. Snow pack dynamics can also be simulated. Potential evapotranspiration ($PET$) is a required input and the model determines maximum canopy transpiration ($Tr_{\max}$) using an empirical relationship between the $LAI$ of the stand and the ratio $Tr_{\max}/PET$ [@Granier1999]. Actual plant transpiration is estimated using a function that depends not only on $Tr_{\max}$ but also on current soil moisture levels, cohort-specific drought resistance, fine root distribution and the degree of shading of the target plant cohort.
+The soil water balance follows the design principles of SIERRA [@Mouillot2001;@Ruffault2014;@Ruffault2013] and BILJOU [@Granier1999;-@Granier2007], although some soil hydrology features are taken from other models [@Kergoat1998]. Hydrological processes include water interception loss [@Gash1995], plant transpiration, evaporation from soil [@Ritchie1972] and the partition between infiltration and runoff [@Boughton1989]. Infiltrated water is either retained by capillarity or percolates through soil layers, depending on macro-porosity, and water exceeding soil water holding capacity is lost beyond the rooting zone via deep drainage. Snow pack dynamics can also be simulated. Potential evapo-transpiration ($PET$) is a required input and the model determines maximum canopy transpiration ($Tr_{\max}$) using an empirical relationship between the $LAI$ of the stand and the ratio $Tr_{\max}/PET$ [@Granier1999]. Actual plant transpiration is estimated using a function that depends not only on $Tr_{\max}$ but also on current soil moisture levels, cohort-specific drought resistance, fine root distribution and the degree of shading of the target plant cohort. When soil water deficit progresses transpiration rates are consequently reduced, but minimum transpiration rates are not zero, because of the role of cuticular transpiration and imperfectly closed stomata [@Duursma2018].
 
-Plant water status (i.e. plant water potential and, hence, plant water content) normally follows variations of soil moisture in the soil layers where fine roots are located. However, during drought plants can close their stomata completely and become disconnected from soil. When in this state, plants continue losing water due to losses through the leaf cuticule.
+Plant water status (i.e. plant water potential and, hence, plant water content) normally follows variations of soil moisture in the soil layers where fine roots are located. However, changes in plant water status also release water (or absorb water from) the transpiration stream, resulting in differences between soil water extraction and transpiration.
 
-By default, the model assumes that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can be simulated. In this case, hydrological processes are replicated for the fraction of soil corresponding to each cohort. Transpiration of each plant cohort depends on the soil moisture beneath itself and, depending on root overlap, on the soil moisture beneath other plant cohorts.
+By default, the model assumes that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can be simulated. In this case, hydrological processes are replicated for the fraction of soil corresponding to each cohort. Transpiration of each plant cohort depends on the soil moisture beneath itself and, depending on rhizosphere overlap, on the soil moisture beneath other plant cohorts.
 
 ## State variables {#statevariablesbasic}
 
@@ -24,25 +24,32 @@ The following are state variables in the model under all simulations:
 
 + Cumulative degree days (a) to budburst, (b) to complete unfolding or (c) to senescence ($S_{eco,d}$, $S_{unf,d}$ or $S_{sen,d}$; all in $^\circ C$), are tracked by the model to determine leaf phenological status (see \@ref(leafphenology)).
 + Soil moisture content dynamics on each layer $s$ are tracked daily using $W_s = \theta_s(\Psi)/ \theta_{fc,s}$, the *proportion of soil moisture in relation to field capacity*, where moisture at field capacity, $\theta_{fc,s}$, is assumed to correspond to $\Psi_{fc} = -0.033$ MPa. Note that $W_s$ values larger than one are possible if the soil is between field capacity and saturation (which can happen if deep drainage is not allowed).
++ Plant water potential $\Psi_i$ of each plant cohort $i$ are tracked daily as the balance between soil water extraction and plant transpiration.
 
 Additional state variables depend on the activation of specific control flags:
 
 + *If snow accumulation/melting is considered*, the model tracks $S_{snow}$, the snow water equivalent (in mm) of the snow pack storage over the surface.
 + *If stem cavitation is not completely reversible*, the model tracks $PLC_{i}$, the proportion of stem conductivity lost by plants of cohort $i$.
-+ *If plant water pools are considered*, the model also tracks $W_{i,s}$, the proportion of soil moisture in relation to field capacity for layer $s$ within the areal fraction of the stand covered by cohort $i$.
++ *If the degree of rhizosphere overlap between plant cohorts is not total*, the model also tracks $W_{i,s}$, the proportion of soil moisture in relation to field capacity for layer $s$ within the areal fraction of the stand covered by cohort $i$.
 
 ## Water balance {#soilwaterbalance}
 
 Daily variations in soil water content ($\Delta{V_{soil}}$ in mm) can be summarized as:
 
 \begin{equation}
-\Delta{V_{soil}} = Pr + Sm - In - Ru - Dd - Es -Tr
+\Delta{V_{soil}} = Pr + Sm - In - Ru - Dd - Es - Ex
 (\#eq:basicwaterbalanceequation)
 \end{equation}
 
-where $Pr$ is precipitation as rainfall, $Sm$ is water from melting the snow pack (if considered), $In$ is the interception loss (i.e., water evaporated after being intercepted by the canopy), $Ru$ is surface runoff, $Dd$ is deep drainage (i.e. water percolated to layers beyond soil depth), $Es$ is evaporation from soil and $Tr$ is plant transpiration. 
+where $Pr$ is precipitation as rainfall, $Sm$ is water from melting the snow pack (if considered), $In$ is the interception loss (i.e., water evaporated after being intercepted by the canopy), $Ru$ is surface runoff, $Dd$ is deep drainage (i.e. water percolated to layers beyond soil depth), $Es$ is evaporation from soil and $Ex$ is plant soil water extraction. 
 
-While the above describes the default water balance equation, variations can occur depending on specific control flags: 
+Daily variations in plant water content ($\Delta{V_{plant}}$ in mm) can be summarized as:
+\begin{equation}
+\Delta{V_{plant}} = Ex - Tr
+\end{equation}
+where $Tr$ is plant transpiration. 
+
+While the above describes the default water balance equations, variations can occur depending on specific control flags: 
 
 a. *If snow dynamics are considered*, the water balance of the snow pack ($\Delta{S_{snow}}$ in mm of snow water equivalents) is defined as:
 \begin{equation}
@@ -50,7 +57,7 @@ a. *If snow dynamics are considered*, the water balance of the snow pack ($\Delt
 (\#eq:snowbalanceequation)
 \end{equation}
 where $Ps$ is precipitation as snowfall and $Sm$ is snow melt. Evaporation from bare soil cannot occur if there is a snow pack over the soil (i.e., if $S_{snow}>0$ then $Es = 0$).
-b. *If plant water pools are considered*, the water balance equation applies not only to the soil of the overall stand but also to the soil beneath each plant cohort. The fraction of stand area covered by each cohort is used to keep the water balance at the two scales aligned. Moreover, the water balances of soils beneath the different plant cohort are more or less correlated depending on root overlap.
+b. *If plant water pools are considered*, the water balance equation applies not only to the soil of the overall stand but also to the soil beneath each plant cohort. The fraction of stand area corresponding to the water pool of each cohort is used to keep the water balance at the two scales aligned. Moreover, the water balances of soils beneath the different plant cohort are more or less correlated depending on rhizosphere overlap.
 
 ## Process scheduling {#basicwaterbalancescheduling}
 
