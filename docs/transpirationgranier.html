@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2022-03-08" />
+<meta name="date" content="2022-03-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -255,7 +255,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="6.1.1" data-path="transpirationgranier.html"><a href="transpirationgranier.html#maximumtranspiration"><i class="fa fa-check"></i><b>6.1.1</b> Maximum transpiration</a></li>
 <li class="chapter" data-level="6.1.2" data-path="transpirationgranier.html"><a href="transpirationgranier.html#actualtranspiration"><i class="fa fa-check"></i><b>6.1.2</b> Actual plant transpiration and plant water potential</a></li>
-<li class="chapter" data-level="6.1.3" data-path="transpirationgranier.html"><a href="transpirationgranier.html#minimum-cuticular-transpiration"><i class="fa fa-check"></i><b>6.1.3</b> Minimum (cuticular) transpiration</a></li>
+<li class="chapter" data-level="6.1.3" data-path="transpirationgranier.html"><a href="transpirationgranier.html#minimum-transpiration"><i class="fa fa-check"></i><b>6.1.3</b> Minimum transpiration</a></li>
 <li class="chapter" data-level="6.1.4" data-path="transpirationgranier.html"><a href="transpirationgranier.html#transpirationpools"><i class="fa fa-check"></i><b>6.1.4</b> Transpiration with plant water pools</a></li>
 <li class="chapter" data-level="6.1.5" data-path="transpirationgranier.html"><a href="transpirationgranier.html#basicphotosynthesis"><i class="fa fa-check"></i><b>6.1.5</b> Plant photosynthesis</a></li>
 </ul></li>
@@ -683,8 +683,9 @@ Figure 6.1: Empirical relationship between <span class="math inline">\(Tr_{\max}
 where <span class="math inline">\(T_{max,LAI}\)</span> and <span class="math inline">\(T_{max,sqLAI}\)</span> are species-specific parameters (if missing, they are given default values 0.134 and -0.006, respectively).</p>
 <p>The maximum transpiration for a given plant cohort <span class="math inline">\(i\)</span> is calculated using the portion of <span class="math inline">\(Tr_{\max}\)</span> defined by <span class="math inline">\(f_i\)</span> the fraction of total absorbed SWR that is due
 to cohort <span class="math inline">\(i\)</span> (see section <a href="leafphenologylight.html#basiclightextinction">4.2</a>):
-<span class="math display">\[\begin{equation}
+<span class="math display" id="eq:maximumcohorttranspiration">\[\begin{equation}
 Tr_{\max, i} = Tr_{\max} \cdot \frac{f_i^{0.75}}{\sum_{j}{f_j^{0.75}}}
+\tag{6.1}
 \end{equation}\]</span>
 Before <strong>ver 2.5.0</strong> <span class="math inline">\(Tr_{\max, i}\)</span> was linearly related to <span class="math inline">\(f_i\)</span>, but an exponent 0.75 is now used to decrease <em>ad hoc</em> the proportion of transpiration corresponding to cohorts absorbing high SWR fractions with respect to those absorbing low amounts of SWR, which has been found to better match the transpiration predicted using the advanced transpiration model. Note that the actual amount of radiation energy absorbed by plants is much more difficult to determine, involving diffuse and direct radiation, as well as net long-wave radiation (see chapter <a href="radiationbalance.html#radiationbalance">9</a>).</p>
 </div>
@@ -693,7 +694,7 @@ Before <strong>ver 2.5.0</strong> <span class="math inline">\(Tr_{\max, i}\)</sp
 <p>Actual plant transpiration depends on soil moisture and is calculated for each plant cohort and each soil layer separately. <span class="math inline">\(Tr_{i,s}\)</span> (in mm) represents the transpiration made by cohort <span class="math inline">\(i\)</span> from layer <span class="math inline">\(s\)</span>. Actual plant transpiration from a given layer is regulated by soil moisture and the resistance to water flow through the plant. For each plant cohort <span class="math inline">\(i\)</span> and soil layer <span class="math inline">\(s\)</span>, the model first estimates the a whole-plant relative water transpiration, <span class="math inline">\(K_{i,s}\)</span>, which varies between 0 and 1 depending on <span class="math inline">\(\Psi_{extract,i}\)</span>, the potential at which transpiration is 50% of maximum, and <span class="math inline">\(\Psi_s\)</span>, the water potential in layer <span class="math inline">\(s\)</span>. This relationship is modelled using a Weibull function (see function <code>hydraulics_psi2K()</code>):
 <span class="math display" id="eq:relativewholeplantconductance">\[\begin{equation}
 K_{i,s}=K_{i}(\Psi_s) = \exp \left \{\ln{(0.5)}\cdot \left[ \frac{\Psi_s}{\Psi_{extract,i}} \right] ^r \right \} 
-\tag{6.1}
+\tag{6.2}
 \end{equation}\]</span>
 where <span class="math inline">\(r\)</span> is an exponent that modulates the steepness of the decrease in relative
 conductance when soil potential becomes negative (by default, <span class="math inline">\(r = 3\)</span>) and <span class="math inline">\(\ln(0.5)\)</span>
@@ -710,57 +711,75 @@ Figure 6.2: Whole-plant relative water conductance functions for different water
 Tr_{i,s} =  Tr_{\max,i} \cdot K_{i,s} \cdot FRP_{i,s}
 \end{equation}\]</span>
 Since <strong>ver 2.5.0</strong>, this equation has been slightly modified and is now:
-<span class="math display">\[\begin{equation}
+<span class="math display" id="eq:actualcohorttranspiration">\[\begin{equation}
 Tr_{i,s} =  Tr_{\max,i} \cdot K_{i,s} \cdot \frac{K_{unsat,s}^{0.5} \cdot FRP_{i,s}}{\sum_r{K_{unsat,r}^{0.5} \cdot FRP_{i,r}}}
+\tag{6.3}
 \end{equation}\]</span>
 where <span class="math inline">\(K_{unsat,s}\)</span> is the unsaturated soil conductivity of layer <span class="math inline">\(s\)</span>. This modification was introduced to allow the plant to increase the amount of water drawn from layers with higher levels of moisture in seasons where the usual water pools are depleted. This formulation decreases the differences in soil moisture between soil layers, which in the advanced model is achieved thanks to hydraulic redistribution process.</p>
-<p>The total amount of water transpired by plants, <span class="math inline">\(Tr\)</span> (in mm), is the sum of <span class="math inline">\(Tr_{i,s}\)</span> values over all plant cohorts and soil layers:
+<p>The total amount of water transpired by cohort <span class="math inline">\(i\)</span>, <span class="math inline">\(Tr_i\)</span> (in mm) is the sum of <span class="math inline">\(Tr_{i,s}\)</span> values over all soil layers:
 <span class="math display">\[\begin{equation}
-Tr =\sum_{s}\sum_{i}{Tr_{i,s}}
+Tr_i =\sum_{s}{Tr_{i,s}}
+\end{equation}\]</span></p>
+<p>Analogously, the total amount of water transpired by all plants, <span class="math inline">\(Tr\)</span> (in mm), is the sum of <span class="math inline">\(Tr_{i}\)</span> values over all plant cohorts:
+<span class="math display">\[\begin{equation}
+Tr =\sum_{i}{Tr_{i}} =\sum_{s}\sum_{i}{Tr_{i,s}}
 \end{equation}\]</span>
-Assuming no water limitations (i.e. <span class="math inline">\(K_{i,s} = 1\)</span>), we have that <span class="math inline">\(Tr = Tr_{\max}\)</span>. Total stand transpiration will be lower than <span class="math inline">\(Tr_{\max}\)</span> if soil water potential in any layer is negative enough to cause a significant reduction in whole-plant conductance. At the plant level, the transpiration of a given plant cohort will be lower than that of others if:</p>
+Assuming no water limitations (i.e. <span class="math inline">\(K_{i,s} = 1\)</span>), we have that <span class="math inline">\(Tr = Tr_{\max}\)</span> and <span class="math inline">\(Tr_i = Tr_{\max,i}\)</span>. Cohort transpiration and stand transpiration will be lower than maximum values if soil water potential in any layer is negative enough to cause a significant reduction in whole-plant conductance. At the plant level, the transpiration of a given plant cohort will be lower than that of others if:</p>
 <ol style="list-style-type: lower-alpha">
 <li>The cohort is under the shade (it reduces <span class="math inline">\(f_i\)</span> and hence <span class="math inline">\(Tr_{\max,i}\)</span>)</li>
 <li>The cohort has a lower amount of leaf area (it reduces <span class="math inline">\(f_i\)</span> and hence <span class="math inline">\(Tr_{\max,i}\)</span>)</li>
 <li>The soil layers exploited by the cohort have more negative water potentials (it reduces <span class="math inline">\(K_{i,s}\)</span>).</li>
 </ol>
-<p>The basic water balance model does not allow estimating a water potential drop from soil to the leaf. Moreover, in a multilayered soil it is difficult to know what would be the water potential of the plant. Despite these limitations, a gross surrogate of ‘plant’ water potential (<span class="math inline">\(\Psi_{plant, i}\)</span>; in MPa) may be obtained averaging whole-plant relative conductance values and inverting the relative transpiration function:
-<span class="math display">\[\begin{equation}
-\Psi_{plant, i}= K_i^{-1}\left(\sum_{s}{K_{i,s}\cdot v_{i,s}}\right)
+<p>The basic water balance model does not allow estimating a water potential drop from soil to the leaf. Moreover, in a multilayered soil it is difficult to know what would be the water potential of the plant. Despite these limitations, a gross surrogate of ‘plant’ water potential (<span class="math inline">\(\Psi_{plant, i}\)</span>; in MPa) may be obtained averaging whole-plant relative conductance values across soil layers and inverting the whole-plant relative transpiration function:
+<span class="math display" id="eq:psiplant">\[\begin{equation}
+\Psi_{plant, i}= K_i^{-1}\left(\sum_{s}{K_{i,s}\cdot FRP_{i,s}}\right)
+\tag{6.4}
 \end{equation}\]</span>
-where <span class="math inline">\(K_i^{-1}\)</span> is the inverse of the relative whole-plant transpiration eq. <a href="transpirationgranier.html#eq:relativewholeplantconductance">(6.1)</a>. The plant water potential is used to determine plant stress levels and cavitation, as explained in <a href="transpirationgranier.html#dailystressbasicwater">6.2.1</a> and <a href="transpirationgranier.html#irreversiblecavitation">6.2.2</a>.</p>
+where <span class="math inline">\(K_i^{-1}\)</span> is the inverse of the relative whole-plant transpiration eq. <a href="transpirationgranier.html#eq:relativewholeplantconductance">(6.2)</a>. The plant water potential is used to determine plant stress levels and cavitation, as explained in <a href="transpirationgranier.html#dailystressbasicwater">6.2.1</a> and <a href="transpirationgranier.html#irreversiblecavitation">6.2.2</a>.</p>
 <p>Importantly, changes in <span class="math inline">\(\Psi_{plant, i}\)</span> induce changes in plant water content, which may induce a release of water in the transpiration stream or an absorption of water from it.</p>
 </div>
-<div id="minimum-cuticular-transpiration" class="section level3" number="6.1.3">
-<h3><span class="header-section-number">6.1.3</span> Minimum (cuticular) transpiration</h3>
+<div id="minimum-transpiration" class="section level3" number="6.1.3">
+<h3><span class="header-section-number">6.1.3</span> Minimum transpiration</h3>
+<p>The description of actual transpiration in the previous section incorporates the assumption that plants can regulate water losses up to zero transpiration, neglecting water leaks through the leaf cuticule and/or incomplete stomatal closure <span class="citation">(<a href="#ref-Duursma2018" role="doc-biblioref">Duursma <em>et al.</em> 2018</a>)</span>. To avoid this assumption we can estimate minimum transpiration for a given plant cohort, <span class="math inline">\(Tr_{\min,i}\)</span> (in mm), and prevent <span class="math inline">\(Tr_i &lt; Tr_{\min,i}\)</span>.</p>
+<p>Minimum transpiration flow per leaf area <span class="math inline">\(E_{\min}\)</span> in <span class="math inline">\(mol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>) can be calculated if we know (1) the minimum leaf conductance to water vapor (<span class="math inline">\(g_{sw, \min}\)</span>; in <span class="math inline">\(mol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>); (2) the leaf vapor pressure deficit (<span class="math inline">\(VPD_{leaf}\)</span>; in <span class="math inline">\(kPa\)</span>); and (3) atmospheric pressure (<span class="math inline">\(P_{atm}\)</span>; also in <span class="math inline">\(kPa\)</span>):
+<span class="math display">\[\begin{equation}
+E_{\min} =  g_{sw,\min}  \cdot \frac{VPD_{leaf}}{P_{atm}}
+\end{equation}\]</span>
+In turn, the vapor pressure deficit in the leaf (<span class="math inline">\(VPD_{leaf}\)</span>) is calculated as:
+<span class="math display">\[\begin{equation}
+VPD_{leaf} = e_{leaf} - e_{air}
+\end{equation}\]</span>
+Where <span class="math inline">\(e_{air}\)</span> is the water vapor pressure of the air surrounding the leaf (but beyond the leaf boundary layer) and <span class="math inline">\(e_{leaf}\)</span> is the vapor pressure inside the leaf. While <span class="math inline">\(e_{air}\)</span> can be derived from the weather input, <span class="math inline">\(e_{leaf}\)</span> should be calculated from leaf temperature (<span class="math inline">\(T_{leaf}\)</span>) and leaf water potential (<span class="math inline">\(\Psi_{leaf}\)</span>):
+<span class="math display">\[\begin{equation}
+e_{leaf}(T_{leaf}, \Psi_{leaf}) = e_{sat}(T_{leaf}) \cdot \exp\left\{\frac{2.17 \cdot \Psi_{leaf}}{T_{leaf}+273.15}\right\}
+\end{equation}\]</span>
+where <span class="math inline">\(e_{sat}(T)\)</span> is a function giving the saturated vapor pressure for temperature <span class="math inline">\(T\)</span> (see <a href="http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils">utility functions</a> of the <strong>meteoland</strong> reference manual). Given the simplicity of the basic water balance model, here we make the assumption that <span class="math inline">\(\Psi_{leaf} = \Psi_{plant}\)</span> (from the previous time step). Furthermore, we assume that leaf temperature is coupled with the temperature of the surrounding air. Given the non-linearity of <span class="math inline">\(e_{leaf}\)</span> we average the wapor pressure values provided by <span class="math inline">\(e_{leaf}(T_{\min}, \Psi_{plant})\)</span> and <span class="math inline">\(e_{leaf}(T_{\max}, \Psi_{plant})\)</span>.</p>
+<p>Once the leaf level <span class="math inline">\(E_{\min}\)</span> is known for a give cohort <span class="math inline">\(i\)</span>, we can scale this instantaneous rate to daily transpiration (in mm) at the cohort level using:
+<span class="math display">\[\begin{equation}
+Tr_{\min,i} = E_{\min,i} \cdot 24 \cdot 3600 \cdot LAI_i^{\phi} \cdot 0.018
+\end{equation}\]</span></p>
 </div>
 <div id="transpirationpools" class="section level3" number="6.1.4">
 <h3><span class="header-section-number">6.1.4</span> Transpiration with plant water pools</h3>
-<p>Considering plant water pools (i.e. setting <code>plantWaterPools = TRUE</code> in the control parameters) involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many plant water pools as plant cohorts, with proportions defined by their LAI values:
+<p>Considering plant water pools (i.e. setting <code>rhizosphereOverlap = "partial"</code> or <code>rhizosphereOverlap = "total"</code> in the control parameters) involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many plant water pools as plant cohorts, with proportions defined by their LAI values. For example, the fraction corresponding to plant cohort <span class="math inline">\(j\)</span> would be:
 <span class="math display">\[\begin{equation}
-f_{pool,i} = \frac{LAI^{live}_i}{LAI^{live}_{stand}}
+f_{pool,j} = \frac{LAI^{live}_j}{LAI^{live}_{stand}}
 \end{equation}\]</span>
 Overall soil moisture is then related to moisture of plant water pools by the following equation, that is fulfilled for each soil layer <span class="math inline">\(s\)</span>:
 <span class="math display">\[\begin{equation}
-W_{s} = \sum_{i}{f_{pool,i} \cdot W_{i,s}}
+W_{s} = \sum_{j}{f_{pool,j} \cdot W_{j,s}}
 \end{equation}\]</span>
-where <span class="math inline">\(W_{i,s}\)</span> is the soil moisture (relative to field capacity) of layer <span class="math inline">\(s\)</span> in the plant water pool of cohort <span class="math inline">\(i\)</span>, i.e. under the area of the stand attributed to cohort <span class="math inline">\(i\)</span>.</p>
-<p>When transpiration occurs and plant water pools are considered, the model assumes that the rhizosphere of each plant cohort occupies its own water pool but may enter into the water pools under other plant cohorts. In other words, the root systems of different cohorts may overlap horizontally. A given plant cohort <span class="math inline">\(i\)</span> will have its roots in layer <span class="math inline">\(s\)</span> partitioned among different water pools. Let us assume that we know <span class="math inline">\(fr_{i,s,j}\)</span>, the (horizontal) proportion of fine roots of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(s\)</span> of the water pool <span class="math inline">\(j\)</span> (see section <a href="model-inputs.html#plantwaterpools">2.3.5</a>). These proportions fulfill:
+where <span class="math inline">\(W_{j,s}\)</span> is the soil moisture (relative to field capacity) of layer <span class="math inline">\(s\)</span> in the water pool of cohort <span class="math inline">\(j\)</span>, i.e. under the area of the stand attributed to cohort <span class="math inline">\(j\)</span>.</p>
+<p>When transpiration occurs and water pools are considered, the model assumes that the rhizosphere of each plant cohort occupies its own water pool, but may enter into the water pools under other plant cohorts if the overlap is partial. In other words, the root systems of different cohorts may overlap horizontally. A given plant cohort <span class="math inline">\(i\)</span> will have its roots in layer <span class="math inline">\(s\)</span> partitioned among different water pools. Let us assume that we know <span class="math inline">\(fr_{i,s,j}\)</span>, the (horizontal) proportion of fine roots of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(s\)</span> of the water pool <span class="math inline">\(j\)</span> (see section <a href="model-inputs.html#plantwaterpools">2.3.5</a>). These proportions sum one when summed across water pools:
 <span class="math display">\[\begin{equation}
 \sum_{j}{fr_{i,s,j}} = 1 \,\, \forall i,s
 \end{equation}\]</span>
-The soil moisture <em>sensed</em> by plant cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(s\)</span>, <span class="math inline">\(W_{rhizo,i,s}\)</span> is a weighted sum of moisture in water pools, with weights being the proportion of fine roots in each pool:
+The proportion of fine roots in a given water pool, with respect to the whole root system, will then be equal to:
 <span class="math display">\[\begin{equation}
-W_{rhizo,i,s} = \sum_{j}{fr_{i,s,j} \cdot W_{i,s}}
+FRP_{i,s,j} = fr_{i,s,j} \cdot FRP_{i,s}
 \end{equation}\]</span>
-This moisture determines <span class="math inline">\(\Psi_{s,i}\)</span>, the corresponding water potential, which replaces <span class="math inline">\(\Psi_{s}\)</span> in eq. <a href="transpirationgranier.html#eq:relativewholeplantconductance">(6.1)</a>, so that plant conductance depends on the soil moisture <em>sensed</em> by the rhizosphere of the plant cohort. If the (actual) transpiration of cohort <span class="math inline">\(i\)</span> from soil layer <span class="math inline">\(s\)</span> is <span class="math inline">\(Tr_{i,s}\)</span>, the water extracted by transpiration from a water pool <span class="math inline">\(j\)</span> will be:
-<span class="math display">\[\begin{equation}
-Tr_{i,s,j} = \frac{fr_{i,s,j} \cdot Tr_{i,s}}{f_{pool,j}}
-\end{equation}\]</span>
-It is easy to verify that this definition ensures the fulfillment of an equation analogous to that between <span class="math inline">\(W_{s}\)</span> and <span class="math inline">\(W_{s,i}\)</span>:
-<span class="math display">\[\begin{equation}
-Tr_{i,s} = \sum_{j}{f_{pool,j} \cdot Tr_{i,s,j}}
-\end{equation}\]</span></p>
+Estimating transpiration with water pools is analogous to estimating transpiration without them, but replacing the role of <span class="math inline">\(FRP_{i,s}\)</span> by <span class="math inline">\(FRP_{i,s,j}\)</span>, and <span class="math inline">\(K_{i,s}\)</span> by <span class="math inline">\(K_{i,s,j}\)</span>, in eq. (eq:actualcohorttranspiration), which leads to the estimation of <span class="math inline">\(Tr_{i,s,j}\)</span>. Analogous replacements have to be made when estimating the plant water potential in eq. (eq:psiplant).</p>
+<p>Finally, note that the amount of water extracted from the soil layer <span class="math inline">\(s\)</span> of given water pool <span class="math inline">\(j\)</span> (i.e. from <span class="math inline">\(W_{j,s}\)</span>) will not be <span class="math inline">\(Tr_{i,s,j}\)</span> (whose units are referred to the overall stand) but <span class="math inline">\(Tr_{i,s,j}/f_{pool,j}\)</span>.</p>
 </div>
 <div id="basicphotosynthesis" class="section level3" number="6.1.5">
 <h3><span class="header-section-number">6.1.5</span> Plant photosynthesis</h3>
@@ -781,7 +800,7 @@ Figure 6.3: Relationship between the percentage of PAR available to a cohort and
 <h2><span class="header-section-number">6.2</span> Plant drought stress and cavitation</h2>
 <div id="dailystressbasicwater" class="section level3" number="6.2.1">
 <h3><span class="header-section-number">6.2.1</span> Daily drought stress</h3>
-<p>Similarly to <span class="citation"><a href="#ref-Mouillot2002" role="doc-biblioref">Mouillot <em>et al.</em></a> (<a href="#ref-Mouillot2002" role="doc-biblioref">2002</a>)</span>, daily drought stress of a given plant cohort <span class="math inline">\(i\)</span>, <span class="math inline">\(DDS_i\)</span>, is defined as the one-complement of relative whole-plant transpiration (see eq. <a href="transpirationgranier.html#eq:relativewholeplantconductance">(6.1)</a>) estimated from its plant water potential (<span class="math inline">\(\Psi_{plant,i}\)</span>):
+<p>Similarly to <span class="citation"><a href="#ref-Mouillot2002" role="doc-biblioref">Mouillot <em>et al.</em></a> (<a href="#ref-Mouillot2002" role="doc-biblioref">2002</a>)</span>, daily drought stress of a given plant cohort <span class="math inline">\(i\)</span>, <span class="math inline">\(DDS_i\)</span>, is defined as the one-complement of relative whole-plant transpiration (see eq. <a href="transpirationgranier.html#eq:relativewholeplantconductance">(6.2)</a>) estimated from its plant water potential (<span class="math inline">\(\Psi_{plant,i}\)</span>):
 <span class="math display">\[\begin{equation}
 DDS_i=\phi_i \cdot (1-K_{i}(\Psi_{plant,i}))
 \end{equation}\]</span>
@@ -793,7 +812,7 @@ Leaf-phenological status is included to prevent winter deciduous plants from suf
 <span class="math display">\[\begin{equation}
 PLC_{i} = \max \left \{PLC_{i}, 1 - \exp \left \{ \ln{(0.5)}\cdot \left[ \frac{\Psi_{plant,i}}{\Psi_{critic,i}} \right] ^r \right \} \right \} 
 \end{equation}\]</span>
-and then <span class="math inline">\(K_{i,s}\)</span> from eq. <a href="transpirationgranier.html#eq:relativewholeplantconductance">(6.1)</a> cannot be larger than the one-complement of <span class="math inline">\(PLC_i\)</span> :
+and then <span class="math inline">\(K_{i,s}\)</span> from eq. <a href="transpirationgranier.html#eq:relativewholeplantconductance">(6.2)</a> cannot be larger than the one-complement of <span class="math inline">\(PLC_i\)</span> :
 <span class="math display">\[\begin{equation}
 K_{i,s} = \min \{K_{i}(\Psi_s), 1.0 - PLC_{i} \}
 \end{equation}\]</span></p>
@@ -829,7 +848,7 @@ where <span class="math inline">\(\pi_0\)</span> (MPa) is the osmotic potential 
 When <span class="math inline">\(\Psi \leq \Psi_{tlp}\)</span>, the water potential at turgor loss point, then <span class="math inline">\(\Psi_{P} = 0\)</span> and <span class="math inline">\(\Psi = \Psi_{S}\)</span>. If <span class="math inline">\(\Psi &gt; \Psi_{tlp}\)</span> then the two components are needed. The water potential at turgor loss point (<span class="math inline">\(\Psi_{tlp}\)</span>) can be found by <span class="citation">(<a href="#ref-Bartlett2012" role="doc-biblioref">Bartlett <em>et al.</em> 2012</a>)</span>:
 <span class="math display" id="eq:turgorlosspoint">\[\begin{equation}
 \Psi_{tlp} = \frac{\pi_0 \cdot \epsilon}{\pi_0 + \epsilon}
-\tag{6.2}
+\tag{6.5}
 \end{equation}\]</span>
 As an example, the following figure draws the pressure-volume curve for a tissue with <span class="math inline">\(\epsilon = 12\)</span> and <span class="math inline">\(\pi_0 = -3.0\)</span>MPa:
 <img src="medfatebook_files/figure-html/unnamed-chunk-9-1.png" width="384" style="display: block; margin: auto;" /></p>
@@ -867,6 +886,9 @@ RWC = RWC_{apo} \cdot f_{apo} + RWC_{sym} \cdot (1 - f_{apo})
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Bartlett2012" class="csl-entry">
 Bartlett, M.K., Scoffoni, C. &amp; Sack, L. (2012). <span class="nocase">The determinants of leaf turgor loss point and prediction of drought tolerance of species and biomes: a global meta-analysis</span>. <em>Ecology letters</em>, 15, 393–405.
+</div>
+<div id="ref-Duursma2018" class="csl-entry">
+Duursma, R.A., Blackman, C.J., Lopéz, R., Martin-StPaul, N.K., Cochard, H. &amp; Medlyn, B.E. (2018). <span class="nocase">On the minimum leaf conductance: its role in models of plant water use, and ecological and environmental controls</span>. <em>New Phytologist</em>.
 </div>
 <div id="ref-Fyllas2009" class="csl-entry">
 Fyllas, N.M. &amp; Troumbis, A.Y. (2009). <span class="nocase">Simulating vegetation shifts in north-eastern Mediterranean mountain forests under climatic change scenarios</span>. <em>Global Ecology and Biogeography</em>, 18, 64–77.

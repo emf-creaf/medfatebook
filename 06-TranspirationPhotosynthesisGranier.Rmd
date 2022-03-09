@@ -31,6 +31,7 @@ The maximum transpiration for a given plant cohort $i$ is calculated using the p
 to cohort $i$ (see section \@ref(basiclightextinction)):
 \begin{equation}
 Tr_{\max, i} = Tr_{\max} \cdot \frac{f_i^{0.75}}{\sum_{j}{f_j^{0.75}}}
+(\#eq:maximumcohorttranspiration)
 \end{equation} 
 Before **ver 2.5.0** $Tr_{\max, i}$ was linearly related to $f_i$, but an exponent 0.75 is now used to decrease *ad hoc* the proportion of transpiration corresponding to cohorts absorbing high SWR fractions with respect to those absorbing low amounts of SWR, which has been found to better match the transpiration predicted using the advanced transpiration model. Note that the actual amount of radiation energy absorbed by plants is much more difficult to determine, involving diffuse and direct radiation, as well as net long-wave radiation (see chapter \@ref(radiationbalance)). 
 
@@ -68,59 +69,80 @@ Tr_{i,s} =  Tr_{\max,i} \cdot K_{i,s} \cdot FRP_{i,s}
 Since **ver 2.5.0**, this equation has been slightly modified and is now:
 \begin{equation}
 Tr_{i,s} =  Tr_{\max,i} \cdot K_{i,s} \cdot \frac{K_{unsat,s}^{0.5} \cdot FRP_{i,s}}{\sum_r{K_{unsat,r}^{0.5} \cdot FRP_{i,r}}}
+(\#eq:actualcohorttranspiration)
 \end{equation}
 where $K_{unsat,s}$ is the unsaturated soil conductivity of layer $s$. This modification was introduced to allow the plant to increase the amount of water drawn from layers with higher levels of moisture in seasons where the usual water pools are depleted. This formulation decreases the differences in soil moisture between soil layers, which in the advanced model is achieved thanks to hydraulic redistribution process.  
 
-The total amount of water transpired by plants, $Tr$ (in mm), is the sum of $Tr_{i,s}$ values over all plant cohorts and soil layers:
+The total amount of water transpired by cohort $i$, $Tr_i$ (in mm) is the sum of $Tr_{i,s}$ values over all soil layers:
 \begin{equation}
-Tr =\sum_{s}\sum_{i}{Tr_{i,s}}
+Tr_i =\sum_{s}{Tr_{i,s}}
 \end{equation}
-Assuming no water limitations (i.e. $K_{i,s} = 1$), we have that $Tr = Tr_{\max}$. Total stand transpiration will be lower than $Tr_{\max}$ if soil water potential in any layer is negative enough to cause a significant reduction in whole-plant conductance. At the plant level, the transpiration of a given plant cohort will be lower than that of others if: 
+
+Analogously, the total amount of water transpired by all plants, $Tr$ (in mm), is the sum of $Tr_{i}$ values over all plant cohorts:
+\begin{equation}
+Tr =\sum_{i}{Tr_{i}} =\sum_{s}\sum_{i}{Tr_{i,s}}
+\end{equation}
+Assuming no water limitations (i.e. $K_{i,s} = 1$), we have that $Tr = Tr_{\max}$ and $Tr_i = Tr_{\max,i}$. Cohort transpiration and stand transpiration will be lower than maximum values if soil water potential in any layer is negative enough to cause a significant reduction in whole-plant conductance. At the plant level, the transpiration of a given plant cohort will be lower than that of others if: 
 
   a. The cohort is under the shade (it reduces $f_i$ and hence $Tr_{\max,i}$)
   b. The cohort has a lower amount of leaf area (it reduces $f_i$ and hence $Tr_{\max,i}$)
   c. The soil layers exploited by the cohort have more negative water potentials (it reduces $K_{i,s}$). 
 
 
-The basic water balance model does not allow estimating a water potential drop from soil to the leaf. Moreover, in a multilayered soil it is difficult to know what would be the water potential of the plant. Despite these limitations, a gross surrogate of  'plant' water potential ($\Psi_{plant, i}$; in MPa) may be obtained averaging whole-plant relative conductance values and inverting the relative transpiration function:
+The basic water balance model does not allow estimating a water potential drop from soil to the leaf. Moreover, in a multilayered soil it is difficult to know what would be the water potential of the plant. Despite these limitations, a gross surrogate of  'plant' water potential ($\Psi_{plant, i}$; in MPa) may be obtained averaging whole-plant relative conductance values across soil layers and inverting the whole-plant relative transpiration function:
 \begin{equation}
-\Psi_{plant, i}= K_i^{-1}\left(\sum_{s}{K_{i,s}\cdot v_{i,s}}\right)
+\Psi_{plant, i}= K_i^{-1}\left(\sum_{s}{K_{i,s}\cdot FRP_{i,s}}\right)
+(\#eq:psiplant)
 \end{equation}
 where $K_i^{-1}$ is the inverse of the relative whole-plant transpiration eq. \@ref(eq:relativewholeplantconductance). The plant water potential is used to determine plant stress levels and cavitation, as explained in \@ref(dailystressbasicwater) and \@ref(irreversiblecavitation). 
 
 Importantly, changes in $\Psi_{plant, i}$ induce changes in plant water content, which may induce a release of water in the transpiration stream or an absorption of water from it.
 
-### Minimum (cuticular) transpiration
+### Minimum transpiration
+The description of actual transpiration in the previous section incorporates the assumption that plants can regulate water losses up to zero transpiration, neglecting water leaks through the leaf cuticule and/or incomplete stomatal closure [@Duursma2018]. To avoid this assumption we can estimate minimum transpiration for a given plant cohort, $Tr_{\min,i}$ (in mm), and prevent $Tr_i < Tr_{\min,i}$.  
+
+Minimum transpiration flow per leaf area $E_{\min}$ in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) can be calculated if we know (1) the minimum leaf conductance to water vapor ($g_{sw, \min}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$); (2) the leaf vapor pressure deficit ($VPD_{leaf}$; in $kPa$); and (3) atmospheric pressure ($P_{atm}$; also in $kPa$):
+\begin{equation}
+E_{\min} =  g_{sw,\min}  \cdot \frac{VPD_{leaf}}{P_{atm}}
+\end{equation}
+In turn, the vapor pressure deficit in the leaf ($VPD_{leaf}$) is calculated as:
+\begin{equation}
+VPD_{leaf} = e_{leaf} - e_{air}
+\end{equation}
+Where $e_{air}$ is the water vapor pressure of the air surrounding the leaf (but beyond the leaf boundary layer) and $e_{leaf}$ is the vapor pressure inside the leaf. While $e_{air}$ can be derived from the weather input, $e_{leaf}$ should be calculated from leaf temperature ($T_{leaf}$) and leaf water potential ($\Psi_{leaf}$):
+\begin{equation}
+e_{leaf}(T_{leaf}, \Psi_{leaf}) = e_{sat}(T_{leaf}) \cdot \exp\left\{\frac{2.17 \cdot \Psi_{leaf}}{T_{leaf}+273.15}\right\}
+\end{equation}
+where $e_{sat}(T)$ is a function giving the saturated vapor pressure for temperature $T$ (see [utility functions](http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual). Given the simplicity of the basic water balance model, here we make the assumption that $\Psi_{leaf} = \Psi_{plant}$ (from the previous time step). Furthermore, we assume that leaf temperature is coupled with the temperature of the surrounding air. Given the non-linearity of $e_{leaf}$ we average the wapor pressure values provided by $e_{leaf}(T_{\min}, \Psi_{plant})$ and $e_{leaf}(T_{\max}, \Psi_{plant})$. 
+
+Once the leaf level $E_{\min}$ is known for a give cohort $i$, we can scale this instantaneous rate to daily transpiration (in mm) at the cohort level using:
+\begin{equation}
+Tr_{\min,i} = E_{\min,i} \cdot 24 \cdot 3600 \cdot LAI_i^{\phi} \cdot 0.018
+\end{equation}
 
 
 ### Transpiration with plant water pools {#transpirationpools}
-Considering plant water pools (i.e. setting `plantWaterPools = TRUE` in the control parameters) involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many plant water pools as plant cohorts, with proportions defined by their LAI values:
+Considering plant water pools (i.e. setting `rhizosphereOverlap = "partial"` or `rhizosphereOverlap = "total"` in the control parameters) involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many plant water pools as plant cohorts, with proportions defined by their LAI values. For example, the fraction corresponding to plant cohort $j$ would be:
 \begin{equation}
-f_{pool,i} = \frac{LAI^{live}_i}{LAI^{live}_{stand}}
+f_{pool,j} = \frac{LAI^{live}_j}{LAI^{live}_{stand}}
 \end{equation}
 Overall soil moisture is then related to moisture of plant water pools by the following equation, that is fulfilled for each soil layer $s$:
 \begin{equation}
-W_{s} = \sum_{i}{f_{pool,i} \cdot W_{i,s}}
+W_{s} = \sum_{j}{f_{pool,j} \cdot W_{j,s}}
 \end{equation}
-where $W_{i,s}$ is the soil moisture (relative to field capacity) of layer $s$ in the plant water pool of cohort $i$, i.e. under the area of the stand attributed to cohort $i$.
+where $W_{j,s}$ is the soil moisture (relative to field capacity) of layer $s$ in the water pool of cohort $j$, i.e. under the area of the stand attributed to cohort $j$.
 
-When transpiration occurs and plant water pools are considered, the model assumes that the rhizosphere of each plant cohort occupies its own water pool but may enter into the water pools under other plant cohorts. In other words, the root systems of different cohorts may overlap horizontally. A given plant cohort $i$ will have its roots in layer $s$ partitioned among different water pools. Let us assume that we know $fr_{i,s,j}$, the (horizontal) proportion of fine roots of cohort $i$ in layer $s$ of the water pool $j$ (see section \@ref(plantwaterpools)). These proportions fulfill:
+When transpiration occurs and water pools are considered, the model assumes that the rhizosphere of each plant cohort occupies its own water pool, but may enter into the water pools under other plant cohorts if the overlap is partial. In other words, the root systems of different cohorts may overlap horizontally. A given plant cohort $i$ will have its roots in layer $s$ partitioned among different water pools. Let us assume that we know $fr_{i,s,j}$, the (horizontal) proportion of fine roots of cohort $i$ in layer $s$ of the water pool $j$ (see section \@ref(plantwaterpools)). These proportions sum one when summed across water pools:
 \begin{equation}
 \sum_{j}{fr_{i,s,j}} = 1 \,\, \forall i,s
 \end{equation}
-The soil moisture *sensed* by plant cohort $i$ in layer $s$, $W_{rhizo,i,s}$ is a weighted sum of moisture in water pools, with weights being the proportion of fine roots in each pool:
+The proportion of fine roots in a given water pool, with respect to the whole root system, will then be equal to:
 \begin{equation}
-W_{rhizo,i,s} = \sum_{j}{fr_{i,s,j} \cdot W_{i,s}}
+FRP_{i,s,j} = fr_{i,s,j} \cdot FRP_{i,s}
 \end{equation}
-This moisture determines $\Psi_{s,i}$, the corresponding water potential, which replaces $\Psi_{s}$ in eq. \@ref(eq:relativewholeplantconductance), so that plant conductance depends on the soil moisture *sensed* by the rhizosphere of the plant cohort. If the (actual) transpiration of cohort $i$ from soil layer $s$ is $Tr_{i,s}$, the water extracted by transpiration from a water pool $j$ will be:
-\begin{equation}
-Tr_{i,s,j} = \frac{fr_{i,s,j} \cdot Tr_{i,s}}{f_{pool,j}}
-\end{equation}
-It is easy to verify that this definition ensures the fulfillment of an equation analogous to that between $W_{s}$ and $W_{s,i}$:
-\begin{equation}
-Tr_{i,s} = \sum_{j}{f_{pool,j} \cdot Tr_{i,s,j}}
-\end{equation}
+Estimating transpiration with water pools is analogous to estimating transpiration without them, but replacing the role of $FRP_{i,s}$ by $FRP_{i,s,j}$, and $K_{i,s}$ by $K_{i,s,j}$, in eq. \ref(eq:actualcohorttranspiration), which leads to the estimation of $Tr_{i,s,j}$. Analogous replacements have to be made when estimating the plant water potential in eq. \ref(eq:psiplant).
 
+Finally, note that the amount of water extracted from the soil layer $s$ of given water pool $j$ (i.e. from $W_{j,s}$) will not be $Tr_{i,s,j}$ (whose units are referred to the overall stand) but $Tr_{i,s,j}/f_{pool,j}$.
 
 ### Plant photosynthesis {#basicphotosynthesis}
 
