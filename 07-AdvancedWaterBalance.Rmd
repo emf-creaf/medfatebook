@@ -182,6 +182,10 @@ A third set includes parameters related to plant anatomic and morphological attr
 | $SLA_i$  | $m^2 \cdot kg^{-1}$ | `SLA` | Specific leaf area |
 | $\rho_{leaf,i}$ | $g \cdot cm^{-3}$ | `LeafDensity` | Leaf tissue density |
 | $\rho_{wood,i}$ | $g \cdot cm^{-3}$ | `WoodDensity` | Wood tissue density |
+| $\rho_{fineroot}$ | $g \cdot cm^{-3}$ | `FineRootDensity` | Fine root tissue density |
+| $SRL$ | $cm \cdot g^{-1}$ | `SRL` | Specific root length |
+| $RLD$ | $cm \cdot cm^{-3}$ | `RLD` | Fine root length density (i.e. density of root length per soil volume) |
+| $r_{6.35}$ | | `r635` | Ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm |
 
 A fourth set of parameters are related to transpiration and photosynthesis (`paramsTranspiration`):
 
@@ -207,6 +211,7 @@ A fifth (final) set of parameters are related to water storage and water relatio
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
+| $LFMC_{\max}$ | % | `maxFMC` | Maximum live fuel moisture content, corresponding to fine fuels (< 6.35 mm twigs and leaves). |
 | $\epsilon_{leaf,i}$ | MPa | `LeafEPS` | Modulus of elasticity of leaves |
 | $\epsilon_{stem,i}$ | MPa | `StemEPS` | Modulus of elasticity of symplastic xylem tissue |
 | $\pi_{0,leaf,i}$ | MPa | `LeafPI0` | Osmotic potential at full turgor of leaves |
@@ -260,7 +265,7 @@ In addition, a number of control parameters are used to modify how hydraulic par
 
 #### Daily output
 
-Function `spwb` with `transpirationMode = "Sperry"` returns a list object with the following elements:
+Functions `spwb()` and `pwb()` with `transpirationMode = "Sperry"` return a list of a class with the same name. The first four elements of this list (i.e., `latitude`, `topography`, `weather` and `spwbInput`) are simply copies of model inputs. The next element is `spwbOutput`, which contains the state of the input object at the end of the simulation (this can be used to perform further simulations starting with current values of state variables). The remainng elements are:
 
 | Element | Description                                                |
 |---------|------------------------------------------------------------|
@@ -294,8 +299,7 @@ Compared to the output of the basic water balance \@ref(basicwaterbalanceoutput)
 | `StemPLC`| $PLC_{stem,i}$ | MPa | Proportion of stem conductance loss. |
 | `LeafRWC`| $RWC_{leaf, i}$ | % | Mean leaf relative water content. |
 | `StemRWC`| $RWC_{stem, i}$ | % | Mean stem relative water content. |
-| `LeafSympRWC`| $RWC_{leaf, i}$ | % | Relative water content in the leaf symplasm. |
-| `StemSympRWC`| $RWC_{stem, i}$ | % | Relative water content in the stem symplasm. |
+| `LFMC`| $LFMC_{i}$ | % | Live fuel moisture content (as percent of dry weight), corresponding to fine fuels (< 6.35 mm twigs and leaves). |
 | `PlantStress` | $DDS_i$ | [0-1] | Drought stress level suffered by each plant cohort (relative whole-plant conductance).|
 
 The following table describes the child elements of `SunlitLeaves` and `ShadeLeaves`, each of them a data frame with dates in rows and plant cohorts in columns:
@@ -306,6 +310,7 @@ The following table describes the child elements of `SunlitLeaves` and `ShadeLea
 | `LeafPsiMax`| $\Psi_{pd, i}^{sunlit}$, $\Psi_{pd, i}^{shade}$| MPa | Maximum (predawn) (sunlit or shade) leaf water potential. |
 | `GW`| $g_{w,i}^{sunlit}$, $g_{w,i}^{shade}$| $mol \cdot s^{-1} \cdot m^{-2}$ | Stomatal conductance to water vapour. |
 
+The output of simulations can be inspected using `plot`, `shinyplot` and `summary` functions specific to `spwb` objects (examples are given in the corresponding package *vignette*).
 
 #### Subdaily output
 

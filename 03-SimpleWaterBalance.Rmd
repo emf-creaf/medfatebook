@@ -90,14 +90,7 @@ The minimum weather variables required to run the model are min/max temperatures
 
 ### Vegetation functional parameters {#basicwatervegetationparameters}
 
-A relatively small set of functional parameters should be supplied for each plant cohort $i$. A first set of parameters relate to light extinction and water interception (`paramsInterception`):
-
-| Symbol | Units | R  | Description                                  | 
-|--------|-------|----| ---------------------------------------------|
-| $k_{PAR}$ | | `kPAR` | PAR extinction coefficient (see section \@ref(basiclightextinction)). |
-| $s_{water}$ | $mm\,H_2O·LAI^{-1}$ | `g` | Crown water storage capacity (i.e. depth of water that can be retained by leaves and branches) per LAI unit (see section \@ref(interception)). |
-
-A second set refers to leaf phenology (`paramsPhenology`):
+The following sets of functional parameters should be supplied for each plant cohort. A first set refers to leaf phenology (`paramsPhenology`):
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
@@ -112,7 +105,29 @@ A second set refers to leaf phenology (`paramsPhenology`):
 | $x_{sen}$ | {0,1,2}  | `xsen` | Discrete values, to allow for any absent/proportional/more than proportional effects of temperature on senescence (see section \@ref(leafphenosenescence)). |
 | $y_{sen}$ | {0,1,2}  | `ysen` | Discrete values, to allow for any absent/proportional/more than proportional effects of photoperiod on senescence (see section \@ref(leafphenosenescence)). |
 
-A third set of parameters are related to transpiration and photosynthesis (`paramsTranspiration`):
+A second set of parameters relate to light extinction and water interception (`paramsInterception`):
+
+| Symbol | Units | R  | Description                                  | 
+|--------|-------|----| ---------------------------------------------|
+| $k_{PAR}$ | | `kPAR` | PAR extinction coefficient (see section \@ref(basiclightextinction)). |
+| $s_{water}$ | $mm\,H_2O·LAI^{-1}$ | `g` | Crown water storage capacity (i.e. depth of water that can be retained by leaves and branches) per LAI unit (see section \@ref(interception)). |
+
+A third set includes parameters related to plant anatomic and morphological attributes (`paramsAnatomy`):
+
+| Symbol | Units | R param | Description                             |
+|--------|-------|---------|-----------------------------------------|
+| $1/H_{v,i}$  | $m^2 \cdot m^{-2}$ | `Al2As` | Ratio of leaf area to sapwood area |
+| $RLR$  | $m^2 \cdot m^{-2}$ | `Ar2Al` | Fine root area to leaf area ratio |
+| $SLA_i$  | $m^2 \cdot kg^{-1}$ | `SLA` | Specific leaf area |
+| $\rho_{leaf,i}$ | $g \cdot cm^{-3}$ | `LeafDensity` | Leaf tissue density |
+| $\rho_{wood,i}$ | $g \cdot cm^{-3}$ | `WoodDensity` | Wood tissue density |
+| $\rho_{fineroot}$ | $g \cdot cm^{-3}$ | `FineRootDensity` | Fine root tissue density |
+| $SRL$ | $cm \cdot g^{-1}$ | `SRL` | Specific root length |
+| $RLD$ | $cm \cdot cm^{-3}$ | `RLD` | Fine root length density (i.e. density of root length per soil volume) |
+| $r_{6.35}$ | | `r635` | Ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm |
+
+
+A fourth set of parameters are related to transpiration and photosynthesis (`paramsTranspiration`):
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
@@ -123,20 +138,20 @@ A third set of parameters are related to transpiration and photosynthesis (`para
 | $\Psi_{critic}$ | $MPa$ | `Psi_Critic` |  The water potential corresponding to 50% of  cavitation (see section \@ref(irreversiblecavitation)).|
 | $WUE_{\max}$ | $g\, C \cdot mm^{-1}$ |  `WUE` |  Maximum water use efficiency under full light and no water limitations (see section \@ref(basicphotosynthesis)).  |
 | $WUE_{decay}$ |  |  `WUE_decay` |  Exponent describing the decay of water use efficiency with low light levels (see section \@ref(basicphotosynthesis)).  |
-| $K_{rootdisc}$ | [0-1] |  `pRootDisc` |  Whole-plant relative transpiration corresponding to hydraulic disconnection from the soil (see section \@ref(irreversiblecavitation)).  |
 
-A forth (final) set of parameters are related to water storage and water relations in plant tissues (`paramsWaterStorage`):
+A fifth (final) set of parameters are related to water storage and water relations in plant tissues (`paramsWaterStorage`):
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
-| $\epsilon_{leaf,i}$ | MPa | `LeafEPS` | Modulus of elasticity of leaves |
-| $\epsilon_{stem,i}$ | MPa | `StemEPS` | Modulus of elasticity of symplastic xylem tissue |
-| $\pi_{0,leaf,i}$ | MPa | `LeafPI0` | Osmotic potential at full turgor of leaves |
-| $\pi_{0,stem,i}$ | MPa | `StemPI0` | Osmotic potential at full turgor of symplastic xylem tissue |
-| $f_{apo,leaf,i}$ | [0-1] | `LeafAF` | Apoplastic fraction in leaf tissues |
-| $f_{apo,stem,i}$ | [0-1] | `StemAF` | Apoplastic fraction in stem tissues |
-| $V_{leaf,i}$ | $l \cdot m^{-2}$ | `Vleaf` | Leaf water capacity per leaf area unit |
-| $V_{sapwood,i}$ | $l \cdot m^{-2}$ | `Vsapwood` | Sapwood water capacity per leaf area unit |
+| $LFMC_{\max}$ | % | `maxFMC` | Maximum live fuel moisture content, corresponding to fine fuels (< 6.35 mm twigs and leaves). |
+| $\epsilon_{leaf}$ | MPa | `LeafEPS` | Modulus of elasticity of leaves |
+| $\epsilon_{stem}$ | MPa | `StemEPS` | Modulus of elasticity of symplastic xylem tissue |
+| $\pi_{0,leaf}$ | MPa | `LeafPI0` | Osmotic potential at full turgor of leaves |
+| $\pi_{0,stem}$ | MPa | `StemPI0` | Osmotic potential at full turgor of symplastic xylem tissue |
+| $f_{apo,leaf}$ | [0-1] | `LeafAF` | Apoplastic fraction in leaf tissues |
+| $f_{apo,stem}$ | [0-1] | `StemAF` | Apoplastic fraction in stem tissues |
+| $V_{leaf}$ | $l \cdot m^{-2}$ | `Vleaf` | Leaf water capacity per leaf area unit |
+| $V_{sapwood}$ | $l \cdot m^{-2}$ | `Vsapwood` | Sapwood water capacity per leaf area unit |
 
 Vegetation functional attributes are normally filled for each cohort $i$ by function `spwbInput()` or `forest2spwbInput()` from species identity (i.e. $SP_i$). However, different parameters can be specified for different cohorts of the same species if desired (see section \@ref(functionaltraits)). 
 
@@ -166,7 +181,7 @@ The other control parameters for the basic water balance model are:
 
 ### Model output {#basicwaterbalanceoutput}
 
-Functions `spwb()` and `pwb()` return a list of a class with the same name. The first four elements of this list (i.e., `latitude`, `topography`, `spwbInput` and `soilInput`) are simply copies of model inputs. The next four elements correspond to *water balance flows*, *soil state* variables, *stand-level* variables, and *plant-level* variables:
+Functions `spwb()` and `pwb()` return a list of a class with the same name. The first four elements of this list (i.e., `latitude`, `topography`, `weather` and `spwbInput`) are simply copies of model inputs. The next element is `spwbOutput`, which contains the state of the input object at the end of the simulation (this can be used to perform further simulations starting with current values of state variables). The next four elements correspond to *water balance flows*, *soil state* variables, *stand-level* variables, and *plant-level* variables:
 
 | Element | Description                                                |
 |---------|------------------------------------------------------------|
@@ -186,17 +201,21 @@ Elements `WaterBalance`, `Soil` and `Stand` are data frame with dates in rows an
 |`GrossPhotosynthesis`| $A_{g,i}$ | $g\,C \cdot m^{-2}$ | Gross photosynthesis per unit ground area.|
 |`PlantPsi` | $\Psi_{plant,i}$ | $MPa$ | Plant water potential.|
 |`StemPLC` | $PLC_{i}$ | [0-1] | Degree of stem embolisation.|
+| `PlantWaterBalance` | | mm | Internal daily plant water balance (balance of soil extraction and transpiration). |
+| `LeafRWC`| $RWC_{leaf, i}$ | % | Mean leaf relative water content. |
+| `StemRWC`| $RWC_{stem, i}$ | % | Mean stem relative water content. |
+| `LFMC`| $LFMC_{i}$ | % | Live fuel moisture content (as percent of dry weight), corresponding to fine fuels (< 6.35 mm twigs and leaves). |
 |`PlantStress` | $DDS_i$ | [0-1] | Drought stress level suffered by each plant cohort (relative whole-plant transpiration).|
 
-The output of simulations can be inspected using `plot` and `summary` functions specific to `spwb` objects (examples are given in the corresponding package *vignette*).
+The output of simulations can be inspected using `plot`, `shinyplot` and `summary` functions specific to `spwb` objects (examples are given in the corresponding package *vignette*).
 
 As it simulates water balance for only one day, function `spwb_day()` returns a much more reduced output. This function is most useful with advanced water balance modelling (chapter \@ref(advancedwaterbalance)).
 
 ## Applications {#basicwaterbalanceapplications}
 
-The basic water balance model is relatively easy to parametrize and use. Moreover, the model is quite fast. These features make it appropriate for applications that do not seek a high predictive at the plant level, but require robust estimates at the stand, landscape or regional levels. In our opinion the basic water balance model may be useful for the following applications: 
+The basic water balance model is easier to parameterize and is faster the advanced water balance model. These features make it appropriate for applications that do not seek a high predictive capacity of water status at the plant level, but require robust estimates of water fluxes at the stand, landscape or regional levels. In our opinion the basic water balance model may be useful for the following applications: 
 
-1. To monitor or forecast temporal variation in transpiration flows and soil water content in particular stands or in multiple stands across a landscape or region. 
+1. To monitor or forecast temporal variation in transpiration fluxes and soil water content in particular stands or in multiple stands across a landscape or region. 
 2. Monitor or forecast temporal variation of plant drought stress in particular stands or in multiple stands across a landscape or region (for example to anticipate mortality events).
 
 For example, @Karavani2018 employed the water balance to provide sound estimates of soil moisture dynamics to predict mushroom production in a network forest stands. The model is particularly interesting to test the relationship between forest structure/composition and the water balance at the stand level or the drought stress suffered by plants, as done in @Ameztegui2017. See also another application in @Rolo2019.

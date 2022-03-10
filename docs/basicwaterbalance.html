@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2022-03-09" />
+<meta name="date" content="2022-03-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -256,7 +256,7 @@ div.csl-indent {
 <li class="chapter" data-level="6.1.1" data-path="transpirationgranier.html"><a href="transpirationgranier.html#maximumtranspiration"><i class="fa fa-check"></i><b>6.1.1</b> Maximum transpiration</a></li>
 <li class="chapter" data-level="6.1.2" data-path="transpirationgranier.html"><a href="transpirationgranier.html#actualtranspiration"><i class="fa fa-check"></i><b>6.1.2</b> Actual plant transpiration and plant water potential</a></li>
 <li class="chapter" data-level="6.1.3" data-path="transpirationgranier.html"><a href="transpirationgranier.html#minimum-transpiration"><i class="fa fa-check"></i><b>6.1.3</b> Minimum transpiration</a></li>
-<li class="chapter" data-level="6.1.4" data-path="transpirationgranier.html"><a href="transpirationgranier.html#transpirationpools"><i class="fa fa-check"></i><b>6.1.4</b> Transpiration with plant water pools</a></li>
+<li class="chapter" data-level="6.1.4" data-path="transpirationgranier.html"><a href="transpirationgranier.html#transpirationpools"><i class="fa fa-check"></i><b>6.1.4</b> Transpiration with water pools</a></li>
 <li class="chapter" data-level="6.1.5" data-path="transpirationgranier.html"><a href="transpirationgranier.html#basicphotosynthesis"><i class="fa fa-check"></i><b>6.1.5</b> Plant photosynthesis</a></li>
 </ul></li>
 <li class="chapter" data-level="6.2" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-drought-stress-and-cavitation"><i class="fa fa-check"></i><b>6.2</b> Plant drought stress and cavitation</a>
@@ -735,38 +735,7 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 </div>
 <div id="basicwatervegetationparameters" class="section level3" number="3.5.2">
 <h3><span class="header-section-number">3.5.2</span> Vegetation functional parameters</h3>
-<p>A relatively small set of functional parameters should be supplied for each plant cohort <span class="math inline">\(i\)</span>. A first set of parameters relate to light extinction and water interception (<code>paramsInterception</code>):</p>
-<table>
-<colgroup>
-<col width="12%" />
-<col width="10%" />
-<col width="6%" />
-<col width="70%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Symbol</th>
-<th>Units</th>
-<th>R</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(k_{PAR}\)</span></td>
-<td></td>
-<td><code>kPAR</code></td>
-<td>PAR extinction coefficient (see section <a href="leafphenologylight.html#basiclightextinction">4.2</a>).</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(s_{water}\)</span></td>
-<td><span class="math inline">\(mm\,H_2O·LAI^{-1}\)</span></td>
-<td><code>g</code></td>
-<td>Crown water storage capacity (i.e. depth of water that can be retained by leaves and branches) per LAI unit (see section <a href="hydrology.html#interception">5.3</a>).</td>
-</tr>
-</tbody>
-</table>
-<p>A second set refers to leaf phenology (<code>paramsPhenology</code>):</p>
+<p>The following sets of functional parameters should be supplied for each plant cohort. A first set refers to leaf phenology (<code>paramsPhenology</code>):</p>
 <table>
 <colgroup>
 <col width="12%" />
@@ -845,7 +814,111 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 </tr>
 </tbody>
 </table>
-<p>A third set of parameters are related to transpiration and photosynthesis (<code>paramsTranspiration</code>):</p>
+<p>A second set of parameters relate to light extinction and water interception (<code>paramsInterception</code>):</p>
+<table>
+<colgroup>
+<col width="12%" />
+<col width="10%" />
+<col width="6%" />
+<col width="70%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Units</th>
+<th>R</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(k_{PAR}\)</span></td>
+<td></td>
+<td><code>kPAR</code></td>
+<td>PAR extinction coefficient (see section <a href="leafphenologylight.html#basiclightextinction">4.2</a>).</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(s_{water}\)</span></td>
+<td><span class="math inline">\(mm\,H_2O·LAI^{-1}\)</span></td>
+<td><code>g</code></td>
+<td>Crown water storage capacity (i.e. depth of water that can be retained by leaves and branches) per LAI unit (see section <a href="hydrology.html#interception">5.3</a>).</td>
+</tr>
+</tbody>
+</table>
+<p>A third set includes parameters related to plant anatomic and morphological attributes (<code>paramsAnatomy</code>):</p>
+<table>
+<colgroup>
+<col width="12%" />
+<col width="10%" />
+<col width="13%" />
+<col width="63%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Units</th>
+<th>R param</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(1/H_{v,i}\)</span></td>
+<td><span class="math inline">\(m^2 \cdot m^{-2}\)</span></td>
+<td><code>Al2As</code></td>
+<td>Ratio of leaf area to sapwood area</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(RLR\)</span></td>
+<td><span class="math inline">\(m^2 \cdot m^{-2}\)</span></td>
+<td><code>Ar2Al</code></td>
+<td>Fine root area to leaf area ratio</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(SLA_i\)</span></td>
+<td><span class="math inline">\(m^2 \cdot kg^{-1}\)</span></td>
+<td><code>SLA</code></td>
+<td>Specific leaf area</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\rho_{leaf,i}\)</span></td>
+<td><span class="math inline">\(g \cdot cm^{-3}\)</span></td>
+<td><code>LeafDensity</code></td>
+<td>Leaf tissue density</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\rho_{wood,i}\)</span></td>
+<td><span class="math inline">\(g \cdot cm^{-3}\)</span></td>
+<td><code>WoodDensity</code></td>
+<td>Wood tissue density</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\rho_{fineroot}\)</span></td>
+<td><span class="math inline">\(g \cdot cm^{-3}\)</span></td>
+<td><code>FineRootDensity</code></td>
+<td>Fine root tissue density</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(SRL\)</span></td>
+<td><span class="math inline">\(cm \cdot g^{-1}\)</span></td>
+<td><code>SRL</code></td>
+<td>Specific root length</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(RLD\)</span></td>
+<td><span class="math inline">\(cm \cdot cm^{-3}\)</span></td>
+<td><code>RLD</code></td>
+<td>Fine root length density (i.e. density of root length per soil volume)</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(r_{6.35}\)</span></td>
+<td></td>
+<td><code>r635</code></td>
+<td>Ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm</td>
+</tr>
+</tbody>
+</table>
+<p>A fourth set of parameters are related to transpiration and photosynthesis (<code>paramsTranspiration</code>):</p>
 <table>
 <colgroup>
 <col width="12%" />
@@ -904,15 +977,9 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <td><code>WUE_decay</code></td>
 <td>Exponent describing the decay of water use efficiency with low light levels (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.5</a>).</td>
 </tr>
-<tr class="even">
-<td><span class="math inline">\(K_{rootdisc}\)</span></td>
-<td>[0-1]</td>
-<td><code>pRootDisc</code></td>
-<td>Whole-plant relative transpiration corresponding to hydraulic disconnection from the soil (see section <a href="transpirationgranier.html#irreversiblecavitation">6.2.2</a>).</td>
-</tr>
 </tbody>
 </table>
-<p>A forth (final) set of parameters are related to water storage and water relations in plant tissues (<code>paramsWaterStorage</code>):</p>
+<p>A fifth (final) set of parameters are related to water storage and water relations in plant tissues (<code>paramsWaterStorage</code>):</p>
 <table>
 <colgroup>
 <col width="12%" />
@@ -930,49 +997,55 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\(\epsilon_{leaf,i}\)</span></td>
+<td><span class="math inline">\(LFMC_{\max}\)</span></td>
+<td>%</td>
+<td><code>maxFMC</code></td>
+<td>Maximum live fuel moisture content, corresponding to fine fuels (&lt; 6.35 mm twigs and leaves).</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\epsilon_{leaf}\)</span></td>
 <td>MPa</td>
 <td><code>LeafEPS</code></td>
 <td>Modulus of elasticity of leaves</td>
 </tr>
-<tr class="even">
-<td><span class="math inline">\(\epsilon_{stem,i}\)</span></td>
+<tr class="odd">
+<td><span class="math inline">\(\epsilon_{stem}\)</span></td>
 <td>MPa</td>
 <td><code>StemEPS</code></td>
 <td>Modulus of elasticity of symplastic xylem tissue</td>
 </tr>
-<tr class="odd">
-<td><span class="math inline">\(\pi_{0,leaf,i}\)</span></td>
+<tr class="even">
+<td><span class="math inline">\(\pi_{0,leaf}\)</span></td>
 <td>MPa</td>
 <td><code>LeafPI0</code></td>
 <td>Osmotic potential at full turgor of leaves</td>
 </tr>
-<tr class="even">
-<td><span class="math inline">\(\pi_{0,stem,i}\)</span></td>
+<tr class="odd">
+<td><span class="math inline">\(\pi_{0,stem}\)</span></td>
 <td>MPa</td>
 <td><code>StemPI0</code></td>
 <td>Osmotic potential at full turgor of symplastic xylem tissue</td>
 </tr>
-<tr class="odd">
-<td><span class="math inline">\(f_{apo,leaf,i}\)</span></td>
+<tr class="even">
+<td><span class="math inline">\(f_{apo,leaf}\)</span></td>
 <td>[0-1]</td>
 <td><code>LeafAF</code></td>
 <td>Apoplastic fraction in leaf tissues</td>
 </tr>
-<tr class="even">
-<td><span class="math inline">\(f_{apo,stem,i}\)</span></td>
+<tr class="odd">
+<td><span class="math inline">\(f_{apo,stem}\)</span></td>
 <td>[0-1]</td>
 <td><code>StemAF</code></td>
 <td>Apoplastic fraction in stem tissues</td>
 </tr>
-<tr class="odd">
-<td><span class="math inline">\(V_{leaf,i}\)</span></td>
+<tr class="even">
+<td><span class="math inline">\(V_{leaf}\)</span></td>
 <td><span class="math inline">\(l \cdot m^{-2}\)</span></td>
 <td><code>Vleaf</code></td>
 <td>Leaf water capacity per leaf area unit</td>
 </tr>
-<tr class="even">
-<td><span class="math inline">\(V_{sapwood,i}\)</span></td>
+<tr class="odd">
+<td><span class="math inline">\(V_{sapwood}\)</span></td>
 <td><span class="math inline">\(l \cdot m^{-2}\)</span></td>
 <td><code>Vsapwood</code></td>
 <td>Sapwood water capacity per leaf area unit</td>
@@ -1011,7 +1084,7 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 </div>
 <div id="basicwaterbalanceoutput" class="section level3" number="3.5.4">
 <h3><span class="header-section-number">3.5.4</span> Model output</h3>
-<p>Functions <code>spwb()</code> and <code>pwb()</code> return a list of a class with the same name. The first four elements of this list (i.e., <code>latitude</code>, <code>topography</code>, <code>spwbInput</code> and <code>soilInput</code>) are simply copies of model inputs. The next four elements correspond to <em>water balance flows</em>, <em>soil state</em> variables, <em>stand-level</em> variables, and <em>plant-level</em> variables:</p>
+<p>Functions <code>spwb()</code> and <code>pwb()</code> return a list of a class with the same name. The first four elements of this list (i.e., <code>latitude</code>, <code>topography</code>, <code>weather</code> and <code>spwbInput</code>) are simply copies of model inputs. The next element is <code>spwbOutput</code>, which contains the state of the input object at the end of the simulation (this can be used to perform further simulations starting with current values of state variables). The next four elements correspond to <em>water balance flows</em>, <em>soil state</em> variables, <em>stand-level</em> variables, and <em>plant-level</em> variables:</p>
 <table>
 <colgroup>
 <col width="13%" />
@@ -1102,6 +1175,30 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <td>Degree of stem embolisation.</td>
 </tr>
 <tr class="even">
+<td><code>PlantWaterBalance</code></td>
+<td></td>
+<td>mm</td>
+<td>Internal daily plant water balance (balance of soil extraction and transpiration).</td>
+</tr>
+<tr class="odd">
+<td><code>LeafRWC</code></td>
+<td><span class="math inline">\(RWC_{leaf, i}\)</span></td>
+<td>%</td>
+<td>Mean leaf relative water content.</td>
+</tr>
+<tr class="even">
+<td><code>StemRWC</code></td>
+<td><span class="math inline">\(RWC_{stem, i}\)</span></td>
+<td>%</td>
+<td>Mean stem relative water content.</td>
+</tr>
+<tr class="odd">
+<td><code>LFMC</code></td>
+<td><span class="math inline">\(LFMC_{i}\)</span></td>
+<td>%</td>
+<td>Live fuel moisture content (as percent of dry weight), corresponding to fine fuels (&lt; 6.35 mm twigs and leaves).</td>
+</tr>
+<tr class="even">
 <td><code>PlantStress</code></td>
 <td><span class="math inline">\(DDS_i\)</span></td>
 <td>[0-1]</td>
@@ -1109,15 +1206,15 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 </tr>
 </tbody>
 </table>
-<p>The output of simulations can be inspected using <code>plot</code> and <code>summary</code> functions specific to <code>spwb</code> objects (examples are given in the corresponding package <em>vignette</em>).</p>
+<p>The output of simulations can be inspected using <code>plot</code>, <code>shinyplot</code> and <code>summary</code> functions specific to <code>spwb</code> objects (examples are given in the corresponding package <em>vignette</em>).</p>
 <p>As it simulates water balance for only one day, function <code>spwb_day()</code> returns a much more reduced output. This function is most useful with advanced water balance modelling (chapter <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>).</p>
 </div>
 </div>
 <div id="basicwaterbalanceapplications" class="section level2" number="3.6">
 <h2><span class="header-section-number">3.6</span> Applications</h2>
-<p>The basic water balance model is relatively easy to parametrize and use. Moreover, the model is quite fast. These features make it appropriate for applications that do not seek a high predictive at the plant level, but require robust estimates at the stand, landscape or regional levels. In our opinion the basic water balance model may be useful for the following applications:</p>
+<p>The basic water balance model is easier to parameterize and is faster the advanced water balance model. These features make it appropriate for applications that do not seek a high predictive capacity of water status at the plant level, but require robust estimates of water fluxes at the stand, landscape or regional levels. In our opinion the basic water balance model may be useful for the following applications:</p>
 <ol style="list-style-type: decimal">
-<li>To monitor or forecast temporal variation in transpiration flows and soil water content in particular stands or in multiple stands across a landscape or region.</li>
+<li>To monitor or forecast temporal variation in transpiration fluxes and soil water content in particular stands or in multiple stands across a landscape or region.</li>
 <li>Monitor or forecast temporal variation of plant drought stress in particular stands or in multiple stands across a landscape or region (for example to anticipate mortality events).</li>
 </ol>
 <p>For example, <span class="citation"><a href="#ref-Karavani2018" role="doc-biblioref">Karavani <em>et al.</em></a> (<a href="#ref-Karavani2018" role="doc-biblioref">2018</a>)</span> employed the water balance to provide sound estimates of soil moisture dynamics to predict mushroom production in a network forest stands. The model is particularly interesting to test the relationship between forest structure/composition and the water balance at the stand level or the drought stress suffered by plants, as done in <span class="citation"><a href="#ref-Ameztegui2017" role="doc-biblioref">Ameztegui <em>et al.</em></a> (<a href="#ref-Ameztegui2017" role="doc-biblioref">2017</a>)</span>. See also another application in <span class="citation"><a href="#ref-Rolo2019" role="doc-biblioref">Rolo &amp; Moreno</a> (<a href="#ref-Rolo2019" role="doc-biblioref">2019</a>)</span>.</p>
