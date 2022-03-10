@@ -1,4 +1,4 @@
-# Transpiration, photosynthesis and drought stress under Granier's model {#transpirationgranier}
+# Plant ranspiration, photosynthesis and water status {#transpirationgranier}
 
 This chapter describes how daily plant transpiration is modelled in the basic water balance model, completing the flows needed to evaluate eq. \@ref(eq:basicwaterbalanceequation). The model uses the approach of BILJOU [@Granier1999] to estimate stand maximum transpiration, and then divides this value among the contribution of plant cohorts and estimate actual transpiration depending on soil moisture and cohort functional parameters, which determine plant drought. The chapter also describes how is daily photosynthesis estimated, a process that in this model does not influence transpiration but is necessary for growth calculations (chapter \@ref(growthmodelling)). 
 
@@ -93,6 +93,8 @@ Assuming no water limitations (i.e. $K_{i,s} = 1$), we have that $Tr = Tr_{\max}
   a. The cohort is under the shade (it reduces $f_i$ and hence $Tr_{\max,i}$)
   b. The cohort has a lower amount of leaf area (it reduces $f_i$ and hence $Tr_{\max,i}$)
   c. The soil layers exploited by the cohort have more negative water potentials (it reduces $K_{i,s}$ and $K^{PLC}_{i,s}$). 
+
+### Plant water potential
 
 The basic water balance model does not allow estimating a water potential drop from soil to the leaf. Moreover, in a multilayered soil it is difficult to know what would be the water potential of the plant. Despite these limitations, a gross surrogate of  'plant' water potential ($\Psi_{plant, i}$; in MPa) may be obtained averaging whole-plant relative conductance values across soil layers and inverting the whole-plant relative transpiration function:
 \begin{equation}
@@ -255,5 +257,23 @@ RWC = RWC_{apo} \cdot f_{apo} + RWC_{sym} \cdot (1 - f_{apo})
 \end{equation}
 
 Normally the apoplastic fraction is large (~80%) in the stem and small (~15%) in leaves. Hence, the relative water content in stems will be mostly dictated by the level of cavitation, whereas that of leaves will mostly follow leaf symplastic water potential and the symplastic pressure-volume curve.
+
+### Live fuel moisture content
+
+Given an average relative water content ($RWC$) of a plant organ, its live fuel moisture content ($LFMC$ in $g H_2O \cdot g^{-1}$ of dry tissue) can be calculated using:
+\begin{equation}
+LFMC = RWC \cdot \Theta \cdot \frac{\rho_{H_2O}}{\rho} = RWC \cdot LFMC_{max}
+\end{equation}
+where $\Theta$ is the tissue porosity ($cm^3$ of water per $cm^3$ of tissue), $\rho$ is the density of the tissue and $\rho_{H_2O}$ is the density of water. In practice estimates of maximum fuel moisture content $LFMC_{max}$ are easier to obtain than porosity estimates, so it is more straightforward to estimate $LFMC$ as the product of $RWC$ and $LFMC_{max}$. 
+
+In medfate, $LFMC$ estimates are assumed to correspond to fine fuels (i.e. leaves and twigs of < 6.5 mm) but are estimated from leaf water content. The relative water content of leaves, and hence its $LFMC$, are estimated using (see \@ref(averagerelativewatercontent)):
+\begin{equation}
+LFMC = (RWC_{apo, leaf} \cdot f_{apo, leaf} + RWC_{sym,leaf} \cdot (1 - f_{apo,leaf})) \cdot LFMC_{max}
+\end{equation}
+where $RWC_{apo,leaf}$ and $RWC_{sym,leaf}$ are the relative water content of apoplastic and symplastic leaf tissue and $f_{apo,leaf}$ is the fraction of apoplastic tissue in leaves.
+
+The package allows estimating $LFMC$ from the output of `spwb()` or `growth()` using function `moisture_cohortFMC()`, but the post-processing function performs slightly different calculations depending on the complexity of the water balance. Basic soil water balance produces, among other outputs, the daily water potential of each plant cohort, $\Psi_{plant}$ (representing an weighted average of soil layer water potentials using fine root distribution as weights) and an estimate of the level of stem cavitation, $PLC_{stem}$. Daily $LFMC$ estimates can be obtained from this output if we use $RWC_{apo, leaf} = 1 - PLC_{stem}$ and calculate  $RWC_{sym, leaf}$ from $\Psi_{plant}$ using symplasmic leaf pressure-volume curves (see \@ref(pressurevolumecurves)).
+When using basic water balance, function `moisture_cohortFMC()` takes daily values $\Psi_{plant}$ and $PLC_{stem}$ from the simulation output, but parameters $\pi_{0,leaf}$, $\epsilon_{leaf}$ (i.e. pressure-volume curve parameters), $f_{apo,leaf}$ and $LFMC_{max}$ are drawn from the data frame `SpParams` of species parameter values. Unlike the basic water balance, the advanced water balance explicitly tracks the water potential in different plant segments and distinguishes between apoplastic and symplastic tissues. In this case, $RWC_{apo,leaf}$ and $RWC_{sym,leaf}$ are obtained directly from the plant water balance, and only $LFMC_{max}$ is drawn from the data frame `SpParams`.
+
 
 

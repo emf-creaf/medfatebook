@@ -2,21 +2,4 @@
 
 
 
-## Live fuel moisture content
-
-Given an average relative water content ($RWC$) of a plant organ, its live fuel moisture content ($LFMC$ in $g H_2O \cdot g^{-1}$ of dry tissue) can be calculated using:
-\begin{equation}
-LFMC = RWC \cdot \Theta \cdot \frac{\rho_{H_2O}}{\rho} = RWC \cdot LFMC_{max}
-\end{equation}
-where $\Theta$ is the tissue porosity ($cm^3$ of water per $cm^3$ of tissue), $\rho$ is the density of the tissue and $\rho_{H_2O}$ is the density of water. In practice estimates of maximum fuel moisture content $LFMC_{max}$ are easier to obtain than porosity estimates, so it is more straightforward to estimate $LFMC$ as the product of $RWC$ and $LFMC_{max}$. 
-
-In medfate, $LFMC$ estimates are assumed to correspond to fine fuels (i.e. leaves and twigs of < 6.5 mm) but are estimated from leaf water content. The relative water content of leaves, and hence its $LFMC$, are estimated using (see \@ref(averagerelativewatercontent)):
-\begin{equation}
-LFMC = (RWC_{apo, leaf} \cdot f_{apo, leaf} + RWC_{sym,leaf} \cdot (1 - f_{apo,leaf})) \cdot LFMC_{max}
-\end{equation}
-where $RWC_{apo,leaf}$ and $RWC_{sym,leaf}$ are the relative water content of apoplastic and symplastic leaf tissue and $f_{apo,leaf}$ is the fraction of apoplastic tissue in leaves.
-
-The package allows estimating $LFMC$ from the output of `spwb()` or `growth()` using function `moisture_cohortFMC()`, but the post-processing function performs slightly different calculations depending on the complexity of the water balance. Basic soil water balance produces, among other outputs, the daily water potential of each plant cohort, $\Psi_{plant}$ (representing an weighted average of soil layer water potentials using fine root distribution as weights) and an estimate of the level of stem cavitation, $PLC_{stem}$. Daily $LFMC$ estimates can be obtained from this output if we use $RWC_{apo, leaf} = 1 - PLC_{stem}$ and calculate  $RWC_{sym, leaf}$ from $\Psi_{plant}$ using symplasmic leaf pressure-volume curves (see \@ref(pressurevolumecurves)).
-When using basic water balance, function `moisture_cohortFMC()` takes daily values $\Psi_{plant}$ and $PLC_{stem}$ from the simulation output, but parameters $\pi_{0,leaf}$, $\epsilon_{leaf}$ (i.e. pressure-volume curve parameters), $f_{apo,leaf}$ and $LFMC_{max}$ are drawn from the data frame `SpParams` of species parameter values. Unlike the basic water balance, the advanced water balance explicitly tracks the water potential in different plant segments and distinguishes between apoplastic and symplastic tissues. In this case, $RWC_{apo,leaf}$ and $RWC_{sym,leaf}$ are obtained directly from the plant water balance, and only $LFMC_{max}$ is drawn from the data frame `SpParams`.
-
 ## Water use efficiency
