@@ -44,8 +44,8 @@ The forest growth model allows simulating the variation of leaf area, sapwood ar
 
  i. **Leaf growth**: Whereas in the water balance models expanded leaf area corresponded to the portion of live leaf area that was unfolded according to the phenological status (see \@ref(leafphenology)), in the growth model expanded leaf area results from explicit simulation of growth. However, leaf phenology submodel still controls the duration of phenophases corresponding budburst, leaf development and senescence. Leaf area growth occurs during *leaf unfolding* periods only, whereas *bud formation* periods are required to update the target leaf area (in accordance to an allocation strategy, see below). 
  ii. **Leaf senescence**: Leaf senescence (and the corresponding increases in dead leaf area) can occur in the model due to *leaf aging* in evergreen species, due to *programmed leaf senescence* in deciduous species, or due to *leaf dessication* (as a result of xylem cavitation and/or low leaf relative water content). 
- iii. **Sapwood growth**: Formation of new sapwood can only occur if unfolded leaves are present, assuming that hormonal signals controlling cambium division are mainly synthesized within leaves. Sapwood formation corresponds to secondary growth, and is only allowed if storage carbon levels are above a given threshold (e.g. 25%). This design was chosen to stop secondary growth before emptying storage carbon, so that maintenance respiration can be sustained longer if photosynthesis is low. Sapwood formation is modelled as a radial file of cells issued from cambium cell divisions and which progressively undergo enlargement and maturation [@Friend2019]. Volume increases of cells in the radial file are translated into ring area increases and, after comparing them to maximum ring area increases, are ultimately translated into sapwood area increases (see \@ref(sapwoodgrowth)). 
- iv. **Sapwood senescence**:  Losses in sapwood area (i.e. conversion to heartwood) occur via tissue *aging* (i.e. assuming a daily rate of conversion).Similarly to 3-PG [@Landsberg1997] we assume that the relative turnover rate of sapwood is smallest for young plants, and it increases up to a maximum value. However, recent reviews indicate that heartwood formation should be viewed as an active developmental program during which a conductive but vulnerable sapwood is transformed in a non-conductive but durable heartwood [@Spicer2005]. Stem *cavitation* also reduces the area of sapwood that is effectively functional for water transport.
+ iii. **Sapwood growth**: Formation of new sapwood can only occur if unfolded leaves are present, assuming that hormonal signals controlling cambium division are mainly synthesized within leaves. Sapwood formation corresponds mostly to secondary growth (but primary growth occurs at the same time due to diameter-height relationships), and is only allowed if storage carbon levels are above a given threshold (e.g. 25%). This design was chosen to stop sapwood growth before emptying storage carbon, so that maintenance respiration can be sustained longer whenever photosynthesis is low, as in shadow-tolerant species. Sapwood formation is modelled as a radial file of cells issued from cambium cell divisions and which progressively undergo enlargement and maturation [@Friend2019]. Volume increases of cells in the radial file are translated into ring area increases and, after comparing them to maximum ring area increases, are ultimately translated into sapwood area increases (see \@ref(sapwoodgrowth)). 
+ iv. **Sapwood senescence**:  Losses in sapwood area (i.e. conversion to heartwood) occur via tissue *aging* (i.e. assuming a daily rate of conversion). Similarly to 3-PG [@Landsberg1997] we assume that the relative turnover rate of sapwood is smallest for young plants, and it increases up to a maximum value. However, recent reviews indicate that heartwood formation should be viewed as an active developmental program during which a conductive but vulnerable sapwood is transformed in a non-conductive but durable heartwood [@Spicer2005]. Stem *cavitation* also reduces the area of sapwood that is effectively functional for water transport.
  v. **Fine root growth**: Fine root growth can in principle occur any time of the year (i.e. the model does not explicitly consider root phenology), but since fine root biomass targets depend on leaf area, seasonal fine root area patterns may follow phenological changes in leaf area. 
  vi. **Fine root senescence**: Fine root senescence occurs via *aging* with a turnover rate depending on soil temperature. 
 
@@ -58,7 +58,7 @@ Two options are possible regarding the **allocation** of new structural carbon t
 
 When running the growth model along with the basic water balance submodel, a stable Huber value is the only strategy available and fine root area growth also follows the need to achieve a stable ratio between leaf area and fine root area. In contrast, the two strategies are possible when simulating growth along with the advance water balance. In this case, fine root area growth is coordinated with the formation of the other tissues via the need to ensure an *average resistance fraction in the rhizosphere*, which is used to define the fine root area target and, hence, the allocation to fine roots. 
 
-The growth rates in all three compartments are modulated by parameters specifying *maximum daily growth rates relative to the amount of sapwood area*. However, since leaf and fine root area targets are constrained by the amount of sapwood area via allocation rules, the relative growth rate for sapwood area also indirectly determines the growth rates of leaves and fine roots at seasonal and annual scales, hence determining the whole-plant growth rate. 
+The growth rates in all three compartments are modulated by parameters specifying *maximum daily growth rates relative to the amount of sapwood area*. Nevertheless, since leaf and fine root area targets are constrained by the amount of sapwood area via allocation rules, the relative growth rate for sapwood area also indirectly determines the growth rates of leaves and fine roots at seasonal and annual scales, hence determining the whole-plant growth rate. When carbon levels are low, sapwood growth rates fall to zero, whereas replacement of leaves and fine roots continues to sustain metabolism. 
 
 Further details and formulation of growth, senescence and allocation are given in chapter \@ref(growthsenescencemortality).
 
@@ -262,7 +262,7 @@ Weather input data must include variables calculated at the **daily** scale. The
 
 The growth model requires many functional parameters to be specified for plant cohorts. Some of them depend on whether the basic or advanced water balance is adopted. Here we report functional parameters needed in addition to those necessary for the water balance submodel.
 
-A first set of parameters refers to anatomical features (`paramsAnatomy`):
+A first set of parameters refers to anatomical features (`paramsAnatomy`), most of them already required by water balance model simulations:
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
@@ -310,8 +310,11 @@ A third set of parameters refers to growth parameters (`paramsGrowth`).
 | $CC_{fineroot}$ | $g\,gluc\cdot g\,dry^{-1}$| `CCfineroot` | Fine root construction cost |
 | $SR_{sapwood}$ | $day^{-1}$| `SRsapwood` | Daily sapwood senescence rate  |
 | $SR_{fineroot}$ | $day^{-1}$| `SRfineroot` | Daily fine root senescence rate |
+| $RSSG$ | [0-1] | `RSSG` | Minimum relative starch for sapwood growth to occur. |
 | $f_{HD,min}$ | $cm \cdot cm^{-1}$ | `fHDmin` | Minimum height-to-diameter ratio |
 | $f_{HD,max}$ | $cm \cdot cm^{-1}$ | `fHDmax` | Maximum height-to-diameter ratio |
+|  | $g\, C \cdot g^{-1} dry$ | `WoodC` | Wood carbon content per dry weight |
+| $P_{mort,base}$ | $[0-1]$ | `MortalityBaselineRate` | Deterministic proportion or probability specifying the baseline reduction of cohort's density occurring in a year |
 
 Vegetation functional attributes are normally filled for each cohort by function `growthInput()` or `forest2growthInput()` from species identity. However, different parameters can be specified for different cohorts of the same species if desired (see section \@ref(functionaltraits)). 
 
@@ -337,7 +340,7 @@ A number of control parameters regulate carbon balance:
 + `phloemConductanceFactor [= 0.2]`: Factor to transform stem xylem conductance to phloem conductance (only for `transpirationMode = "Sperry"`).
 + `nonSugarConcentration [=0.25]`: A constant specifying non-sugar (inorganic) solute concentration ($mol \cdot L^{-1}$) in cells.
 + `equilibriumOsmoticConcentration [= c(leaf = 0.8, sapwood = 0.6)]`: Equilibrium osmotic concentrations ($mol \cdot L^{-1}$) for leaf and sapwood cells. The difference between leaf and sapwood values helps maintaining phloem transport. The equilibrium sugar concentration is found using `equilibriumOsmoticConcentration - nonSugarConcentration` and defaults to `[= c(leaf = 0.55, sapwood = 0.35)]`.
-+ `minimumRelativeStarchForGrowth [= 0.25]`: Minimum concentration of storage carbon, relative to maximum storage capacity, for secondary growth (sapwood formation) to occur. 
++ `minimumRelativeStarchForGrowth [= 0.25]`: Default minimum concentration of storage carbon (starch), relative to the maximum storage capacity, for sapwood growth to occur. This default value is used when  species-specific values are not specified via `SpParams`.
 + `senescenceRates [= c(sapwood = 0.0001261398, fineroot = 0.001897231)]`: Relative senescence rates ($day^{-1}$) for sapwood and fine roots. Default are equivalent to 4.5% and 50% annual turnover for sapwood and fine roots, respectively. Leaf senescence rates depend on leaf lifespan (i.e. leaf duration) for evergreen species. These are default values used when relative growth rates are not specified via species-specific `SpParams`.
 + `constructionCosts [= c(leaf = 1.5, sapwood = 1.47, fineroot = 1.30)]`: Default construction costs, including respiration and structural carbon, per dry weight of new tissue ($g\,gluc \cdot g\,dry^{-1}$). These are default values used when relative growth rates are not specified via species-specific `SpParams`.
 + `maximumRelativeGrowthRates [= c(leaf = 0.01, sapwood = 0.005, fineroot = 0.1)]`: Default maximum leaf growth rate relative to sapwood area ($m^{2}\cdot cm^{-2} \cdot day^{-1}$), maximum sapwood relative growth rate ($cm^{2}\cdot cm^{-2} \cdot day^{-1}$) and maximum fine root growth rate relative to sapwood area ($g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$). These are default values used when relative growth rates are not specified via species-specific `SpParams`.
@@ -345,7 +348,7 @@ A number of control parameters regulate carbon balance:
 Finally, we have the following options regarding mortality:
 
 + `mortalityMode [= "density/deterministic"]`: String describing how mortality is applied. Current accepted values are combinations of `"cohort"` vs `"density"` (for whole-cohort mortality vs reduction of stem density) and `"deterministic"` vs. `"stochastic"`.
-+ `mortalityBaselineRate [= 0.005]`: Deterministic proportion or probability specifying the baseline reduction of cohort's density occurring in a year (for `mortalityMode = "density/deterministic"` or `"density/stochastic"`).
++ `mortalityBaselineRate [= 0.0]`: Default deterministic proportion or probability specifying the baseline reduction of cohort's density occurring in a year (for `mortalityMode = "density/deterministic"` or `"density/stochastic"`).
 + `mortalityRelativeSugarThreshold [= 0.3]`: Threshold of stem sugar concentration relative to equilibrium values (by default 30\%), resulting in an increased mortality rate/probability whenever levels are below.
 + `mortalityRWCThreshold [= 0.3]`: Threshold of stem relative water content resulting in increased mortality rate/probability whenever levels are below.
 
@@ -354,14 +357,14 @@ Finally, we have the following options regarding mortality:
 
 #### Daily output
 
-Function `growth` returns a list object with the following elements:
+Functions `growth()` returns a list of a class with the same name. The first four elements of this list (i.e., `latitude`, `topography`, `weather` and `growthInput`) are simply copies of model inputs. The next element is `growthOutput`, which contains the state of the input object at the end of the simulation (this can be used to perform further simulations starting with current values of state variables). The remaining list elements are:
 
 | Element | Description                                                |
 |---------|------------------------------------------------------------|
 | `WaterBalance`| Climatic input and water balance flows (i.e. net precipitation, infiltration, runoff, transpiration...). All of them in $mm = L \cdot m^{-2}$. |
 | `EnergyBalance` | Energy balance components (instantaneous values) for the soil and the canopy |
 | `BiomassBalance` | Stand-level biomass balance components |
-| `Temperature` | Minimum and maximum temperature values for topsoil, canopy and atmosphere |
+| `Temperature` | Minimum and maximum temperature values for topsoil, canopy and atmosphere (if `transpirationMode = "Sperry"`) |
 | `Soil`| Soil variables for each soil layer: Moisture relative to field capacity ($W_s$), water potential ($\Psi_s$) and volumetric water content ($V_s$). |
 | `Stand`| Stand-level variables, such as $LAI^{\phi}_{stand} = LAI^{live}_{stand}$, $LAI^{dead}_{stand}$, the water retention capacity of the canopy ($S_{canopy}$) or the fraction of light reaching the ground ($L^{PAR}_{ground}$ and $L^{SWR}_{ground}$).|
 | `Plants`| Plant-level variables, such as $LAI^{phi}_i$, plant transpiration, plant water potential, etc. |
@@ -373,7 +376,7 @@ Function `growth` returns a list object with the following elements:
 | `GrowthMortality`| A list with daily results of growth rates for leaf, sapwood and fine roots; as well as daily mortality rates. |
 
 
-Elements `WaterBalance` to `ShadeLeaves` are equal to the output of function `spwb` and were described in previous chapters (see \@ref(basicwaterbalanceoutput) and \@ref(advancedwaterbalanceoutput)). 
+Elements `WaterBalance` to `ShadeLeaves` are equal to the output of function `spwb()` and were described in previous chapters (see \@ref(basicwaterbalanceoutput) and \@ref(advancedwaterbalanceoutput)). 
 
 The following table describes the child elements of `LabileCarbonBalance`, each of them a data frame with dates in rows and plant cohorts in columns:
 
@@ -407,10 +410,14 @@ The following table describes the child elements of `PlantStructure`, again each
 
 | Element | Symbol | Units | Description                               |
 |---------|--------|-------|-------------------------------------------|
+| `LeafBiomass`|$B_{leaf,i}$ | $g\,dry \cdot ind^{-1}$ | Daily leaf structural biomass for an average individual. |
+| `SapwoodBiomass`|$B_{sapwood,i}$ | $g\,dry \cdot ind^{-1}$ | Daily sapwood structural biomass for an average individual. |
+| `FineRootBiomass`|$B_{fineroot,i}$ | $g\,dry \cdot ind^{-1}$ | Daily fine root biomass for an average individual. |
 | `LeafArea`|$LA_{i}$ | $m^{2}$ | Daily amount of leaf area for an average individual. |
 | `SapwoodArea`|$SA_{i}$ | $cm^{2}$ | Daily amount of sapwood area for an average individual. |
 | `FineRootArea`|$FRA_{i}$ | $m^{2}$ | Daily amount of fine root area for an average individual. |
-| `FineRootBiomass`|$B_{fineroot,i}$ | $g\,dry \cdot ind^{-1}$ | Daily fine root biomass for an average individual. |
+| `HuberValue` | $H_{v}$ | $cm^2 \cdot m^{-2}$ | The ratio of sapwood area to (target) leaf area |
+| `RootAreaLeafArea` |  | $m^2 \cdot m^{-2}$ | The ratio of fine root area to (target) leaf area |
 | `DBH`|$DBH_{i}$ | $cm$ | Daily diameter at breast height for an average individual. |
 | `Height`|$H_{i}$ | $cm$ | Daily total height for an average individual. |
 
@@ -427,4 +434,4 @@ The following table describes the child elements of `GrowthMortality`, again eac
 
 #### Subdaily output
 
-As with function `spwb()`, subdaily output can also be generated with function `growth()`. This is done via setting  `subdailyResults = TRUE` in the control parameter list. In that case, the output list of `growth()` will include an element `subdaily`, whose subelements correspond to the results of `growth_day()` for each date simulated. Refer to the documentation of function `growth_day()` for details of subdaily output.
+As with function `spwb()`, subdaily output can also be generated with function `growth()`. This is done via setting  `subdailyResults = TRUE` in the control parameter list. In that case, the output list of `growth()` will include an element `subdaily`, whose subelements correspond to the results of `growth_day()` for each date simulated. Refer to the documentation of function `growth_day()` for details of sub-daily output.

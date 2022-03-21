@@ -1,4 +1,4 @@
-# Carbon pools and components of carbon balance {#carbonpoolsbalance}
+# Carbon pools and components of the carbon balance {#carbonpoolsbalance}
 
 ## Size of carbon pools {#estimationcarbonpools}
 
@@ -105,17 +105,21 @@ A = \frac{10000 \cdot A_g}{N} \cdot \frac{m_{gluc}}{m_{carbon} \cdot 6}
 where $N$ is the density of individuals per hectare, $m_{gluc}$ is the glucose molar mass and $m_{carbon}$ is the carbon molar mass.
 
 ### Maintenance respiration
-Maintenance respiration (in $g\,gluc·ind^{-1}$) is calculated for each of the three compartments (leaves, sapwood, and fine roots) individually [@Mouillot2001].  The model uses a $Q_{10}$ relationship with temperature, which means that for every 10 ºC change in temperature there is a $Q_{10}$ factor change in respiration:
+Maintenance respiration (in $g\,gluc·ind^{-1}$) is calculated for each of the three compartments (leaves, sapwood, and fine roots) individually [@Mouillot2001], and differs slightly depending on the complexity of the transpiration submodel. 
+
+When simulating growth with the basic water balance, the model uses a $Q_{10}$ relationship of baseline respiration with temperature, which means that for every 10 ºC change in temperature there is a $Q_{10}$ factor change in respiration:
 \begin{eqnarray}
-M_{leaf} &=& (B_{leaf} + B_{sugar,leaf}) \cdot MR_{leaf} \cdot Q_{10}^{(T_{mean}-20)/10} \\
+M_{leaf} &=& (B_{leaf} + B_{sugar,leaf}) \cdot MR_{leaf} \cdot Q_{10}^{(T_{mean}-20)/10} \cdot (L^{PAR})^{WUE_{decay}} \\
 M_{sapwood} &=& (B_{living,sapwood} + B_{sugar,sapwood}) \cdot MR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
-M_{fineroot} &=& B_{fineroot} \cdot MR_{fineroot} \cdot Q_{10}^{(T_{mean}-20)/10} 
+M_{fineroot} &=& B_{fineroot} \cdot MR_{fineroot} \cdot Q_{10}^{(T_{mean}-20)/10} \cdot ( LA_{i}/LA^{live}_i) 
 \end{eqnarray}
-where $T_{mean}$ is the average daily temperature (in ºC). Baseline maintenance respiration rates per dry biomass ($MR_{leaf}$, $MR_{sapwood}$ and $MR_{fineroot}$ for leaves, parenchymatic sapwood and fine roots, respectively; in $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$) are can be supplied via species-specific parameters and should refer to 20 ºC. Alternatively, they can be estimated from nitrogen concentration in different tissues, following @Reich2008 (see section \@ref(imputationRER)). Factor $Q_{10}$ has been found to decrease with temperature [@Tjoelker2001]. For example, a 10 °C increase in measurement temperature at low measurement temperatures from 5 to 15 °C results in an approximate 2.8 fold increase in respiration rate, whereas an increase in temperature from 25 to 35 °C results in a less than two-fold (1.8) increase in rate. The general temperature relationship proposed by @Tjoelker2001 is used here:
+where $T_{mean}$ is the average daily temperature (in ºC). Baseline maintenance respiration rates per dry biomass ($MR_{leaf}$, $MR_{sapwood}$ and $MR_{fineroot}$ for leaves, parenchymatic sapwood and fine roots, respectively; in $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$) are can be supplied via species-specific parameters and should refer to 20 ºC. Leaf and fine root rates can also be estimated from nitrogen concentration, following @Reich2008 (see section \@ref(imputationRER)). Factor $Q_{10}$ has been found to decrease with temperature [@Tjoelker2001]. For example, a 10 °C increase in measurement temperature at low measurement temperatures from 5 to 15 °C results in an approximate 2.8 fold increase in respiration rate, whereas an increase in temperature from 25 to 35 °C results in a less than two-fold (1.8) increase in rate. The general temperature relationship proposed by @Tjoelker2001 is used here:
 \begin{equation}
 Q_{10} = 3.22 - 0.046 \cdot T_{mean}
 \end{equation}
-Maintenance respiration equations are used for growth simulations, regardless of the transpiration model (whether basic or advanced), the only differences being that in the latter the daily rates are divided by the number of subdaily steps and, hence, subdaily temperature variation is taken into account (i.e. subdaily canopy $T_{can}$ values are used instead of the daily temperature mean, $T_{mean}$).
+Factor $(L^{PAR})^{WUE_{decay}}$ is added to reduce respiration rates in leaves under shade, analogously to the reduction of water use efficiency explained in \@ref(basicphotosynthesis). Thus, it is assumed that the carbon use efficiency of the leaves is more or less constant. Factor $LA_{i}/LA^{live}_i$ is added to the maintenance respiration of fine roots to reduce respiration rates during winter in winter-deciduous species, assuming a decrease in respiration rates of fine roots parallel to that of leaves.
+
+When simulating growth with the advanced model, sub-daily leaf maintenance respiration rates are estimated as the difference between gross and net photosynthesis (see \@ref(leafphotosynthesis)). Sapwood and fine root respiration rates are also estimated at sub-daily steps and, hence, sub-daily canopy temperature variation is taken into account (i.e. sub-daily canopy $T_{can}$ values are used instead of the daily temperature mean, $T_{mean}$). 
 
 ### Growth respiration
 
