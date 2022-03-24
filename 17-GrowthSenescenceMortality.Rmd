@@ -117,23 +117,19 @@ if $LA^{cavitation} < LA^{\phi}$ then the corresponding proportion $p_{cavitatio
 
 ### Sapwood senescence {#sapwoodsenescence}
 
-The daily rate of sapwood senescence is specified via the species-specific parameter $SR_{sapwood}$ or, when missing, via a control parameter. @Prentice1993 assumed a constant annual rate of 4% for the conversion from sapwood to heartwood. Similarly, @Sitch2003 assumed a sapwood annual turnover rate of 5% for all biomes. A reasonable value for maximum daily senescence rate would be (assuming an annual rate of 4.5%):
+The daily rate of sapwood senescence is specified via the species-specific parameter $SR_{sapwood}$ or, when missing, via a control parameter. @Prentice1993 assumed a constant annual rate of 4% for the conversion from sapwood to heartwood. Similarly, @Sitch2003 assumed a sapwood annual turnover rate of 5% for all biomes. In our model, the proportion of sapwood area that is transformed into heartwood daily is estimated using:
 \begin{equation}
-SR_{sapwood}  = 1-0.955^{(1/365)} = 0.0001261398
+p_{aging, sapwood} = \frac{SR_{sapwood}}{1+15\cdot e^{-0.01\cdot H}} \cdot \frac{\max(T_{day}-5,0)}{20}
 \end{equation}
-The actual proportion of sapwood area that is transformed into heartwood daily is:
-\begin{equation}
-p_{aging, sapwood} = \frac{SR_{sapwood}}{1+15\cdot e^{-0.01\cdot H}}
-\end{equation}
-where 0.01 is a constant causing shorter plants to have slower senescence rates. It is important to mention that, while stem cavitation $PLC_{stem}$ reduces the amount of functional sapwood in with respect to hydraulics (and therefore transpiration and photosynthesis), it does not increase the rate of sapwood senescence, because xylem vessels are already dead cells. Hence, when xylem embolism occurs air bubbles are formed within vessels but surrounding parenchymatic cells (as well as the storage carbon they contain) are assumed unaffected. 
+where $SR_{sapwood}$ is a species-specific parameter, $T_{day}$ is the average day temperature and 0.01 is a constant causing shorter plants to have slower senescence rates. It is important to mention that, while stem cavitation $PLC_{stem}$ reduces the amount of functional sapwood in with respect to hydraulics (and therefore transpiration and photosynthesis), it does not increase the rate of sapwood senescence. Hence, when xylem embolism occurs air bubbles are formed within vessels but surrounding parenchymatic cells (as well as the storage carbon they contain) are assumed unaffected. 
 
 ### Fine root senescence {#finerootsenescence}
 
-Aging is the only process leading to fine root senescence. Default daily turnover proportion for fine roots ($SR_{fineroot}$), which is assumed to correspond to a temperature of 25 ºC, is specified via species-specific parameters or the control parameters `turnoverRates`. Actual turnover proportion for a given soil layer ($p_{aging,fineroot}$) decreases linearly with soil temperature down to zero at 5 ºC:
+Aging is the only process leading to fine root senescence. The daily turnover proportion for fine roots ($SR_{fineroot}$) is assumed to correspond to a temperature of 25 ºC, is specified via species-specific parameters or the control parameters `turnoverRates`. Actual turnover proportion for a given soil layer ($p_{aging,fineroot}$) decreases linearly with soil temperature down to zero at 5 ºC:
 \begin{equation}
 p_{aging,fineroot} = SR_{fineroot} \cdot \frac{\max(T_{soil,s}-5,0)}{20}
 \end{equation}
-Default control value for $SR_{fineroot}$ is set to produce an annual 50\% turnover of fine roots.
+where $T_{soil,s}$ is the temperature of soil layer $s$. When $SR_{fineroot}$ is missing from species parameter, a default control value for $SR_{fineroot}$ is taken, which produces an annual 50\% turnover of fine roots.
 
 ## Update of plant traits and allocation targets
 
