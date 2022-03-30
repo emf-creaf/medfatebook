@@ -96,7 +96,6 @@ The following tables describe how the different functional parameters are dealt 
 | $WUE_{decay}$ | `WUE_decay` |  Exponent describing the decay of water use efficiency with low light levels  | No | No | \@ref(imputationtranspwue) |
 | $\Psi_{extract}$ | `Psi_Extract` |  The water potential at which plant transpiration is 50% of its maximum | No | No |  \@ref(imputationtranspwue) |
 | $\Psi_{critic}$ | `Psi_Critic` |  The water potential corresponding to 50% of stem xylem cavitation |  No | No | \@ref(imputationVCs) |
-| $K_{rootdisc}$ | `pRootDisc` |  Whole-plant relative transpiration corresponding to hydraulic disconnection from the soil  | No |  No | \@ref(imputationsoildisconnection) |
 | $g_{swmin}$ | `Gwmin` | Minimum stomatal conductance to water vapour | No | No | \@ref(imputationstomatalconductance) |
 | $g_{swmax}$ | `Gwmax` | Maximum stomatal conductance to water vapour | No | No | \@ref(imputationstomatalconductance) |
 | $J_{max, 298}$ | `Jmax298` | Maximum rate of electron transport at 298K | No | No | \@ref(imputationphotosynthesis) |
@@ -124,7 +123,7 @@ The following tables describe how the different functional parameters are dealt 
 | $V_{leaf}$ |  `Vleaf` | Leaf water capacity per leaf area unit | No | \@ref(plantwaterstoragecapacity) | No |
 | $V_{sapwood}$ |  `Vsapwood` | Sapwood water capacity per leaf area unit | No | \@ref(plantwaterstoragecapacity) | No |
 
-**Growth**
+**Growth and mortality**
 
 | Symbol | R    | Description                          | Strict | Scaled | Imputable |
 |--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
@@ -139,7 +138,9 @@ The following tables describe how the different functional parameters are dealt 
 | $RGR_{fineroot, max}$ | `RGRfinerootmax` | Maximum daily fine root relative growth rate | No | No | \@ref(imputationRGR) |
 | $SR_{sapwood}$ | `SRsapwood` | Daily sapwood senescence rate  | No | No | \@ref(imputationSR) |
 | $SR_{fineroot}$ | `SRfineroot` | Daily fine root senescence rate | No | No | \@ref(imputationSR) |
+| $RSSG$ | `RSSG` | Minimum relative starch for sapwood growth | No | No | \@ref(imputationRSSG) |
 | $C_{wood}$ | `WoodC` | Wood carbon content per dry weight  | No | No | \@ref(imputationCwood) |
+| $P_{mort,base}$ | `MortalityBaselineRate` | Default deterministic proportion or probability specifying the baseline reduction of cohort's density occurring in a year | No | No | \@ref(imputationMortalityBaseline) |
 
 
 **Recruitment**
@@ -328,9 +329,6 @@ Default values for radiation extinction and water interception parameters depend
 
 where $k_{PAR}$ is the PAR extinction coefficient, $\alpha_{SWR}$ is the short-wave radiation leaf absorbance coefficient, $\gamma_{SWR}$ is the short-wave radiation leaf reflectance (albedo) and $s_{water}$ is the crown water storage capacity per LAI unit.
 
-### Disconnection from the soil {#imputationsoildisconnection}
-
-When missing, the relative whole-plant conductance corresponding to disconnection from the soil is set to $K_{rootdisc,i} = 0$, its default value.
 
 ### Stomatal conductance {#imputationstomatalconductance}
 
@@ -477,11 +475,15 @@ Default `control` values ($MR_{leaf} = 0.00260274$), sapwood ($MR_{sapwood} = 6.
 
 ### Relative growth rates {#imputationRGR}
 
-When missing at the species parameter table, maximum relative growth rates for leaves, sapwood and fine roots are taken from `control` parameters. [JUSTIFICATION MISSING]
+When missing at the species parameter table, maximum relative growth rates for leaves, sapwood and fine roots are taken from `control` parameters. Default values are provided in \@ref(forestgrowthcontrol).
 
 ### Senescence rates {#imputationSR}
 
-When missing at the species parameter table, senescence rates for sapwood and fine roots are taken from `control` parameters. [JUSTIFICATION MISSING]
+When missing at the species parameter table, senescence rates for sapwood and fine roots are taken from `control` parameters.
+
+### Relative starch for sapwood growth {#imputationRSSG}
+
+When missing at the species parameter table, the minimum relative starch for sapwood growth is taken from `control` parameters. Default value is provided in \@ref(forestgrowthcontrol).
 
 ### Wood carbon {#imputationCwood}
 
@@ -494,9 +496,13 @@ knitr::kable(tfm[!is.na(tfm$WoodC), c("WoodC"),drop=FALSE],
 
 If family-level values are missing, default value of $C_{wood} = 0.5\,g\,C\cdot g\,dry^{-1}$ is used.
 
+### Mortality baseline rate {#imputationMortalityBaseline}
+
+When missing at the species parameter table, the mortality baseline rate is taken from `control` parameters. Default value is provided in \@ref(forestgrowthcontrol).
+
 ### Recruitment {#imputationrecruitment}
 
-Imputation of missing values for recruitment is specified via `control` parameters. Default values are provided in \@ref(forestdynamicscontrol)
+Imputation of missing values for recruitment is specified via `control` parameters. Default values are provided in \@ref(forestdynamicscontrol).
 
 ### Flammability {#imputationflammability}
 

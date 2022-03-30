@@ -314,7 +314,7 @@ A third set of parameters refers to growth parameters (`paramsGrowth`).
 | $f_{HD,min}$ | $cm \cdot cm^{-1}$ | `fHDmin` | Minimum height-to-diameter ratio |
 | $f_{HD,max}$ | $cm \cdot cm^{-1}$ | `fHDmax` | Maximum height-to-diameter ratio |
 |  | $g\, C \cdot g^{-1} dry$ | `WoodC` | Wood carbon content per dry weight |
-| $P_{mort,base}$ | $[0-1]$ | `MortalityBaselineRate` | Deterministic proportion or probability specifying the baseline reduction of cohort's density occurring in a year |
+| $P_{mort,base}$ | $[0-1]$ | `MortalityBaselineRate` | Deterministic proportion or probability specifying the baseline reduction of cohort's density occurring in a year as a result of processes not explicitly modelled |
 
 Vegetation functional attributes are normally filled for each cohort by function `growthInput()` or `forest2growthInput()` from species identity. However, different parameters can be specified for different cohorts of the same species if desired (see section \@ref(functionaltraits)). 
 
@@ -340,7 +340,7 @@ A number of control parameters regulate carbon balance:
 + `phloemConductanceFactor [= 0.2]`: Factor to transform stem xylem conductance to phloem conductance (only for `transpirationMode = "Sperry"`).
 + `nonSugarConcentration [=0.25]`: A constant specifying non-sugar (inorganic) solute concentration ($mol \cdot L^{-1}$) in cells.
 + `equilibriumOsmoticConcentration [= c(leaf = 0.8, sapwood = 0.6)]`: Equilibrium osmotic concentrations ($mol \cdot L^{-1}$) for leaf and sapwood cells. The difference between leaf and sapwood values helps maintaining phloem transport. The equilibrium sugar concentration is found using `equilibriumOsmoticConcentration - nonSugarConcentration` and defaults to `[= c(leaf = 0.55, sapwood = 0.35)]`.
-+ `minimumRelativeStarchForGrowth [= 0.25]`: Default minimum concentration of storage carbon (starch), relative to the maximum storage capacity, for sapwood growth to occur. This default value is used when  species-specific values are not specified via `SpParams`.
++ `minimumRelativeStarchForGrowth [= 0.50]`: Default minimum concentration of storage carbon (starch), relative to the maximum storage capacity, for sapwood growth to occur. This default value is used when  species-specific values are not specified via `SpParams`.
 + `senescenceRates [= c(sapwood = 0.0001261398, fineroot = 0.001897231)]`: Relative senescence rates ($day^{-1}$) for sapwood and fine roots. Default are equivalent to 4.5% and 50% annual turnover for sapwood and fine roots, respectively. Leaf senescence rates depend on leaf lifespan (i.e. leaf duration) for evergreen species. These are default values used when relative growth rates are not specified via species-specific `SpParams`.
 + `constructionCosts [= c(leaf = 1.5, sapwood = 1.47, fineroot = 1.30)]`: Default construction costs, including respiration and structural carbon, per dry weight of new tissue ($g\,gluc \cdot g\,dry^{-1}$). These are default values used when relative growth rates are not specified via species-specific `SpParams`.
 + `maximumRelativeGrowthRates [= c(leaf = 0.01, sapwood = 0.005, fineroot = 0.1)]`: Default maximum leaf growth rate relative to sapwood area ($m^{2}\cdot cm^{-2} \cdot day^{-1}$), maximum sapwood relative growth rate ($cm^{2}\cdot cm^{-2} \cdot day^{-1}$) and maximum fine root growth rate relative to sapwood area ($g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$). These are default values used when relative growth rates are not specified via species-specific `SpParams`.
@@ -348,7 +348,7 @@ A number of control parameters regulate carbon balance:
 Finally, we have the following options regarding mortality:
 
 + `mortalityMode [= "density/deterministic"]`: String describing how mortality is applied. Current accepted values are combinations of `"cohort"` vs `"density"` (for whole-cohort mortality vs reduction of stem density) and `"deterministic"` vs. `"stochastic"`.
-+ `mortalityBaselineRate [= 0.0]`: Default deterministic proportion or probability specifying the baseline reduction of cohort's density occurring in a year (for `mortalityMode = "density/deterministic"` or `"density/stochastic"`).
++ `mortalityBaselineRate [= 0.0015]`: Default deterministic proportion or probability specifying the baseline reduction of cohort's density occurring in a year as a result of processes not explicitly modelled (for `mortalityMode = "density/deterministic"` or `"density/stochastic"`).
 + `mortalityRelativeSugarThreshold [= 0.3]`: Threshold of stem sugar concentration relative to equilibrium values (by default 30\%), resulting in an increased mortality rate/probability whenever levels are below.
 + `mortalityRWCThreshold [= 0.3]`: Threshold of stem relative water content resulting in increased mortality rate/probability whenever levels are below.
 
