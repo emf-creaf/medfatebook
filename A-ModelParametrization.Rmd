@@ -134,7 +134,8 @@ The following tables describe how the different functional parameters are dealt 
 | $MR_{sapwood}$ | `RERsapwood` | Living sapwood (parenchymatic tissue) respiration rate at 20 ºC | No | No | \@ref(imputationRER) |
 | $MR_{fineroot}$ | `RERfineroot` | Fine root respiration rate at 20 ºC | No | No | \@ref(imputationRER) |
 | $RGR_{leaf, max}$ | `RGRleafmax` | Maximum leaf area daily growth rate, relative to sapwood area | No | No | \@ref(imputationRGR) |
-| $RGR_{sapwood, max}$ | `RGRsapwoodmax` | Maximum daily sapwood relative growth rate (in sapwood area basis) | No | No | \@ref(imputationRGR) |
+| $RGR_{cambium, max}$ | `RGRsapwoodmax` | Maximum tree daily sapwood growth rate relative to cambium perimeter length | No | No | \@ref(imputationRGR) |
+| $RGR_{sapwood, max}$ | `RGRsapwoodmax` | Maximum shrub daily sapwood growth rate relative to sapwood area | No | No | \@ref(imputationRGR) |
 | $RGR_{fineroot, max}$ | `RGRfinerootmax` | Maximum daily fine root relative growth rate | No | No | \@ref(imputationRGR) |
 | $SR_{sapwood}$ | `SRsapwood` | Daily sapwood senescence rate  | No | No | \@ref(imputationSR) |
 | $SR_{fineroot}$ | `SRfineroot` | Daily fine root senescence rate | No | No | \@ref(imputationSR) |
@@ -292,27 +293,7 @@ Leaf senescence values were derived for deciduous broad-leaved forests by @Delpi
 
 When the basic soil water balance model is used, $T_{max,LAI}$ and $T_{max,sqLAI}$ are species-specific parameters that regulate the maximum transpiration of plant cohorts (see \@ref(maximumtranspiration)). When these parameters are missing from `SpParams` table, they are given default values $T_{max,LAI} = 0.134$ and $T_{max,sqLAI} = -0.006$, according to @Granier1999.  
 
-When maximum water use efficiency ($WUE_{\max}$) is missing, it is determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
-```{r echo = FALSE}
-tfm = medfate:::trait_family_means
-knitr::kable(tfm[!is.na(tfm$WUE),
-                 c("WUE"),drop=FALSE],
-             caption = 'Default maximum water use efficiency by family.')
-```
-
-
-If there is no information derived from taxonomic family, the following default values are assigned depending on leaf shape and leaf size:
-
-|  Leaf shape | Leaf size |  $WUE_{\max}$  |
-|:--------------- |:-----:|:-----:|
-| Broad | Large |   3.028   |
-| Broad | Medium |   3.982   | 
-| Broad | Small |   4.290   |
-| Linear | [any] |   3.707   |
-| Needle | [any] |  3.707    |
-| Scale | [any] |   1.665   |
-
-By default, the coefficient describing the decay of water use efficiency with lower light levels is given a default value of $WUE_{decay} = 0.2812$.
+When maximum water use efficiency ($WUE_{\max}$) is missing, it is given a value of $WUE_{\max} = 5$. By default, the coefficient describing the decay of water use efficiency with lower light levels is given a default value of $WUE_{decay} = 0.2812$.
 
 When missing, the water potential corresponding to 50\% of transpiration ($\Psi_{extract}$) is estimated by calculating the water potential corresponding to the loss leaf turgor ($\Psi_{tlp}$), using equation \@ref(eq:turgorlosspoint) from @Bartlett2012. The parameters of the leaf pressure-volume curve needed for applying equation \@ref(eq:turgorlosspoint) may be themselves estimated (see \@ref(inputationPV)). Note that $\Psi_{tlp}$ has been found to be highly correlated to $\Psi_{gs50}$, the water potential corresponding to 50\% of stomatal conductance [@Bartlett2016].
 

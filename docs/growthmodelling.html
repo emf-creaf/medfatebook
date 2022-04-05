@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2022-03-30" />
+<meta name="date" content="2022-04-05" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1126,72 +1126,78 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 <td>Maximum leaf area daily growth rate, relative to sapwood area</td>
 </tr>
 <tr class="odd">
+<td><span class="math inline">\(RGR_{cambium, max}\)</span></td>
+<td><span class="math inline">\(cm^2 \cdot cm^{-1} \cdot day^{-1}\)</span></td>
+<td><code>RGRcambiummax</code></td>
+<td>Maximum daily tree sapwood growth rate relative to cambium perimeter length</td>
+</tr>
+<tr class="even">
 <td><span class="math inline">\(RGR_{sapwood, max}\)</span></td>
 <td><span class="math inline">\(cm^2 \cdot cm^{-2} \cdot day^{-1}\)</span></td>
 <td><code>RGRsapwoodmax</code></td>
-<td>Maximum daily sapwood relative growth rate (in sapwood area basis)</td>
+<td>Maximum daily shrub sapwood growth rate relative to sapwood area</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(RGR_{fineroot, max}\)</span></td>
 <td><span class="math inline">\(g\,dry \cdot g\,dry^{-1} \cdot day^{-1}\)</span></td>
 <td><code>RGRfinerootmax</code></td>
 <td>Maximum daily fine root relative growth rate</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(CC_{leaf}\)</span></td>
 <td><span class="math inline">\(g\,gluc\cdot g\,dry^{-1}\)</span></td>
 <td><code>CCleaf</code></td>
 <td>Leaf construction cost</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(CC_{sapwood}\)</span></td>
 <td><span class="math inline">\(g\,gluc\cdot g\,dry^{-1}\)</span></td>
 <td><code>CCsapwood</code></td>
 <td>Sapwood construction cost</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(CC_{fineroot}\)</span></td>
 <td><span class="math inline">\(g\,gluc\cdot g\,dry^{-1}\)</span></td>
 <td><code>CCfineroot</code></td>
 <td>Fine root construction cost</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(SR_{sapwood}\)</span></td>
 <td><span class="math inline">\(day^{-1}\)</span></td>
 <td><code>SRsapwood</code></td>
 <td>Daily sapwood senescence rate</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(SR_{fineroot}\)</span></td>
 <td><span class="math inline">\(day^{-1}\)</span></td>
 <td><code>SRfineroot</code></td>
 <td>Daily fine root senescence rate</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(RSSG\)</span></td>
 <td>[0-1]</td>
 <td><code>RSSG</code></td>
 <td>Minimum relative starch for sapwood growth to occur.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(f_{HD,min}\)</span></td>
 <td><span class="math inline">\(cm \cdot cm^{-1}\)</span></td>
 <td><code>fHDmin</code></td>
 <td>Minimum height-to-diameter ratio</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(f_{HD,max}\)</span></td>
 <td><span class="math inline">\(cm \cdot cm^{-1}\)</span></td>
 <td><code>fHDmax</code></td>
 <td>Maximum height-to-diameter ratio</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td></td>
 <td><span class="math inline">\(g\, C \cdot g^{-1} dry\)</span></td>
 <td><code>WoodC</code></td>
 <td>Wood carbon content per dry weight</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(P_{mort,base}\)</span></td>
 <td><span class="math inline">\([0-1]\)</span></td>
 <td><code>MortalityBaselineRate</code></td>
@@ -1225,7 +1231,7 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 <li><code>minimumRelativeStarchForGrowth [= 0.50]</code>: Default minimum concentration of storage carbon (starch), relative to the maximum storage capacity, for sapwood growth to occur. This default value is used when species-specific values are not specified via <code>SpParams</code>.</li>
 <li><code>senescenceRates [= c(sapwood = 0.0001261398, fineroot = 0.001897231)]</code>: Relative senescence rates (<span class="math inline">\(day^{-1}\)</span>) for sapwood and fine roots. Default are equivalent to 4.5% and 50% annual turnover for sapwood and fine roots, respectively. Leaf senescence rates depend on leaf lifespan (i.e. leaf duration) for evergreen species. These are default values used when relative growth rates are not specified via species-specific <code>SpParams</code>.</li>
 <li><code>constructionCosts [= c(leaf = 1.5, sapwood = 1.47, fineroot = 1.30)]</code>: Default construction costs, including respiration and structural carbon, per dry weight of new tissue (<span class="math inline">\(g\,gluc \cdot g\,dry^{-1}\)</span>). These are default values used when relative growth rates are not specified via species-specific <code>SpParams</code>.</li>
-<li><code>maximumRelativeGrowthRates [= c(leaf = 0.01, sapwood = 0.005, fineroot = 0.1)]</code>: Default maximum leaf growth rate relative to sapwood area (<span class="math inline">\(m^{2}\cdot cm^{-2} \cdot day^{-1}\)</span>), maximum sapwood relative growth rate (<span class="math inline">\(cm^{2}\cdot cm^{-2} \cdot day^{-1}\)</span>) and maximum fine root growth rate relative to sapwood area (<span class="math inline">\(g\,dry \cdot g\,dry^{-1} \cdot day^{-1}\)</span>). These are default values used when relative growth rates are not specified via species-specific <code>SpParams</code>.</li>
+<li><code>maximumRelativeGrowthRates [= c(leaf = 0.01, cambium = 0.005, sapwood = 0.002, fineroot = 0.1)]</code>: Default maximum relative growth rates for leaves (<span class="math inline">\(m^{2}\cdot cm^{-2} \cdot day^{-1}\)</span>), tree sapwood (<span class="math inline">\(cm^{2}\cdot cm^{-1} \cdot day^{-1}\)</span>), shrub sapwood (<span class="math inline">\(cm^{2}\cdot cm^{-2} \cdot day^{-1}\)</span>) and fine roots (<span class="math inline">\(g\,dry \cdot g\,dry^{-1} \cdot day^{-1}\)</span>). These are default values used when relative growth rates are not specified via species-specific <code>SpParams</code>.</li>
 </ul>
 <p>Finally, we have the following options regarding mortality:</p>
 <ul>
