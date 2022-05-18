@@ -19,9 +19,9 @@ According to section \@ref(leafenergybalancephoto), each $E_{leaf}$ value implie
 
 The hydraulic supply function is used to derive a transpirational *cost function* $\theta_1(\Psi_{leaf})$ that reflects the increasing damage from cavitation and the greater difficulty of moving water along the continuum [@Sperry2016a]:
 \begin{equation}
-\theta(\Psi_{leaf}) = \left[ \frac{k_{c,max}-k_{c}(\Psi_{leaf})}{k_{c,max}-k_{crit}}\right]^{a_{\theta}}
+\theta(\Psi_{leaf}) = \frac{k_{c,max}-k_{c}(\Psi_{leaf})}{k_{c,max}-k_{crit}}
 \end{equation}
-where $k_c(\Psi_{leaf}) = dE/d\Psi(\Psi)$ is the slope of the supply function corresponding to (leaf) water potential $\Psi_{leaf}$, $k_{c,max}$ is the maximum slope of the supply function (which occurs when $E_{leaf}=0$), i.e. the maximum whole-plant conductance for the current soil moisture conditions, and $k_{crit} = k_c(\Psi_{crit})$ is the slope of the supply function at $E_{leaf} = E_{crit}$ the critical flow beyond which hydraulic failure occurs. $a_{\theta}$ is an exponent that modifies the cost function, specified as a control parameter. In @Sperry2016a, this exponent was missing (i.e. $a_{\theta} = 1.0$), and this is the default in **medfate**, but we introduced it to allow some flexibility in the gain/cost comparison (see below).
+where $k_c(\Psi_{leaf}) = dE/d\Psi(\Psi)$ is the slope of the supply function corresponding to (leaf) water potential $\Psi_{leaf}$, $k_{c,max}$ is the maximum slope of the supply function (which occurs when $E_{leaf}=0$), i.e. the maximum whole-plant conductance for the current soil moisture conditions, and $k_{crit} = k_c(\Psi_{crit})$ is the slope of the supply function at $E_{leaf} = E_{crit}$ the critical flow beyond which hydraulic failure occurs. 
 
 ```{r, echo=FALSE}
 PM11 =transp_profitMaximization(supplyNetwork11, psi2A11, Gmin, Gmax)
@@ -49,40 +49,13 @@ PM31emb =transp_profitMaximization(supplyNetwork31emb, psi2A31emb, Gmin, Gmax)
 PM32emb =transp_profitMaximization(supplyNetwork32emb, psi2A32emb, Gmin, Gmax)
 PM33emb =transp_profitMaximization(supplyNetwork33emb, psi2A33emb, Gmin, Gmax)
 PM34emb =transp_profitMaximization(supplyNetwork34emb, psi2A34emb, Gmin, Gmax)
-
-PM11_s2 =transp_profitMaximization(supplyNetwork11, psi2A11, Gmin, Gmax, gainModifier = 0.5)
-PM12_s2 =transp_profitMaximization(supplyNetwork12, psi2A12,Gmin, Gmax, gainModifier = 0.5)
-PM13_s2 =transp_profitMaximization(supplyNetwork13, psi2A13, Gmin, Gmax, gainModifier = 0.5)
-PM14_s2 =transp_profitMaximization(supplyNetwork14, psi2A14,Gmin, Gmax, gainModifier = 0.5)
-PM21_s2 =transp_profitMaximization(supplyNetwork21, psi2A21,Gmin, Gmax, gainModifier = 0.5)
-PM22_s2 =transp_profitMaximization(supplyNetwork22, psi2A22,Gmin, Gmax, gainModifier = 0.5)
-PM23_s2 =transp_profitMaximization(supplyNetwork23, psi2A23,Gmin, Gmax, gainModifier = 0.5)
-PM24_s2 =transp_profitMaximization(supplyNetwork24, psi2A24,Gmin, Gmax, gainModifier = 0.5)
-PM31_s2 =transp_profitMaximization(supplyNetwork31, psi2A31, Gmin, Gmax, gainModifier = 0.5)
-PM32_s2 =transp_profitMaximization(supplyNetwork32, psi2A32,Gmin, Gmax, gainModifier = 0.5)
-PM33_s2 =transp_profitMaximization(supplyNetwork33, psi2A33, Gmin, Gmax, gainModifier = 0.5)
-PM34_s2 =transp_profitMaximization(supplyNetwork34, psi2A34, Gmin, Gmax, gainModifier = 0.5)
-
-PM11emb_s2 =transp_profitMaximization(supplyNetwork11emb, psi2A11emb, Gmin, Gmax, gainModifier = 0.5)
-PM12emb_s2 =transp_profitMaximization(supplyNetwork12emb, psi2A12emb, Gmin, Gmax, gainModifier = 0.5)
-PM13emb_s2 =transp_profitMaximization(supplyNetwork13emb, psi2A13emb, Gmin, Gmax, gainModifier = 0.5)
-PM14emb_s2 =transp_profitMaximization(supplyNetwork14emb, psi2A14emb, Gmin, Gmax, gainModifier = 0.5)
-PM21emb_s2 =transp_profitMaximization(supplyNetwork21emb, psi2A21emb, Gmin, Gmax, gainModifier = 0.5)
-PM22emb_s2 =transp_profitMaximization(supplyNetwork22emb, psi2A22emb, Gmin, Gmax, gainModifier = 0.5)
-PM23emb_s2 =transp_profitMaximization(supplyNetwork23emb, psi2A23emb, Gmin, Gmax, gainModifier = 0.5)
-PM24emb_s2 =transp_profitMaximization(supplyNetwork24emb, psi2A24emb, Gmin, Gmax, gainModifier = 0.5)
-PM31emb_s2 =transp_profitMaximization(supplyNetwork31emb, psi2A31emb, Gmin, Gmax, gainModifier = 0.5)
-PM32emb_s2 =transp_profitMaximization(supplyNetwork32emb, psi2A32emb, Gmin, Gmax, gainModifier = 0.5)
-PM33emb_s2 =transp_profitMaximization(supplyNetwork33emb, psi2A33emb, Gmin, Gmax, gainModifier = 0.5)
-PM34emb_s2 =transp_profitMaximization(supplyNetwork34emb, psi2A34emb, Gmin, Gmax, gainModifier = 0.5)
-
 ```
 
 The following figures illustrate the $\theta(\Psi_{leaf})$ curves corresponding to the supply functions:
 
-(ref:costfunction-cap) Cost functions (i.e. $\theta(\Psi_{leaf})$) obtained for a hydraulic network, corresponding to fig. \@ref(fig:supplynetwork) and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. In all cases $a_{\theta}=0$.
+(ref:costfunction-cap) Cost functions (i.e. $\theta(\Psi_{leaf})$) obtained for a hydraulic network, corresponding to fig. \@ref(fig:supplynetwork) and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. 
 
-```{r costfunction, echo=FALSE, fig.width=8, fig.height=3.5, fig.align="center", fig.cap='(ref:costfunction-cap)'}
+```{r costfunction, echo=FALSE, fig.width=8, fig.height=4, fig.align="center", fig.cap='(ref:costfunction-cap)'}
 par(mar=c(4,4,3,1), mfrow=c(1,2))
 plot(-supplyNetwork11$psiLeaf, PM11$Cost, type="l", col=col1, ylab="Cost function 1", xlab = "Leaf sap pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,1), lwd=1, main = "Cost 1 (original)")
 lines(-supplyNetwork12$psiLeaf, PM12$Cost, lty=1, lwd=1, col=col2)
@@ -117,18 +90,18 @@ legend("topleft", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 
 The normalized photosynthetic *gain function* $\beta(\Psi_{leaf})$ reflects the actual assimilation rate with respect to the maximum [@Sperry2016a]:
 \begin{equation}
-\beta(\Psi_{leaf}) = \left[\frac{A(\Psi_{leaf})}{A_{max}}\right]^{a_{\beta}}
+\beta(\Psi_{leaf}) = \frac{A(\Psi_{leaf})}{A_{max}}
 \end{equation}
-where $A_{max}$ is the instantaneous maximum (gross) assimilation rate estimated over the full $\Psi_{leaf}$ range (including values that imply a stomatal conductance larger than the maximum). Similarly to the cost function, $a_{\beta}$ is an exponent that modifies the gain function, specified as a control parameter. In @Sperry2016a, this exponent was missing (i.e. $a_{\beta} = 1.0$), and this is the default in **medfate**, but we introduced it to allow some flexibility in the gain/cost comparison.
+where $A_{max}$ is the instantaneous maximum (gross) assimilation rate estimated over the full $\Psi_{leaf}$ range (including values that imply a stomatal conductance larger than the maximum). 
 
-The following figures illustrate the $\beta(\Psi_{leaf})$ curves corresponding to the supply and assimilation functions, for either  $a_{\beta} = 1.0$ (top row) or  $a_{\beta} = 0.5$ (bottom row):
+The following figures illustrate the $\beta(\Psi_{leaf})$ curves corresponding to the supply and assimilation functions:
 
-(ref:gainfunction-cap) Gain function ($\beta(\Psi_{leaf})$) obtained for a hydraulic network, corresponding to fig. \@ref(fig:supplynetwork) and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. Top and bottom panels correspond to $a_{\beta}=1.0$ and $a_{\beta}=0.5$, respectively. 
+(ref:gainfunction-cap) Gain function ($\beta(\Psi_{leaf})$) obtained for a hydraulic network, corresponding to fig. \@ref(fig:supplynetwork) and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively.
 
-```{r gainfunction, echo=FALSE, fig.width=8, fig.height=7, fig.align="center", fig.cap='(ref:gainfunction-cap)'}
-par(mar=c(4,4,3,1), mfrow=c(2,2))
+```{r gainfunction, echo=FALSE, fig.width=8, fig.height=4, fig.align="center", fig.cap='(ref:gainfunction-cap)'}
+par(mar=c(4,4,3,1), mfrow=c(1,2))
 
-plot(-supplyNetwork11$psiLeaf, PM11$Gain, type="l", col=col1, ylab="Gain function (a = 1.0)", xlab = "Canopy sap pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,1), lwd=1, main = "Gain (original)")
+plot(-supplyNetwork11$psiLeaf, PM11$Gain, type="l", col=col1, ylab="Gain function", xlab = "Canopy sap pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,1), lwd=1, main = "Gain (original)")
 lines(-supplyNetwork12$psiLeaf, PM12$Gain, lty=1, lwd=1, col=col2)
 lines(-supplyNetwork13$psiLeaf, PM13$Gain, lty=1, lwd=1, col=col3)
 lines(-supplyNetwork14$psiLeaf, PM14$Gain, lty=1, lwd=1, col=col4)
@@ -143,7 +116,7 @@ lines(-supplyNetwork34$psiLeaf, PM34$Gain, lty=3, lwd=1, col=col4)
 legend("bottomright", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 
 
-plot(-supplyNetwork11emb$psiLeaf, PM11emb$Gain, type="l", col=col1, ylab="Gain function (a = 1.0)", xlab = "Canopy sap pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,1), lwd=1, main = "Gain (after cavitation)")
+plot(-supplyNetwork11emb$psiLeaf, PM11emb$Gain, type="l", col=col1, ylab="Gain function", xlab = "Canopy sap pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,1), lwd=1, main = "Gain (after cavitation)")
 lines(-supplyNetwork12emb$psiLeaf, PM12emb$Gain, lty=1, lwd=1, col=col2)
 lines(-supplyNetwork13emb$psiLeaf, PM13emb$Gain, lty=1, lwd=1, col=col3)
 lines(-supplyNetwork14emb$psiLeaf, PM14emb$Gain, lty=1, lwd=1, col=col4)
@@ -157,40 +130,7 @@ lines(-supplyNetwork33emb$psiLeaf, PM33emb$Gain, lty=3, lwd=1, col=col3)
 lines(-supplyNetwork34emb$psiLeaf, PM34emb$Gain, lty=3, lwd=1, col=col4)
 abline(v=-psiCav, col="gray", lwd=1.5)
 legend("bottomright", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
-
-plot(-supplyNetwork11$psiLeaf, PM11_s2$Gain, type="l", col=col1, ylab="Gain function (a = 0.5)", xlab = "Canopy sap pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,1), lwd=1, main = "Gain (original)")
-lines(-supplyNetwork12$psiLeaf, PM12_s2$Gain, lty=1, lwd=1, col=col2)
-lines(-supplyNetwork13$psiLeaf, PM13_s2$Gain, lty=1, lwd=1, col=col3)
-lines(-supplyNetwork14$psiLeaf, PM14_s2$Gain, lty=1, lwd=1, col=col4)
-lines(-supplyNetwork21$psiLeaf, PM21_s2$Gain, lty=2, lwd=1, col=col1)
-lines(-supplyNetwork22$psiLeaf, PM22_s2$Gain, lty=2, lwd=1, col=col2)
-lines(-supplyNetwork23$psiLeaf, PM23_s2$Gain, lty=2, lwd=1, col=col3)
-lines(-supplyNetwork24$psiLeaf, PM24_s2$Gain, lty=2, lwd=1, col=col4)
-lines(-supplyNetwork31$psiLeaf, PM31_s2$Gain, lty=3, lwd=1, col=col1)
-lines(-supplyNetwork32$psiLeaf, PM32_s2$Gain, lty=3, lwd=1, col=col2)
-lines(-supplyNetwork33$psiLeaf, PM33_s2$Gain, lty=3, lwd=1, col=col3)
-lines(-supplyNetwork34$psiLeaf, PM34_s2$Gain, lty=3, lwd=1, col=col4)
-legend("bottomright", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
-
-
-plot(-supplyNetwork11emb$psiLeaf, PM11emb_s2$Gain, type="l", col=col1, ylab="Gain function (a = 0.5)", xlab = "Canopy sap pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,1), lwd=1, main = "Gain (after cavitation)")
-lines(-supplyNetwork12emb$psiLeaf, PM12emb_s2$Gain, lty=1, lwd=1, col=col2)
-lines(-supplyNetwork13emb$psiLeaf, PM13emb_s2$Gain, lty=1, lwd=1, col=col3)
-lines(-supplyNetwork14emb$psiLeaf, PM14emb_s2$Gain, lty=1, lwd=1, col=col4)
-lines(-supplyNetwork21emb$psiLeaf, PM21emb_s2$Gain, lty=2, lwd=1, col=col1)
-lines(-supplyNetwork22emb$psiLeaf, PM22emb_s2$Gain, lty=2, lwd=1, col=col2)
-lines(-supplyNetwork23emb$psiLeaf, PM23emb_s2$Gain, lty=2, lwd=1, col=col3)
-lines(-supplyNetwork24emb$psiLeaf, PM24emb_s2$Gain, lty=2, lwd=1, col=col4)
-lines(-supplyNetwork31emb$psiLeaf, PM31emb_s2$Gain, lty=3, lwd=1, col=col1)
-lines(-supplyNetwork32emb$psiLeaf, PM32emb_s2$Gain, lty=3, lwd=1, col=col2)
-lines(-supplyNetwork33emb$psiLeaf, PM33emb_s2$Gain, lty=3, lwd=1, col=col3)
-lines(-supplyNetwork34emb$psiLeaf, PM34emb_s2$Gain, lty=3, lwd=1, col=col4)
-abline(v=-psiCav, col="gray", lwd=1.5)
-legend("bottomright", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
-
 ```
-
-Note that setting $a_{\beta} = 0.5$ makes gain function steeper at the begining of the curve, hence making additional gains in photosynthesis less relevant compared to $a_{\beta} = 1.0$. This has an effect on the profit maximization strategy presented in the next subsection.
 
 
 ### Profit maximization at the leaf level
@@ -207,11 +147,11 @@ Instantaneous profit maximization assumes a 'use it or lose it' reality with reg
 
 The following figures illustrate the $Profit(\Psi_{leaf})$ curves of corresponding to the previous cost and gain curves:
 
-(ref:profitfunction-cap) Profit functions (i.e. $Profit(\Psi_{leaf})$) obtained for a hydraulic network, corresponding to fig. \@ref(fig:supplynetwork) and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. Top and bottom panels correspond to $a_{\beta}=1.0$ and $a_{\beta}=0.5$, respectively. 
+(ref:profitfunction-cap) Profit functions (i.e. $Profit(\Psi_{leaf})$) obtained for a hydraulic network, corresponding to fig. \@ref(fig:supplynetwork) and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. 
 
-```{r profitfunction, echo=FALSE, fig.width=8, fig.height=7, fig.align="center", fig.cap = '(ref:profitfunction-cap)'}
-par(mar=c(4,4,2,1), mfrow=c(2,2))
-plot(-supplyNetwork11$psiLeaf, PM11$Profit, type="l", col=col1, ylab="Profit (a = 1)", xlab = "Leaf sap pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,1), lwd=1, main="original")
+```{r profitfunction, echo=FALSE, fig.width=8, fig.height=4, fig.align="center", fig.cap = '(ref:profitfunction-cap)'}
+par(mar=c(4,4,2,1), mfrow=c(1,2))
+plot(-supplyNetwork11$psiLeaf, PM11$Profit, type="l", col=col1, ylab="Profit", xlab = "Leaf sap pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,1), lwd=1, main="original")
 points(-supplyNetwork11$psiLeaf[PM11$iMaxProfit+1],
          PM11$Profit[PM11$iMaxProfit+1], col=col1, pch = 0)
 lines(-supplyNetwork12$psiLeaf, PM12$Profit, lty=1, lwd=1, col=col2)
@@ -250,7 +190,7 @@ points(-supplyNetwork34$psiLeaf[PM34$iMaxProfit+1],
 legend("topright", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 abline(h=0,col="gray")
 
-plot(-supplyNetwork11emb$psiLeaf, PM11emb$Profit, type="l", col=col1, ylab="Profit (a = 1)", xlab = "Leaf sap pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,1), lwd=1, main="after cavitation")
+plot(-supplyNetwork11emb$psiLeaf, PM11emb$Profit, type="l", col=col1, ylab="Profit", xlab = "Leaf sap pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,1), lwd=1, main="after cavitation")
 points(-supplyNetwork11emb$psiLeaf[PM11emb$iMaxProfit+1],
          PM11emb$Profit[PM11emb$iMaxProfit+1], col=col1, pch = 0)
 lines(-supplyNetwork12emb$psiLeaf, PM12emb$Profit, lty=1, lwd=1, col=col2)
@@ -289,156 +229,18 @@ points(-supplyNetwork34emb$psiLeaf[PM34emb$iMaxProfit+1],
 legend("topright", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 abline(h=0,col="gray")
 abline(v=-psiCav, col="gray", lwd=1.5)
-
-plot(-supplyNetwork11$psiLeaf, PM11_s2$Profit, type="l", col=col1, ylab="Profit (a = 0.5)", xlab = "Leaf sap pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,1), lwd=1, main="original")
-points(-supplyNetwork11$psiLeaf[PM11_s2$iMaxProfit+1],
-         PM11_s2$Profit[PM11_s2$iMaxProfit+1], col=col1, pch = 0)
-lines(-supplyNetwork12$psiLeaf, PM12_s2$Profit, lty=1, lwd=1, col=col2)
-points(-supplyNetwork12$psiLeaf[PM12_s2$iMaxProfit+1],
-         PM12_s2$Profit[PM12_s2$iMaxProfit+1], col=col2, pch = 0)
-lines(-supplyNetwork13$psiLeaf, PM13_s2$Profit, lty=1, lwd=1, col=col3)
-points(-supplyNetwork13$psiLeaf[PM13_s2$iMaxProfit+1],
-         PM13_s2$Profit[PM13_s2$iMaxProfit+1], col=col3, pch = 0)
-lines(-supplyNetwork14$psiLeaf, PM14_s2$Profit, lty=1, lwd=1, col=col4)
-points(-supplyNetwork14$psiLeaf[PM14_s2$iMaxProfit+1],
-         PM14_s2$Profit[PM14_s2$iMaxProfit+1], col=col4, pch = 0)
-lines(-supplyNetwork21$psiLeaf, PM21_s2$Profit, lty=2, lwd=1, col=col1)
-points(-supplyNetwork21$psiLeaf[PM21_s2$iMaxProfit+1],
-         PM21_s2$Profit[PM21_s2$iMaxProfit+1], col=col1, pch = 0)
-lines(-supplyNetwork22$psiLeaf, PM22_s2$Profit, lty=2, lwd=1, col=col2)
-points(-supplyNetwork22$psiLeaf[PM22_s2$iMaxProfit+1],
-         PM22_s2$Profit[PM22_s2$iMaxProfit+1], col=col2, pch = 0)
-lines(-supplyNetwork23$psiLeaf, PM23_s2$Profit, lty=2, lwd=1, col=col3)
-points(-supplyNetwork23$psiLeaf[PM23_s2$iMaxProfit+1],
-         PM23_s2$Profit[PM23_s2$iMaxProfit+1], col=col3, pch = 0)
-lines(-supplyNetwork24$psiLeaf, PM24_s2$Profit, lty=2, lwd=1, col=col4)
-points(-supplyNetwork24$psiLeaf[PM24_s2$iMaxProfit+1],
-         PM24_s2$Profit[PM24_s2$iMaxProfit+1], col=col4, pch = 0)
-lines(-supplyNetwork31$psiLeaf, PM31_s2$Profit, lty=3, lwd=1, col=col1)
-points(-supplyNetwork31$psiLeaf[PM31_s2$iMaxProfit+1],
-         PM31_s2$Profit[PM31_s2$iMaxProfit+1], col=col1, pch = 0)
-lines(-supplyNetwork32$psiLeaf, PM32_s2$Profit, lty=3, lwd=1, col=col2)
-points(-supplyNetwork32$psiLeaf[PM32_s2$iMaxProfit+1],
-         PM32_s2$Profit[PM32_s2$iMaxProfit+1], col=col2, pch = 0)
-lines(-supplyNetwork33$psiLeaf, PM33_s2$Profit, lty=3, lwd=1, col=col3)
-points(-supplyNetwork33$psiLeaf[PM33_s2$iMaxProfit+1],
-         PM33_s2$Profit[PM33_s2$iMaxProfit+1], col=col3, pch = 0)
-lines(-supplyNetwork34$psiLeaf, PM34_s2$Profit, lty=3, lwd=1, col=col4)
-points(-supplyNetwork34$psiLeaf[PM34_s2$iMaxProfit+1],
-         PM34_s2$Profit[PM34_s2$iMaxProfit+1], col=col4, pch = 0)
-legend("topright", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
-abline(h=0,col="gray")
-
-plot(-supplyNetwork11emb$psiLeaf, PM11emb_s2$Profit, type="l", col=col1, ylab="Profit (a = 0.5)", xlab = "Leaf sap pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,1), lwd=1, main="after cavitation")
-points(-supplyNetwork11emb$psiLeaf[PM11emb_s2$iMaxProfit+1],
-         PM11emb_s2$Profit[PM11emb_s2$iMaxProfit+1], col=col1, pch = 0)
-lines(-supplyNetwork12emb$psiLeaf, PM12emb_s2$Profit, lty=1, lwd=1, col=col2)
-points(-supplyNetwork12emb$psiLeaf[PM12emb_s2$iMaxProfit+1],
-         PM12emb_s2$Profit[PM12emb_s2$iMaxProfit+1], col=col2, pch = 0)
-lines(-supplyNetwork13emb$psiLeaf, PM13emb_s2$Profit, lty=1, lwd=1, col=col3)
-points(-supplyNetwork13emb$psiLeaf[PM13emb_s2$iMaxProfit+1],
-         PM13emb_s2$Profit[PM13emb_s2$iMaxProfit+1], col=col3, pch = 0)
-lines(-supplyNetwork14emb$psiLeaf, PM14emb_s2$Profit, lty=1, lwd=1, col=col4)
-points(-supplyNetwork14emb$psiLeaf[PM14emb_s2$iMaxProfit+1],
-         PM14emb_s2$Profit[PM14emb_s2$iMaxProfit+1], col=col4, pch = 0)
-lines(-supplyNetwork21emb$psiLeaf, PM21emb_s2$Profit, lty=2, lwd=1, col=col1)
-points(-supplyNetwork21emb$psiLeaf[PM21emb_s2$iMaxProfit+1],
-         PM21emb_s2$Profit[PM21emb_s2$iMaxProfit+1], col=col1, pch = 0)
-lines(-supplyNetwork22emb$psiLeaf, PM22emb_s2$Profit, lty=2, lwd=1, col=col2)
-points(-supplyNetwork22emb$psiLeaf[PM22emb_s2$iMaxProfit+1],
-         PM22emb_s2$Profit[PM22emb_s2$iMaxProfit+1], col=col2, pch = 0)
-lines(-supplyNetwork23emb$psiLeaf, PM23emb_s2$Profit, lty=2, lwd=1, col=col3)
-points(-supplyNetwork23emb$psiLeaf[PM23emb_s2$iMaxProfit+1],
-         PM23emb_s2$Profit[PM23emb_s2$iMaxProfit+1], col=col3, pch = 0)
-lines(-supplyNetwork24emb$psiLeaf, PM24emb_s2$Profit, lty=2, lwd=1, col=col4)
-points(-supplyNetwork24emb$psiLeaf[PM24emb_s2$iMaxProfit+1],
-         PM24emb_s2$Profit[PM24emb_s2$iMaxProfit+1], col=col4, pch = 0)
-lines(-supplyNetwork31emb$psiLeaf, PM31emb_s2$Profit, lty=3, lwd=1, col=col1)
-points(-supplyNetwork31emb$psiLeaf[PM31emb_s2$iMaxProfit+1],
-         PM31emb_s2$Profit[PM31emb_s2$iMaxProfit+1], col=col1, pch = 0)
-lines(-supplyNetwork32emb$psiLeaf, PM32emb_s2$Profit, lty=3, lwd=1, col=col2)
-points(-supplyNetwork32emb$psiLeaf[PM32emb_s2$iMaxProfit+1],
-         PM32emb_s2$Profit[PM32emb_s2$iMaxProfit+1], col=col2, pch = 0)
-lines(-supplyNetwork33emb$psiLeaf, PM33emb_s2$Profit, lty=3, lwd=1, col=col3)
-points(-supplyNetwork33emb$psiLeaf[PM33emb_s2$iMaxProfit+1],
-         PM33emb_s2$Profit[PM33emb_s2$iMaxProfit+1], col=col3, pch = 0)
-lines(-supplyNetwork34emb$psiLeaf, PM34emb_s2$Profit, lty=3, lwd=1, col=col4)
-points(-supplyNetwork34emb$psiLeaf[PM34emb_s2$iMaxProfit+1],
-         PM34emb_s2$Profit[PM34emb_s2$iMaxProfit+1], col=col4, pch = 0)
-legend("topright", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
-abline(h=0,col="gray")
-abline(v=-psiCav, col="gray", lwd=1.5)
 ```
 
 Squares in the previous figures indicate the maximum profit points in each situation. The drier the soil, the closer is the maximum profit $\Psi_{leaf}$ to soil water potential as one would expect intuitively (i.e. a smaller drop in water potential along the hydraulic pathway). Note that when the soil is very dry the squares are to the right of the true maximum. This is because the `transp_profitMaximization()` function takes into account the minimum and maximum  stomatal conductance and, in this case, does not allow optimum stomatal conductances below the minimum (cuticular) value.
 
-Differences between $a_{\beta}=1.0$ and $a_{\beta}=0.5$ can be more easily seen when plotting directly the optima in terms of both canopy sap pressure and flow rate:
-
-(ref:compprofit-cap) Comparison of optimum flow and water potential values under profit functions built using $a_{\beta}=1.0$ and $a_{\beta}=0.5$, from the results of fig. \@ref(fig:profitfunction).
-
-```{r compprofit, echo=FALSE, fig.width=5, fig.height=4, fig.align="center", fig.cap="(ref:compprofit-cap)"}
-par(mar=c(4,4,2,1), mfrow=c(1,1))
-plot(-supplyNetwork11$psiLeaf, supplyNetwork11$E, type="n", col=col1, ylab="Flow rate", xlab = "Leaf sap pressure (-MPa)",  xlim=c(0, 5), ylim=c(0,4), lwd=1, main="")
-p11 = c(-supplyNetwork11$psiLeaf[PM11$iMaxProfit+1],
-         supplyNetwork11$E[PM11$iMaxProfit+1])
-p12 = c(-supplyNetwork12$psiLeaf[PM12$iMaxProfit+1],
-         supplyNetwork12$E[PM12$iMaxProfit+1])
-p13 = c(-supplyNetwork13$psiLeaf[PM13$iMaxProfit+1],
-         supplyNetwork13$E[PM13$iMaxProfit+1])
-p14=c(-supplyNetwork14$psiLeaf[PM14$iMaxProfit+1],
-         supplyNetwork14$E[PM14$iMaxProfit+1])
-p11_cav = c(-supplyNetwork11emb$psiLeaf[PM11emb$iMaxProfit+1],
-         supplyNetwork11emb$E[PM11emb$iMaxProfit+1])
-p12_cav = c(-supplyNetwork12emb$psiLeaf[PM12emb$iMaxProfit+1],
-         supplyNetwork12emb$E[PM12emb$iMaxProfit+1])
-p13_cav = c(-supplyNetwork13emb$psiLeaf[PM13emb$iMaxProfit+1],
-         supplyNetwork13emb$E[PM13emb$iMaxProfit+1])
-p14_cav = c(-supplyNetwork14emb$psiLeaf[PM14emb$iMaxProfit+1],
-         supplyNetwork14emb$E[PM14emb$iMaxProfit+1])
-points(rbind(p11,p12,p13,p14), col=c(col1, col2, col3,col4), pch = 0)
-points(rbind(p11_cav,p12_cav,p13_cav,p14_cav), col=c(col1, col2, col3,col4), pch = 15)
-lines(rbind(p11,p11_cav), col=col1)
-lines(rbind(p12,p12_cav), col=col2)
-lines(rbind(p13,p13_cav), col=col3)
-lines(rbind(p14,p14_cav), col=col4)
-
-p11_s2 = c(-supplyNetwork11$psiLeaf[PM11_s2$iMaxProfit+1],
-         supplyNetwork11$E[PM11_s2$iMaxProfit+1])
-p12_s2 = c(-supplyNetwork12$psiLeaf[PM12_s2$iMaxProfit+1],
-         supplyNetwork12$E[PM12_s2$iMaxProfit+1])
-p13_s2 = c(-supplyNetwork13$psiLeaf[PM13_s2$iMaxProfit+1],
-         supplyNetwork13$E[PM13_s2$iMaxProfit+1])
-p14_s2 = c(-supplyNetwork14$psiLeaf[PM14_s2$iMaxProfit+1],
-         supplyNetwork14$E[PM14_s2$iMaxProfit+1])
-p11_cav_s2 = c(-supplyNetwork11emb$psiLeaf[PM11emb_s2$iMaxProfit+1],
-         supplyNetwork11emb$E[PM11emb_s2$iMaxProfit+1])
-p12_cav_s2 = c(-supplyNetwork12emb$psiLeaf[PM12emb_s2$iMaxProfit+1],
-         supplyNetwork12emb$E[PM12emb_s2$iMaxProfit+1])
-p13_cav_s2 = c(-supplyNetwork13emb$psiLeaf[PM13emb_s2$iMaxProfit+1],
-         supplyNetwork13emb$E[PM13emb_s2$iMaxProfit+1])
-p14_cav_s2 = c(-supplyNetwork14emb$psiLeaf[PM14emb_s2$iMaxProfit+1],
-         supplyNetwork14emb$E[PM14emb_s2$iMaxProfit+1])
-points(rbind(p11_s2,p12_s2,p13_s2,p14_s2), col=c(col1, col2, col3,col4), pch = 1)
-points(rbind(p11_cav_s2,p12_cav_s2,p13_cav_s2,p14_cav_s2), col=c(col1, col2, col3,col4), pch = 19)
-lines(rbind(p11_s2,p11_cav_s2), col=col1)
-lines(rbind(p12_s2,p12_cav_s2), col=col2)
-lines(rbind(p13_s2,p13_cav_s2), col=col3)
-lines(rbind(p14_s2,p14_cav_s2), col=col4)
-
-legend("topleft", bty="n", legend=c("Profit (a = 1) (original)", "Profit (a = 1) (cavitated)", "Profit (a = 2) (original)", "Profit (a = 2) (cavitated)"), pch=c(0,15, 1,19), cex=0.6)
-abline(v=-psiCav, col="gray")
-legend("topright", bty="n", col=c(col1,col2,col3,col4), lty=1, legend=c("P_soil = -0.1/-0.2/-0.3","P_soil = -1.1/-1.2/-1.3","P_soil = -2.1/-2.2/-2.3","P_soil = -3.1/-3.2/-3.3"), cex=0.6)
-```
-
-When changing from $a_{\beta}=1.0$ to $a_{\beta}=0.5$ the optimum values are shifted towards less negative water potentials and, accordingly, lower transpiration rates. Hence, $a_{\beta}$ allows modifying the relative weight of gains and costs.
 
 Note that $\theta$, $\beta$ and $Profit$ functions can be expressed as a function of stomatal conductance, instead of leaf water potential. This allows visualizing more clearly the effect of $g_{sw,\min}$ and $g_{sw,\max}$ thresholds on the maximum profit optimization strategy, as illustrated in the following figures.
 
-(ref:profitfunction-gscap) Profit function as a function of stomatal conductance, corresponding to fig. \@ref(fig:profitfunction) and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. Top and bottom panels correspond to $a_{\beta}=1.0$ and $a_{\beta}=0.5$, respectively. 
+(ref:profitfunction-gscap) Profit function as a function of stomatal conductance, corresponding to fig. \@ref(fig:profitfunction) and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively. 
 
-```{r profitfunction-gs, echo=FALSE, warning=FALSE, fig.width=8, fig.height=7, fig.align="center", fig.cap = '(ref:profitfunction-gscap)'}
-par(mar=c(4,4,2,1), mfrow=c(2,2))
-plot(psi2A11$Gsw, PM11$Profit, type="l", col=col1, ylab="Profit (a = 1)", xlab = "Stomatal conductance",  xlim=c(0.001, 0.5), log="x", ylim=c(0,1), lwd=1, main="original")
+```{r profitfunction-gs, echo=FALSE, warning=FALSE, fig.width=8, fig.height=4, fig.align="center", fig.cap = '(ref:profitfunction-gscap)'}
+par(mar=c(4,4,2,1), mfrow=c(1,2))
+plot(psi2A11$Gsw, PM11$Profit, type="l", col=col1, ylab="Profit", xlab = "Stomatal conductance",  xlim=c(0.001, 0.5), log="x", ylim=c(0,1), lwd=1, main="original")
 points(psi2A11$Gsw[PM11$iMaxProfit+1],
          PM11$Profit[PM11$iMaxProfit+1], col=col1, pch = 0)
 lines(psi2A12$Gsw, PM12$Profit, lty=1, lwd=1, col=col2)
@@ -479,7 +281,7 @@ abline(h=0,col="gray")
 abline(v=Gmin, col="gray", lwd=1.5)
 abline(v=Gmax, col="gray", lwd=1.5)
 
-plot(psi2A11emb$Gsw, PM11emb$Profit, type="l", col=col1, ylab="Profit (a = 1)", xlab = "Stomatal conductance",  xlim=c(0.001, 0.5), log="x", ylim=c(0,1), lwd=1, main="after cavitation")
+plot(psi2A11emb$Gsw, PM11emb$Profit, type="l", col=col1, ylab="Profit", xlab = "Stomatal conductance",  xlim=c(0.001, 0.5), log="x", ylim=c(0,1), lwd=1, main="after cavitation")
 points(psi2A11emb$Gsw[PM11emb$iMaxProfit+1],
          PM11emb$Profit[PM11emb$iMaxProfit+1], col=col1, pch = 0)
 lines(psi2A12emb$Gsw, PM12emb$Profit, lty=1, lwd=1, col=col2)
@@ -515,89 +317,6 @@ points(psi2A33emb$Gsw[PM33emb$iMaxProfit+1],
 lines(psi2A34emb$Gsw, PM34emb$Profit, lty=3, lwd=1, col=col4)
 points(psi2A34emb$Gsw[PM34emb$iMaxProfit+1],
          PM34emb$Profit[PM34emb$iMaxProfit+1], col=col4, pch = 0)
-legend("topright", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
-abline(h=0,col="gray")
-abline(v=Gmin, col="gray", lwd=1.5)
-abline(v=Gmax, col="gray", lwd=1.5)
-
-
-plot(psi2A11$Gsw, PM11_s2$Profit, type="l", col=col1, ylab="Profit (a = 0.5)", xlab = "Stomatal conductance",  xlim=c(0.001, 0.5), log="x", ylim=c(0,1), lwd=1, main="original")
-points(psi2A11$Gsw[PM11_s2$iMaxProfit+1],
-         PM11_s2$Profit[PM11_s2$iMaxProfit+1], col=col1, pch = 0)
-lines(psi2A12$Gsw, PM12_s2$Profit, lty=1, lwd=1, col=col2)
-points(psi2A12$Gsw[PM12_s2$iMaxProfit+1],
-         PM12_s2$Profit[PM12_s2$iMaxProfit+1], col=col2, pch = 0)
-lines(psi2A13$Gsw, PM13_s2$Profit, lty=1, lwd=1, col=col3)
-points(psi2A13$Gsw[PM13_s2$iMaxProfit+1],
-         PM13_s2$Profit[PM13_s2$iMaxProfit+1], col=col3, pch = 0)
-lines(psi2A14$Gsw, PM14_s2$Profit, lty=1, lwd=1, col=col4)
-points(psi2A14$Gsw[PM14_s2$iMaxProfit+1],
-         PM14_s2$Profit[PM14_s2$iMaxProfit+1], col=col4, pch = 0)
-lines(psi2A21$Gsw, PM21_s2$Profit, lty=2, lwd=1, col=col1)
-points(psi2A21$Gsw[PM21_s2$iMaxProfit+1],
-         PM21_s2$Profit[PM21_s2$iMaxProfit+1], col=col1, pch = 0)
-lines(psi2A22$Gsw, PM22_s2$Profit, lty=2, lwd=1, col=col2)
-points(psi2A22$Gsw[PM22_s2$iMaxProfit+1],
-         PM22_s2$Profit[PM22_s2$iMaxProfit+1], col=col2, pch = 0)
-lines(psi2A23$Gsw, PM23_s2$Profit, lty=2, lwd=1, col=col3)
-points(psi2A23$Gsw[PM23_s2$iMaxProfit+1],
-         PM23_s2$Profit[PM23_s2$iMaxProfit+1], col=col3, pch = 0)
-lines(psi2A24$Gsw, PM24_s2$Profit, lty=2, lwd=1, col=col4)
-points(psi2A24$Gsw[PM24_s2$iMaxProfit+1],
-         PM24_s2$Profit[PM24_s2$iMaxProfit+1], col=col4, pch = 0)
-lines(psi2A31$Gsw, PM31_s2$Profit, lty=3, lwd=1, col=col1)
-points(psi2A31$Gsw[PM31_s2$iMaxProfit+1],
-         PM31_s2$Profit[PM31_s2$iMaxProfit+1], col=col1, pch = 0)
-lines(psi2A32$Gsw, PM32_s2$Profit, lty=3, lwd=1, col=col2)
-points(psi2A32$Gsw[PM32_s2$iMaxProfit+1],
-         PM32_s2$Profit[PM32_s2$iMaxProfit+1], col=col2, pch = 0)
-lines(psi2A33$Gsw, PM33_s2$Profit, lty=3, lwd=1, col=col3)
-points(psi2A33$Gsw[PM33_s2$iMaxProfit+1],
-         PM33_s2$Profit[PM33_s2$iMaxProfit+1], col=col3, pch = 0)
-lines(psi2A34$Gsw, PM34_s2$Profit, lty=3, lwd=1, col=col4)
-points(psi2A34$Gsw[PM34_s2$iMaxProfit+1],
-         PM34_s2$Profit[PM34_s2$iMaxProfit+1], col=col4, pch = 0)
-legend("topright", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
-abline(h=0,col="gray")
-abline(v=Gmin, col="gray", lwd=1.5)
-abline(v=Gmax, col="gray", lwd=1.5)
-
-plot(psi2A11emb$Gsw, PM11emb_s2$Profit, type="l", col=col1, ylab="Profit (a = 2)", xlab = "Stomatal conductance",  xlim=c(0.001, 0.5), log="x", ylim=c(0,1), lwd=1, main="after cavitation")
-points(psi2A11emb$Gsw[PM11emb_s2$iMaxProfit+1],
-         PM11emb_s2$Profit[PM11emb_s2$iMaxProfit+1], col=col1, pch = 0)
-lines(psi2A12emb$Gsw, PM12emb_s2$Profit, lty=1, lwd=1, col=col2)
-points(psi2A12emb$Gsw[PM12emb_s2$iMaxProfit+1],
-         PM12emb_s2$Profit[PM12emb_s2$iMaxProfit+1], col=col2, pch = 0)
-lines(psi2A13emb$Gsw, PM13emb_s2$Profit, lty=1, lwd=1, col=col3)
-points(psi2A13emb$Gsw[PM13emb_s2$iMaxProfit+1],
-         PM13emb_s2$Profit[PM13emb_s2$iMaxProfit+1], col=col3, pch = 0)
-lines(psi2A14emb$Gsw, PM14emb_s2$Profit, lty=1, lwd=1, col=col4)
-points(psi2A14emb$Gsw[PM14emb_s2$iMaxProfit+1],
-         PM14emb_s2$Profit[PM14emb_s2$iMaxProfit+1], col=col4, pch = 0)
-lines(psi2A21emb$Gsw, PM21emb_s2$Profit, lty=2, lwd=1, col=col1)
-points(psi2A21emb$Gsw[PM21emb_s2$iMaxProfit+1],
-         PM21emb_s2$Profit[PM21emb_s2$iMaxProfit+1], col=col1, pch = 0)
-lines(psi2A22emb$Gsw, PM22emb_s2$Profit, lty=2, lwd=1, col=col2)
-points(psi2A22emb$Gsw[PM22emb_s2$iMaxProfit+1],
-         PM22emb_s2$Profit[PM22emb_s2$iMaxProfit+1], col=col2, pch = 0)
-lines(psi2A23emb$Gsw, PM23emb_s2$Profit, lty=2, lwd=1, col=col3)
-points(psi2A23emb$Gsw[PM23emb_s2$iMaxProfit+1],
-         PM23emb_s2$Profit[PM23emb_s2$iMaxProfit+1], col=col3, pch = 0)
-lines(psi2A24emb$Gsw, PM24emb_s2$Profit, lty=2, lwd=1, col=col4)
-points(psi2A24emb$Gsw[PM24emb_s2$iMaxProfit+1],
-         PM24emb_s2$Profit[PM24emb_s2$iMaxProfit+1], col=col4, pch = 0)
-lines(psi2A31emb$Gsw, PM31emb_s2$Profit, lty=3, lwd=1, col=col1)
-points(psi2A31emb$Gsw[PM31emb_s2$iMaxProfit+1],
-         PM31emb_s2$Profit[PM31emb_s2$iMaxProfit+1], col=col1, pch = 0)
-lines(psi2A32emb$Gsw, PM32emb_s2$Profit, lty=3, lwd=1, col=col2)
-points(psi2A32emb$Gsw[PM32emb_s2$iMaxProfit+1],
-         PM32emb_s2$Profit[PM32emb_s2$iMaxProfit+1], col=col2, pch = 0)
-lines(psi2A33emb$Gsw, PM33emb_s2$Profit, lty=3, lwd=1, col=col3)
-points(psi2A33emb$Gsw[PM33emb_s2$iMaxProfit+1],
-         PM33emb_s2$Profit[PM33emb_s2$iMaxProfit+1], col=col3, pch = 0)
-lines(psi2A34emb$Gsw, PM34emb_s2$Profit, lty=3, lwd=1, col=col4)
-points(psi2A34emb$Gsw[PM34emb_s2$iMaxProfit+1],
-         PM34emb_s2$Profit[PM34emb_s2$iMaxProfit+1], col=col4, pch = 0)
 legend("topright", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 abline(h=0,col="gray")
 abline(v=Gmin, col="gray", lwd=1.5)
