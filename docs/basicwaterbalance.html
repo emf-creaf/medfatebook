@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2022-05-18" />
+<meta name="date" content="2022-07-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -973,13 +973,19 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <td><span class="math inline">\(WUE_{\max}\)</span></td>
 <td><span class="math inline">\(g\, C \cdot mm^{-1}\)</span></td>
 <td><code>WUE</code></td>
-<td>Maximum water use efficiency under full light and no water limitations (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>).</td>
+<td>Maximum water use efficiency under full light and without water or CO2 limitations (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>).</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(WUE_{decay}\)</span></td>
+<td><span class="math inline">\(WUE_{PAR}\)</span></td>
 <td></td>
-<td><code>WUE_decay</code></td>
-<td>Exponent describing the decay of water use efficiency with low light levels (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>).</td>
+<td><code>WUE_par</code></td>
+<td>Coefficient describing the decay of water use efficiency with low light levels (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>).</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(WUE_{CO2}\)</span></td>
+<td></td>
+<td><code>WUE_co2</code></td>
+<td>Coefficient for gross photosynthesis dependency on atmospheric CO2 concentration (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>).</td>
 </tr>
 </tbody>
 </table>
@@ -1065,6 +1071,7 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <ul>
 <li><code>soilFunctions [="SX"]</code>: Soil water retention curve and conductivity functions, either ‘SX’ (for Saxton) or ‘VG’ (for Van Genuchten).</li>
 <li><code>defaultWindSpeed [= 2.5]</code>: Default value for wind speed (in <span class="math inline">\(m \cdot s^{-1}\)</span>) when this is missing (only used for leaf fall, see section <a href="leafphenologylight.html#leafphenology">4.1</a>).</li>
+<li><code>defaultCO2 [=386]</code>: Default atmospheric (abovecanopy) <span class="math inline">\(CO_2\)</span> concentration (in micromol <span class="math inline">\(CO_2 \cdot mol^{-1}\)</span> = ppm). This value will be used whenever <span class="math inline">\(CO_2\)</span> concentration is not specified in the weather input.</li>
 <li><code>snowpack [= TRUE]</code>: Whether dynamics of snow pack are included (see section <a href="hydrology.html#snowpack">5.2</a>).</li>
 <li><code>leafPhenology [ = TRUE]</code>: Whether leaf phenology is simulated (see section <a href="leafphenologylight.html#leafphenology">4.1</a>). If <code>FALSE</code> then all species are assumed to be evergreen.</li>
 <li><code>rockyLayerDrainage [= TRUE]</code>: Whether water exceeding the field capacity of the deepest layer can be drained via macropore flow towards a non-reachable compartment, only for layers with &gt; 95% rocks (see section <a href="hydrology.html#runoff">5.4</a>).</li>

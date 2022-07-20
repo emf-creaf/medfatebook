@@ -92,8 +92,9 @@ The following tables describe how the different functional parameters are dealt 
 |--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
 | $T_{max, LAI}$ | `Tmax_LAI` | Empirical coefficient relating LAI with the ratio of maximum transpiration over potential evapotranspiration | No | No | \@ref(imputationtranspwue) |
 | $T_{max, sqLAI}$ | `Tmax_LAIsq` | Empirical coefficient relating squared LAI with the ratio of maximum transpiration over potential evapotranspiration | No | No | \@ref(imputationtranspwue) |
-| $WUE_{\max}$ | `WUE` |  Water use efficiency  | No | No | \@ref(imputationtranspwue) |
-| $WUE_{decay}$ | `WUE_decay` |  Exponent describing the decay of water use efficiency with low light levels  | No | No | \@ref(imputationtranspwue) |
+| $WUE_{\max}$ | `WUE` |  Maximum water use efficiency under full light and without water or CO2 limitations  | No | No | \@ref(imputationtranspwue) |
+| $WUE_{PAR}$ | `WUE_par` |  Coefficient describing the decay of water use efficiency with low light levels  | No | No | \@ref(imputationtranspwue) |
+| $WUE_{CO2}$ | `WUE_co2` |  Coefficient for gross photosynthesis dependency on atmospheric CO2 concentration  | No | No | \@ref(imputationtranspwue) |
 | $\Psi_{extract}$ | `Psi_Extract` |  The water potential at which plant transpiration is 50% of its maximum | No | No |  \@ref(imputationtranspwue) |
 | $\Psi_{critic}$ | `Psi_Critic` |  The water potential corresponding to 50% of stem xylem cavitation |  No | No | \@ref(imputationVCs) |
 | $g_{swmin}$ | `Gwmin` | Minimum stomatal conductance to water vapour | No | No | \@ref(imputationstomatalconductance) |
@@ -293,7 +294,7 @@ Leaf senescence values were derived for deciduous broad-leaved forests by @Delpi
 
 When the basic soil water balance model is used, $T_{max,LAI}$ and $T_{max,sqLAI}$ are species-specific parameters that regulate the maximum transpiration of plant cohorts (see \@ref(maximumtranspiration)). When these parameters are missing from `SpParams` table, they are given default values $T_{max,LAI} = 0.134$ and $T_{max,sqLAI} = -0.006$, according to @Granier1999.  
 
-When maximum water use efficiency ($WUE_{\max}$) is missing, it is given a value of $WUE_{\max} = 5$. By default, the coefficient describing the decay of water use efficiency with lower light levels is given a default value of $WUE_{decay} = 0.2812$.
+When maximum water use efficiency ($WUE_{\max}$) is missing, it is given a value of $WUE_{\max} = 7.55$. By default, the coefficient describing the decay of water use efficiency with lower light levels is given a default value of $WUE_{PAR} = 0.2812$, and the coefficient regulating the relationship between gross photosynthesis and CO2 concentration is given a default $WUE_{CO2} = 0.0028$.
 
 When missing, the water potential corresponding to 50\% of transpiration ($\Psi_{extract}$) is estimated by calculating the water potential corresponding to the loss leaf turgor ($\Psi_{tlp}$), using equation \@ref(eq:turgorlosspoint) from @Bartlett2012. The parameters of the leaf pressure-volume curve needed for applying equation \@ref(eq:turgorlosspoint) may be themselves estimated (see \@ref(inputationPV)). Note that $\Psi_{tlp}$ has been found to be highly correlated to $\Psi_{gs50}$, the water potential corresponding to 50\% of stomatal conductance [@Bartlett2016].
 

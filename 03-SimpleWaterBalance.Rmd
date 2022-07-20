@@ -136,8 +136,9 @@ A fourth set of parameters are related to transpiration and photosynthesis (`par
 | $T_{max, sqLAI}$ |       | `Tmax_LAIsq` | Empirical coefficient relating squared LAI with the ratio of maximum transpiration over potential evapotranspiration (see section \@ref(maximumtranspiration)). |
 | $\Psi_{extract}$ | $MPa$ | `Psi_Extract` |  The water potential at which plant transpiration is 50% of its maximum (see section \@ref(actualtranspiration)).|
 | $\Psi_{critic}$ | $MPa$ | `Psi_Critic` |  The water potential corresponding to 50% of  cavitation (see section \@ref(irreversiblecavitation)).|
-| $WUE_{\max}$ | $g\, C \cdot mm^{-1}$ |  `WUE` |  Maximum water use efficiency under full light and no water limitations (see section \@ref(basicphotosynthesis)).  |
-| $WUE_{decay}$ |  |  `WUE_decay` |  Exponent describing the decay of water use efficiency with low light levels (see section \@ref(basicphotosynthesis)).  |
+| $WUE_{\max}$ | $g\, C \cdot mm^{-1}$ |  `WUE` |  Maximum water use efficiency under full light and without water or CO2 limitations (see section \@ref(basicphotosynthesis)).  |
+| $WUE_{PAR}$ |  |  `WUE_par` |  Coefficient describing the decay of water use efficiency with low light levels (see section \@ref(basicphotosynthesis)). |
+| $WUE_{CO2}$ |  |  `WUE_co2` |  Coefficient for gross photosynthesis dependency on atmospheric CO2 concentration (see section \@ref(basicphotosynthesis)).  |
 
 A fifth (final) set of parameters are related to water storage and water relations in plant tissues (`paramsWaterStorage`):
 
@@ -163,6 +164,7 @@ The other control parameters for the basic water balance model are:
 
 + `soilFunctions [="SX"]`: Soil water retention curve and conductivity functions, either 'SX' (for Saxton) or 'VG' (for Van Genuchten). 
 + `defaultWindSpeed [= 2.5]`: Default value for wind speed (in $m \cdot s^{-1}$) when this is missing (only used for leaf fall, see section \@ref(leafphenology)).
++ `defaultCO2 [=386]`: Default atmospheric (abovecanopy) $CO_2$ concentration (in micromol $CO_2 \cdot mol^{-1}$ = ppm). This value will be used whenever $CO_2$ concentration is not specified in the weather input.
 + `snowpack [= TRUE]`:  Whether dynamics of snow pack are included (see section \@ref(snowpack)).
 + `leafPhenology [ = TRUE]`:  Whether leaf phenology is simulated (see section \@ref(leafphenology)). If `FALSE` then all species are assumed to be evergreen.
 + `rockyLayerDrainage [= TRUE]`:  Whether water exceeding the field capacity of the deepest layer can be drained via macropore flow towards a non-reachable compartment, only for layers with > 95\% rocks (see section \@ref(runoff)).
