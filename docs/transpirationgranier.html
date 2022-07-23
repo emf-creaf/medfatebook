@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 6 Plant transpiration, photosynthesis and water status | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 6 Plant transpiration, photosynthesis and water status | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2022-07-20" />
+<meta name="date" content="2022-07-23" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -795,13 +795,13 @@ Estimating transpiration with water pools is analogous to estimating transpirati
 </div>
 <div id="basicphotosynthesis" class="section level3 hasAnchor" number="6.1.6">
 <h3><span class="header-section-number">6.1.6</span> Plant photosynthesis<a href="transpirationgranier.html#basicphotosynthesis" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Because it is useful for growth, and for compatibility with the ‘Sperry’ transpiration mode (chapter <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>), the water balance model using ‘Granier’ transpiration mode also calculates gross assimilated carbon. Assuming a constant maximum water use efficiency (<span class="math inline">\(WUE_{\max}\)</span>), gross photosynthesis for a given plant cohort <span class="math inline">\(i\)</span> (in <span class="math inline">\(g\,C \cdot m^{-2}\)</span>) is estimated as a function of transpiration:
+<p>Because it is useful for growth, and for compatibility with the ‘Sperry’ transpiration mode (chapter <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>), the water balance model using ‘Granier’ transpiration mode also calculates gross assimilated carbon. Gross photosynthesis for a given plant cohort <span class="math inline">\(i\)</span> (in <span class="math inline">\(g\,C \cdot m^{-2}\)</span>) is estimated as a function of transpiration:
 <span class="math display" id="eq:Agbasic">\[\begin{equation}
-A_{g,i} = Tr_i \cdot WUE_{\max,i} \cdot (L^{PAR}_i)^{WUE_{PAR,i}} \cdot (1 - e^{WUE_{CO2,i} \cdot C_{air}})
+A_{g,i} = Tr_i \cdot WUE_{\max,i} \cdot (L^{PAR}_i)^{WUE_{PAR,i}} \cdot (1 - e^{WUE_{CO2,i} \cdot C_{air}}) \cdot VPD^{WUE_{VPD}}
 \tag{6.5}
 \end{equation}\]</span>
-where <span class="math inline">\(Tr_i\)</span> is the transpiration of plant cohort <span class="math inline">\(i\)</span>, <span class="math inline">\(WUE_{\max,i}\)</span> is the maximum water use efficiency of the cohort (in <span class="math inline">\(g\,C \cdot mm^{-1}\)</span>) - a species-specific parameter where WUE assumed to be estimated under conditions of no water stress, no atmospheric CO2 limitations and maximum light availability -; <span class="math inline">\(L^{PAR}_i\)</span> is the proportion of photosynthetically-active radiation available at the mid-crown of cohort <span class="math inline">\(i\)</span>, according to the Beer-Lambert extinction model; <span class="math inline">\(C_{air}\)</span> is the atmospheric CO2 concentration (in ppm); <span class="math inline">\(WUE_{CO2,i}\)</span> is the species-specific coefficient regulating the influence of CO2 concentration on photosynthetic rates and <span class="math inline">\(WUE_{PAR,i}\)</span> is a species-specific exponent indicating how relative WUE decreases with lower light levels.</p>
-<p>Different effects are taken into account in the estimation of gross photosynthesis (eq. <a href="transpirationgranier.html#eq:Agbasic">(6.5)</a>). The dependency of photosynthesis on drought stress is represented in the <span class="math inline">\(Tr_i\)</span> term, whereas the dependency on <span class="math inline">\(CO_2\)</span> concentration is given by the negative exponential term, and the reduction of photosynthesis due to low light availability (for cohorts in the understory) is represented by the reduction of relative WUE given by low values of <span class="math inline">\(L^{PAR}_i\)</span>:</p>
+where <span class="math inline">\(Tr_i\)</span> is the transpiration of plant cohort <span class="math inline">\(i\)</span>, <span class="math inline">\(WUE_{\max,i}\)</span> is the maximum water use efficiency of the cohort (in <span class="math inline">\(g\,C \cdot mm^{-1}\)</span>) - a species-specific parameter where WUE assumed to be estimated under conditions of <span class="math inline">\(VPD = 1kPa\)</span>, no atmospheric CO2 limitations and maximum light availability -; <span class="math inline">\(L^{PAR}_i\)</span> is the proportion of photosynthetically-active radiation available at the mid-crown of cohort <span class="math inline">\(i\)</span>, according to the Beer-Lambert extinction model; <span class="math inline">\(C_{air}\)</span> is the atmospheric CO2 concentration (in ppm); <span class="math inline">\(VPD\)</span> is the vapor pressure deficit (in kPa); <span class="math inline">\(WUE_{CO2,i}\)</span> and <span class="math inline">\(WUE_{VPD,i}\)</span> are species-specific coefficients regulating the influence of CO2 concentration and VPD on WUE, respectively; and <span class="math inline">\(WUE_{PAR,i}\)</span> is a species-specific exponent indicating how relative WUE decreases with lower light levels.</p>
+<p>Different effects are taken into account in the estimation of gross photosynthesis (eq. <a href="transpirationgranier.html#eq:Agbasic">(6.5)</a>). The dependency of photosynthesis on drought stress is represented in the <span class="math inline">\(Tr_i\)</span> term, whereas the dependency on <span class="math inline">\(CO_2\)</span> concentration is given by the negative exponential term and the progressive reduction of photosynthesis under higher <span class="math inline">\(VPD\)</span> (assuming a reduction of stomatal conductance but the same water flow) is modelled using negative <span class="math inline">\(WUE_{VPD,i}\)</span> exponents. Finally, the reduction of photosynthesis due to low light availability (for cohorts in the understory) is represented by the reduction of relative WUE given by low values of <span class="math inline">\(L^{PAR}_i\)</span>:</p>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:WUErelationship"></span>
 <img src="WUE_relationship.png" alt="Relationship between the percentage of PAR available to a cohort and the water use efficiency (left) or the water use efficiency relative to the maximum value observed in the stand for the same species (right). WUE values were estimated using the advanced water balance model and a non-linear regression was fitted." width="100%" />
 <p class="caption">
