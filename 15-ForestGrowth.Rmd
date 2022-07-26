@@ -198,6 +198,14 @@ where $N_{cohort}$ is the initial cohort density (before mortality occurred) and
 \end{equation}
 where $N_{dead}$ is the density of dead individuals and $B_{plant}$ is the initial plant biomass.
 
+### Stand-level carbon balance
+
+With the aim to produce outputs to be compared with Eddy-covariance flux data, the model produces aggregates of gross photosynthesis and respiration at the stand level, all expressed using units of $g\,C\cdot m^{-2}$.
+
+  + *Gross primary production* ($GPP$) is the sum of gross photosynthesis across plant cohorts.
+  + *Maintenance respiration* is the sum across cohorts of the carbon emitted to the atmosphere as a result of maintenance respiration, i.e. $M$.
+  + *Synthesis respiration* is the sum across cohorts of the carbon returned to the atmosphere as a result of the process of synthesizing new structures. Note that this is less than $G$, as it does not include the carbon allocated to the new structures.
+  + *Net primary production* ($NPP$) is $GPP$ minus the maintenance and synthesis respiration terms.
 
 ## Process scheduling {#growthscheduling}
 
@@ -364,7 +372,8 @@ Functions `growth()` returns a list of a class with the same name. The first fou
 |---------|------------------------------------------------------------|
 | `WaterBalance`| Climatic input and water balance flows (i.e. net precipitation, infiltration, runoff, transpiration...). All of them in $mm = L \cdot m^{-2}$. |
 | `EnergyBalance` | Energy balance components (instantaneous values) for the soil and the canopy |
-| `BiomassBalance` | Stand-level biomass balance components |
+| `CarbonBalance` | Stand-level carbon balance components (gross primary production, maintenance respiration, synthesis respiration and net primary production). All of them in $g\,C \cdot m^{-2}$. |
+| `BiomassBalance` | Stand-level biomass balance components. All of them in $g\,dry \cdot m^{-2}$. |
 | `Temperature` | Minimum and maximum temperature values for topsoil, canopy and atmosphere (if `transpirationMode = "Sperry"`) |
 | `Soil`| Soil variables for each soil layer: Moisture relative to field capacity ($W_s$), water potential ($\Psi_s$) and volumetric water content ($V_s$). |
 | `Stand`| Stand-level variables, such as $LAI^{\phi}_{stand} = LAI^{live}_{stand}$, $LAI^{dead}_{stand}$, the water retention capacity of the canopy ($S_{canopy}$) or the fraction of light reaching the ground ($L^{PAR}_{ground}$ and $L^{SWR}_{ground}$).|

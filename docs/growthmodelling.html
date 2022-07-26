@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2022-07-23" />
+<meta name="date" content="2022-07-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -409,6 +409,7 @@ div.csl-indent {
 <li class="chapter" data-level="15.3.1" data-path="growthmodelling.html"><a href="growthmodelling.html#water-and-energy-balance"><i class="fa fa-check"></i><b>15.3.1</b> Water and energy balance</a></li>
 <li class="chapter" data-level="15.3.2" data-path="growthmodelling.html"><a href="growthmodelling.html#labile-carbon-balance"><i class="fa fa-check"></i><b>15.3.2</b> Labile carbon balance</a></li>
 <li class="chapter" data-level="15.3.3" data-path="growthmodelling.html"><a href="growthmodelling.html#biomass-balance"><i class="fa fa-check"></i><b>15.3.3</b> Biomass balance</a></li>
+<li class="chapter" data-level="15.3.4" data-path="growthmodelling.html"><a href="growthmodelling.html#stand-level-carbon-balance"><i class="fa fa-check"></i><b>15.3.4</b> Stand-level carbon balance</a></li>
 </ul></li>
 <li class="chapter" data-level="15.4" data-path="growthmodelling.html"><a href="growthmodelling.html#growthscheduling"><i class="fa fa-check"></i><b>15.4</b> Process scheduling</a>
 <ul>
@@ -842,6 +843,16 @@ B_{mortality} = (B_{plant} + \Delta{B_{plant}}) \cdot N_{dead}
 \end{equation}\]</span>
 where <span class="math inline">\(N_{dead}\)</span> is the density of dead individuals and <span class="math inline">\(B_{plant}\)</span> is the initial plant biomass.</p>
 </div>
+<div id="stand-level-carbon-balance" class="section level3 hasAnchor" number="15.3.4">
+<h3><span class="header-section-number">15.3.4</span> Stand-level carbon balance<a href="growthmodelling.html#stand-level-carbon-balance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>With the aim to produce outputs to be compared with Eddy-covariance flux data, the model produces aggregates of gross photosynthesis and respiration at the stand level, all expressed using units of <span class="math inline">\(g\,C\cdot m^{-2}\)</span>.</p>
+<ul>
+<li><em>Gross primary production</em> (<span class="math inline">\(GPP\)</span>) is the sum of gross photosynthesis across plant cohorts.</li>
+<li><em>Maintenance respiration</em> is the sum across cohorts of the carbon emitted to the atmosphere as a result of maintenance respiration, i.e. <span class="math inline">\(M\)</span>.</li>
+<li><em>Synthesis respiration</em> is the sum across cohorts of the carbon returned to the atmosphere as a result of the process of synthesizing new structures. Note that this is less than <span class="math inline">\(G\)</span>, as it does not include the carbon allocated to the new structures.</li>
+<li><em>Net primary production</em> (<span class="math inline">\(NPP\)</span>) is <span class="math inline">\(GPP\)</span> minus the maintenance and synthesis respiration terms.</li>
+</ul>
+</div>
 </div>
 <div id="growthscheduling" class="section level2 hasAnchor" number="15.4">
 <h2><span class="header-section-number">15.4</span> Process scheduling<a href="growthmodelling.html#growthscheduling" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -1265,46 +1276,50 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 <td>Energy balance components (instantaneous values) for the soil and the canopy</td>
 </tr>
 <tr class="odd">
-<td><code>BiomassBalance</code></td>
-<td>Stand-level biomass balance components</td>
+<td><code>CarbonBalance</code></td>
+<td>Stand-level carbon balance components (gross primary production, maintenance respiration, synthesis respiration and net primary production). All of them in <span class="math inline">\(g\,C \cdot m^{-2}\)</span>.</td>
 </tr>
 <tr class="even">
+<td><code>BiomassBalance</code></td>
+<td>Stand-level biomass balance components. All of them in <span class="math inline">\(g\,dry \cdot m^{-2}\)</span>.</td>
+</tr>
+<tr class="odd">
 <td><code>Temperature</code></td>
 <td>Minimum and maximum temperature values for topsoil, canopy and atmosphere (if <code>transpirationMode = "Sperry"</code>)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>Soil</code></td>
 <td>Soil variables for each soil layer: Moisture relative to field capacity (<span class="math inline">\(W_s\)</span>), water potential (<span class="math inline">\(\Psi_s\)</span>) and volumetric water content (<span class="math inline">\(V_s\)</span>).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>Stand</code></td>
 <td>Stand-level variables, such as <span class="math inline">\(LAI^{\phi}_{stand} = LAI^{live}_{stand}\)</span>, <span class="math inline">\(LAI^{dead}_{stand}\)</span>, the water retention capacity of the canopy (<span class="math inline">\(S_{canopy}\)</span>) or the fraction of light reaching the ground (<span class="math inline">\(L^{PAR}_{ground}\)</span> and <span class="math inline">\(L^{SWR}_{ground}\)</span>).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>Plants</code></td>
 <td>Plant-level variables, such as <span class="math inline">\(LAI^{phi}_i\)</span>, plant transpiration, plant water potential, etc.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>SunlitLeaves</code></td>
 <td>Leaf-level output variables for sunlit leaves (<code>transpirationMode = "Sperry"</code>).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>ShadeLeaves</code></td>
 <td>Leaf-level output variables for shade leaves (<code>transpirationMode = "Sperry"</code>).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>LabileCarbonBalance</code></td>
 <td>A list with the daily results of labile carbon balance components and carbon pools.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>PlantBiomassBalance</code></td>
 <td>A list with the daily results of biomass balance components for plant cohorts.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>PlantStructure</code></td>
 <td>A list with daily results of plant compartment sizes, in terms of area and biomass.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>GrowthMortality</code></td>
 <td>A list with daily results of growth rates for leaf, sapwood and fine roots; as well as daily mortality rates.</td>
 </tr>
