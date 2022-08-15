@@ -258,24 +258,24 @@ In contrast, growth simulation requires updating the structure of vegetation, i.
 
 ## Metereological input {#meteoinput}
 
-Weather input data must include variables calculated at the **daily** scale. Weather data should be arranged in a data frame with days in rows and variables in columns. The following table indicates the symbols, units, definitions and the variable name in R.
+Weather input data must include variables calculated at the **daily** scale. Weather data should be arranged in a data frame with days in **rows** and variables in **columns**. Dates are needed in **medfate** to estimate parameters like solar declination or the day of the year ($DOY$). Importantly, *dates* should be included as row names (in format *year-month-day*) of the input meteorology data frame.
 
-| Symbol | Units | R param | Description                        | Basic | Advanced |
-|--------|-------|---------|------------------------------------|--------|----------|
-| $T_{mean}$ | $^{\circ} \mathrm{C}$ | `MeanTemperature` | Mean temperature | Y | Y |
-| $T_{min}$ | $^{\circ} \mathrm{C}$ | `MinTemperature` | Minimum temperature | Y | Y |
-| $T_{max}$ | $^{\circ} \mathrm{C}$ | `MaxTemperature` | Maximum temperature | Y | Y |
-| $RH_{min}$ | % | `MinRelativeHumidity` | Minimum relative humidity | Y | Y |
-| $RH_{max}$ | % | `MaxRelativeHumidity` | Maximum relative humidity | Y | Y |
-| $P$ | $L \cdot m^{-2} = mm$ | `Precipitation` | Precipitation (either rainfall or snow). | Y | Y |
-| $PET$ | $L \cdot m^{-2} = mm$ | `PET` | Potential evapotranspiration, preferably calculated using Penman's (1948) equation | Y | N |
-| $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds | (opt.) | Y |
-| $u$ | $m \cdot s^{-1}$ | `WindSpeed` | Wind speed | Y | Y |
-| $C_{atm}$ | $ppm$ | `CO2` | Atmospheric (above-canopy) $CO_2$ concentration | N | Y |
+The following table indicates the symbols, units, definitions and the variable name in R.
 
-Dates are needed in **medfate** to estimate parameters like solar declination or the day of the year ($DOY$). Importantly, *dates* should be included as row names (in format *year-month-day*) of the input meteorology data frame. Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018], but other sources are possible.
+| Symbol | Units | R param | Description                        |
+|--------|-------|---------|------------------------------------|
+| $T_{min}$ | $^{\circ} \mathrm{C}$ | `MinTemperature` | Minimum temperature |
+| $T_{max}$ | $^{\circ} \mathrm{C}$ | `MaxTemperature` | Maximum temperature |
+| $RH_{min}$ | % | `MinRelativeHumidity` | Minimum relative humidity |
+| $RH_{max}$ | % | `MaxRelativeHumidity` | Maximum relative humidity |
+| $P$ | $L \cdot m^{-2} = mm$ | `Precipitation` | Precipitation (either rainfall or snow). |
+| $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds |
+| $u$ | $m \cdot s^{-1}$ | `WindSpeed` | Wind speed (optional) |
+| $C_{atm}$ | $ppm$ | `CO2` | Atmospheric (above-canopy) $CO_2$ concentration (optional) |
 
-Not all simulation models require all weather variables (see rightmost columns in the previous table). In particular, basic water balance modelling (chapter \@ref(basicwaterbalance)) requires much less information than advance water balance modelling (chapter \@ref(advancedwaterbalance)). The weather input requirements for modelling growth (chapter \@ref(growthmodelling)) or forest dynamics (chapter \@ref(dynamicsmodelling)) depend on the complexity of the water balance model used within it.
+ Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018], but other sources are possible.
+
+As an alternative to providing daily atmospheric $CO_2$ concentration values, simulation functions allow the user to provide $CO_2$ concentration values in **annual** time steps using a separate vector.
 
 While the weather variables listed in the table above are input requirements, **medfate** derives other atmospheric variables from them, using also topographic information (see [utility functions](http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual):
 
@@ -284,6 +284,8 @@ While the weather variables listed in the table above are input requirements, **
 | $P_{atm}$ | $kPa$ |  | Atmospheric pressure |
 | $\rho_{air}$ | $kg \cdot m^{-3}$ |  | Air density |
 | $e_{atm}$ | $kPa$ | | Atmospheric water vapor pressure |
+| $T_{mean}$ | $^{\circ} \mathrm{C}$ | `MeanTemperature` | Mean daily temperature |
+| $PET$ | $L \cdot m^{-2} = mm$ | `PET` | Potential evapotranspiration, calculated using Penman's (1948) equation |
 
 
 ## Simulation control {#controlparameters}

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 15 Forest growth model | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.28 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 15 Forest growth model | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2022-07-26" />
+<meta name="date" content="2022-08-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -912,7 +912,7 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 <p><strong>Vegetation</strong></p>
 <p>Vegetation input requirements were fully described in section <a href="model-inputs.html#vegetationinput">2.3</a>. Trees and shrubs do not need to be characterized with different variables in soil water balance calculations, since both kinds of cohort have a <span class="math inline">\(LAI\)</span> value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. <span class="math inline">\(LAI^{live}\)</span>, because one can assume no dead leaves in the canopy (i.e., <span class="math inline">\(LAI^{dead} = 0\)</span>). Note that vegetation characteristics are modified by simulations in this model.</p>
 <p><strong>Metereological input</strong></p>
-<p>Weather input data must include variables calculated at the <strong>daily</strong> scale. The variables required by function <code>growth()</code> depend on the transpiration mode, similarly to function <code>spwb()</code>. We recommend meteorological input to be generated using package <strong>meteoland</strong> <span class="citation">(<a href="#ref-DeCaceres2018" role="doc-biblioref">De Cáceres <em>et al.</em> 2018</a>)</span>.</p>
+<p>The minimum weather variables required to run the model are min/max temperatures (<span class="math inline">\(T_{min}\)</span> and <span class="math inline">\(T_{max}\)</span>), min/max relative humidity (<span class="math inline">\(RH_{min}\)</span> and <span class="math inline">\(RH_{max}\)</span>), precipitation (<span class="math inline">\(P\)</span>) and solar radiation (<span class="math inline">\(Rad\)</span>). Wind speed (<span class="math inline">\(u\)</span>) is also needed, but the user may use missing values if not available (a default value will be used in this case). Wind speed is assumed to have been measured at a specific height above the canopy (by default at 2 m). Atmospheric <span class="math inline">\(CO_2\)</span> concentration (<span class="math inline">\(C_{atm}\)</span>) may also be specified, but if missing a default constant value is assumed, which is taken from the control parameters. Definitions and units of these variables were given in section <a href="model-inputs.html#meteoinput">2.4</a>.</p>
 </div>
 <div id="growthvegetationparameters" class="section level3 hasAnchor" number="15.5.2">
 <h3><span class="header-section-number">15.5.2</span> Vegetation functional parameters<a href="growthmodelling.html#growthvegetationparameters" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -1632,9 +1632,6 @@ Cabon, A., Peters, R.L., Fonti, P., Martínez‐Vilalta, J. &amp; De Cáceres, M
 <div id="ref-Cannell2000" class="csl-entry">
 Cannell, M.G.R. &amp; Thornley, J.H.M. (2000). <a href="https://doi.org/10.1006/anbo.1999.0996"><span class="nocase">Modelling the Components of Plant Respiration: Some Guiding Principles</span></a>. <em>Annals of Botany</em>, 85, 45–54.
 </div>
-<div id="ref-DeCaceres2018" class="csl-entry">
-De Cáceres, M., Martin-StPaul, N., Turco, M., Cabon, A. &amp; Granda, V. (2018). <a href="https://doi.org/10.1016/j.envsoft.2018.08.003"><span class="nocase">Estimating daily meteorological data and downscaling climate models over landscapes</span></a>. <em>Environmental Modelling &amp; Software</em>, 108, 186–196.
-</div>
 <div id="ref-Dietze2014" class="csl-entry">
 Dietze, M.C., Sala, A., Carbone, M.S., Czimczik, C.I., Mantooth, J.A., Richardson, A.D., <em>et al.</em> (2014). <a href="https://doi.org/10.1146/annurev-arplant-050213-040054"><span class="nocase">Nonstructural Carbon in Woody Plants</span></a>. <em>Annual Review of Plant Biology</em>, 65, 667–687.
 </div>
@@ -1789,7 +1786,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');

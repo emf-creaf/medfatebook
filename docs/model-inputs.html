@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 2 Model inputs | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.28 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 2 Model inputs | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2022-07-26" />
+<meta name="date" content="2022-08-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1123,15 +1123,14 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 </div>
 <div id="meteoinput" class="section level2 hasAnchor" number="2.4">
 <h2><span class="header-section-number">2.4</span> Metereological input<a href="model-inputs.html#meteoinput" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Weather input data must include variables calculated at the <strong>daily</strong> scale. Weather data should be arranged in a data frame with days in rows and variables in columns. The following table indicates the symbols, units, definitions and the variable name in R.</p>
+<p>Weather input data must include variables calculated at the <strong>daily</strong> scale. Weather data should be arranged in a data frame with days in <strong>rows</strong> and variables in <strong>columns</strong>. Dates are needed in <strong>medfate</strong> to estimate parameters like solar declination or the day of the year (<span class="math inline">\(DOY\)</span>). Importantly, <em>dates</em> should be included as row names (in format <em>year-month-day</em>) of the input meteorology data frame.</p>
+<p>The following table indicates the symbols, units, definitions and the variable name in R.</p>
 <table>
 <colgroup>
-<col width="10%" />
-<col width="8%" />
+<col width="13%" />
 <col width="11%" />
-<col width="46%" />
-<col width="10%" />
-<col width="12%" />
+<col width="15%" />
+<col width="60%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1139,97 +1138,69 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <th>Units</th>
 <th>R param</th>
 <th>Description</th>
-<th>Basic</th>
-<th>Advanced</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\(T_{mean}\)</span></td>
-<td><span class="math inline">\(^{\circ} \mathrm{C}\)</span></td>
-<td><code>MeanTemperature</code></td>
-<td>Mean temperature</td>
-<td>Y</td>
-<td>Y</td>
-</tr>
-<tr class="even">
 <td><span class="math inline">\(T_{min}\)</span></td>
 <td><span class="math inline">\(^{\circ} \mathrm{C}\)</span></td>
 <td><code>MinTemperature</code></td>
 <td>Minimum temperature</td>
-<td>Y</td>
-<td>Y</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(T_{max}\)</span></td>
 <td><span class="math inline">\(^{\circ} \mathrm{C}\)</span></td>
 <td><code>MaxTemperature</code></td>
 <td>Maximum temperature</td>
-<td>Y</td>
-<td>Y</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(RH_{min}\)</span></td>
 <td>%</td>
 <td><code>MinRelativeHumidity</code></td>
 <td>Minimum relative humidity</td>
-<td>Y</td>
-<td>Y</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(RH_{max}\)</span></td>
 <td>%</td>
 <td><code>MaxRelativeHumidity</code></td>
 <td>Maximum relative humidity</td>
-<td>Y</td>
-<td>Y</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(P\)</span></td>
 <td><span class="math inline">\(L \cdot m^{-2} = mm\)</span></td>
 <td><code>Precipitation</code></td>
 <td>Precipitation (either rainfall or snow).</td>
-<td>Y</td>
-<td>Y</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(PET\)</span></td>
-<td><span class="math inline">\(L \cdot m^{-2} = mm\)</span></td>
-<td><code>PET</code></td>
-<td>Potential evapotranspiration, preferably calculated using Penman’s (1948) equation</td>
-<td>Y</td>
-<td>N</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(Rad\)</span></td>
 <td><span class="math inline">\(MJ \cdot m^{-2}\)</span></td>
 <td><code>Radiation</code></td>
 <td>Solar radiation after accounting for clouds</td>
-<td>(opt.)</td>
-<td>Y</td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(u\)</span></td>
 <td><span class="math inline">\(m \cdot s^{-1}\)</span></td>
 <td><code>WindSpeed</code></td>
-<td>Wind speed</td>
-<td>Y</td>
-<td>Y</td>
+<td>Wind speed (optional)</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(C_{atm}\)</span></td>
 <td><span class="math inline">\(ppm\)</span></td>
 <td><code>CO2</code></td>
-<td>Atmospheric (above-canopy) <span class="math inline">\(CO_2\)</span> concentration</td>
-<td>N</td>
-<td>Y</td>
+<td>Atmospheric (above-canopy) <span class="math inline">\(CO_2\)</span> concentration (optional)</td>
 </tr>
 </tbody>
 </table>
-<p>Dates are needed in <strong>medfate</strong> to estimate parameters like solar declination or the day of the year (<span class="math inline">\(DOY\)</span>). Importantly, <em>dates</em> should be included as row names (in format <em>year-month-day</em>) of the input meteorology data frame. Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package <strong>meteoland</strong> <span class="citation">(<a href="#ref-DeCaceres2018" role="doc-biblioref">De Cáceres <em>et al.</em> 2018</a>)</span>, but other sources are possible.</p>
-<p>Not all simulation models require all weather variables (see rightmost columns in the previous table). In particular, basic water balance modelling (chapter <a href="basicwaterbalance.html#basicwaterbalance">3</a>) requires much less information than advance water balance modelling (chapter <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>). The weather input requirements for modelling growth (chapter <a href="growthmodelling.html#growthmodelling">15</a>) or forest dynamics (chapter <a href="dynamicsmodelling.html#dynamicsmodelling">18</a>) depend on the complexity of the water balance model used within it.</p>
+<p>Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package <strong>meteoland</strong> <span class="citation">(<a href="#ref-DeCaceres2018" role="doc-biblioref">De Cáceres <em>et al.</em> 2018</a>)</span>, but other sources are possible.</p>
+<p>As an alternative to providing daily atmospheric <span class="math inline">\(CO_2\)</span> concentration values, simulation functions allow the user to provide <span class="math inline">\(CO_2\)</span> concentration values in <strong>annual</strong> time steps using a separate vector.</p>
 <p>While the weather variables listed in the table above are input requirements, <strong>medfate</strong> derives other atmospheric variables from them, using also topographic information (see <a href="http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils">utility functions</a> of the <strong>meteoland</strong> reference manual):</p>
 <table>
+<colgroup>
+<col width="13%" />
+<col width="11%" />
+<col width="15%" />
+<col width="60%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Symbol</th>
@@ -1257,6 +1228,18 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <td></td>
 <td>Atmospheric water vapor pressure</td>
 </tr>
+<tr class="even">
+<td><span class="math inline">\(T_{mean}\)</span></td>
+<td><span class="math inline">\(^{\circ} \mathrm{C}\)</span></td>
+<td><code>MeanTemperature</code></td>
+<td>Mean daily temperature</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(PET\)</span></td>
+<td><span class="math inline">\(L \cdot m^{-2} = mm\)</span></td>
+<td><code>PET</code></td>
+<td>Potential evapotranspiration, calculated using Penman’s (1948) equation</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1264,30 +1247,41 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <h2><span class="header-section-number">2.5</span> Simulation control<a href="model-inputs.html#controlparameters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Simulation control parameters are a list of global parameter values, initialized using function <code>defaultControl()</code>, that the user can modify to change the general behavior of simulation functions. Here is the set of global control parameters currently accepted in <strong>medfate</strong>:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="model-inputs.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
-<pre><code>##  [1] &quot;fillMissingRootParams&quot;               &quot;fillMissingSpParams&quot;                 &quot;verbose&quot;                            
-##  [4] &quot;subdailyResults&quot;                     &quot;transpirationMode&quot;                   &quot;soilFunctions&quot;                      
-##  [7] &quot;defaultWindSpeed&quot;                    &quot;defaultCO2&quot;                          &quot;snowpack&quot;                           
-## [10] &quot;leafPhenology&quot;                       &quot;rockyLayerDrainage&quot;                  &quot;unlimitedSoilWater&quot;                 
-## [13] &quot;rhizosphereOverlap&quot;                  &quot;unfoldingDD&quot;                         &quot;verticalLayerSize&quot;                  
-## [16] &quot;windMeasurementHeight&quot;               &quot;cavitationRefill&quot;                    &quot;ndailysteps&quot;                        
-## [19] &quot;nsubsteps&quot;                           &quot;capacitance&quot;                         &quot;taper&quot;                              
-## [22] &quot;multiLayerBalance&quot;                   &quot;maximumStemConductance&quot;              &quot;klatstem&quot;                           
-## [25] &quot;klatleaf&quot;                            &quot;numericParams&quot;                       &quot;fracLeafResistance&quot;                 
-## [28] &quot;fracRootResistance&quot;                  &quot;averageFracRhizosphereResistance&quot;    &quot;thermalCapacityLAI&quot;                 
-## [31] &quot;boundaryLayerSize&quot;                   &quot;refillMaximumRate&quot;                   &quot;allowDessication&quot;                   
-## [34] &quot;allowStarvation&quot;                     &quot;allowDefoliation&quot;                    &quot;sinkLimitation&quot;                     
-## [37] &quot;shrubDynamics&quot;                       &quot;allocationStrategy&quot;                  &quot;nonStomatalPhotosynthesisLimitation&quot;
-## [40] &quot;phloemConductanceFactor&quot;             &quot;nonSugarConcentration&quot;               &quot;equilibriumOsmoticConcentration&quot;    
-## [43] &quot;minimumRelativeStarchForGrowth&quot;      &quot;constructionCosts&quot;                   &quot;senescenceRates&quot;                    
-## [46] &quot;maximumRelativeGrowthRates&quot;          &quot;mortalityMode&quot;                       &quot;mortalityBaselineRate&quot;              
-## [49] &quot;mortalityRelativeSugarThreshold&quot;     &quot;mortalityRWCThreshold&quot;               &quot;allowRecruitment&quot;                   
-## [52] &quot;recruitmentMode&quot;                     &quot;removeEmptyCohorts&quot;                  &quot;minimumCohortDensity&quot;               
-## [55] &quot;seedRain&quot;                            &quot;seedProductionTreeHeight&quot;            &quot;seedProductionShrubHeight&quot;          
-## [58] &quot;probRecr&quot;                            &quot;minTempRecr&quot;                         &quot;minMoistureRecr&quot;                    
-## [61] &quot;minFPARRecr&quot;                         &quot;recrTreeDBH&quot;                         &quot;recrTreeDensity&quot;                    
-## [64] &quot;recrTreeHeight&quot;                      &quot;recrShrubCover&quot;                      &quot;recrShrubHeight&quot;                    
-## [67] &quot;recrTreeZ50&quot;                         &quot;recrShrubZ50&quot;                        &quot;recrTreeZ95&quot;                        
-## [70] &quot;recrShrubZ95&quot;</code></pre>
+<pre><code>##  [1] &quot;fillMissingRootParams&quot;               &quot;fillMissingSpParams&quot;                
+##  [3] &quot;verbose&quot;                             &quot;subdailyResults&quot;                    
+##  [5] &quot;transpirationMode&quot;                   &quot;soilFunctions&quot;                      
+##  [7] &quot;defaultWindSpeed&quot;                    &quot;defaultCO2&quot;                         
+##  [9] &quot;snowpack&quot;                            &quot;leafPhenology&quot;                      
+## [11] &quot;rockyLayerDrainage&quot;                  &quot;unlimitedSoilWater&quot;                 
+## [13] &quot;rhizosphereOverlap&quot;                  &quot;unfoldingDD&quot;                        
+## [15] &quot;verticalLayerSize&quot;                   &quot;windMeasurementHeight&quot;              
+## [17] &quot;cavitationRefill&quot;                    &quot;ndailysteps&quot;                        
+## [19] &quot;nsubsteps&quot;                           &quot;capacitance&quot;                        
+## [21] &quot;taper&quot;                               &quot;multiLayerBalance&quot;                  
+## [23] &quot;maximumStemConductance&quot;              &quot;klatstem&quot;                           
+## [25] &quot;klatleaf&quot;                            &quot;numericParams&quot;                      
+## [27] &quot;fracLeafResistance&quot;                  &quot;fracRootResistance&quot;                 
+## [29] &quot;averageFracRhizosphereResistance&quot;    &quot;thermalCapacityLAI&quot;                 
+## [31] &quot;boundaryLayerSize&quot;                   &quot;refillMaximumRate&quot;                  
+## [33] &quot;allowDessication&quot;                    &quot;allowStarvation&quot;                    
+## [35] &quot;allowDefoliation&quot;                    &quot;sinkLimitation&quot;                     
+## [37] &quot;shrubDynamics&quot;                       &quot;allocationStrategy&quot;                 
+## [39] &quot;nonStomatalPhotosynthesisLimitation&quot; &quot;phloemConductanceFactor&quot;            
+## [41] &quot;nonSugarConcentration&quot;               &quot;equilibriumOsmoticConcentration&quot;    
+## [43] &quot;minimumRelativeStarchForGrowth&quot;      &quot;constructionCosts&quot;                  
+## [45] &quot;senescenceRates&quot;                     &quot;maximumRelativeGrowthRates&quot;         
+## [47] &quot;mortalityMode&quot;                       &quot;mortalityBaselineRate&quot;              
+## [49] &quot;mortalityRelativeSugarThreshold&quot;     &quot;mortalityRWCThreshold&quot;              
+## [51] &quot;allowRecruitment&quot;                    &quot;recruitmentMode&quot;                    
+## [53] &quot;removeEmptyCohorts&quot;                  &quot;minimumCohortDensity&quot;               
+## [55] &quot;seedRain&quot;                            &quot;seedProductionTreeHeight&quot;           
+## [57] &quot;seedProductionShrubHeight&quot;           &quot;probRecr&quot;                           
+## [59] &quot;minTempRecr&quot;                         &quot;minMoistureRecr&quot;                    
+## [61] &quot;minFPARRecr&quot;                         &quot;recrTreeDBH&quot;                        
+## [63] &quot;recrTreeDensity&quot;                     &quot;recrTreeHeight&quot;                     
+## [65] &quot;recrShrubCover&quot;                      &quot;recrShrubHeight&quot;                    
+## [67] &quot;recrTreeZ50&quot;                         &quot;recrShrubZ50&quot;                       
+## [69] &quot;recrTreeZ95&quot;                         &quot;recrShrubZ95&quot;</code></pre>
 <p>Control parameters are employed when initializing vegetation inputs and state variables using functions <code>spwbInput()</code> and <code>growthInput()</code>, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as <code>spwb()</code> or <code>growth()</code>. Function <code>fordyn()</code> is different than the other simulation functions, because the list control parameters is directly passed to the function.</p>
 <p>Even if the list of control parameters is large, not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), and most of them should not be altered from their default values. However, there are a set of parameters that are relevant learning:</p>
 <ul>
@@ -1405,7 +1399,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');
