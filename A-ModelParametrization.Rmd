@@ -722,34 +722,22 @@ for(i in 1:length(pres)) {
                      krootmax, rootc,rootd, 
                      kstemmax, stemc, stemd,
                      kleafmax, leafc, leafd)
-  sfn1 = hydraulics_supplyFunctionNetwork(psiSoilLayers1,
-                                  krhizomaxvec1,s$VG_n,s$VG_alpha,
-                                  krootmaxvec, rootc,rootd,
-                                  kstemmax, stemc,stemd,
-                                  kleafmax, leafc, leafd,
-                                  PLCstem = plcCav,
-                                  maxNsteps = 400)
-  sfn2 = hydraulics_supplyFunctionNetwork(psiSoilLayers2,
-                                  krhizomaxvec1,s$VG_n,s$VG_alpha,
-                                  krootmaxvec, rootc,rootd,
-                                  kstemmax, stemc,stemd,
-                                  kleafmax, leafc, leafd,
-                                  PLCstem = plcCav,
-                                  maxNsteps = 400)
-  sfn3 = hydraulics_supplyFunctionNetwork(psiSoilLayers3,
-                                  krhizomaxvec1,s$VG_n,s$VG_alpha,
-                                  krootmaxvec, rootc,rootd,
-                                  kstemmax, stemc,stemd,
-                                  kleafmax, leafc, leafd,
-                                  PLCstem = plcCav,
-                                  maxNsteps = 400)
-  sfn4 = hydraulics_supplyFunctionNetwork(psiSoilLayers4,
-                                  krhizomaxvec1,s$VG_n,s$VG_alpha,
-                                  krootmaxvec, rootc,rootd,
-                                  kstemmax, stemc,stemd,
-                                  kleafmax, leafc, leafd,
-                                  PLCstem = plcCav,
-                                  maxNsteps = 400)
+  hn1 <- list("psisoil" = psiSoilLayers1,
+             "krhizomax" = krhizomaxvec1, "nsoil" = s$VG_n, "alphasoil" = s$VG_alpha,
+             "krootmax" = krootmaxvec, "rootc" = rootc, "rootd" = rootd,
+             "kstemmax" = kstemmax, "stemc" = stemc, "stemd" = stemd,
+             "kleafmax" = kleafmax, "leafc" = leafc, "leafd" = leafd,
+             "PLCstem" =plcCav)
+  sfn1 = hydraulics_supplyFunctionNetwork(hn1, maxNsteps = 400)
+  hn2 <- hn1
+  hn2$psisoil <- psiSoilLayers2
+  sfn2 = hydraulics_supplyFunctionNetwork(hn2, maxNsteps = 400)
+  hn3 <- hn1
+  hn3$psisoil <- psiSoilLayers3
+  sfn3 = hydraulics_supplyFunctionNetwork(hn3, maxNsteps = 400)
+  hn4 <- hn1
+  hn4$psisoil <- psiSoilLayers4
+  sfn4 = hydraulics_supplyFunctionNetwork(hn4, maxNsteps = 400)
   if(i==1) {
     plot(-sfn1$psiLeaf, sfn1$E ,type="l", ylab="Flow rate  (mmol·m-2·s-1)", 
        xlab = "Leaf Pressure (-MPa)",  main="",  xlim=c(0, 7), ylim=c(0,max(sfn1$E)), lwd=1, col = col1)
