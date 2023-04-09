@@ -6,17 +6,17 @@ This chapter provides an overview of the purpose of developing the **medfate** a
 
 ## Purpose
 
-Being able to anticipate the impact of global change on forests is one of the major environmental challenges in contemporary societies. However, uncertainties in how forest ecosystems function and practical constraints in how to integrate available information still hinder the availability of robust and reliable predictive models. Despite the amount of knowledge accumulated about the functioning and dynamics of forest ecosystems and the plethora of modelling tools already available, further efforts are necessary to achieve the challenge of integrating different global change drivers into simulation tools useful for research and applications.
+Being able to anticipate the impact of global change on forest function and dynamics is one of the major environmental challenges in contemporary societies. However, uncertainties in the mechanisms underpinning forest function and practical constraints in how to integrate available information still hinder the availability of robust and reliable predictive models. Despite the amount of knowledge accumulated about the function and dynamics of forest ecosystems and the plethora of modelling tools already available, further efforts are necessary to achieve the challenge of integrating different global change drivers into simulation tools useful for research and applications.
 
 ### Package medfate
 
-The R package **medfate** has been designed as a platform to simulate the functioning and dynamics of individual forest stands at temporal scales from days to years. Climate is the main environmental driver covered by the package and the ecological, hydrological and physiological processes surrounding these are fundamental for the simulation models included in the package. In particular, the package allows the simulation of water balance of soils and plants within forest stands. It also allows simulating plant growth, mortality and recruitment processes of a set of cohorts competing for light and water within a forest stand. Finally, additional package functions allow relating the amount of plant biomass and the water status of plant tissues to fuel characteristics and, hence, fire hazard.
+The R package **medfate** has been designed as a platform to simulate the function and dynamics of individual forest stands at temporal scales from days to years. Climate is the main environmental driver covered by the package and the ecological, hydrological and physiological processes surrounding these are fundamental for the simulation models included in the package. In particular, the package allows the simulation of daily water balance of soils and plants within forest stands. It also allows simulating plant growth, mortality and recruitment processes of a set of cohorts competing for light and water within a forest stand. Finally, additional package functions allow relating the amount of plant biomass and the water status of plant tissues to fuel characteristics and, hence, fire hazard.
 
 The version of the reference manual that you are reading is intended to reflect **version `r packageVersion("medfate")`** of the package.
 
 ### Package medfateland
 
-The R package **medfateland** has been designed to extend the capabilities of **medfate** to the landscape level. It allows running the stand-level models available in **medfate** on points and cells within landscape. More importantly, the package allows considering spatial hydrological processes in forested watersheds. Hence, **medfateland** can be used as a tool for eco-hydrological applications.   
+The R package **medfateland** has been designed to extend the capabilities of **medfate** to the landscape and regional levels. It allows running the stand-level models available in **medfate** on a set of spatial units (normally points or cells) within a target area. The package allows coordinating the dynamics of multiple stands via the evaluation of demand-based management scenarios. More importantly, the package allows considering spatial hydrological processes in forested watersheds. Hence, **medfateland** can be used as a tool for eco-hydrological applications.   
 
 The version of the reference manual that you are reading is intended to reflect **version `r packageVersion("medfateland")`** of the package.
 
@@ -24,7 +24,7 @@ The version of the reference manual that you are reading is intended to reflect 
 
 ### medfate
 
-Package **medfate** can be found at [CRAN](https://CRAN.R-project.org/package=medfate), where it is updated every few months. Hence, it can be installed using:
+Package **medfate** can be found at [CRAN](https://CRAN.R-project.org/package=medfate), where it is updated every few months. Hence, it can be installed as any other R package using:
 ```{r eval=FALSE}
 install.packages("medfate")
 ```
@@ -42,6 +42,7 @@ remotes::install_github("emf-creaf/medfate",
                          build_opts = c("--no-resave-data", "--no-manual"),
                          build_vignettes = TRUE)
 ```
+
 
 Among other dependencies, installing **medfate** requires package **meteoland**, as it links to some of its C++ functions. Note that some package dependencies are only *suggested*, so that they are not automatically installed when installing **medfate**.
 
@@ -64,7 +65,8 @@ remotes::install_github("emf-creaf/medfateland",
 
 ### Installation from sources
 
-Both packages have a user interface in R, but actual calculations have been implemented as C++ functions and linked to R via the **Rcpp** package. This means that you will need a compiler to install **medfate** and **medfateland** packages from sources (i.e. Rtools in Windows).
+Both packages have a user interface in R, but actual calculations have been implemented as C++ functions and linked to R via the **Rcpp** package. This means that you will need a compiler to install **medfate** and **medfateland** packages from sources (i.e. Rtools in Windows). Note that compilers will be a requirement when installing packages from GitHub. 
+
 
 ## Data structures and functions in medfate
 
@@ -81,16 +83,16 @@ Package **medfate** deals with simulations at stand level and, hence, the data s
 
 Dynamic simulation functions in **medfate** include three nested simulation levels (Fig. \@ref(fig:models)):
 
-  1. Forest water and energy balance can be studied for a given forest stand using function `spwb()` (soil-plant-water-balance). The same function is used to run two models of different degree of complexity (*basic* or *advanced*; see Fig. \@ref(fig:models)), from which the user should choose depending on the intended application and data availability. Water balance simulations include hydrological processes (rainfall interception, soil infiltration, percolation and evapotranspiration) and plant physiological processes related to transpiration (hydraulics, photosynthesis and stomatal regulation). Most processes are implemented at the daily scale, although some operate at subdaily time steps. Function `spwb()` has a closely related function `spwb.day()` that allows focusing on subdaily processes. Finally, one can simulate plant physiological processes only, while having soil moisture as a prescribed dynamic input like weather, using function `pwb()` (plant-water-balance).
-  2. Changes in primary (leaf area) and secondary (sapwood) growth are key to evaluate the influence of climatic conditions on plant and forest structure and function. Function `growth()` extends the previous models because it allows simulating carbon balance, growth and mortality of a set of plant cohorts competing for light and water in a given forest stand. Analogously to the simulation of water balance, `growth()` has a closely related function `growth.day()` that allows focusing on sub-daily processes (i.e. carbon balance). 
-  3. Finally, function `fordyn()` complements growth and mortality processes with recruitment (from seeds), thus completing the minimum set of demographic processes needed to simulate forest dynamics. The function splits the period to be simulated by years and makes internal calls to `growth()` for the simulation of growth and mortality. `fordyn()` is suited to simulate the inter-annual variation in forest structure and composition, while accounting for the biophysical and physiological processes provided by the former models.
+  1. Forest water and energy balance can be studied for a given forest stand using function `spwb()` (soil-plant-water-balance). The same function is used to run three different models (`Granier`, `Sperry` or `Cochard`), that correspond to two levels of different degree of complexity (*basic* or *advanced*; see Fig. \@ref(fig:models)). The user should choose one model or another depending on the intended application and data availability. Water balance simulations include hydrological processes (rainfall interception, soil infiltration, percolation and evapotranspiration) and plant physiological processes related to transpiration (hydraulics, photosynthesis and stomatal regulation). Most processes are implemented at the daily scale, although some operate at subdaily time steps for *advanced* models. Function `spwb()` has a closely related function `spwb.day()` that allows focusing on sub-daily processes. Finally, one can simulate plant physiological processes only, while having soil moisture as a prescribed dynamic input like weather, using function `pwb()` (plant-water-balance).
+  2. Changes in primary (leaf area) and secondary (sapwood) growth are key to evaluate the influence of climatic conditions on plant and forest structure and function. Function `growth()` extends the previous models because it allows simulating carbon balance, tissue growth and mortality of a set of plant cohorts competing for light and water in a given forest stand. Analogously to the simulation of water balance, `growth()` has a closely related function `growth.day()` that allows focusing on sub-daily processes (i.e. carbon balance). 
+  3. Finally, function `fordyn()` complements growth and mortality processes with recruitment (from seeds) and resprouting, thus completing the minimum set of demographic processes needed to simulate Mediterranean forest dynamics. The function splits the period to be simulated by years and makes internal calls to `growth()` for the simulation of growth and mortality. `fordyn()` is suited to simulate the inter-annual variation in forest structure and composition, while accounting for the biophysical and physiological processes provided by the former models. In addition, in allows simulating human interventions (i.e. tree or shrub cuts) on forest stands.
   
 ```{r models, out.width='100%', fig.align="center", fig.cap="Nested relationships between simulation functions and  processes included in each model", echo=FALSE}
 knitr::include_graphics("models.png")
 
 ```
 
-Importantly, `growth()` and `fordyn()` functions and the processes that they implements are still **under development**.
+Importantly, `growth()` and `fordyn()` functions and the processes that they implements are still **under active development**.
 
 ### Sub-model functions
 
@@ -134,25 +136,17 @@ Vegetation functioning and dynamics have strong, but complex, effects on fire ha
 
 ### Data structures
 
-Package **medfateland** allows simulating forest functioning and dynamics on sets forests stands distributed across space. Three S4 classes have been defined to facilitate simulations on particular locations and over grids. They extend spatial classes from package **meteoland**
-
-+ S4 class `SpatialPointsLandscape` contains a list of soil and forest stand descriptions along with the spatial location of stands. It extends class `SpatialPointsTopography`.
-+ S4 class `SpatialPixelsLandscape` contains a set of soil and forest stand descriptions along with the location over a grid of the corresponding set of pixels. It extends class `SpatialPixelsTopography`.
-+ S4 class `SpatialGridLandscape` contains a set of soil and forest stand descriptions along with the location over a full grid. It extends class `SpatialGridTopography`.
-
-While simulation functions in the package can be run sequentially on individual forest stands of the former classes, the package has been designed so that it could be part of a broader modelling infrastructure including *spatial hydrological processes*, notably surface and sub-surface lateral water flows. An additional S4 class has been defined for this purpose.
-
-+ S4 class `DistributedWatershed` contains a set of soil and forest stand descriptions along with the location over a grid of the corresponding set of pixels, because it extends class `SpatialPixelsLandscape`. In addition, however, `DistributedWatershed` includes many other spatial layers, such as list of discharge values to neighbors, an integer vector of cell processing order or the water content of the underlying aquifer. 
+Package **medfateland** allows simulating forest functioning and dynamics on sets forests stands distributed across space. Spatial information needs to be provided in `sf` objects, whose columns typically include spatial geometries, topographic features and lists of `forest` objects and `soil` objects. The actual columns required depend on the simulation function to be used. For example, if forest dynamics includes forest management, the user may supply management arguments for each spatial unit in an additional column.
 
 ### Dynamic simulation functions
 
-Package **medfateland** offers sets of simulation functions for the first three S4 classes presented above. Simulations available are analogous to those of package **medfate**:
+Package **medfateland** offers sets of simulation functions that are analogous to those of package **medfate** but allow processing multiple forest stands sequentially or in parallel:
 
-+ Forest water and energy balance can be studied for a set of forest stands using functions `spwbpoints()`, `spwbpixels()` and  `spwbgrid()` .
-+ Growth and mortality of a set of plant cohorts competing for light and water can be simulated for a set of forest stands using functions `growthpoints()`, `growthpixels()` and `growthgrid()` .
-+ Forest dynamics arising from competition for light and water can be simulated for a set of forest stands using functions `fordynpoints()`, `fordynpixels()` and `fordyngrid()` .
++ Forest water and energy balance can be studied for a set of forest stands using functions `spwb_spatial()` or `spwb_spatial_day()`.
++ Growth and mortality of a set of plant cohorts competing for light and water can be simulated for a set of forest stands using functions `growth_spatial()` or `growth_spatial_day()`.
++ Forest dynamics arising from competition for light and water can be simulated for a set of forest stands using function `fordyn_spatial()`.
 
-In addition, the package offers a simulation function tailored to be used with objects of class `DistributedWatershed`:
+In addition, the package offers simulation functions where forest stands are related by spatial processes:
 
-+ Function `wswb()` is distributed hydrological model that simulates daily water balance on the cells of a watershed while accounting for overland runoff, subsurface flow and groundwater flow between cells.
-
++ Functions `spwb_land()` and `growth_land()` include distributed hydrological models that allow simulating daily water balance or growth processes on the cells of a watershed while accounting for overland runoff, subsurface flow and groundwater flow between cells.
++ Function `fordyn_scenario()` allows simulating `fordyn()` on forest stands, while applying a demand-based forest management scenario.

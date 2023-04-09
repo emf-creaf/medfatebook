@@ -260,18 +260,18 @@ In contrast, growth simulation requires updating the structure of vegetation, i.
 
 Weather input data must include variables calculated at the **daily** scale. Weather data should be arranged in a data frame with days in **rows** and variables in **columns**. Dates are needed in **medfate** to estimate parameters like solar declination or the day of the year ($DOY$). Importantly, *dates* should be included as row names (in format *year-month-day*) of the input meteorology data frame.
 
-The following table indicates the symbols, units, definitions and the variable name in R.
+The following table indicates the symbols, units, definitions and the variable name in R of all weather variables. Some of them are optional, as indicated in the right-most column (missing values will be replaced by defaults defined in control parameters).
 
-| Symbol | Units | R param | Description                        |
-|--------|-------|---------|------------------------------------|
-| $T_{min}$ | $^{\circ} \mathrm{C}$ | `MinTemperature` | Minimum temperature |
-| $T_{max}$ | $^{\circ} \mathrm{C}$ | `MaxTemperature` | Maximum temperature |
-| $RH_{min}$ | % | `MinRelativeHumidity` | Minimum relative humidity |
-| $RH_{max}$ | % | `MaxRelativeHumidity` | Maximum relative humidity |
-| $P$ | $L \cdot m^{-2} = mm$ | `Precipitation` | Precipitation (either rainfall or snow). |
-| $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds |
-| $u$ | $m \cdot s^{-1}$ | `WindSpeed` | Wind speed (optional) |
-| $C_{atm}$ | $ppm$ | `CO2` | Atmospheric (above-canopy) $CO_2$ concentration (optional) |
+| Symbol | Units | R param | Description                        | Optional |
+|--------|-------|---------|------------------------------------|----------|
+| $T_{min}$ | $^{\circ} \mathrm{C}$ | `MinTemperature` | Minimum temperature | No |
+| $T_{max}$ | $^{\circ} \mathrm{C}$ | `MaxTemperature` | Maximum temperature | No |
+| $RH_{min}$ | % | `MinRelativeHumidity` | Minimum relative humidity | No |
+| $RH_{max}$ | % | `MaxRelativeHumidity` | Maximum relative humidity | No |
+| $P$ | $L \cdot m^{-2} = mm$ | `Precipitation` | Precipitation (either rainfall or snow). | No |
+| $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds | No |
+| $u$ | $m \cdot s^{-1}$ | `WindSpeed` | Wind speed | Yes |
+| $C_{atm}$ | $ppm$ | `CO2` | Atmospheric (above-canopy) $CO_2$ concentration | Yes |
 
  Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018], but other sources are possible.
 
@@ -296,12 +296,12 @@ names(defaultControl())
 ```
 
 
-Control parameters are employed when initializing vegetation inputs and state variables using functions `spwbInput()` and `growthInput()`, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as `spwb()` or `growth()`. Function `fordyn()` is different than the other simulation functions, because the list control parameters is directly passed to the function.
+Control parameters are employed when initializing vegetation inputs and state variables using functions `forest2spwbInput()` and `forest2growthInput()`, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as `spwb()` or `growth()`. Function `fordyn()` is different than the other simulation functions, because the list control parameters is directly passed to the function.
 
 Even if the list of control parameters is large, not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), and most of them should not be altered from their default values. However, there are a set of parameters that are relevant learning:
 
 + `verbose [=TRUE]`: Whether extra console output is desired during simulations.
-+ `fillMissingSpParams [=TRUE]`: Boolean flag to indicate that functions ` spwbInput()` and `growthInput()` should provide estimates for functional parameters if these are lacking in the species parameter table `SpParams`. Note that if `fillMissingSpParams` is set to `FALSE` then simulations may fail if the user does not provide values for required parameters.
-+ `subdailyResults [=FALSE]`: Boolean flag to force subdaily results to be stored in calls to `spwb()`. Subdaily results are returned as a list called `subdaily` of `spwb_day` objects, one by simulated date. In function `fordyn()` option `subdailyResults` is always set to `FALSE` and, hence, subdaily results are not possible.
-+ `transpirationMode [="Granier"]` is an important control parameter, because it allows the user to switch between the *basic* and *advanced* water balance models (chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). 
++ `fillMissingRootParams [= TRUE]`: Boolean flag to indicate that initialization functions should provide estimates for `Z50` and `Z95` if these are lacking in the forest data. Note that if `fillMissingRootParams` is set to `FALSE` then simulations may fail if the user does not provide values for `Z50` and `Z95` in tree or shrub data.
++ `fillMissingSpParams [=TRUE]`: Boolean flag to indicate that initialization functions should provide estimates for functional parameters if these are lacking in the species parameter table `SpParams`. Note that if `fillMissingSpParams` is set to `FALSE` then simulations may fail if the user does not provide values for required parameters.
++ `transpirationMode [="Granier"]` is an important control parameter, because it allows the user to switch between the *basic* (i.e. `"Granier"`) and *advanced* (i.e., either `"Sperry"` or `"Cochard"`) water balance models (chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). 
 + `rhizosphereOverlap [="total"]` is also a relevant parameter, since changing its default value allows considering that plants extract soil water from partially or totally unrelated water pools, as explained in \@ref(plantwaterpools).
