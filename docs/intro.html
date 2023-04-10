@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-04-09" />
+<meta name="date" content="2023-04-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -170,6 +170,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="1.1.1" data-path="intro.html"><a href="intro.html#package-medfate"><i class="fa fa-check"></i><b>1.1.1</b> Package medfate</a></li>
 <li class="chapter" data-level="1.1.2" data-path="intro.html"><a href="intro.html#package-medfateland"><i class="fa fa-check"></i><b>1.1.2</b> Package medfateland</a></li>
+<li class="chapter" data-level="1.1.3" data-path="intro.html"><a href="intro.html#companion-packages"><i class="fa fa-check"></i><b>1.1.3</b> Companion packages</a></li>
 </ul></li>
 <li class="chapter" data-level="1.2" data-path="intro.html"><a href="intro.html#package-installation"><i class="fa fa-check"></i><b>1.2</b> Package installation</a>
 <ul>
@@ -680,6 +681,16 @@ div.csl-indent {
 <p>The R package <strong>medfateland</strong> has been designed to extend the capabilities of <strong>medfate</strong> to the landscape and regional levels. It allows running the stand-level models available in <strong>medfate</strong> on a set of spatial units (normally points or cells) within a target area. The package allows coordinating the dynamics of multiple stands via the evaluation of demand-based management scenarios. More importantly, the package allows considering spatial hydrological processes in forested watersheds. Hence, <strong>medfateland</strong> can be used as a tool for eco-hydrological applications.</p>
 <p>The version of the reference manual that you are reading is intended to reflect <strong>version 1.1.2</strong> of the package.</p>
 </div>
+<div id="companion-packages" class="section level3 hasAnchor" number="1.1.3">
+<h3><span class="header-section-number">1.1.3</span> Companion packages<a href="intro.html#companion-packages" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Packages <strong>medfate</strong> and <strong>medfateland</strong> are more easily used in conjunction with two other packages, called <strong>meteoland</strong> and <strong>medfateutils</strong>. Package <strong>meteoland</strong> assists the estimation of weather variables over landscapes, whereas <strong>medfateutils</strong> provides multiple functions to assist the creation of inputs and the parameterization of simulation models. Together the four R packages conform a modelling framework designed to help simulating the function and dynamics of forest ecosystems, with a particular focus on drought impacts under Mediterranean conditions:</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:packages"></span>
+<img src="packages.png" alt="Set of packages conforming the medfate modelling framework" width="100%" />
+<p class="caption">
+Figure 1.1: Set of packages conforming the medfate modelling framework
+</p>
+</div>
+</div>
 </div>
 <div id="package-installation" class="section level2 hasAnchor" number="1.2">
 <h2><span class="header-section-number">1.2</span> Package installation<a href="intro.html#package-installation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -722,16 +733,16 @@ div.csl-indent {
 </div>
 <div id="dynamic-simulation-functions" class="section level3 hasAnchor" number="1.3.2">
 <h3><span class="header-section-number">1.3.2</span> Dynamic simulation functions<a href="intro.html#dynamic-simulation-functions" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Dynamic simulation functions in <strong>medfate</strong> include three nested simulation levels (Fig. <a href="intro.html#fig:models">1.1</a>):</p>
+<p>Dynamic simulation functions in <strong>medfate</strong> include three nested simulation levels (Fig. <a href="intro.html#fig:models">1.2</a>):</p>
 <ol style="list-style-type: decimal">
-<li>Forest water and energy balance can be studied for a given forest stand using function <code>spwb()</code> (soil-plant-water-balance). The same function is used to run three different models (<code>Granier</code>, <code>Sperry</code> or <code>Cochard</code>), that correspond to two levels of different degree of complexity (<em>basic</em> or <em>advanced</em>; see Fig. <a href="intro.html#fig:models">1.1</a>). The user should choose one model or another depending on the intended application and data availability. Water balance simulations include hydrological processes (rainfall interception, soil infiltration, percolation and evapotranspiration) and plant physiological processes related to transpiration (hydraulics, photosynthesis and stomatal regulation). Most processes are implemented at the daily scale, although some operate at subdaily time steps for <em>advanced</em> models. Function <code>spwb()</code> has a closely related function <code>spwb.day()</code> that allows focusing on sub-daily processes. Finally, one can simulate plant physiological processes only, while having soil moisture as a prescribed dynamic input like weather, using function <code>pwb()</code> (plant-water-balance).</li>
+<li>Forest water and energy balance can be studied for a given forest stand using function <code>spwb()</code> (soil-plant-water-balance). The same function is used to run three different models (<code>Granier</code>, <code>Sperry</code> or <code>Cochard</code>), that correspond to two levels of different degree of complexity (<em>basic</em> or <em>advanced</em>; see Fig. <a href="intro.html#fig:models">1.2</a>). The user should choose one model or another depending on the intended application and data availability. Water balance simulations include hydrological processes (rainfall interception, soil infiltration, percolation and evapotranspiration) and plant physiological processes related to transpiration (hydraulics, photosynthesis and stomatal regulation). Most processes are implemented at the daily scale, although some operate at subdaily time steps for <em>advanced</em> models. Function <code>spwb()</code> has a closely related function <code>spwb.day()</code> that allows focusing on sub-daily processes. Finally, one can simulate plant physiological processes only, while having soil moisture as a prescribed dynamic input like weather, using function <code>pwb()</code> (plant-water-balance).</li>
 <li>Changes in primary (leaf area) and secondary (sapwood) growth are key to evaluate the influence of climatic conditions on plant and forest structure and function. Function <code>growth()</code> extends the previous models because it allows simulating carbon balance, tissue growth and mortality of a set of plant cohorts competing for light and water in a given forest stand. Analogously to the simulation of water balance, <code>growth()</code> has a closely related function <code>growth.day()</code> that allows focusing on sub-daily processes (i.e. carbon balance).</li>
 <li>Finally, function <code>fordyn()</code> complements growth and mortality processes with recruitment (from seeds) and resprouting, thus completing the minimum set of demographic processes needed to simulate Mediterranean forest dynamics. The function splits the period to be simulated by years and makes internal calls to <code>growth()</code> for the simulation of growth and mortality. <code>fordyn()</code> is suited to simulate the inter-annual variation in forest structure and composition, while accounting for the biophysical and physiological processes provided by the former models. In addition, in allows simulating human interventions (i.e. tree or shrub cuts) on forest stands.</li>
 </ol>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:models"></span>
 <img src="models.png" alt="Nested relationships between simulation functions and  processes included in each model" width="100%" />
 <p class="caption">
-Figure 1.1: Nested relationships between simulation functions and processes included in each model
+Figure 1.2: Nested relationships between simulation functions and processes included in each model
 </p>
 </div>
 <p>Importantly, <code>growth()</code> and <code>fordyn()</code> functions and the processes that they implements are still <strong>under active development</strong>.</p>

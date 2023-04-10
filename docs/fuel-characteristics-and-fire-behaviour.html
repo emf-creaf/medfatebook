@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-04-09" />
+<meta name="date" content="2023-04-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -170,6 +170,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="1.1.1" data-path="intro.html"><a href="intro.html#package-medfate"><i class="fa fa-check"></i><b>1.1.1</b> Package medfate</a></li>
 <li class="chapter" data-level="1.1.2" data-path="intro.html"><a href="intro.html#package-medfateland"><i class="fa fa-check"></i><b>1.1.2</b> Package medfateland</a></li>
+<li class="chapter" data-level="1.1.3" data-path="intro.html"><a href="intro.html#companion-packages"><i class="fa fa-check"></i><b>1.1.3</b> Companion packages</a></li>
 </ul></li>
 <li class="chapter" data-level="1.2" data-path="intro.html"><a href="intro.html#package-installation"><i class="fa fa-check"></i><b>1.2</b> Package installation</a>
 <ul>
@@ -668,7 +669,21 @@ div.csl-indent {
 <h1><span class="header-section-number">Chapter 23</span> Fuel characteristics and fire behaviour<a href="fuel-characteristics-and-fire-behaviour.html#fuel-characteristics-and-fire-behaviour" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <div id="overview-1" class="section level2 hasAnchor" number="23.1">
 <h2><span class="header-section-number">23.1</span> Overview<a href="fuel-characteristics-and-fire-behaviour.html#overview-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Functions <code>fuel_FCCS()</code> and <code>fire_FCCS()</code> allow calculating potential fire behaviour for forest inventory plots. Formulation of fuel characteristics and fire behaviour is an adaptation of the Fuel Characteristics Classification System [FCCS; <span class="citation">Prichard <em>et al.</em> (<a href="#ref-Prichard2013" role="doc-biblioref">2013</a>)</span>]. In FCCS, fuelbed is divided into six strata, including canopy, shrub, herbaceous vegetation, dead woody materials, leaf litter and ground fuels. All except ground fuels are considered here. The intensity of burning depends on several factors, including topography, wind conditions, fuel structure and its moisture content, which is determined from antecedent and current meteorological conditions. A modification of the Rothermel’s <span class="citation">(<a href="#ref-Rothermel1972" role="doc-biblioref">1972</a>)</span> model is used to calculate the intensity of surface fire reaction (in <span class="math inline">\(kW/m^2\)</span>) and the rate of fire spread (in <span class="math inline">\(m/min\)</span>) of surface fires assuming a steady-state fire. Both quantities are dependent on fuel characteristics, windspeed and direction, and topographic slope and aspect. The model returns the following results: (1) Fuel characteristics by stratum; (2) Surface fire behavior (i.e. reaction intensity, rate of spread, fireline intensity and flame length); (3) Crown fire behavior; (4) Fire potential ratings of surface fire behavior and crown fire behavior.</p>
+<p>Functions <code>fuel_FCCS()</code> and <code>fire_FCCS()</code> allow calculating potential fire behaviour for forest inventory plots. Formulation of fuel characteristics and fire behaviour is an adaptation of the Fuel Characteristics Classification System [FCCS; <span class="citation">Prichard <em>et al.</em> (<a href="#ref-Prichard2013" role="doc-biblioref">2013</a>)</span>]. In FCCS, fuelbed is divided into six strata, including canopy, shrub, herbaceous vegetation, dead woody materials, leaf litter and ground fuels. All except ground fuels are considered here. The intensity of burning depends on several factors, including topography, wind conditions, fuel structure and its moisture content, which is determined from antecedent and current meteorological conditions. A modification of the Rothermel’s <span class="citation">(<a href="#ref-Rothermel1972" role="doc-biblioref">1972</a>)</span> model is used to calculate the intensity of surface fire reaction (in <span class="math inline">\(kW/m^2\)</span>) and the rate of fire spread (in <span class="math inline">\(m/min\)</span>) of surface fires assuming a steady-state fire. Both quantities are dependent on fuel characteristics, windspeed and direction, and topographic slope and aspect.</p>
+<p>Fuel and fire behavior calculations provide the following results:</p>
+<ol style="list-style-type: decimal">
+<li>Fuel characteristics by stratum.</li>
+<li>Surface fire behavior (i.e. reaction intensity. rate of spread, fireline intensity and flame length);</li>
+<li>Crown fire behavior.</li>
+<li>Fire potential ratings of surface fire behavior and crown fire behavior.</li>
+</ol>
+<p>The following figure provide an overview of the steps to calculate surface/crown fire behavior and fire potentials from fuel characteristics.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:firebehavior"></span>
+<img src="fire_behavior.png" alt="Overview of the steps involved in fire behavior and fire potential calculations starting from fuel properties" width="100%" />
+<p class="caption">
+Figure 23.1: Overview of the steps involved in fire behavior and fire potential calculations starting from fuel properties
+</p>
+</div>
 </div>
 <div id="input-data-1" class="section level2 hasAnchor" number="23.2">
 <h2><span class="header-section-number">23.2</span> Input data<a href="fuel-characteristics-and-fire-behaviour.html#input-data-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -918,11 +933,11 @@ Canopy bulk density normally ranges between 0 and 0.4 <span class="math inline">
 <li><em>Canopy top height</em>, <span class="math inline">\(H_{ct}\)</span> (in <span class="math inline">\(cm\)</span>): the maximum height where bulk density is larger than <span class="math inline">\(t_{BDP}\)</span>.</li>
 <li><em>Canopy gap</em>, <span class="math inline">\(H_{gap}\)</span> (in <span class="math inline">\(cm\)</span>): the difference between <span class="math inline">\(H_{cb}\)</span> and <span class="math inline">\(H_{st}\)</span>. The canopy gap is used to calculate crown initiation potential.</li>
 </ul>
-Figure <a href="fuel-characteristics-and-fire-behaviour.html#fig:bulkdensityprofile">23.1</a> illustrates the definition and analysis of the fuel bulk density profile for a given forest stand (see function <code>vprofile_fuelBulkDensity()</code>). Following <span class="citation">Mitsopoulos &amp; Dimitrakopoulos (<a href="#ref-Mitsopoulos2007" role="doc-biblioref">2007</a>)</span>, a threshold <span class="math inline">\(t_{BDP} = 0.04\)</span> is used to determine shrub and canopy heights.
+Figure <a href="fuel-characteristics-and-fire-behaviour.html#fig:bulkdensityprofile">23.2</a> illustrates the definition and analysis of the fuel bulk density profile for a given forest stand (see function <code>vprofile_fuelBulkDensity()</code>). Following <span class="citation">Mitsopoulos &amp; Dimitrakopoulos (<a href="#ref-Mitsopoulos2007" role="doc-biblioref">2007</a>)</span>, a threshold <span class="math inline">\(t_{BDP} = 0.04\)</span> is used to determine shrub and canopy heights.
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:bulkdensityprofile"></span>
 <img src="medfatebook_files/figure-html/bulkdensityprofile-1.png" alt="Bulk density profile of an example forest" width="384" />
 <p class="caption">
-Figure 23.1: Bulk density profile of an example forest
+Figure 23.2: Bulk density profile of an example forest
 </p>
 </div>
 </div>
