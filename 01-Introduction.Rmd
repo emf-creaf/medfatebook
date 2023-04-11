@@ -24,13 +24,17 @@ The version of the reference manual that you are reading is intended to reflect 
 
 Packages **medfate** and **medfateland** are more easily used in conjunction with two other packages, called **meteoland** and **medfateutils**. Package **meteoland** assists the estimation of weather variables over landscapes, whereas **medfateutils** provides multiple functions to assist the creation of inputs and the parameterization of simulation models. Together the four R packages conform a modelling framework designed to help simulating the function and dynamics of forest ecosystems, with a particular focus on drought impacts under Mediterranean conditions:
 
-```{r packages, out.width='100%', fig.align="center", fig.cap="Set of packages conforming the medfate modelling framework", echo=FALSE}
+```{r packages, out.width='70%', fig.align="center", fig.cap="Set of packages conforming the medfate modelling framework", echo=FALSE}
 knitr::include_graphics("packages.png")
 ```
 
-## Package installation
+## Installation
 
-### medfate
+### Requirements
+
+Both **medfate** and **medfateland** have a user interface in R, but actual calculations have been implemented as C++ functions and linked to R via the **Rcpp** package. This means that whenever installation is done from sources you will need a compiler (i.e. Rtools in Windows). Note that compilers will always be a requirement when installing packages from GitHub. 
+
+### Installing medfate
 
 Package **medfate** can be found at [CRAN](https://CRAN.R-project.org/package=medfate), where it is updated every few months. Hence, it can be installed as any other R package using:
 ```{r eval=FALSE}
@@ -54,7 +58,7 @@ remotes::install_github("emf-creaf/medfate",
 
 Among other dependencies, installing **medfate** requires package **meteoland**, as it links to some of its C++ functions. Note that some package dependencies are only *suggested*, so that they are not automatically installed when installing **medfate**.
 
-### medfateland
+### Installing medfateland
 
 Since both packages evolve together, installing **medfateland** normally requires an up-to-date version of **medfate**. The package **medfateland** is currently only available at GitHub, and can be installed using: 
 
@@ -71,21 +75,8 @@ remotes::install_github("emf-creaf/medfateland",
 ```
 
 
-### Installation from sources
 
-Both packages have a user interface in R, but actual calculations have been implemented as C++ functions and linked to R via the **Rcpp** package. This means that you will need a compiler to install **medfate** and **medfateland** packages from sources (i.e. Rtools in Windows). Note that compilers will be a requirement when installing packages from GitHub. 
-
-
-## Data structures and functions in medfate
-
-### Data structures
-
-Package **medfate** deals with simulations at stand level and, hence, the data structures defined in the package are meant to encapsulate information about a target forest stands and the properties of the soil where it grows:
-
-+ S3 class `soil` is a list of soil physical properties, including both parameters and state variables. Soil objects are described in subsection \@ref(soilinitialization).
-+ S3 class `forest` is a list of forest inventory data (i.e. mainly tree and shrub measurements) corresponding to a single forest stand. Forest plot objects are described in subsection \@ref(forestobjects). 
-+ S3 classes `spwbInput` and `growthInput` are lists containing all the vegetation parameters and state variables necessary to run water-balance simulations (function `spwb()` and alike) and forest growth simulations (function `growth()` and alike). Objects of classes `spwbInput` and `growthInput` are created using functions whose input includes a `forest` object and a `soil` object. 
-
+## Main functions in medfate
 
 ### Dynamic simulation functions
 
@@ -140,15 +131,12 @@ Vegetation functioning and dynamics have strong, but complex, effects on fire ha
 3. Crown fire behavior.
 4. Fire potential ratings of surface fire behavior and crown fire behavior.
 
-## Data structures and functions in medfateland
 
-### Data structures
+## Main functions in medfateland
 
-Package **medfateland** allows simulating forest functioning and dynamics on sets forests stands distributed across space. Spatial information needs to be provided in `sf` objects, whose columns typically include spatial geometries, topographic features and lists of `forest` objects and `soil` objects. The actual columns required depend on the simulation function to be used. For example, if forest dynamics includes forest management, the user may supply management arguments for each spatial unit in an additional column.
+Package **medfateland** allows simulating forest functioning and dynamics on sets forests stands distributed across space, with or without spatial processes. 
 
-### Dynamic simulation functions
-
-Package **medfateland** offers sets of simulation functions that are analogous to those of package **medfate** but allow processing multiple forest stands sequentially or in parallel:
+When spatial processes are omitted, the package offers a set of simulation functions that are analogous to those of package **medfate** but allow processing multiple forest stands sequentially or in parallel:
 
 + Forest water and energy balance can be studied for a set of forest stands using functions `spwb_spatial()` or `spwb_spatial_day()`.
 + Growth and mortality of a set of plant cohorts competing for light and water can be simulated for a set of forest stands using functions `growth_spatial()` or `growth_spatial_day()`.
@@ -158,3 +146,5 @@ In addition, the package offers simulation functions where forest stands are rel
 
 + Functions `spwb_land()` and `growth_land()` include distributed hydrological models that allow simulating daily water balance or growth processes on the cells of a watershed while accounting for overland runoff, subsurface flow and groundwater flow between cells.
 + Function `fordyn_scenario()` allows simulating `fordyn()` on forest stands, while applying a demand-based forest management scenario.
+
+

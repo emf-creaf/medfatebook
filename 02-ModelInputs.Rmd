@@ -1,10 +1,54 @@
 # Model inputs
 
-Data input for simulation models can be grouped into four categories. First, a description of the  **vegetation** existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in `spwb()` calls, but becomes dynamic in calls to `growth()`. Hence, in this latter case the input vegetation describes the starting point. Second, information on the physical structure of **soil** is also required. While soil physical features are considered static parameters in simulations, **weather** is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur. Finally, **topographic and geographic information** is often required, since internal calculations of some physical variables (such as atmospheric pressure or radiation) require them. 
+This chapter describes the input requirements for simulation models of **medfate** and **medfateland** packages. First we describe the input R structures required for the two packages. Then, we provide the details for four different kinds of input:
 
-This chapter describes the requirements of **medfate** package with respect to each of these data input categories. The last section describes additional parameters that are used to specify global options of simulation functions (i.e., `spwb()`, `pwb()`, `growth()`, `fordyn()` and daily simulation functions).
+  (1) A description of the  **vegetation** existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in `spwb()` calls, but becomes dynamic in calls to `growth()`. Hence, in this latter case the input vegetation describes the starting point. 
+  (2) Information on the physical structure of **soil** is also required and is considered static. 
+  (3) Unlike soil physical features, **weather** is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur. 
+  (4) Finally, **topographic and geographic information** is also required, since internal calculations of some physical variables (such as atmospheric pressure or radiation) require them. 
+
+The last section describes additional input parameters that are used to specify global options of simulation functions.
 
 Since preparing inputs for simulations can be hard, package [**medfateutils**](https://github.com/emf-creaf/medfateutils) provides a set of utility functions aimed at facilitating this task.
+
+
+## Input structures
+### Input structures in medfate
+
+Package **medfate** deals with simulations at stand level and, hence, the data structures defined in the package are meant to encapsulate information about a target forest stands and the properties of the soil where it grows:
+
++ S3 class `soil` is a list of soil physical properties, including both parameters and state variables. Soil objects are described in subsection \@ref(soilinitialization).
++ S3 class `forest` is a list of forest inventory data (i.e. mainly tree and shrub measurements) corresponding to a single forest stand. Forest plot objects are described in subsection \@ref(forestobjects). 
++ S3 classes `spwbInput` and `growthInput` are lists containing all the vegetation parameters and state variables necessary to run water-balance simulations (function `spwb()` and alike) and forest growth simulations (function `growth()` and alike). Objects of classes `spwbInput` and `growthInput` are created using functions whose input includes a `forest` object and a `soil` object. 
+
+### Input structures in medfateland
+
+Spatial information for **medfateland** needs to be provided in `sf` objects (i.e. data frames with geometry), whose actual columns required depend on the simulation function to be used. 
+
+|  Column | Description         | Use                           |
+| ------- | ------------------- | ----------------------------- |
+|  `geom`      | Spatial geometries (points, polygons, ...) |  Always required | 
+|  `id`      | Stand identifiers |  Required for `*_spatial()`, `*_spatial_day()` and `fordyn_scenario()` | 
+|  `elevation`      | Elevation values above sea level (in m) |  Always required | 
+|  `slope`      | Slope values (in degrees) |  Always required | 
+|  `aspect`      |  Aspect values (in degrees) |  Always required | 
+|  `forest`      |  Objects of class `forest` |  Always required | 
+|  `soil`      |  Objects of class `soil` |  Always required | 
+|  `state`      |  Objects of class `spwbInput` or `growthInput` |  Optional to recover the final state of a previous simulation | 
+|  `meteo`      |  Weather data frames |  Optional | 
+|  `management_arguments`      |  Management arguments for each stand |  Optional for `fordyn_spatial()` | 
+|  `management_unit`      |  Management unit corresponding to each stand |  Required for `fordyn_scenario()` | 
+|  `represented_area`      |  Area represented by each stand or cell |  Required for `fordyn_scenario()` and `*_land()` | 
+| `waterOrder` | Integers indicating cell processing order. | Required for `*_land()` | 
+| `waterQ` | Lists of water discharge values to neighbors. | Required for `*_land()` | 
+| `queenNeigh` | Lists of integers identifying the (up to 8) queen neighbors. | Required for `*_land()` | 
+| `channel` | Logical values indicating whether cells belong to the channel network. | Required for `*_land()` | 
+| `depth_to_bedrock` | Depth to bedrock (mm). | Required for `*_land()` | 
+| `bedrock_conductivity` | Bedrock (saturated) conductivity (in m·day-1). | Required for `*_land()` | 
+| `depth_to_bedrock` | Bedrock porosity ([0-1]). | Required for `*_land()` | 
+| `snowpack` | Snow water equivalent content of the snowpack (mm). | Required for `*_land()` | 
+| `aquifer` | Water content of the aquifer in each cell. | Required for `*_land()` | 
+
 
 ## Latitude and topography {#topoinput}
 
@@ -286,7 +330,6 @@ While the weather variables listed in the table above are input requirements, **
 | $e_{atm}$ | $kPa$ | | Atmospheric water vapor pressure |
 | $T_{mean}$ | $^{\circ} \mathrm{C}$ | `MeanTemperature` | Mean daily temperature |
 | $PET$ | $L \cdot m^{-2} = mm$ | `PET` | Potential evapotranspiration, calculated using Penman's (1948) equation |
-
 
 ## Simulation control {#controlparameters}
 
