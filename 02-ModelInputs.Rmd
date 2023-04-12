@@ -21,7 +21,7 @@ Package **medfate** deals with simulations at stand level and, hence, the data s
 + S3 class `forest` is a list of forest inventory data (i.e. mainly tree and shrub measurements) corresponding to a single forest stand. Forest plot objects are described in subsection \@ref(forestobjects). 
 + S3 classes `spwbInput` and `growthInput` are lists containing all the vegetation parameters and state variables necessary to run water-balance simulations (function `spwb()` and alike) and forest growth simulations (function `growth()` and alike). Objects of classes `spwbInput` and `growthInput` are created using functions whose input includes a `forest` object and a `soil` object. 
 
-### Input structures in medfateland
+### Input structures in medfateland {#medfatelandstructures}
 
 Spatial information for **medfateland** needs to be provided in `sf` objects (i.e. data frames with geometry), whose actual columns required depend on the simulation function to be used. 
 
@@ -32,10 +32,12 @@ Spatial information for **medfateland** needs to be provided in `sf` objects (i.
 |  `elevation`      | Elevation values above sea level (in m) |  Always required | 
 |  `slope`      | Slope values (in degrees) |  Always required | 
 |  `aspect`      |  Aspect values (in degrees) |  Always required | 
+|  `land_cover_type` | Land cover type: *wildland*, *agriculture*, *rock*, *artificial* or *water* | Required for `*_land()`, optional for `*_spatial()` and `*_spatial_day()` |
 |  `forest`      |  Objects of class `forest` |  Always required | 
 |  `soil`      |  Objects of class `soil` |  Always required | 
 |  `state`      |  Objects of class `spwbInput` or `growthInput` |  Optional to recover the final state of a previous simulation | 
-|  `meteo`      |  Weather data frames |  Optional | 
+|  `meteo`      |  Weather data frames |  Optional |
+|  `crop_factor` | Crop evapo-transpiration factor | Only required for *agriculture* land cover type |
 |  `management_arguments`      |  Management arguments for each stand |  Optional for `fordyn_spatial()` | 
 |  `management_unit`      |  Management unit corresponding to each stand |  Required for `fordyn_scenario()` | 
 |  `represented_area`      |  Area represented by each stand or cell |  Required for `fordyn_scenario()` and `*_land()` | 

@@ -1,16 +1,24 @@
-# (PART) Landscape processes {-}
+# (PART) Landscape modelling {-}
 
 # Watershed hydrology {#watershedhydrology}
 
-This chapter describes the distributed watershed water balance model implemented in function `wswb` of package **medfateland**. 
+This chapter describes the distributed watershed water balance model implemented in functions `spwb_land()` and `growth_land()` of package **medfateland**. 
 
 ## Design principles
 
-Watersheds are described in raster (i.e. gridded) mode, each cell representing a patch of vegetation (or another land cover) in a catchment. Watershed water balance simulations extend the simulation of soil water balance to the landscape scale. Hence, the design of most vertical hydrological processes is the same as those of forest water balance. However, additional water compartments and processes are represented in watershed water balance simulations. Each cell in the watershed may include the following: a snowpack comparment, one or several soil layers (including a rocky layer down to several meters depth), and a groundwater compartment assumed to be beyond the reach of plant roots. Similar to other models such as TETIS [@Frances2007], three lateral flows are considered between adjacent cells: 
+Watersheds are described in raster (i.e. gridded) mode, each cell representing a patch of vegetation (or another land cover) in a catchment. Land cover types are:
 
-  (a) Overland surface flows from upper elevation cells.
-  (b) Lateral saturated soil flows (i.e. interflow) between adjacent cells. 
-  (c) Lateral groundwater flow (i.e. baseflow) between adjacent cells.
+  a. *wildland*: forests, shrublands or grasslands.
+  b. *agriculture*: agricultural lands.
+  c. *rock*: rock outcrops.
+  d. *artificial*: urban areas.
+  e. *water*: water bodies. 
+
+Watershed water balance simulations extend the simulation of soil water balance to the landscape scale. Hence, the design of most vertical hydrological processes is the same as those of forest water balance. However, additional water compartments and processes are represented in watershed water balance simulations. Each cell in the watershed may include the following: a snow-pack compartment, one or several soil layers (including a rocky layer down to several meters depth), and a groundwater compartment assumed to be beyond the reach of plant roots. Similar to other models such as TETIS [@Frances2007], three lateral flows are considered between adjacent cells: 
+
+  (i) Overland surface flows from upper elevation cells.
+  (ii) Lateral saturated soil flows (i.e. interflow) between adjacent cells. 
+  (iii) Lateral groundwater flow (i.e. baseflow) between adjacent cells.
 
 Overland surface flows are modeled following T-HYDRO @Ostendorf1993. Subsurface flows, including both soil saturated flow and groundwater flow, are modeled following the kinematic wave approach of DSHVM @Wigmosta1994.
 
@@ -18,13 +26,13 @@ Split-parameter parametrization following @Frances2007.
 
 ## State variables {#statevariableswatershed}
 
-Distributed simulation of rainfall-runoff processes implies that state variables are defined for each cell of the watershed. For this kind of simulations, state variables describing the water content of different compartments are the most important. In the case of *wildland* and *agricultural* cells these are:
+Distributed simulation of rainfall-runoff processes implies that state variables are defined for each cell of the watershed. For this kind of simulations, state variables describing the water content of different compartments are the most important. In the case of *wildland* and *agriculture* cells these are:
 
 + $W_s$, the proportion of soil moisture in relation to field capacity for each soil layer $s$ in the cell.
 + $S_{snow}$ the snow water equivalent (mm) of the snow pack storage over the cell surface.
 + $S_{aquifer}$ the water content (mm) in the cell's aquifer beyond the reach of plant roots.
 
-Additional cell state variables in *wildland* cells concern the water status (or other state variables) of plant cohorts in the cell, and they were described in chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance). In the case of cells of other land cover types (i.e. *rock*, *artificial* or *water*) soils are not defined, and so are soil state variables.
+Additional cell state variables in *wildland* cells concern the water status (or other state variables) of plant cohorts in the cell, and they were described in chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance). In the case of cells of other land cover types (i.e. *rock*, *artificial* or *water*) soils are not defined, and neither are soil state variables.
 
 ## Water balance {#watershedbalance}
 
@@ -80,10 +88,9 @@ For every day to be simulated, the model performs the following steps:
  3. Apply changes in cell soil moisture content due to soil lateral flows (i.e. determine $\Delta{S_{sub}}$ for each cell), including the possibility of a return flow to the surface if the soil becomes saturated (i.e. saturation excess flow).
  4. Apply changes in cell aquifer water content, including the possibility of discharge from the aquifer to the soil and a saturation excess flow (eq. \@ref(eq:cellaquiferwaterbalanceequation)).
  5. Determine remaining cell flows by processing watershed cells in order of decreasing elevation (i.e. cells at higher elevation are processed before cells at lower elevation). For each cell to be processed:
-    a. Determine snowpack dynamics, rainfall interception loss, infiltration and runoff, transpiration, soil evaporation processes as described in \@ref(basicwaterbalancescheduling), while including saturation excess flow as well as potential runon ($Ro$) from upslope cells as additional water inputs.
+    a. For *wildland* or *agriculture* cells, determine snow-pack dynamics, rainfall interception loss, infiltration and runoff, transpiration, soil evaporation processes as described in \@ref(basicwaterbalancescheduling), while including saturation excess flow as well as potential runon ($Ro$) from upslope cells as additional water inputs. For *rock* and *artificial* cells, snow pack dynamics is still processed in these cells, but all runon or rainfall input becomes runoff to be passed downhill, and when the level of the aquifer reaches the surface any discharge also becomes runoff. In the case of *water* cells, snow pack dynamics is also processed, but evaporation from the water surface is not modelled. All liquid water inputs are poured onto the aquifer water content, and runoff can still occur when the aquifer reaches the surface.
     b. Distribute surface runoff among cells downhill (\@ref(overlandflows)). If a cell does not have downhill neighbors (i.e outlet cell) its runoff becomes water exported from the watershed.
 
-The steps listed in the previous steps refer to cells whose land cover is either *wildland* or *agricultural*. In contrast, *rock* and *artificial* cells lack a soil object defined, so that snow pack dynamics is still processed in these cells, but all runon or rainfall input becomes runoff to be passed downhill, and when the level of the aquifer reaches the surface any discharge also becomes runoff. In the case of *water* cells, which also lack a soil, snow pack dynamics is also processed, but all liquid water inputs are poured onto the aquifer water content, and runoff can still occur when the aquifer reaches the surface.
 
 ## Inputs and outputs
 
@@ -91,21 +98,15 @@ The steps listed in the previous steps refer to cells whose land cover is either
 
 Hydrological distributed models demand large amounts of data, information and parameters in order to accurately represent the spatial variability of the main hydrological processes and weather inputs. As mentioned in design principles, watersheds are described in raster (i.e. gridded) mode, each cell representing a patch of vegetation (or another land cover) in a catchment. Rasters do not need to be (should not be) complete, since the model is intended to be used on individual catchments with defined boundaries. 
 
-Given a set of grid cells representing the watershed at a given spatial resolution, the following information needs to be specified:
-
-1. Land cover type for all cells, with pixels classified into *wildland* (forests, shrublands or grasslands), *agriculture*, *rock* (for rock outcrops), *artificial* (for urban areas) or *water* (for water bodies).
-2. Topography, i.e. elevation, slope and aspect for each cell.
-3. For each *wildland* cell, a description of plant cohorts in terms of a *forest* object (see \@ref(forestobjects)).
-4. For each *wildland* and *agriculture* cell, a data frame of soil physical properties or an initialized soil object (see \@ref(soilinitialization)).
-5. Bedrock hydraulic conductivity and depth to unaltered bedrock for all cells.
+Given a set of grid cells representing the watershed at a given spatial resolution, input data for `spwb_land()` and `growth_land()` should be specified using `sf` objects. These were described in section \@ref(medfatelandstructures).
 
 ### Watershed meteorology input
 
-Simulation of watershed hydrology requires specifying weather variables for all cells and the simulation period considered. Function `wswb` allows weather to be specified in three ways:
+Simulation of watershed hydrology requires specifying weather variables for all cells and the simulation period considered. Functions `spwb_land()` and `growth_land()` allow weather to be specified in three ways:
 
 + If a single data frame of daily weather is provided, the model assumes that all watershed cells experience the same weather.
-+ If an object of class `SpatialPixelsMeteorology` is provided, the model will read daily weather grids from that object (see documentation of package **meteoland**).
-+ If an object of class `MeteorologyInterpolationData` is provided, the model will call function `interpolationpixels` from package **meteoland** (see package documentation) every day to be simulated.
++ A different data frame of daily weather may be provided for each cell, using column `meteo` of the `sf` object (see \@ref(medfatelandstructures)).
++ If an interpolator object of class `stars` is provided, the model will call function `interpolate_data()` for every day to be simulated (see **meteoland** package documentation).
 
 ### Watershed hydraulic correction parameters {#watershedbalancecontrol}
 
@@ -121,16 +122,15 @@ The effective model parameter for each of these is defined for the spatial (depe
   
 ### Model outputs {#watershedbalanceoutput}
 
-Distributed hydrological models can produce very detailed spatial and temporal outputs, hence consuming lots of memory resources. While the model runs at a daily scale, function `wswb` can be asked to retain spatial outputs and summaries at coarser temporal scales (i.e. weekly, monthly, etc.). The output of function `wswb` is an S3 list of the same class name with the following data elements:
+Distributed hydrological models can produce very detailed spatial and temporal outputs, hence consuming lots of memory resources. While the model runs at a daily scale, functions `spwb_land()` and `growth_land()` can be asked to retain spatial outputs and summaries at coarser temporal scales (i.e. weekly, monthly, etc.). The output of functions `spwb_land()` and `growth_land()` is an S3 list with the following data elements:
 
 
 | Element | Description                                                |
 |---------|------------------------------------------------------------|
-| `WatershedBalance`| Data frame with averaged (over cell) components of the watershed balance corresponding to each summary. |
-| `WatershedSoilBalance`| Averaged (over cell) components of the watershed balance, including only cells that have defined soils (i.e. *wildland* and *agriculture* cells), corresponding to each summary. |
-| `CellBalance`| Gridded data with the water balance components at each cell, corresponding to each summary.|
-| `CellState`| Gridded data with the water status at each cell, corresponding to each summary.|
-| `DailyRunoff` | A matrix with daily runoff (in m3/day) at each of the outlet cells of the landscape. |
+| `sf`| An object of class `sf` containing the geometries, final state and summary of the landscape cells.|
+| `watershed_balance`| Data frame with averaged (over cell) components of the watershed balance corresponding to each summary. |
+| `watershed_soil_balance`| Averaged (over cell) components of the watershed balance, including only cells that have defined soils (i.e. *wildland* and *agriculture* cells), corresponding to each summary. |
+| `daily_runoff` | A matrix with daily runoff (in m3/day) at each of the outlet cells of the landscape. |
 
 ## Process details {#watershedbalancedetails}
 
