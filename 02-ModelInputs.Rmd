@@ -304,7 +304,7 @@ In contrast, growth simulation requires updating the structure of vegetation, i.
 
 Weather input data must include variables calculated at the **daily** scale. Weather data should be arranged in a data frame with days in **rows** and variables in **columns**. Dates are needed in **medfate** to estimate parameters like solar declination or the day of the year ($DOY$). Importantly, *dates* should be included as row names (in format *year-month-day*) of the input meteorology data frame.
 
-The following table indicates the symbols, units, definitions and the variable name in R of all weather variables. Some of them are optional, as indicated in the right-most column (missing values will be replaced by defaults defined in control parameters).
+The following table indicates the symbols, units, definitions and the variable name in R of all weather variables. Some of them are optional, as indicated in the right-most column.
 
 | Symbol | Units | R param | Description                        | Optional |
 |--------|-------|---------|------------------------------------|----------|
@@ -316,20 +316,20 @@ The following table indicates the symbols, units, definitions and the variable n
 | $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds | No |
 | $u$ | $m \cdot s^{-1}$ | `WindSpeed` | Wind speed | Yes |
 | $C_{atm}$ | $ppm$ | `CO2` | Atmospheric (above-canopy) $CO_2$ concentration | Yes |
-
- Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018], but other sources are possible.
-
-As an alternative to providing daily atmospheric $CO_2$ concentration values, simulation functions allow the user to provide $CO_2$ concentration values in **annual** time steps using a separate vector.
+| $P_{atm}$ | $kPa$ | `Patm` | Surface atmospheric pressure | Yes |
 
 While the weather variables listed in the table above are input requirements, **medfate** derives other atmospheric variables from them, using also topographic information (see [utility functions](http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual):
 
 | Symbol | Units | R param | Description                        |
 |--------|-------|---------|------------------------------------|
-| $P_{atm}$ | $kPa$ |  | Atmospheric pressure |
 | $\rho_{air}$ | $kg \cdot m^{-3}$ |  | Air density |
 | $e_{atm}$ | $kPa$ | | Atmospheric water vapor pressure |
 | $T_{mean}$ | $^{\circ} \mathrm{C}$ | `MeanTemperature` | Mean daily temperature |
 | $PET$ | $L \cdot m^{-2} = mm$ | `PET` | Potential evapotranspiration, calculated using Penman's (1948) equation |
+
+Missing wind speed ($u$) and $CO_2$ values will be replaced by defaults defined in control parameters. As an alternative to providing daily atmospheric $CO_2$ concentration values, simulation functions allow the user to provide $CO_2$ concentration values in **annual** time steps using a separate vector. When missing, atmospheric pressure ($P_{atm}$) is also derived from elevation using an [utility function](http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils) available in **meteoland**.
+
+ Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018], but other sources are possible.
 
 ## Simulation control {#controlparameters}
 
