@@ -27,7 +27,7 @@ The following table shows the allometric coefficients needed for the calculation
 
 | Symbol       | Units | R param       | Description                      |
 |--------------|-------|---------------|----------------------------------|
-| $a_{fbt}$, $b_{fbt}$, $c_{fbt}$, $d_{fbt}$ | | `a_fbt`, `b_fbt`, `c_fbt`, `d_fbt` | Coefficients to calculate foliar biomass of an individual tree  |
+| $a_{fbt}$, $b_{fbt}$, $c_{fbt}$ | | `a_fbt`, `b_fbt`, `c_fbt` | Coefficients to calculate foliar biomass of an individual tree  |
 | $a_{ash}$, $b_{ash}$ | | `a_ash`, `b_ash` | Coefficients relating the square of shrub height with shrub area |
 | $a_{bsh}$, $b_{bsh}$ | | `a_bsh`, `b_bsh` | Coefficients relating crown volume with dry weight of shrub individuals |
 | $a_{cr}$, $b_{1cr}$, $b_{2cr}$, $b_{3cr}$, $c_{1cr}$, $c_{2cr}$ | | `a_cr`, `b_1cr`, `b_2cr`, `b_3cr`, `c_1cr`, `c_2cr` | Coefficients to calculate crown ratio of trees |
@@ -45,10 +45,10 @@ Leaf biomass calculations are done differently for trees and shrub cohorts. They
 
 Foliar biomass for a single tree of cohort $i$ ($FB_{tree,i}$; in $kg$) is calculated using:
 \begin{equation}
-FB_{tree,i} = a_{fbt} \cdot DBH_{i}^{b_{fbt}}\cdot e^{c_{fbt}\cdot BAL_i} \cdot DBH_{i}^{d_{fbt} \cdot BA_{sup}}
+FB_{tree,i} = a_{fbt} \cdot DBH_{i}^{b_{fbt}}\cdot e^{c_{fbt}\cdot BAL_i} \cdot e^{-0.0001\cdot N_i}
 (\#eq:onetreefoliarbiomass)
 \end{equation}
-where $DBH_{i}$ is the diameter of the tree (in $cm$), $BAL_i$ is the cummulative basal area ($m^2\cdot ha^{-1}$) of trees having a larger diameter, and $a_{fbt}$, $b_{fbt}$, $c_{fbt}$ and $c_{fbt}$ are species-specific regression coefficients. The foliar biomass of the whole tree cohort ($FB_{i}$; in $kg\cdot m^{-2}$) is obtained multiplying tree foliar biomass by tree density  ($N_{i}$; in $ind.\cdot ha^{-1}$):
+where $DBH_{i}$ is the diameter of the tree (in $cm$), $BAL_i$ is the cummulative basal area ($m^2\cdot ha^{-1}$) of trees having an equal or larger diameter (including the target tree), $N_i$ is the density of the cohort, and $a_{fbt}$, $b_{fbt}$ and $c_{fbt}$ are species-specific regression coefficients. The first two determine the relationship between tree diameter and its foliar biomass, whereas the third one leads to reductions of foliar biomass because of over-shading and self-shading. Factor $e^{-0.001\cdot N_i}$ reduces foliar biomass for cohorts with very high density (such as very dense regeneration after a fire). The foliar biomass of the whole tree cohort ($FB_{i}$; in $kg\cdot m^{-2}$) is obtained multiplying tree foliar biomass by tree density  ($N_{i}$; in $ind.\cdot ha^{-1}$):
 \begin{equation}
 FB_{i} = FB_{tree,i}\cdot (N_{i}/10000)
 (\#eq:treefoliarbiomass)
@@ -62,9 +62,9 @@ A_{sh,i} = a_{ash} \cdot H_{i}^{b_{ash}}
 \end{equation}
 where $a_{ash}$ and $b_{ash}$ are species-specific parameters. The model then estimates the dry weight of leaves and branches up to 6.35mm in diameter ($B_{sh,i}$, in kg) of this average individual (i.e. fine fuel biomass), using an allometric relationship with shrub crown phytovolume assuming a cylinder (in $cm^3$):
 \begin{equation}
-B_{sh,i} = a_{bsh} \cdot (A_{sh,i}\cdot H_{i}\cdot cr_i)^{b_{bsh}}
+B_{sh,i} = a_{bsh} \cdot (A_{sh,i}\cdot H_{i}\cdot cr_i)^{b_{bsh}} \cdot e^{-0.0147\cdot BA} 
 \end{equation}
-where $a_{bsh}$ and $b_{bsh}$ are species-specific parameters and $cr_i$ is the crown ratio (a value between 0 and 1, the ratio between crown length and total height). Shrub density ($N_{i}$; in $ind.\cdot m^{-2}$) can be grossly estimated from percent cover ($C_{i}$, in percent) and $A_{sh,i}$ (in $cm^{-2}$):
+where $a_{bsh}$ and $b_{bsh}$ are species-specific parameters and $cr_i$ is the crown ratio (a value between 0 and 1, the ratio between crown length and total height). Here $BA$ is the stand basal area ($m^2\cdot ha^{-1}$), which induces a reduction of $B_{sh,i}$ similar to the one described for tree foliar biomass, but with a fixed coefficient. Shrub density ($N_{i}$; in $ind.\cdot m^{-2}$) can be grossly estimated from percent cover ($C_{i}$, in percent) and $A_{sh,i}$ (in $cm^{-2}$):
 \begin{equation}
 N_{i} = \frac{C_{i}/100}{A_{sh,i}/10000}
 \end{equation}
