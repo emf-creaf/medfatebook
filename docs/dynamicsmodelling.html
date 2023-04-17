@@ -779,13 +779,25 @@ div.csl-indent {
 <td>Minimum percentage of PAR at the ground level for successful recruitment from seeds</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(DBH_{recr}\)</span></td>
-<td><span class="math inline">\(cm\)</span></td>
-<td><code>RecrTreeDBH</code></td>
-<td>DBH for tree recruits from seeds (e.g. 1 cm).</td>
+<td><span class="math inline">\(N_{tree, recr}\)</span></td>
+<td><span class="math inline">\(ind \cdot ha^{-1}\)</span></td>
+<td><code>RecrTreeDensity</code></td>
+<td>Density of tree recruits from seeds.</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(DBH_{ingrowth}\)</span></td>
+<td><span class="math inline">\(N_{tree, ingrowth}\)</span></td>
+<td><span class="math inline">\(ind \cdot ha^{-1}\)</span></td>
+<td><code>IngrowthTreeDensity</code></td>
+<td>Density of trees reaching ingrowth DBH.</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(DBH_{tree,recr}\)</span></td>
+<td><span class="math inline">\(cm\)</span></td>
+<td><code>RecrTreeDBH</code></td>
+<td>DBH for tree recruits from seeds or resprouting (e.g. 1 cm).</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(DBH_{tree,ingrowth}\)</span></td>
 <td><span class="math inline">\(cm\)</span></td>
 <td><code>IngrowthTreeDBH</code></td>
 <td>Ingrowth DBH for trees (e.g. 7.5 cm).</td>
@@ -794,19 +806,7 @@ div.csl-indent {
 <td><span class="math inline">\(H_{tree, recr}\)</span></td>
 <td><span class="math inline">\(cm\)</span></td>
 <td><code>RecrTreeHeight</code></td>
-<td>Height for tree recruits from seeds</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(N_{tree, recr}\)</span></td>
-<td><span class="math inline">\(ind \cdot ha^{-1}\)</span></td>
-<td><code>RecrTreeDensity</code></td>
-<td>Density of tree recruits from seeds.</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(N_{tree, ingrowth}\)</span></td>
-<td><span class="math inline">\(ind \cdot ha^{-1}\)</span></td>
-<td><code>IngrowthTreeDensity</code></td>
-<td>Density of trees reaching ingrowth DBH.</td>
+<td>Height for tree recruits from seeds or resprouting</td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(Cover_{shrub, recr}\)</span></td>
@@ -969,11 +969,11 @@ div.csl-indent {
 <h3><span class="header-section-number">18.5.1</span> Recruitment from seeds<a href="dynamicsmodelling.html#recruitment-from-seeds-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>To determine the amount of new trees originated from seeds, the model first determines the <em>seed rain</em> in the stand by determining which cohorts have heights above maturity thresholds for trees (control parameter <code>seedProductionTreeHeight</code>) and shrubs (control parameter <code>seedProductionShrubHeight</code>). Additionally, the user can use a control parameter to impose a seed rain arriving to the stand via dispersal processes, which are not explicitly modelled.</p>
 <p>Actual <em>sapling recruitment</em> (ingrowth into a desired size class) depends on environmental conditions in the stand. Specifically, the model calculates, for the year that ended, the mean temperature of the coldest month (<span class="math inline">\(TCM\)</span>), the moisture index (<span class="math inline">\(MI\)</span>) and the fraction of photosynthetic active radiation reaching the ground, given the current structure (<span class="math inline">\(FPAR\)</span>). These values are compared to species specific parameter thresholds <span class="math inline">\(TCM_{recr}\)</span>, <span class="math inline">\(MI_{recr}\)</span> and <span class="math inline">\(FPAR_{recr}\)</span>, respectively. More specifically, a given species <span class="math inline">\(j\)</span> can recruit only if <span class="math inline">\(TCM &gt; TCM_{recr, j}\)</span>, <span class="math inline">\(MI &gt; MI_{recr, j}\)</span> and <span class="math inline">\(FPAR &gt; FPAR_{recr, j}\)</span>. These filters do not ensure recruitment, as it is assumed that multiple processes can further determine the death of recruits. A probability of recruitment <span class="math inline">\(P_{recr}\)</span> is used to represent these additional processes. When simulation of recruitment is stochastic, a given species will recruit if (in addition to the bioclimatic limits) a Bernouilli draw falls below <span class="math inline">\(P_{recr}\)</span>. If recruitment is deterministic, then the probability of recruitment is used to multiply the recruitment density or cover.</p>
-<p>Tree recruitment density, diameter and height are determined by control parameters <code>recrTreeDensity</code>, <code>recrTreeDBH</code> and <code>recrTreeHeight</code>, respectively; whereas cover and height of shrub recruitment is determined by control parameters <code>recrShrubCover</code> and <code>recrShrubHeight</code>. If stochastic simulation of recruitment is requested, then density or cover values are considered mean values of a Poisson distribution.</p>
+<p>Tree recruitment density, diameter and height are determined by parameters <span class="math inline">\(N_{tree,recr}\)</span>, <span class="math inline">\(DBH_{tree, recr}\)</span> and <span class="math inline">\(H_{tree, recr}\)</span>, respectively; whereas cover and height of shrub recruitment is determined by parameters <code>Cover_{recr}</code> and <span class="math inline">\(H_{shrub, recr}\)</span>, respectively. If stochastic simulation of recruitment is requested, then density or cover values are considered mean values of a Poisson distribution.</p>
 </div>
 <div id="resprouting-1" class="section level3 hasAnchor" number="18.5.2">
 <h3><span class="header-section-number">18.5.2</span> Resprouting<a href="dynamicsmodelling.html#resprouting-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Currently, resprouting only occurs in the model if plant cohorts have been cut or they died of desiccation (i.e. resprouting does not occur for baseline mortality or after plant starvation). The model first determines the density of tree resprouts originated after desiccation of above-ground parts, multiplying the density of desiccated trees by the value of <span class="math inline">\(Resp_{dist}\)</span> of the corresponding species, which should only be non-zero in the case the species has resprouting capacity. If management occurred, the model then estimates the density of resprouts originated after trees were cut, by multiplying the density cut trees by the value of <span class="math inline">\(Resp_{clip}\)</span> of the corresponding species. Tree resprouts have all a starting diameter of <strong>0.5 cm</strong> and a height of <strong>50 cm</strong>, but the root system is the same of the <em>parent</em> tree cohort. In the case of shrub species, the same operations are done, but on cover values instead of density values. Shrub height of resprouts is assumed to be <strong>10 cm</strong>. Resprouting after fire is not yet implemented.</p>
+<p>Currently, resprouting only occurs in the model if plant cohorts have been cut or they died of desiccation (i.e. resprouting does not occur for baseline mortality or after plant starvation). The model first determines the density of tree resprouts originated after desiccation of above-ground parts, multiplying the density of desiccated trees by the value of <span class="math inline">\(Resp_{dist}\)</span> of the corresponding species, which should only be non-zero in the case the species has resprouting capacity. If management occurred, the model then estimates the density of resprouts originated after trees were cut, by multiplying the density cut trees by the value of <span class="math inline">\(Resp_{clip}\)</span> of the corresponding species. Tree resprouts have all a starting diameter <span class="math inline">\(DBH_{tree, recr}\)</span> and a height <span class="math inline">\(H_{tree, recr}\)</span>, but the root system is the same of the <em>parent</em> tree cohort. In the case of shrub species, the same operations are done, but on cover values instead of density values. Shrub height of resprouts is assumed to be <span class="math inline">\(H_{shrub, recr}\)</span>. Resprouting after fire is not yet implemented.</p>
 
 </div>
 </div>
