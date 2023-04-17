@@ -16,11 +16,11 @@ Recruitment of saplings involves a number of processes (flowering and pollinatio
   2. Drought tolerance, indicated by the annual moisture index (annual precipitation divided by annual evapotranspiration).
   3. Shade tolerance, indicated by the percentage of photosynthetic active radiation reaching the ground.
 
-A target species can recruit on a given year if current conditions for all three environmental indicators are above the species tolerance thresholds. A constant probability of recruitment determines actual recruitment within these bioclimatic limits. Recruitment densities and plant size of recruited individuals are specified via species parameters.
+A target species can recruit on a given year if current conditions for all three environmental indicators are above the species tolerance thresholds. A constant probability of recruitment determines actual recruitment within these bioclimatic limits. Recruitment densities and plant size of recruited individuals are specified via species parameters. Trees recruited from seed are subject to self-thinning processes before attaining the diameter of ingrowth (see \@ref(selfthinning)).
 
 ### Resprouting
 
-Resprouting is a common feature of Mediterranean species. Here resprouting is assumed happen from buds at the stump/stool level after a given disturbance has led to aboveground plant die-back. Resprouting can occur as a response to different disturbances. For example, resprouting occurs after clipping (e.g. if management is applied), after a fire, or after cavitation has led to dessication of above-ground plant organs. There are marked differences in resprouting depending on the disturbance type, and fire is often the most severe disturbance because it includes both defoliation and lethal temperatures [@Pausas2016]. Moreover, resprouting vigor also depends on the size of the plant [@moreira_resprout_2012]. Hence, in our model the density of resprouts depends on the cause underlying the resprouting and on the size of the *parent* plant, but in all cases the resprouts inherit the root system of their parent. Like saplings, resprouts are subject to self-thinning processes before attaining the diameter of adults.
+Resprouting is a common feature of Mediterranean species. Here resprouting is assumed happen from buds at the stump/stool level after a given disturbance has led to aboveground plant die-back. Resprouting can occur as a response to different disturbances. For example, resprouting occurs after clipping (e.g. if management is applied), after a fire, or after cavitation has led to dessication of above-ground plant organs. There are marked differences in resprouting depending on the disturbance type, and fire is often the most severe disturbance because it includes both defoliation and lethal temperatures [@Pausas2016]. Moreover, resprouting vigor also depends on the size of the plant [@moreira_resprout_2012]. Hence, in our model the density of resprouts depends on the cause underlying the resprouting and on the size of the *parent* plant, but in all cases the resprouts inherit the root system of their parent. Like saplings, resprouts are subject to self-thinning processes before attaining the diameter of ingrowth (see \@ref(selfthinning)).
 
 ### Forest management
 
@@ -77,13 +77,15 @@ All of them concern the simulation of recruitment and are specified in the speci
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
 | $H_{seed}$  | $cm$ | `SeedProductionHeight` | Minimum height for seed production |
-| $P_{recr}$ | [0-1] | `ProbRecr` | Probability of recruitment within the bioclimatic limits imposed by temperature, moisture and light thresholds |
-| $TCM_{recr}$  | $^{\circ} \mathrm{C}$ | `MinTempRecr` |  Minimum average temperature (Celsius) of the coldest month for successful recruitment |
-| $MI_{recr}$  |  | `MinMoistureRecr` |  Minimum value of the moisture index (annual precipitation over annual PET) for successful recruitment |
-| $FPAR_{recr}$  | \% | `MinFPARRecr` | Minimum percentage of PAR at the ground level for successful recruitment |
-| $DBH_{recr}$  | $cm$  | `RecrTreeDBH` | Recruitment DBH for trees |
-| $H_{tree, recr}$  | $cm$  | `RecrTreeHeight` | Recruitment height for trees |
-| $N_{tree, recr}$  | $ind \cdot ha^{-1}$  | `RecrTreeDensity` | Recruitment density for trees |
+| $P_{recr}$ | [0-1] | `ProbRecr` | Probability of recruitment from seeds within the bioclimatic limits imposed by temperature, moisture and light thresholds |
+| $TCM_{recr}$  | $^{\circ} \mathrm{C}$ | `MinTempRecr` |  Minimum average temperature (Celsius) of the coldest month for successful recruitment from seeds |
+| $MI_{recr}$  |  | `MinMoistureRecr` |  Minimum value of the moisture index (annual precipitation over annual PET) for successful recruitment from seeds |
+| $FPAR_{recr}$  | \% | `MinFPARRecr` | Minimum percentage of PAR at the ground level for successful recruitment from seeds |
+| $DBH_{recr}$  | $cm$  | `RecrTreeDBH` | DBH for tree recruits from seeds (e.g. 1 cm). |
+| $DBH_{ingrowth}$  | $cm$  | `IngrowthTreeDBH` | Ingrowth DBH for trees (e.g. 7.5 cm). |
+| $H_{tree, recr}$  | $cm$  | `RecrTreeHeight` | Height for tree recruits from seeds |
+| $N_{tree, recr}$  | $ind \cdot ha^{-1}$  | `RecrTreeDensity` | Density of tree recruits from seeds. |
+| $N_{tree, ingrowth}$  | $ind \cdot ha^{-1}$  | `IngrowthTreeDensity` | Density of trees reaching ingrowth DBH. |
 | $Cover_{shrub, recr}$  | %  | `RecrShrubCover` | Recruitment cover for shrubs |
 | $H_{shrub, recr}$  | $cm$  | `RecrShrubHeight` | Recruitment height for shrubs |
 | $Z50_{recr}$  | mm  | `RecrZ50` | Soil depth corresponding to 50% of fine roots for recruitment |

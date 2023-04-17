@@ -198,7 +198,9 @@ In this strategy, increases in leaf area will be scheduled whenever the current 
 
 While leaf area target depends on the allocation strategy, the target of fine root biomass for any given soil layer $s$ ($B_{fineroot,target,s}$) directly follows changes in maximum whole-plant conductance. The average resistance in the rhizosphere is assumed to correspond to a fixed percentage of total soil-plant resistance. Hence, changes in the conductance of leaves, stem or coarse roots will entail a variation in the absolute rhizosphere maximum conductance to be targeted ($k_{rhizo,max, target,s}$), which in turn will determine $B_{fineroot,target,s}$. For example $k_{rhizo,max, target,s}$ will increase as a consequence of sapwood area growth. The model thus first estimate $k_{rhizo, max, target,s}$ for each layer $s$ and then translates $k_{rhizo,max, target,s}$ values to $B_{fineroot,target,s}$ using the relationships based on soil saturated hydraulic conductance, species-specific root length, root length density and density of fine roots mentioned above.
 
-## Plant mortality thresholds {#plantmortality}
+## Plant mortality {#plantmortality}
+
+### Plant mortality thresholds {#mortality thresholds}
 
 Plant cohorts can die from either *starvation* (if metabolic carbon is exhausted) or *dessication* (tissue dehydration). When simulating growth with the basic water balance submodel, starvation occurs if $SS_{sapwood} \leq 0$ and, since plant water balance is not explicitly modelled, dessication is determined if $PLC_{stem} \geq 0.5$.  When simulating growth with the advanced water balance submodel, starvation occurs also if $SS_{sapwood} \leq 0$, but in this case a better indicator of dehydration can be used, the stem symplastic relative water content $RWC_{stem, symp}$. Dessication is determined in this case if $RWC_{stem, symp} \leq 0.5$. 
 
@@ -223,6 +225,29 @@ lines(WD, psi_lethal05, col="blue")
 legend("bottomleft", legend=c("RWC = 20%", "RWC = 30%", "RWC = 40%", "RWC = 50%"),
        lty=1, col=c("black", "green","red", "blue"), bty="n")
 ```
+
+### Self-thinning of small trees {#selfthinning}
+
+As explained in the mortality design section (\@ref(mortalitydesign)), the model implements a mortality process for young individual trees, meant to represent a self-thinning process occurring between trees of small diameter, $DBH_{tree, recr}$ and trees achieving the diameter size $DBH_{tree,ingrowth}$ corresponding to inclusion as individual in forest inventories (e.g. ingrowth size). The aim is to ensure that the tree density is progressively reduced until the tree cohort reaches $DBH_{tree,ingrowth}$, where the density should be $N_{tree,ingrowth}$. The following relationship between tree diameter and density is used: 
+\begin{equation}
+N = a_{st} \cdot DBH ^{b_{st}}
+\end{equation}
+where $a_{st}$ and $b_{st}$ are parameters regulating the speed of the self-thinning process. Note that if we know the diameter and density of recruitment (i.e. $DBH_{tree,ingrowth}$ and $N_{tree,ingrowth}$), as well as $N_{tree,ingrowth}$, the density we want to ensure when the tree reaches $DBH_{tree,ingrowth}$, the self-thinning curve is completely determined. Hence, we can estimate $b_{st}$ using:
+\begin{equation}
+b_{st} = \frac{log(N_{tree,ingrowth}/N_{tree,recr})}{log(DBH_{tree,ingrowth}/DBH_{tree,recr})}
+\end{equation}
+whereas $a_{st}$ can be estimated using:
+\begin{equation}
+ a_{st} = \frac{N_{tree, ingrowth}}{DBH_{tree,ingrowth}^{b_{st}}}
+\end{equation}
+
+Once we know the parameters of the self-thinning curve, we can determine the maximum cohort density allowed for any cohort of diameter $DBH_i$. If the tree cohort has density $N_i$, the density decrease due to self-thinning mortality can be estimated using:
+
+\begin{equation}
+N_{dead,i} = N_i - \min(N_i,  a_{st} \cdot DBH_{i}^{b_{st}})
+\end{equation}
+
+Note that the self-thinning process does not distinguish between tree resprouts or trees recruited from seeds.
 
 ## Update of structural variables {#structuralupdate}
 

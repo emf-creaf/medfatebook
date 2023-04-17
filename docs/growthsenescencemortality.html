@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-04-16" />
+<meta name="date" content="2023-04-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -401,7 +401,7 @@ div.csl-indent {
 <li class="chapter" data-level="15.1.2" data-path="growthmodelling.html"><a href="growthmodelling.html#carbon-compartments-transport-and-carbon-balance"><i class="fa fa-check"></i><b>15.1.2</b> Carbon compartments, transport and carbon balance</a></li>
 <li class="chapter" data-level="15.1.3" data-path="growthmodelling.html"><a href="growthmodelling.html#tissue-growth-senescence-and-allocation"><i class="fa fa-check"></i><b>15.1.3</b> Tissue growth, senescence and allocation</a></li>
 <li class="chapter" data-level="15.1.4" data-path="growthmodelling.html"><a href="growthmodelling.html#carbonwaterlinks"><i class="fa fa-check"></i><b>15.1.4</b> Coordination between water and carbon balances</a></li>
-<li class="chapter" data-level="15.1.5" data-path="growthmodelling.html"><a href="growthmodelling.html#plant-mortality"><i class="fa fa-check"></i><b>15.1.5</b> Plant mortality</a></li>
+<li class="chapter" data-level="15.1.5" data-path="growthmodelling.html"><a href="growthmodelling.html#mortalitydesign"><i class="fa fa-check"></i><b>15.1.5</b> Plant mortality</a></li>
 <li class="chapter" data-level="15.1.6" data-path="growthmodelling.html"><a href="growthmodelling.html#tree-diameter-tree-height-and-shrub-cover-updates"><i class="fa fa-check"></i><b>15.1.6</b> Tree diameter, tree height and shrub cover updates</a></li>
 </ul></li>
 <li class="chapter" data-level="15.2" data-path="growthmodelling.html"><a href="growthmodelling.html#state-variables"><i class="fa fa-check"></i><b>15.2</b> State variables</a></li>
@@ -464,7 +464,11 @@ div.csl-indent {
 <li class="chapter" data-level="17.3.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#updateplanttraits"><i class="fa fa-check"></i><b>17.3.1</b> Plant traits</a></li>
 <li class="chapter" data-level="17.3.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#updateallocationtargets"><i class="fa fa-check"></i><b>17.3.2</b> Leaf area and fine root biomass targets</a></li>
 </ul></li>
-<li class="chapter" data-level="17.4" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#plantmortality"><i class="fa fa-check"></i><b>17.4</b> Plant mortality thresholds</a></li>
+<li class="chapter" data-level="17.4" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#plantmortality"><i class="fa fa-check"></i><b>17.4</b> Plant mortality</a>
+<ul>
+<li class="chapter" data-level="17.4.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#plant-mortality-thresholds-mortality-thresholds"><i class="fa fa-check"></i><b>17.4.1</b> Plant mortality thresholds {#mortality thresholds}</a></li>
+<li class="chapter" data-level="17.4.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#selfthinning"><i class="fa fa-check"></i><b>17.4.2</b> Self-thinning of small trees</a></li>
+</ul></li>
 <li class="chapter" data-level="17.5" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#structuralupdate"><i class="fa fa-check"></i><b>17.5</b> Update of structural variables</a>
 <ul>
 <li class="chapter" data-level="17.5.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#tree-diameter-height-and-crown-ratio"><i class="fa fa-check"></i><b>17.5.1</b> Tree diameter, height and crown ratio</a></li>
@@ -851,9 +855,32 @@ In this strategy, increases in leaf area will be scheduled whenever the current 
 </div>
 </div>
 <div id="plantmortality" class="section level2 hasAnchor" number="17.4">
-<h2><span class="header-section-number">17.4</span> Plant mortality thresholds<a href="growthsenescencemortality.html#plantmortality" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<h2><span class="header-section-number">17.4</span> Plant mortality<a href="growthsenescencemortality.html#plantmortality" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="plant-mortality-thresholds-mortality-thresholds" class="section level3 hasAnchor" number="17.4.1">
+<h3><span class="header-section-number">17.4.1</span> Plant mortality thresholds {#mortality thresholds}<a href="growthsenescencemortality.html#plant-mortality-thresholds-mortality-thresholds" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Plant cohorts can die from either <em>starvation</em> (if metabolic carbon is exhausted) or <em>dessication</em> (tissue dehydration). When simulating growth with the basic water balance submodel, starvation occurs if <span class="math inline">\(SS_{sapwood} \leq 0\)</span> and, since plant water balance is not explicitly modelled, dessication is determined if <span class="math inline">\(PLC_{stem} \geq 0.5\)</span>. When simulating growth with the advanced water balance submodel, starvation occurs also if <span class="math inline">\(SS_{sapwood} \leq 0\)</span>, but in this case a better indicator of dehydration can be used, the stem symplastic relative water content <span class="math inline">\(RWC_{stem, symp}\)</span>. Dessication is determined in this case if <span class="math inline">\(RWC_{stem, symp} \leq 0.5\)</span>.</p>
 <p><img src="medfatebook_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+</div>
+<div id="selfthinning" class="section level3 hasAnchor" number="17.4.2">
+<h3><span class="header-section-number">17.4.2</span> Self-thinning of small trees<a href="growthsenescencemortality.html#selfthinning" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>As explained in the mortality design section (<a href="growthmodelling.html#mortalitydesign">15.1.5</a>), the model implements a mortality process for young individual trees, meant to represent a self-thinning process occurring between trees of small diameter, <span class="math inline">\(DBH_{tree, recr}\)</span> and trees achieving the diameter size <span class="math inline">\(DBH_{tree,ingrowth}\)</span> corresponding to inclusion as individual in forest inventories (e.g. ingrowth size). The aim is to ensure that the tree density is progressively reduced until the tree cohort reaches <span class="math inline">\(DBH_{tree,ingrowth}\)</span>, where the density should be <span class="math inline">\(N_{tree,ingrowth}\)</span>. The following relationship between tree diameter and density is used:
+<span class="math display">\[\begin{equation}
+N = a_{st} \cdot DBH ^{b_{st}}
+\end{equation}\]</span>
+where <span class="math inline">\(a_{st}\)</span> and <span class="math inline">\(b_{st}\)</span> are parameters regulating the speed of the self-thinning process. Note that if we know the diameter and density of recruitment (i.e. <span class="math inline">\(DBH_{tree,ingrowth}\)</span> and <span class="math inline">\(N_{tree,ingrowth}\)</span>), as well as <span class="math inline">\(N_{tree,ingrowth}\)</span>, the density we want to ensure when the tree reaches <span class="math inline">\(DBH_{tree,ingrowth}\)</span>, the self-thinning curve is completely determined. Hence, we can estimate <span class="math inline">\(b_{st}\)</span> using:
+<span class="math display">\[\begin{equation}
+b_{st} = \frac{log(N_{tree,ingrowth}/N_{tree,recr})}{log(DBH_{tree,ingrowth}/DBH_{tree,recr})}
+\end{equation}\]</span>
+whereas <span class="math inline">\(a_{st}\)</span> can be estimated using:
+<span class="math display">\[\begin{equation}
+a_{st} = \frac{N_{tree, ingrowth}}{DBH_{tree,ingrowth}^{b_{st}}}
+\end{equation}\]</span></p>
+<p>Once we know the parameters of the self-thinning curve, we can determine the maximum cohort density allowed for any cohort of diameter <span class="math inline">\(DBH_i\)</span>. If the tree cohort has density <span class="math inline">\(N_i\)</span>, the density decrease due to self-thinning mortality can be estimated using:</p>
+<p><span class="math display">\[\begin{equation}
+N_{dead,i} = N_i - \min(N_i,  a_{st} \cdot DBH_{i}^{b_{st}})
+\end{equation}\]</span></p>
+<p>Note that the self-thinning process does not distinguish between tree resprouts or trees recruited from seeds.</p>
+</div>
 </div>
 <div id="structuralupdate" class="section level2 hasAnchor" number="17.5">
 <h2><span class="header-section-number">17.5</span> Update of structural variables<a href="growthsenescencemortality.html#structuralupdate" class="anchor-section" aria-label="Anchor link to header"></a></h2>
