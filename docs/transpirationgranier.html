@@ -708,17 +708,17 @@ Before <strong>ver 2.5.0</strong> <span class="math inline">\(Tr_{\max, i}\)</sp
 <h3><span class="header-section-number">6.1.2</span> Actual plant transpiration and plant water potential<a href="transpirationgranier.html#actualtranspiration" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Actual plant transpiration depends on soil moisture and is calculated for each plant cohort and each soil layer separately. <span class="math inline">\(Tr_{i,s}\)</span> (in mm) represents the transpiration made by cohort <span class="math inline">\(i\)</span> from layer <span class="math inline">\(s\)</span>. Actual plant transpiration from a given layer is regulated by soil moisture and the resistance to water flow through the plant. For each plant cohort <span class="math inline">\(i\)</span> and soil layer <span class="math inline">\(s\)</span>, the model first estimates the a whole-plant relative water transpiration, <span class="math inline">\(K_{i,s}\)</span>, which varies between 0 and 1 depending on <span class="math inline">\(\Psi_{extract,i}\)</span>, the potential at which transpiration is 50% of maximum, and <span class="math inline">\(\Psi_s\)</span>, the water potential in layer <span class="math inline">\(s\)</span>. This relationship is modelled using a Weibull function (see function <code>hydraulics_psi2K()</code>):
 <span class="math display" id="eq:relativewholeplantconductance">\[\begin{equation}
-K_{i,s}=K_{i}(\Psi_s) = \exp \left \{\ln{(0.5)}\cdot \left[ \frac{\Psi_s}{\Psi_{extract,i}} \right] ^r \right \}
+K_{i,s}=K_{i}(\Psi_s) = \exp \left \{\ln{(0.5)}\cdot \left[ \frac{\Psi_s}{\Psi_{extract,i}} \right] ^{c_{extract,i}} \right \}
 \tag{6.2}
 \end{equation}\]</span>
-where <span class="math inline">\(r\)</span> is an exponent that modulates the steepness of the decrease in relative
-conductance when soil potential becomes negative (by default, <span class="math inline">\(r = 3\)</span>) and <span class="math inline">\(\ln(0.5)\)</span>
+where <span class="math inline">\(c_{extract,i}\)</span> is an exponent that modulates the steepness of the decrease in relative
+conductance when soil potential becomes negative and <span class="math inline">\(\ln(0.5)\)</span>
 is used to ensure that <span class="math inline">\(K_{i}(\Psi_{extract,i}) = 0.5\)</span> (Fig. <a href="transpirationgranier.html#fig:wholeplantconductance">6.2</a>).</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:wholeplantconductance"></span>
-<img src="medfatebook_files/figure-html/wholeplantconductance-1.png" alt="Whole-plant relative water conductance functions for different water potential values (\(r = 3\) in all cases)" width="384" />
+<img src="medfatebook_files/figure-html/wholeplantconductance-1.png" alt="Whole-plant relative water conductance functions for different water potential values (\(c_{extract} = 3\) in all cases)" width="384" />
 <p class="caption">
-Figure 6.2: Whole-plant relative water conductance functions for different water potential values (<span class="math inline">\(r = 3\)</span> in all cases)
+Figure 6.2: Whole-plant relative water conductance functions for different water potential values (<span class="math inline">\(c_{extract} = 3\)</span> in all cases)
 </p>
 </div>
 <p>If cavitation has occurred in previous steps then the capacity of the plant to transport water is impaired. Hence <span class="math inline">\(K_{i,s}\)</span> from eq. <a href="transpirationgranier.html#eq:relativewholeplantconductance">(6.2)</a> cannot be larger than the one-complement of <span class="math inline">\(PLC_i\)</span>, so that:
