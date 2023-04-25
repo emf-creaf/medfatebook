@@ -1,19 +1,19 @@
 # Model inputs
 
-This chapter describes the input requirements for simulation models of **medfate** and **medfateland** packages. First we describe the input R structures required for the two packages. Then, we provide the details for four different kinds of input:
+This chapter describes the inputs required by simulation models of **medfate** and **medfateland** packages. First, we describe the R structures required for the two packages. Then, we provide the details for four different kinds of inputs:
 
-  (1) A description of the  **vegetation** existing in the target forest stand is needed. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in `spwb()` calls, but becomes dynamic in calls to `growth()`. Hence, in this latter case the input vegetation describes the starting point. 
-  (2) Information on the physical structure of **soil** is also required and is considered static. 
-  (3) Unlike soil physical features, **weather** is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur. 
-  (4) Finally, **topographic and geographic information** is also required, since internal calculations of some physical variables (such as atmospheric pressure or radiation) require them. 
+  (1) *Vegetation existing in the forest stand*. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in `spwb()` calls, but becomes dynamic in calls to `growth()` or `fordyn()`. Hence, in these functions the input vegetation describes the starting point. 
+  (2) *Information on the physical structure of soil*. Soil information is also required but, unlike vegetation, soil's physical structure is considered static. 
+  (3) *Climatic forcing*. Weather is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur. 
+  (4) *Topographic and geographic information*. Topography and latitude are also required, because internal calculations of some physical variables require them. 
 
 The last section describes additional input parameters that are used to specify global options of simulation functions.
 
-Since preparing inputs for simulations can be hard, package [**medfateutils**](https://github.com/emf-creaf/medfateutils) provides a set of utility functions aimed at facilitating this task.
+Since preparing inputs for simulations can be daunting for most users, package [**medfateutils**](https://github.com/emf-creaf/medfateutils) provides a set of utility functions aimed at facilitating the preparation of vegetation and soil inputs, whereas package [**meteoland**](https://github.com/emf-creaf/meteoland) provides functions to assess daily weather over landscapes.
 
 
 ## Input structures
-### Input structures in medfate
+### Input structures in medfate {#inputstructuresmedfate}
 
 Package **medfate** deals with simulations at stand level and, hence, the data structures defined in the package are meant to encapsulate information about a target forest stands and the properties of the soil where it grows:
 
@@ -21,7 +21,7 @@ Package **medfate** deals with simulations at stand level and, hence, the data s
 + S3 class `forest` is a list of forest inventory data (i.e. mainly tree and shrub measurements, but can include herbaceous vegetation) corresponding to a single forest stand. Forest plot objects are described in subsection \@ref(forestobjects). 
 + S3 classes `spwbInput` and `growthInput` are lists containing all the vegetation parameters and state variables necessary to run water-balance simulations (function `spwb()` and alike) and forest growth simulations (function `growth()` and alike). Objects of classes `spwbInput` and `growthInput` are created using functions whose input includes a `forest` object and a `soil` object. 
 
-The following figure can be used to illustrate the workflow of soil/forest input creation for the main simulation functions in **medfate**:
+The figure below (Fig. \@ref(fig:inputworkflow)) can be used to illustrate the workflow of soil/forest input creation for the main simulation functions in **medfate**. Note the different inputs in the case of `fordyn()`.
 
 ```{r inputworkflow, out.width='100%', fig.align="center", fig.cap="Schematic workflow of input creation for simulation functions in medfate", echo=FALSE}
 knitr::include_graphics("input_workflow.png")
@@ -30,7 +30,7 @@ knitr::include_graphics("input_workflow.png")
 
 ### Input structures in medfateland {#medfatelandstructures}
 
-Spatial information for **medfateland** needs to be provided in `sf` objects (i.e. data frames with geometry), whose actual columns required depend on the simulation function to be used. 
+Spatial information for **medfateland** needs to be provided in `sf` objects (i.e. data frames with geometry, see package [**sf**](https://cran.r-project.org/package=sf)), whose actual columns required depend on the simulation function to be used, as described in the following table. 
 
 |  Column | Description         | Use                           |
 | ------- | ------------------- | ----------------------------- |
@@ -61,11 +61,11 @@ Spatial information for **medfateland** needs to be provided in `sf` objects (i.
 
 ## Latitude and topography {#topoinput}
 
-Topography has a relatively small direct influence in **medfate** simulations, because most topographic effects are assumed to be taken into account in the estimation of weather input. Nonetheless, *elevation* in meters is needed to estimate atmospheric pressure and air density (see \@ref(meteoinput)), whereas *aspect* (in degrees from North) and *slope* (also in degrees) are needed in addition to *latitude* (also in degrees North) to estimate sunrise/sunset hours and potential radiation. Topographic variables should be readily accessible for users having access to a digital elevation model.
+Topography has a relatively small direct influence in **medfate** simulations, because most topographic effects are assumed to be taken into account in the estimation of weather inputs. Nonetheless, *elevation* in meters is needed to estimate atmospheric pressure and air density (see \@ref(meteoinput)), whereas *aspect* (in degrees from North) and *slope* (also in degrees) are needed in addition to *latitude* (also in degrees North) to estimate sunrise/sunset hours and potential radiation. Topographic variables should be readily accessible for users having access to a digital elevation model of the target area.
 
 ## Soil description  {#soilinput}
 
-Soils are described in **medfate** using $S > 1$ different soil layers ($s \in \{1, 2, ..., S\}$). Here the word *soil* refers to depths that plant rooting systems can reach (i.e., the critical zone), including cracks within the bedrock. The number and size of soil layers may reflect changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties and are considered *static* parameters in simulations. In contrast, soil moisture content, variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered, are state variables.
+Soils are described in **medfate** using $S > 1$ different soil layers ($s \in \{1, 2, ..., S\}$). Here the word *soil* refers to depths that plant rooting systems can reach (i.e., the critical zone), including cracks within the bedrock. The number and size of soil layers may correspond to changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties and are considered **static soil parameters** in simulations. In contrast, soil moisture content, other variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered, are all **soil state variables**.
 
 ### Soil physical properties
 
@@ -90,11 +90,11 @@ The depth of a given soil layer $s$ ($Z_s$; in mm) is defined as the sum of laye
 \begin{equation}
 Z_s = \sum_{i=1}^s{d_s}
 \end{equation}
-And the overall *soil depth*  ($Z_{soil}$; in mm) is the sum of soil layer widths. As it may include rocky layers, the value of $Z_{soil}$ may be larger than the soil depth reported in soil profiles. 
+And the overall *soil depth*  ($Z_{soil}$; in mm) is the sum of widths across all soil layers. As the soil may include deep rocky layers, the value of $Z_{soil}$ may be larger than the soil depth reported in soil profiles. 
 
 ### Water retention curves {#waterretentioncurves}
 
-The water retention curve of a soil is the relationship between *volumetric soil moisture content* ($\theta$, in $m^3 \cdot m^{-3}$ of soil, excluding rock fragments) and the corresponding *soil water potential* ($\Psi$, in MPa), i.e. the amount of work that must be done per unit quantity of pure water in order to transport reversibly and isothermally an infinitesimal quantity of water from a reference pool. The shape of the water retention curve (also called the *soil moisture characteristic curve*) depends on physical properties (mainly texture and bulk density, but also organic matter content). Since soil layers usually differ in their physical properties they also normally have different water retention curves.
+The **water retention curve** of a soil is the relationship between *volumetric soil moisture content* ($\theta$, in $m^3 \cdot m^{-3}$ of soil, excluding rock fragments) and the corresponding *soil water potential* ($\Psi$, in MPa), i.e. the amount of work that must be done per unit quantity of pure water in order to transport reversibly and isothermally an infinitesimal quantity of water from a reference pool. The shape of the water retention curve (also called the *soil moisture characteristic curve*) depends on physical properties (mainly texture and bulk density, but also organic matter content). Since soil layers usually differ in their physical properties they also normally have different water retention curves.
 
 Two water retention curve models are available in **medfate** (fig. \@ref(fig:retention-curves)):
 
@@ -114,7 +114,7 @@ soil_retentionCurvePlot(soil(defaultSoilParams()), model="both")+
 
 
 ### Soil initialization  {#soilinitialization}
-Soil initialization is needed to estimate soil hydrological parameters for each soil layer $s$ from their physical attributes. Initialization is done using function `soil()`, which returns an object of a S3 class with the same name. Simulation functions in **medfate** need an object of class `soil` to be run. 
+Soil initialization is needed to estimate hydrological parameters for each soil layer $s$ from its physical attributes. Soil initialization is done using function `soil()`, which returns an object of a S3 class with the same name (see \@ref(inputstructuresmedfate)). Simulation functions in **medfate** need an object of class `soil` to be run. 
 
 Function `soil()` adds the following information to the physical soil description: 
 
@@ -169,13 +169,13 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 
 ## Vegetation description {#vegetationinput}
 
-The representation of vegetation within a target forest stand is done in **medfate** primarily by means of **cohorts of woody plants** (i.e. trees and shrubs). A woody plant cohort represents a set of plants that belong to the same species (or functional group) and are more or less of the same *size*. For example, trees in a stand may be grouped by species and diameter class, whereas shrubs may be grouped by species and height. This representation is chosen so that package functions can be easily applied to **forest inventory data**, for example from national forest surveys. The description of woody plant cohorts includes a measure of *abundance* of the cohort in the stand, which in the case of trees is *density* as stems per hectare and for shrubs is *percent cover* (shrubs are often multi-stemmed). The difference in measurement units for abundance is the main motivation for distinguishing between tree cohorts and shrub cohorts, rather than their size or growth form. Additionally, the description of vegetation may include the cover and height of **herbaceous vegetation**. This is not always present in forest inventory data, but may be relevant for open vegetation such as shrublands.
+The representation of vegetation within a target forest stand is done in **medfate** primarily by means of **cohorts of woody plants** (i.e. trees and shrubs). A woody plant cohort represents a set of woody plants that belong to the same species (or functional group) and are more or less of the same *size*. For example, trees in a stand may be grouped by species and diameter class, whereas shrubs may be grouped by species and height. In practice however, plant cohorts are entities that are treated separately when modeling the forest stand. This representation in plant cohorts was chosen so that package functions can be easily applied to **forest inventory data**, for example from national forest surveys. The description of woody plant cohorts includes a measure of *abundance* of the cohort in the stand, which in the case of trees is *density* as stems per hectare and for shrubs is *percent cover* (shrubs are often multi-stemmed). The difference in measurement units for abundance is the main motivation for distinguishing between tree cohorts and shrub cohorts, rather than their size or growth form. Additionally, the description of vegetation in the forest stand may include the cover and mean height of a **herbaceous layer**. The presence or abundance of herbs is not always recorded in forest inventory surveys, but may be relevant vegetation component in open habitats like shrublands.
 
 Note that one limitation of the representation of vegetation in **medfate** is that it is not spatially-explicit (i.e. plants cannot have explicit coordinates within forest stands) and hence spatial (horizontal) interactions between plant cannot be taken into account explicitly (but see \@ref(plantwaterpools)).  
 
 ### Structural attributes of woody plant cohorts
 
-A plant cohort $i$ is either a *tree cohort* or a *shrub cohort*, and is defined using a set of structural attributes shown in the following table, where columns **spwb**, **growth** and **fordyn** indicate whether attributes are required by simulation functions `spwb()/pwb()`, `growth()` and `fordyn()`, respectively:
+A woody plant cohort $i$ is either a *tree cohort* or a *shrub cohort*, and is defined using a set of structural attributes shown in the following table, where columns **spwb**, **growth** and **fordyn** indicate whether attributes are required by simulation functions `spwb()/pwb()`, `growth()` and `fordyn()`, respectively:
 
 | Symbol | Units | R  | Description                        | spwb | growth | fordyn |
 |--------|-------|----| ------------------------------------|-----|-----|-----|
@@ -191,15 +191,16 @@ A plant cohort $i$ is either a *tree cohort* or a *shrub cohort*, and is defined
 | $Z_{50,i}$ | mm | `Z50` | Depth above which 50% of the fine root mass is located | Y | Y | Y |
 | $Z_{95,i}$ | mm | `Z95` | Depth above which 95% of the fine root mass is located | Y | Y | Y |
 
-Height ($H$) values refer to average height of individuals included in the cohort, and the same for crown ratio ($CR$) and diameter at breast height ($DBH$). While plant size (i.e. height or diameter) is relatively easy to tally, other measurements are not usually made in the field. Package **medfate** includes utility functions that provide estimates $CR$ and $LAI$ from forest inventory data (e.g. heights, DBH and density for measured trees), using allometric relationships calibrated for Catalonia (see chapter \@ref(allometricmodels)). 
+Height ($H$) values refer to average height of individuals included in the cohort, and the same for crown ratio ($CR$) and diameter at breast height ($DBH$). While plant size (i.e. height or diameter) is relatively easy to tally, other measurements are not usually made in the field. Package **medfate** includes utility functions that provide estimates $CR$ and $LAI$ from forest inventory data (e.g. heights, DBH and density for measured trees), using allometric relationships calibrated for Catalonia, Spain (see chapter \@ref(allometricmodels)). 
 
-$LAI$ variables refer to *one-sided leaf area* of plants in the cohort per surface area of the stand. Leaves standing on branches can be alive or dead. We will call *total leaf area index* of a plant cohort $i$ ($LAI^{all}_{i}$) to the sum of dead and live (and unfolded) leaves of the cohort:
+**Leaf area index**
+
+$LAI$ variables refer to *one-sided leaf area* of plants per surface area of the stand. Leaves standing on branches of woody plants can be alive or dead. We will call *total leaf area index* of a woody plant cohort $i$ ($LAI^{all}_{i}$) to the sum of its dead and live (and unfolded) leaf area:
 \begin{equation}
 LAI^{all}_{i} = LAI^{\phi}_{i}+LAI^{dead}_{i}
 \end{equation}
 
-For simulations not involving growth, winter-deciduous phenology is a prognostic variable and the current level of leaves unfolded may be lower than the maximum (live) amount of leaves. In simulations involving growth, both $LAI^{\phi}$ and $LAI^{live}$ can change, the former due to leaf phenology (unfolding is  simulated explicitly and has carbon costs) and the latter due to leaf allocation limits during plant development.
-
+For simulations not involving growth, winter-deciduous phenology is a prognosed variable, and the current level of leaves unfolded may be lower than the maximum (live) amount of leaves. In simulations involving growth, both $LAI^{\phi}$ and $LAI^{live}$ can change, the former due to leaf phenology (unfolding is simulated explicitly and has carbon costs) and the latter due to leaf allocation limits during plant development.
 
 ### Structural attributes of herbaceous vegetation
 
@@ -215,7 +216,7 @@ Leaf area index of herbaceous layer ($LAI_{herb}$), is normally estimated from $
 
 ### Leaf area index of the forest stand
 
-If there are $c$ plant cohorts, the leaf area index corresponding to living leaves, unfolded leaves and dead leaves can be aggregated across woody cohorts using:
+If there are $c$ woody plant cohorts, the leaf area index corresponding to living leaves, unfolded leaves and dead leaves can be aggregated across cohorts using:
 
 \begin{eqnarray}
 LAI^{live}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{live}} \\
@@ -223,7 +224,7 @@ LAI^{\phi}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{\phi}} \\
 LAI^{dead}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{dead}}
 \end{eqnarray}
 
-Finally, we can also estimate the overall leaf area index of the whole stand, which also takes into account herbaceous vegetation:
+Finally, we can also estimate the overall leaf area index of the whole stand, which also takes into account the herbaceous layer:
 
 \begin{eqnarray}
 LAI^{all}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{all}} + LAI_{herb} = LAI^{\phi}_{stand}+LAI^{dead}_{stand} + LAI_{herb} 
@@ -232,13 +233,13 @@ LAI^{all}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{all}} + LAI_{herb} = LAI^{\phi}_{sta
 
 ### Forest plot objects {#forestobjects}
 
-While the previous section described the structural forest variables required to run simulations in **medfate**, forest plot data input in the package is easier if one uses a format that follows closely forest inventory plot descriptions. In this format, each forest plot is represented in an object of class `forest`, a list that contains several elements:
+While the previous section described the structural forest variables required to run simulations in **medfate**, forest plot data input in the package is easier if one uses a format that follows closely forest inventory plot descriptions. In this format, each forest plot is represented in an object of class `forest`, a list that contains several elements. Here we use an example forest stand provided with the package:
 ```{r}
 data(exampleforestMED)
 exampleforestMED
 ```
 
-Among them, the most important items are two data frames, `treeData` (for trees) and `shrubData` for shrubs, but the herbaceous layer is described using `herbCover` and `herbHeight`. With the aim to help users in the task of constructing `forest` objects, package [**medfateutils**](https://github.com/emf-creaf/medfateutils) includes functions to map user data in into tables `treeData` and `shrubData`.
+The most important items of `forest` are the two data frames describing woody vegetation, `treeData` (for trees) and `shrubData` for shrubs, but the herbaceous layer can also be described using `herbCover` and `herbHeight`. With the aim to help users in the task of constructing `forest` objects, package [**medfateutils**](https://github.com/emf-creaf/medfateutils) includes functions to map user data in into tables `treeData` and `shrubData`.
 
 `forest` objects are a convenient format to start calculations with **medfate**, because there are many static functions that take forest objects as input. For example, a `summary.forest()` function provides the basal area, density, cover and leaf area index of the forest stand, and its different components:
 
@@ -249,7 +250,7 @@ summary(exampleforestMED, SpParamsMED)
 
 ### Vertical leaf distribution {#leafdistribution}
 
-The vegetation inputs for height, leaf area index and crown ratio allow the package to determine the vertical distribution of leaves in the stand. The leaf area of any plant cohort is assumed to be distributed vertically following a **truncated Gaussian function** whose standardized values -1.5 and 1.5 correspond to crown base height ($H_{crown,i}$; in $cm$) and total plant height ($H_i$), respectively. Crown base height is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort ($CR_i$; a proportion between 0 and 1), which in turn can be estimated as explained in \@ref(eq:CrownHeight). 
+The vegetation input structures allow the package to determine the vertical distribution of leaves in the stand. The leaf area of any woody plant cohort is assumed to be distributed vertically following a **truncated Gaussian function** whose standardized values -1.5 and 1.5 correspond to crown base height ($H_{crown,i}$; in $cm$) and total plant height ($H_i$), respectively. Crown base height is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort ($CR_i$; a proportion between 0 and 1), which in turn can be estimated as explained in \@ref(eq:CrownHeight). 
 
 Simulation models in **medfate** divide the vertical dimension into vertical layers (by default are 100 cm width, but see control parameter `verticalLayerSize`). Let us define $LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}$ as the leaf area index of cohort $i$ in layer $j$ including both functional leaves and dead leaves standing on branches. The truncated Gaussian distribution defines the $LAI_{i,j}^{\phi}$ and $LAI_{i,j}^{dead}$ for all plant cohorts and vertical layers.
 
@@ -264,7 +265,7 @@ plot_grid(g1, g2, nrow=1, ncol=2)
 
 The leaf area density profile determines the light extinction rates through the forest canopy. The same truncated Gaussian distribution is used to distribute leaf and small branch biomass along the vertical dimension.
 
-If present, we can include herbaceous vegetation (i.e. $LAI_{herb}$) in the leaf area density profile:
+When present, we can include herbaceous vegetation (i.e. $LAI_{herb}$) in the leaf area density profile. Its vertical distribution is also assumed to follow a truncated Gaussian function:
 
 ```{r leafareadensityherbs, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap="Leaf area density distribution in a forest stand, including the herbaceous layer. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution."}
 g1<-vprofile_leafAreaDensity(exampleforestMED, SpParamsMED, z = seq(0,1000, by=1), byCohorts = T, includeHerbs = TRUE)
@@ -329,15 +330,15 @@ $Area_{i,s} > AreaPool_{i}$ then the excess should be counted as overlap with th
 
 Besides the physical representation of vegetation, forest ecosystem models require information regarding plant functional traits, because this influences the outcome of physical, physiological and hydrological processes. In the following chapters, we will indicate for each simulated process its required plant functional parameters. A description of all parameters is provided in data frame `SpParamsDefinition` included in the package.
 
-Normally, functional traits are described at the species level because infra-specific parameters are hard to get. Even at the species level, many functional (e.g. physiological) traits are hard to obtain, so in **medfate** we provide a default species parameter table for woody species found in Spain, with many of them occurring elsewhere in the Mediterranean Basin (`SpParamsMED`). A new parameter data set is being developed for plants in California (`SpParamsUS`). User can modify these data frames to account for intra-specific trait variation (see function `modifySpParams()`). 
+Normally, functional traits are described at the species level because infra-specific parameters are hard to get. Even at the species level, many functional (e.g. physiological) traits are hard to obtain, so in **medfate** we provide a default species parameter table for woody species found in Spain, with many of them occurring elsewhere in the Mediterranean Basin (`SpParamsMED`). User can modify this data frame to account for intra-specific trait variation (see function `modifySpParams()`). 
 
-The package provides functions `spwbInput()` and `growthInput()` that prepare the vegetation input for simulation functions `spwb()` and `growth()`, respectively. This initialization mostly consists in compiling the necessary functional traits from the species parameter table, following the $SP_i$ attribute of plant cohorts. Some new model parameters are estimated from the initial ones, while taking into account the structural attributes of cohorts (an example of these derived quantities is stem conductance, which estimated from stem xylem conductivity, Huber value and plant height). Users can take the output of these initialization functions and replace parameter values for specific plant cohorts (see function `modifyCohortParams()`). 
+The package provides functions `forest2spwbInput()` and `forest2growthInput()` that prepare the `forest` vegetation input for simulation functions `spwb()` and `growth()`, respectively (see \@ref(inputstructuresmedfate)). This initialization mostly consists in compiling the necessary functional traits from the species parameter table, following the $SP_i$ attribute of woody plant cohorts. Some new model parameters are estimated from the initial ones, while taking into account the structural attributes of cohorts (an example of these derived quantities is stem conductance, which estimated from stem xylem conductivity, Huber value and plant height). Users can take the output of these initialization functions and replace parameter values for specific plant cohorts (see function `modifyCohortParams()`). 
 
 ### Update of structural variables during simulations
 
 Vegetation characteristics stay constant during simulations using functions `spwb()` or `pwb()`, although the actual (unfolded) leaf area and dead leaf area may vary depending on leaf phenology.
 
-In contrast, growth simulation requires updating the structure of vegetation, i.e. plant heights, tree diameters, tree density and shrub cover. Function `growth()` can modify any of the vegetation attributes. Finally, function `fordyn()` modifies not only structural variables of the initial cohorts but also involves the recruitment of new woody cohorts during simulations.
+In contrast, growth simulation requires updating the structure of vegetation, i.e. plant heights, tree diameters, tree density and shrub cover. Function `growth()` can modify any of the vegetation attributes. Finally, function `fordyn()` modifies not only structural variables of the initial cohorts but also involves the removal of dead (or cut) woody cohorts and recruitment of new woody cohorts during simulations.
 
 
 ## Metereological input {#meteoinput}
@@ -379,12 +380,12 @@ names(defaultControl())
 ```
 
 
-Control parameters are employed when initializing vegetation inputs and state variables using functions `forest2spwbInput()` and `forest2growthInput()`, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as `spwb()` or `growth()`. Function `fordyn()` is different than the other simulation functions, because the list control parameters is directly passed to the function.
+Control parameters are employed when initializing vegetation inputs and state variables using functions `forest2spwbInput()` and `forest2growthInput()`, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as `spwb()` or `growth()`. Function `fordyn()` is different than the other simulation functions, because the list control parameters is directly passed to the function (see \@ref(inputstructuresmedfate)).
 
-Even if the list of control parameters is large, not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), and most of them should not be altered from their default values. However, there are a set of parameters that are relevant learning:
+Even if the list of control parameters is long, not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), and most of them should not be altered from their default values. However, there are a set of parameters that are worth learning:
 
 + `verbose [=TRUE]`: Whether extra console output is desired during simulations.
 + `fillMissingRootParams [= TRUE]`: Boolean flag to indicate that initialization functions should provide estimates for `Z50` and `Z95` if these are lacking in the forest data. Note that if `fillMissingRootParams` is set to `FALSE` then simulations may fail if the user does not provide values for `Z50` and `Z95` in tree or shrub data.
 + `fillMissingSpParams [=TRUE]`: Boolean flag to indicate that initialization functions should provide estimates for functional parameters if these are lacking in the species parameter table `SpParams`. Note that if `fillMissingSpParams` is set to `FALSE` then simulations may fail if the user does not provide values for required parameters.
-+ `transpirationMode [="Granier"]` is an important control parameter, because it allows the user to switch between the *basic* (i.e. `"Granier"`) and *advanced* (i.e., either `"Sperry"` or `"Cochard"`) water balance models (chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). 
++ `transpirationMode [="Granier"]` is an important control parameter, because it allows the user to switch between the *basic* (i.e. `"Granier"`) and *advanced* (i.e., either `"Sperry"` or `"Cochard"`) water balance models, corresponding to chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance), respectively. 
 + `rhizosphereOverlap [="total"]` is also a relevant parameter, since changing its default value allows considering that plants extract soil water from partially or totally unrelated water pools, as explained in \@ref(plantwaterpools).
