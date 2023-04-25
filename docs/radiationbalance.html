@@ -232,7 +232,7 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="3.6" data-path="basicwaterbalance.html"><a href="basicwaterbalance.html#basicwaterbalanceapplications"><i class="fa fa-check"></i><b>3.6</b> Applications</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="leafphenologylight.html"><a href="leafphenologylight.html"><i class="fa fa-check"></i><b>4</b> Leaf phenology and light extinction</a>
+<li class="chapter" data-level="4" data-path="leafphenologylight.html"><a href="leafphenologylight.html"><i class="fa fa-check"></i><b>4</b> Leaf phenology and radiation extinction</a>
 <ul>
 <li class="chapter" data-level="4.1" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafphenology"><i class="fa fa-check"></i><b>4.1</b> Leaf phenology</a>
 <ul>
@@ -241,7 +241,7 @@ div.csl-indent {
 <li class="chapter" data-level="4.1.3" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafphenosenescence"><i class="fa fa-check"></i><b>4.1.3</b> Leaf senescence</a></li>
 <li class="chapter" data-level="4.1.4" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leaf-abscission"><i class="fa fa-check"></i><b>4.1.4</b> Leaf abscission</a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path="leafphenologylight.html"><a href="leafphenologylight.html#basiclightextinction"><i class="fa fa-check"></i><b>4.2</b> Light extinction</a></li>
+<li class="chapter" data-level="4.2" data-path="leafphenologylight.html"><a href="leafphenologylight.html#basiclightextinction"><i class="fa fa-check"></i><b>4.2</b> Radiation extinction</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="hydrology.html"><a href="hydrology.html"><i class="fa fa-check"></i><b>5</b> Forest hydrology</a>
 <ul>
@@ -250,8 +250,9 @@ div.csl-indent {
 <li class="chapter" data-level="5.3" data-path="hydrology.html"><a href="hydrology.html#interception"><i class="fa fa-check"></i><b>5.3</b> Rainfall interception loss</a></li>
 <li class="chapter" data-level="5.4" data-path="hydrology.html"><a href="hydrology.html#runoff"><i class="fa fa-check"></i><b>5.4</b> Runoff, infiltration and percolation</a></li>
 <li class="chapter" data-level="5.5" data-path="hydrology.html"><a href="hydrology.html#soilevaporation"><i class="fa fa-check"></i><b>5.5</b> Bare soil evaporation</a></li>
+<li class="chapter" data-level="5.6" data-path="hydrology.html"><a href="hydrology.html#herbaceoustranspiration"><i class="fa fa-check"></i><b>5.6</b> Transpiration of the herbaceous layer</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Plant transpiration, photosynthesis and water status</a>
+<li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Woody plant transpiration, photosynthesis and water status</a>
 <ul>
 <li class="chapter" data-level="6.1" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-transpiration-and-photosynthesis"><i class="fa fa-check"></i><b>6.1</b> Plant transpiration and photosynthesis</a>
 <ul>
@@ -700,18 +701,18 @@ LAI^{shade}_{i,j} &amp;=&amp; (1 - f_{SL,j}) \cdot LAI^{\phi}_{i,j}
 \tag{9.1}
 \end{eqnarray}\]</span></p>
 <p>As an example we will consider a canopy of one species of LAI = 2, divided into ten layers with constant leaf density:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="radiationbalance.html#cb14-1" aria-hidden="true" tabindex="-1"></a>LAI <span class="ot">=</span> <span class="dv">2</span></span>
-<span id="cb14-2"><a href="radiationbalance.html#cb14-2" aria-hidden="true" tabindex="-1"></a>nlayer <span class="ot">=</span> <span class="dv">10</span></span>
-<span id="cb14-3"><a href="radiationbalance.html#cb14-3" aria-hidden="true" tabindex="-1"></a>LAIlayerlive <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
-<span id="cb14-4"><a href="radiationbalance.html#cb14-4" aria-hidden="true" tabindex="-1"></a>LAIlayermax <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
-<span id="cb14-5"><a href="radiationbalance.html#cb14-5" aria-hidden="true" tabindex="-1"></a>LAIlayerdead <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,nlayer,<span class="dv">1</span>)</span>
-<span id="cb14-6"><a href="radiationbalance.html#cb14-6" aria-hidden="true" tabindex="-1"></a>kb <span class="ot">=</span> <span class="fl">0.8</span></span>
-<span id="cb14-7"><a href="radiationbalance.html#cb14-7" aria-hidden="true" tabindex="-1"></a>kd_PAR <span class="ot">=</span> <span class="fl">0.5</span></span>
-<span id="cb14-8"><a href="radiationbalance.html#cb14-8" aria-hidden="true" tabindex="-1"></a>kd_SWR <span class="ot">=</span> kd_PAR<span class="sc">/</span><span class="fl">1.35</span></span>
-<span id="cb14-9"><a href="radiationbalance.html#cb14-9" aria-hidden="true" tabindex="-1"></a>alpha_PAR <span class="ot">=</span> <span class="fl">0.9</span></span>
-<span id="cb14-10"><a href="radiationbalance.html#cb14-10" aria-hidden="true" tabindex="-1"></a>gamma_PAR <span class="ot">=</span> <span class="fl">0.04</span></span>
-<span id="cb14-11"><a href="radiationbalance.html#cb14-11" aria-hidden="true" tabindex="-1"></a>gamma_SWR <span class="ot">=</span> <span class="fl">0.05</span></span>
-<span id="cb14-12"><a href="radiationbalance.html#cb14-12" aria-hidden="true" tabindex="-1"></a>alpha_SWR <span class="ot">=</span> <span class="fl">0.7</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="radiationbalance.html#cb13-1" aria-hidden="true" tabindex="-1"></a>LAI <span class="ot">=</span> <span class="dv">2</span></span>
+<span id="cb13-2"><a href="radiationbalance.html#cb13-2" aria-hidden="true" tabindex="-1"></a>nlayer <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb13-3"><a href="radiationbalance.html#cb13-3" aria-hidden="true" tabindex="-1"></a>LAIlayerlive <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
+<span id="cb13-4"><a href="radiationbalance.html#cb13-4" aria-hidden="true" tabindex="-1"></a>LAIlayermax <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
+<span id="cb13-5"><a href="radiationbalance.html#cb13-5" aria-hidden="true" tabindex="-1"></a>LAIlayerdead <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,nlayer,<span class="dv">1</span>)</span>
+<span id="cb13-6"><a href="radiationbalance.html#cb13-6" aria-hidden="true" tabindex="-1"></a>kb <span class="ot">=</span> <span class="fl">0.8</span></span>
+<span id="cb13-7"><a href="radiationbalance.html#cb13-7" aria-hidden="true" tabindex="-1"></a>kd_PAR <span class="ot">=</span> <span class="fl">0.5</span></span>
+<span id="cb13-8"><a href="radiationbalance.html#cb13-8" aria-hidden="true" tabindex="-1"></a>kd_SWR <span class="ot">=</span> kd_PAR<span class="sc">/</span><span class="fl">1.35</span></span>
+<span id="cb13-9"><a href="radiationbalance.html#cb13-9" aria-hidden="true" tabindex="-1"></a>alpha_PAR <span class="ot">=</span> <span class="fl">0.9</span></span>
+<span id="cb13-10"><a href="radiationbalance.html#cb13-10" aria-hidden="true" tabindex="-1"></a>gamma_PAR <span class="ot">=</span> <span class="fl">0.04</span></span>
+<span id="cb13-11"><a href="radiationbalance.html#cb13-11" aria-hidden="true" tabindex="-1"></a>gamma_SWR <span class="ot">=</span> <span class="fl">0.05</span></span>
+<span id="cb13-12"><a href="radiationbalance.html#cb13-12" aria-hidden="true" tabindex="-1"></a>alpha_SWR <span class="ot">=</span> <span class="fl">0.7</span></span></code></pre></div>
 <p>This canopy definition leads to a percentage of the above-canopy irradiance reaching each layer <span class="citation">(<a href="#ref-Anten2016" role="doc-biblioref">Anten &amp; Bastiaans 2016</a>)</span>. Extinction of direct radiation also defines the proportion of leaves of each layer that are affected by sunflecks (i.e. the proportion of sunlit leaves). Both outcomes are illustrated in the figure below:</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:irradianceperlayer"></span>
@@ -744,11 +745,11 @@ where <span class="math inline">\(\beta\)</span> is the solar elevation angle in
 \tag{9.2}
 \end{eqnarray}\]</span></p>
 <p>Let us show how all this works in an example. Regarding incoming light, we assume the following direct and diffuse irradiance at the top of the canopy:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="radiationbalance.html#cb15-1" aria-hidden="true" tabindex="-1"></a>solarElevation <span class="ot">=</span> <span class="fl">0.67</span></span>
-<span id="cb15-2"><a href="radiationbalance.html#cb15-2" aria-hidden="true" tabindex="-1"></a>SWR_direct <span class="ot">=</span> <span class="dv">1100</span></span>
-<span id="cb15-3"><a href="radiationbalance.html#cb15-3" aria-hidden="true" tabindex="-1"></a>SWR_diffuse <span class="ot">=</span> <span class="dv">300</span></span>
-<span id="cb15-4"><a href="radiationbalance.html#cb15-4" aria-hidden="true" tabindex="-1"></a>PAR_direct <span class="ot">=</span> <span class="dv">550</span></span>
-<span id="cb15-5"><a href="radiationbalance.html#cb15-5" aria-hidden="true" tabindex="-1"></a>PAR_diffuse <span class="ot">=</span> <span class="dv">150</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="radiationbalance.html#cb14-1" aria-hidden="true" tabindex="-1"></a>solarElevation <span class="ot">=</span> <span class="fl">0.67</span></span>
+<span id="cb14-2"><a href="radiationbalance.html#cb14-2" aria-hidden="true" tabindex="-1"></a>SWR_direct <span class="ot">=</span> <span class="dv">1100</span></span>
+<span id="cb14-3"><a href="radiationbalance.html#cb14-3" aria-hidden="true" tabindex="-1"></a>SWR_diffuse <span class="ot">=</span> <span class="dv">300</span></span>
+<span id="cb14-4"><a href="radiationbalance.html#cb14-4" aria-hidden="true" tabindex="-1"></a>PAR_direct <span class="ot">=</span> <span class="dv">550</span></span>
+<span id="cb14-5"><a href="radiationbalance.html#cb14-5" aria-hidden="true" tabindex="-1"></a>PAR_diffuse <span class="ot">=</span> <span class="dv">150</span></span></code></pre></div>
 <p>Solar elevation is the angle between the sun and the horizon (i.e. the complement of the zenith angle). Under these conditions, and for the same canopy used for fig. <a href="radiationbalance.html#fig:irradianceperlayer">9.1</a>, the amount of PAR and SWR absorbed per unit of leaf area at each canopy layer is <span class="citation">(<a href="#ref-Anten2016" role="doc-biblioref">Anten &amp; Bastiaans 2016</a>)</span>:</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:absorbanceperlayer"></span>

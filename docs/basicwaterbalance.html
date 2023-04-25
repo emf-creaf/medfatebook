@@ -232,7 +232,7 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="3.6" data-path="basicwaterbalance.html"><a href="basicwaterbalance.html#basicwaterbalanceapplications"><i class="fa fa-check"></i><b>3.6</b> Applications</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="leafphenologylight.html"><a href="leafphenologylight.html"><i class="fa fa-check"></i><b>4</b> Leaf phenology and light extinction</a>
+<li class="chapter" data-level="4" data-path="leafphenologylight.html"><a href="leafphenologylight.html"><i class="fa fa-check"></i><b>4</b> Leaf phenology and radiation extinction</a>
 <ul>
 <li class="chapter" data-level="4.1" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafphenology"><i class="fa fa-check"></i><b>4.1</b> Leaf phenology</a>
 <ul>
@@ -241,7 +241,7 @@ div.csl-indent {
 <li class="chapter" data-level="4.1.3" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafphenosenescence"><i class="fa fa-check"></i><b>4.1.3</b> Leaf senescence</a></li>
 <li class="chapter" data-level="4.1.4" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leaf-abscission"><i class="fa fa-check"></i><b>4.1.4</b> Leaf abscission</a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path="leafphenologylight.html"><a href="leafphenologylight.html#basiclightextinction"><i class="fa fa-check"></i><b>4.2</b> Light extinction</a></li>
+<li class="chapter" data-level="4.2" data-path="leafphenologylight.html"><a href="leafphenologylight.html#basiclightextinction"><i class="fa fa-check"></i><b>4.2</b> Radiation extinction</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="hydrology.html"><a href="hydrology.html"><i class="fa fa-check"></i><b>5</b> Forest hydrology</a>
 <ul>
@@ -250,8 +250,9 @@ div.csl-indent {
 <li class="chapter" data-level="5.3" data-path="hydrology.html"><a href="hydrology.html#interception"><i class="fa fa-check"></i><b>5.3</b> Rainfall interception loss</a></li>
 <li class="chapter" data-level="5.4" data-path="hydrology.html"><a href="hydrology.html#runoff"><i class="fa fa-check"></i><b>5.4</b> Runoff, infiltration and percolation</a></li>
 <li class="chapter" data-level="5.5" data-path="hydrology.html"><a href="hydrology.html#soilevaporation"><i class="fa fa-check"></i><b>5.5</b> Bare soil evaporation</a></li>
+<li class="chapter" data-level="5.6" data-path="hydrology.html"><a href="hydrology.html#herbaceoustranspiration"><i class="fa fa-check"></i><b>5.6</b> Transpiration of the herbaceous layer</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Plant transpiration, photosynthesis and water status</a>
+<li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Woody plant transpiration, photosynthesis and water status</a>
 <ul>
 <li class="chapter" data-level="6.1" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-transpiration-and-photosynthesis"><i class="fa fa-check"></i><b>6.1</b> Plant transpiration and photosynthesis</a>
 <ul>
@@ -674,13 +675,13 @@ div.csl-indent {
 <div id="basicwaterbalance" class="section level1 hasAnchor" number="3">
 <h1><span class="header-section-number">Chapter 3</span> Basic water balance model<a href="basicwaterbalance.html#basicwaterbalance" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>This chapter provides an overview of the basic soil and plant water balance model included in <strong>medfate</strong>. The model allows simulating vertical water fluxes in a forest stand, and performs soil and plant water balance on a daily step basis for the period corresponding to input weather data.</p>
-<p>The model is run using function <code>spwb()</code>, for a set of days, or function <code>spwb_day()</code>, for a single day. Alternatively, one can use function <code>pwb()</code> to evaluate plant transpiration and drought stress resulting from given weather and soil moisture dynamics.</p>
+<p>The model is run using function <code>spwb()</code>, for a set of days, or function <code>spwb_day()</code>, for a single day. Alternatively, one can use function <code>pwb()</code> to evaluate plant transpiration and drought stress resulting from given weather and soil moisture dynamics. The basic water balance model corresponds to the control variable <code>transpirationMode = "Granier"</code>.</p>
 <p>The description of the model presented here conforms to a large extent to the description given in <span class="citation">De Cáceres <em>et al.</em> (<a href="#ref-DeCaceres2015" role="doc-biblioref">2015</a>)</span>, but includes several modifications that have been implemented since the publication of this scientific article. The information provided in this chapter should be enough to understand what the model does and when it can be useful, but the reading the following ones should provide a more detailed understanding on how the different processes are formulated.</p>
 <div id="basicdesign" class="section level2 hasAnchor" number="3.1">
 <h2><span class="header-section-number">3.1</span> Design principles<a href="basicwaterbalance.html#basicdesign" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The model considers only the vertical spatial dimension of the stand and not the horizontal distribution of plants within it. In other words, the model is not spatially explicit (i.e., plants do not have horizontal coordinates nor interact for space explicitly). Woody vegetation in the stand is divided into groups, here referred to as <em>plant cohorts</em> of different species, height and leaf area index (<span class="math inline">\(LAI\)</span>). Height and <span class="math inline">\(LAI\)</span> values determine competition for light. <span class="math inline">\(LAI\)</span> values also drive competition for soil water, along with fine root distribution. The model can also consider a layer herbaceous vegetation, which also has a height value and <span class="math inline">\(LAI\)</span>, but where plant cohorts are not distinguished.</p>
-<p>The soil water balance follows the design principles of SIERRA <span class="citation">(<a href="#ref-Mouillot2001" role="doc-biblioref">Mouillot <em>et al.</em> 2001</a>; <a href="#ref-Ruffault2013" role="doc-biblioref">Ruffault <em>et al.</em> 2013</a>, <a href="#ref-Ruffault2014" role="doc-biblioref">2014</a>)</span> and BILJOU <span class="citation">(<a href="#ref-Granier1999" role="doc-biblioref">Granier <em>et al.</em> 1999</a>, <a href="#ref-Granier2007" role="doc-biblioref">2007</a>)</span>, although some soil hydrology features are taken from other models <span class="citation">(<a href="#ref-Kergoat1998" role="doc-biblioref">Kergoat 1998</a>)</span>. Hydrological processes include water interception loss <span class="citation">(<a href="#ref-Gash1995" role="doc-biblioref">Gash <em>et al.</em> 1995</a>)</span>, plant transpiration, evaporation from soil <span class="citation">(<a href="#ref-Ritchie1972" role="doc-biblioref">Ritchie 1972</a>)</span> and the partition between infiltration and runoff <span class="citation">(<a href="#ref-Boughton1989" role="doc-biblioref">Boughton 1989</a>)</span>. Infiltrated water is either retained by capillarity or percolates through soil layers, depending on macro-porosity, and water exceeding soil water holding capacity is lost beyond the rooting zone via deep drainage. Snow pack dynamics can also be simulated. Potential evapo-transpiration (<span class="math inline">\(PET\)</span>) is a required input and the model determines maximum herbaceous and canopy transpiration (<span class="math inline">\(Tr_{\max}\)</span>) using an empirical relationship between the <span class="math inline">\(LAI\)</span> of the stand and the ratio <span class="math inline">\(Tr_{\max}/PET\)</span> <span class="citation">(<a href="#ref-Granier1999" role="doc-biblioref">Granier <em>et al.</em> 1999</a>)</span>. Actual plant transpiration is estimated using a function that depends not only on <span class="math inline">\(Tr_{\max}\)</span> but also on current soil moisture levels, cohort-specific drought resistance, fine root distribution and the degree of shading of the target plant cohort. When soil water deficit progresses transpiration rates are consequently reduced, but minimum transpiration rates are not zero, because of the role of cuticular transpiration and imperfectly closed stomata <span class="citation">(<a href="#ref-Duursma2018" role="doc-biblioref">Duursma <em>et al.</em> 2018</a>)</span>. Plant water status (i.e. plant water potential and, hence, plant water content) follows variations of soil moisture in the soil layers where fine roots are located.</p>
-<p>By default, the model assumes that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, 3D variations in soil moisture beneath plant cohorts can be simulated in spatially-explicit forest ecosystem models <span class="citation">(<a href="#ref-Manoli2017" role="doc-biblioref">Manoli <em>et al.</em> 2017</a>; <a href="#ref-Rotzer2017" role="doc-biblioref">Rötzer <em>et al.</em> 2017</a>)</span>. Our water balance model does not simulate horizontal spatial processes explicitly, but allows considering more or less independent water pools for plant cohorts. In this case, hydrological processes are replicated for the fraction of soil corresponding to each cohort. Transpiration of each plant cohort depends on the soil moisture beneath itself and, depending on the degree of rhizosphere overlap, on the soil moisture beneath other plant cohorts.</p>
+<p>The water balance model considers only the vertical spatial dimension of the stand and not the horizontal distribution of plants within it. In other words, the model is not spatially explicit (i.e., plants do not have horizontal coordinates nor interact for space explicitly). Woody vegetation in the stand is divided into groups, here referred to as <em>plant cohorts</em> of different species, height and leaf area index (<span class="math inline">\(LAI\)</span>). Height and <span class="math inline">\(LAI\)</span> values determine competition for light. <span class="math inline">\(LAI\)</span> values also drive competition for soil water, along with fine root distribution. The model can also consider a layer herbaceous vegetation, which also has a height value and <span class="math inline">\(LAI\)</span>, but where plant cohorts are not distinguished and with fine roots confined to the topmost layer.</p>
+<p>The soil water balance follows the design principles of SIERRA <span class="citation">(<a href="#ref-Mouillot2001" role="doc-biblioref">Mouillot <em>et al.</em> 2001</a>; <a href="#ref-Ruffault2013" role="doc-biblioref">Ruffault <em>et al.</em> 2013</a>, <a href="#ref-Ruffault2014" role="doc-biblioref">2014</a>)</span> and BILJOU <span class="citation">(<a href="#ref-Granier1999" role="doc-biblioref">Granier <em>et al.</em> 1999</a>, <a href="#ref-Granier2007" role="doc-biblioref">2007</a>)</span>, although some soil hydrology features are taken from other models <span class="citation">(<a href="#ref-Kergoat1998" role="doc-biblioref">Kergoat 1998</a>)</span>. Hydrological processes include water interception loss <span class="citation">(<a href="#ref-Gash1995" role="doc-biblioref">Gash <em>et al.</em> 1995</a>)</span>, plant transpiration, evaporation from soil <span class="citation">(<a href="#ref-Ritchie1972" role="doc-biblioref">Ritchie 1972</a>)</span> and the partition between infiltration and runoff <span class="citation">(<a href="#ref-Boughton1989" role="doc-biblioref">Boughton 1989</a>)</span>. Infiltrated water is either retained by capillarity or percolates through soil layers, depending on macro-porosity, and water exceeding soil water holding capacity is lost beyond the rooting zone via deep drainage. Snow pack dynamics can also be simulated. Potential evapo-transpiration (<span class="math inline">\(PET\)</span>) is a required input and the model determines maximum herbaceous and maximum canopy transpiration (<span class="math inline">\(Tr_{\max}\)</span>) using an empirical relationship between the <span class="math inline">\(LAI\)</span> of the stand and the ratio <span class="math inline">\(Tr_{\max}/PET\)</span> <span class="citation">(<a href="#ref-Granier1999" role="doc-biblioref">Granier <em>et al.</em> 1999</a>)</span>. Actual plant transpiration is estimated using a function that depends not only on <span class="math inline">\(Tr_{\max}\)</span> but also on current soil moisture levels, cohort-specific drought resistance, fine root distribution and the degree of shading of the target plant cohort. When soil water deficit progresses transpiration rates are consequently reduced, but minimum transpiration rates of woody vegetation are not zero, because of the role of cuticular transpiration and imperfectly closed stomata <span class="citation">(<a href="#ref-Duursma2018" role="doc-biblioref">Duursma <em>et al.</em> 2018</a>)</span>. Woody plant water status (i.e. plant water potential and, hence, plant water content) follows variations of soil moisture in the soil layers where fine roots are located.</p>
+<p>By default, the model assumes that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, 3D variations in soil moisture beneath plant cohorts can be simulated in spatially-explicit forest ecosystem models <span class="citation">(<a href="#ref-Manoli2017" role="doc-biblioref">Manoli <em>et al.</em> 2017</a>; <a href="#ref-Rotzer2017" role="doc-biblioref">Rötzer <em>et al.</em> 2017</a>)</span>. The water balance model does not simulate horizontal spatial processes explicitly, but allows considering more or less independent water pools for plant cohorts. If partial or completely independent water pools are considered, hydrological processes are replicated for the fraction of soil corresponding to each woody cohort. Transpiration of each plant cohort depends on the soil moisture beneath itself and, depending on the degree of rhizosphere overlap, on the soil moisture beneath other plant cohorts.</p>
 </div>
 <div id="statevariablesbasic" class="section level2 hasAnchor" number="3.2">
 <h2><span class="header-section-number">3.2</span> State variables<a href="basicwaterbalance.html#statevariablesbasic" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -694,17 +695,17 @@ div.csl-indent {
 <ul>
 <li><em>If snow accumulation/melting is considered</em>, the model tracks <span class="math inline">\(S_{snow}\)</span>, the snow water equivalent (in mm) of the snow pack storage over the surface.</li>
 <li><em>If stem cavitation is not completely reversible</em>, the model tracks <span class="math inline">\(PLC_{i}\)</span>, the proportion of stem conductivity lost by plants of cohort <span class="math inline">\(i\)</span>.</li>
-<li><em>If the degree of rhizosphere overlap between plant cohorts is not total</em>, the model also tracks <span class="math inline">\(W_{i,s}\)</span>, the proportion of soil moisture in relation to field capacity for layer <span class="math inline">\(s\)</span> within the areal fraction of the stand covered by cohort <span class="math inline">\(i\)</span>.</li>
+<li><em>If the degree of rhizosphere overlap between plant cohorts is not total</em> (i.e. if <code>rhizosphereOverlap = "none"</code> or <code>rhizosphereOverlap = "partial"</code>), the model also tracks <span class="math inline">\(W_{i,s}\)</span>, the proportion of soil moisture in relation to field capacity for layer <span class="math inline">\(s\)</span> within the areal fraction of the stand covered by the woody cohort <span class="math inline">\(i\)</span>.</li>
 </ul>
 </div>
 <div id="soilwaterbalance" class="section level2 hasAnchor" number="3.3">
 <h2><span class="header-section-number">3.3</span> Water balance<a href="basicwaterbalance.html#soilwaterbalance" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Daily variations in soil water content (<span class="math inline">\(\Delta{V_{soil}}\)</span> in mm) can be summarized as:</p>
 <p><span class="math display" id="eq:basicwaterbalanceequation">\[\begin{equation}
-\Delta{V_{soil}} = Pr + Sm - In - Ru - Dd - Es - Tr_h - Tr_w
+\Delta{V_{soil}} = Pr + Sm - In - Ru - Dd - Es - Tr_{herb} - Tr_{woody}
 \tag{3.1}
 \end{equation}\]</span></p>
-<p>where <span class="math inline">\(Pr\)</span> is precipitation as rainfall, <span class="math inline">\(Sm\)</span> is water from melting the snow pack (if considered), <span class="math inline">\(In\)</span> is the interception loss (i.e., water evaporated after being intercepted by the canopy), <span class="math inline">\(Ru\)</span> is surface runoff, <span class="math inline">\(Dd\)</span> is deep drainage (i.e. water percolated to layers beyond soil depth), <span class="math inline">\(Es\)</span> is evaporation from soil, <span class="math inline">\(Tr_h\)</span> is the transpiration made by herbaceous plants and <span class="math inline">\(Tr_w\)</span> is the transpiration made by woody plants.</p>
+<p>where <span class="math inline">\(Pr\)</span> is precipitation as rainfall, <span class="math inline">\(Sm\)</span> is water from melting the snow pack (if considered), <span class="math inline">\(In\)</span> is the interception loss (i.e., water evaporated after being intercepted by the canopy), <span class="math inline">\(Ru\)</span> is surface runoff, <span class="math inline">\(Dd\)</span> is deep drainage (i.e. water percolated to layers beyond soil depth), <span class="math inline">\(Es\)</span> is evaporation from soil, <span class="math inline">\(Tr_{herb}\)</span> is the transpiration made by herbaceous plants and <span class="math inline">\(Tr_{woody}\)</span> is the transpiration made by woody plants.</p>
 <p>While the above describes the default water balance equations, variations can occur depending on specific control flags:</p>
 <ol style="list-style-type: lower-alpha">
 <li><em>If snow dynamics are considered</em>, the water balance of the snow pack (<span class="math inline">\(\Delta{S_{snow}}\)</span> in mm of snow water equivalents) is defined as:
@@ -713,19 +714,19 @@ div.csl-indent {
 \tag{3.2}
 \end{equation}\]</span>
 where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <span class="math inline">\(Sm\)</span> is snow melt. Evaporation from bare soil cannot occur if there is a snow pack over the soil (i.e., if <span class="math inline">\(S_{snow}&gt;0\)</span> then <span class="math inline">\(Es = 0\)</span>).</li>
-<li><em>If water pools are considered</em>, the water balance equation applies not only to the soil of the overall stand but also to the soil beneath each plant cohort. The fraction of stand area corresponding to the water pool of each cohort is used to keep the water balance at the two scales aligned. Moreover, the water balances of soils beneath the different plant cohort are more or less correlated depending on the degree of rhizosphere overlap.</li>
+<li><em>If plant water pools are considered</em>, the water balance equation applies not only to the soil of the overall stand but also to the soil beneath each woody plant cohort. The fraction of stand area corresponding to the water pool of each cohort is used to keep the water balance at the two scales aligned. Moreover, the water balances of soils beneath the different plant cohort are more or less correlated depending on the degree of rhizosphere overlap.</li>
 </ol>
 </div>
 <div id="basicwaterbalancescheduling" class="section level2 hasAnchor" number="3.4">
 <h2><span class="header-section-number">3.4</span> Process scheduling<a href="basicwaterbalance.html#basicwaterbalancescheduling" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>For every day to be simulated, the model performs the following steps:</p>
 <ol style="list-style-type: decimal">
-<li>Update leaf area values according to the phenology of species and recalculate light extinction (sections <a href="leafphenologylight.html#leafphenology">4.1</a> and <a href="leafphenologylight.html#basiclightextinction">4.2</a>).</li>
+<li>Update leaf area values according to the phenology of species and recalculate radiation extinction (sections <a href="leafphenologylight.html#leafphenology">4.1</a> and <a href="leafphenologylight.html#basiclightextinction">4.2</a>).</li>
 <li>If snow dynamics are included, increase snow pack from snow precipitation (<span class="math inline">\(Ps\)</span>) and decrease it following snow melt (<span class="math inline">\(Sm\)</span>) (section <a href="hydrology.html#snowpack">5.2</a>).</li>
 <li>Determine rainfall interception loss (<span class="math inline">\(In\)</span>) and net rainfall (<span class="math inline">\(Pr_{net}\)</span>) (section <a href="hydrology.html#interception">5.3</a>)</li>
 <li>Increase soil water content due to net rainfall (<span class="math inline">\(Pr_{net}\)</span>), surface runon (<span class="math inline">\(Ro\)</span>) and snow melt (<span class="math inline">\(Sm\)</span>), after accounting for surface runoff (<span class="math inline">\(Ru\)</span>) and deep drainage (<span class="math inline">\(Dd\)</span>) (section <a href="hydrology.html#runoff">5.4</a>).</li>
-<li>Decrease soil water content of the topmost soil layer due to bare soil evaporation (<span class="math inline">\(Es\)</span>), if snow is not present (section <a href="hydrology.html#soilevaporation">5.5</a>), and herbaceous transpiration (<span class="math inline">\(Tr_h\)</span>).</li>
-<li>Determine woody plant transpiration (<span class="math inline">\(Tr_w\)</span>) and photosynthesis (chapter <a href="transpirationgranier.html#transpirationgranier">6</a>).</li>
+<li>Decrease soil water content of the topmost soil layer due to bare soil evaporation (<span class="math inline">\(Es\)</span>), if snow is not present (section <a href="hydrology.html#soilevaporation">5.5</a>), and herbaceous transpiration (<span class="math inline">\(Tr_{herb}\)</span>; section <a href="hydrology.html#herbaceoustranspiration">5.6</a>).</li>
+<li>Determine woody plant transpiration (<span class="math inline">\(Tr_{woody}\)</span>) and photosynthesis (chapter <a href="transpirationgranier.html#transpirationgranier">6</a>).</li>
 <li>Update plant water potential (<span class="math inline">\(\Psi_{plant}\)</span>) and plant drought stress for each plant cohort and decrease soil water content due to woody plant transpiration.</li>
 </ol>
 <p>Details of the formulation of each of these processes are provided within the referred chapters and sections. <em>If plant water pools are considered</em>, steps 4-5 are performed for each plant water pool separately, step 6 involves extracting water from different plant water pools depending on the proportion of fine roots of each cohort in each pool (see <a href="transpirationgranier.html#transpirationpools">6.1.5</a>).</p>
@@ -737,13 +738,14 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <p><strong>Soil</strong></p>
 <p>Soil input requirements are fully described in section <a href="model-inputs.html#soilinput">2.3</a>.</p>
 <p><strong>Vegetation</strong></p>
-<p>Vegetation input requirements are fully described in section <a href="model-inputs.html#vegetationinput">2.4</a>. Trees and shrubs do not need to be characterized with different variables in soil water balance calculations, since both kinds of cohorts have a <span class="math inline">\(LAI\)</span> value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. <span class="math inline">\(LAI^{live}\)</span>, because normally at the starting point all leaves are expanded (i.e. <span class="math inline">\(LAI^{\phi} = LAI^{live}\)</span>) and one can assume no dead leaves in the canopy (i.e., <span class="math inline">\(LAI^{dead} = 0\)</span>). Vegetation characteristics stay constant during simulations using function <code>spwb()</code>, although the actual expanded leaf area (<span class="math inline">\(LAI^{\phi}\)</span>) and dead leaf area (<span class="math inline">\(LAI^{dead}\)</span>) may vary is the species is winter deciduous.</p>
+<p>Vegetation input requirements are fully described in section <a href="model-inputs.html#vegetationinput">2.4</a>. Trees and shrubs do not need to be characterized with different variables in soil water balance calculations, since both kinds of woody cohorts have a <span class="math inline">\(LAI\)</span> value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. <span class="math inline">\(LAI^{live}\)</span>, because normally at the starting point all leaves are expanded (i.e. <span class="math inline">\(LAI^{\phi} = LAI^{live}\)</span>) and one can assume no dead leaves in the canopy (i.e., <span class="math inline">\(LAI^{dead} = 0\)</span>). Vegetation characteristics stay constant during simulations using function <code>spwb()</code>, although the actual expanded leaf area (<span class="math inline">\(LAI^{\phi}\)</span>) and dead leaf area (<span class="math inline">\(LAI^{dead}\)</span>) may vary is the species is winter deciduous.</p>
 <p><strong>Meteorology</strong></p>
 <p>The minimum weather variables required to run the model are min/max temperatures (<span class="math inline">\(T_{min}\)</span> and <span class="math inline">\(T_{max}\)</span>), min/max relative humidity (<span class="math inline">\(RH_{min}\)</span> and <span class="math inline">\(RH_{max}\)</span>), precipitation (<span class="math inline">\(P\)</span>) and solar radiation (<span class="math inline">\(Rad\)</span>). Wind speed (<span class="math inline">\(u\)</span>) is also needed, but the user may use missing values if not available (a default value will be used in this case). Wind speed is assumed to have been measured at a specific height above the canopy (by default at 2 m). Atmospheric <span class="math inline">\(CO_2\)</span> concentration (<span class="math inline">\(C_{atm}\)</span>) may also be specified, but if missing a default constant value is assumed, which is taken from the control parameters. Definitions and units of these variables were given in section <a href="model-inputs.html#meteoinput">2.5</a>.</p>
 </div>
 <div id="basicwatervegetationparameters" class="section level3 hasAnchor" number="3.5.2">
 <h3><span class="header-section-number">3.5.2</span> Vegetation functional parameters<a href="basicwaterbalance.html#basicwatervegetationparameters" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The following sets of functional parameters should be supplied for each plant cohort. A first set refers to leaf phenology (<code>paramsPhenology</code>):</p>
+<p>The following sets of functional parameters should be supplied for each woody plant cohort. In practice, they are normally estimated from the species-specific parameter table and imputation of missing values (see <a href="modelparametrization.html#modelparametrization">A</a>). Functional attributes are filled for each cohort <span class="math inline">\(i\)</span> by function <code>forest2spwbInput()</code> from species identity (i.e. <span class="math inline">\(SP_i\)</span>). However, different parameters can be specified for different cohorts of the same species if desired (see section <a href="model-inputs.html#functionaltraits">2.4.8</a>).</p>
+<p>A first set of functional parameters refers to leaf phenology (<code>paramsPhenology</code>):</p>
 <table>
 <colgroup>
 <col width="12%" />
@@ -871,7 +873,7 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\(1/H_{v,i}\)</span></td>
+<td><span class="math inline">\(1/H_{v}\)</span></td>
 <td><span class="math inline">\(m^2 \cdot m^{-2}\)</span></td>
 <td><code>Al2As</code></td>
 <td>Ratio of leaf area to sapwood area</td>
@@ -883,19 +885,19 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <td>Fine root area to leaf area ratio</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(SLA_i\)</span></td>
+<td><span class="math inline">\(SLA\)</span></td>
 <td><span class="math inline">\(m^2 \cdot kg^{-1}\)</span></td>
 <td><code>SLA</code></td>
 <td>Specific leaf area</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(\rho_{leaf,i}\)</span></td>
+<td><span class="math inline">\(\rho_{leaf}\)</span></td>
 <td><span class="math inline">\(g \cdot cm^{-3}\)</span></td>
 <td><code>LeafDensity</code></td>
 <td>Leaf tissue density</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(\rho_{wood,i}\)</span></td>
+<td><span class="math inline">\(\rho_{wood}\)</span></td>
 <td><span class="math inline">\(g \cdot cm^{-3}\)</span></td>
 <td><code>WoodDensity</code></td>
 <td>Wood tissue density</td>
@@ -944,7 +946,7 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\(g_{swmin,i}\)</span></td>
+<td><span class="math inline">\(g_{swmin}\)</span></td>
 <td><span class="math inline">\(mol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span></td>
 <td><code>Gwmin</code></td>
 <td>Minimum stomatal conductance to water vapour</td>
@@ -968,30 +970,36 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <td>The water potential at which plant transpiration is 50% of its maximum (see section <a href="transpirationgranier.html#actualtranspiration">6.1.2</a>).</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(\Psi_{critic}\)</span></td>
-<td><span class="math inline">\(MPa\)</span></td>
-<td><code>Psi_Critic</code></td>
-<td>The water potential corresponding to 50% of cavitation (see section <a href="transpirationgranier.html#irreversiblecavitation">6.2.2</a>).</td>
+<td><span class="math inline">\(c_{extract}\)</span></td>
+<td></td>
+<td><code>Exp_Extract</code></td>
+<td>Parameter of the Weibull function regulating transpiration reduction (see section <a href="transpirationgranier.html#actualtranspiration">6.1.2</a>).</td>
 </tr>
 <tr class="even">
+<td><span class="math inline">\(c_{stem}\)</span>, <span class="math inline">\(d_{stem}\)</span></td>
+<td>(unitless), MPa</td>
+<td><code>VCstem_c</code>, <code>VCstem_d</code></td>
+<td>Parameters of the vulnerability curve for stem xylem</td>
+</tr>
+<tr class="odd">
 <td><span class="math inline">\(WUE_{\max}\)</span></td>
 <td><span class="math inline">\(g\, C \cdot mm^{-1}\)</span></td>
 <td><code>WUE</code></td>
 <td>Water use efficiency at VPD = 1kPa and without light or CO2 limitations (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(WUE_{PAR}\)</span></td>
 <td></td>
 <td><code>WUE_par</code></td>
 <td>Coefficient describing the progressive decay of WUE with lower light levels (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(WUE_{CO2}\)</span></td>
 <td></td>
 <td><code>WUE_co2</code></td>
 <td>Coefficient for WUE dependency on atmospheric CO2 concentration <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(WUE_{VPD}\)</span></td>
 <td></td>
 <td><code>WUE_vpd</code></td>
@@ -1072,12 +1080,11 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 </tr>
 </tbody>
 </table>
-<p>Vegetation functional attributes are normally filled for each cohort <span class="math inline">\(i\)</span> by function <code>spwbInput()</code> or <code>forest2spwbInput()</code> from species identity (i.e. <span class="math inline">\(SP_i\)</span>). However, different parameters can be specified for different cohorts of the same species if desired (see section <a href="model-inputs.html#functionaltraits">2.4.8</a>).</p>
 </div>
 <div id="basicwaterbalancecontrol" class="section level3 hasAnchor" number="3.5.3">
 <h3><span class="header-section-number">3.5.3</span> Control parameters<a href="basicwaterbalance.html#basicwaterbalancecontrol" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Control parameters modulate the overall behaviour of water balance simulations (see section <a href="model-inputs.html#controlparameters">2.6</a>). Most importantly, <code>transpirationMode</code> defines the transpiration model, which in turn defines the complexity of the water balance model. If <code>transpirationMode = "Granier"</code> (the default value) then the basic water balance model is used.</p>
-<p>The other control parameters for the basic water balance model are:</p>
+<p>The other relevant control parameters for the basic water balance model are:</p>
 <ul>
 <li><code>soilFunctions [="SX"]</code>: Soil water retention curve and conductivity functions, either ‘SX’ (for Saxton) or ‘VG’ (for Van Genuchten).</li>
 <li><code>defaultWindSpeed [= 2.5]</code>: Default value for wind speed (in <span class="math inline">\(m \cdot s^{-1}\)</span>) when this is missing (only used for leaf fall, see section <a href="leafphenologylight.html#leafphenology">4.1</a>).</li>
@@ -1105,7 +1112,7 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 </div>
 <div id="basicwaterbalanceoutput" class="section level3 hasAnchor" number="3.5.4">
 <h3><span class="header-section-number">3.5.4</span> Model output<a href="basicwaterbalance.html#basicwaterbalanceoutput" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Functions <code>spwb()</code> and <code>pwb()</code> return a list of a class with the same name. The first four elements of this list (i.e., <code>latitude</code>, <code>topography</code>, <code>weather</code> and <code>spwbInput</code>) are simply copies of model inputs. The next element is <code>spwbOutput</code>, which contains the state of the input object at the end of the simulation (this can be used to perform further simulations starting with current values of state variables). The next four elements correspond to <em>water balance flows</em>, <em>soil state</em> variables, <em>stand-level</em> variables, and <em>plant-level</em> variables:</p>
+<p>Functions <code>spwb()</code> and <code>pwb()</code> return a list of a class with the same name. The first four elements of this list (i.e., <code>latitude</code>, <code>topography</code>, <code>weather</code> and <code>spwbInput</code>) are simply copies of model inputs. The next element is <code>spwbOutput</code>, which contains the state of the input object at the end of the simulation (this can be used to perform further simulations starting with current values of state variables). The next five elements correspond to <em>water balance flows</em>, <em>soil state</em> variables, <em>stand-level</em> variables, <em>plant-level</em> and <em>fire hazard</em> results:</p>
 <table>
 <colgroup>
 <col width="13%" />
@@ -1120,7 +1127,7 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <tbody>
 <tr class="odd">
 <td><code>WaterBalance</code></td>
-<td>Climatic input and water balance flows (i.e. net precipitation, infiltration, runoff, transpiration…). All of them in <span class="math inline">\(mm = l \cdot m^{-2}\)</span>.</td>
+<td>Climatic input and water balance flows of eq.<a href="basicwaterbalance.html#eq:basicwaterbalanceequation">(3.1)</a> (i.e. net precipitation, infiltration, runoff, transpiration…). All of them in <span class="math inline">\(mm = l \cdot m^{-2}\)</span>.</td>
 </tr>
 <tr class="even">
 <td><code>Soil</code></td>
@@ -1132,11 +1139,15 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 </tr>
 <tr class="even">
 <td><code>Plants</code></td>
-<td>Plant-level variables, such as <span class="math inline">\(LAI^{phi}_i\)</span>, plant transpiration, plant water potential, etc.</td>
+<td>Variables defined at the level of woody plant cohort, such as expanded leaf area (<span class="math inline">\(LAI^{phi}_i\)</span>), transpiration, photosynthesis, water potential, etc.</td>
+</tr>
+<tr class="odd">
+<td><code>FireHazard</code></td>
+<td>Fire hazard variables (fuel moisture, rate of spread, fire potentials, etc). Only returned if <code>fireHazardResults = TRUE</code>.</td>
 </tr>
 </tbody>
 </table>
-<p>Elements <code>WaterBalance</code>, <code>Soil</code> and <code>Stand</code> are data frame with dates in rows and variables in columns, whereas <code>Plants</code> is itself a list with several elements, with dates in rows and plant cohorts in columns:</p>
+<p>Elements <code>WaterBalance</code>, <code>Soil</code>, <code>Stand</code> and <code>FireHazard</code> are data frames with dates in rows and variables in columns, whereas <code>Plants</code> is itself a list with several data frames, with dates in rows and woody plant cohorts in columns:</p>
 <table>
 <colgroup>
 <col width="13%" />

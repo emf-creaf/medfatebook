@@ -232,7 +232,7 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="3.6" data-path="basicwaterbalance.html"><a href="basicwaterbalance.html#basicwaterbalanceapplications"><i class="fa fa-check"></i><b>3.6</b> Applications</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="leafphenologylight.html"><a href="leafphenologylight.html"><i class="fa fa-check"></i><b>4</b> Leaf phenology and light extinction</a>
+<li class="chapter" data-level="4" data-path="leafphenologylight.html"><a href="leafphenologylight.html"><i class="fa fa-check"></i><b>4</b> Leaf phenology and radiation extinction</a>
 <ul>
 <li class="chapter" data-level="4.1" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafphenology"><i class="fa fa-check"></i><b>4.1</b> Leaf phenology</a>
 <ul>
@@ -241,7 +241,7 @@ div.csl-indent {
 <li class="chapter" data-level="4.1.3" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafphenosenescence"><i class="fa fa-check"></i><b>4.1.3</b> Leaf senescence</a></li>
 <li class="chapter" data-level="4.1.4" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leaf-abscission"><i class="fa fa-check"></i><b>4.1.4</b> Leaf abscission</a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path="leafphenologylight.html"><a href="leafphenologylight.html#basiclightextinction"><i class="fa fa-check"></i><b>4.2</b> Light extinction</a></li>
+<li class="chapter" data-level="4.2" data-path="leafphenologylight.html"><a href="leafphenologylight.html#basiclightextinction"><i class="fa fa-check"></i><b>4.2</b> Radiation extinction</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="hydrology.html"><a href="hydrology.html"><i class="fa fa-check"></i><b>5</b> Forest hydrology</a>
 <ul>
@@ -250,8 +250,9 @@ div.csl-indent {
 <li class="chapter" data-level="5.3" data-path="hydrology.html"><a href="hydrology.html#interception"><i class="fa fa-check"></i><b>5.3</b> Rainfall interception loss</a></li>
 <li class="chapter" data-level="5.4" data-path="hydrology.html"><a href="hydrology.html#runoff"><i class="fa fa-check"></i><b>5.4</b> Runoff, infiltration and percolation</a></li>
 <li class="chapter" data-level="5.5" data-path="hydrology.html"><a href="hydrology.html#soilevaporation"><i class="fa fa-check"></i><b>5.5</b> Bare soil evaporation</a></li>
+<li class="chapter" data-level="5.6" data-path="hydrology.html"><a href="hydrology.html#herbaceoustranspiration"><i class="fa fa-check"></i><b>5.6</b> Transpiration of the herbaceous layer</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Plant transpiration, photosynthesis and water status</a>
+<li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Woody plant transpiration, photosynthesis and water status</a>
 <ul>
 <li class="chapter" data-level="6.1" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-transpiration-and-photosynthesis"><i class="fa fa-check"></i><b>6.1</b> Plant transpiration and photosynthesis</a>
 <ul>
@@ -673,7 +674,7 @@ div.csl-indent {
             <section class="normal" id="section-">
 <div id="hydrology" class="section level1 hasAnchor" number="5">
 <h1><span class="header-section-number">Chapter 5</span> Forest hydrology<a href="hydrology.html#hydrology" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>Forest hydrological processes are key for soil and plant water balances. This chapter details the design and implementation of most of the vertical hydrological processes included in package <strong>medfate</strong>. These processes determine the value of the water flows mentioned in eq. <a href="basicwaterbalance.html#eq:basicwaterbalanceequation">(3.1)</a>. The only process that is not described here is plant transpiration (<span class="math inline">\(Tr\)</span>), as it will be covered in detail in chapter <a href="transpirationgranier.html#transpirationgranier">6</a>.</p>
+<p>Forest hydrological processes are key for soil and plant water balances. This chapter details the design and implementation of most of the vertical hydrological processes included in package <strong>medfate</strong>. These processes determine the value of the water flows mentioned in eq. <a href="basicwaterbalance.html#eq:basicwaterbalanceequation">(3.1)</a>. The only process that is not described here is woody plant transpiration (<span class="math inline">\(Tr_w\)</span>), as it will be covered in detail in chapter <a href="transpirationgranier.html#transpirationgranier">6</a>.</p>
 <p>Although each process can be simulated in specific sub-model functions, function <code>hydrology_verticalInputs()</code> allows simulating soil water input processes altogether, including canopy water interception, snow accumulation/melt, soil infiltration and percolation.</p>
 <div id="precipitation" class="section level2 hasAnchor" number="5.1">
 <h2><span class="header-section-number">5.1</span> Snow and rainfall<a href="hydrology.html#precipitation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -697,9 +698,9 @@ where <span class="math inline">\(Rad\)</span> is solar radiation (<span class="
 <span class="math display">\[\begin{equation}
 P_G = - \frac{S_{canopy}/C_{canopy}}{ER_{ratio}} \cdot \ln(1-ER_{ratio})
 \end{equation}\]</span>
-where <span class="math inline">\(S_{canopy}\)</span> is the canopy water storage capacity (in mm) – i.e. the minimum amount of water needed to saturate the canopy –, <span class="math inline">\(C_{canopy}\)</span> is the canopy cover and <span class="math inline">\(ER_{ratio}\)</span> is the ratio of evaporation rate to rainfall rate during the rainfall event. Although interception models are normally applied to single-canopy stands, we apply the sparse Gash model to the whole stand (including shrubs). Moreover, in our implementation stem interception is lumped with canopy interception, so that <span class="math inline">\(S_{canopy}\)</span> represents both. Following <span class="citation">Watanabe &amp; Mizutani (<a href="#ref-Watanabe1996" role="doc-biblioref">1996</a>)</span> we estimate <span class="math inline">\(S_{canopy}\)</span>, the canopy water storage capacity, from adjusted LAI values:
+where <span class="math inline">\(S_{canopy}\)</span> is the canopy water storage capacity (in mm) – i.e. the minimum amount of water needed to saturate the canopy –, <span class="math inline">\(C_{canopy}\)</span> is the canopy cover and <span class="math inline">\(ER_{ratio}\)</span> is the ratio of evaporation rate to rainfall rate during the rainfall event. Although interception models are normally applied to single-canopy stands, we apply the sparse Gash model to the whole stand (including shrubs and the herbaceous layer). Moreover, in our implementation stem interception is lumped with crown interception, so that <span class="math inline">\(S_{canopy}\)</span> represents both. Following <span class="citation">Watanabe &amp; Mizutani (<a href="#ref-Watanabe1996" role="doc-biblioref">1996</a>)</span> we estimate <span class="math inline">\(S_{canopy}\)</span>, the canopy water storage capacity, from adjusted LAI values:
 <span class="math display">\[\begin{equation}
-S_{canopy}=\sum_{i}{s_{water,i}\cdot LAI_{i}^{\phi}}
+S_{canopy}=LAI_{herb}+\sum_{i}{s_{water,i}\cdot LAI_{i}^{\phi}}
 \end{equation}\]</span>
 where <span class="math inline">\(s_{water,i}\)</span> is the depth of water that can be retained by leaves, branches and stems of cohort <span class="math inline">\(i\)</span> per unit of leaf area index (<span class="math inline">\(mm \cdot LAI^{-1}\)</span>). To estimate the stand cover, <span class="math inline">\(C_{canopy}\)</span>, we use the complement of the percentage of PAR that reaches the ground, i.e. <span class="math inline">\(C_{canopy} = 1 - L^{PAR}_{ground}\)</span> <span class="citation">(<a href="#ref-Deguchi2006" role="doc-biblioref">Deguchi <em>et al.</em> 2006</a>)</span>.</p>
 <p>Simplifying assumptions are made to determine <span class="math inline">\(ER_{ratio}\)</span>. Values of the evaporation-to-rainfall ratio are calculated from daily potential evapotranspiration and rainfall, while accounting for seasonal variation in rainfall intensity (<span class="math inline">\(mm \cdot h^{-1}\)</span>). Minimum values for rainfall intensity are assumed for convective storms (<span class="math inline">\(5.6\,mm \cdot h^{-1}\)</span>) and synoptic storms (<span class="math inline">\(1.5\,mm \cdot h^{-1}\)</span>) from <span class="citation">Miralles <em>et al.</em> (<a href="#ref-Miralles2010" role="doc-biblioref">2010</a>)</span>. Synoptic storms are assumed between December and June, and convective storms are assumed for the remaining months, as typical in the Mediterranean Basin.</p>
@@ -763,6 +764,22 @@ Es = \min(PE_{soil}, SE_{soil})
 Figure 5.3: Cumulative bare soil evaporation for different values of maximum evaporation rate (<span class="math inline">\(\gamma_{soil}\)</span>) and extinction coefficient (<span class="math inline">\(\kappa_{soil}\)</span>). Three soil layers (0 – 30 cm; 30 – 150 cm; 150 – 400 cm) are initialized at field capacity (<span class="math inline">\(V_1 = 50 mm\)</span>; <span class="math inline">\(V_2 = 201 mm\)</span>; <span class="math inline">\(V_3 = 35 mm\)</span>). <span class="math inline">\(PE_{soil}\)</span> was assumed not to be limiting.
 </p>
 </div>
+</div>
+<div id="herbaceoustranspiration" class="section level2 hasAnchor" number="5.6">
+<h2><span class="header-section-number">5.6</span> Transpiration of the herbaceous layer<a href="hydrology.html#herbaceoustranspiration" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Transpiration of herbaceous layer is modelled analogously to the transpiration of woody plants. First, potential evapotranspiration from the herbaceous layer (<span class="math inline">\(PET_{herb}\)</span>; in <span class="math inline">\(mm \cdot day^{-1}\)</span>) is defined as the product between <span class="math inline">\(PET\)</span> and <span class="math inline">\(L^{SWR}_{herb}\)</span>, the proportion of SWR reaching the herbaceous layer:
+<span class="math display">\[\begin{equation}
+PET_{herb} =  PET \cdot L^{SWR}_{herb}
+\end{equation}\]</span>
+Thus, the more dense the woody plant canopy, the lower herbaceous transpiration will be. Maximum herbaceous transpiration <span class="math inline">\(Tr_{herb, \max}\)</span> depends on both <span class="math inline">\(PET_{herb}\)</span> and the amount of transpiring surface, i.e. <span class="math inline">\(LAI_{herb}\)</span>. To estimate <span class="math inline">\(Tr_{\max}\)</span> the model uses the empirical equation of <span class="citation">Granier <em>et al.</em> (<a href="#ref-Granier1999" role="doc-biblioref">1999</a>)</span>, as in section <a href="transpirationgranier.html#maximumtranspiration">6.1.1</a>:
+<span class="math display">\[\begin{equation}
+\frac{Tr_{herb,\max}}{PET}= -0.006\cdot (LAI_{herb})^2+0.134\cdot LAI_{herb}
+\end{equation}\]</span></p>
+<p>Finally, actual herbaceous transpiration (<span class="math inline">\(Tr_{herb}\)</span>) is reduced according to the water potential in the topmost soil layer (<span class="math inline">\(\Psi_1\)</span>), assuming that transpiration reduction follows Weibull function with fixed coefficients:</p>
+<p><span class="math display" id="eq:herbaceoustranspiration">\[\begin{equation}
+Tr_{herb}=Tr_{herb,\max} \cdot \exp \left \{\ln{(0.5)}\cdot \left[ \frac{\Psi_1}{-1.5} \right] ^2 \right \}
+\tag{5.1}
+\end{equation}\]</span></p>
 
 </div>
 </div>

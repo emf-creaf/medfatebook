@@ -1,6 +1,6 @@
 # Forest hydrology {#hydrology}
 
-Forest hydrological processes are key for soil and plant water balances. This chapter details the design and implementation of most of the vertical hydrological processes included in package **medfate**. These processes determine the value of the water flows mentioned in eq. \@ref(eq:basicwaterbalanceequation). The only process that is not described here is plant transpiration ($Tr$), as it will be covered in detail in chapter \@ref(transpirationgranier).
+Forest hydrological processes are key for soil and plant water balances. This chapter details the design and implementation of most of the vertical hydrological processes included in package **medfate**. These processes determine the value of the water flows mentioned in eq. \@ref(eq:basicwaterbalanceequation). The only process that is not described here is woody plant transpiration ($Tr_w$), as it will be covered in detail in chapter \@ref(transpirationgranier).
 
 Although each process can be simulated in specific sub-model functions, function `hydrology_verticalInputs()` allows simulating soil water input processes altogether, including canopy water interception, snow accumulation/melt, soil infiltration and percolation.
 
@@ -27,9 +27,9 @@ As mentioned above, interception loss is only modelled for liquid precipitation 
 \begin{equation}
 P_G = - \frac{S_{canopy}/C_{canopy}}{ER_{ratio}} \cdot \ln(1-ER_{ratio})
 \end{equation}
-where $S_{canopy}$ is the canopy water storage capacity (in mm) –  i.e. the minimum amount of water needed to saturate the canopy –, $C_{canopy}$ is the canopy cover and $ER_{ratio}$ is the ratio of evaporation rate to rainfall rate during the rainfall event. Although interception models are normally applied to single-canopy stands, we apply the sparse Gash model to the whole stand (including shrubs). Moreover, in our implementation stem interception is lumped with canopy interception, so that $S_{canopy}$ represents both. Following @Watanabe1996 we estimate $S_{canopy}$, the canopy water storage capacity, from adjusted LAI values:
+where $S_{canopy}$ is the canopy water storage capacity (in mm) –  i.e. the minimum amount of water needed to saturate the canopy –, $C_{canopy}$ is the canopy cover and $ER_{ratio}$ is the ratio of evaporation rate to rainfall rate during the rainfall event. Although interception models are normally applied to single-canopy stands, we apply the sparse Gash model to the whole stand (including shrubs and the herbaceous layer). Moreover, in our implementation stem interception is lumped with crown interception, so that $S_{canopy}$ represents both. Following @Watanabe1996 we estimate $S_{canopy}$, the canopy water storage capacity, from adjusted LAI values:
 \begin{equation}
-S_{canopy}=\sum_{i}{s_{water,i}\cdot LAI_{i}^{\phi}}
+S_{canopy}=LAI_{herb}+\sum_{i}{s_{water,i}\cdot LAI_{i}^{\phi}}
 \end{equation}
 where $s_{water,i}$ is the depth of water that can be retained by leaves, branches and stems of cohort $i$ per unit of leaf area index ($mm \cdot LAI^{-1}$). To estimate the stand cover, $C_{canopy}$, we use the complement of the percentage of PAR that reaches the ground, i.e. $C_{canopy} = 1 - L^{PAR}_{ground}$ [@Deguchi2006].
 
@@ -281,3 +281,20 @@ legend("topleft", lty=rep(1:3,2), pch=c(1,1,1,2,2,2), legend=c("Gsoil = 1 Ksoil 
                                     "Gsoil = 3 Ksoil = 0.005"), cex = 0.7, bty="n")
 ```
 
+## Transpiration of the herbaceous layer {#herbaceoustranspiration}
+
+Transpiration of herbaceous layer is modelled analogously to the transpiration of woody plants. First, potential evapotranspiration from the herbaceous layer ($PET_{herb}$; in $mm \cdot day^{-1}$) is defined as the product between $PET$ and $L^{SWR}_{herb}$, the proportion of SWR reaching the herbaceous layer:
+\begin{equation}
+PET_{herb} =  PET \cdot L^{SWR}_{herb}
+\end{equation}
+Thus, the more dense the woody plant canopy, the lower herbaceous transpiration will be. Maximum herbaceous transpiration $Tr_{herb, \max}$ depends on both $PET_{herb}$ and the amount of transpiring surface, i.e. $LAI_{herb}$. To estimate $Tr_{\max}$ the model uses the empirical equation of @Granier1999, as in section \@ref(maximumtranspiration):
+\begin{equation}
+\frac{Tr_{herb,\max}}{PET}= -0.006\cdot (LAI_{herb})^2+0.134\cdot LAI_{herb}
+\end{equation}
+
+Finally, actual herbaceous transpiration ($Tr_{herb}$) is reduced according to the water potential in the topmost soil layer ($\Psi_1$), assuming that transpiration reduction follows Weibull function with fixed coefficients:
+
+\begin{equation}
+Tr_{herb}=Tr_{herb,\max} \cdot \exp \left \{\ln{(0.5)}\cdot \left[ \frac{\Psi_1}{-1.5} \right] ^2 \right \} 
+(\#eq:herbaceoustranspiration)
+\end{equation}

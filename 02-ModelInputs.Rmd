@@ -219,15 +219,21 @@ Leaf area index of herbaceous layer ($LAI_{herb}$), is normally estimated from $
 If there are $c$ woody plant cohorts, the leaf area index corresponding to living leaves, unfolded leaves and dead leaves can be aggregated across cohorts using:
 
 \begin{eqnarray}
-LAI^{live}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{live}} \\
-LAI^{\phi}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{\phi}} \\
-LAI^{dead}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{dead}}
+LAI^{live}_{woody} &=& \sum_{i=1}^c{LAI_{i}^{live}} \\
+LAI^{\phi}_{woody} &=& \sum_{i=1}^c{LAI_{i}^{\phi}} \\
+LAI^{dead}_{woody} &=& \sum_{i=1}^c{LAI_{i}^{dead}}
 \end{eqnarray}
 
-Finally, we can also estimate the overall leaf area index of the whole stand, which also takes into account the herbaceous layer:
+We can also estimate the overall leaf area index of woody plant cohorts ($LAI^{all}_{woody}$):
 
 \begin{eqnarray}
-LAI^{all}_{stand} &=& \sum_{i=1}^c{LAI_{i}^{all}} + LAI_{herb} = LAI^{\phi}_{stand}+LAI^{dead}_{stand} + LAI_{herb} 
+LAI^{all}_{woody} &=& \sum_{i=1}^c{LAI_{i}^{woody}}= LAI^{\phi}_{woody}+LAI^{dead}_{woody}
+\end{eqnarray}
+
+Finally, we can also estimate the overall leaf area index of the whole stand ($LAI^{all}_{stand}$), which also takes into account the herbaceous layer ($LAI_{herb}$):
+
+\begin{eqnarray}
+LAI^{all}_{stand} &=& LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody}+LAI^{dead}_{woody} + LAI_{herb} 
 \end{eqnarray}
 
 
@@ -256,7 +262,7 @@ Simulation models in **medfate** divide the vertical dimension into vertical lay
 
 Dividing the leaf area of a given layer by its width, one obtains the *leaf area density* ($LAD$ in $m^2 \cdot m^{-3}$). Figure \@ref(fig:leafareadensity) illustrates the leaf area density profile (see function `vprofile_leafAreaDensity()`) corresponding to the forest stand described in the example `forest` object that we showed above. 
 
-```{r leafareadensity, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap="Leaf area density distribution in a forest stand. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution."}
+```{r leafareadensity, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap="Leaf area density distribution of woody vegetation in a forest stand. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution."}
 g1<-vprofile_leafAreaDensity(exampleforestMED, SpParamsMED, z = seq(0,1000, by=1), byCohorts = T)
 g1 <- g1 + theme(legend.background = element_blank(), legend.position = c(0.8,0.8))
 g2<-vprofile_leafAreaDensity(exampleforestMED, SpParamsMED, z = seq(0,1000, by=1))

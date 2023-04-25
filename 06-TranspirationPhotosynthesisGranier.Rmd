@@ -1,36 +1,36 @@
-# Plant transpiration, photosynthesis and water status {#transpirationgranier}
+# Woody plant transpiration, photosynthesis and water status {#transpirationgranier}
 
-This chapter describes how daily plant transpiration is modelled in the basic water balance model, completing the flows needed to evaluate eq. \@ref(eq:basicwaterbalanceequation). The model uses the approach of BILJOU [@Granier1999] to estimate stand maximum transpiration, and then divides this value among the contribution of plant cohorts and estimate actual transpiration depending on soil moisture and cohort functional parameters, which determine plant drought. The chapter also describes how is daily photosynthesis estimated, a process that in this model does not influence transpiration but is necessary for growth calculations (chapter \@ref(growthmodelling)). 
+This chapter describes how daily woody plant transpiration ($Tr_{woody}$) is modelled in the basic water balance model, completing the flows needed to evaluate eq. \@ref(eq:basicwaterbalanceequation). The model uses the approach of BILJOU [@Granier1999] to estimate woody maximum transpiration, and then divides this value among the contribution of plant cohorts and estimate actual transpiration depending on soil moisture and cohort functional parameters, which determine plant drought. The chapter also describes how is daily photosynthesis estimated, a process that in this model does not influence transpiration but is necessary for growth calculations (chapter \@ref(growthmodelling)). 
 
 ## Plant transpiration and photosynthesis
 ### Maximum transpiration {#maximumtranspiration}
 
-Potential evapotranspiration ($PET$, in mm) is assumed to represent open water evaporation potential. Maximum canopy transpiration $Tr_{\max}$ depends on both $PET$ and the amount of transpirating surface, i.e. the current cumulative $LAI$ of the stand, $LAI^{\phi}_{stand}$. To estimate $Tr_{\max}$ the model uses the empirical equation of @Granier1999, where $Tr_{\max}/PET$ is a function of $LAI^{\phi}_{stand}$:
+Potential evapotranspiration ($PET$, in mm) is assumed to represent open water evaporation potential. Maximum canopy transpiration $Tr_{woody, \max}$ depends on both $PET$ and the amount of transpirating surface, i.e. the current cumulative $LAI$ of the woody vegetation, $LAI^{\phi}_{woody}$. To estimate $Tr_{woody, \max}$ the model uses the empirical equation of @Granier1999, where $Tr_{woody, \max}/PET$ is a function of $LAI^{\phi}_{woody}$:
 
 \begin{equation}
-\frac{Tr_{\max}}{PET}= -0.006\cdot (LAI^{\phi}_{stand})^2+0.134\cdot LAI^{\phi}_{stand}+0.036
+\frac{Tr_{woody, \max}}{PET}= -0.006\cdot (LAI^{\phi}_{woody})^2+0.134\cdot LAI^{\phi}_{woody}+0.036
 \end{equation}
 This equation has already been adopted for Mediterranean biomes [@Fyllas2009; @Ruffault2013]. 
 
-(ref:tmaxpet-cap) Empirical relationship between $Tr_{\max}/PET$ and $LAI^{\phi}_{stand}$
+(ref:tmaxpet-cap) Empirical relationship between $Tr_{woody, \max}/PET$ and $LAI^{\phi}_{woody}$
 
 ```{r tmaxpet, fig.width=4, fig.height=4, fig.align = "center", echo=FALSE, fig.cap='(ref:tmaxpet-cap)'}
 par(mar=c(4,4,1,1))
 LAIc = seq(0,10, by=0.01)
 TmaxPET = -0.006*(LAIc^2) + 0.134*LAIc + 0.036
-plot(LAIc, TmaxPET, type="l", ylab="Tr_max/PET", xlab="LAIstand", ylim=c(0,1))
+plot(LAIc, TmaxPET, type="l", ylab="Tr_woody_max/PET", xlab="LAIwoody", ylim=c(0,1))
 ```
 
 Since medfate's **ver. 2.1**, empirical coefficients can be species-specific and @Granier1999 empirical equation has been generalized to:
 \begin{equation}
-\frac{Tr_{\max}}{PET}=  T_{max,LAI} \cdot LAI^{\phi}_{stand} + T_{max,sqLAI} \cdot (LAI^{\phi}_{stand})^2 
+\frac{Tr_{woody, \max}}{PET}=  T_{max,LAI} \cdot LAI^{\phi}_{woody} + T_{max,sqLAI} \cdot (LAI^{\phi}_{woody})^2 
 \end{equation}
 where $T_{max,LAI}$ and $T_{max,sqLAI}$ are species-specific parameters (if missing, they are given default values 0.134 and -0.006, respectively). 
 
 The maximum transpiration for a given plant cohort $i$ is calculated using the portion of $Tr_{\max}$ defined by $f_i$ the fraction of total absorbed SWR that is due
 to cohort $i$ (see section \@ref(basiclightextinction)):
 \begin{equation}
-Tr_{\max, i} = Tr_{\max} \cdot \frac{f_i^{0.75}}{\sum_{j}{f_j^{0.75}}}
+Tr_{\max, i} = Tr_{woody, \max} \cdot \frac{f_i^{0.75}}{\sum_{j}{f_j^{0.75}}}
 (\#eq:maximumcohorttranspiration)
 \end{equation} 
 Before **ver 2.5.0** $Tr_{\max, i}$ was linearly related to $f_i$, but an exponent 0.75 is now used to decrease *ad hoc* the proportion of transpiration corresponding to cohorts absorbing high SWR fractions with respect to those absorbing low amounts of SWR, which has been found to better match the transpiration predicted using the advanced transpiration model. Note that the actual amount of radiation energy absorbed by plants is much more difficult to determine, involving diffuse and direct radiation, as well as net long-wave radiation (see chapter \@ref(radiationbalance)). 
@@ -79,16 +79,16 @@ Tr_{i,s} =  Tr_{\max,i} \cdot K^{PLC}_{i,s} \cdot \frac{K_{unsat,s}^{0.5} \cdot 
 \end{equation}
 where $K_{unsat,s}$ is the unsaturated soil conductivity of layer $s$. This modification was introduced to allow the plant to increase the amount of water drawn from layers with higher levels of moisture in seasons where the usual water pools are depleted. This formulation decreases the differences in soil moisture between soil layers, which in the advanced model is achieved thanks to hydraulic redistribution process.  
 
-The total amount of water transpired by cohort $i$, $Tr_i$ (in mm) is the sum of $Tr_{i,s}$ values over all soil layers:
+The total amount of water transpired by woody cohort $i$, $Tr_i$ (in mm) is the sum of $Tr_{i,s}$ values over all soil layers:
 \begin{equation}
 Tr_i =\sum_{s}{Tr_{i,s}}
 \end{equation}
 
-Analogously, the total amount of water transpired by all plants, $Tr$ (in mm), is the sum of $Tr_{i}$ values over all plant cohorts:
+Analogously, the total amount of water transpired by woody plants, $Tr_{woody}$ (in mm), is the sum of $Tr_{i}$ values over all plant cohorts:
 \begin{equation}
-Tr =\sum_{i}{Tr_{i}} =\sum_{s}\sum_{i}{Tr_{i,s}}
+Tr_{woody} =\sum_{i}{Tr_{i}} =\sum_{s}\sum_{i}{Tr_{i,s}}
 \end{equation}
-Assuming no water limitations (i.e. $K_{i,s} = 1$), we have that $Tr = Tr_{\max}$ and $Tr_i = Tr_{\max,i}$. Cohort transpiration and stand transpiration will be lower than maximum values if soil water potential in any layer is negative enough to cause a significant reduction in whole-plant conductance. At the plant level, the transpiration of a given plant cohort will be lower than that of others if: 
+Assuming no water limitations (i.e. $K_{i,s} = 1$), we have that $Tr_{woody} = Tr_{woody, \max}$ and $Tr_i = Tr_{\max,i}$. Cohort transpiration and stand transpiration will be lower than maximum values if soil water potential in any layer is negative enough to cause a significant reduction in whole-plant conductance. At the plant level, the transpiration of a given plant cohort will be lower than that of others if: 
 
   a. The cohort is under the shade (it reduces $f_i$ and hence $Tr_{\max,i}$)
   b. The cohort has a lower amount of leaf area (it reduces $f_i$ and hence $Tr_{\max,i}$)
