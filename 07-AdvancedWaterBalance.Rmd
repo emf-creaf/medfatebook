@@ -2,28 +2,32 @@
 
 # Advanced water balance model {#advancedwaterbalance}
 
-This chapter provides an overview of a water and energy balance model that shares some characteristics with the basic water balance model described in previous chapters. Like the previous one, the model is run using function `spwb()`, for a set of days, or function `spwb_day()`, for a single day. Compared to the basic model, the advanced water balance model adds more detail in some processes (light extinction, plant hydraulics and photosynthesis) and incorporates others that were missing (energy balances, plant water balance and hydraulic redistribution). Importantly, two alternative approaches are possible regarding *plant hydraulics* and *stomatal conductance* sub-models:
+This chapter provides an overview of the advanced water and energy balance model available in **medfate**. It shares some characteristics with the basic water balance model described in previous chapters. Like the previous one, the model is run using function `spwb()`, for a set of days, or function `spwb_day()`, for a single day. Compared to the basic model, the advanced water balance model adds more detail in some processes (radiation transfer, plant hydraulics and photosynthesis) and incorporates other processes that were missing (canopy/soil energy balances and plant water balance). Importantly, two alternative approaches are possible regarding *plant hydraulics* and *stomatal conductance* sub-models:
 
   + If `transpirationMode = "Sperry"`, the sub-models of plant hydraulics and stomatal conductance follow @Sperry2016 and were described in detail in @DeCaceres2021. 
   + If `transpirationMode = "Cochard"`, the sub-models of plant hydraulics and stomatal conductance follow SurEau-ECOS and were described in @ruffault_sureau-ecos_2022. 
 
-The following overview is structured as in chapter \@ref(basicwaterbalance). Process formulations shared with the basic water balance model were presented in previous chapters and will not be repeated. The chapters following this one provide a detailed description of those sub-modules that are exclusive of the advanced model. In particular, we focus on the two sub-models of plant hydraulics and stomatal conductance corresponding to @DeCaceres2021 and @ruffault_sureau-ecos_2022. We recommend readers to familiarize themselves with basic water balance modelling processes before reading this and the subsequent chapters. In addition, users of this model should have a background on the processes implemented to fully understand and exploit model outputs. Since the scope of this book is focused on the model, interested readers should address relevant ecophysiological bibliography complement the material exposed here.
+The following model overview is structured as in chapter \@ref(basicwaterbalance). Process formulations shared with the basic water balance model were presented in previous chapters and will not be repeated. The chapters following this one provide a detailed description of those sub-modules that are exclusive of the advanced model. Whenever necessary, we will detail the difference between the two sub-models of plant hydraulics and stomatal conductance corresponding to @DeCaceres2021 and @ruffault_sureau-ecos_2022. We recommend readers to familiarize themselves with basic water balance modelling processes before reading this and the subsequent chapters. In addition, users of this model should have a background on the processes implemented to fully understand and exploit model outputs. Since the scope of this book is focused on the model, interested readers should address relevant eco-physiological bibliography complement the material exposed here.
 
 ## Design principles {#advanceddesign}
 
-The model performs soil/plant water balance and soil/canopy energy balance for a given forest stand and for the period corresponding to input weather data. Soil water balance is calculated on a daily step basis whereas energy balances and plant transpiration are determined at subdaily steps. The model considers only the vertical spatial dimension of the stand, and not the horizontal distribution of plants within it. Still, the forest stand is divided into: (a) canopy vertical layers; (b) plant cohorts of different species, height and leaf area index ($LAI$). 
+The model performs soil/plant water balance and soil/canopy energy balance for a given forest stand and for the period corresponding to input weather data. Soil water balance is calculated on a daily step basis whereas energy balances and plant transpiration are determined at subdaily steps (typically 1h steps). The model considers only the vertical spatial dimension of the stand, and not the horizontal distribution of plants within it. Still, the forest stand is divided into: (a) canopy vertical layers; (b) woody plant cohorts of different species and a herbaceous layer. 
 
-Hydrological processes are the same as in chapter \@ref(basicwaterbalance), except for the addition of hydraulic redistribution of soil water via plant roots. The model includes water interception loss [@Gash1995], plant transpiration, evaporation from soil [@Ritchie1972] and the partition between infiltration and runoff [@Boughton1989]. Infiltration is partitioned among soil layers, depending on macroporosity, and water exceeding soil water holding capacity is lost via deep drainage. Snow pack dynamics can also be simulated.
+Hydrological processes are the same as in chapter \@ref(basicwaterbalance). Thus, the model includes water interception loss [@Gash1995], plant transpiration, evaporation from soil [@Ritchie1972], transpiration of the herbaceous layer and partition between infiltration and runoff [@Boughton1989]. Infiltration is partitioned among soil layers, depending on macroporosity, and water exceeding soil water holding capacity is lost via deep drainage. Snow pack dynamics can also be simulated.
 
-A great deal of the complexity of the advanced model concerns the estimation of plant transpiration and photosynthesis. The model simulates stomatal regulation of gas exchange separately for sunlit and shade leaves at sub-daily steps, involving detailed calculations of hydraulics, leaf energy balance and photosynthesis [@Sperry2016]. Compared to the basic water balance model of chapter \@ref(basicwaterbalance), the higher level of complexity of the advanced model allows a more precise estimation of photosynthesis and transpiration. Moreover, the plant hydraulics submodel generates redistribution of water among soil layers.
+A great deal of the complexity of the advanced model concerns the estimation of woody plant transpiration and photosynthesis. The model simulates stomatal regulation of gas exchange separately for sunlit and shade leaves at sub-daily steps, involving detailed calculations of plant hydraulics, leaf energy balance and photosynthesis. Compared to the basic water balance model of chapter \@ref(basicwaterbalance), the higher level of complexity of the advanced model allows a more precise estimation of carbon and water flows, as well as a more nuanced evaluation of plant water status.
 
-To calculate radiation balance and incident PAR at the leaf level, the leaf area of each plant cohort is divided into vertical layers according to its crown limits. Photosynthesis and transpiration of sunlit and shade leaves are treated separatedly [@DePury1997]. Given an input direct and diffuse short-wave irradiance at the top of the canopy, the amount of light absorbed by sunlit leaves, shade leaves and the soil follows the model of @Anten2016. The scheme for long-wave radiation transfer between the atmosphere, the different canopy layers and the soil follows the SHAW model [@Flerchinger2009].
+To calculate radiation balance and incident PAR at the leaf level, the leaf area of each plant cohort is divided into vertical layers according to its crown limits. Photosynthesis and transpiration of sunlit and shade leaves are treated separately [@DePury1997]. Given an input direct and diffuse short-wave irradiance at the top of the canopy, the amount of light absorbed by sunlit leaves, shade leaves and the soil follows the model of @Anten2016. The scheme for long-wave radiation transfer between the atmosphere, the different canopy layers and the soil follows the SHAW model [@Flerchinger2009].
 
 Energy balances are conducted at two levels: the canopy (or canopy layers) level and the leaf level. The model keeps track of temperature variation within the canopy (i.e. canopy energy balance) and in the uppermost soil surface (i.e. soil energy balance) as the result of energy exchanges between them and with the atmosphere. Heat conduction also occurs among soil layers. Energy balance can be performed assuming a single canopy layer, with soil and canopy energy balance equations being similar to those of Best et al. [-@Best2011] for JULES. Alternatively, energy balance can be conducted for each vertical layer following @Bonan2014. In this case, the model allows considering within-canopy gradients in temperature, water vapor pressure, and $CO_2$ as well as the turbulent transport of heat, water vapor and $CO_2$ between canopy layers [@Ma2019], determined using a canopy turbulence model by @Katul2004.
 
-The model also performs the energy balance at the leaf level to determine transpiration [@Sperry2016]. At this scale, radiation inputs include shortwave radiation from the atmosphere absorbed by the leaf and the net balance of long-wave radiation. Leaf temperature is determined assuming that the temperature of the surrounding air is that of the canopy (or canopy layer). After determining stomatal regulation, the model up-scales the transpiration flux to the canopy (or canopy layer) scale and the corresponding latent heat is used to complete the calculation of the energy balance at the canopy (or canopy layer) level. Latent heat fluxes from evaporation from the soil and evaporation of intercepted rainfall are also included in the canopy/soil energy balances.
+The model also performs the energy balance at the leaf level to determine transpiration. At this scale, radiation inputs include shortwave radiation from the atmosphere absorbed by the leaf and the net balance of long-wave radiation. Leaf temperature is determined assuming that the temperature of the surrounding air is that of the canopy (or canopy layer). After determining stomatal regulation, the model up-scales the transpiration flux to the canopy (or canopy layer) scale and the corresponding latent heat is used to complete the calculation of the energy balance at the canopy (or canopy layer) level. Latent heat fluxes from evaporation from the soil and evaporation of intercepted rainfall are also included in the canopy/soil energy balances.
 
-While plant water content is normally determined by changes in water potential values corresponding to changes in soil moisture and transpiration rates, the model can also consider an explicit water balance within the plant. In this case, the amount of water within plant compartments is explicitly tracked and the rate of extraction of soil water can be decoupled from the rate of transpiration. 
+Plant hydraulics and stomatal regulation follow different designs depending on the sub-model employed:
+
++ If `transpirationMode = "Sperry"`, plant hydraulics follows the steady-state approach of Sperry et al. [-@Sperry1998] model, and stomatal regulation follows the profit maximization approach of Sperry et al. [-@Sperry2016]. A variant of this sub-model (i.e., if `capacitance = TRUE`) can also consider an explicit water balance within plant compartments @DeCaceres2021. In this case, the amount of water within plant compartments is explicitly tracked and the rate of extraction of soil water can be decoupled from the rate of transpiration. 
+
++ If `transpirationMode = "Cochard"`, plant water compartments are always included, and water flows follow Darcy's law, as described in @ruffault_sureau-ecos_2022. In this case, stomatal regulation follows a Jarvis-type model.
 
 Like in the basic water model, the advanced model assumes by default that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can be simulated. In this case, hydrological processes are replicated for the fraction of soil corresponding to each cohort. Transpiration of each plant cohort depends on the soil moisture beneath itself and, depending on root overlap, on the soil moisture beneath other plant cohorts.
 
@@ -52,15 +56,15 @@ Additional state variables depend on the activation of specific control flags (s
 Daily variations in soil water content ($\Delta{V_{soil}}$ in mm) can be summarized as:
 
 \begin{equation}
-\Delta{V_{soil}} = Pr + Sm - In - Ru - Dd - Es - Ex
+\Delta{V_{soil}} = Pr + Sm - In - Ru - Dd - Es - Tr_{herb} - Ex_{woody}
 (\#eq:advancedwaterbalanceequation)
 \end{equation}
 
-where $Pr$ is precipitation as rainfall, $Sm$ is water reaching the soil from snow melt (if snow-pack dynamics are considered), $In$ is the interception loss (i.e., water evaporated after being intercepted by the canopy), $Ru$ is surface runoff, $Dd$ is deep drainage (i.e. water percolated to layers beyond soil depth), $Es$ is evaporation from soil surface and $Ex$ is water extraction by plants. 
+where $Pr$ is precipitation as rainfall, $Sm$ is water reaching the soil from snow melt (if snow-pack dynamics are considered), $In$ is the interception loss (i.e., water evaporated after being intercepted by the canopy), $Ru$ is surface runoff, $Dd$ is deep drainage (i.e. water percolated to layers beyond soil depth), $Es$ is evaporation from soil surface, $Tr_{herb}$ is the transpiration of the herbaceous layer and $Ex_{woody}$ is soil water extraction done by woody plants. 
 
-Although the advanced water balance model includes hydraulic redistribution, this does not change the total amount of water in the soil, so the water balance equation is is very similar to that of the basic water balance model (eq.\@ref(eq:basicwaterbalanceequation)). Soil water extraction ($Ex$) and plant transpiration ($Tr$) will be equal if plant capacitance effects are not considered. Otherwise the amount of water stored in the plant changes according to:
+Although the advanced water balance model includes hydraulic redistribution, this does not change the total amount of water in the soil, so the water balance equation is is very similar to that of the basic water balance model (eq.\@ref(eq:basicwaterbalanceequation)). Soil water extraction ($Ex_{woody}$) and plant transpiration ($Tr_{woody}$) will be equal if capacitance effects are not considered. Otherwise the amount of water stored in the woody plant tissues changes according to:
 \begin{equation}
-\Delta{V_{plant}} = Ex - Tr
+\Delta{V_{plant}} = Ex_{woody} - Tr_{woody}
 (\#eq:plantwaterbalance)
 \end{equation}
 
@@ -73,7 +77,7 @@ a. *If snow dynamics are considered*, the water balance of the snow pack is defi
 where $Ps$ is precipitation as snowfall and $Sm$ is snow melt. Evaporation from bare soil cannot occur if there is a snow pack over the soil surface (i.e., if $S_{snow}>0$ then $Es = 0$). 
 b. *If plant water pools are considered*, the water balance equation applies not only to the soil of the overall stand but also to the soil beneath each plant cohort. The fraction of stand area covered by each cohort is used to keep the water balance at the two scales aligned. Moreover, the water balances of soils beneath the different plant cohort are more or less correlated depending on root overlap.
 
-Unlike the basic water balance, in this model water balance components contributing to latent heat ($Es$, $Tr$, $In$ and $Sm$) are included in the energy balance equations of the canopy and soil, therefore coupling water and energy balances.
+Unlike the basic water balance, in this model water balance components contributing to latent heat ($Es$, $Tr_{woody}$, $Tr_{herb}$, $In$ and $Sm$) are included in the energy balance equations of the canopy and soil, therefore coupling water and energy balances.
 
 ### Single-layer canopy energy balance
 
@@ -119,21 +123,31 @@ For every day to be simulated, the model performs the following steps:
 2. If snow dynamics are included, increase snow pack from snow precipitation ($Ps$) and decrease it following snow melt ($Sm$) (section \@ref(snowpack)).
 3. Determine rainfall interception loss ($In$) and net rainfall ($Pr_{net}$) (section \@ref(interception)).
 4. Increase soil water content due to net rainfall ($Pr_{net}$), surface runon ($Ro$) and snow melt ($Sm$), after accounting for surface runoff ($Ru$) and deep drainage ($Dd$) (section \@ref(runoff)).
-5. Decrease soil water content due to bare soil evaporation ($Es$), if snow is not present (section \@ref(soilevaporation)).
-6. Determine subdaily air temperature and direct/diffuse irradiance variations (chapter \@ref(subdailytemplight)).
-7. Determine shortwave radiation absorbed by plant cohorts and the soil at subdaily steps (sections \@ref(shortwaveradiationcanopyabs) and \@ref(shortwaveradiationsoilabs)).
-8. Update the water supply function of each plant cohort, according to the hydraulic model and the current soil water potential (chapter \@ref(planthydraulics)). If plant capacitance effects are considered, the supply function involves only the soil-to-stem part of the hydraulic pathway. Otherwise, it describes the complete soil-to-leaf pathway.
-9. Determine instantaneous plant cohort transpiration, photosynthesis rates and close soil/canopy energy balance at subdaily steps (chapters \@ref(transpirationsperrycochard) and \@ref(closecanopysoilenergybalance)). This involves the following actions for each subdaily step:
-    + Determine long-wave radiation exchange between soil, canopy layers and atmosphere (section \@ref(longwaveradiation)).
-    + If plant capacitance effects are considered update the stem-to-leaf hydraulic supply function.
-    + Calculate leaf energy balance and photosynthesis (for shade and sunlit leaves of each plant cohort) corresponding to each transpiration value of the supply function (section \@ref(leafenergybalancephoto)). If plant capacitance effects are considered this concerns the stem-to-leaf hydraulic supply function.
-    + Determine stomatal conductance, transpiration and photosynthesis on shade and sunlit leaves of each plant cohort according to Sperry's [-@Sperry2016] profit maximization strategy (section \@ref(stomatalregulation)).
-    + Scale transpiration ($Tr$) and net photosynthesis ($A_n$) from sunlit/shade leaves to the plant cohort level (section \@ref(scalingtranspirationphotosynthesis)).
-    + If plant capacitance effects are considered perform water balance of plant compartments at high temporal resolution (1 second steps), while re-estimating the flow from the soil to the stem at each step according to changes in stem water potential (see \@ref(hydraulicswithcompartments)). 
-    + Scale water extraction from soil layers ($Ex$) to the plant cohort level.
-    + Complete energy balance of the canopy and the soil, after translating plant transpiration, evaporation from bare soil, snow melt and interception loss to latent heat and calculating convective heat exchange for both the canopy and the soil. Alternatively, perform energy balance for individual canopy layers, while including turbulent heat exchange and turbulent transport of water vapor and $CO_2$ between layers (chapter \@ref(closecanopysoilenergybalance)).
+5. Decrease soil water content due to bare soil evaporation ($Es$), if snow is not present (section \@ref(soilevaporation)), and herbaceous transpiration ($Tr_{herb}$; section \@ref(herbaceoustranspiration)).
+6. Determine sub-daily air temperature and direct/diffuse irradiance variations (chapter \@ref(subdailytemplight)).
+7. Determine shortwave radiation absorbed by plant cohorts and the soil at sub-daily steps (sections \@ref(shortwaveradiationcanopyabs) and \@ref(shortwaveradiationsoilabs)).
+8. If `transpirationMode = "Sperry"`, update the water supply function of each plant cohort, according to the hydraulic model and the current soil water potential (chapter \@ref(planthydraulics)). If plant capacitance effects are considered, the supply function involves only the soil-to-stem part of the hydraulic pathway. Otherwise, it describes the complete soil-to-leaf pathway.
+9. Determine instantaneous plant cohort transpiration, photosynthesis rates and close soil/canopy energy balance at sub-daily steps (chapters \@ref(transpirationsperrycochard) and \@ref(closecanopysoilenergybalance)). This involves the following actions for each sub-daily step:
+    a. Determine long-wave radiation exchange between soil, canopy layers and atmosphere (section \@ref(longwaveradiation)).
+    b. If `transpirationMode = "Sperry"`, for each woody cohort:
+
+        i. If plant capacitance effects are considered update the stem-to-leaf hydraulic supply function.
+        ii. Calculate leaf energy balance and photosynthesis (for shade and sunlit leaves of each plant cohort) corresponding to each transpiration value of the supply function (section \@ref(leafenergybalancephoto)). If plant capacitance effects are considered this concerns the stem-to-leaf hydraulic supply function.
+        iii. Determine stomatal conductance, transpiration and photosynthesis on shade and sunlit leaves of each plant cohort according to Sperry's [-@Sperry2016] profit maximization strategy (section \@ref(stomatalregulation)).
+        iv. If plant capacitance effects are considered perform water balance of plant compartments at high temporal resolution (1 second steps), while re-estimating the flow from the soil to the stem at each step according to changes in stem water potential (see \@ref(hydraulicswithcompartments)). 
+        
+    c. If `transpirationMode = "Cochard"`, for each plant cohort repeat the following in small sub-steps (e.g. 10 min):
+
+       i. Perform energy balance of sunlit and shade leaves (section \@ref(leafenergybalancephoto)), according to the current transpiration flow.
+        ii. Re-estimate leaf and stem cuticular transpiration.
+        iii. Re-estimate stomatal regulation, transpiration and photosynthesis for sunlit and shade leaves.
+        iv. Update water potentials, flows and conductances across the hydraulic network.
+
+    d. Scale transpiration ($Tr_{woody}$) and net photosynthesis ($A_n$) from sunlit/shade leaves to the plant cohort level (section \@ref(scalingtranspirationphotosynthesis)).
+    e. Scale water extraction from soil layers ($Ex_{woody}$) to the woody plant cohort level.
+    f. Complete energy balance of the canopy and the soil, after translating plant transpiration, evaporation from bare soil, snow melt and interception loss to latent heat and calculating convective heat exchange for both the canopy and the soil. Alternatively, perform energy balance for individual canopy layers, while including turbulent heat exchange and turbulent transport of water vapor and $CO_2$ between layers (chapter \@ref(closecanopysoilenergybalance)).
 10. Determine day-level photosynthesis and transpiration from instantaneous rates and update soil moisture (section \@ref(daylevelphototransp)), effectively closing the soil water balance at the daily scale.
-11. Determine drought stress for each plant cohort (section \@ref(advanceddroughtstress)).
+11. Determine drought stress for each woody plant cohort (section \@ref(advanceddroughtstress)).
 
 Details of the formulation of each of these processes are provided within the referred chapters and sections (some processes have been already described in previous chapters/sections).
 
@@ -234,8 +248,8 @@ Vegetation functional attributes are normally filled for each cohort by function
 
 Control parameters modulate the overall behaviour of water balance simulations (see section \@ref(controlparameters)). There are three **key control parameters**:
 
-1. `transpirationMode` defines the transpiration model, which in turn defines the complexity of the water balance model. If `transpirationMode = "Sperry"` then the advanced water balance model is run. In this model, the water retention curve model is forced to be that of Van Genuchten, i.e. `soilFunctions = "VG"` (see section \@ref(waterretentioncurves)). 
-2. `capacitance` defines whether plant capacitance (hence, plant water balance) is considered. By default it is set to `capacitance = FALSE`.
+1. `transpirationMode` defines the transpiration model. If `transpirationMode = "Sperry"` or `transpirationMode = "Cochard"` then the advanced water balance model is run with the corresponding plant hydraulics and stomatal regulation sub-models. In advanced water balance models, the water retention curve model is forced to be that of Van Genuchten, i.e. `soilFunctions = "VG"` (see section \@ref(waterretentioncurves)). 
+2. `capacitance` defines whether plant capacitance (hence, plant water balance) is considered (only relevant for `transpirationMode = "Sperry"`). By default it is set to `capacitance = FALSE`.
 3. `ndailysteps` defines the number of daily steps. By default `ndailysteps = 24`, so that steps are hours, but users can increase the temporal resolution, for example to half hour substeps by setting `ndailysteps = 48`.
 4. `multiLayerBalance` is a boolean flag to indicate that multi-layer energy balance is desired (by default `multiLayerBalance = FALSE`).
 5. `nsubsteps`  defines the number of substeps for multi-layer energy balance calculations. By default `nsubsteps = 3600`, so that substeps are 1 sec if `ndailysteps = 24`.
@@ -283,6 +297,7 @@ Functions `spwb()` and `pwb()` with `transpirationMode = "Sperry"` return a list
 | `Plants`| Plant-level variables, such as $LAI^{phi}_i$, plant transpiration, plant water potential, etc. |
 | `SunlitLeaves` | Leaf-level output variables for sunlit leaves. |
 | `ShadeLeaves` | Leaf-level output variables for shade leaves. |
+| `FireHazard`| Fire hazard variables (fuel moisture, rate of spread, fire potentials, etc). Only returned if `fireHazardResults = TRUE`. |
 
 Compared to the output of the basic water balance \@ref(basicwaterbalanceoutput), new output elements are produced. Many results are given as sub-elements of `Plants`, each of them a data frame with dates in rows and plant cohorts in columns:
 
@@ -318,6 +333,6 @@ The following table describes the child elements of `SunlitLeaves` and `ShadeLea
 
 The output of simulations can be inspected using `plot`, `shinyplot` and `summary` functions specific to `spwb` objects (examples are given in the corresponding package *vignette*).
 
-#### Subdaily output
+#### Sub-daily output
 
-Calling function `spwb_day()` with the advanced water balance model results in subdaily results for the simulated date. When running the advanced water balance model with function `spwb()` one can request subdaily results to be included with the function output. This is done via setting  `subdailyResults = TRUE` in the control parameter list. In that case, the output list of `spwb()` will include an element `subdaily`, whose subelements correspond to the results of `spwb_day()` for each date simulated. Refer to the documentation of functions `spwb_day()` and `transp_transpirationSperry()` for details of subdaily output.
+Calling function `spwb_day()` with the advanced water balance model results in sub-daily results for the simulated date. When running the advanced water balance model with function `spwb()` one can request sub-daily results to be included with the function output. This is done via setting  `subdailyResults = TRUE` in the control parameter list. In that case, the output list of `spwb()` will include an element `subdaily`, whose sub-elements correspond to the results of `spwb_day()` for each date simulated. Refer to the documentation of functions `spwb_day()` and `transp_transpirationSperry()` or `transp_transpirationCochard()` for details of sub-daily output.
