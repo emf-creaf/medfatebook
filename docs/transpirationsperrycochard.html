@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 21 Post-simulation procedures | The medfate reference book</title>
+  <title>Chapter 12 Stomatal regulation, transpiration and photosynthesis | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
   <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 21 Post-simulation procedures | The medfate reference book" />
+  <meta property="og:title" content="Chapter 12 Stomatal regulation, transpiration and photosynthesis | The medfate reference book" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="This is a reference book for models implemented in packages medfate and medfateland." />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 21 Post-simulation procedures | The medfate reference book" />
+  <meta name="twitter:title" content="Chapter 12 Stomatal regulation, transpiration and photosynthesis | The medfate reference book" />
   
   <meta name="twitter:description" content="This is a reference book for models implemented in packages medfate and medfateland." />
   
@@ -29,8 +29,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="allometricmodels.html"/>
-<link rel="next" href="windextinction.html"/>
+<link rel="prev" href="plantphotosynthesis.html"/>
+<link rel="next" href="closecanopysoilenergybalance.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -673,11 +673,150 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="post-simulation-procedures" class="section level1 hasAnchor" number="21">
-<h1><span class="header-section-number">Chapter 21</span> Post-simulation procedures<a href="post-simulation-procedures.html#post-simulation-procedures" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<div id="water-use-efficiency" class="section level2 hasAnchor" number="21.1">
-<h2><span class="header-section-number">21.1</span> Water use efficiency<a href="post-simulation-procedures.html#water-use-efficiency" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="transpirationsperrycochard" class="section level1 hasAnchor" number="12">
+<h1><span class="header-section-number">Chapter 12</span> Stomatal regulation, transpiration and photosynthesis<a href="transpirationsperrycochard.html#transpirationsperrycochard" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Plants must open their stomata to acquire <span class="math inline">\(CO_2\)</span> and perform photosynthesis, but doing so promotes water loss. This trade-off has resulted in a tight coordination between capacity to supply and transpire water (hydraulic conductance and diffusive conductance to water vapor) and the maximum capacity for photosynthesis (carboxylation rate and electron-transport rate). For modelling purposes, this carbon-for-water trade-off means that hydraulics, stomatal conductance, transpiration and photosynthesis need to be estimated simultaneously. In chapters <a href="planthydraulics.html#planthydraulics">10</a> and <a href="plantphotosynthesis.html#plantphotosynthesis">11</a> we introduced supply and photosynthesis functions, but we did not explain how are actual transpiration and photosynthesis values determined. This is the subject of the present chapter.</p>
+<div id="stomatal-regulation-under-sperrys-sub-model" class="section level2 hasAnchor" number="12.1">
+<h2><span class="header-section-number">12.1</span> Stomatal regulation under Sperry’s sub-model<a href="transpirationsperrycochard.html#stomatal-regulation-under-sperrys-sub-model" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The framework of <span class="citation">Sperry <em>et al.</em> (<a href="#ref-Sperry2016" role="doc-biblioref">2017</a>)</span> suggests estimating stomatal conductance from the instantaneous maximization of profit, defined as the difference between photosynthesis gain and hydraulic cost (both normalized for comparability). First, transpiration and photosynthesis is estimated separately for sunlit and shade leaves according to this framework. An average transpiration rate is then determined depending on sunlit/shade transpiration rates and their leaf area contributions. Finally, the instantaneous transpiration and assimilation rates of each time step are scaled to the duration of the time step and to the leaf area of the plant cohort. The following sections provide details for all these steps.</p>
+<div id="water-supply-and-sunlitshade-photosynthesis-functions" class="section level3 hasAnchor" number="12.1.1">
+<h3><span class="header-section-number">12.1.1</span> Water supply and sunlit/shade photosynthesis functions<a href="transpirationsperrycochard.html#water-supply-and-sunlitshade-photosynthesis-functions" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Let us start by summarizing the concepts introduced in the last two chapters. The <strong>supply function</strong> described in chapter <a href="planthydraulics.html#planthydraulics">10</a> describes the rate of transpiration flow as a function of the pressure drop between the soil and the leaf, and incorporates both soil, xylem and leaf hydraulic constrains <span class="citation">(<a href="#ref-Sperry1998" role="doc-biblioref">Sperry <em>et al.</em> 1998</a>, <a href="#ref-Sperry2016a" role="doc-biblioref">2016</a>; <a href="#ref-Sperry2015" role="doc-biblioref">Sperry &amp; Love 2015</a>)</span>. Here we assume that hydraulic conductance <span class="math inline">\(k\)</span> is in <span class="math inline">\(mmol\,H_2O \cdot s^{-1} \cdot m^{-2}\cdot MPa^{-1}\)</span> of leaf area, transpiration rate <span class="math inline">\(E_{leaf}\)</span> in <span class="math inline">\(mmol\,H_2O \cdot s^{-1} \cdot m^{-2}\)</span> of leaf area and leaf water potential <span class="math inline">\(\Psi_{leaf}\)</span> is in MPa.</p>
+<p>According to section <a href="plantphotosynthesis.html#leafenergybalancephoto">11.1</a>, each <span class="math inline">\(E_{leaf}\)</span> value implies an energy balance at the leaf level, stomatal conductance to water vapour and a particular value of leaf photosynthesis. More specifically, for each pair of <span class="math inline">\(E_{leaf}\)</span> and <span class="math inline">\(\Psi_{leaf}\)</span> values, we have a corresponding leaf temperature (<span class="math inline">\(T_{leaf}\)</span>; in ºC), leaf-to-air vapor pressure deficit (<span class="math inline">\(VPD_{leaf}\)</span>; in kPa), leaf water vapor conductance (<span class="math inline">\(g_{sw}\)</span>; in <span class="math inline">\(mol\,H_2O·s^{-1}·m^{-2}\)</span>) and, finally the leaf gross and net (i.e. after accounting for autotrophic respiration) photosynthesis assimilation rates (<span class="math inline">\(A_g\)</span> and <span class="math inline">\(A_n\)</span>; both in <span class="math inline">\(\mu mol\,CO_2·s^{-1}·m^{-2}\)</span>). In short, the supply function generates a <strong>photosynthesis function</strong>. Since the model deals with canopies and not single leaves, however, different parts of the crowns of plant cohorts may be in different canopy positions. Calculating photosynthesis at the canopy level requires dividing the canopy into vertical layers, differentiating between <em>sunlit</em> and <em>shade</em> leaves and determining <strong>photosynthesis functions for sunlit and shade leaves separately</strong>, as explained in section <a href="plantphotosynthesis.html#crownphotosynthesis">11.2</a>.</p>
+</div>
+<div id="stomatalregulation" class="section level3 hasAnchor" number="12.1.2">
+<h3><span class="header-section-number">12.1.2</span> Leaf stomatal regulation by profit maximization<a href="transpirationsperrycochard.html#stomatalregulation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><span class="citation">Wolf <em>et al.</em> (<a href="#ref-Wolf2016" role="doc-biblioref">2016</a>)</span> proposed the <strong>carbon maximization criterion</strong>, which states that at each instant in time the stomata regulate canopy gas exchange and pressure to achieve the maximum profit, which is the maximum difference between photosynthetic gains and costs, the latter associated with hydraulic vulnerability attained with low water potentials. Such approach has been shown to be supported by data from global forest biomes <span class="citation">(<a href="#ref-Anderegg2018" role="doc-biblioref">Anderegg <em>et al.</em> 2018</a>)</span>. Building on this approach, <span class="citation">Sperry <em>et al.</em> (<a href="#ref-Sperry2016" role="doc-biblioref">2017</a>)</span> presented a profit maximization function where hydraulic costs of opening the stomata are compared against photosynthetic gains. Details of their formulation are given in this section. Stomatal regulation is performed in <strong>medfate</strong> separatedly for sunlit and shade leaves.</p>
+<div id="cost-and-gain-functions" class="section level4 hasAnchor" number="12.1.2.1">
+<h4><span class="header-section-number">12.1.2.1</span> Cost and gain functions<a href="transpirationsperrycochard.html#cost-and-gain-functions" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The hydraulic supply function is used to derive a transpirational <em>cost function</em> <span class="math inline">\(\theta_1(\Psi_{leaf})\)</span> that reflects the increasing damage from cavitation and the greater difficulty of moving water along the continuum <span class="citation">(<a href="#ref-Sperry2016a" role="doc-biblioref">Sperry <em>et al.</em> 2016</a>)</span>:
+<span class="math display">\[\begin{equation}
+\theta(\Psi_{leaf}) = \frac{k_{c,max}-k_{c}(\Psi_{leaf})}{k_{c,max}-k_{crit}}
+\end{equation}\]</span>
+where <span class="math inline">\(k_c(\Psi_{leaf}) = dE/d\Psi(\Psi)\)</span> is the slope of the supply function corresponding to (leaf) water potential <span class="math inline">\(\Psi_{leaf}\)</span>, <span class="math inline">\(k_{c,max}\)</span> is the maximum slope of the supply function (which occurs when <span class="math inline">\(E_{leaf}=0\)</span>), i.e. the maximum whole-plant conductance for the current soil moisture conditions, and <span class="math inline">\(k_{crit} = k_c(\Psi_{crit})\)</span> is the slope of the supply function at <span class="math inline">\(E_{leaf} = E_{crit}\)</span> the critical flow beyond which hydraulic failure occurs.</p>
+<p>The following figures illustrate the <span class="math inline">\(\theta(\Psi_{leaf})\)</span> curves corresponding to the supply functions:</p>
 
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:costfunction"></span>
+<img src="medfatebook_files/figure-html/costfunction-1.png" alt="Cost functions (i.e. \(\theta(\Psi_{leaf})\)) obtained for a hydraulic network, corresponding to fig. 10.14 and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively." width="768" />
+<p class="caption">
+Figure 12.1: Cost functions (i.e. <span class="math inline">\(\theta(\Psi_{leaf})\)</span>) obtained for a hydraulic network, corresponding to fig. <a href="planthydraulics.html#fig:supplynetwork">10.14</a> and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively.
+</p>
+</div>
+<p>The normalized photosynthetic <em>gain function</em> <span class="math inline">\(\beta(\Psi_{leaf})\)</span> reflects the actual assimilation rate with respect to the maximum <span class="citation">(<a href="#ref-Sperry2016a" role="doc-biblioref">Sperry <em>et al.</em> 2016</a>)</span>:
+<span class="math display">\[\begin{equation}
+\beta(\Psi_{leaf}) = \frac{A(\Psi_{leaf})}{A_{max}}
+\end{equation}\]</span>
+where <span class="math inline">\(A_{max}\)</span> is the instantaneous maximum (gross) assimilation rate estimated over the full <span class="math inline">\(\Psi_{leaf}\)</span> range (including values that imply a stomatal conductance larger than the maximum).</p>
+<p>The following figures illustrate the <span class="math inline">\(\beta(\Psi_{leaf})\)</span> curves corresponding to the supply and assimilation functions:</p>
+
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:gainfunction"></span>
+<img src="medfatebook_files/figure-html/gainfunction-1.png" alt="Gain function (\(\beta(\Psi_{leaf})\)) obtained for a hydraulic network, corresponding to fig. 10.14 and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively." width="768" />
+<p class="caption">
+Figure 12.2: Gain function (<span class="math inline">\(\beta(\Psi_{leaf})\)</span>) obtained for a hydraulic network, corresponding to fig. <a href="planthydraulics.html#fig:supplynetwork">10.14</a> and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively.
+</p>
+</div>
+</div>
+<div id="profit-maximization-at-the-leaf-level" class="section level4 hasAnchor" number="12.1.2.2">
+<h4><span class="header-section-number">12.1.2.2</span> Profit maximization at the leaf level<a href="transpirationsperrycochard.html#profit-maximization-at-the-leaf-level" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p><span class="citation">Sperry <em>et al.</em> (<a href="#ref-Sperry2016" role="doc-biblioref">2017</a>)</span> suggested that stomatal regulation can be effectively estimated by determining the maximum of the <em>profit function</em> (<span class="math inline">\(Profit(\Psi_{leaf})\)</span>):
+<span class="math display">\[\begin{equation}
+Profit(\Psi_{leaf}) = \beta(\Psi_{leaf})-\theta(\Psi_{leaf})
+\end{equation}\]</span>
+The maximization is achieved when the slopes of the gain and cost functions are equal:
+<span class="math display">\[\begin{equation}
+\frac{\delta \beta(\Psi_{leaf})}{\delta \Psi_{leaf}} = \frac{\delta \theta(\Psi_{leaf})}{\delta \Psi_{leaf}}
+\end{equation}\]</span>
+Instantaneous profit maximization assumes a ‘use it or lose it’ reality with regards to available soil water. Because the gain function accelerates more quickly from zero and reaches 1 sooner than the cost functiion, their maximum difference occurs at intermediate <span class="math inline">\(\Psi_{leaf}\)</span> values. Once <span class="math inline">\(\Psi_{leaf}\)</span> that maximizes profit is determined, the values of the remaining variables are also determined. At this point, it may happen that <span class="math inline">\(g_{sw}(\Psi_{leaf})\)</span> is lower than the minimum (i.e. cuticular) water vapor conductance (<span class="math inline">\(g_{sw,\min}\)</span>) or larger than the maximum water vapor conductance (<span class="math inline">\(g_{sw,\max}\)</span>). These thresholds need to be taken into account when determining the maximum of the profit function.</p>
+<p>The following figures illustrate the <span class="math inline">\(Profit(\Psi_{leaf})\)</span> curves of corresponding to the previous cost and gain curves:</p>
+
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:profitfunction"></span>
+<img src="medfatebook_files/figure-html/profitfunction-1.png" alt="Profit functions (i.e. \(Profit(\Psi_{leaf})\)) obtained for a hydraulic network, corresponding to fig. 10.14 and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively." width="768" />
+<p class="caption">
+Figure 12.3: Profit functions (i.e. <span class="math inline">\(Profit(\Psi_{leaf})\)</span>) obtained for a hydraulic network, corresponding to fig. <a href="planthydraulics.html#fig:supplynetwork">10.14</a> and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively.
+</p>
+</div>
+<p>Squares in the previous figures indicate the maximum profit points in each situation. The drier the soil, the closer is the maximum profit <span class="math inline">\(\Psi_{leaf}\)</span> to soil water potential as one would expect intuitively (i.e. a smaller drop in water potential along the hydraulic pathway). Note that when the soil is very dry the squares are to the right of the true maximum. This is because the <code>transp_profitMaximization()</code> function takes into account the minimum and maximum stomatal conductance and, in this case, does not allow optimum stomatal conductances below the minimum (cuticular) value.</p>
+<p>Note that <span class="math inline">\(\theta\)</span>, <span class="math inline">\(\beta\)</span> and <span class="math inline">\(Profit\)</span> functions can be expressed as a function of stomatal conductance, instead of leaf water potential. This allows visualizing more clearly the effect of <span class="math inline">\(g_{sw,\min}\)</span> and <span class="math inline">\(g_{sw,\max}\)</span> thresholds on the maximum profit optimization strategy, as illustrated in the following figures.</p>
+
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:profitfunction-gs"></span>
+<img src="medfatebook_files/figure-html/profitfunction-gs-1.png" alt="Profit function as a function of stomatal conductance, corresponding to fig. 12.3 and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively." width="768" />
+<p class="caption">
+Figure 12.4: Profit function as a function of stomatal conductance, corresponding to fig. <a href="transpirationsperrycochard.html#fig:profitfunction">12.3</a> and different soil textures and soil water potentials. Left/right panels show values for uncavitated/cavitated supply functions, respectively.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="stomatal-regulation-under-cochards-sub-model" class="section level2 hasAnchor" number="12.2">
+<h2><span class="header-section-number">12.2</span> Stomatal regulation under Cochard’s sub-model<a href="transpirationsperrycochard.html#stomatal-regulation-under-cochards-sub-model" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>[TO BE DESCRIBED]</p>
+</div>
+<div id="scalingtranspirationphotosynthesis" class="section level2 hasAnchor" number="12.3">
+<h2><span class="header-section-number">12.3</span> Cohort-level transpiration and photosynthesis<a href="transpirationsperrycochard.html#scalingtranspirationphotosynthesis" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In the previous section, we considered stomatal regulation at the leaf level only. At the plant cohort level, the gain function could be build from a crown photosynthesis function <span class="math inline">\(A(\Psi_{leaf})\)</span>, as shown in section <a href="plantphotosynthesis.html#crownphotosynthesis">11.2</a>. However, applying the profit maximization approach for a single crown photosynthesis function would imply the assumption that the same stomatal aperture occurs in all leaves of the plant cohort, independently of whether they are in shade or sunlit. A more realistic approach is to determine stomatal regulation by profit maximization for sunlit and shade leaves separately. The gain function and profit maximization calculations conducted for each leaf type yield instantaneous leaf water potentials <span class="math inline">\(\Psi^{sunlit}_{leaf}\)</span> and <span class="math inline">\(\Psi^{shade}_{leaf}\)</span> and instantaneous flow values <span class="math inline">\(E^{shade}\)</span> and <span class="math inline">\(E^{sunlit}\)</span> from the supply functions. The corresponding photosynthesis functions allow determining values for leaf temperatures <span class="math inline">\(T_{leaf}^{sunlit}\)</span> and <span class="math inline">\(T_{leaf}^{shade}\)</span>, vapour pressure deficits <span class="math inline">\(VPD_{leaf}^{sunlit}\)</span> <span class="math inline">\(VPD_{leaf}^{shade}\)</span>, stomatal conductance <span class="math inline">\(g_{sw}^{sunlit}\)</span> and <span class="math inline">\(g_{sw}^{shade}\)</span> and net photosynthesis rates <span class="math inline">\(A_{n}^{sunlit}\)</span> and <span class="math inline">\(A_{n}^{shade}\)</span>. This is a lot of useful information at the leaf level for each plant cohort <span class="math inline">\(i\)</span>, but we also need transpiration and photosynthesis values at the plant cohort-level.</p>
+<p>The average instantaneous flow rate (<span class="math inline">\(E_i^{average}\)</span>, in <span class="math inline">\(mmol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>) per leaf area unit of plant cohort <span class="math inline">\(i\)</span> is the weighed average:
+<span class="math display">\[\begin{equation}
+E_i^{average} = \frac{E_{i}^{shade} \cdot LAI_i^{sunlit} + E_{i}^{shade} \cdot LAI_i^{shade}}{LAI_i^{\phi}}
+\end{equation}\]</span>
+where <span class="math inline">\(LAI_i^{sunlit}\)</span> and <span class="math inline">\(LAI_i^{shade}\)</span> are the cohorts LAI values for sunlit and shade leaves, from eq. <a href="radiationbalance.html#eq:sunlitshadelai">(9.1)</a>, and <span class="math inline">\(LAI_i^{\phi}\)</span> is the leaf area index of plant cohort <span class="math inline">\(i\)</span>. The model then uses the hydraulic supply function to find the transpiration rate <span class="math inline">\(E_i\)</span> numerically closest to <span class="math inline">\(E_i^{average}\)</span> (remember that the supply function is build in discrete steps). Finding the <span class="math inline">\(E_i\)</span> value numerically closest to <span class="math inline">\(E_i^{average}\)</span> determines the <span class="math inline">\(E_{i,t}\)</span> the instantaneous transpiration flow for current time step <span class="math inline">\(t\)</span>, and also leads to setting values for <span class="math inline">\(t\)</span> of several other variables, such as water potentials (<span class="math inline">\(\Psi_{leaf, i,t}\)</span>, <span class="math inline">\(\Psi_{stem, i,t}\)</span>, <span class="math inline">\(\Psi_{rootcrown, i,t}\)</span>, …), the slope of the supply function (<span class="math inline">\((d E/d\Psi_{i})_t\)</span>), and instantaneous soil water extraction rates (<span class="math inline">\(E_{i,s,t}\)</span>).</p>
+<p>The amount of transpiration from the plant cohort in a given time step <span class="math inline">\(t\)</span> (<span class="math inline">\(Tr_{i,t}\)</span>, in <span class="math inline">\(l \cdot m^{-2}\)</span> of ground area, i.e. in mm) is:
+<span class="math display" id="eq:cohorttranspiration">\[\begin{equation}
+Tr_{i,t} = E_{i,t} \cdot LAI_i^{\phi} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
+\tag{12.1}
+\end{equation}\]</span>
+where <span class="math inline">\(0.01802\)</span> is the molar weight (in <span class="math inline">\(kg = l\)</span>) of water and <span class="math inline">\(\Delta t_{step} = 86400/n_t\)</span> the size of the time step in seconds, being <span class="math inline">\(n_t\)</span> the number of time steps. Soil extraction rates (<span class="math inline">\(Ex\)</span>) are scaled to the cohort level as done for transpiration:
+<span class="math display" id="eq:cohortextraction">\[\begin{equation}
+Ex_{i,s,t} = E_{i,s,t} \cdot LAI_i^{\phi} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
+\tag{12.2}
+\end{equation}\]</span>
+If plant water storage is not considered, one should have that soil extraction equals transpiration:
+<span class="math display">\[\begin{equation}
+Tr_{i,t} = Ex_{i,t} = \sum_s {Ex_{i,s,t}}
+\end{equation}\]</span></p>
+<p>Instantaneous net photosynthesis per leaf area of sunlit and shade leaves in a given time step <span class="math inline">\(t\)</span> (i.e. <span class="math inline">\(A_{n,i,t}^{sunlit}\)</span> and <span class="math inline">\(A_{n,i,t}^{shade}\)</span>) are also aggregated into <span class="math inline">\(A_{n,i,t}\)</span>, the net photosynthesis of the plant cohort <span class="math inline">\(i\)</span> for the time step <span class="math inline">\(t\)</span>, in <span class="math inline">\(g\,C \cdot m^{-2}\)</span> of ground area:
+<span class="math display" id="eq:cohortnetphotosynthesis">\[\begin{equation}
+A_{n,i,t} = (A_{n,i,t}^{sunlit} \cdot LAI_i^{sunlit} + A_{n,i,t}^{shade} \cdot LAI_i^{shade}) \cdot 10^{-6} \cdot 12.01017 \cdot \Delta t_{step}
+\tag{12.3}
+\end{equation}\]</span></p>
+</div>
+<div id="cavitationrefill" class="section level2 hasAnchor" number="12.4">
+<h2><span class="header-section-number">12.4</span> Stem cavitation and conduit refilling<a href="transpirationsperrycochard.html#cavitationrefill" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Like with the ‘Granier’ transpiration mode, the water balance model with ‘Sperry’ transpiration mode is normally run assuming that although soil drought may reduce transpiration, embolized xylem conduits are automatically refilled when soil moisture recovers (i.e. <code>cavitation = "total"</code>). Automatic refilling is always assumed for leaf and root segments, but not for stems. There are three other options to deal with stem xylem cavitation besides automatic refilling. Any of them cause the model to keep track of the proportion of lost conductance in the stem xylem of the plant cohort <span class="math inline">\(i\)</span> (<span class="math inline">\(PLC_{stem,i}\)</span>) at successive time steps:
+<span class="math display">\[\begin{equation}
+PLC_{stem,i, t}= \max \{PLC_{stem,i, t-1}, 1 - k_{stem,i}(\Psi_{stem})/k_{max,stem,i} \}
+\end{equation}\]</span>
+When water compartments are not considered, this equation is evaluated every hour time step, whereas it is evaluated every 1s with water compartments, as part of the constitutive equations (see <a href="planthydraulics.html#constitutiveequations">10.5.2</a>).</p>
+<p>For simulations of less than one year one can use <code>cavitationRefill = "none"</code> to keep track of the maximum drought stress. However, for simulations of several years, it is normally advisable to allow recovery. If <code>cavitation = "annual"</code>, <span class="math inline">\(PLC_{stem,i}\)</span> values are set to zero at the beginning of each year, assuming that embolized plants overcome the conductance loss by creating new xylem tissue. Finally, if <code>cavitationRefill = "rate"</code> the model simulates stem refilling at daily steps as a function of symplasmic water potential. First, a daily recovery rate (<span class="math inline">\(r_{refill}\)</span>; in <span class="math inline">\(cm^2 \cdot m^{-2} \cdot day^{-1}\)</span>) is estimated as a function of <span class="math inline">\(\Psi_{symp,stem}\)</span>:
+<span class="math display">\[\begin{equation}
+r_{refill}(\Psi_{symp,stem}) = r_{\max,refill} \cdot \max \{0.0, (\Psi_{symp,stem} + 1.5)/1.5\}
+\end{equation}\]</span>
+Where <span class="math inline">\(r_{\max,refill}\)</span> is the control parameter <code>refillMaximumRate</code> indicating a maximum refill rate. The right part of the equation normalizes the water potential, so that <span class="math inline">\(r_{refill} = r_{refill,\max}\)</span> if <span class="math inline">\(\Psi_{symp,stem} = 0\)</span> and <span class="math inline">\(r_{refill} = 0\)</span> if <span class="math inline">\(\Psi_{symp,stem} &lt;= -1.5MPa\)</span>. The proportion of conductance lost is then updated using:
+<span class="math display">\[\begin{equation}
+PLC_{stem,i}= \max \{0.0, PLC_{stem,i} - (r_{refill}/H_v) \}
+\end{equation}\]</span>
+where <span class="math inline">\(H_v\)</span> is the Huber value in units of <span class="math inline">\(cm^2 \cdot m^{-2}\)</span>.</p>
+
+</div>
+</div>
+<h3>Bibliography<a href="bibliography.html#bibliography" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Anderegg2018" class="csl-entry">
+Anderegg, W.R.L., Wolf, A., Arango-Velez, A., Choat, B., Chmura, D.J., Jansen, S., <em>et al.</em> (2018). <a href="https://doi.org/10.1111/ele.12962">Woody plants optimise stomatal behaviour relative to hydraulic risk</a>. <em>Ecology Letters</em>, 21, 968–977.
+</div>
+<div id="ref-Sperry1998" class="csl-entry">
+Sperry, J.S., Adler, F.R., Campbell, G.S. &amp; Comstock, J.P. (1998). <a href="https://doi.org/10.1046/j.1365-3040.1998.00287.x">Limitation of plant water use by rhizosphere and xylem conductance: Results from a model</a>. <em>Plant, Cell &amp; Environment</em>, 21, 347–359.
+</div>
+<div id="ref-Sperry2015" class="csl-entry">
+Sperry, J.S. &amp; Love, D.M. (2015). <a href="https://doi.org/10.1111/nph.13354">What plant hydraulics can tell us about responses to climate-change droughts</a>. <em>New Phytologist</em>, 207, 14–27.
+</div>
+<div id="ref-Sperry2016" class="csl-entry">
+Sperry, J.S., Venturas, M.D., Anderegg, W.R.L., Mencuccini, M., Mackay, D.S., Wang, Y., <em>et al.</em> (2017). <a href="https://doi.org/10.1111/pce.12852">Predicting stomatal responses to the environment from the optimization of photosynthetic gain and hydraulic cost</a>. <em>Plant, Cell &amp; Environment</em>, 40, 816–830.
+</div>
+<div id="ref-Sperry2016a" class="csl-entry">
+Sperry, J.S., Wang, Y., Wolfe, B.T., Mackay, D.S., Anderegg, W.R.L., Mcdowell, N.G., <em>et al.</em> (2016). <a href="https://doi.org/10.1111/nph.14059">Pragmatic hydraulic theory predicts stomatal responses to climatic water deficits</a>. <em>New Phytologist</em>, 212, 577–589.
+</div>
+<div id="ref-Wolf2016" class="csl-entry">
+Wolf, A., Anderegg, W.R.L. &amp; Pacala, S.W. (2016). <a href="https://doi.org/10.1073/pnas.1615144113">Optimal stomatal behavior with competition for water and risk of hydraulic impairment</a>. <em>Proceedings of the National Academy of Sciences</em>, 113, E7222–E7230.
 </div>
 </div>
             </section>
@@ -685,8 +824,8 @@ div.csl-indent {
           </div>
         </div>
       </div>
-<a href="allometricmodels.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="windextinction.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="plantphotosynthesis.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="closecanopysoilenergybalance.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
