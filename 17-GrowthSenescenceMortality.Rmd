@@ -228,11 +228,11 @@ legend("bottomleft", legend=c("RWC = 20%", "RWC = 30%", "RWC = 40%", "RWC = 50%"
 
 ### Self-thinning of small trees {#selfthinning}
 
-As explained in the mortality design section (\@ref(mortalitydesign)), the model implements a mortality process for young individual trees, meant to represent a self-thinning process occurring between trees of small diameter, $DBH_{tree, recr}$ and trees achieving the diameter size $DBH_{tree,ingrowth}$ corresponding to inclusion as individual in forest inventories (e.g. ingrowth size). The aim is to ensure that the tree density is progressively reduced until the tree cohort reaches $DBH_{tree,ingrowth}$, where the density should be $N_{tree,ingrowth}$. The following relationship between tree diameter and density is used: 
+As explained in the mortality design section (\@ref(mortalitydesign)), the model implements a mortality process for young individual trees, meant to represent a self-thinning process occurring between trees of small diameter ($DBH_{tree, recr}$, typically 1 cm) and trees having a diameter  corresponding to inclusion as individual in forest inventories ($DBH_{tree,ingrowth}$, typically 7.5 cm). The aim is to ensure that the tree density is progressively reduced until the tree cohort reaches $DBH_{tree,ingrowth}$, where the density should be $N_{tree,ingrowth}$. The following relationship between tree diameter and density is used: 
 \begin{equation}
 N = a_{st} \cdot DBH ^{b_{st}}
 \end{equation}
-where $a_{st}$ and $b_{st}$ are parameters regulating the speed of the self-thinning process. Note that if we know the diameter and density of recruitment (i.e. $DBH_{tree,ingrowth}$ and $N_{tree,ingrowth}$), as well as $N_{tree,ingrowth}$, the density we want to ensure when the tree reaches $DBH_{tree,ingrowth}$, the self-thinning curve is completely determined. Hence, we can estimate $b_{st}$ using:
+where $a_{st}$ and $b_{st}$ are parameters regulating the speed of the self-thinning process. Note that if we know the diameter and density of recruitment (i.e. $DBH_{tree,recr}$ and $N_{tree,recr}$), as well as $N_{tree,ingrowth}$, the density we want to ensure when the tree reaches $DBH_{tree,ingrowth}$, the self-thinning curve is completely determined. Hence, we can estimate $b_{st}$ using:
 \begin{equation}
 b_{st} = \frac{log(N_{tree,ingrowth}/N_{tree,recr})}{log(DBH_{tree,ingrowth}/DBH_{tree,recr})}
 \end{equation}

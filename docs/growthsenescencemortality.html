@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-04-28" />
+<meta name="date" content="2023-05-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -868,11 +868,11 @@ In this strategy, increases in leaf area will be scheduled whenever the current 
 </div>
 <div id="selfthinning" class="section level3 hasAnchor" number="17.4.2">
 <h3><span class="header-section-number">17.4.2</span> Self-thinning of small trees<a href="growthsenescencemortality.html#selfthinning" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>As explained in the mortality design section (<a href="growthmodelling.html#mortalitydesign">15.1.5</a>), the model implements a mortality process for young individual trees, meant to represent a self-thinning process occurring between trees of small diameter, <span class="math inline">\(DBH_{tree, recr}\)</span> and trees achieving the diameter size <span class="math inline">\(DBH_{tree,ingrowth}\)</span> corresponding to inclusion as individual in forest inventories (e.g. ingrowth size). The aim is to ensure that the tree density is progressively reduced until the tree cohort reaches <span class="math inline">\(DBH_{tree,ingrowth}\)</span>, where the density should be <span class="math inline">\(N_{tree,ingrowth}\)</span>. The following relationship between tree diameter and density is used:
+<p>As explained in the mortality design section (<a href="growthmodelling.html#mortalitydesign">15.1.5</a>), the model implements a mortality process for young individual trees, meant to represent a self-thinning process occurring between trees of small diameter (<span class="math inline">\(DBH_{tree, recr}\)</span>, typically 1 cm) and trees having a diameter corresponding to inclusion as individual in forest inventories (<span class="math inline">\(DBH_{tree,ingrowth}\)</span>, typically 7.5 cm). The aim is to ensure that the tree density is progressively reduced until the tree cohort reaches <span class="math inline">\(DBH_{tree,ingrowth}\)</span>, where the density should be <span class="math inline">\(N_{tree,ingrowth}\)</span>. The following relationship between tree diameter and density is used:
 <span class="math display">\[\begin{equation}
 N = a_{st} \cdot DBH ^{b_{st}}
 \end{equation}\]</span>
-where <span class="math inline">\(a_{st}\)</span> and <span class="math inline">\(b_{st}\)</span> are parameters regulating the speed of the self-thinning process. Note that if we know the diameter and density of recruitment (i.e. <span class="math inline">\(DBH_{tree,ingrowth}\)</span> and <span class="math inline">\(N_{tree,ingrowth}\)</span>), as well as <span class="math inline">\(N_{tree,ingrowth}\)</span>, the density we want to ensure when the tree reaches <span class="math inline">\(DBH_{tree,ingrowth}\)</span>, the self-thinning curve is completely determined. Hence, we can estimate <span class="math inline">\(b_{st}\)</span> using:
+where <span class="math inline">\(a_{st}\)</span> and <span class="math inline">\(b_{st}\)</span> are parameters regulating the speed of the self-thinning process. Note that if we know the diameter and density of recruitment (i.e. <span class="math inline">\(DBH_{tree,recr}\)</span> and <span class="math inline">\(N_{tree,recr}\)</span>), as well as <span class="math inline">\(N_{tree,ingrowth}\)</span>, the density we want to ensure when the tree reaches <span class="math inline">\(DBH_{tree,ingrowth}\)</span>, the self-thinning curve is completely determined. Hence, we can estimate <span class="math inline">\(b_{st}\)</span> using:
 <span class="math display">\[\begin{equation}
 b_{st} = \frac{log(N_{tree,ingrowth}/N_{tree,recr})}{log(DBH_{tree,ingrowth}/DBH_{tree,recr})}
 \end{equation}\]</span>
