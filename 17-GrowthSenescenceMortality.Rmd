@@ -45,10 +45,10 @@ Second, $\Delta LA_{source}$ represents the leaf area increment expected given c
 \end{equation}
 where $ST_{sapwood}$ is the current concentration of sapwood storage carbon (starch), $V_{storage,sapwood}$ is the sapwood storage volume and $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per leaf area unit, see eq. \@ref(eq:leafconstructioncost). 
 
-Finally, $\Delta LA_{sink}$ represents the leaf area increment expected by taking into account the maximum leaf tissue growth rate relative to sapwood area ($RGR_{leaf, max}$; in $m^2 \cdot cm^{-2} \cdot day^{-1}$) and the relative cell expansion rate given $T_{day}$, $\Psi_{symp,leaf}$ and $\pi_{0,leaf}$: 
+Finally, $\Delta LA_{sink}$ represents the leaf area increment expected by taking into account the maximum leaf tissue growth rate relative to sapwood area ($RGR_{leaf, max}$; in $m^2 \cdot cm^{-2} \cdot day^{-1}$), the percentage of the crown with active buds ($PCAB$) and the relative cell expansion rate given $T_{day}$, $\Psi_{symp,leaf}$ and $\pi_{0,leaf}$: 
 \begin{eqnarray}
-\Delta LA_{sink} &=& SA \cdot RGR_{leaf, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{symp,leaf}, \pi_{0,leaf})}{r_{cell,max}} \\
-                 &=& SA \cdot RGR_{leaf, max} \cdot \frac{(\Psi_{symp,leaf} - \pi_{0,leaf} - Y_{P}) }{(2 - Y_{P})} \cdot \frac{ f_{met}(T_{day})}{f_{met}(30)}
+\Delta LA_{sink} &=& SA \cdot (PCAB/100) \cdot RGR_{leaf, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{symp,leaf}, \pi_{0,leaf})}{r_{cell,max}} \\
+                 &=& SA \cdot (PCAB/100) \cdot RGR_{leaf, max} \cdot \frac{(\Psi_{symp,leaf} - \pi_{0,leaf} - Y_{P}) }{(2 - Y_{P})} \cdot \frac{ f_{met}(T_{day})}{f_{met}(30)}
 \end{eqnarray}
 where cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(30, 0, -2)$ so that $RGR_{leaf, max}$ is attained when sink conditions are optimal. Other parameters for eq. \@ref(eq:cellexpansion) are $\phi_{max} = 0.5$ (which becomes irrelevant), $Y_{P} = 0.05\,MPa$ and $T_{thr} = 5$ºC. Note that the final expression of $\Delta LA_{sink}$ reduces to a product of the maximum leaf area growth times two factors (for turgor and temperature) bounded between 0 and 1.
 
@@ -112,7 +112,7 @@ cell relative expansion rate is divided by the maximum relative cell expansion r
 
 ## Senescence
 
-### Leaf senescence {#leafsenescence}
+### Leaf senescence and cavitation effects on leaves and buds {#leafsenescence}
 
 Leaf senescence can occur due to two processes: aging or dessication. Senescence due to advanced leaf age is assumed to be programmed (Ca+ accumulation?). In deciduous species all live leaf area turns to death leaf area when the phenology submodel indicates it (\@ref(leafphenosenescence)). In evergreen species the proportion of leaf area that undergoes senescence each day is determined by the species-specific leaf duration parameter ($LD$):
 \begin{equation}
@@ -123,6 +123,13 @@ Senescence due to drought effects occurs as a consequence of stem cavitation. If
 LA^{cavitation} = (1 - PLC_{stem}) \cdot LA^{target}
 \end{equation}
 if $LA^{cavitation} < LA^{\phi}$ then the corresponding proportion $p_{cavitation, leaf}$ is estimated. The maximum of $p_{aging,leaf}$ and $p_{cavitation, leaf}$ is applied as a reduction of leaf area. If growth is simulated using the advanced water model, it also checks whether the relative water content in leaves becomes less than 50\% (i.e. $RWC_{leaf} < 0.5$) and, if this happens, the plant cohort is completely defoliated.
+
+Xylem cavitation not only causes defoliation but also mortality of buds, which has the effect of slowing down post-drought leaf area recovery. The percentage of the crown with active buds ($PCAB$) is reduced whenever the proportion of conductance loss has increased with respect to the preceeding day. 
+
+\begin{equation}
+PCAB = \min(PCAB, 100 \cdot (1 - PLC_{stem}))
+\end{equation}
+
 
 ### Sapwood senescence {#sapwoodsenescence}
 
@@ -167,7 +174,10 @@ The proportion of conductance loss due to cavitation ($PLC_{stem}$) is reduced w
 \begin{equation}
 PLC_{stem, t+1} = \min(PLC_{stem,t} - \frac{\Delta SA}{SA},0)
 \end{equation}
-This allows a progressive increase in functional sapwood area.
+This allows a progressive increase in functional sapwood area. Similarly, if previous drought or fire impacts had reduced the percentage of the crown with active buds, it can increase with the formation of new sapwood area (until it achieves 100\%):
+\begin{equation}
+PCAB_{t+1} = \min(PCAB_{t} + 100 \cdot \frac{\Delta SA}{SA}, 100)
+\end{equation}
 
 <!-- Update of osmotic water potentials at full turgor in leaf and stem symplastic tissues ($\pi_{0,leaf}$ and $\pi_{0,stem}$) are determined from $SS_{leaf}$ and $SS_{sapwood}$, respectively, following Van't Hoff's equation: -->
 <!-- \begin{eqnarray} -->
@@ -248,6 +258,7 @@ N_{dead,i} = N_i - \min(N_i,  a_{st} \cdot DBH_{i}^{b_{st}})
 \end{equation}
 
 Note that the self-thinning process does not distinguish between tree resprouts or trees recruited from seeds.
+
 
 ## Update of structural variables {#structuralupdate}
 
