@@ -101,6 +101,23 @@ Finally, the model implements an additional source of mortality for young indivi
 
 Details of the implementation of plant mortality are given in section \@ref(plantmortality).
 
+### Fire occurrence and severity
+
+The occurrence of fires is represented in the growth model in a forcing variable that describes the daily probability that a wildfire strikes the stand. Whenever a fire occurs, the model will first simulate fire behavior according to the conditions of the stand (see chapter \@ref(fuelandfirebehavior)) and then fire severity will be evaluated. 
+
+The degree to which vegetation is impacted by fire depends on the heat fluxes incident on various plant parts, which is an outcome of various fire behavior variables such as fireline intensity and residence time. Fire effects on trees can be classified as two types: first- and second-order effects [@bar_fire_2019]. First-order effects comprise the immediate impacts of heat transfer on plant tissues. Nonlethal first-order heat injuries can trigger second-order effects, such as physiological limitations in carbon and water relations or increased susceptibility to insect attacks and pathogenic infections. 
+
+The growth model currently deals with first-order effects only. The design of first-order fire effects on vegetation follows, with some modifications, the model proposed by @michaletz_biophysical_2008 for surface fires, and it is outlined in fig. \@ref(fig:carbonwaterlinks). The surface fire behavior variables required for severity evaluation are the residence time and fireline intensity. With them, the model estimates the air temperature gradient of the plume, which is then compared to the distribution of foliage for the determination of the proportion of the crown foliage and crown buds that die due to heat accumulation. In addition, the model determines the effects on the cambium by estimating the radial necrosis depth and comparing it with bark thickness. If enough heat reaches the cambium, the tree is considered girdled, which leads to above-ground mortality. Otherwise, the degree of crown bud necrosis will determine whether the plant can resprout from the crown (and rebuild the leaf area lost) or not. 
+
+Crown fires will be considered to impact the forest stand whenever surface fireline intensity is larger than the critical value considered necessary for crowing [@Scott2002]. Crown fires are considered to burn for all plant cohorts, 100\% of crown foliage and, most likely, 100\% of crown buds (although very fast crown fires could spare buds if sufficiently protected, [@michaletz_biophysical_2008]). When crown fires do not occur at the stand level, torching may still occur for particular plant cohorts depending on its crown base height, with the same effects. 
+
+If 100\% of buds have died but the cambium is alive and the species has dormant buds beneath the bark, then it can still resprout epicormically, but other for other species the above-ground structures of the plant will be considered dead. At this point, the cohort may resprout from the root crown only, but is dealt in the forest dynamics model (see chapter \@ref(dynamicsmodelling)).
+
+```{r fireseverity, out.width='100%', fig.align="center", fig.cap="Schematic representation of the design of fire effects on foliage, buds and cambium.", echo=FALSE}
+knitr::include_graphics("FireSeverity.drawio.png")
+```
+
+
 ### Tree diameter, tree height and shrub cover updates
 
 Tree diameter increment follows the creation of sapwood area, whereas sapwood area decreases do not affect diameter, as they imply conversion to heartwood. Tree height increments are estimated from diameter increments following diameter-height ratios that are modulated by the proportion of light available to the plant cohort, as frequently done in forest gap models [@Lindner1997]. Tree crown ratios are updated using static allometric relationships, whereas shrub height and cover are estimated from new leaf area values by inverting static leaf biomass allometries. 
@@ -275,7 +292,7 @@ Vegetation input requirements were fully described in section \@ref(vegetationin
 
 **Metereological input**
 
-The minimum weather variables required to run the model are min/max temperatures ($T_{min}$ and $T_{max}$), min/max relative humidity ($RH_{min}$ and $RH_{max}$), precipitation ($P$) and solar radiation ($Rad$). Wind speed ($u$) is also needed, but the user may use missing values if not available (a default value will be used in this case). Wind speed is assumed to have been measured at a specific height above the canopy (by default at 2 m). Atmospheric $CO_2$ concentration ($C_{atm}$) may also be specified, but if missing a default constant value is assumed, which is taken from the control parameters. Definitions and units of these variables were given in section \@ref(meteoinput).
+The minimum weather variables required to run the model are min/max temperatures ($T_{min}$ and $T_{max}$), min/max relative humidity ($RH_{min}$ and $RH_{max}$), precipitation ($P$) and solar radiation ($Rad$). Wind speed ($u$) is also needed, but the user may use missing values if not available (a default value will be used in this case). Wind speed is assumed to have been measured at a specific height above the canopy (by default at 2 m). Atmospheric $CO_2$ concentration ($C_{atm}$) may also be specified, but if missing a default constant value is assumed, which is taken from the control parameters. If wildfire occurrence and severity is to be simulated, the user has to specify daily fire probability ($P_{fire}$) in an additional column. Definitions and units of these variables were given in section \@ref(meteoinput).
 
 ### Vegetation functional parameters {#growthvegetationparameters}
 
