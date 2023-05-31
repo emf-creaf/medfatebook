@@ -101,7 +101,7 @@ Finally, the model implements an additional source of mortality for young indivi
 
 Details of the implementation of plant mortality are given in section \@ref(plantmortality).
 
-### Fire occurrence and severity
+### Fire occurrence and severity {#fireseveritydesign}
 
 The occurrence of fires is represented in the growth model in a forcing variable that describes the daily probability that a wildfire strikes the stand. Whenever a fire occurs, the model first simulates fire behavior according to the conditions of the stand (see chapter \@ref(fuelandfirebehavior)) and then fire severity is evaluated. 
 
@@ -118,6 +118,9 @@ knitr::include_graphics("FireSeverity.drawio.png")
 ```
 
 While the severity sub-model described above is based on heat transfer and accumulation in tissues, causing necrosis, it is important to note that a growing number of studies increasingly have been documenting fire impacts on xylem hydraulic function, both via increased vapor pressure deficit (causing cavitation) and via structural damage in the xylem, affecting its efficiency and vulnerability [@bar_fire_2019; @hood_fire_2018]. These first-order effects are not considered here.
+
+
+Details of the implementation of fire severity are given in section \@ref(fireseverity).
 
 ### Tree diameter, tree height and shrub cover updates
 
@@ -238,9 +241,10 @@ With the aim to produce outputs to be compared with Eddy-covariance flux data, t
 
 ## Process scheduling {#growthscheduling}
 
-Growth simulations are conducted in **daily** time steps. Depending on the transpiration mode (`Granier` or `Sperry`) the actual steps conducted are different (see subsections below). 
+Growth simulations are conducted in **daily** time steps. If using the basic water balance sub-model, processes are scheduled following the *regular scheduling*. In contrast, if using the advanced water balance model, the growth processes can be simulated using a *detailed scheduling*.
 
-### Basic scheduling
+### Regular scheduling
+
 For every day to be simulated, first executes soil water balance, transpiration and photosynthesis calculations by calling the basic water balance model (\@ref(basicwaterbalancescheduling)). After that, the model performs the following steps for each plant cohort:
 
 1. Determine the amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and storage capacity (\@ref(estimationcarbonpools)). 
@@ -255,9 +259,10 @@ For every day to be simulated, first executes soil water balance, transpiration 
 10. Evaluate labile carbon translocation due to leaf and sapwood senescence ($TS_{leaf}$, $TT_{leaf}$ and $TS_{sapwood}$). If leaf storage carbon is surpassed, add the excess to $TT_{leaf}$. Add the sum of translocated carbon to the starch sapwood pool.
 11. Move any surplus in sapwood storage carbon to root exudation ($RE_{sapwood}$). This completes the daily carbon balance for leaf labile pools \@ref(eq:leafcarbonbalanceequations), sapwood labile pools \@ref(eq:sapwoodcarbonbalanceequations), and plant-level labile carbon. \@ref(eq:plantcarbonbalanceequation).
 12. Update leaf area, sapwood area, fine root area and derived variables (e.g., leaf area index and Huber value) (\@ref(updateplanttraits)). 
-13. Determine if plant death by starvation or desiccation occurred (\@ref(plantmortality)).
-14. Update fine root area target and, if phenology indicates bud formation, update the leaf area target (\@ref(updateallocationtargets)). 
-15. Translate sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover), (\@ref(structuralupdate)) and update storage volumes and the concentration of labile pools.
+13. Determine if a wildfire stroke the forest stand and, if so, fire severity effects (\@ref(fireseverity)).
+14. Determine if plant death by starvation or desiccation occurred (\@ref(plantmortality)).
+15. Update fine root area target and, if phenology indicates bud formation, update the leaf area target (\@ref(updateallocationtargets)). 
+16. Translate sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover), (\@ref(structuralupdate)) and update storage volumes and the concentration of labile pools.
 
 ### Advanced scheduling
 For every day to be simulated, the model first executes soil water balance, energy balance, transpiration and photosynthesis calculations in subdaily times steps, by calling the advanced water balance model (\@ref(advancedwaterbalancescheduling)). After that, the model performs the following steps for each plant cohort:
@@ -323,8 +328,10 @@ A second set of parameters refers to allometric coefficients needed for structur
 |--------------|-------|---------------|----------------------------------|
 | $a_{ash}$ | | `Aash` | Coefficient relating the square of shrub height with shrub area |
 | $a_{bsh}$, $b_{bsh}$ | |`Absh`, `Bbsh` | Coefficients relating crown volume with dry weight of shrub individuals |
+| $bt_{sh}$ | | `BTsh` | Bark thickness in shrubs |
 | $a_{cr}$, $b_{1cr}$, $b_{2cr}$, $b_{3cr}$, $c_{1cr}$, $c_{2cr}$ | | `B1cr`, `B2cr`, `B3cr`, `C1cr`, `C2cr` | Coefficients to calculate crown ratio of trees |
 | $a_{cw}$, $b_{cw}$ | | `Acw`, `Bcw` | Regression coefficients used to calculate the crown width of trees (as intermediary step to obtain the crown ratio).|
+| $a_{bt}$, $b_{bt}$ | | `Abt`, `Bbt` | Regression coefficients used to calculate the bark thickness of trees |
 
 A third set of parameters refers to growth parameters (`paramsGrowth`).
 

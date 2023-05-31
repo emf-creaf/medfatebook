@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-05-30" />
+<meta name="date" content="2023-05-31" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -407,7 +407,7 @@ div.csl-indent {
 <li class="chapter" data-level="15.1.3" data-path="growthmodelling.html"><a href="growthmodelling.html#tissue-growth-senescence-and-allocation"><i class="fa fa-check"></i><b>15.1.3</b> Tissue growth, senescence and allocation</a></li>
 <li class="chapter" data-level="15.1.4" data-path="growthmodelling.html"><a href="growthmodelling.html#carbonwaterlinks"><i class="fa fa-check"></i><b>15.1.4</b> Coordination between water and carbon balances</a></li>
 <li class="chapter" data-level="15.1.5" data-path="growthmodelling.html"><a href="growthmodelling.html#mortalitydesign"><i class="fa fa-check"></i><b>15.1.5</b> Plant mortality</a></li>
-<li class="chapter" data-level="15.1.6" data-path="growthmodelling.html"><a href="growthmodelling.html#fire-occurrence-and-severity"><i class="fa fa-check"></i><b>15.1.6</b> Fire occurrence and severity</a></li>
+<li class="chapter" data-level="15.1.6" data-path="growthmodelling.html"><a href="growthmodelling.html#fireseveritydesign"><i class="fa fa-check"></i><b>15.1.6</b> Fire occurrence and severity</a></li>
 <li class="chapter" data-level="15.1.7" data-path="growthmodelling.html"><a href="growthmodelling.html#tree-diameter-tree-height-and-shrub-cover-updates"><i class="fa fa-check"></i><b>15.1.7</b> Tree diameter, tree height and shrub cover updates</a></li>
 </ul></li>
 <li class="chapter" data-level="15.2" data-path="growthmodelling.html"><a href="growthmodelling.html#state-variables"><i class="fa fa-check"></i><b>15.2</b> State variables</a></li>
@@ -420,7 +420,7 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="15.4" data-path="growthmodelling.html"><a href="growthmodelling.html#growthscheduling"><i class="fa fa-check"></i><b>15.4</b> Process scheduling</a>
 <ul>
-<li class="chapter" data-level="15.4.1" data-path="growthmodelling.html"><a href="growthmodelling.html#basic-scheduling"><i class="fa fa-check"></i><b>15.4.1</b> Basic scheduling</a></li>
+<li class="chapter" data-level="15.4.1" data-path="growthmodelling.html"><a href="growthmodelling.html#regular-scheduling"><i class="fa fa-check"></i><b>15.4.1</b> Regular scheduling</a></li>
 <li class="chapter" data-level="15.4.2" data-path="growthmodelling.html"><a href="growthmodelling.html#advanced-scheduling"><i class="fa fa-check"></i><b>15.4.2</b> Advanced scheduling</a></li>
 </ul></li>
 <li class="chapter" data-level="15.5" data-path="growthmodelling.html"><a href="growthmodelling.html#inputs-and-outputs-1"><i class="fa fa-check"></i><b>15.5</b> Inputs and outputs</a>
@@ -475,7 +475,12 @@ div.csl-indent {
 <li class="chapter" data-level="17.4.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#mortalitythresholds"><i class="fa fa-check"></i><b>17.4.1</b> Plant mortality thresholds</a></li>
 <li class="chapter" data-level="17.4.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#selfthinning"><i class="fa fa-check"></i><b>17.4.2</b> Self-thinning of small trees</a></li>
 </ul></li>
-<li class="chapter" data-level="17.5" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#fire-severity"><i class="fa fa-check"></i><b>17.5</b> Fire severity</a></li>
+<li class="chapter" data-level="17.5" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#fireseverity"><i class="fa fa-check"></i><b>17.5</b> Fire severity</a>
+<ul>
+<li class="chapter" data-level="17.5.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#plume-temperature-distribution"><i class="fa fa-check"></i><b>17.5.1</b> Plume temperature distribution</a></li>
+<li class="chapter" data-level="17.5.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#foliage-and-crown-bud-necrosis"><i class="fa fa-check"></i><b>17.5.2</b> Foliage and crown bud necrosis</a></li>
+<li class="chapter" data-level="17.5.3" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#cambium-necrosis"><i class="fa fa-check"></i><b>17.5.3</b> Cambium necrosis</a></li>
+</ul></li>
 <li class="chapter" data-level="17.6" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#structuralupdate"><i class="fa fa-check"></i><b>17.6</b> Update of structural variables</a>
 <ul>
 <li class="chapter" data-level="17.6.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#tree-diameter-height-and-crown-ratio"><i class="fa fa-check"></i><b>17.6.1</b> Tree diameter, height and crown ratio</a></li>
@@ -764,8 +769,8 @@ Figure 15.3: Schematic representation of relationships between water balance (ad
 <p>Finally, the model implements an additional source of mortality for young individual trees, meant to represent a self-thinning process occurring between small trees (e.g. 1 cm DBH) resulting from seed establishment (or resprouting) and trees achieving the size (e.g. 7.5 cm) corresponding to inclusion as individual in forest inventories (e.g. ingrowth size). This mortality process is most relevant for simulations of forest dynamics (see <a href="dynamicsmodelling.html#dynamicsmodelling">18</a>).</p>
 <p>Details of the implementation of plant mortality are given in section <a href="growthsenescencemortality.html#plantmortality">17.4</a>.</p>
 </div>
-<div id="fire-occurrence-and-severity" class="section level3 hasAnchor" number="15.1.6">
-<h3><span class="header-section-number">15.1.6</span> Fire occurrence and severity<a href="growthmodelling.html#fire-occurrence-and-severity" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="fireseveritydesign" class="section level3 hasAnchor" number="15.1.6">
+<h3><span class="header-section-number">15.1.6</span> Fire occurrence and severity<a href="growthmodelling.html#fireseveritydesign" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The occurrence of fires is represented in the growth model in a forcing variable that describes the daily probability that a wildfire strikes the stand. Whenever a fire occurs, the model first simulates fire behavior according to the conditions of the stand (see chapter <a href="fuelandfirebehavior.html#fuelandfirebehavior">23</a>) and then fire severity is evaluated.</p>
 <p>The degree to which vegetation is impacted by fire depends on the heat fluxes incident on plant tissues and organs, which is an outcome of various fire behavior variables (such as fireline intensity and residence time) and the position of plant organs in the stand, and the physiological responses triggered thereafter. Fire effects on plants can be classified as two types: first- and second-order effects <span class="citation">(<a href="#ref-hood_fire_2018" role="doc-biblioref">Hood <em>et al.</em> 2018</a>; <a href="#ref-bar_fire_2019" role="doc-biblioref">Bär <em>et al.</em> 2019</a>)</span>. First-order effects comprise the immediate impacts of heat transfer on plant tissues. Nonlethal first-order heat injuries can trigger second-order effects, such as physiological limitations in carbon and water relations or increased susceptibility to insect attacks and pathogenic infections. The growth model currently deals with first-order effects only. Moreover, the model focuses on effects in above-ground tissues (leaves, buds and cambium), disregarding fire effects on below-ground structures such as seed banks, or below-ground meristems, which are also important for the resilience of ecosystems <span class="citation">(<a href="#ref-stephan_first-order_2010" role="doc-biblioref">Stephan <em>et al.</em> 2010</a>)</span>.</p>
 <p>Fire-induced plant injury and mortality models can be grouped into two categories: (1) statistical models that involve regression equations relating injury and mortality to observable indicators; and (2) process models that explicitly simulate the underlying thermal and biophysical processes occurring when a plant is heated <span class="citation">(<a href="#ref-butler_tree_2010" role="doc-biblioref">Butler &amp; Dickinson 2010</a>; <a href="#ref-hood_fire_2018" role="doc-biblioref">Hood <em>et al.</em> 2018</a>)</span>. The design of first-order fire effects on vegetation follows, with some modifications, the process-based model proposed by <span class="citation">Michaletz &amp; Johnson (<a href="#ref-michaletz_biophysical_2008" role="doc-biblioref">2008</a>)</span> for surface fires, and it is outlined in fig. <a href="growthmodelling.html#fig:carbonwaterlinks">15.3</a>. The surface fire behavior variables required for severity evaluation are the residence time and fireline intensity. With them, the model estimates the air temperature gradient of the plume, which is then compared to the distribution of foliage for the determination of the proportion of the crown foliage and crown buds that die due to heat accumulation. In addition, the model determines the effects on the cambium by estimating the radial necrosis depth and comparing it with bark thickness. If enough heat reaches the cambium, the tree is considered girdled, which leads to above-ground mortality. Otherwise, the degree of crown bud necrosis will determine whether the plant can resprout from the crown (and rebuild the leaf area lost) or not.</p>
@@ -778,6 +783,7 @@ Figure 15.4: Schematic representation of the design of fire effects on foliage, 
 </p>
 </div>
 <p>While the severity sub-model described above is based on heat transfer and accumulation in tissues, causing necrosis, it is important to note that a growing number of studies increasingly have been documenting fire impacts on xylem hydraulic function, both via increased vapor pressure deficit (causing cavitation) and via structural damage in the xylem, affecting its efficiency and vulnerability <span class="citation">(<a href="#ref-hood_fire_2018" role="doc-biblioref">Hood <em>et al.</em> 2018</a>; <a href="#ref-bar_fire_2019" role="doc-biblioref">Bär <em>et al.</em> 2019</a>)</span>. These first-order effects are not considered here.</p>
+<p>Details of the implementation of fire severity are given in section <a href="growthsenescencemortality.html#fireseverity">17.5</a>.</p>
 </div>
 <div id="tree-diameter-tree-height-and-shrub-cover-updates" class="section level3 hasAnchor" number="15.1.7">
 <h3><span class="header-section-number">15.1.7</span> Tree diameter, tree height and shrub cover updates<a href="growthmodelling.html#tree-diameter-tree-height-and-shrub-cover-updates" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -894,9 +900,9 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 </div>
 <div id="growthscheduling" class="section level2 hasAnchor" number="15.4">
 <h2><span class="header-section-number">15.4</span> Process scheduling<a href="growthmodelling.html#growthscheduling" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Growth simulations are conducted in <strong>daily</strong> time steps. Depending on the transpiration mode (<code>Granier</code> or <code>Sperry</code>) the actual steps conducted are different (see subsections below).</p>
-<div id="basic-scheduling" class="section level3 hasAnchor" number="15.4.1">
-<h3><span class="header-section-number">15.4.1</span> Basic scheduling<a href="growthmodelling.html#basic-scheduling" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Growth simulations are conducted in <strong>daily</strong> time steps. If using the basic water balance sub-model, processes are scheduled following the <em>regular scheduling</em>. In contrast, if using the advanced water balance model, the growth processes can be simulated using a <em>detailed scheduling</em>.</p>
+<div id="regular-scheduling" class="section level3 hasAnchor" number="15.4.1">
+<h3><span class="header-section-number">15.4.1</span> Regular scheduling<a href="growthmodelling.html#regular-scheduling" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>For every day to be simulated, first executes soil water balance, transpiration and photosynthesis calculations by calling the basic water balance model (<a href="basicwaterbalance.html#basicwaterbalancescheduling">3.4</a>). After that, the model performs the following steps for each plant cohort:</p>
 <ol style="list-style-type: decimal">
 <li>Determine the amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and storage capacity (<a href="carbonpoolsbalance.html#estimationcarbonpools">16.1</a>).</li>
@@ -912,6 +918,7 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 <li>Evaluate labile carbon translocation due to leaf and sapwood senescence (<span class="math inline">\(TS_{leaf}\)</span>, <span class="math inline">\(TT_{leaf}\)</span> and <span class="math inline">\(TS_{sapwood}\)</span>). If leaf storage carbon is surpassed, add the excess to <span class="math inline">\(TT_{leaf}\)</span>. Add the sum of translocated carbon to the starch sapwood pool.</li>
 <li>Move any surplus in sapwood storage carbon to root exudation (<span class="math inline">\(RE_{sapwood}\)</span>). This completes the daily carbon balance for leaf labile pools <a href="growthmodelling.html#eq:leafcarbonbalanceequations">(15.1)</a>, sapwood labile pools <a href="growthmodelling.html#eq:sapwoodcarbonbalanceequations">(15.2)</a>, and plant-level labile carbon. <a href="growthmodelling.html#eq:plantcarbonbalanceequation">(15.3)</a>.</li>
 <li>Update leaf area, sapwood area, fine root area and derived variables (e.g., leaf area index and Huber value) (<a href="growthsenescencemortality.html#updateplanttraits">17.3.1</a>).</li>
+<li>Determine if a wildfire stroke the forest stand and, if so, fire severity effects (<a href="growthsenescencemortality.html#fireseverity">17.5</a>).</li>
 <li>Determine if plant death by starvation or desiccation occurred (<a href="growthsenescencemortality.html#plantmortality">17.4</a>).</li>
 <li>Update fine root area target and, if phenology indicates bud formation, update the leaf area target (<a href="growthsenescencemortality.html#updateallocationtargets">17.3.2</a>).</li>
 <li>Translate sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover), (<a href="growthsenescencemortality.html#structuralupdate">17.6</a>) and update storage volumes and the concentration of labile pools.</li>
@@ -1082,16 +1089,28 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 <td>Coefficients relating crown volume with dry weight of shrub individuals</td>
 </tr>
 <tr class="odd">
+<td><span class="math inline">\(bt_{sh}\)</span></td>
+<td></td>
+<td><code>BTsh</code></td>
+<td>Bark thickness in shrubs</td>
+</tr>
+<tr class="even">
 <td><span class="math inline">\(a_{cr}\)</span>, <span class="math inline">\(b_{1cr}\)</span>, <span class="math inline">\(b_{2cr}\)</span>, <span class="math inline">\(b_{3cr}\)</span>, <span class="math inline">\(c_{1cr}\)</span>, <span class="math inline">\(c_{2cr}\)</span></td>
 <td></td>
 <td><code>B1cr</code>, <code>B2cr</code>, <code>B3cr</code>, <code>C1cr</code>, <code>C2cr</code></td>
 <td>Coefficients to calculate crown ratio of trees</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(a_{cw}\)</span>, <span class="math inline">\(b_{cw}\)</span></td>
 <td></td>
 <td><code>Acw</code>, <code>Bcw</code></td>
 <td>Regression coefficients used to calculate the crown width of trees (as intermediary step to obtain the crown ratio).</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(a_{bt}\)</span>, <span class="math inline">\(b_{bt}\)</span></td>
+<td></td>
+<td><code>Abt</code>, <code>Bbt</code></td>
+<td>Regression coefficients used to calculate the bark thickness of trees</td>
 </tr>
 </tbody>
 </table>

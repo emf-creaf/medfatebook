@@ -259,9 +259,54 @@ N_{dead,i} = N_i - \min(N_i,  a_{st} \cdot DBH_{i}^{b_{st}})
 
 Note that the self-thinning process does not distinguish between tree resprouts or trees recruited from seeds.
 
-## Fire severity
-TO BE WRITTEN
+## Fire severity {#fireseverity}
 
+Fire effects on plants follow, with some modifications, the model by @michaletz_biophysical_2008. Buoyant plume theory is first used to estimate the vertical plume temperature $T_{plume}$ distribution that will drive heat transfer to the vascular cambium and vegetative organs. Heat transfer theory is then used to calculate the depth of vascular cambium necrosis and height of crown foliage and crown bud necrosis. Finally, these severity metrics are used to define the fate of the plant cohort, as described in section \@ref(fireseveritydesign).
+
+### Plume temperature distribution
+
+The surface fire is assumed to occur at the time of the day where temperature is $T_{max}$ is the maximum daily temperature. For a line-source plume in a quiescent atmosphere (no wind), the plume temperature $T_{plume}$ at height $z$ (in m) can be estimated using [@michaletz_biophysical_2008]:
+\begin{equation}
+T_{plume}(z) = \min{\left[900,\, C_{plume}\cdot \left( \frac{1}{z} \right) \cdot \left(\frac{T_{max} + 273.15}{g} \right)^{1/3} \cdot \left( \frac{I_{B}}{c_{p, air} \cdot \rho_{air}} \right)^{2/3} + T_{max} \right]}
+(\#eq:temperatureplume)
+\end{equation}
+where $C_{plume} = 2.6$ is the plume proportionality constant, $g = 9.8\,m \cdot s^{-2}$ is the gravity constant, $I_{B}$ is Byram's surface fireline intensity (eq. \@ref(eq:surfacefirelineintensity); expressed in $kW\cdot m^{-1}$), $c_{p, air} = 1.007\,J\cdot kg^{-1}\cdot ^{\circ} \mathrm{C}^{-1}$ is the specific heat capacity of the air and $\rho_{air}$ is the air density at temperature $T_{max}$. Because this similarity analysis fails at heights comparable with the fireline width, $T_{plume}$ is constrained to a maximum flame temperature of 900 $^{\circ} \mathrm{C}$.
+
+### Foliage and crown bud necrosis
+
+The model predicting the distribution of plume temperature and the residence time of surface fires $t_R$ (eq. \@ref(eq:surfaceresidencetime)), are used to determine the height of necrosis for plant organs, here foliage or crown buds, depending also on their heat capacitance. The estimate (foliage or bud) necrosis height $z_n$ (in m) is given by [@michaletz_biophysical_2008]:
+\begin{equation}
+z_n = C_{plume}\cdot \left( \frac{1}{T_{crit} - T_{max}} \right) \cdot \left(\frac{T_{max} + 273.15}{g} \right)^{1/3} \cdot \left( \frac{I_{B}}{c_{p, air} \cdot \rho_{air}} \right)^{2/3}
+(\#eq:necrosisheight)
+\end{equation}
+where $T_{crit}$ is the critical temperature of the plume required for organ necrosis, given a residence time $t_R$, which is estimated using:
+\begin{equation}
+T_{crit} = \frac{T_n - \theta_{T} \cdot T_{max}}{1 - \theta_{T}}
+\end{equation}
+Here, $T_n$ is the temperature leading to necrosis, assumed to be $60^{\circ}\mathrm{C}$ and $\theta_{T}$ is defined as the excess temperature ratio, which depends on the organ thermal factor ($TF$) and $t_R$:
+\begin{equation}
+\theta_{T} = exp(- TF \cdot t_R)
+\end{equation}
+The thermal factor $TF$ is normally larger for leaves than buds, given their higher surface are to volume ratio, resulting in lower values of $T_{crit}$ and, therefore, higher values of necrosis height. In the case of leaves, the thermal factor ($TF_{leaves}$) is estimated from specific leaf area, $SLA$, using [@michaletz_heat_2006; @michaletz_biophysical_2008]:
+\begin{equation}
+TF_{leaves} = SLA \cdot (h_{leaves}/c_{leaves})
+\end{equation}
+where $h_{leaves}=130$ stands for the convection heat transfer coefficient of leaves and $c_{leaves} = 2500$ is the specific heat capacity of leaves. Typical values would be $TF_{leaves} = 0.208$ for $SLA = 4$ and $TF_{leaves} = 0.624$ for $SLA = 12$. Currently, for crown buds a constant $TF_{buds} = 0.130$ is assumed, on the basis of values given in @michaletz_heat_2006, but we acknowledge that $TF_{buds}$ should be at least species-specific. Once $z_n$ is defined, for either leaves or crown buds, depending on their $TF$ value, the vertical leaf distribution described in \@ref(leafdistribution) is used to determine the proportion of crown leaves or crown buds with necrosis. 
+
+If the case of a crown fires, i.e. if surface fireline intensity is larger than van Wagner's critical intensity; eq. \@ref(eq:vanwagnercriticalintensity), then all crown foliage is burned. The same happens if torching occurs for the target plant cohort, which is determined by calculating a cohort-specific critical intensity. Crown bud necrosis is decided in those cases by calculating $T_{crit}$ using the crown fire residence time and comparing it to the flame temperature, i.e. $900^{\circ}\mathrm{C}$. Despite these calculations, in practice all crown buds will also normally suffer necrosis under a crown fire.
+
+### Cambium necrosis
+
+Vascular cambium necrosis is a one-dimensional transient conduction problem depending the thermal diffusivity of the bark, $\alpha_{bark}$, and the surface fire residence time $t_R$. Assuming that the bark surface temperature is equal to the plume temperature at $z = 0.1$, i.e. $T_{plume}(0.1)$, the radial bole necrosis depth, $x_n$ (in m),  can be estimated using:
+\begin{equation}
+x_n = 2 \cdot (\alpha_{bark} \cdot t_R)^{1/2} \cdot \mathrm{erf}^{-1}\left( \frac{T_n - T_{plume}(0.1)}{T_{max} - T_{plume}(0.1)} \right)
+\end{equation}
+
+where $\mathrm{erf}^{-1}$ is the inverse error function. Bark diffusivity ($\alpha_{bark}$) is estimated following the equations given in @michaletz_biophysical_2008, which depend on bark's tissue density, moisture content (estimated assuming a fine dead fuel) and temperature. Cambium necrosis is determined by comparing $x_n$ (in m) with $x_{ba}$ (in mm) the bark thickness of the plant, which in case of trees depends on DBH:
+\begin{equation}
+x_{ba} = a_{bt} \cdot DBH^{b_{bt}}
+\end{equation}
+and in the case of shrubs $x_{ba}$ is assumed to be equal to a fixed species-specific value $bt_{sh}$.
 
 
 ## Update of structural variables {#structuralupdate}
