@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 2 Model inputs | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 2 Model inputs | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-05-31" />
+<meta name="date" content="2023-06-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -118,6 +118,10 @@ code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
 <style type="text/css">
 /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
 div.csl-bib-body { }
@@ -1502,32 +1506,45 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <h2><span class="header-section-number">2.6</span> Simulation control<a href="model-inputs.html#controlparameters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Simulation control parameters are a list of global parameter values, initialized using function <code>defaultControl()</code>, that the user can modify to change the general behavior of simulation functions. Here is the set of global control parameters currently accepted in <strong>medfate</strong>:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="model-inputs.html#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
-<pre><code>##  [1] &quot;fillMissingRootParams&quot;            &quot;fillMissingSpParams&quot;              &quot;verbose&quot;                         
-##  [4] &quot;subdailyResults&quot;                  &quot;standResults&quot;                     &quot;soilResults&quot;                     
-##  [7] &quot;plantResults&quot;                     &quot;leafResults&quot;                      &quot;temperatureResults&quot;              
-## [10] &quot;fireHazardResults&quot;                &quot;transpirationMode&quot;                &quot;soilFunctions&quot;                   
-## [13] &quot;defaultWindSpeed&quot;                 &quot;defaultCO2&quot;                       &quot;snowpack&quot;                        
-## [16] &quot;leafPhenology&quot;                    &quot;rockyLayerDrainage&quot;               &quot;unlimitedSoilWater&quot;              
-## [19] &quot;rhizosphereOverlap&quot;               &quot;unfoldingDD&quot;                      &quot;verticalLayerSize&quot;               
-## [22] &quot;windMeasurementHeight&quot;            &quot;cavitationRefill&quot;                 &quot;hydraulicRedistributionFraction&quot; 
-## [25] &quot;ndailysteps&quot;                      &quot;nsubsteps&quot;                        &quot;capacitance&quot;                     
-## [28] &quot;taper&quot;                            &quot;multiLayerBalance&quot;                &quot;maximumStemConductance&quot;          
-## [31] &quot;klatstem&quot;                         &quot;klatleaf&quot;                         &quot;numericParams&quot;                   
-## [34] &quot;fracLeafResistance&quot;               &quot;fracRootResistance&quot;               &quot;averageFracRhizosphereResistance&quot;
-## [37] &quot;thermalCapacityLAI&quot;               &quot;boundaryLayerSize&quot;                &quot;refillMaximumRate&quot;               
-## [40] &quot;subdailyCarbonBalance&quot;            &quot;allowDessication&quot;                 &quot;allowStarvation&quot;                 
-## [43] &quot;sinkLimitation&quot;                   &quot;shrubDynamics&quot;                    &quot;allocationStrategy&quot;              
-## [46] &quot;phloemConductanceFactor&quot;          &quot;nonSugarConcentration&quot;            &quot;equilibriumOsmoticConcentration&quot; 
-## [49] &quot;minimumRelativeStarchForGrowth&quot;   &quot;constructionCosts&quot;                &quot;senescenceRates&quot;                 
-## [52] &quot;maximumRelativeGrowthRates&quot;       &quot;mortalityMode&quot;                    &quot;mortalityBaselineRate&quot;           
-## [55] &quot;mortalityRelativeSugarThreshold&quot;  &quot;mortalityRWCThreshold&quot;            &quot;recrTreeDBH&quot;                     
-## [58] &quot;recrTreeDensity&quot;                  &quot;ingrowthTreeDBH&quot;                  &quot;ingrowthTreeDensity&quot;             
-## [61] &quot;allowRecruitment&quot;                 &quot;recruitmentMode&quot;                  &quot;allowResprouting&quot;                
-## [64] &quot;removeEmptyCohorts&quot;               &quot;minimumCohortDensity&quot;             &quot;seedRain&quot;                        
-## [67] &quot;seedProductionTreeHeight&quot;         &quot;seedProductionShrubHeight&quot;        &quot;probRecr&quot;                        
-## [70] &quot;minTempRecr&quot;                      &quot;minMoistureRecr&quot;                  &quot;minFPARRecr&quot;                     
-## [73] &quot;recrTreeHeight&quot;                   &quot;recrShrubCover&quot;                   &quot;recrShrubHeight&quot;                 
-## [76] &quot;recrTreeZ50&quot;                      &quot;recrShrubZ50&quot;                     &quot;recrTreeZ95&quot;                     
+<pre><code>##  [1] &quot;fillMissingRootParams&quot;            &quot;fillMissingSpParams&quot;             
+##  [3] &quot;verbose&quot;                          &quot;subdailyResults&quot;                 
+##  [5] &quot;standResults&quot;                     &quot;soilResults&quot;                     
+##  [7] &quot;plantResults&quot;                     &quot;leafResults&quot;                     
+##  [9] &quot;temperatureResults&quot;               &quot;fireHazardResults&quot;               
+## [11] &quot;transpirationMode&quot;                &quot;soilFunctions&quot;                   
+## [13] &quot;defaultWindSpeed&quot;                 &quot;defaultCO2&quot;                      
+## [15] &quot;snowpack&quot;                         &quot;leafPhenology&quot;                   
+## [17] &quot;rockyLayerDrainage&quot;               &quot;unlimitedSoilWater&quot;              
+## [19] &quot;rhizosphereOverlap&quot;               &quot;unfoldingDD&quot;                     
+## [21] &quot;verticalLayerSize&quot;                &quot;windMeasurementHeight&quot;           
+## [23] &quot;cavitationRefill&quot;                 &quot;hydraulicRedistributionFraction&quot; 
+## [25] &quot;ndailysteps&quot;                      &quot;nsubsteps&quot;                       
+## [27] &quot;capacitance&quot;                      &quot;taper&quot;                           
+## [29] &quot;multiLayerBalance&quot;                &quot;maximumStemConductance&quot;          
+## [31] &quot;klatstem&quot;                         &quot;klatleaf&quot;                        
+## [33] &quot;numericParams&quot;                    &quot;fracLeafResistance&quot;              
+## [35] &quot;fracRootResistance&quot;               &quot;averageFracRhizosphereResistance&quot;
+## [37] &quot;thermalCapacityLAI&quot;               &quot;boundaryLayerSize&quot;               
+## [39] &quot;refillMaximumRate&quot;                &quot;subdailyCarbonBalance&quot;           
+## [41] &quot;allowDessication&quot;                 &quot;allowStarvation&quot;                 
+## [43] &quot;sinkLimitation&quot;                   &quot;shrubDynamics&quot;                   
+## [45] &quot;allocationStrategy&quot;               &quot;phloemConductanceFactor&quot;         
+## [47] &quot;nonSugarConcentration&quot;            &quot;equilibriumOsmoticConcentration&quot; 
+## [49] &quot;minimumRelativeStarchForGrowth&quot;   &quot;constructionCosts&quot;               
+## [51] &quot;senescenceRates&quot;                  &quot;maximumRelativeGrowthRates&quot;      
+## [53] &quot;mortalityMode&quot;                    &quot;mortalityBaselineRate&quot;           
+## [55] &quot;mortalityRelativeSugarThreshold&quot;  &quot;mortalityRWCThreshold&quot;           
+## [57] &quot;recrTreeDBH&quot;                      &quot;recrTreeDensity&quot;                 
+## [59] &quot;ingrowthTreeDBH&quot;                  &quot;ingrowthTreeDensity&quot;             
+## [61] &quot;allowRecruitment&quot;                 &quot;recruitmentMode&quot;                 
+## [63] &quot;allowResprouting&quot;                 &quot;removeEmptyCohorts&quot;              
+## [65] &quot;minimumCohortDensity&quot;             &quot;seedRain&quot;                        
+## [67] &quot;seedProductionTreeHeight&quot;         &quot;seedProductionShrubHeight&quot;       
+## [69] &quot;probRecr&quot;                         &quot;minTempRecr&quot;                     
+## [71] &quot;minMoistureRecr&quot;                  &quot;minFPARRecr&quot;                     
+## [73] &quot;recrTreeHeight&quot;                   &quot;recrShrubCover&quot;                  
+## [75] &quot;recrShrubHeight&quot;                  &quot;recrTreeZ50&quot;                     
+## [77] &quot;recrShrubZ50&quot;                     &quot;recrTreeZ95&quot;                     
 ## [79] &quot;recrShrubZ95&quot;</code></pre>
 <p>Control parameters are employed when initializing vegetation inputs and state variables using functions <code>forest2spwbInput()</code> and <code>forest2growthInput()</code>, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as <code>spwb()</code> or <code>growth()</code>. Function <code>fordyn()</code> is different than the other simulation functions, because the list control parameters is directly passed to the function (see <a href="model-inputs.html#inputstructuresmedfate">2.1.1</a>).</p>
 <p>Even if the list of control parameters is long, not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), and most of them should not be altered from their default values. However, there are a set of parameters that are worth learning:</p>
