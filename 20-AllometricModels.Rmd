@@ -62,9 +62,12 @@ A_{sh,i} = a_{ash} \cdot H_{i}^{b_{ash}}
 \end{equation}
 where $a_{ash}$ and $b_{ash}$ are species-specific parameters. The model then estimates the dry weight of leaves and branches up to 6.35mm in diameter ($B_{sh,i}$, in kg) of this average individual (i.e. fine fuel biomass), using an allometric relationship with shrub crown phytovolume assuming a cylinder (in $cm^3$):
 \begin{equation}
-B_{sh,i} = a_{bsh} \cdot (A_{sh,i}\cdot H_{i}\cdot cr_i)^{b_{bsh}} \cdot e^{-0.0147\cdot BA} 
+B_{sh,i} = a_{bsh} \cdot (A_{sh,i}\cdot H_{i})^{b_{bsh}} \cdot e^{-0.235\cdot LAI^{live}_{trees}} 
+(\#eq:shrubindividualfuel)
 \end{equation}
-where $a_{bsh}$ and $b_{bsh}$ are species-specific parameters and $cr_i$ is the crown ratio (a value between 0 and 1, the ratio between crown length and total height). Here $BA$ is the stand basal area ($m^2\cdot ha^{-1}$), which induces a reduction of $B_{sh,i}$ similar to the one described for tree foliar biomass, but with a fixed coefficient. Shrub density ($N_{i}$; in $ind.\cdot m^{-2}$) can be grossly estimated from percent cover ($C_{i}$, in percent) and $A_{sh,i}$ (in $cm^{-2}$):
+where $a_{bsh}$ and $b_{bsh}$ are species-specific parameters. Here $LAI^{live}_{trees}$ ($m^2\cdot m^{-2}$) is the sum of leaf area index values of tree cohorts, which induces a reduction of $B_{sh,i}$ similar to the one described for tree foliar biomass by $BAL_i$. This reduction is important for biomass and leaf area estimation of shrubs in forests, since it has been observed that light availability affects the growth, architecture and bulk density of the understory [@pimont_simple_2018].
+
+Shrub density ($N_{i}$; in $ind.\cdot m^{-2}$) can be grossly estimated from percent cover ($C_{i}$, in percent) and $A_{sh,i}$ (in $cm^{-2}$):
 \begin{equation}
 N_{i} = \frac{C_{i}/100}{A_{sh,i}/10000}
 \end{equation}
@@ -80,6 +83,16 @@ FB_{i} =  W_{i}/r_{6.35, i}
 \end{equation}
 If not known, $r_{6.35,i}$ can be set to a default value of 2 (equivalent to 50% of weight corresponding to leaves).
 
+**Herbaceous layer**
+
+Foliar biomass of the herbaceous layer (which is equal to its fine fuel loading) is estimated from herbaceous cover ($Cover_{herb}$; in %) and height ($H_{herb}$; in cm) assuming a constant bulk density coefficient:
+
+\begin{equation}
+FB_{herb} = 0.014 \cdot Cover_{herb} \cdot (H_{herb}/100.0) \cdot e^{-0.235\cdot LAI^{live}_{woody}} 
+\end{equation}
+
+where the factor $e^{-0.235\cdot LAI^{live}_{woody}}$ is analogous to that of shrubs (eq. \@ref(eq:shrubindividualfuel)), but using the overall leaf area index of woody cohorts as driving variable. 
+
 
 ### Leaf area and LAI
 Leaf area index ($LAI$ in $m^2 \cdot m^{-2}$) of a given cohort $i$ can be calculated from its foliar biomass (in $kg \cdot m^{-2}$) by using a *specific leaf area* coefficient ($SLA$, in $m^2 \cdot kg^{-1}$) that in **medfate** is species-specific:
@@ -91,7 +104,9 @@ The leaf area ($LA$ in $m^2$) of an individual of the cohort is found by dividin
 LA_{i} =  10000 \cdot LAI_{i} / N_{i}
 \end{equation}
 
-LAI values are calculated from `forest` objects using function `plant_LAI()`.
+LAI values of woody cohorts are calculated from `forest` objects using function `plant_LAI()`.
+
+Leaf area index of the herbaceous layer ($LAI_{herb}$) is estimated from $FB_{herb}$ by applying a $SLA = 9$ value, is limited to $LAI_{herb} = 2\,\,m^2\cdot m^{-2}$, and can be calculated from `forest` objects using function `herb_LAI()`.
 
 ### Crown vertical dimensions {#crownbaseheight}
 

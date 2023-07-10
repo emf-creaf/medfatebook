@@ -367,6 +367,9 @@ A third set of parameters refers to mortality/regeneration parameters (`paramsMo
 | Symbol       | Units | R param       | Description                      |
 |--------------|-------|---------------|----------------------------------|
 | $P_{mort,base}$ | $[0-1]$ | `MortalityBaselineRate` | Deterministic proportion or probability specifying the baseline reduction of cohort's density occurring in a year as a result of processes not explicitly modelled |
+| $TS_{surv}$ | $[0-1]$ | `SurvivalModelStep` | Time step in years of the empirical survival model depending on stand basal area (e.g. 10) |
+| $\beta_{surv,0}$ | $[0-1]$ | `SurvivalB0` | Intercept of the logistic baseline survival model depending on stand basal area |
+| $\beta_{surv,1}$ | $[0-1]$ | `SurvivalB1` | Slope of the logistic baseline survival model depending on stand basal area |
 | $N_{tree, recr}$  | $ind \cdot ha^{-1}$  | `RecrTreeDensity` | Density of tree recruits from seeds. |
 | $N_{tree, ingrowth}$  | $ind \cdot ha^{-1}$  | `IngrowthTreeDensity` | Density of trees reaching ingrowth DBH. |
 | $DBH_{tree, recr}$  | $cm$  | `RecrTreeDBH` | DBH for tree recruits from seeds or resprouting (e.g. 1 cm). |
@@ -385,6 +388,7 @@ First, there are flags that regulate the application of processes:
 + `allowStarvation [=TRUE]`: Boolean flag to indicate that mortality by starvation is allowed.
 + `sinkLimitation [=TRUE]`: Boolean flag to indicate that temperature and turgor limitations to growth are applied.
 + `shrubDynamics [= TRUE]`: Boolean flag to allow the application of demographic processes to shrubs.
++ `herbDynamics [= TRUE]`: Boolean flag to allow dynamic herb leaf area as a function of shading due to leaf area of woody cohorts.
 
 An important parameter concerns the allocation strategy: 
 
@@ -405,7 +409,7 @@ Finally, we have the following options regarding mortality:
 + `mortalityMode [= "density/deterministic"]`: String describing how mortality is applied. Current accepted values are combinations of `"cohort"` vs `"density"` (for whole-cohort mortality vs reduction of stem density) and `"deterministic"` vs. `"stochastic"`.
 + `mortalityBaselineRate [= 0.0015]`: Default deterministic proportion or probability specifying the baseline reduction of cohort's density occurring in a year as a result of processes not explicitly modelled (for `mortalityMode = "density/deterministic"` or `"density/stochastic"`).
 + `mortalityRelativeSugarThreshold [= 0.3]`: Threshold of stem sugar concentration relative to equilibrium values (by default 30\%), resulting in an increased mortality rate/probability whenever levels are below.
-+ `mortalityRWCThreshold [= 0.3]`: Threshold of stem relative water content resulting in increased mortality rate/probability whenever levels are below.
++ `mortalityRWCThreshold [= 0.4]`: Threshold of stem relative water content resulting in increased mortality rate/probability whenever levels are below (by default 40\%).
 
 
 ### Model output {#forestgrowthoutput}

@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-06-06" />
+<meta name="date" content="2023-07-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -844,24 +844,32 @@ FB_{i} = FB_{tree,i}\cdot (N_{i}/10000)
 A_{sh,i} = a_{ash} \cdot H_{i}^{b_{ash}}
 \end{equation}\]</span>
 where <span class="math inline">\(a_{ash}\)</span> and <span class="math inline">\(b_{ash}\)</span> are species-specific parameters. The model then estimates the dry weight of leaves and branches up to 6.35mm in diameter (<span class="math inline">\(B_{sh,i}\)</span>, in kg) of this average individual (i.e. fine fuel biomass), using an allometric relationship with shrub crown phytovolume assuming a cylinder (in <span class="math inline">\(cm^3\)</span>):
-<span class="math display">\[\begin{equation}
-B_{sh,i} = a_{bsh} \cdot (A_{sh,i}\cdot H_{i}\cdot cr_i)^{b_{bsh}} \cdot e^{-0.0147\cdot BA}
+<span class="math display" id="eq:shrubindividualfuel">\[\begin{equation}
+B_{sh,i} = a_{bsh} \cdot (A_{sh,i}\cdot H_{i})^{b_{bsh}} \cdot e^{-0.235\cdot LAI^{live}_{trees}}
+\tag{20.3}
 \end{equation}\]</span>
-where <span class="math inline">\(a_{bsh}\)</span> and <span class="math inline">\(b_{bsh}\)</span> are species-specific parameters and <span class="math inline">\(cr_i\)</span> is the crown ratio (a value between 0 and 1, the ratio between crown length and total height). Here <span class="math inline">\(BA\)</span> is the stand basal area (<span class="math inline">\(m^2\cdot ha^{-1}\)</span>), which induces a reduction of <span class="math inline">\(B_{sh,i}\)</span> similar to the one described for tree foliar biomass, but with a fixed coefficient. Shrub density (<span class="math inline">\(N_{i}\)</span>; in <span class="math inline">\(ind.\cdot m^{-2}\)</span>) can be grossly estimated from percent cover (<span class="math inline">\(C_{i}\)</span>, in percent) and <span class="math inline">\(A_{sh,i}\)</span> (in <span class="math inline">\(cm^{-2}\)</span>):
+where <span class="math inline">\(a_{bsh}\)</span> and <span class="math inline">\(b_{bsh}\)</span> are species-specific parameters. Here <span class="math inline">\(LAI^{live}_{trees}\)</span> (<span class="math inline">\(m^2\cdot m^{-2}\)</span>) is the sum of leaf area index values of tree cohorts, which induces a reduction of <span class="math inline">\(B_{sh,i}\)</span> similar to the one described for tree foliar biomass by <span class="math inline">\(BAL_i\)</span>. This reduction is important for biomass and leaf area estimation of shrubs in forests, since it has been observed that light availability affects the growth, architecture and bulk density of the understory <span class="citation">(<a href="#ref-pimont_simple_2018">Pimont <em>et al.</em> 2018</a>)</span>.</p>
+<p>Shrub density (<span class="math inline">\(N_{i}\)</span>; in <span class="math inline">\(ind.\cdot m^{-2}\)</span>) can be grossly estimated from percent cover (<span class="math inline">\(C_{i}\)</span>, in percent) and <span class="math inline">\(A_{sh,i}\)</span> (in <span class="math inline">\(cm^{-2}\)</span>):
 <span class="math display">\[\begin{equation}
 N_{i} = \frac{C_{i}/100}{A_{sh,i}/10000}
 \end{equation}\]</span>
 The fine fuel biomass of a shrub cohort (<span class="math inline">\(W_{i}\)</span>, in <span class="math inline">\(kg \cdot m^{-2}\)</span>) is simply the product of <span class="math inline">\(B_{sh,i}\)</span> (<span class="math inline">\(kg\)</span> of dry weight) and <span class="math inline">\(N_{i}\)</span>:
 <span class="math display" id="eq:shrubloading">\[\begin{equation}
 W_{i} =  B_{sh,i} \cdot N_{i}
-\tag{20.3}
+\tag{20.4}
 \end{equation}\]</span>
 Foliar biomass (in <span class="math inline">\(kg \cdot m^{-2}\)</span>) can be obtained using the species-specific ratio <span class="math inline">\(r_{6.35,i}\)</span>:
 <span class="math display" id="eq:shrubfoliarbiomass">\[\begin{equation}
 FB_{i} =  W_{i}/r_{6.35, i}
-\tag{20.4}
+\tag{20.5}
 \end{equation}\]</span>
 If not known, <span class="math inline">\(r_{6.35,i}\)</span> can be set to a default value of 2 (equivalent to 50% of weight corresponding to leaves).</p>
+<p><strong>Herbaceous layer</strong></p>
+<p>Foliar biomass of the herbaceous layer (which is equal to its fine fuel loading) is estimated from herbaceous cover (<span class="math inline">\(Cover_{herb}\)</span>; in %) and height (<span class="math inline">\(H_{herb}\)</span>; in cm) assuming a constant bulk density coefficient:</p>
+<p><span class="math display">\[\begin{equation}
+FB_{herb} = 0.014 \cdot Cover_{herb} \cdot (H_{herb}/100.0) \cdot e^{-0.235\cdot LAI^{live}_{woody}}
+\end{equation}\]</span></p>
+<p>where the factor <span class="math inline">\(e^{-0.235\cdot LAI^{live}_{woody}}\)</span> is analogous to that of shrubs (eq. <a href="allometricmodels.html#eq:shrubindividualfuel">(20.3)</a>), but using the overall leaf area index of woody cohorts as driving variable.</p>
 </div>
 <div id="leaf-area-and-lai" class="section level3 hasAnchor" number="20.2.2">
 <h3><span class="header-section-number">20.2.2</span> Leaf area and LAI<a href="allometricmodels.html#leaf-area-and-lai" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -873,21 +881,22 @@ The leaf area (<span class="math inline">\(LA\)</span> in <span class="math inli
 <span class="math display">\[\begin{equation}
 LA_{i} =  10000 \cdot LAI_{i} / N_{i}
 \end{equation}\]</span></p>
-<p>LAI values are calculated from <code>forest</code> objects using function <code>plant_LAI()</code>.</p>
+<p>LAI values of woody cohorts are calculated from <code>forest</code> objects using function <code>plant_LAI()</code>.</p>
+<p>Leaf area index of the herbaceous layer (<span class="math inline">\(LAI_{herb}\)</span>) is estimated from <span class="math inline">\(FB_{herb}\)</span> by applying a <span class="math inline">\(SLA = 9\)</span> value, is limited to <span class="math inline">\(LAI_{herb} = 2\,\,m^2\cdot m^{-2}\)</span>, and can be calculated from <code>forest</code> objects using function <code>herb_LAI()</code>.</p>
 </div>
 <div id="crownbaseheight" class="section level3 hasAnchor" number="20.2.3">
 <h3><span class="header-section-number">20.2.3</span> Crown vertical dimensions<a href="allometricmodels.html#crownbaseheight" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Crown base height, i.e. the height were the first living branch of trees or shrubs occurs, is an important parameter to know the vertical distribution of leaves (see section <a href="model-inputs.html#leafdistribution">2.4.5</a>). Crown base height of a plant cohort <span class="math inline">\(i\)</span> (i.e., <span class="math inline">\(H_{crown,i}\)</span>, in <span class="math inline">\(cm\)</span>) is related to the total height of the cohort (<span class="math inline">\(H_i\)</span>, in <span class="math inline">\(cm\)</span>) and its crown ratio (<span class="math inline">\(CR_i\)</span>), which is the ratio between crown length and plant height:
 <span class="math display" id="eq:CrownHeight">\[\begin{equation}
 H_{crown,i} = (1 - CR_i) \cdot H_i
-\tag{20.5}
-\end{equation}\]</span>
-In the case of shrubs the crown ratio <span class="math inline">\(CR_i\)</span> is normally an input (species-specific) parameter (<span class="math inline">\(cr\)</span>). In the case of trees, the crown ratio is modelled as a function of tree size and stand competition, following a modification of the logistic equation of <span class="citation">Hasenauer &amp; Monserud (<a href="#ref-Hasenauer1996" role="doc-biblioref">1996</a>)</span> :
-<span class="math display" id="eq:treecrownratio">\[\begin{equation}
-CR_i = \frac{1}{1+e^{-(a_{cr}+b_{1cr}\cdot HD_i +b_{2cr} \cdot (H_i/100)+b_{3cr} \cdot DBH_i^2+c_{1cr} \cdot BAL_i + c_{2cr} \cdot ln(CCF_i))}}
 \tag{20.6}
 \end{equation}\]</span>
-where <span class="math inline">\(HD_i = H_i/(100\cdot DBH_i)\)</span> is the height to diameter ratio (in <span class="math inline">\(m\cdot cm^{-1}\)</span>), <span class="math inline">\(H_i\)</span> is the tree height, <span class="math inline">\(DBH_i\)</span> is the diameter, <span class="math inline">\(CCF_i\)</span> is the crown competition factor and <span class="math inline">\(a_{cr}\)</span>, <span class="math inline">\(b_{1cr}\)</span>, <span class="math inline">\(b_{2cr}\)</span>, <span class="math inline">\(b_{3cr}\)</span>, <span class="math inline">\(c_{1cr}\)</span> and <span class="math inline">\(c_{2cr}\)</span> are species-specific parameters. The crown competition factor is in turn calculated using <span class="citation">(<a href="#ref-Krajicek1961" role="doc-biblioref">Krajicek <em>et al.</em> 1961</a>)</span>:
+In the case of shrubs the crown ratio <span class="math inline">\(CR_i\)</span> is normally an input (species-specific) parameter (<span class="math inline">\(cr\)</span>). In the case of trees, the crown ratio is modelled as a function of tree size and stand competition, following a modification of the logistic equation of <span class="citation">Hasenauer &amp; Monserud (<a href="#ref-Hasenauer1996">1996</a>)</span> :
+<span class="math display" id="eq:treecrownratio">\[\begin{equation}
+CR_i = \frac{1}{1+e^{-(a_{cr}+b_{1cr}\cdot HD_i +b_{2cr} \cdot (H_i/100)+b_{3cr} \cdot DBH_i^2+c_{1cr} \cdot BAL_i + c_{2cr} \cdot ln(CCF_i))}}
+\tag{20.7}
+\end{equation}\]</span>
+where <span class="math inline">\(HD_i = H_i/(100\cdot DBH_i)\)</span> is the height to diameter ratio (in <span class="math inline">\(m\cdot cm^{-1}\)</span>), <span class="math inline">\(H_i\)</span> is the tree height, <span class="math inline">\(DBH_i\)</span> is the diameter, <span class="math inline">\(CCF_i\)</span> is the crown competition factor and <span class="math inline">\(a_{cr}\)</span>, <span class="math inline">\(b_{1cr}\)</span>, <span class="math inline">\(b_{2cr}\)</span>, <span class="math inline">\(b_{3cr}\)</span>, <span class="math inline">\(c_{1cr}\)</span> and <span class="math inline">\(c_{2cr}\)</span> are species-specific parameters. The crown competition factor is in turn calculated using <span class="citation">(<a href="#ref-Krajicek1961">Krajicek <em>et al.</em> 1961</a>)</span>:
 <span class="math display">\[\begin{equation}
 CCF_i = \sum_{i}{N_i \cdot \pi \cdot (CW_i/2)^2/100}
 \end{equation}\]</span>
@@ -908,6 +917,9 @@ Hasenauer, H. &amp; Monserud, R.A. (1996). <a href="https://doi.org/10.1016/0378
 </div>
 <div id="ref-Krajicek1961" class="csl-entry">
 Krajicek, J., Brinkman, K. &amp; Gingrich, S. (1961). Crown competition-a measure of density. <em>Forest Science</em>, 7, 35–42.
+</div>
+<div id="ref-pimont_simple_2018" class="csl-entry">
+Pimont, F., Dupuy, J.L. &amp; Rigolot, E. (2018). <a href="https://doi.org/10.1007/s13595-018-0713-y">A simple model for shrub-strata-fuel dynamics in <span>Quercus</span> coccifera <span>L</span>. communities</a>. <em>Annals of Forest Science</em>, 75, 1–9.
 </div>
 </div>
             </section>

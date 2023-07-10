@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-06-06" />
+<meta name="date" content="2023-07-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -859,7 +859,7 @@ Figure 2.1: Schematic workflow of input creation for simulation functions in med
 <p>Soils are described in <strong>medfate</strong> using <span class="math inline">\(S &gt; 1\)</span> different soil layers (<span class="math inline">\(s \in \{1, 2, ..., S\}\)</span>). Here the word <em>soil</em> refers to depths that plant rooting systems can reach (i.e., the critical zone), including cracks within the bedrock. The number and size of soil layers may correspond to changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties and are considered <strong>static soil parameters</strong> in simulations. In contrast, soil moisture content, other variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered, are all <strong>soil state variables</strong>.</p>
 <div id="soil-physical-properties" class="section level3 hasAnchor" number="2.3.1">
 <h3><span class="header-section-number">2.3.1</span> Soil physical properties<a href="model-inputs.html#soil-physical-properties" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Soil physical properties, such as <em>texture</em> (i.e. volume percent of sand, silt and clay), <em>organic matter content</em>, <em>bulk density</em> or <em>rock fragment content</em>, can differ between soil layers, and this has important consequences for soil water retention capacity and soil hydraulics. Specifying layers with an elevated rock fragment content (e.g. layers of weathered rock where soil particles are scarce) may be important in seasonally-arid climates like the Mediterranean, because plants often extend their roots into cracks existing in the parent rock to access water during summer <span class="citation">(<a href="#ref-Ruffault2013" role="doc-biblioref">Ruffault <em>et al.</em> 2013</a>)</span>.</p>
+<p>Soil physical properties, such as <em>texture</em> (i.e. volume percent of sand, silt and clay), <em>organic matter content</em>, <em>bulk density</em> or <em>rock fragment content</em>, can differ between soil layers, and this has important consequences for soil water retention capacity and soil hydraulics. Specifying layers with an elevated rock fragment content (e.g. layers of weathered rock where soil particles are scarce) may be important in seasonally-arid climates like the Mediterranean, because plants often extend their roots into cracks existing in the parent rock to access water during summer <span class="citation">(<a href="#ref-Ruffault2013">Ruffault <em>et al.</em> 2013</a>)</span>.</p>
 <p>For each soil layer <span class="math inline">\(s\)</span>, the following physical parameters are needed:</p>
 <table>
 <colgroup>
@@ -930,8 +930,8 @@ And the overall <em>soil depth</em> (<span class="math inline">\(Z_{soil}\)</spa
 <ol style="list-style-type: decimal">
 <li><em>Saxton model</em>: In this model, volumetric soil moisture <span class="math inline">\(\theta(\Psi)\)</span> corresponding to a given water potential <span class="math inline">\(\Psi\)</span> (in MPa) below field capacity (i.e., <span class="math inline">\(\Psi &lt; \Psi_{fc}\)</span>) is calculated using:
 <span class="math display">\[\begin{equation}\theta(\Psi) = (\Psi/A)^{(1/B)}\end{equation}\]</span>
-where <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> depend on the texture and, if available, organic matter in the soil. If organic matter is available, <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> are calculated from <span class="math inline">\(P_{clay}\)</span>, <span class="math inline">\(P_{sand}\)</span> and <span class="math inline">\(OM\)</span> following <span class="citation">Saxton &amp; Rawls (<a href="#ref-Saxton2006" role="doc-biblioref">2006</a>)</span>. Otherwise, they are calculated from <span class="math inline">\(P_{clay}\)</span> and <span class="math inline">\(P_{sand}\)</span> as indicated in <span class="citation">Saxton <em>et al.</em> (<a href="#ref-Saxton1986" role="doc-biblioref">1986</a>)</span>. Volumetric changes between field capacity and saturation (i.e., <span class="math inline">\(\Psi_{fc} \leq \Psi &lt; 0\)</span>) are estimated using a linear function.</li>
-<li><em>Van Genuchten model</em>: The well known van Genuchten <span class="citation">(<a href="#ref-Genuchten1980" role="doc-biblioref">1980</a>)</span> model is:
+where <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> depend on the texture and, if available, organic matter in the soil. If organic matter is available, <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> are calculated from <span class="math inline">\(P_{clay}\)</span>, <span class="math inline">\(P_{sand}\)</span> and <span class="math inline">\(OM\)</span> following <span class="citation">Saxton &amp; Rawls (<a href="#ref-Saxton2006">2006</a>)</span>. Otherwise, they are calculated from <span class="math inline">\(P_{clay}\)</span> and <span class="math inline">\(P_{sand}\)</span> as indicated in <span class="citation">Saxton <em>et al.</em> (<a href="#ref-Saxton1986">1986</a>)</span>. Volumetric changes between field capacity and saturation (i.e., <span class="math inline">\(\Psi_{fc} \leq \Psi &lt; 0\)</span>) are estimated using a linear function.</li>
+<li><em>Van Genuchten model</em>: The well known van Genuchten <span class="citation">(<a href="#ref-Genuchten1980">1980</a>)</span> model is:
 <span class="math display">\[\begin{equation}\theta(\Psi) = \theta_{res}+\frac{\theta_{sat}-\theta_{res}}{\left[1+ (\alpha \cdot \Psi)^n \right]^{1-1/n}}\end{equation}\]</span>
 where <span class="math inline">\(\theta(\psi)\)</span> is the water retention, <span class="math inline">\(\theta_{sat}\)</span> is the saturated water content, <span class="math inline">\(\theta_{res}\)</span> is the residual water content, <span class="math inline">\(\alpha\)</span> is related to the inverse of the air entry pressure, and <span class="math inline">\(n\)</span> is a measure of the pore-size distribution.</li>
 </ol>
@@ -939,7 +939,7 @@ where <span class="math inline">\(\theta(\psi)\)</span> is the water retention, 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:retention-curves"></span>
 <img src="medfatebook_files/figure-html/retention-curves-1.png" alt="Water retention curves under the Saxton and Van Genuchten models, for the same physical attributes (25% sand, 25% clay, 50% silt and bulk density of \(1.5 g \cdot cm^{-3}\)). Parameters of the Van Genuchten curve have been estimated using pedotransfer functions given in Tóth et al. (2015)." width="384" />
 <p class="caption">
-Figure 2.2: Water retention curves under the Saxton and Van Genuchten models, for the same physical attributes (25% sand, 25% clay, 50% silt and bulk density of <span class="math inline">\(1.5 g \cdot cm^{-3}\)</span>). Parameters of the Van Genuchten curve have been estimated using pedotransfer functions given in <span class="citation">Tóth <em>et al.</em> (<a href="#ref-Toth2015" role="doc-biblioref">2015</a>)</span>.
+Figure 2.2: Water retention curves under the Saxton and Van Genuchten models, for the same physical attributes (25% sand, 25% clay, 50% silt and bulk density of <span class="math inline">\(1.5 g \cdot cm^{-3}\)</span>). Parameters of the Van Genuchten curve have been estimated using pedotransfer functions given in <span class="citation">Tóth <em>et al.</em> (<a href="#ref-Toth2015">2015</a>)</span>.
 </p>
 </div>
 </div>
@@ -997,13 +997,13 @@ Figure 2.2: Water retention curves under the Saxton and Van Genuchten models, fo
 <td><span class="math inline">\(n_s\)</span></td>
 <td></td>
 <td><code>VG_n</code></td>
-<td>Parameter <span class="math inline">\(n\)</span> of the Van Genuchten <span class="citation">(<a href="#ref-Genuchten1980" role="doc-biblioref">1980</a>)</span> model</td>
+<td>Parameter <span class="math inline">\(n\)</span> of the Van Genuchten <span class="citation">(<a href="#ref-Genuchten1980">1980</a>)</span> model</td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(\alpha_s\)</span></td>
 <td><span class="math inline">\(MPa^{-1}\)</span></td>
 <td><code>VG_alpha</code></td>
-<td>Parameter <span class="math inline">\(\alpha\)</span> of the Van Genuchten <span class="citation">(<a href="#ref-Genuchten1980" role="doc-biblioref">1980</a>)</span> model</td>
+<td>Parameter <span class="math inline">\(\alpha\)</span> of the Van Genuchten <span class="citation">(<a href="#ref-Genuchten1980">1980</a>)</span> model</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(K_{sat,s}\)</span></td>
@@ -1019,12 +1019,12 @@ Figure 2.2: Water retention curves under the Saxton and Van Genuchten models, fo
 </tr>
 </tbody>
 </table>
-<p>Macroporosity values are calculated using the equations given in <span class="citation">Stolf <em>et al.</em> (<a href="#ref-Stolf2011" role="doc-biblioref">2011</a>)</span>, while <span class="math inline">\(\gamma_{soil}\)</span> and <span class="math inline">\(\kappa_{soil}\)</span> are derived from texture. Parameters of the van Genuchten model for each layer are estimated from the physical description of the layer using one of two pedotransfer functions (see help for <code>soil()</code>):</p>
+<p>Macroporosity values are calculated using the equations given in <span class="citation">Stolf <em>et al.</em> (<a href="#ref-Stolf2011">2011</a>)</span>, while <span class="math inline">\(\gamma_{soil}\)</span> and <span class="math inline">\(\kappa_{soil}\)</span> are derived from texture. Parameters of the van Genuchten model for each layer are estimated from the physical description of the layer using one of two pedotransfer functions (see help for <code>soil()</code>):</p>
 <ol style="list-style-type: decimal">
-<li>Using the USDA texture classification and the average texture class parameters given by <span class="citation">Carsel &amp; Parrish (<a href="#ref-Carsel1988" role="doc-biblioref">1988</a>)</span>.</li>
-<li>Directly from the soil texture, organic matter and bulk density, using the pedotransfer functions in <span class="citation">Tóth <em>et al.</em> (<a href="#ref-Toth2015" role="doc-biblioref">2015</a>)</span>.</li>
+<li>Using the USDA texture classification and the average texture class parameters given by <span class="citation">Carsel &amp; Parrish (<a href="#ref-Carsel1988">1988</a>)</span>.</li>
+<li>Directly from the soil texture, organic matter and bulk density, using the pedotransfer functions in <span class="citation">Tóth <em>et al.</em> (<a href="#ref-Toth2015">2015</a>)</span>.</li>
 </ol>
-<p>Soil layer saturated conductivity (<span class="math inline">\(K_{sat,s}\)</span>) is estimated using <span class="citation">Saxton &amp; Rawls (<a href="#ref-Saxton2006" role="doc-biblioref">2006</a>)</span> or <span class="citation">Saxton <em>et al.</em> (<a href="#ref-Saxton1986" role="doc-biblioref">1986</a>)</span>, depending on whether an estimate of organic mater is available. <span class="math inline">\(K_{drain}\)</span> is currently initialized from soil saturated conductivity in the deepest soil layer, but should be defined depending on the permeability of the bedrock material.</p>
+<p>Soil layer saturated conductivity (<span class="math inline">\(K_{sat,s}\)</span>) is estimated using <span class="citation">Saxton &amp; Rawls (<a href="#ref-Saxton2006">2006</a>)</span> or <span class="citation">Saxton <em>et al.</em> (<a href="#ref-Saxton1986">1986</a>)</span>, depending on whether an estimate of organic mater is available. <span class="math inline">\(K_{drain}\)</span> is currently initialized from soil saturated conductivity in the deepest soil layer, but should be defined depending on the permeability of the bedrock material.</p>
 <p>Besides defining soil parameters, function <code>soil()</code> also initializes <em>soil state variables</em>: soil moisture content, soil temperature (although set to a missing value) and water table depth. Users can edit the <code>soil</code> object manually (it is actually a <code>list</code>), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements.</p>
 </div>
 <div id="water-content-and-water-table-depth" class="section level3 hasAnchor" number="2.3.4">
@@ -1253,8 +1253,8 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 <div id="forestobjects" class="section level3 hasAnchor" number="2.4.4">
 <h3><span class="header-section-number">2.4.4</span> Forest plot objects<a href="model-inputs.html#forestobjects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>While the previous section described the structural forest variables required to run simulations in <strong>medfate</strong>, forest plot data input in the package is easier if one uses a format that follows closely forest inventory plot descriptions. In this format, each forest plot is represented in an object of class <code>forest</code>, a list that contains several elements. Here we use an example forest stand provided with the package:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="model-inputs.html#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(exampleforestMED)</span>
-<span id="cb6-2"><a href="model-inputs.html#cb6-2" aria-hidden="true" tabindex="-1"></a>exampleforestMED</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="model-inputs.html#cb6-1" tabindex="-1"></a><span class="fu">data</span>(exampleforestMED)</span>
+<span id="cb6-2"><a href="model-inputs.html#cb6-2" tabindex="-1"></a>exampleforestMED</span></code></pre></div>
 <pre><code>## $treeData
 ##            Species   N   DBH Height Z50  Z95
 ## 1 Pinus halepensis 168 37.55    800 100  600
@@ -1274,17 +1274,17 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 ## [1] &quot;forest&quot; &quot;list&quot;</code></pre>
 <p>The most important items of <code>forest</code> are the two data frames describing woody vegetation, <code>treeData</code> (for trees) and <code>shrubData</code> for shrubs, but the herbaceous layer can also be described using <code>herbCover</code> and <code>herbHeight</code>. With the aim to help users in the task of constructing <code>forest</code> objects, package <a href="https://github.com/emf-creaf/medfateutils"><strong>medfateutils</strong></a> includes functions to map user data in into tables <code>treeData</code> and <code>shrubData</code>.</p>
 <p><code>forest</code> objects are a convenient format to start calculations with <strong>medfate</strong>, because there are many static functions that take forest objects as input. For example, a <code>summary.forest()</code> function provides the basal area, density, cover and leaf area index of the forest stand, and its different components:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="model-inputs.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(exampleforestMED, SpParamsMED)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="model-inputs.html#cb8-1" tabindex="-1"></a><span class="fu">summary</span>(exampleforestMED, SpParamsMED)</span></code></pre></div>
 <pre><code>## Tree BA (m2/ha): 25.0333016  adult trees: 25.0333016  saplings: 0 
 ## Density (ind/ha) adult trees: 552  saplings: 0  shrubs (estimated): 749.4923076 
 ## Cover (%) adult trees: 100  saplings: 0  shrubs: 3.75  herbs: 10 
-## LAI (m2/m2) total: 1.8335096  adult trees: 1.5543216  saplings: 0  shrubs: 0.027188  herbs: 0.252 
-## Fuel (kg/m2) total: 0.5699197  adult trees: 0.5255004  saplings: 0  shrubs: 0.0164193  herbs: 0.028 
-## PAR ground (%): 38.5431077  SWR ground (%): 49.3507632</code></pre>
+## LAI (m2/m2) total: 1.7585845  adult trees: 1.5543216  saplings: 0  shrubs: 0.030626  herbs: 0.1736369 
+## Fuel loading (kg/m2) total: 0.5588728  adult trees: 0.5255004  saplings: 0  shrubs: 0.0140795  herbs: 0.019293 
+## PAR ground (%): 40.0075402  SWR ground (%): 50.7329667</code></pre>
 </div>
 <div id="leafdistribution" class="section level3 hasAnchor" number="2.4.5">
 <h3><span class="header-section-number">2.4.5</span> Vertical leaf distribution<a href="model-inputs.html#leafdistribution" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The vegetation input structures allow the package to determine the vertical distribution of leaves in the stand. The leaf area of any woody plant cohort is assumed to be distributed vertically following a <strong>truncated Gaussian function</strong> whose standardized values -1.5 and 1.5 correspond to crown base height (<span class="math inline">\(H_{crown,i}\)</span>; in <span class="math inline">\(cm\)</span>) and total plant height (<span class="math inline">\(H_i\)</span>), respectively. Crown base height is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort (<span class="math inline">\(CR_i\)</span>; a proportion between 0 and 1), which in turn can be estimated as explained in <a href="allometricmodels.html#eq:CrownHeight">(20.5)</a>.</p>
+<p>The vegetation input structures allow the package to determine the vertical distribution of leaves in the stand. The leaf area of any woody plant cohort is assumed to be distributed vertically following a <strong>truncated Gaussian function</strong> whose standardized values -1.5 and 1.5 correspond to crown base height (<span class="math inline">\(H_{crown,i}\)</span>; in <span class="math inline">\(cm\)</span>) and total plant height (<span class="math inline">\(H_i\)</span>), respectively. Crown base height is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort (<span class="math inline">\(CR_i\)</span>; a proportion between 0 and 1), which in turn can be estimated as explained in <a href="allometricmodels.html#eq:CrownHeight">(20.6)</a>.</p>
 <p>Simulation models in <strong>medfate</strong> divide the vertical dimension into vertical layers (by default are 100 cm width, but see control parameter <code>verticalLayerSize</code>). Let us define <span class="math inline">\(LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}\)</span> as the leaf area index of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> including both functional leaves and dead leaves standing on branches. The truncated Gaussian distribution defines the <span class="math inline">\(LAI_{i,j}^{\phi}\)</span> and <span class="math inline">\(LAI_{i,j}^{dead}\)</span> for all plant cohorts and vertical layers.</p>
 <p>Dividing the leaf area of a given layer by its width, one obtains the <em>leaf area density</em> (<span class="math inline">\(LAD\)</span> in <span class="math inline">\(m^2 \cdot m^{-3}\)</span>). Figure <a href="model-inputs.html#fig:leafareadensity">2.3</a> illustrates the leaf area density profile (see function <code>vprofile_leafAreaDensity()</code>) corresponding to the forest stand described in the example <code>forest</code> object that we showed above.</p>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:leafareadensity"></span>
@@ -1305,7 +1305,7 @@ Figure 2.4: Leaf area density distribution in a forest stand, including the herb
 <div id="rootdistribution" class="section level3 hasAnchor" number="2.4.6">
 <h3><span class="header-section-number">2.4.6</span> Vertical root distribution<a href="model-inputs.html#rootdistribution" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Roots can be distinguished functionally into two different organs: <strong>coarse roots</strong> are responsible for mechanical support and transport of water and nutrients towards the stem, whereas <strong>fine roots</strong> are responsible for absorbing water and nutrients.</p>
-<p>Analogously to the aboveground vegetation parameters, inputs describing depths corresponding to 50% and 95% of fine roots (<span class="math inline">\(Z_{50,i}\)</span> and <span class="math inline">\(Z_{95,i}\)</span>) are used to completely specify the distribution of roots across soil layers. The root system of each plant cohort <span class="math inline">\(i\)</span> is described using <span class="math inline">\(FRP_{i,s}\)</span>, the proportion of fine roots (with respect to the whole plant) in each soil layer <span class="math inline">\(s\)</span>. <span class="math inline">\(FRP_{i,s}\)</span> values are normally defined using the linear dose response model <span class="citation">(<a href="#ref-Schenk2002" role="doc-biblioref">Schenk &amp; Jackson 2002</a>; <a href="#ref-Collins2007" role="doc-biblioref">Collins &amp; Bras 2007</a>)</span>:
+<p>Analogously to the aboveground vegetation parameters, inputs describing depths corresponding to 50% and 95% of fine roots (<span class="math inline">\(Z_{50,i}\)</span> and <span class="math inline">\(Z_{95,i}\)</span>) are used to completely specify the distribution of roots across soil layers. The root system of each plant cohort <span class="math inline">\(i\)</span> is described using <span class="math inline">\(FRP_{i,s}\)</span>, the proportion of fine roots (with respect to the whole plant) in each soil layer <span class="math inline">\(s\)</span>. <span class="math inline">\(FRP_{i,s}\)</span> values are normally defined using the linear dose response model <span class="citation">(<a href="#ref-Schenk2002">Schenk &amp; Jackson 2002</a>; <a href="#ref-Collins2007">Collins &amp; Bras 2007</a>)</span>:
 <span class="math display">\[\begin{eqnarray}
 FRP_{i,s} &amp;=&amp; Y_i(Z_s) - Y_i(Z_{s-1}) \\
 Y_i(z) &amp;=&amp; \frac{1}{1+(z/Z_{50,i})^{c_i}}
@@ -1322,7 +1322,7 @@ Figure 2.5: Examples of root density profile according to the linear dose respon
 </div>
 <div id="plantwaterpools" class="section level3 hasAnchor" number="2.4.7">
 <h3><span class="header-section-number">2.4.7</span> Water pools and root horizontal distribution<a href="model-inputs.html#plantwaterpools" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>By default, models in <strong>medfate</strong> assume that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). Therefore, it neglects spatial variation in soil moisture, against moisture variation patterns observed in mixed stands <span class="citation">(<a href="#ref-Schume2004" role="doc-biblioref">Schume <em>et al.</em> 2004</a>)</span>. However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can also be simulated if required by the user (see parameter <code>rhizosphereOverlap</code> in <a href="model-inputs.html#controlparameters">2.6</a>). This involves considering that a given plant cohort will perform water uptake from the <strong>water pool</strong> surrounding its roots, whereas it may not have access to the water beneath other plants. However, there can exist some degree of horizontal overlap between water pools exploited by different plants.</p>
+<p>By default, models in <strong>medfate</strong> assume that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). Therefore, it neglects spatial variation in soil moisture, against moisture variation patterns observed in mixed stands <span class="citation">(<a href="#ref-Schume2004">Schume <em>et al.</em> 2004</a>)</span>. However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can also be simulated if required by the user (see parameter <code>rhizosphereOverlap</code> in <a href="model-inputs.html#controlparameters">2.6</a>). This involves considering that a given plant cohort will perform water uptake from the <strong>water pool</strong> surrounding its roots, whereas it may not have access to the water beneath other plants. However, there can exist some degree of horizontal overlap between water pools exploited by different plants.</p>
 <p>Considering water pools involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many water pools as plant cohorts, with proportions defined by their LAI values:
 <span class="math display">\[\begin{equation}
 f_{pool,i} = \frac{LAI^{live}_i}{LAI^{live}_{stand}}
@@ -1500,52 +1500,39 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 </tbody>
 </table>
 <p>Missing wind speed (<span class="math inline">\(u\)</span>) and <span class="math inline">\(CO_2\)</span> values will be replaced by defaults defined in control parameters. As an alternative to providing daily atmospheric <span class="math inline">\(CO_2\)</span> concentration values, simulation functions allow the user to provide <span class="math inline">\(CO_2\)</span> concentration values in <strong>annual</strong> time steps using a separate vector. When missing, atmospheric pressure (<span class="math inline">\(P_{atm}\)</span>) is also derived from elevation using an <a href="http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils">utility function</a> available in <strong>meteoland</strong>.</p>
-<p>Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package <strong>meteoland</strong> <span class="citation">(<a href="#ref-DeCaceres2018" role="doc-biblioref">De Cáceres <em>et al.</em> 2018</a>)</span>, but other sources are possible.</p>
+<p>Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package <strong>meteoland</strong> <span class="citation">(<a href="#ref-DeCaceres2018">De Cáceres <em>et al.</em> 2018</a>)</span>, but other sources are possible.</p>
 </div>
 <div id="controlparameters" class="section level2 hasAnchor" number="2.6">
 <h2><span class="header-section-number">2.6</span> Simulation control<a href="model-inputs.html#controlparameters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Simulation control parameters are a list of global parameter values, initialized using function <code>defaultControl()</code>, that the user can modify to change the general behavior of simulation functions. Here is the set of global control parameters currently accepted in <strong>medfate</strong>:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="model-inputs.html#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
-<pre><code>##  [1] &quot;fillMissingRootParams&quot;            &quot;fillMissingSpParams&quot;             
-##  [3] &quot;verbose&quot;                          &quot;subdailyResults&quot;                 
-##  [5] &quot;standResults&quot;                     &quot;soilResults&quot;                     
-##  [7] &quot;plantResults&quot;                     &quot;leafResults&quot;                     
-##  [9] &quot;temperatureResults&quot;               &quot;fireHazardResults&quot;               
-## [11] &quot;transpirationMode&quot;                &quot;soilFunctions&quot;                   
-## [13] &quot;defaultWindSpeed&quot;                 &quot;defaultCO2&quot;                      
-## [15] &quot;snowpack&quot;                         &quot;leafPhenology&quot;                   
-## [17] &quot;rockyLayerDrainage&quot;               &quot;unlimitedSoilWater&quot;              
-## [19] &quot;rhizosphereOverlap&quot;               &quot;unfoldingDD&quot;                     
-## [21] &quot;verticalLayerSize&quot;                &quot;windMeasurementHeight&quot;           
-## [23] &quot;cavitationRefill&quot;                 &quot;hydraulicRedistributionFraction&quot; 
-## [25] &quot;ndailysteps&quot;                      &quot;nsubsteps&quot;                       
-## [27] &quot;capacitance&quot;                      &quot;taper&quot;                           
-## [29] &quot;multiLayerBalance&quot;                &quot;maximumStemConductance&quot;          
-## [31] &quot;klatstem&quot;                         &quot;klatleaf&quot;                        
-## [33] &quot;numericParams&quot;                    &quot;fracLeafResistance&quot;              
-## [35] &quot;fracRootResistance&quot;               &quot;averageFracRhizosphereResistance&quot;
-## [37] &quot;thermalCapacityLAI&quot;               &quot;boundaryLayerSize&quot;               
-## [39] &quot;refillMaximumRate&quot;                &quot;subdailyCarbonBalance&quot;           
-## [41] &quot;allowDessication&quot;                 &quot;allowStarvation&quot;                 
-## [43] &quot;sinkLimitation&quot;                   &quot;shrubDynamics&quot;                   
-## [45] &quot;allocationStrategy&quot;               &quot;phloemConductanceFactor&quot;         
-## [47] &quot;nonSugarConcentration&quot;            &quot;equilibriumOsmoticConcentration&quot; 
-## [49] &quot;minimumRelativeStarchForGrowth&quot;   &quot;constructionCosts&quot;               
-## [51] &quot;senescenceRates&quot;                  &quot;maximumRelativeGrowthRates&quot;      
-## [53] &quot;mortalityMode&quot;                    &quot;mortalityBaselineRate&quot;           
-## [55] &quot;mortalityRelativeSugarThreshold&quot;  &quot;mortalityRWCThreshold&quot;           
-## [57] &quot;recrTreeDBH&quot;                      &quot;recrTreeDensity&quot;                 
-## [59] &quot;ingrowthTreeDBH&quot;                  &quot;ingrowthTreeDensity&quot;             
-## [61] &quot;allowRecruitment&quot;                 &quot;recruitmentMode&quot;                 
-## [63] &quot;allowResprouting&quot;                 &quot;removeEmptyCohorts&quot;              
-## [65] &quot;minimumCohortDensity&quot;             &quot;seedRain&quot;                        
-## [67] &quot;seedProductionTreeHeight&quot;         &quot;seedProductionShrubHeight&quot;       
-## [69] &quot;probRecr&quot;                         &quot;minTempRecr&quot;                     
-## [71] &quot;minMoistureRecr&quot;                  &quot;minFPARRecr&quot;                     
-## [73] &quot;recrTreeHeight&quot;                   &quot;recrShrubCover&quot;                  
-## [75] &quot;recrShrubHeight&quot;                  &quot;recrTreeZ50&quot;                     
-## [77] &quot;recrShrubZ50&quot;                     &quot;recrTreeZ95&quot;                     
-## [79] &quot;recrShrubZ95&quot;</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="model-inputs.html#cb10-1" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
+<pre><code>##  [1] &quot;fillMissingRootParams&quot;            &quot;fillMissingSpParams&quot;              &quot;verbose&quot;                         
+##  [4] &quot;subdailyResults&quot;                  &quot;standResults&quot;                     &quot;soilResults&quot;                     
+##  [7] &quot;plantResults&quot;                     &quot;leafResults&quot;                      &quot;temperatureResults&quot;              
+## [10] &quot;fireHazardResults&quot;                &quot;transpirationMode&quot;                &quot;soilFunctions&quot;                   
+## [13] &quot;defaultWindSpeed&quot;                 &quot;defaultCO2&quot;                       &quot;snowpack&quot;                        
+## [16] &quot;leafPhenology&quot;                    &quot;rockyLayerDrainage&quot;               &quot;unlimitedSoilWater&quot;              
+## [19] &quot;rhizosphereOverlap&quot;               &quot;unfoldingDD&quot;                      &quot;verticalLayerSize&quot;               
+## [22] &quot;windMeasurementHeight&quot;            &quot;cavitationRefill&quot;                 &quot;hydraulicRedistributionFraction&quot; 
+## [25] &quot;ndailysteps&quot;                      &quot;nsubsteps&quot;                        &quot;capacitance&quot;                     
+## [28] &quot;taper&quot;                            &quot;multiLayerBalance&quot;                &quot;maximumStemConductance&quot;          
+## [31] &quot;klatstem&quot;                         &quot;klatleaf&quot;                         &quot;numericParams&quot;                   
+## [34] &quot;fracLeafResistance&quot;               &quot;fracRootResistance&quot;               &quot;averageFracRhizosphereResistance&quot;
+## [37] &quot;thermalCapacityLAI&quot;               &quot;boundaryLayerSize&quot;                &quot;refillMaximumRate&quot;               
+## [40] &quot;subdailyCarbonBalance&quot;            &quot;allowDessication&quot;                 &quot;allowStarvation&quot;                 
+## [43] &quot;sinkLimitation&quot;                   &quot;shrubDynamics&quot;                    &quot;herbDynamics&quot;                    
+## [46] &quot;allocationStrategy&quot;               &quot;phloemConductanceFactor&quot;          &quot;nonSugarConcentration&quot;           
+## [49] &quot;equilibriumOsmoticConcentration&quot;  &quot;minimumRelativeStarchForGrowth&quot;   &quot;constructionCosts&quot;               
+## [52] &quot;senescenceRates&quot;                  &quot;maximumRelativeGrowthRates&quot;       &quot;mortalityMode&quot;                   
+## [55] &quot;mortalityBaselineRate&quot;            &quot;mortalityRelativeSugarThreshold&quot;  &quot;mortalityRWCThreshold&quot;           
+## [58] &quot;recrTreeDBH&quot;                      &quot;recrTreeDensity&quot;                  &quot;ingrowthTreeDBH&quot;                 
+## [61] &quot;ingrowthTreeDensity&quot;              &quot;allowRecruitment&quot;                 &quot;recruitmentMode&quot;                 
+## [64] &quot;allowResprouting&quot;                 &quot;removeEmptyCohorts&quot;               &quot;minimumCohortDensity&quot;            
+## [67] &quot;dynamicallyMergeCohorts&quot;          &quot;seedRain&quot;                         &quot;seedProductionTreeHeight&quot;        
+## [70] &quot;seedProductionShrubHeight&quot;        &quot;probRecr&quot;                         &quot;minTempRecr&quot;                     
+## [73] &quot;minMoistureRecr&quot;                  &quot;minFPARRecr&quot;                      &quot;recrTreeHeight&quot;                  
+## [76] &quot;recrShrubCover&quot;                   &quot;recrShrubHeight&quot;                  &quot;recrTreeZ50&quot;                     
+## [79] &quot;recrShrubZ50&quot;                     &quot;recrTreeZ95&quot;                      &quot;recrShrubZ95&quot;</code></pre>
 <p>Control parameters are employed when initializing vegetation inputs and state variables using functions <code>forest2spwbInput()</code> and <code>forest2growthInput()</code>, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as <code>spwb()</code> or <code>growth()</code>. Function <code>fordyn()</code> is different than the other simulation functions, because the list control parameters is directly passed to the function (see <a href="model-inputs.html#inputstructuresmedfate">2.1.1</a>).</p>
 <p>Even if the list of control parameters is long, not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), and most of them should not be altered from their default values. However, there are a set of parameters that are worth learning:</p>
 <ul>
