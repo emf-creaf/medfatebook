@@ -20,7 +20,13 @@ A target species can recruit on a given year if current conditions for all three
 
 ### Resprouting
 
-Resprouting is a common feature of Mediterranean species. Here resprouting is assumed happen from buds at the stump/stool level after a given disturbance has led to aboveground plant die-back. Resprouting can occur as a response to different disturbances. For example, resprouting occurs after clipping (e.g. if management is applied), after a fire, or after cavitation has led to dessication of above-ground plant organs. There are marked differences in resprouting depending on the disturbance type, and fire is often the most severe disturbance because it includes both defoliation and lethal temperatures [@Pausas2016]. Moreover, resprouting vigor also depends on the size of the plant [@moreira_resprout_2012]. Hence, in our model the density of resprouts depends on the cause underlying the resprouting and on the size of the *parent* plant, but in all cases the resprouts inherit the root system of their parent. Like saplings, resprouts are subject to self-thinning processes before attaining the diameter of ingrowth (see \@ref(selfthinning)).
+Resprouting is a common feature of Mediterranean species. Most, if not all, Mediterranean broadleaved species are able to resprout from buds protected in branches, subterranean structures (e.g. burl, taproot, lateral roots) or in the root collar after a disturbance destroys the aerial part. Yet, some differences in the resprouting ability (i.e. survival) exist regarding the type of disturbance and the species affected. 
+
+In medfate, resprouting is assumed happen from buds at the stump/stool level after a given disturbance has led to aboveground plant die-back. Resprouting can occur as a response to different disturbances. For example, resprouting occurs after clipping (e.g. if management is applied), after a fire, or after cavitation has led to dessication of above-ground plant organs. 
+
+Regarding disturbance type, differences in survivorship through resprouting mostly depends on the intensity of the disturbance experienced, with an increasing occurrence of mortality after disturbances in the following order: *browsing*, *cutting*, *drought* and *fire* [@espelta_resprouting_1999]. Fire is the disturbance that causes greatest mortality, probably because it may physically destroy part of the bud bank due to lethal temperatures or directly charring it [@Pausas2016]. Moreover, resprouting vigor also depends on the size of the plant [@moreira_resprout_2012]. According to different literature sources, the number of resprouts initially produced is approximately 2 per 1 cm2 of stump area [@retana_regeneration_1992; @garciajimenez_contrasting_2017]. Hence, in medfate the final density of resprouts depends on the disturbance that caused resprouting (via survivorship) and on the diameter of the *parent* plant, but in all cases the resprouts inherit the root system of their parent. 
+
+Like saplings originated from seeds, resprouts are subject to self-thinning processes before attaining the diameter of ingrowth (see \@ref(selfthinning)).
 
 ### Forest management
 
@@ -162,7 +168,33 @@ Tree recruitment density, diameter and height are determined by parameters $N_{t
 
 ### Resprouting
 
-Currently, resprouting only occurs in the model if plant cohorts have been **cut** or they died of **desiccation** (future model versions will include resprouting after fire impacts). In other words, resprouting does not occur for baseline mortality, self-thinning of recruits or after plant starvation. The model first determines the density of tree resprouts originated after desiccation of above-ground parts, multiplying the density of desiccated trees by the value of $Resp_{dist}$ of the corresponding species, which should only be non-zero in the case the species has resprouting capacity. If management occurred, the model then estimates the density of resprouts originated after trees were cut, by multiplying the density cut trees by the value of $Resp_{clip}$ of the corresponding species. Tree resprouts have all a starting diameter $DBH_{tree, recr}$ and a height $H_{tree, recr}$, but the root system is the same of the *parent* tree cohort. Analogously to recruitment from seeds, the initial density of tree resprout will decrease during the years after the initial resprouting due to a **self-thinning** process, until $DBH$ reaches $DBH_{tree,ingrowth}$ where $N$ will be $N_{tree,ingrowth}$, as explained in \@ref(selfthinning). 
+Currently, resprouting only occurs in the model if plant cohorts have been **cut**, **burned** or they died of **desiccation** (future model versions will include resprouting after fire impacts). In other words, resprouting does not occur for baseline mortality, self-thinning of recruits or due to starvation.
+
+**Resprouting survivorship**
+
+The model first determines **resprouting survivorship**, which depends on the disturbance type and, in the case of fire, on species identity. Unfortunately, we lack information on the mortality caused in resprouting by cutting or drought for the vast majority of species except for holm oak (*Quercus ilex*). Thus, we suggest applying tentatively to all species the mortality values obtained in different studies for this species: 2.5% after browsing [@espelta_response_2006], 4% after cutting [@retana_regeneration_1992], 5% after drought [@lloret_canopy_2004]. Larger differences among species have been reported for fire [@espelta_post-fire_2012]. This pattern may be linked to inter-specific differences in the size of the bud bank, the degree of bud protection or the amount of stored resources in belowground organs (burl, taproot). Accordingly, default values for survivorship are $Resp_{clip} = 0.04$ (for cutting) and $Resp_{dist} = 0.05$ (for dessication), whereas no default value is given for $Resp_{fire}$. Naturally, the number of surviving trees (stumps) is given by the number of trees affected by the disturbance multiplied by the survivorship rate:
+\begin{equation}
+N_{surv} = N_{mort, dist} \cdot Resp_{dist}
+\end{equation}
+for a generic disturbance, but the same equation would apply for cutting, dessication or fire.
+
+
+**Resprouting vigor**
+
+For those individuals that survive the disturbance event and are able to resprout, the number of resprouts present in a given moment is a matter of the stump area and age. According to different literature sources, the number of resprouts initially produced is approximately 1.82 per 1 cm2 of stump area, but owing to the intra- and inter-individual competition (self-thinning), the number of resprouts will decrease with time following an exponential equation (Retana et al. 1999. Espelta et al. 1999, 2013):
+
+\begin{equation}
+N_{resp} = N_{surv} \cdot SA \cdot 1.82 \cdot 10^{-0.053\cdot x}
+\end{equation}
+
+where $x = 5$ is time in years, $N_{resp}$ is the number of resprouts, $N_{surv}$ is the number of parent trees that survived. 
+
+
+**Initial characteristics and self-thinning**
+
+Tree resprouts have all a starting diameter $DBH_{tree, recr}$ and a height $H_{tree, recr}$, but the root system is the same of the *parent* tree cohort. Analogously to recruitment from seeds, the initial density of tree resprout will decrease during the years after the initial resprouting due to a **self-thinning** process, until $DBH$ reaches $DBH_{tree,ingrowth}$ where $N$ will be $N_{tree,ingrowth}$, as explained in \@ref(selfthinning). 
+
+**Resprouting in shrubs**
 
 In the case of shrub species, the same operations are done, but on cover values instead of density values. Shrub height of resprouts is assumed to be $H_{shrub, recr}$. 
 
