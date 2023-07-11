@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-07-10" />
+<meta name="date" content="2023-07-11" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -476,8 +476,11 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="17.4" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#plantmortality"><i class="fa fa-check"></i><b>17.4</b> Plant mortality</a>
 <ul>
-<li class="chapter" data-level="17.4.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#mortalitythresholds"><i class="fa fa-check"></i><b>17.4.1</b> Plant mortality thresholds</a></li>
-<li class="chapter" data-level="17.4.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#selfthinning"><i class="fa fa-check"></i><b>17.4.2</b> Self-thinning of small trees</a></li>
+<li class="chapter" data-level="17.4.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#selfthinning"><i class="fa fa-check"></i><b>17.4.1</b> Self-thinning of small trees</a></li>
+<li class="chapter" data-level="17.4.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#basalmortality"><i class="fa fa-check"></i><b>17.4.2</b> Basal mortality rates</a></li>
+<li class="chapter" data-level="17.4.3" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#starvationmortality"><i class="fa fa-check"></i><b>17.4.3</b> Mortality due to starvation</a></li>
+<li class="chapter" data-level="17.4.4" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#dessicationmortality"><i class="fa fa-check"></i><b>17.4.4</b> Mortality due to dessication</a></li>
+<li class="chapter" data-level="17.4.5" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#overall-mortality-probability"><i class="fa fa-check"></i><b>17.4.5</b> Overall mortality probability</a></li>
 </ul></li>
 <li class="chapter" data-level="17.5" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#fireseverity"><i class="fa fa-check"></i><b>17.5</b> Fire severity</a>
 <ul>
@@ -879,16 +882,8 @@ In this strategy, increases in leaf area will be scheduled whenever the current 
 </div>
 <div id="plantmortality" class="section level2 hasAnchor" number="17.4">
 <h2><span class="header-section-number">17.4</span> Plant mortality<a href="growthsenescencemortality.html#plantmortality" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="mortalitythresholds" class="section level3 hasAnchor" number="17.4.1">
-<h3><span class="header-section-number">17.4.1</span> Plant mortality thresholds<a href="growthsenescencemortality.html#mortalitythresholds" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Plant cohorts can die from either <em>starvation</em> (if metabolic carbon is exhausted) or <em>dessication</em> (tissue dehydration). When simulating growth with the basic water balance submodel, starvation occurs if <span class="math inline">\(SS_{sapwood} \leq 0\)</span> and, since plant water balance is not explicitly modelled, dessication is determined if <span class="math inline">\(PLC_{stem} \geq 0.5\)</span>. When simulating growth with the advanced water balance submodel, starvation occurs also if <span class="math inline">\(SS_{sapwood} \leq 0\)</span>, but in this case a better indicator of dehydration can be used, the stem symplastic relative water content <span class="math inline">\(RWC_{stem, symp}\)</span>. Dessication is determined in this case if <span class="math inline">\(RWC_{stem, symp} \leq 0.5\)</span>.</p>
-<p><img src="medfatebook_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
-<p><img src="medfatebook_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
-<p><img src="medfatebook_files/figure-html/unnamed-chunk-42-1.png" width="768" /></p>
-<p><img src="medfatebook_files/figure-html/unnamed-chunk-43-1.png" width="768" /></p>
-</div>
-<div id="selfthinning" class="section level3 hasAnchor" number="17.4.2">
-<h3><span class="header-section-number">17.4.2</span> Self-thinning of small trees<a href="growthsenescencemortality.html#selfthinning" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="selfthinning" class="section level3 hasAnchor" number="17.4.1">
+<h3><span class="header-section-number">17.4.1</span> Self-thinning of small trees<a href="growthsenescencemortality.html#selfthinning" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>As explained in the mortality design section (<a href="growthmodelling.html#mortalitydesign">15.1.5</a>), the model implements a mortality process for young individual trees, meant to represent a self-thinning process occurring between trees of small diameter (<span class="math inline">\(DBH_{tree, recr}\)</span>, typically 1 cm) and trees having a diameter corresponding to inclusion as individual in forest inventories (<span class="math inline">\(DBH_{tree,ingrowth}\)</span>, typically 7.5 cm). The aim is to ensure that the tree density is progressively reduced until the tree cohort reaches <span class="math inline">\(DBH_{tree,ingrowth}\)</span>, where the density should be <span class="math inline">\(N_{tree,ingrowth}\)</span>. The following relationship between tree diameter and density is used:
 <span class="math display">\[\begin{equation}
 N = a_{st} \cdot DBH ^{b_{st}}
@@ -906,6 +901,74 @@ a_{st} = \frac{N_{tree, ingrowth}}{DBH_{tree,ingrowth}^{b_{st}}}
 N_{dead,i} = N_i - \min(N_i,  a_{st} \cdot DBH_{i}^{b_{st}})
 \end{equation}\]</span></p>
 <p>Note that the self-thinning process does not distinguish between tree resprouts or trees recruited from seeds.</p>
+</div>
+<div id="basalmortality" class="section level3 hasAnchor" number="17.4.2">
+<h3><span class="header-section-number">17.4.2</span> Basal mortality rates<a href="growthsenescencemortality.html#basalmortality" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Adult trees (<span class="math inline">\(DBH &gt; 7.5\)</span> cm) and shrubs die at a basal rate due to unspecific causes. For shrubs, the basal rate is always a species-specific constant (<span class="math inline">\(P_{mort,base}\)</span>). For trees, the basal rate can alternatively depend on the degree of (symmetric) competition, which is measured using the tree basal area <span class="math inline">\(BA\)</span> (<span class="math inline">\(m^2\cdot ha^{-1}\)</span>) of the stand, through a simple survival logistic model:</p>
+<p><span class="math display">\[\begin{equation}
+P_{surv,base} =  logit^{-1}(\beta_{surv, 0} + \beta_{surv,1} \cdot \sqrt{BA}) = \frac{\exp(\beta_{surv, 0} + \beta_{surv,1} \cdot \sqrt{BA})}{1 + \exp(\beta_{surv, 0} + \beta_{surv,1} \cdot \sqrt{BA})}
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\beta_{surv, 0}\)</span> and <span class="math inline">\(\beta_{surv, 1}\)</span> are species-specific coefficients using repeated forest inventory plot data.</p>
+</div>
+<div id="starvationmortality" class="section level3 hasAnchor" number="17.4.3">
+<h3><span class="header-section-number">17.4.3</span> Mortality due to starvation<a href="growthsenescencemortality.html#starvationmortality" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The starvation stress indicator is <span class="math inline">\(ST^{sapwood}_{relative}\)</span>, the starch concentration in sapwood relative to the equilibrium value:
+<span class="math display">\[\begin{equation}
+ST^{sapwood}_{relative} = \frac{ST_{sapwood}}{ST^{sapwood}_{equilibrium}}
+\end{equation}\]</span>
+where <span class="math inline">\(ST_{sapwood}\)</span> (<span class="math inline">\(\,mol\,gluc\,\cdot l^{-1}\)</span>) is the current starch concentration in sapwood and <span class="math inline">\(ST^{sapwood}_{equilibrium}\)</span> is the equilibrium concentration (by default <span class="math inline">\(ST^{sapwood}_{equilibrium} = 0.35\,mol\,gluc\,\cdot l^{-1}\)</span>. Assuming that a threshold of relative starch concentration (<span class="math inline">\(ST_{relative}^{thresh}\)</span>) corresponds to 50% annual mortality due to starvation, a logistic sigmoidal function is used to estimate the probability of annual starvation from a given <span class="math inline">\(ST^{sapwood}_{relative}\)</span>:
+<span class="math display">\[\begin{equation}
+P_{starv, annual} = 1.0 - \frac{\exp(40 \cdot (ST^{sapwood}_{relative}  - ST_{relative}^{thresh}))}{1.0 + \exp(40 \cdot (ST^{sapwood}_{relative}  - ST_{relative}^{thresh}))}
+\end{equation}\]</span></p>
+<p>Since the model operates at the daily temporal resolution, <span class="math inline">\(P_{starv, annual}\)</span> is re-expressed as a daily probability using:</p>
+<p><span class="math display">\[\begin{equation}
+P_{starv, daily} = 1.0 - \exp(\log(1.0 - P_{starv, annual})/356)
+\end{equation}\]</span></p>
+<p>Assuming a relative threshold <span class="math inline">\(ST_{relative}^{thresh} = 0.4\)</span>, the figure below illustrates the shape of the sigmoidal function (top) and the corresponding daily probability function.</p>
+<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-40"></span>
+<img src="medfatebook_files/figure-html/unnamed-chunk-40-1.png" alt="Annual (top) and daily (bottom) probability of starvation as a function of sapwood starch concentration relative to its equilibrium value." width="768" />
+<p class="caption">
+Figure 17.1: Annual (top) and daily (bottom) probability of starvation as a function of sapwood starch concentration relative to its equilibrium value.
+</p>
+</div>
+</div>
+<div id="dessicationmortality" class="section level3 hasAnchor" number="17.4.4">
+<h3><span class="header-section-number">17.4.4</span> Mortality due to dessication<a href="growthsenescencemortality.html#dessicationmortality" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>As explained in the section <a href="growthmodelling.html#mortalitydesign">15.1.5</a>, the dessication stress indicator (<span class="math inline">\(D_{stem}\)</span>) is the maximum of relative water content in the stem (<span class="math inline">\(RWC_{stem}\)</span>) and relative hydraulic conductance in the stem, i.e. the complement of <span class="math inline">\(PLC_{stem}\)</span></p>
+<p><span class="math display">\[\begin{equation}
+D_{stem} = \max(RWC_{stem}, 1.0 - PLC_{stem})
+\end{equation}\]</span></p>
+<p>Assuming that a threshold of relative water content (<span class="math inline">\(RWC_{thresh}\)</span>) corresponds to 50% annual mortality due to dessication, its probability is estimated analogously to starvation. First, a logistic sigmoidal function is used to estimate the probability of annual dessication from a given <span class="math inline">\(D_{stem}\)</span> value:</p>
+<p><span class="math display">\[\begin{equation}
+P_{dessic, annual} = 1.0 - \frac{\exp(40 \cdot (D_{stem}  - RWC_{thresh}))}{1.0 + \exp(40 \cdot (D_{stem}  - RWC_{thresh}))}
+\end{equation}\]</span></p>
+<p>Since the model operates at the daily temporal resolution, <span class="math inline">\(P_{dessic, annual}\)</span> is re-expressed as a daily probability using:</p>
+<p><span class="math display">\[\begin{equation}
+P_{dessic, daily} = 1.0 - \exp(\log(1.0 - P_{dessic, annual})/356)
+\end{equation}\]</span></p>
+Assuming a relative threshold <span class="math inline">\(RWC_{thresh} = 0.4\)</span>, the figure below illustrates the shape of the sigmoidal function (top) and the corresponding daily probability function.
+<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-41"></span>
+<img src="medfatebook_files/figure-html/unnamed-chunk-41-1.png" alt="Annual (top) and daily (bottom) probability of dessication as a function of the maximum value of stem relative water content and stem relative hydraulic conductance." width="768" />
+<p class="caption">
+Figure 17.2: Annual (top) and daily (bottom) probability of dessication as a function of the maximum value of stem relative water content and stem relative hydraulic conductance.
+</p>
+</div>
+<p><strong>Uncertainty of stem pressure-volume parameters</strong></p>
+<p>As explained in <a href="growthmodelling.html#mortalitydesign">15.1.5</a>, using stem relative water content as indicator of dessication has the inconvenient that the parameters <span class="math inline">\(\pi_{0,stem}\)</span> and <span class="math inline">\(\epsilon_{stem}\)</span> specifying the pressure-volume curve are often not known, so that estimates have to come from wood density (see section <a href="modelparametrization.html#inputationPV">A.3.12</a>). The following figure shows the water potential corresponding to the dessication threshold for species with different wood density:</p>
+<p><img src="medfatebook_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+<p>If the relationship between wood density and the stem pressure-volume curve (<a href="modelparametrization.html#inputationPV">A.3.12</a>) does not hold for a particular species the mortality rate may be under or overestimated. Here an example would be <em>Cistus albidus</em>, which has a low wood density but high dessication resistance. This is illustrated when we draw a scatter plot between the water potential corresponding to 60% stem PLC (i.e. 40% stem relative hydraulic conductance) against the water potential corresponding to 40% stem RWC:</p>
+<p><img src="medfatebook_files/figure-html/unnamed-chunk-43-1.png" width="672" /></p>
+<p>As explained in <a href="growthmodelling.html#mortalitydesign">15.1.5</a>, one can avoid the potential uncertainty in dessication mortality by defining the dessication stress indicator (<span class="math inline">\(D_{stem}\)</span>) as the maximum of relative water content in the stem (<span class="math inline">\(RWC_{stem}\)</span>) and relative hydraulic conductance in the stem. When we do so, the following curves are obtained for each of the previous species:</p>
+<p><img src="medfatebook_files/figure-html/unnamed-chunk-44-1.png" width="768" /></p>
+<p>It is obvious in the former figure that using <span class="math inline">\(D_{stem}\)</span> is indicator results in curves that are not continuous in all their range. However, we prefer this inconvenient to the potential overestimation of mortality due to an uncertainty in the pressure-volume curve parameters.</p>
+</div>
+<div id="overall-mortality-probability" class="section level3 hasAnchor" number="17.4.5">
+<h3><span class="header-section-number">17.4.5</span> Overall mortality probability<a href="growthsenescencemortality.html#overall-mortality-probability" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Every day the model determines for woody cohorts the overall probability of mortality (<span class="math inline">\(P_{mort, daily}\)</span>) as the maximum of the basal probability, starvation probability and dessication probability:</p>
+<p><span class="math display">\[\begin{equation}
+P_{mort, daily} = \max( P_{mort, base},\, P_{starv, daily}, \, P_{dessic, daily})
+\end{equation}\]</span></p>
+<p>At this point <span class="math inline">\(P_{mort, daily}\)</span> may be used deterministically (i.e., as a proportion of <span class="math inline">\(N\)</span> to kill) or stochastically (i.e. throwing a random number between 0 and 1 to determine the mortality event).</p>
 </div>
 </div>
 <div id="fireseverity" class="section level2 hasAnchor" number="17.5">

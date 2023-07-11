@@ -210,9 +210,150 @@ While leaf area target depends on the allocation strategy, the target of fine ro
 
 ## Plant mortality {#plantmortality}
 
-### Plant mortality thresholds {#mortalitythresholds}
+### Self-thinning of small trees {#selfthinning}
 
-Plant cohorts can die from either *starvation* (if metabolic carbon is exhausted) or *dessication* (tissue dehydration). When simulating growth with the basic water balance submodel, starvation occurs if $SS_{sapwood} \leq 0$ and, since plant water balance is not explicitly modelled, dessication is determined if $PLC_{stem} \geq 0.5$.  When simulating growth with the advanced water balance submodel, starvation occurs also if $SS_{sapwood} \leq 0$, but in this case a better indicator of dehydration can be used, the stem symplastic relative water content $RWC_{stem, symp}$. Dessication is determined in this case if $RWC_{stem, symp} \leq 0.5$. 
+As explained in the mortality design section (\@ref(mortalitydesign)), the model implements a mortality process for young individual trees, meant to represent a self-thinning process occurring between trees of small diameter ($DBH_{tree, recr}$, typically 1 cm) and trees having a diameter  corresponding to inclusion as individual in forest inventories ($DBH_{tree,ingrowth}$, typically 7.5 cm). The aim is to ensure that the tree density is progressively reduced until the tree cohort reaches $DBH_{tree,ingrowth}$, where the density should be $N_{tree,ingrowth}$. The following relationship between tree diameter and density is used: 
+\begin{equation}
+N = a_{st} \cdot DBH ^{b_{st}}
+\end{equation}
+where $a_{st}$ and $b_{st}$ are parameters regulating the speed of the self-thinning process. Note that if we know the diameter and density of recruitment (i.e. $DBH_{tree,recr}$ and $N_{tree,recr}$), as well as $N_{tree,ingrowth}$, the density we want to ensure when the tree reaches $DBH_{tree,ingrowth}$, the self-thinning curve is completely determined. Hence, we can estimate $b_{st}$ using:
+\begin{equation}
+b_{st} = \frac{log(N_{tree,ingrowth}/N_{tree,recr})}{log(DBH_{tree,ingrowth}/DBH_{tree,recr})}
+\end{equation}
+whereas $a_{st}$ can be estimated using:
+\begin{equation}
+ a_{st} = \frac{N_{tree, ingrowth}}{DBH_{tree,ingrowth}^{b_{st}}}
+\end{equation}
+
+Once we know the parameters of the self-thinning curve, we can determine the maximum cohort density allowed for any cohort of diameter $DBH_i$. If the tree cohort has density $N_i$, the density decrease due to self-thinning mortality can be estimated using:
+
+\begin{equation}
+N_{dead,i} = N_i - \min(N_i,  a_{st} \cdot DBH_{i}^{b_{st}})
+\end{equation}
+
+Note that the self-thinning process does not distinguish between tree resprouts or trees recruited from seeds.
+
+
+### Basal mortality rates {#basalmortality}
+
+Adult trees ($DBH > 7.5$ cm) and shrubs die at a basal rate due to unspecific causes. For shrubs, the basal rate is always a species-specific constant ($P_{mort,base}$). For trees, the basal rate can alternatively depend on the degree of (symmetric) competition, which is measured using the tree basal area $BA$ ($m^2\cdot ha^{-1}$) of the stand, through a simple survival logistic model:
+
+\begin{equation}
+P_{surv,base} =  logit^{-1}(\beta_{surv, 0} + \beta_{surv,1} \cdot \sqrt{BA}) = \frac{\exp(\beta_{surv, 0} + \beta_{surv,1} \cdot \sqrt{BA})}{1 + \exp(\beta_{surv, 0} + \beta_{surv,1} \cdot \sqrt{BA})}
+\end{equation}
+
+where $\beta_{surv, 0}$ and $\beta_{surv, 1}$ are species-specific coefficients using repeated forest inventory plot data. 
+
+### Mortality due to starvation {#starvationmortality}
+
+The starvation stress indicator is $ST^{sapwood}_{relative}$, the starch concentration in sapwood relative to the equilibrium value:
+\begin{equation}
+ST^{sapwood}_{relative} = \frac{ST_{sapwood}}{ST^{sapwood}_{equilibrium}}
+\end{equation}
+where $ST_{sapwood}$ ($\,mol\,gluc\,\cdot l^{-1}$) is the current starch concentration in sapwood and $ST^{sapwood}_{equilibrium}$ is the equilibrium concentration (by default $ST^{sapwood}_{equilibrium} = 0.35\,mol\,gluc\,\cdot l^{-1}$. Assuming that a threshold of relative starch concentration ($ST_{relative}^{thresh}$) corresponds to 50\% annual mortality due to starvation, a logistic sigmoidal function is used to estimate the probability of annual starvation from a given $ST^{sapwood}_{relative}$:
+\begin{equation}
+P_{starv, annual} = 1.0 - \frac{\exp(40 \cdot (ST^{sapwood}_{relative}  - ST_{relative}^{thresh}))}{1.0 + \exp(40 \cdot (ST^{sapwood}_{relative}  - ST_{relative}^{thresh}))}
+\end{equation}
+
+Since the model operates at the daily temporal resolution, $P_{starv, annual}$ is re-expressed as a daily probability using:
+
+\begin{equation}
+P_{starv, daily} = 1.0 - \exp(\log(1.0 - P_{starv, annual})/356)
+\end{equation}
+
+Assuming a relative threshold $ST_{relative}^{thresh} = 0.4$, the figure below illustrates the shape of the sigmoidal function (top) and the corresponding daily probability function.
+
+```{r, fig = TRUE, fig.height=6, fig.width=8, echo = FALSE, fig.cap="Annual (top) and daily (bottom) probability of starvation as a function of sapwood starch concentration relative to its equilibrium value."}
+df_NSC <- data.frame(NSC_rel = seq(100, 0.0, by = -0.01))
+df_NSC$Pstarvation = NA
+for(i in 1:nrow(df_NSC)) {
+  x <- (df_NSC$NSC_rel[i]/100 - 0.4)
+  fact <- 40
+  df_NSC$Pstarvation_annual[i] = 1 - exp(fact*x)/(1+exp(fact*x))
+  df_NSC$Pstarvation_daily[i] = 1.0 - exp(log(1.0 - df_NSC$Pstarvation_annual[i])/356.0)
+}
+
+g1 <- ggplot(df_NSC)+
+  geom_line(aes(x=NSC_rel, y = Pstarvation_annual), size = 1)+
+  xlab("Percent of equilibrium starch concentration (%)")+ ylab("Annual starvation probability [0-1]")+
+  geom_vline(xintercept = 40, linetype = "dashed")+
+  scale_x_reverse()+
+  theme_bw()
+g2 <- ggplot(df_NSC)+
+  geom_line(aes(x=NSC_rel, y = Pstarvation_daily), size = 1)+
+  xlab("Percent of equilibrium starch concentration (%)")+ ylab("Daily starvation probability [0-1]")+
+  geom_vline(xintercept = 40, linetype = "dashed")+
+  scale_x_reverse()+
+  theme_bw()
+plot_grid(g1, g2, nrow = 2)
+```
+
+
+
+### Mortality due to dessication {#dessicationmortality}
+
+As explained in the section \@ref(mortalitydesign), the dessication stress indicator ($D_{stem}$) is the maximum of relative water content in the stem ($RWC_{stem}$) and relative hydraulic conductance in the stem, i.e. the complement of $PLC_{stem}$
+
+\begin{equation}
+D_{stem} = \max(RWC_{stem}, 1.0 - PLC_{stem})
+\end{equation}
+
+Assuming that a threshold of relative water content ($RWC_{thresh}$) corresponds to 50\% annual mortality due to dessication, its probability is estimated analogously to starvation. First, a logistic sigmoidal function is used to estimate the probability of annual dessication from a given $D_{stem}$ value:
+
+\begin{equation}
+P_{dessic, annual} = 1.0 - \frac{\exp(40 \cdot (D_{stem}  - RWC_{thresh}))}{1.0 + \exp(40 \cdot (D_{stem}  - RWC_{thresh}))}
+\end{equation}
+
+Since the model operates at the daily temporal resolution, $P_{dessic, annual}$ is re-expressed as a daily probability using:
+
+\begin{equation}
+P_{dessic, daily} = 1.0 - \exp(\log(1.0 - P_{dessic, annual})/356)
+\end{equation}
+
+Assuming a relative threshold $RWC_{thresh} = 0.4$, the figure below illustrates the shape of the sigmoidal function (top) and the corresponding daily probability function.
+```{r, fig = TRUE, echo = FALSE, fig.width=8, fig.height=6, fig.cap="Annual (top) and daily (bottom) probability of dessication as a function of the maximum value of stem relative water content and stem relative hydraulic conductance."}
+l <- vector("list", nrow(df))
+for(is in 1:nrow(df)) {
+  df_psi <- data.frame(Psi = seq(-1.0, -12.0, by = -0.01))
+  df_psi$Name = df$Name[is]
+  df_psi$RWC = NA
+  df_psi$PLC = NA
+  df_psi$x = NA
+  df_psi$Pdessication_annual = NA
+  df_psi$Pdessication_daily = NA
+  for(i in 1:nrow(df_psi)) {
+    df_psi$RWC[i] = moisture_symplasticRWC(df_psi$Psi[i], df$StemPI0[is], df$StemEPS[is])*100
+    df_psi$PLC[i] = 100 - hydraulics_xylemConductance(df_psi$Psi[i], 1.0, df$VCstem_c[is], df$VCstem_d[is])*100
+    df_psi$x[i] <- max(df_psi$RWC[i], 100 - df_psi$PLC[i])
+    y <- (df_psi$x[i]/100 - 0.4)
+    fact <- 40
+    df_psi$Pdessication_annual[i] = 1 - exp(fact*y)/(1+exp(fact*y))
+    df_psi$Pdessication_daily[i] = 1.0 - exp(log(1.0 - df_psi$Pdessication_annual[i])/356.0)
+  }
+  l[[is]] <- df_psi
+}
+df3 <- dplyr::bind_rows(l)
+
+g1 <- ggplot(df3)+
+  geom_line(aes(x=x, y = Pdessication_annual), size = 1)+
+  xlab("Maximum of stem relative water content and stem relative conductance (%)")+ ylab("Annual dessication probability [0-1]")+
+  geom_vline(xintercept = 40, linetype = "dashed")+
+  scale_color_brewer( type ="qual", palette = "Set1")+
+  scale_x_reverse()+
+  theme_bw()
+g2 <- ggplot(df3)+
+  geom_line(aes(x=x, y = Pdessication_daily), size = 1)+
+  xlab("Maximum of stem relative water content and stem relative conductance  (%)")+ ylab("Daily dessication probability [0-1]")+
+  scale_color_brewer( type ="qual", palette = "Set1")+
+  geom_vline(xintercept = 40, linetype = "dashed")+
+  scale_x_reverse()+
+  theme_bw()
+plot_grid(g1, g2, nrow = 2, ncol = 1)
+```
+
+**Uncertainty of stem pressure-volume parameters**
+
+As explained in \@ref(mortalitydesign), using stem relative water content as indicator of dessication has the inconvenient that the parameters $\pi_{0,stem}$ and $\epsilon_{stem}$ specifying the pressure-volume curve are often not known, so that estimates have to come from wood density (see section \@ref(inputationPV)). The following figure shows the water potential corresponding to the dessication threshold for species with different wood density:
 
 ```{r, fig=TRUE, echo=FALSE, warning = FALSE}
 df <- SpParamsMED[SpParamsMED$Name %in% c("Abies alba","Cistus albidus", "Juniperus communis","Populus spp.", "Quercus ilex", "Quercus suber", "Quercus pubescens", "Pinus halepensis", "Pinus sylvestris"), c("Name", "StemPI0", "StemEPS", "WoodDensity", "VCstem_c", "VCstem_d")]
@@ -238,6 +379,8 @@ ggplot()+
   theme_bw()
 ```
 
+If the relationship between wood density and the stem pressure-volume curve (\@ref(inputationPV)) does not hold for a particular species the mortality rate may be under or overestimated. Here an example would be *Cistus albidus*, which has a low wood density but high dessication resistance. This is illustrated when we draw a scatter plot between the water potential corresponding to 60\% stem PLC (i.e. 40\% stem relative hydraulic conductance) against the water potential corresponding to 40\% stem RWC:
+
 ```{r, echo = FALSE}
 ggplot()+
   geom_point(aes(x=Psi_PLC60, y = Psi_RWC40), data = df)+
@@ -247,108 +390,36 @@ ggplot()+
   theme_bw()
 ```
 
+As explained in \@ref(mortalitydesign), one can avoid the potential uncertainty in dessication mortality by defining the dessication stress indicator ($D_{stem}$) as the maximum of relative water content in the stem ($RWC_{stem}$) and relative hydraulic conductance in the stem. When we do so, the following curves are obtained for each of the previous species:
 
-```{r, fig = TRUE, echo = FALSE, fig.width=8, fig.height=14}
-l <- vector("list", nrow(df))
-for(is in 1:nrow(df)) {
-  df_psi <- data.frame(Psi = seq(-1.0, -12.0, by = -0.01))
-  df_psi$Name = df$Name[is]
-  df_psi$RWC = NA
-  df_psi$PLC = NA
-  df_psi$x = NA
-  df_psi$Pdessication_annual = NA
-  df_psi$Pdessication_daily = NA
-  for(i in 1:nrow(df_psi)) {
-    df_psi$RWC[i] = moisture_symplasticRWC(df_psi$Psi[i], df$StemPI0[is], df$StemEPS[is])*100
-    df_psi$PLC[i] = 100 - hydraulics_xylemConductance(df_psi$Psi[i], 1.0, df$VCstem_c[is], df$VCstem_d[is])*100
-    df_psi$x[i] <- max(df_psi$RWC[i], 100 - df_psi$PLC[i])
-    y <- (df_psi$x[i]/100 - 0.4)
-    fact <- 40
-    df_psi$Pdessication_annual[i] = 1 - exp(fact*y)/(1+exp(fact*y))
-    df_psi$Pdessication_daily[i] = 1.0 - exp(log(1.0 - df_psi$Pdessication_annual[i])/356.0)
-  }
-  l[[is]] <- df_psi
-}
-df3 <- dplyr::bind_rows(l)
+```{r, fig = TRUE, echo = FALSE, fig.width=8, fig.height=7}
 
-g1 <- ggplot(df3)+
-  geom_line(aes(x=x, y = Pdessication_annual), size = 1)+
-  xlab("Maximum of relative water content and relative stem conductance (%)")+ ylab("Annual dessication probability [0-1]")+
-  geom_vline(xintercept = 40, linetype = "dashed")+
-  scale_color_brewer( type ="qual", palette = "Set1")+
-  scale_x_reverse()+
-  theme_bw()
-g2 <- ggplot(df3)+
-  geom_line(aes(x=x, y = Pdessication_daily), size = 1)+
-  xlab("Maximum of relative water content and relative stem conductance  (%)")+ ylab("Daily dessication probability [0-1]")+
-  scale_color_brewer( type ="qual", palette = "Set1")+
-  geom_vline(xintercept = 40, linetype = "dashed")+
-  scale_x_reverse()+
-  theme_bw()
 g3 <- ggplot(df3)+
   geom_line(aes(x=Psi, y = Pdessication_annual, col = Name), size = 1)+
   xlab("Stem water potential (MPa)")+ ylab("Annual dessication probability [0-1]")+
   scale_color_brewer("", type ="qual", palette = "Set1")+
   scale_x_reverse()+
-  theme_bw()+ theme(legend.position = c(0.87, 0.5))
+  theme_bw()+ theme(legend.position = c(0.87, 0.4))
 g4 <- ggplot(df3)+
   geom_line(aes(x=Psi, y = Pdessication_daily, col = Name), size = 1)+
   xlab("Stem water potential (MPa)")+ ylab("Daily dessication probability [0-1]")+
   scale_color_brewer("", type ="qual", palette = "Set1")+
   scale_x_reverse()+
   theme_bw()+theme(legend.position = "none")
-plot_grid(g1, g2, g3, g4, nrow = 4, ncol = 1)
+plot_grid(g3, g4, nrow = 2, ncol = 1)
 ```
 
+It is obvious in the former figure that using $D_{stem}$ is indicator results in curves that are not continuous in all their range. However, we prefer this inconvenient to the potential overestimation of mortality due to an uncertainty in the pressure-volume curve parameters.
 
-```{r, fig = TRUE, fig.height=5, fig.width=8, echo = FALSE}
-df_NSC <- data.frame(NSC_rel = seq(100, 0.0, by = -0.01))
-df_NSC$Pstarvation = NA
-for(i in 1:nrow(df_NSC)) {
-  # pday = mortality_dailyProbability(0.00001, stressValue = df_NSC$NSC_rel[i]/100, stressThreshold = 0.3)
-  x <- (df_NSC$NSC_rel[i]/100 - 0.3)
-  fact <- 40
-  df_NSC$Pstarvation_annual[i] = 1 - exp(fact*x)/(1+exp(fact*x))
-  df_NSC$Pstarvation_daily[i] = 1.0 - exp(log(1.0 - df_NSC$Pstarvation_annual[i])/356.0)
-}
+### Overall mortality probability
 
-g1 <- ggplot(df_NSC)+
-  geom_line(aes(x=NSC_rel, y = Pstarvation_annual), size = 1)+
-  xlab("Percent of maximum starch capacity (%)")+ ylab("Annual starvation probability [0-1]")+
-  geom_vline(xintercept = 30, linetype = "dashed")+
-  scale_x_reverse()+
-  theme_bw()
-g2 <- ggplot(df_NSC)+
-  geom_line(aes(x=NSC_rel, y = Pstarvation_daily), size = 1)+
-  xlab("Percent of maximum starch capacity (%)")+ ylab("Daily starvation probability [0-1]")+
-  geom_vline(xintercept = 30, linetype = "dashed")+
-  scale_x_reverse()+
-  theme_bw()
-plot_grid(g1, g2, nrow = 2)
-```
-
-### Self-thinning of small trees {#selfthinning}
-
-As explained in the mortality design section (\@ref(mortalitydesign)), the model implements a mortality process for young individual trees, meant to represent a self-thinning process occurring between trees of small diameter ($DBH_{tree, recr}$, typically 1 cm) and trees having a diameter  corresponding to inclusion as individual in forest inventories ($DBH_{tree,ingrowth}$, typically 7.5 cm). The aim is to ensure that the tree density is progressively reduced until the tree cohort reaches $DBH_{tree,ingrowth}$, where the density should be $N_{tree,ingrowth}$. The following relationship between tree diameter and density is used: 
-\begin{equation}
-N = a_{st} \cdot DBH ^{b_{st}}
-\end{equation}
-where $a_{st}$ and $b_{st}$ are parameters regulating the speed of the self-thinning process. Note that if we know the diameter and density of recruitment (i.e. $DBH_{tree,recr}$ and $N_{tree,recr}$), as well as $N_{tree,ingrowth}$, the density we want to ensure when the tree reaches $DBH_{tree,ingrowth}$, the self-thinning curve is completely determined. Hence, we can estimate $b_{st}$ using:
-\begin{equation}
-b_{st} = \frac{log(N_{tree,ingrowth}/N_{tree,recr})}{log(DBH_{tree,ingrowth}/DBH_{tree,recr})}
-\end{equation}
-whereas $a_{st}$ can be estimated using:
-\begin{equation}
- a_{st} = \frac{N_{tree, ingrowth}}{DBH_{tree,ingrowth}^{b_{st}}}
-\end{equation}
-
-Once we know the parameters of the self-thinning curve, we can determine the maximum cohort density allowed for any cohort of diameter $DBH_i$. If the tree cohort has density $N_i$, the density decrease due to self-thinning mortality can be estimated using:
+Every day the model determines for woody cohorts the overall probability of mortality ($P_{mort, daily}$) as the maximum of the basal probability, starvation probability and dessication probability:
 
 \begin{equation}
-N_{dead,i} = N_i - \min(N_i,  a_{st} \cdot DBH_{i}^{b_{st}})
+P_{mort, daily} = \max( P_{mort, base},\, P_{starv, daily}, \, P_{dessic, daily})
 \end{equation}
 
-Note that the self-thinning process does not distinguish between tree resprouts or trees recruited from seeds.
+At this point $P_{mort, daily}$ may be used deterministically (i.e., as a proportion of $N$ to kill) or stochastically (i.e. throwing a random number between 0 and 1 to determine the mortality event).
 
 ## Fire severity {#fireseverity}
 
