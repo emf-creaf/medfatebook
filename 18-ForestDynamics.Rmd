@@ -172,7 +172,7 @@ Currently, resprouting only occurs in the model if plant cohorts have been **cut
 
 **Resprouting survivorship**
 
-The model first determines **resprouting survivorship**, which depends on the disturbance type and, in the case of fire, on species identity. Unfortunately, we lack information on the mortality caused in resprouting by cutting or drought for the vast majority of species except for holm oak (*Quercus ilex*). Thus, we suggest applying tentatively to all species the mortality values obtained in different studies for this species: 2.5% after browsing [@espelta_response_2006], 4% after cutting [@retana_regeneration_1992], 5% after drought [@lloret_canopy_2004]. Larger differences among species have been reported for fire [@espelta_post-fire_2012]. This pattern may be linked to inter-specific differences in the size of the bud bank, the degree of bud protection or the amount of stored resources in belowground organs (burl, taproot). Accordingly, default values for survivorship are $Resp_{clip} = 0.04$ (for cutting) and $Resp_{dist} = 0.05$ (for dessication), whereas no default value is given for $Resp_{fire}$. Naturally, the number of surviving trees (stumps) is given by the number of trees affected by the disturbance multiplied by the survivorship rate:
+The model first determines **resprouting survivorship**, which depends on the disturbance type and, in the case of fire, on species identity. Unfortunately, we lack information on the mortality caused in resprouting by cutting or drought for the vast majority of species except for holm oak (*Quercus ilex*). Thus, we suggest applying tentatively to all species the mortality values obtained in different studies for this species: 2.5% after browsing [@espelta_response_2006], 4% after cutting [@retana_regeneration_1992], 5% after drought [@lloret_canopy_2004]. Larger differences among species have been reported for fire [@espelta_post-fire_2012]. This pattern may be linked to inter-specific differences in the size of the bud bank, the degree of bud protection or the amount of stored resources in belowground organs (burl, taproot). Accordingly, default values for survivorship are $Resp_{clip} = 0.96$ (for cutting) and $Resp_{dist} = 0.95$ (for dessication), whereas no default value is given for $Resp_{fire}$. Naturally, the number of surviving trees (stumps) is given by the number of trees affected by the disturbance multiplied by the survivorship rate:
 \begin{equation}
 N_{surv} = N_{mort, dist} \cdot Resp_{dist}
 \end{equation}
@@ -184,10 +184,10 @@ for a generic disturbance, but the same equation would apply for cutting, dessic
 For those individuals that survive the disturbance event and are able to resprout, the number of resprouts present in a given moment is a matter of the stump area and age. According to different literature sources, the number of resprouts initially produced is approximately 1.82 per 1 cm2 of stump area, but owing to the intra- and inter-individual competition (self-thinning), the number of resprouts will decrease with time following an exponential equation (Retana et al. 1999. Espelta et al. 1999, 2013):
 
 \begin{equation}
-N_{resp} = N_{surv} \cdot SA \cdot 1.82 \cdot 10^{-0.053\cdot x}
+N_{resp} = N_{surv} \cdot \pi \cdot (DBH/2)^2 \cdot 1.82 \cdot 10^{-0.053\cdot x}
 \end{equation}
 
-where $x = 5$ is time in years, $N_{resp}$ is the number of resprouts, $N_{surv}$ is the number of parent trees that survived. 
+where $DBH$ is diameter at breast height of the *parent* tree cohort, in cm, $x = 5$ is time in years, $N_{resp}$ is the number of resprouts, $N_{surv}$ is the number of parent trees that survived. 
 
 
 **Initial characteristics and self-thinning**

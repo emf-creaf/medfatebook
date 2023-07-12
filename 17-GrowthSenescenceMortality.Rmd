@@ -310,6 +310,18 @@ Since the model operates at the daily temporal resolution, $P_{dessic, annual}$ 
 P_{dessic, daily} = 1.0 - \exp(\log(1.0 - P_{dessic, annual})/356)
 \end{equation}
 
+```{r, echo = FALSE}
+df <- SpParamsMED[SpParamsMED$Name %in% c("Abies alba","Cistus albidus", "Juniperus communis","Populus spp.", "Quercus ilex", "Quercus suber", "Quercus pubescens", "Pinus halepensis", "Pinus sylvestris"), c("Name", "StemPI0", "StemEPS", "WoodDensity", "VCstem_c", "VCstem_d")]
+df$StemPI0 =  0.52-4.16*df$WoodDensity
+df$StemEPS =  sqrt(1.02*exp(8.5*df$WoodDensity)-2.89)
+df$Psi_RWC40 = NA
+df$Psi_PLC60 = NA
+for(i in 1:nrow(df)) {
+  df$Psi_RWC40[i] = moisture_symplasticPsi(0.4, df$StemPI0[i], df$StemEPS[i])
+  df$Psi_PLC60[i] = hydraulics_xylemPsi(0.4, 1.0, df$VCstem_c[i], df$VCstem_d[i])
+}
+```
+
 Assuming a relative threshold $RWC_{thresh} = 0.4$, the figure below illustrates the shape of the sigmoidal function (top) and the corresponding daily probability function.
 ```{r, fig = TRUE, echo = FALSE, fig.width=8, fig.height=6, fig.cap="Annual (top) and daily (bottom) probability of dessication as a function of the maximum value of stem relative water content and stem relative hydraulic conductance."}
 l <- vector("list", nrow(df))
@@ -356,15 +368,6 @@ plot_grid(g1, g2, nrow = 2, ncol = 1)
 As explained in \@ref(mortalitydesign), using stem relative water content as indicator of dessication has the inconvenient that the parameters $\pi_{0,stem}$ and $\epsilon_{stem}$ specifying the pressure-volume curve are often not known, so that estimates have to come from wood density (see section \@ref(inputationPV)). The following figure shows the water potential corresponding to the dessication threshold for species with different wood density:
 
 ```{r, fig=TRUE, echo=FALSE, warning = FALSE}
-df <- SpParamsMED[SpParamsMED$Name %in% c("Abies alba","Cistus albidus", "Juniperus communis","Populus spp.", "Quercus ilex", "Quercus suber", "Quercus pubescens", "Pinus halepensis", "Pinus sylvestris"), c("Name", "StemPI0", "StemEPS", "WoodDensity", "VCstem_c", "VCstem_d")]
-df$StemPI0 =  0.52-4.16*df$WoodDensity
-df$StemEPS =  sqrt(1.02*exp(8.5*df$WoodDensity)-2.89)
-df$Psi_RWC40 = NA
-df$Psi_PLC60 = NA
-for(i in 1:nrow(df)) {
-  df$Psi_RWC40[i] = moisture_symplasticPsi(0.4, df$StemPI0[i], df$StemEPS[i])
-  df$Psi_PLC60[i] = hydraulics_xylemPsi(0.4, 1.0, df$VCstem_c[i], df$VCstem_d[i])
-}
 WD = seq(0.15, 1, by=.01)
 psi_lethal04 = rep(NA, length(WD))
 for(i in 1:length(WD)) {
