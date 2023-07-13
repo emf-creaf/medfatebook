@@ -242,7 +242,7 @@ Adult trees ($DBH > 7.5$ cm) and shrubs die at a basal rate due to unspecific ca
 P_{surv,base} =  logit^{-1}(\beta_{surv, 0} + \beta_{surv,1} \cdot \sqrt{BA}) = \frac{\exp(\beta_{surv, 0} + \beta_{surv,1} \cdot \sqrt{BA})}{1 + \exp(\beta_{surv, 0} + \beta_{surv,1} \cdot \sqrt{BA})}
 \end{equation}
 
-where $\beta_{surv, 0}$ and $\beta_{surv, 1}$ are species-specific coefficients using repeated forest inventory plot data. 
+where $\beta_{surv, 0}$ and $\beta_{surv, 1}$ are species-specific coefficients obtained by fitting Generalized Linear Models on repeated forest inventory plot data. These models can be developed for arbitrary time steps (normally 5 or 10 years), but the basal mortality rate has to be finally expressed as a daily probability ($P_{base, daily}$).
 
 ### Mortality due to starvation {#starvationmortality}
 
@@ -295,7 +295,7 @@ plot_grid(g1, g2, nrow = 2)
 As explained in the section \@ref(mortalitydesign), the dessication stress indicator ($D_{stem}$) is the maximum of relative water content in the stem ($RWC_{stem}$) and relative hydraulic conductance in the stem, i.e. the complement of $PLC_{stem}$
 
 \begin{equation}
-D_{stem} = \max(RWC_{stem}, 1.0 - PLC_{stem})
+D_{stem} = (RWC_{stem}, 1.0 - PLC_{stem})/2.0
 \end{equation}
 
 Assuming that a threshold of relative water content ($RWC_{thresh}$) corresponds to 50\% annual mortality due to dessication, its probability is estimated analogously to starvation. First, a logistic sigmoidal function is used to estimate the probability of annual dessication from a given $D_{stem}$ value:
@@ -323,7 +323,7 @@ for(i in 1:nrow(df)) {
 ```
 
 Assuming a relative threshold $RWC_{thresh} = 0.4$, the figure below illustrates the shape of the sigmoidal function (top) and the corresponding daily probability function.
-```{r, fig = TRUE, echo = FALSE, fig.width=8, fig.height=6, fig.cap="Annual (top) and daily (bottom) probability of dessication as a function of the maximum value of stem relative water content and stem relative hydraulic conductance."}
+```{r, fig = TRUE, echo = FALSE, fig.width=8, fig.height=6, fig.cap="Annual (top) and daily (bottom) probability of dessication as a function of the average value of stem relative water content and stem relative hydraulic conductance."}
 l <- vector("list", nrow(df))
 for(is in 1:nrow(df)) {
   df_psi <- data.frame(Psi = seq(-1.0, -12.0, by = -0.01))
@@ -336,7 +336,7 @@ for(is in 1:nrow(df)) {
   for(i in 1:nrow(df_psi)) {
     df_psi$RWC[i] = moisture_symplasticRWC(df_psi$Psi[i], df$StemPI0[is], df$StemEPS[is])*100
     df_psi$PLC[i] = 100 - hydraulics_xylemConductance(df_psi$Psi[i], 1.0, df$VCstem_c[is], df$VCstem_d[is])*100
-    df_psi$x[i] <- max(df_psi$RWC[i], 100 - df_psi$PLC[i])
+    df_psi$x[i] <- sum(df_psi$RWC[i], 100 - df_psi$PLC[i])/2
     y <- (df_psi$x[i]/100 - 0.4)
     fact <- 40
     df_psi$Pdessication_annual[i] = 1 - exp(fact*y)/(1+exp(fact*y))
@@ -348,14 +348,14 @@ df3 <- dplyr::bind_rows(l)
 
 g1 <- ggplot(df3)+
   geom_line(aes(x=x, y = Pdessication_annual), size = 1)+
-  xlab("Maximum of stem relative water content and stem relative conductance (%)")+ ylab("Annual dessication probability [0-1]")+
+  xlab("Average of stem relative water content and stem relative conductance (%)")+ ylab("Annual dessication probability [0-1]")+
   geom_vline(xintercept = 40, linetype = "dashed")+
   scale_color_brewer( type ="qual", palette = "Set1")+
   scale_x_reverse()+
   theme_bw()
 g2 <- ggplot(df3)+
   geom_line(aes(x=x, y = Pdessication_daily), size = 1)+
-  xlab("Maximum of stem relative water content and stem relative conductance  (%)")+ ylab("Daily dessication probability [0-1]")+
+  xlab("Average of stem relative water content and stem relative conductance  (%)")+ ylab("Daily dessication probability [0-1]")+
   scale_color_brewer( type ="qual", palette = "Set1")+
   geom_vline(xintercept = 40, linetype = "dashed")+
   scale_x_reverse()+
@@ -402,7 +402,7 @@ g3 <- ggplot(df3)+
   xlab("Stem water potential (MPa)")+ ylab("Annual dessication probability [0-1]")+
   scale_color_brewer("", type ="qual", palette = "Set1")+
   scale_x_reverse()+
-  theme_bw()+ theme(legend.position = c(0.87, 0.4))
+  theme_bw()+ theme(legend.position = c(0.87, 0.45))
 g4 <- ggplot(df3)+
   geom_line(aes(x=Psi, y = Pdessication_daily, col = Name), size = 1)+
   xlab("Stem water potential (MPa)")+ ylab("Daily dessication probability [0-1]")+
@@ -419,7 +419,7 @@ It is obvious in the former figure that using $D_{stem}$ is indicator results in
 Every day the model determines for woody cohorts the overall probability of mortality ($P_{mort, daily}$) as the maximum of the basal probability, starvation probability and dessication probability:
 
 \begin{equation}
-P_{mort, daily} = \max( P_{mort, base},\, P_{starv, daily}, \, P_{dessic, daily})
+P_{mort, daily} = \max( P_{base, daily},\, P_{starv, daily}, \, P_{dessic, daily})
 \end{equation}
 
 At this point $P_{mort, daily}$ may be used deterministically (i.e., as a proportion of $N$ to kill) or stochastically (i.e. throwing a random number between 0 and 1 to determine the mortality event).

@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-07-12" />
+<meta name="date" content="2023-07-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -908,7 +908,7 @@ N_{dead,i} = N_i - \min(N_i,  a_{st} \cdot DBH_{i}^{b_{st}})
 <p><span class="math display">\[\begin{equation}
 P_{surv,base} =  logit^{-1}(\beta_{surv, 0} + \beta_{surv,1} \cdot \sqrt{BA}) = \frac{\exp(\beta_{surv, 0} + \beta_{surv,1} \cdot \sqrt{BA})}{1 + \exp(\beta_{surv, 0} + \beta_{surv,1} \cdot \sqrt{BA})}
 \end{equation}\]</span></p>
-<p>where <span class="math inline">\(\beta_{surv, 0}\)</span> and <span class="math inline">\(\beta_{surv, 1}\)</span> are species-specific coefficients using repeated forest inventory plot data.</p>
+<p>where <span class="math inline">\(\beta_{surv, 0}\)</span> and <span class="math inline">\(\beta_{surv, 1}\)</span> are species-specific coefficients obtained by fitting Generalized Linear Models on repeated forest inventory plot data. These models can be developed for arbitrary time steps (normally 5 or 10 years), but the basal mortality rate has to be finally expressed as a daily probability (<span class="math inline">\(P_{base, daily}\)</span>).</p>
 </div>
 <div id="starvationmortality" class="section level3 hasAnchor" number="17.4.3">
 <h3><span class="header-section-number">17.4.3</span> Mortality due to starvation<a href="growthsenescencemortality.html#starvationmortality" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -936,7 +936,7 @@ Figure 17.1: Annual (top) and daily (bottom) probability of starvation as a func
 <h3><span class="header-section-number">17.4.4</span> Mortality due to dessication<a href="growthsenescencemortality.html#dessicationmortality" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>As explained in the section <a href="growthmodelling.html#mortalitydesign">15.1.5</a>, the dessication stress indicator (<span class="math inline">\(D_{stem}\)</span>) is the maximum of relative water content in the stem (<span class="math inline">\(RWC_{stem}\)</span>) and relative hydraulic conductance in the stem, i.e. the complement of <span class="math inline">\(PLC_{stem}\)</span></p>
 <p><span class="math display">\[\begin{equation}
-D_{stem} = \max(RWC_{stem}, 1.0 - PLC_{stem})
+D_{stem} = (RWC_{stem}, 1.0 - PLC_{stem})/2.0
 \end{equation}\]</span></p>
 <p>Assuming that a threshold of relative water content (<span class="math inline">\(RWC_{thresh}\)</span>) corresponds to 50% annual mortality due to dessication, its probability is estimated analogously to starvation. First, a logistic sigmoidal function is used to estimate the probability of annual dessication from a given <span class="math inline">\(D_{stem}\)</span> value:</p>
 <p><span class="math display">\[\begin{equation}
@@ -948,9 +948,9 @@ P_{dessic, daily} = 1.0 - \exp(\log(1.0 - P_{dessic, annual})/356)
 \end{equation}\]</span></p>
 Assuming a relative threshold <span class="math inline">\(RWC_{thresh} = 0.4\)</span>, the figure below illustrates the shape of the sigmoidal function (top) and the corresponding daily probability function.
 <div class="figure"><span style="display:block;" id="fig:unnamed-chunk-42"></span>
-<img src="medfatebook_files/figure-html/unnamed-chunk-42-1.png" alt="Annual (top) and daily (bottom) probability of dessication as a function of the maximum value of stem relative water content and stem relative hydraulic conductance." width="768" />
+<img src="medfatebook_files/figure-html/unnamed-chunk-42-1.png" alt="Annual (top) and daily (bottom) probability of dessication as a function of the average value of stem relative water content and stem relative hydraulic conductance." width="768" />
 <p class="caption">
-Figure 17.2: Annual (top) and daily (bottom) probability of dessication as a function of the maximum value of stem relative water content and stem relative hydraulic conductance.
+Figure 17.2: Annual (top) and daily (bottom) probability of dessication as a function of the average value of stem relative water content and stem relative hydraulic conductance.
 </p>
 </div>
 <p><strong>Uncertainty of stem pressure-volume parameters</strong></p>
@@ -966,7 +966,7 @@ Figure 17.2: Annual (top) and daily (bottom) probability of dessication as a fun
 <h3><span class="header-section-number">17.4.5</span> Overall mortality probability<a href="growthsenescencemortality.html#overall-mortality-probability" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Every day the model determines for woody cohorts the overall probability of mortality (<span class="math inline">\(P_{mort, daily}\)</span>) as the maximum of the basal probability, starvation probability and dessication probability:</p>
 <p><span class="math display">\[\begin{equation}
-P_{mort, daily} = \max( P_{mort, base},\, P_{starv, daily}, \, P_{dessic, daily})
+P_{mort, daily} = \max( P_{base, daily},\, P_{starv, daily}, \, P_{dessic, daily})
 \end{equation}\]</span></p>
 <p>At this point <span class="math inline">\(P_{mort, daily}\)</span> may be used deterministically (i.e., as a proportion of <span class="math inline">\(N\)</span> to kill) or stochastically (i.e. throwing a random number between 0 and 1 to determine the mortality event).</p>
 </div>
