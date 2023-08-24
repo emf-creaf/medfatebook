@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 1 Introduction | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.35 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 1 Introduction | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-07-25" />
+<meta name="date" content="2023-08-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -727,20 +727,12 @@ Figure 1.1: Set of packages conforming the medfate modelling framework
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="intro.html#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;medfate&quot;</span>)</span></code></pre></div>
 <p>Users can also download and install the latest stable versions GitHub as follows (required package <a href="https://CRAN.R-project.org/package=remotes"><strong>remotes</strong></a> should be installed/updated first):</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="intro.html#cb2-1" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;emf-creaf/medfate&quot;</span>)</span></code></pre></div>
-<p>When installing from GitHub, one may force the installation of package vignettes by using:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="intro.html#cb3-1" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;emf-creaf/medfate&quot;</span>, </span>
-<span id="cb3-2"><a href="intro.html#cb3-2" tabindex="-1"></a>                         <span class="at">build_opts =</span> <span class="fu">c</span>(<span class="st">&quot;--no-resave-data&quot;</span>, <span class="st">&quot;--no-manual&quot;</span>),</span>
-<span id="cb3-3"><a href="intro.html#cb3-3" tabindex="-1"></a>                         <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>Among other dependencies, installing <strong>medfate</strong> requires package <strong>meteoland</strong>, as it links to some of its C++ functions. Note that some package dependencies are only <em>suggested</em>, so that they are not automatically installed when installing <strong>medfate</strong>.</p>
 </div>
 <div id="installing-medfateland" class="section level3 hasAnchor" number="1.2.3">
 <h3><span class="header-section-number">1.2.3</span> Installing medfateland<a href="intro.html#installing-medfateland" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Since both packages evolve together, installing <strong>medfateland</strong> normally requires an up-to-date version of <strong>medfate</strong>. The package <strong>medfateland</strong> is currently only available at GitHub, and can be installed using:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="intro.html#cb4-1" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;emf-creaf/medfateland&quot;</span>)</span></code></pre></div>
-<p>As with <strong>medfate</strong>, one may force the installation of package vignettes for <strong>medfateland</strong>, by using:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="intro.html#cb5-1" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;emf-creaf/medfateland&quot;</span>, </span>
-<span id="cb5-2"><a href="intro.html#cb5-2" tabindex="-1"></a>                         <span class="at">build_opts =</span> <span class="fu">c</span>(<span class="st">&quot;--no-resave-data&quot;</span>, <span class="st">&quot;--no-manual&quot;</span>),</span>
-<span id="cb5-3"><a href="intro.html#cb5-3" tabindex="-1"></a>                         <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="intro.html#cb3-1" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;emf-creaf/medfateland&quot;</span>)</span></code></pre></div>
 <p>Among other dependencies, installing <strong>medfateland</strong> requires packages <strong>medfate</strong> and <strong>meteoland</strong>, as it links to some of their C++ functions.</p>
 </div>
 </div>
@@ -859,10 +851,14 @@ Figure 1.2: Nested relationships between simulation functions and processes incl
 <li>Growth and mortality of a set of plant cohorts competing for light and water can be simulated for a set of forest stands using functions <code>growth_spatial()</code> or <code>growth_spatial_day()</code>.</li>
 <li>Forest dynamics arising from competition for light and water can be simulated for a set of forest stands using function <code>fordyn_spatial()</code>.</li>
 </ul>
-<p>In addition, the package offers simulation functions where forest stands are related by spatial processes:</p>
+<p>The package offers a simulation function where the dynamics of forest stands are related by management and/or fire regime scenarios:</p>
+<ul>
+<li>Function <code>fordyn_scenario()</code> allows simulating <code>fordyn()</code> on forest stands, while applying a demand-based forest management scenario and/or a fire regime scenario.</li>
+</ul>
+<p>Finally, there are three functions that are meant to simulate watersheds, including landscape spatial processes:</p>
 <ul>
 <li>Functions <code>spwb_land()</code> and <code>growth_land()</code> include distributed hydrological models that allow simulating daily water balance or growth processes on the cells of a watershed while accounting for overland runoff, subsurface flow and groundwater flow between cells.</li>
-<li>Function <code>fordyn_scenario()</code> allows simulating <code>fordyn()</code> on forest stands, while applying a demand-based forest management scenario.</li>
+<li>Forest dynamics arising from competition for light and water can be simulated in a watershed using function <code>fordyn_land()</code>.</li>
 </ul>
 
 </div>

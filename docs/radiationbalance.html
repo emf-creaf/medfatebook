@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 9 Radiation transfer | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.35 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 9 Radiation transfer | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-07-25" />
+<meta name="date" content="2023-08-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -717,18 +717,18 @@ LAI^{shade}_{i,j} &amp;=&amp; (1 - f_{SL,j}) \cdot LAI^{\phi}_{i,j}
 \tag{9.1}
 \end{eqnarray}\]</span></p>
 <p>As an example we will consider a canopy of one species of LAI = 2, divided into ten layers with constant leaf density:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="radiationbalance.html#cb13-1" tabindex="-1"></a>LAI <span class="ot">=</span> <span class="dv">2</span></span>
-<span id="cb13-2"><a href="radiationbalance.html#cb13-2" tabindex="-1"></a>nlayer <span class="ot">=</span> <span class="dv">10</span></span>
-<span id="cb13-3"><a href="radiationbalance.html#cb13-3" tabindex="-1"></a>LAIlayerlive <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
-<span id="cb13-4"><a href="radiationbalance.html#cb13-4" tabindex="-1"></a>LAIlayermax <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
-<span id="cb13-5"><a href="radiationbalance.html#cb13-5" tabindex="-1"></a>LAIlayerdead <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,nlayer,<span class="dv">1</span>)</span>
-<span id="cb13-6"><a href="radiationbalance.html#cb13-6" tabindex="-1"></a>kb <span class="ot">=</span> <span class="fl">0.8</span></span>
-<span id="cb13-7"><a href="radiationbalance.html#cb13-7" tabindex="-1"></a>kd_PAR <span class="ot">=</span> <span class="fl">0.5</span></span>
-<span id="cb13-8"><a href="radiationbalance.html#cb13-8" tabindex="-1"></a>kd_SWR <span class="ot">=</span> kd_PAR<span class="sc">/</span><span class="fl">1.35</span></span>
-<span id="cb13-9"><a href="radiationbalance.html#cb13-9" tabindex="-1"></a>alpha_PAR <span class="ot">=</span> <span class="fl">0.9</span></span>
-<span id="cb13-10"><a href="radiationbalance.html#cb13-10" tabindex="-1"></a>gamma_PAR <span class="ot">=</span> <span class="fl">0.04</span></span>
-<span id="cb13-11"><a href="radiationbalance.html#cb13-11" tabindex="-1"></a>gamma_SWR <span class="ot">=</span> <span class="fl">0.05</span></span>
-<span id="cb13-12"><a href="radiationbalance.html#cb13-12" tabindex="-1"></a>alpha_SWR <span class="ot">=</span> <span class="fl">0.7</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="radiationbalance.html#cb11-1" tabindex="-1"></a>LAI <span class="ot">=</span> <span class="dv">2</span></span>
+<span id="cb11-2"><a href="radiationbalance.html#cb11-2" tabindex="-1"></a>nlayer <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb11-3"><a href="radiationbalance.html#cb11-3" tabindex="-1"></a>LAIlayerlive <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
+<span id="cb11-4"><a href="radiationbalance.html#cb11-4" tabindex="-1"></a>LAIlayermax <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
+<span id="cb11-5"><a href="radiationbalance.html#cb11-5" tabindex="-1"></a>LAIlayerdead <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,nlayer,<span class="dv">1</span>)</span>
+<span id="cb11-6"><a href="radiationbalance.html#cb11-6" tabindex="-1"></a>kb <span class="ot">=</span> <span class="fl">0.8</span></span>
+<span id="cb11-7"><a href="radiationbalance.html#cb11-7" tabindex="-1"></a>kd_PAR <span class="ot">=</span> <span class="fl">0.5</span></span>
+<span id="cb11-8"><a href="radiationbalance.html#cb11-8" tabindex="-1"></a>kd_SWR <span class="ot">=</span> kd_PAR<span class="sc">/</span><span class="fl">1.35</span></span>
+<span id="cb11-9"><a href="radiationbalance.html#cb11-9" tabindex="-1"></a>alpha_PAR <span class="ot">=</span> <span class="fl">0.9</span></span>
+<span id="cb11-10"><a href="radiationbalance.html#cb11-10" tabindex="-1"></a>gamma_PAR <span class="ot">=</span> <span class="fl">0.04</span></span>
+<span id="cb11-11"><a href="radiationbalance.html#cb11-11" tabindex="-1"></a>gamma_SWR <span class="ot">=</span> <span class="fl">0.05</span></span>
+<span id="cb11-12"><a href="radiationbalance.html#cb11-12" tabindex="-1"></a>alpha_SWR <span class="ot">=</span> <span class="fl">0.7</span></span></code></pre></div>
 <p>This canopy definition leads to a percentage of the above-canopy irradiance reaching each layer <span class="citation">(<a href="#ref-Anten2016">Anten &amp; Bastiaans 2016</a>)</span>. Extinction of direct radiation also defines the proportion of leaves of each layer that are affected by sunflecks (i.e. the proportion of sunlit leaves). Both outcomes are illustrated in the figure below:</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:irradianceperlayer"></span>
@@ -761,11 +761,11 @@ where <span class="math inline">\(\beta\)</span> is the solar elevation angle in
 \tag{9.2}
 \end{eqnarray}\]</span></p>
 <p>Let us show how all this works in an example. Regarding incoming light, we assume the following direct and diffuse irradiance at the top of the canopy:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="radiationbalance.html#cb14-1" tabindex="-1"></a>solarElevation <span class="ot">=</span> <span class="fl">0.67</span></span>
-<span id="cb14-2"><a href="radiationbalance.html#cb14-2" tabindex="-1"></a>SWR_direct <span class="ot">=</span> <span class="dv">1100</span></span>
-<span id="cb14-3"><a href="radiationbalance.html#cb14-3" tabindex="-1"></a>SWR_diffuse <span class="ot">=</span> <span class="dv">300</span></span>
-<span id="cb14-4"><a href="radiationbalance.html#cb14-4" tabindex="-1"></a>PAR_direct <span class="ot">=</span> <span class="dv">550</span></span>
-<span id="cb14-5"><a href="radiationbalance.html#cb14-5" tabindex="-1"></a>PAR_diffuse <span class="ot">=</span> <span class="dv">150</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="radiationbalance.html#cb12-1" tabindex="-1"></a>solarElevation <span class="ot">=</span> <span class="fl">0.67</span></span>
+<span id="cb12-2"><a href="radiationbalance.html#cb12-2" tabindex="-1"></a>SWR_direct <span class="ot">=</span> <span class="dv">1100</span></span>
+<span id="cb12-3"><a href="radiationbalance.html#cb12-3" tabindex="-1"></a>SWR_diffuse <span class="ot">=</span> <span class="dv">300</span></span>
+<span id="cb12-4"><a href="radiationbalance.html#cb12-4" tabindex="-1"></a>PAR_direct <span class="ot">=</span> <span class="dv">550</span></span>
+<span id="cb12-5"><a href="radiationbalance.html#cb12-5" tabindex="-1"></a>PAR_diffuse <span class="ot">=</span> <span class="dv">150</span></span></code></pre></div>
 <p>Solar elevation is the angle between the sun and the horizon (i.e. the complement of the zenith angle). Under these conditions, and for the same canopy used for fig. <a href="radiationbalance.html#fig:irradianceperlayer">9.1</a>, the amount of PAR and SWR absorbed per unit of leaf area at each canopy layer is <span class="citation">(<a href="#ref-Anten2016">Anten &amp; Bastiaans 2016</a>)</span>:</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:absorbanceperlayer"></span>
