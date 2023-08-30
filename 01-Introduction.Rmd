@@ -63,14 +63,14 @@ Among other dependencies, installing **medfateland** requires packages **medfate
 
 ### Dynamic simulation functions
 
-Dynamic simulation functions in **medfate** include three nested simulation levels (Fig. \@ref(fig:models)):
+Dynamic simulation functions in **medfate** include three nested simulation levels (Fig. \@ref(fig:designmedfate)):
 
-  1. Forest water and energy balance can be studied for a given forest stand using function `spwb()` (soil-plant-water-balance). The same function is used to run three different models (`Granier`, `Sperry` or `Cochard`), that correspond to two levels of complexity (*basic* or *advanced*; see Fig. \@ref(fig:models)). The user should choose one model or another depending on the intended application and data availability. Water balance simulations include hydrological processes (rainfall interception, soil infiltration, percolation and evapotranspiration) and plant physiological processes related to transpiration (hydraulics, photosynthesis and stomatal regulation). Most processes are implemented at the daily scale, although some operate at subdaily time steps for *advanced* models. Function `spwb()` has a closely related function `spwb_day()` that allows focusing on sub-daily processes. Finally, one can simulate plant physiological processes only, while having soil moisture as a prescribed dynamic input like weather, using function `pwb()` (plant-water-balance).
+  1. Forest water and energy balance can be studied for a given forest stand using function `spwb()` (soil-plant-water-balance). The same function is used to run three different models (`Granier`, `Sperry` or `Cochard`), that correspond to two levels of complexity (*basic* or *advanced*; see Fig. \@ref(fig:designmedfate)). The user should choose one model or another depending on the intended application and data availability. Water balance simulations include hydrological processes (rainfall interception, soil infiltration, percolation and evapotranspiration) and plant physiological processes related to transpiration (hydraulics, photosynthesis and stomatal regulation). Most processes are implemented at the daily scale, although some operate at subdaily time steps for *advanced* models. Function `spwb()` has a closely related function `spwb_day()` that allows focusing on sub-daily processes. Finally, one can simulate plant physiological processes only, while having soil moisture as a prescribed dynamic input like weather, using function `pwb()` (plant-water-balance).
   2. Changes in primary (leaf area) and secondary (sapwood) growth are key to evaluate the influence of climatic conditions on plant and forest structure and function. Function `growth()` extends the previous models because it allows simulating carbon balance, tissue growth and mortality of a set of plant cohorts competing for light and water in a given forest stand. Analogously to the simulation of water balance, `growth()` has a closely related function `growth_day()` that allows focusing on sub-daily processes (i.e. carbon balance). 
   3. Finally, function `fordyn()` complements growth and mortality processes with recruitment (from seeds) and resprouting, thus completing the minimum set of demographic processes needed to simulate Mediterranean forest dynamics. The function splits the period to be simulated by years and makes internal calls to `growth()` for the simulation of growth and mortality. `fordyn()` is suited to simulate the inter-annual variation in forest structure and composition, while accounting for the biophysical and physiological processes provided by the former models. In addition, in allows simulating human interventions (i.e. tree or shrub cuts) on forest stands.
   
-```{r models, out.width='100%', fig.align="center", fig.cap="Nested relationships between simulation functions and  processes included in each model", echo=FALSE}
-knitr::include_graphics("Package_design.png")
+```{r designmedfate, out.width='100%', fig.align="center", fig.cap="Nested relationships between medfate simulation functions and processes included in each model", echo=FALSE}
+knitr::include_graphics("Package_design_medfate.png")
 
 ```
 
@@ -84,7 +84,7 @@ Many of the sub-models included in **medfate** are implemented as C++ functions 
 |  `biophysics_*` | Physics and biophysics |
 |  `carbon_*` | Carbon balance |
 |  `fuel_*`  | Fuel properties |
-|  `fire_*`  | Fire behaviour |
+|  `fire_*`  | Fire behaviour and severity |
 |  `hydraulics_*` | Plant hydraulics |
 |  `hydrology_*` | Canopy and soil hydrology |
 |  `light_*` | Light extinction and absortion |
@@ -117,7 +117,7 @@ Vegetation functioning and dynamics have strong, but complex, effects on fire ha
 
 ## Main functions in medfateland
 
-Package **medfateland** allows simulating forest functioning and dynamics on sets forests stands distributed across space, with or without spatial processes. 
+Package **medfateland** allows simulating forest functioning and dynamics on sets forests stands distributed across space, with or without spatial processes  (Fig. \@ref(fig:designmedfateland)). 
 
 When spatial processes are omitted, the package offers a set of simulation functions that are analogous to those of package **medfate** but allow processing multiple forest stands sequentially or in parallel:
 
@@ -125,13 +125,19 @@ When spatial processes are omitted, the package offers a set of simulation funct
 + Growth and mortality of a set of plant cohorts competing for light and water can be simulated for a set of forest stands using functions `growth_spatial()` or `growth_spatial_day()`.
 + Forest dynamics arising from competition for light and water can be simulated for a set of forest stands using function `fordyn_spatial()`.
 
-The package offers a simulation function where the dynamics of forest stands are related by management and/or fire regime scenarios:
+The package offers a simulation function where the dynamics of forest stands are related by management decisions:
 
-+ Function `fordyn_scenario()` allows simulating `fordyn()` on forest stands, while applying a demand-based forest management scenario and/or a fire regime scenario.
++ Function `fordyn_scenario()` allows simulating `fordyn()` on forest stands, while applying a demand-based forest management scenario. Simulations with this function also include seed dispersal among forest stands.
 
-Finally, there are three functions that are meant to simulate watersheds, including landscape spatial processes:
+Finally, there are three functions that are meant to simulate watersheds, including spatial processes:
 
 + Functions `spwb_land()` and `growth_land()` include distributed hydrological models that allow simulating daily water balance or growth processes on the cells of a watershed while accounting for overland runoff, subsurface flow and groundwater flow between cells.
-+ Forest dynamics arising from competition for light and water can be simulated in a watershed using function `fordyn_land()`.
++ Forest dynamics arising from competition for light and water can be simulated in a watershed using function `fordyn_land()`. Simulations with this function also include seed dispersal among grid cells.
+
+
+```{r designmedfateland, out.width='100%', fig.align="center", fig.cap="Overview of simulation functions in medfateland and the processes available for each of them", echo=FALSE}
+knitr::include_graphics("Package_design_medfateland.png")
+
+```
 
 
