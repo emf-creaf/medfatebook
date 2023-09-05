@@ -5,7 +5,7 @@ This chapter describes the seed dispersal sub-model implemented in functions `fo
 
 ## Design principles
 
-Given their sessile lifestyle, dispersal is the only process through which plants can spread in a landscape. Different parts of plants can be dispersed (seeds, fruits, branches or even the entire plant), but here it is assumed that seeds are the dispersed elements. Mathematically, dispersal can be addressed via process-based models (e.g. @nathan_field_2001). However, it is more commonly addressed via empirical dispersal kernels, which describe the statistical distribution of dispersal distances in a population [@clobert_dispersal_2012]. More specifically, the dispersal kernel is a probability density function describing the distribution of post-dispersal locations relative to a source point. While many different equations can be used and compared to describe dispersal [@clobert_dispersal_2012], here we focus on the exponential power kernel proposed by Clark et al. [-@clark_stages_1998], which has shown a good performance compared to other kernels [@bullock_synthesis_2017] and has been used for other dynamic vegetation models [@snell_simulating_2014].
+Given their sessile lifestyle, dispersal is the only process through which plants can spread in a landscape. Different parts of plants can be dispersed (seeds, fruits, branches or even the entire plant), but here it is assumed that seeds are the dispersed elements. Mathematically, dispersal can be addressed via process-based models (e.g. @nathan_field_2001). However, it is more commonly addressed via empirical dispersal kernels, which describe the statistical distribution of dispersal distances in a population [@clobert_dispersal_2012]. More specifically, the dispersal kernel is a probability density function describing the distribution of post-dispersal locations relative to a source point. While many different equations can be used and compared to describe dispersal [@clobert_dispersal_2012], here we focus on the exponential power kernel proposed by Clark et al. [-@clark_stages_1998], which has shown a good performance compared to other kernels [@bullock_synthesis_2017] and has been used for other dynamic vegetation models [@snell_simulating_2014]. The kernel is isotropic, meaning that is equal in all directions. Therefore, one can consider dispersal either from source or sink locations.
 
 When implementing a dispersal kernel in a dynamic forest simulation model, an important issue to overcome is the fact that forest stands in the target landscape are often separated by distances that are larger (e.g. 500 m, 1 km or even more) than the average area that they represent (normally forest plots have a radius between 10 and 25 m). This entails that there is a uncertainty in the model regarding the presence of seed sources from forest stands at distances between the two scales. In other words, the model does not know whether there are forest patches that can act as seed sources, between a given target forest stand and its nearest neighbors (Fig. \@ref(fig:seeddispersal)). Ignoring this fact can lead to underestimating colonization. We address this issue by considering that seed sources from unavailable forest stands can be estimated from the set of stands that are represented in the data set, using weights inverse to their distance to the location of the unavailable stand. This is illustrated in Fig. \@ref(fig:seeddispersal) below with the area with unavailable stands in grey and distances represented using red and black arrows:
 
@@ -20,7 +20,7 @@ Seed dispersal is considered once a year. Process scheduling in the dispersal su
 
 1. Mortality of seeds in first performed for all stands (see \@ref(seedbankdynamics)).
 2. Seed production is simulated in all stands with woody vegetation (see \@ref(seedbankdynamics)).
-3. For each target forest stand, seed dispersal (including local seed rain) is simulated, leading to a replenishment of its seed bank (see next section).
+3. For each target forest stand, seed dispersal (including local seed rain) is simulated, leading to a replenishment of its seed bank.
 
 ## Process details
 
@@ -33,3 +33,25 @@ where $N$ is the normalizing constant:
 N = \frac{2\cdot \pi  \cdot Disp_{dist}^2 \cdot \Gamma(2/Disp_{shape})}{Disp_{shape}}
 \end{equation}
 and $\Gamma()$ is the Gamma function.
+
+Let $i$ be the stand corresponding to seed sink location (i.e. red dot in Fig. \@ref(fig:seeddispersal), we first compute the geographic distances between $i$ and all the other stands using geographic coordinates $x$ and $y$ (assuming these are in meters).
+\begin{equation}
+d(i,j) = \sqrt{(x_i - x_j)^2 + (y_i - y_j)^2}
+\end{equation}
+
+Then we consider a given distance value $r > 0$ from $i$. We define the probability of choosing a given stand $j$ for a location at this distance as follows:
+\begin{equation}
+p_i(r, j) = \frac{1}{M}\cdot \frac{1}{|r - d(i,j)|}
+\end{equation}
+where $M$ is an appropriate normalizing factor so that:
+\begin{equation}
+\sum_{j=1}^n{p_i(r, j)} = 1
+\end{equation}
+Note that the former equation assumes that the density of spatial points is even across space. If not the sum should be lower than one.
+
+Given the above definitions and assuming that seed bank should be refilled to 100% when if and only if all plots are seed sources, the percentage of seeds reaching the target location $i$, i.e.  $P_{seeds, i}$, is estimated using:
+\begin{equation}
+P_{seeds, i} = 100 \cdot 2 \pi \cdot \int_{r > 0}^{r_{\max}}{r \cdot f(r) \cdot \left( \sum_{j=1}^{n}{p_i(r,j)} \right) \cdot \delta r}
+\end{equation}
+
+where $r_{\max}$ is the maximum allowed dispersal distance
