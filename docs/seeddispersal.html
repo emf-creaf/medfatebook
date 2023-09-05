@@ -515,7 +515,7 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="18.5" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#process-details"><i class="fa fa-check"></i><b>18.5</b> Process details</a>
 <ul>
-<li class="chapter" data-level="18.5.1" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#seed-production-and-seed-bank-dynamics"><i class="fa fa-check"></i><b>18.5.1</b> Seed production and seed bank dynamics</a></li>
+<li class="chapter" data-level="18.5.1" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#seedbankdynamics"><i class="fa fa-check"></i><b>18.5.1</b> Seed production and seed bank dynamics</a></li>
 <li class="chapter" data-level="18.5.2" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#recruitment-from-seeds-1"><i class="fa fa-check"></i><b>18.5.2</b> Recruitment from seeds</a></li>
 <li class="chapter" data-level="18.5.3" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#resprouting-1"><i class="fa fa-check"></i><b>18.5.3</b> Resprouting</a></li>
 </ul></li>
@@ -548,6 +548,8 @@ div.csl-indent {
 <li class="chapter" data-level="20" data-path="seeddispersal.html"><a href="seeddispersal.html"><i class="fa fa-check"></i><b>20</b> Seed dispersal</a>
 <ul>
 <li class="chapter" data-level="20.1" data-path="seeddispersal.html"><a href="seeddispersal.html#design-principles-2"><i class="fa fa-check"></i><b>20.1</b> Design principles</a></li>
+<li class="chapter" data-level="20.2" data-path="seeddispersal.html"><a href="seeddispersal.html#process-scheduling-1"><i class="fa fa-check"></i><b>20.2</b> Process scheduling</a></li>
+<li class="chapter" data-level="20.3" data-path="seeddispersal.html"><a href="seeddispersal.html#process-details-1"><i class="fa fa-check"></i><b>20.3</b> Process details</a></li>
 </ul></li>
 <li class="part"><span><b>VII Static modules</b></span></li>
 <li class="chapter" data-level="21" data-path="allometricmodels.html"><a href="allometricmodels.html"><i class="fa fa-check"></i><b>21</b> Allometric models</a>
@@ -699,12 +701,53 @@ div.csl-indent {
 <p>This chapter describes the seed dispersal sub-model implemented in functions <code>fordyn_scenario()</code> and <code>fordyn_land()</code> of package <strong>medfateland</strong> (Fig. <a href="intro.html#fig:designmedfateland">1.3</a>).</p>
 <div id="design-principles-2" class="section level2 hasAnchor" number="20.1">
 <h2><span class="header-section-number">20.1</span> Design principles<a href="seeddispersal.html#design-principles-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Given their sessile lifestyle, dispersal is the only process through which plants can spread in a landscape. Different parts of plants can be dispersed (seeds, fruits, branches or even the entire plant), but here it is assumed that seeds are the dispersed elements. Mathematically, dispersal can be addressed via process-based models (e.g. <span class="citation">Nathan <em>et al.</em> (<a href="#ref-nathan_field_2001">2001</a>)</span>). However, it is more commonly addressed via empirical dispersal kernels, which describe the statistical distribution of dispersal distances in a population <span class="citation">(<a href="#ref-clobert_dispersal_2012">Nathan <em>et al.</em> 2012</a>)</span>. More specifically, the dispersal kernel is a probability density function describing the distribution of post-dispersal locations relative to a source point. While many different equations can be used and compared to describe dispersal <span class="citation">(<a href="#ref-clobert_dispersal_2012">Nathan <em>et al.</em> 2012</a>)</span>, here we focus on the exponential power kernel proposed by Clark et al. <span class="citation">(<a href="#ref-clark_stages_1998">1998</a>)</span>, which has shown a good performance compared to other kernels <span class="citation">(<a href="#ref-bullock_synthesis_2017">Bullock <em>et al.</em> 2017</a>)</span> and has been used for other dynamic vegetation models <span class="citation">(<a href="#ref-snell_simulating_2014">Snell 2014</a>)</span>.</p>
+<p>When implementing a dispersal kernel in a dynamic forest simulation model, an important issue to overcome is the fact that forest stands in the target landscape are often separated by distances that are larger (e.g. 500 m, 1 km or even more) than the average area that they represent (normally forest plots have a radius between 10 and 25 m). This entails that there is a uncertainty in the model regarding the presence of seed sources from forest stands at distances between the two scales. In other words, the model does not know whether there are forest patches that can act as seed sources, between a given target forest stand and its nearest neighbor(s). Ignoring this fact can lead to underestimating colonization. We address this issue by considering that seed sources from unavailable forest stands can be estimated from the set of stands that are represented, using weights inverse to their distance to the location of the unavailable stand. This is illustrated in the following figure:</p>
+</div>
+<div id="process-scheduling-1" class="section level2 hasAnchor" number="20.2">
+<h2><span class="header-section-number">20.2</span> Process scheduling<a href="seeddispersal.html#process-scheduling-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Seed dispersal is considered once a year. Process scheduling in the dispersal sub-model is rather straightforward:</p>
+<ol style="list-style-type: decimal">
+<li>Mortality of seeds in first performed for all stands (see <a href="dynamicsmodelling.html#seedbankdynamics">18.5.1</a>).</li>
+<li>Seed production is simulated in all stands with woody vegetation (see <a href="dynamicsmodelling.html#seedbankdynamics">18.5.1</a>).</li>
+<li>For each target forest stand, seed dispersal (including local seed rain) is simulated, leading to a replenishment of its seed bank (see next section).</li>
+</ol>
+</div>
+<div id="process-details-1" class="section level2 hasAnchor" number="20.3">
+<h2><span class="header-section-number">20.3</span> Process details<a href="seeddispersal.html#process-details-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The exponential power kernel depends on species-specific parameters <span class="math inline">\(Disp_{dist}\)</span> and <span class="math inline">\(Disp_{shape}\)</span> and is calculated for a given distance <span class="math inline">\(r\)</span> using <span class="citation">(<a href="#ref-clark_stages_1998">Clark <em>et al.</em> 1998</a>)</span>:
+<span class="math display">\[\begin{equation}
+f(r) = \frac{1}{N} \cdot \exp \left[ - \left( \frac{r}{Disp_{dist}} \right)^{Disp_{shape}} \right]
+\end{equation}\]</span>
+where <span class="math inline">\(N\)</span> is the normalizing constant:
+<span class="math display">\[\begin{equation}
+N = \frac{2\cdot \pi  \cdot Disp_{dist}^2 \cdot \Gamma(2/Disp_{shape})}{Disp_{shape}}
+\end{equation}\]</span>
+and <span class="math inline">\(\Gamma\)</span> is the Gamma function.</p>
 
 </div>
 </div>
 
 
 
+<h3>Bibliography<a href="bibliography.html#bibliography" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bullock_synthesis_2017" class="csl-entry">
+Bullock, J.M., Mallada González, L., Tamme, R., Götzenberger, L., White, S.M., Pärtel, M., <em>et al.</em> (2017). <a href="https://doi.org/10.1111/1365-2745.12666">A synthesis of empirical plant dispersal kernels</a>. <em>Journal of Ecology</em>, 105, 6–19.
+</div>
+<div id="ref-clark_stages_1998" class="csl-entry">
+Clark, J.S., Macklin, E. &amp; Wood, L. (1998). <a href="https://doi.org/10.1890/0012-9615(1998)068[0213:SASSOR]2.0.CO;2">Stages and spatial scales of recruitment limitation in <span>Southern</span> <span>Appalachian</span> forests</a>. <em>Ecological Monographs</em>, 68, 213–235.
+</div>
+<div id="ref-clobert_dispersal_2012" class="csl-entry">
+Nathan, R., Klein, E., Robledo-Arnuncio, J.J. &amp; Revilla, E. (2012). <a href="https://doi.org/10.1093/acprof:oso/9780199608898.003.0015">Dispersal kernels: review</a>. In: <em>Dispersal <span>Ecology</span> and <span>Evolution</span></em> (eds. Clobert, J., Baguette, M., Benton, T.G. &amp; Bullock, J.M.). Oxford University Press, pp. 186–210.
+</div>
+<div id="ref-nathan_field_2001" class="csl-entry">
+Nathan, R., Safriel, U.N. &amp; Noy-Meir, I. (2001). <a href="https://doi.org/10.1890/0012-9658(2001)082[0374:FVASAO]2.0.CO;2">Field validation and sensitivity analysis of a mechanistic model for tree seed dispersal by wind</a>. <em>Ecology</em>, 82, 374–388.
+</div>
+<div id="ref-snell_simulating_2014" class="csl-entry">
+Snell, R.S. (2014). <a href="https://doi.org/10.1111/geb.12106">Simulating long-distance seed dispersal in a dynamic vegetation model</a>. <em>Global Ecology and Biogeography</em>, 23, 89–98.
+</div>
+</div>
             </section>
 
           </div>
