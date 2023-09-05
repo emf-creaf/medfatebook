@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-08-31" />
+<meta name="date" content="2023-09-05" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -165,6 +165,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#how-to-use-this-book"><i class="fa fa-check"></i>How to use this book</a></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#an-ongoing-project"><i class="fa fa-check"></i>An ongoing project</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#funding"><i class="fa fa-check"></i>Funding</a></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgements"><i class="fa fa-check"></i>Acknowledgements</a></li>
 </ul></li>
 <li class="part"><span><b>I Preliminaries</b></span></li>
@@ -514,8 +515,9 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="18.5" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#process-details"><i class="fa fa-check"></i><b>18.5</b> Process details</a>
 <ul>
-<li class="chapter" data-level="18.5.1" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#recruitment-from-seeds-1"><i class="fa fa-check"></i><b>18.5.1</b> Recruitment from seeds</a></li>
-<li class="chapter" data-level="18.5.2" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#resprouting-1"><i class="fa fa-check"></i><b>18.5.2</b> Resprouting</a></li>
+<li class="chapter" data-level="18.5.1" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#seed-production-and-seed-bank-dynamics"><i class="fa fa-check"></i><b>18.5.1</b> Seed production and seed bank dynamics</a></li>
+<li class="chapter" data-level="18.5.2" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#recruitment-from-seeds-1"><i class="fa fa-check"></i><b>18.5.2</b> Recruitment from seeds</a></li>
+<li class="chapter" data-level="18.5.3" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#resprouting-1"><i class="fa fa-check"></i><b>18.5.3</b> Resprouting</a></li>
 </ul></li>
 </ul></li>
 <li class="part"><span><b>VI Landscape/regional modelling</b></span></li>
@@ -697,10 +699,10 @@ div.csl-indent {
 <p>This chapter provides an overview of a forest dynamics model, which builds on the previous models and allows simulating the recruitment, growth, mortality and management of woody plant cohorts in a forest stand. The model was described in <span class="citation">De Cáceres <em>et al.</em> (<a href="#ref-de_caceres_medfate_2023">2023</a>)</span> and is run using function <code>fordyn()</code> for a set of years.</p>
 <div id="design-principles" class="section level2 hasAnchor" number="18.1">
 <h2><span class="header-section-number">18.1</span> Design principles<a href="dynamicsmodelling.html#design-principles" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The design of the forest dynamics model is to a large degree inherited from the water balance and growth models it builds on. Readers should refer to former sections to learn the design of the basic water balance (see <a href="basicwaterbalance.html#basicdesign">3.1</a>), advanced water/energy balance (see <a href="advancedwaterbalance.html#advanceddesign">7.1</a>) or growth/mortality processes (see <a href="growthmodelling.html#growthdesign">15.1</a>). Regeneration, from either seed production and establishment or via resprouting, and forest management are explicitly simulated at the level of <code>fordyn()</code> and hence will be the focus of this chapter.</p>
+<p>The design of the forest dynamics model is to a large degree inherited from the water balance and growth models it builds on. Readers should refer to former sections to learn the design of the basic water balance (see <a href="basicwaterbalance.html#basicdesign">3.1</a>), advanced water/energy balance (see <a href="advancedwaterbalance.html#advanceddesign">7.1</a>) or growth/mortality processes (see <a href="growthmodelling.html#growthdesign">15.1</a>). Regeneration, from either seed germination and establishment or via resprouting, and forest management are explicitly simulated at the level of <code>fordyn()</code> and hence will be the focus of this chapter.</p>
 <div id="recruitment-from-seeds" class="section level3 hasAnchor" number="18.1.1">
 <h3><span class="header-section-number">18.1.1</span> Recruitment from seeds<a href="dynamicsmodelling.html#recruitment-from-seeds" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Recruitment of saplings involves a number of processes (flowering and pollination, fruit/seed production, dispersal, storage, seed predation, germination, seedling establishment and survival until the sapling stage). All these processes have their own biotic and abiotic drivers <span class="citation">(<a href="#ref-Price2001">Price <em>et al.</em> 2001</a>)</span>, so that modelling becomes a challenging task. Processes leading to sapling recruitment are frequently extremely simplified or their mechanisms ignored in many forest models <span class="citation">(<a href="#ref-Price2001">Price <em>et al.</em> 2001</a>)</span>. The design of the forest dynamics model with respect to recruitment follows that of many gap models. Local seed production is considered in a binary way, where plants are considered fertile and able to produce viable seeds if they reach a given height (different for shrubs and trees). Alternatively, the user can specify a set of species whose seeds arrive to the target stand via dispersal processes. Actual recruitment depends on a set of regeneration <em>thresholds</em> are used to determine whether recruitment of new saplings (i.e. ingrowth into a given diameter class for trees or size for shrubs) is possible. Typically, regeneration thresholds concern environmental conditions, although some models also consider ungulate browsing <span class="citation">(<a href="#ref-Wehrli2007">Wehrli <em>et al.</em> 2007</a>)</span>. In our case we focus on three environmental drivers limiting the transition from seedlings to saplings:</p>
+<p>Recruitment of saplings involves a number of processes (flowering and pollination, fruit/seed production, dispersal, storage, seed predation, germination, seedling establishment and survival until the sapling stage). All these processes have their own biotic and abiotic drivers <span class="citation">(<a href="#ref-Price2001">Price <em>et al.</em> 2001</a>)</span>, so that modelling becomes a challenging task. Processes leading to sapling recruitment are frequently extremely simplified or their mechanisms ignored in many forest models <span class="citation">(<a href="#ref-Price2001">Price <em>et al.</em> 2001</a>)</span>. The design of the forest dynamics model with respect to recruitment follows that of many gap models. Local seed production is considered in a binary way, where plants are considered fertile and able to produce viable seeds if they reach a given height (different for shrubs and trees). Alternatively, the user can specify a set of species whose seeds arrive to the target stand via simulation control parameters or dispersal processes (see chapter <a href="seeddispersal.html#seeddispersal">20</a>). A seed bank exists in the forest stand, where seed levels are relative (up to 100%) and result from the interplay between seed rain and seed mortality. Actual recruitment from seeds depends on a set of regeneration <em>thresholds</em> are used to determine whether recruitment of new saplings (i.e. ingrowth into a given diameter class for trees or size for shrubs) is possible. Typically, regeneration thresholds concern environmental conditions, although some models also consider ungulate browsing <span class="citation">(<a href="#ref-Wehrli2007">Wehrli <em>et al.</em> 2007</a>)</span>. In our case we focus on three environmental drivers limiting the transition from seedlings to saplings:</p>
 <ol style="list-style-type: decimal">
 <li>Tolerance to low temperatures, indicated by the mean temperature of the coldest month.</li>
 <li>Drought tolerance, indicated by the annual moisture index (annual precipitation divided by annual evapotranspiration).</li>
@@ -728,7 +730,7 @@ div.csl-indent {
 </div>
 <div id="state-variables-1" class="section level2 hasAnchor" number="18.2">
 <h2><span class="header-section-number">18.2</span> State variables<a href="dynamicsmodelling.html#state-variables-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The main state variables of the forest dynamic model are those conforming the structure and composition of the forest stand, i.e. the set of woody cohorts (either trees or shrubs) and their attributes (height, density, DBH, cover, etc.). Since the model performs calls to the <code>growth()</code> model, many other state variables are defined for intra-annual simulations (see <a href="growthmodelling.html#growthscheduling">15.4</a>). When including forest management action, additional state variables may be defined as management parameters.</p>
+<p>The main state variables of the forest dynamic model are those conforming the structure and composition of the forest stand, i.e. the set of woody cohorts (either trees or shrubs) and their attributes (height, density, DBH, cover, etc.). Additionally, the seed species identity and relative abundance in the seed bank are also state variables of the model. Since the model performs calls to the <code>growth()</code> model, many other state variables are defined for intra-annual simulations (see <a href="growthmodelling.html#growthscheduling">15.4</a>). When including forest management action, additional state variables may be defined as management parameters.</p>
 </div>
 <div id="process-scheduling" class="section level2 hasAnchor" number="18.3">
 <h2><span class="header-section-number">18.3</span> Process scheduling<a href="dynamicsmodelling.html#process-scheduling" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -736,7 +738,7 @@ div.csl-indent {
 <ol style="list-style-type: decimal">
 <li>Calls function <code>growth()</code> to simulate daily water/carbon balance, growth and mortality processes (sub-daily processes may also be involved in <code>transpirationMode = "Sperry"</code> or <code>transpirationMode = "Cochard"</code>). See section <a href="growthmodelling.html#growthscheduling">15.4</a> for details of growth scheduling.</li>
 <li>If a management function is supplied, calls this function and apply the resulting reductions in tree density and shrub cover.</li>
-<li>If required, simulates recruitment and/or resprouting.</li>
+<li>If required, simulates seed production, seed bank mortality, seed rain, recruitment from seeds and/or resprouting. In a spatial context, seed rain will include seeds dispersed from other forest stands <a href="seeddispersal.html#seeddispersal">20</a>.</li>
 <li>Removes tree (or shrub) cohorts whose remaining density (resp. cover) is lower than a specified threshold.</li>
 <li>Merges surviving cohorts with recruitment in the <code>forest</code> object and prepares the input of function <code>growth()</code> for the next annual time step.</li>
 <li>Store current status of the <code>forest</code> object and update output tables/summaries.</li>
@@ -779,6 +781,30 @@ div.csl-indent {
 <td><span class="math inline">\(cm\)</span></td>
 <td><code>SeedProductionHeight</code></td>
 <td>Minimum height for seed production</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(SM\)</span></td>
+<td><span class="math inline">\(mg\)</span></td>
+<td><code>SeedMass</code></td>
+<td>Seed dry mass</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(SL\)</span></td>
+<td><span class="math inline">\(yr\)</span></td>
+<td><code>SeedLongevity</code></td>
+<td>Seedbank average longevity</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(Disp_{alpha}\)</span></td>
+<td><span class="math inline">\(m\)</span></td>
+<td><code>DispersalDistance</code></td>
+<td>Distance parameter for dispersal kernel</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(Disp_{shape}\)</span></td>
+<td></td>
+<td><code>DispersalShape</code></td>
+<td>Shape parameter for dispersal kernel</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(P_{recr}\)</span></td>
@@ -881,19 +907,20 @@ div.csl-indent {
 </div>
 <div id="forestdynamicscontrol" class="section level3 hasAnchor" number="18.4.3">
 <h3><span class="header-section-number">18.4.3</span> Control parameters<a href="dynamicsmodelling.html#forestdynamicscontrol" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Control parameters modulate the overall behavior of <code>fordyn</code> simulations, which extend the parameters used for growth simulations (see section <a href="growthmodelling.html#forestgrowthcontrol">15.5.3</a>). First, there are parameters that regulate the application of recruiment and the removal of cohorts with few individuals:</p>
+<p>Control parameters modulate the overall behavior of <code>fordyn</code> simulations, which extend the parameters used for growth simulations (see section <a href="growthmodelling.html#forestgrowthcontrol">15.5.3</a>). First, there are parameters that regulate the application of seed production, seed bank dynamics, recruitment from seeds, resprouting and the removal of cohorts with few individuals:</p>
 <ul>
+<li><code>applySeedBankDynamics [= TRUE]</code>: Boolean flag to indicate that seed bank dynamics (seed production, seed bank mortality and seed rain) need to be simulated.</li>
 <li><code>applyRecruitment [= TRUE]</code>: Boolean flag to indicate that recruitment from seeds is allowed.</li>
-<li><code>recruitmentMode [= "stochastic"]</code>: String describing how recruitment from seeds is applied. Current accepted values are “deterministic” or “stochastic”.</li>
 <li><code>applyResprouting [= TRUE]</code>: Boolean flag to indicate that resprouting is allowed.</li>
+<li><code>recruitmentMode [= "stochastic"]</code>: String describing how recruitment from seeds is applied. Current accepted values are “deterministic” or “stochastic”.</li>
 <li><code>removeEmptyCohorts [= FALSE]</code>: Boolean flag to indicate the removal of cohorts whose density is too low.</li>
 <li><code>minimumTreeCohortDensity [= 1]</code>: Threshold of tree density resulting in cohort removal.</li>
 <li><code>minimumShrubCohortCover [= 0.01]</code>: Threshold of shrub cover resulting in cohort removal.</li>
 <li><code>dynamicallyMergeCohorts [= TRUE]</code>: Boolean flag to indicate that cohorts should be merged when possible. This option speeds up calculations but results in a loss of cohort identity and reinitialization of many state variables.</li>
 </ul>
-<p>Next, a few parameters control the production/arrival of seeds in a qualitative way:</p>
+<p>Next, a few parameters control the production/arrival of seeds:</p>
 <ul>
-<li><code>seedRain [= NULL]</code>: Vector of species codes whose seed rain is to be simulated. If <code>NULL</code> the species identity of seed rain is taken from species currently present in the forest stand and with minimum size (see below).</li>
+<li><code>seedRain [= NULL]</code>: Vector of species names whose seed rain is to be added to seed bank, regardless of local seed production.</li>
 <li><code>seedProductionTreeHeight [= 300]</code>: Default minimum tree height for producing seeds (when species parameter <code>SeedProductionHeight</code> is missing).</li>
 <li><code>seedProductionShrubHeight [= 30]</code>: Default minimum shrub height for producing seeds (when species parameter <code>SeedProductionHeight</code> is missing).</li>
 </ul>
@@ -993,14 +1020,21 @@ div.csl-indent {
 </div>
 <div id="process-details" class="section level2 hasAnchor" number="18.5">
 <h2><span class="header-section-number">18.5</span> Process details<a href="dynamicsmodelling.html#process-details" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="recruitment-from-seeds-1" class="section level3 hasAnchor" number="18.5.1">
-<h3><span class="header-section-number">18.5.1</span> Recruitment from seeds<a href="dynamicsmodelling.html#recruitment-from-seeds-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>To determine the amount of new trees originated from seeds, the model first determines the <strong>seed rain</strong> in the stand by determining which cohorts have total plant heights above maturity thresholds for trees and shrubs (via parameters <code>seedProductionTreeHeight</code>and <code>seedProductionShrubHeight</code>, respectively). Additionally, the user can use a control parameter to impose a seed rain arriving to the stand via dispersal processes, which are not explicitly modelled.</p>
-<p>Actual <strong>sapling recruitment</strong> (i.e. recruitment of small trees, typically 1 cm diameter) depends on environmental conditions in the stand. Specifically, the model calculates, for the year that ended, the mean temperature of the coldest month (<span class="math inline">\(TCM\)</span>), the moisture index (<span class="math inline">\(MI\)</span>) and the fraction of photosynthetic active radiation reaching the ground, given the current structure (<span class="math inline">\(FPAR\)</span>). These values are compared to species specific parameter thresholds <span class="math inline">\(TCM_{recr}\)</span>, <span class="math inline">\(MI_{recr}\)</span> and <span class="math inline">\(FPAR_{recr}\)</span>, respectively. More specifically, a given species <span class="math inline">\(j\)</span> can recruit only if <span class="math inline">\(TCM &gt; TCM_{recr, j}\)</span>, <span class="math inline">\(MI &gt; MI_{recr, j}\)</span> and <span class="math inline">\(FPAR &gt; FPAR_{recr, j}\)</span>. These filters do not ensure recruitment, as it is assumed that multiple processes can further determine the death of recruits. A probability of recruitment <span class="math inline">\(P_{recr}\)</span> is used to represent these additional processes. When simulation of recruitment is <em>stochastic</em>, a given species will recruit if (in addition to the bioclimatic limits) a Bernouilli draw falls below <span class="math inline">\(P_{recr}\)</span> and, if so, the initial density or cover will be fixed. If recruitment is deterministic, then the probability of recruitment is used to multiply the recruitment density or cover.</p>
-<p>Tree recruitment density, diameter and height are determined by parameters <span class="math inline">\(N_{tree,recr}\)</span>, <span class="math inline">\(DBH_{tree, recr}\)</span> and <span class="math inline">\(H_{tree, recr}\)</span>, respectively; whereas cover and height of shrub recruitment is determined by parameters <span class="math inline">\(Cover_{recr}\)</span> and <span class="math inline">\(H_{shrub, recr}\)</span>, respectively. If stochastic simulation of recruitment is requested, then density or cover values are considered mean values of a Poisson distribution. Note that density of tree recruits will decrease during the years after recruitment due to a <strong>self-thinning</strong> process, until <span class="math inline">\(DBH\)</span> reaches <span class="math inline">\(DBH_{tree,ingrowth}\)</span> where <span class="math inline">\(N\)</span> will be <span class="math inline">\(N_{tree,ingrowth}\)</span>, as explained in <a href="growthsenescencemortality.html#selfthinning">17.4.1</a>.</p>
+<div id="seed-production-and-seed-bank-dynamics" class="section level3 hasAnchor" number="18.5.1">
+<h3><span class="header-section-number">18.5.1</span> Seed production and seed bank dynamics<a href="dynamicsmodelling.html#seed-production-and-seed-bank-dynamics" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The model considers <strong>mortality of seeds</strong> in the seed bank before adding new seeds. Annual seed bank mortality is simulated for each species using an exponential decay function, driven by the species-specific seed longevity (<span class="math inline">\(SL\)</span>):</p>
+<p><span class="math display">\[\begin{equation}
+Seeds_{t+1} = Seeds_{t} \cdot \exp(- 1/SL)
+\end{equation}\]</span></p>
+<p>To determine seed production, the model determines the <strong>seed rain</strong> in the stand by determining which cohorts have total plant heights above maturity thresholds for trees and shrubs. This is done, for each cohort, by comparing its height with the species-specific parameter seed production height (<span class="math inline">\(H_{seed}\)</span>). Missing values of <span class="math inline">\(H_{seed}\)</span> are given values from control variables <code>seedProductionTreeHeight</code> and <code>seedProductionShrubHeight</code> for trees and shrubs, respectively. In addition to locally produced seeds, the user can use control parameter <code>seedRain</code> to specify a list of species names whose seeds arrive to the stand. Despite the origin, in non-spatial simulations the seed bank relative amount of species with seed rain is set to 100%, assuming that there is enough seed production to allow normal recruitment. However, when simulations are conducted in a spatial context, the species identity and relative amount of seeds is determined via dispersal sub-model (see chapter <a href="seeddispersal.html#seeddispersal">20</a>).</p>
 </div>
-<div id="resprouting-1" class="section level3 hasAnchor" number="18.5.2">
-<h3><span class="header-section-number">18.5.2</span> Resprouting<a href="dynamicsmodelling.html#resprouting-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="recruitment-from-seeds-1" class="section level3 hasAnchor" number="18.5.2">
+<h3><span class="header-section-number">18.5.2</span> Recruitment from seeds<a href="dynamicsmodelling.html#recruitment-from-seeds-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Actual <strong>sapling recruitment</strong> (i.e. recruitment of small trees, typically 1 cm diameter) depends on environmental conditions in the stand. Specifically, the model calculates, for the year that ended, the mean temperature of the coldest month (<span class="math inline">\(TCM\)</span>), the moisture index (<span class="math inline">\(MI\)</span>) and the fraction of photosynthetic active radiation reaching the ground, given the current structure (<span class="math inline">\(FPAR\)</span>). These values are compared to species specific parameter thresholds <span class="math inline">\(TCM_{recr}\)</span>, <span class="math inline">\(MI_{recr}\)</span> and <span class="math inline">\(FPAR_{recr}\)</span>, respectively. More specifically, a given species <span class="math inline">\(j\)</span> can recruit only if <span class="math inline">\(TCM &gt; TCM_{recr, j}\)</span>, <span class="math inline">\(MI &gt; MI_{recr, j}\)</span> and <span class="math inline">\(FPAR &gt; FPAR_{recr, j}\)</span>. These filters do not ensure recruitment, as it is assumed that multiple processes can further determine the death of recruits. A probability of recruitment <span class="math inline">\(P_{recr}\)</span> is used to represent these additional processes. When simulation of recruitment is <em>stochastic</em>, a given species will recruit if (in addition to the bioclimatic limits) a Bernouilli draw falls below <span class="math inline">\(P_{recr}\)</span> and, if so, the initial density or cover will be fixed. If recruitment is deterministic, then the probability of recruitment is used to multiply the recruitment density or cover.</p>
+<p>Tree recruitment density, diameter and height are determined by parameters <span class="math inline">\(N_{tree,recr}\)</span>, <span class="math inline">\(DBH_{tree, recr}\)</span> and <span class="math inline">\(H_{tree, recr}\)</span>, respectively; whereas cover and height of shrub recruitment is determined by parameters <span class="math inline">\(Cover_{recr}\)</span> and <span class="math inline">\(H_{shrub, recr}\)</span>, respectively. Density/cover of recruits is reduced depending on the relative amount of seeds in the seed bank (i.e. maximum density or cover will occur if seed bank levels are 100%). If stochastic simulation of recruitment is requested, then density or cover values are considered mean values of a Poisson distribution. Note that density of tree recruits will decrease during the years after recruitment due to a <strong>self-thinning</strong> process, until <span class="math inline">\(DBH\)</span> reaches <span class="math inline">\(DBH_{tree,ingrowth}\)</span> where <span class="math inline">\(N\)</span> will be <span class="math inline">\(N_{tree,ingrowth}\)</span>, as explained in <a href="growthsenescencemortality.html#selfthinning">17.4.1</a>.</p>
+</div>
+<div id="resprouting-1" class="section level3 hasAnchor" number="18.5.3">
+<h3><span class="header-section-number">18.5.3</span> Resprouting<a href="dynamicsmodelling.html#resprouting-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Currently, resprouting only occurs in the model if plant cohorts have been <strong>cut</strong>, <strong>burned</strong> or they died of <strong>desiccation</strong> (future model versions will include resprouting after fire impacts). In other words, resprouting does not occur for baseline mortality, self-thinning of recruits or due to starvation.</p>
 <p><strong>Resprouting survivorship</strong></p>
 <p>The model first determines <strong>resprouting survivorship</strong>, which depends on the disturbance type and, in the case of fire, on species identity. Unfortunately, we lack information on the mortality caused in resprouting by cutting or drought for the vast majority of species except for holm oak (<em>Quercus ilex</em>). Thus, we suggest applying tentatively to all species the mortality values obtained in different studies for this species: 2.5% after browsing <span class="citation">(<a href="#ref-espelta_response_2006">Espelta <em>et al.</em> 2006</a>)</span>, 4% after cutting <span class="citation">(<a href="#ref-retana_regeneration_1992">Retana <em>et al.</em> 1992</a>)</span>, 5% after drought <span class="citation">(<a href="#ref-lloret_canopy_2004">Lloret <em>et al.</em> 2004</a>)</span>. Larger differences among species have been reported for fire <span class="citation">(<a href="#ref-espelta_post-fire_2012">Espelta <em>et al.</em> 2012</a>)</span>. This pattern may be linked to inter-specific differences in the size of the bud bank, the degree of bud protection or the amount of stored resources in belowground organs (burl, taproot). Accordingly, default values for survivorship are <span class="math inline">\(Resp_{clip} = 0.96\)</span> (for cutting) and <span class="math inline">\(Resp_{dist} = 0.95\)</span> (for dessication), whereas no default value is given for <span class="math inline">\(Resp_{fire}\)</span>. Naturally, the number of surviving trees (stumps) is given by the number of trees affected by the disturbance multiplied by the survivorship rate:
