@@ -25,7 +25,7 @@ The model also performs the energy balance at the leaf level to determine transp
 
 Plant hydraulics and stomatal regulation follow different designs depending on the sub-model employed:
 
-+ If `transpirationMode = "Sperry"`, plant hydraulics follows the steady-state approach of Sperry et al. [-@Sperry1998] model, and stomatal regulation follows the profit maximization approach of Sperry et al. [-@Sperry2016]. A variant of this sub-model (i.e., if `capacitance = TRUE`) can also consider an explicit water balance within plant compartments @DeCaceres2021. In this case, the amount of water within plant compartments is explicitly tracked and the rate of extraction of soil water can be decoupled from the rate of transpiration. 
++ If `transpirationMode = "Sperry"`, plant hydraulics follows the steady-state approach of Sperry et al. [-@Sperry1998] model, and stomatal regulation follows the profit maximization approach of Sperry et al. [-@Sperry2016]. 
 
 + If `transpirationMode = "Cochard"`, plant water compartments are always included, and water flows follow Darcy's law, as described in @ruffault_sureau-ecos_2022. In this case, stomatal regulation follows a Jarvis-type model.
 
@@ -41,8 +41,8 @@ The following are state variables in the model under all simulations:
 
 Additional state variables depend on the activation of specific control flags (see subsection \@ref(advancedwaterbalancecontrol)):
 
-+ *If plant capacitance effects are considered*, the model also tracks $\Psi_{apo, stem,i}$, the water potential of the stem apoplastic compartment, as well as the water potential of stem and leaf symplastic compartments, $\Psi_{symp, stem,i}$ and $\Psi_{symp, leaf,i}$ respectively.
-+ *If cavitation is not completely reversible*, the proportion of stem hydraulic conductance loss for each plant cohort $i$, $PLC_{stem,i}$, becomes a state variable.
++ If `transpirationMode = "Cochard"`, the model also tracks $\Psi_{apo, stem,i}$, the water potential of the stem apoplastic compartment, as well as the water potential of stem and leaf symplastic compartments, $\Psi_{symp, stem,i}$ and $\Psi_{symp, leaf,i}$ respectively.
++ *If stem cavitation is not completely reversible*, the model tracks $PLC_{stem, i}$ and $PLC_{leaf, i}$, the proportion of conductivity lost the stem and leaves, respectively, of plants of cohort $i$.
 + *If plant water pools are considered*, the model also tracks $W_{i,s}$, the proportion of soil moisture in relation to field capacity for layer $s$ within the areal fraction of stand covered by cohort $i$.
 + *If multi-layer canopy energy balance is activated*, the model tracks for each vertical layer $j \in \{1,l\}$: 
   a. Air temperature, $T_{air,j}$
@@ -131,10 +131,8 @@ For every day to be simulated, the model performs the following steps:
     a. Determine long-wave radiation exchange between soil, canopy layers and atmosphere (section \@ref(longwaveradiation)).
     b. If `transpirationMode = "Sperry"`, for each woody cohort:
 
-        i. If plant capacitance effects are considered update the stem-to-leaf hydraulic supply function.
-        ii. Calculate leaf energy balance and photosynthesis (for shade and sunlit leaves of each plant cohort) corresponding to each transpiration value of the supply function (section \@ref(leafenergybalancephoto)). If plant capacitance effects are considered this concerns the stem-to-leaf hydraulic supply function.
-        iii. Determine stomatal conductance, transpiration and photosynthesis on shade and sunlit leaves of each plant cohort according to Sperry's [-@Sperry2016] profit maximization strategy (section \@ref(stomatalregulation)).
-        iv. If plant capacitance effects are considered perform water balance of plant compartments at high temporal resolution (1 second steps), while re-estimating the flow from the soil to the stem at each step according to changes in stem water potential (see \@ref(hydraulicswithcompartments)). 
+        i. Calculate leaf energy balance and photosynthesis (for shade and sunlit leaves of each plant cohort) corresponding to each transpiration value of the supply function (section \@ref(leafenergybalancephoto)). If plant capacitance effects are considered this concerns the stem-to-leaf hydraulic supply function.
+        ii. Determine stomatal conductance, transpiration and photosynthesis on shade and sunlit leaves of each plant cohort according to Sperry's [-@Sperry2016] profit maximization strategy (section \@ref(stomatalregulation)).
         
     c. If `transpirationMode = "Cochard"`, for each plant cohort repeat the following in small sub-steps (e.g. 10 min):
 
@@ -249,10 +247,9 @@ Vegetation functional attributes are normally filled for each cohort by function
 Control parameters modulate the overall behaviour of water balance simulations (see section \@ref(controlparameters)). There are three **key control parameters**:
 
 1. `transpirationMode` defines the transpiration model. If `transpirationMode = "Sperry"` or `transpirationMode = "Cochard"` then the advanced water balance model is run with the corresponding plant hydraulics and stomatal regulation sub-models. In advanced water balance models, the water retention curve model is forced to be that of Van Genuchten, i.e. `soilFunctions = "VG"` (see section \@ref(waterretentioncurves)). 
-2. `capacitance` defines whether plant capacitance (hence, plant water balance) is considered (only relevant for `transpirationMode = "Sperry"`). By default it is set to `capacitance = FALSE`.
-3. `ndailysteps` defines the number of daily steps. By default `ndailysteps = 24`, so that steps are hours, but users can increase the temporal resolution, for example to half hour substeps by setting `ndailysteps = 48`.
-4. `multiLayerBalance` is a boolean flag to indicate that multi-layer energy balance is desired (by default `multiLayerBalance = FALSE`).
-5. `nsubsteps`  defines the number of substeps for multi-layer energy balance calculations. By default `nsubsteps = 3600`, so that substeps are 1 sec if `ndailysteps = 24`.
+2. `ndailysteps` defines the number of daily steps. By default `ndailysteps = 24`, so that steps are hours, but users can increase the temporal resolution, for example to half hour substeps by setting `ndailysteps = 48`.
+3. `multiLayerBalance` is a boolean flag to indicate that multi-layer energy balance is desired (by default `multiLayerBalance = FALSE`).
+4. `nsubsteps`  defines the number of substeps for multi-layer energy balance calculations. By default `nsubsteps = 3600`, so that substeps are 1 sec if `ndailysteps = 24`.
 
 The other control parameters relevant for the advanced water balance model are:
 
@@ -268,7 +265,11 @@ The other control parameters relevant for the advanced water balance model are:
 + `cuticularTranspiration [=TRUE]`: Boolean flag to indicate the simulation of cuticular transpiration (at night or when stomata are fully closed) according to minimum stomatal conductance (see section \@ref(stomatalregulation)).
 + `thermalCapacityLAI [= 1000000]`: Canopy thermal capacitance per LAI unit (see section \@ref(canopycapacitancetemperature)).
 + `verticalLayerSize [= 100]`: The size of vertical layers (in $cm$) for leaf area distribution and light extinction calculations (see section \@ref(leafdistribution)).
-+ `cavitationRefill [= "total"]`: Controls recovery from cavitation. If `"total"` cavitation is completely reversible. If `"none"` the model operates in a irreversible cavitation mode. If `"annual"` plants are assumed to recover from previous drought at the first day of the year and, finally, if `"rate"` cavitation recovery follows a daily recovery rate (see section \@ref(cavitationrefill)).
++ `cavitationRefill [= "annual"]`: A string indicating how refilling of embolized conduits is done  (see section \@ref(cavitationrefill). Allowed values are: 
+  + `"none"` - no refilling.
+  + `"annual"` - every first day of the year.
+  + `"total"` - instantaneous complete refilling.
+  + `"rate"` - following a rate of new sapwood formation.
 + `refillMaximumRate [= 0.05]`: Maximum rate of conduit refilling (see section \@ref(cavitationrefill)).
 + `klatstem [= 0.01]`: Stem symplastic-apoplastic lateral conductance (in $mmol·s^{-1}·m^{-2}·MPa^{-1}$). Only relevant when `capacitance = TRUE` (see section \@ref(hydraulicswithcompartments)).
 + `klatleaf [= 0.01]`: Leaf symplastic-apoplastic lateral conductance (in $mmol·s^{-1}·m^{-2}·MPa^{-1}$). Only relevant when `capacitance = TRUE` (see section \@ref(hydraulicswithcompartments)).

@@ -311,14 +311,15 @@ P_{dessic, daily} = 1.0 - \exp(\log(1.0 - P_{dessic, annual})/356)
 \end{equation}
 
 ```{r, echo = FALSE}
-df <- SpParamsMED[SpParamsMED$Name %in% c("Abies alba","Cistus albidus", "Juniperus communis","Populus spp.", "Quercus ilex", "Quercus suber", "Quercus pubescens", "Pinus halepensis", "Pinus sylvestris"), c("Name", "StemPI0", "StemEPS", "WoodDensity", "VCstem_c", "VCstem_d")]
+df <- SpParamsMED[SpParamsMED$Name %in% c("Abies alba","Cistus albidus", "Juniperus communis","Populus spp.", "Quercus ilex", "Quercus suber", "Quercus pubescens", "Pinus halepensis", "Pinus sylvestris"), c("Name", "StemPI0", "StemEPS", "WoodDensity", "VCstem_P50", "VCstem_P12", "VCstem_P88")]
 df$StemPI0 =  0.52-4.16*df$WoodDensity
 df$StemEPS =  sqrt(1.02*exp(8.5*df$WoodDensity)-2.89)
 df$Psi_RWC40 = NA
 df$Psi_PLC60 = NA
 for(i in 1:nrow(df)) {
+  pars  = hydraulics_psi2Weibull(df$VCstem_P50[i], df$VCstem_P88[i], df$VCstem_P12[i])
   df$Psi_RWC40[i] = moisture_symplasticPsi(0.4, df$StemPI0[i], df$StemEPS[i])
-  df$Psi_PLC60[i] = hydraulics_xylemPsi(0.4, 1.0, df$VCstem_c[i], df$VCstem_d[i])
+  df$Psi_PLC60[i] = hydraulics_xylemPsi(0.4, 1.0, pars["c"], pars["d"])
 }
 ```
 
@@ -334,8 +335,9 @@ for(is in 1:nrow(df)) {
   df_psi$Pdessication_annual = NA
   df_psi$Pdessication_daily = NA
   for(i in 1:nrow(df_psi)) {
+    pars  = hydraulics_psi2Weibull(df$VCstem_P50[is], df$VCstem_P88[is], df$VCstem_P12[i])
     df_psi$RWC[i] = moisture_symplasticRWC(df_psi$Psi[i], df$StemPI0[is], df$StemEPS[is])*100
-    df_psi$PLC[i] = 100 - hydraulics_xylemConductance(df_psi$Psi[i], 1.0, df$VCstem_c[is], df$VCstem_d[is])*100
+    df_psi$PLC[i] = 100 - hydraulics_xylemConductance(df_psi$Psi[i], 1.0, pars["c"], pars["d"])*100
     df_psi$x[i] <- sum(df_psi$RWC[i], 100 - df_psi$PLC[i])/2
     y <- (df_psi$x[i]/100 - 0.4)
     fact <- 40

@@ -62,11 +62,11 @@ legend("topright", lty=1:4, col=c(rep("black",4)),
 abline(h=50, col="gray", lwd=2)
 ```
 
-If cavitation has occurred in previous steps then the capacity of the plant to transport water is impaired. Hence $K_{i,s}$ from eq. \@ref(eq:relativewholeplantconductance) cannot be larger than the one-complement of $PLC_i$, so that:
+If cavitation has occurred in previous steps then the capacity of the plant to transport water is impaired. Hence $K_{i,s}$ from eq. \@ref(eq:relativewholeplantconductance) cannot be larger than the one-complement of the degree of conductance loss in the stem ($PLC_{stem, i}$), so that:
 \begin{equation}
-K^{PLC}_{i,s} = \min \{K_{i,s}, 1.0 - PLC_{i} \}
+K^{PLC}_{i,s} = \min \{K_{i,s}, 1.0 - PLC_{stem, i} \}
 \end{equation}
-where $PLC_{i}$ is the proportion of conductance lost for cohort $i$ (see \@ref(irreversiblecavitation)). 
+where $PLC_{stem, i}$ is the proportion of stem conductance lost for cohort $i$ (see \@ref(irreversiblecavitation)). 
 
 Until **ver 2.5.0**, actual transpiration of plant cohort $i$ from a given soil layer $s$, $Tr_{i,s}$, was defined as the product of [@Mouillot2001]: the maximum transpiration of the plant cohort ($Tr_{\max,i}$), the relative whole-plant transpiration ($K^{PLC}_{i,s}$) corresponding to the species and water potential in layer $s$, and the proportion of plant fine roots in layer $s$, $FRP_{i,s}$:
 \begin{equation}
@@ -177,19 +177,21 @@ DDS_i=\phi_i \cdot (1-K_{i}(\Psi_{plant,i}))
 Leaf-phenological status is included to prevent winter deciduous plants from suffering drought stress during winter. Daily drought stress values can be later used to define other drought stress indices for larger temporal scales.
  
 ### Cavitation and hydraulic recovery {#irreversiblecavitation}
-The water balance model is normally run assuming that although soil drought may reduce transpiration, embolized xylem conduits are automatically refilled when soil moisture recovers (in other words, cavitation is reversible and `cavitationRefill = "total"`). It is possible to simulate irreversible cavitation by setting `cavitationRefill = "none"`, `cavitationRefill = "rate"` or `cavitation = "annual"` in the control parameters. Any of these options cause the model to keep track of the maximum value of cavitation so far experienced using the proportion of of lost conductance for the plant cohort $i$ ($PLC_i$), which is modelled from $\Psi_{plant}$ using a Weibull function:
-\begin{equation}
-PLC_{i} = \max \left \{PLC_{i}, 1 - \exp \left \{ \ln{(0.5)}\cdot \left[ \frac{\Psi_{plant,i}}{\Psi_{critic,i}} \right] ^r \right \} \right \} 
-\end{equation}
+The water balance model is normally run assuming that although soil drought may reduce transpiration, embolized xylem conduits are automatically refilled when soil moisture recovers (in other words, cavitation is reversible and `cavitationRefill = "total"`). It is possible to simulate irreversible cavitation by setting `cavitationRefill = "none"`, `cavitationRefill = "rate"` or `cavitation = "annual"` in the control parameters. Any of these options cause the model to keep track of the maximum value of cavitation so far experienced using the proportion of of lost conductance for leaves and the stem the plant cohort $i$ ($PLC_{leaf, i}$ and $PLC_{stem, i}$), which are modelled from $\Psi_{plant}$ using Weibull functions:
+\begin{eqnarray}
+PLC_{leaf, i} &=& \max \left \{PLC_{leaf, i}, 1 - \exp \left \{ \left[ \frac{\Psi_{plant,i}}{d_{leaf}} \right] ^{c_{leaf}} \right \} \right \} \\
+PLC_{stem, i} &=& \max \left \{PLC_{stem, i}, 1 - \exp \left \{ \left[ \frac{\Psi_{plant,i}}{d_{stem}} \right] ^{c_{stem}} \right \} \right \}
+\end{eqnarray}
 
-For simulations of less than one year one can use `cavitationRefill = "none"` to keep track of the maximum cavitation. However, for simulations of several years, it is normally advisable to allow recovery. If `cavitation = "annual"`, $PLC_{i}$ values are set to zero at the beginning of each year, assuming that embolized plants overcome the conductance loss by creating new xylem tissue. Finally, if `cavitationRefill = "rate"` the model simulates stem refilling at daily steps as a function of symplasmic water potential. First, a daily recovery rate ($r_{refill}$; in $cm^2 \cdot m^{-2} \cdot day^{-1}$) is estimated as a function of $\Psi_{plant,i}$:
+For simulations of less than one year one can use `cavitationRefill = "none"` to keep track of the maximum cavitation. However, for simulations of several years, it is normally advisable to allow recovery. If `cavitation = "annual"`, $PLC_{leaf, i}$ and $PLC_{stem, i}$ values are set to zero at the beginning of each year, assuming that embolized plants overcome the conductance loss by creating new xylem tissue. Finally, if `cavitationRefill = "rate"` the model simulates stem refilling at daily steps as a function of symplasmic water potential. First, a daily recovery rate ($r_{refill}$; in $cm^2 \cdot m^{-2} \cdot day^{-1}$) is estimated as a function of $\Psi_{plant,i}$:
 \begin{equation}
 r_{refill}(\Psi_{plant,i}) = r_{\max,refill} \cdot \max \{0.0, (\Psi_{plant,i} + 1.5)/1.5\}
 \end{equation}
-Where $r_{\max,refill}$ is the control parameter `refillMaximumRate` indicating a maximum refill rate. The right part of the equation normalizes the water potential, so that $r_{refill} = r_{refill,\max}$ if $\Psi_{plant,i} = 0$ and $r_{refill} = 0$ if $\Psi_{plant,i} <= -1.5MPa$. The proportion of conductance lost is then updated using:
-\begin{equation}
-PLC_{i}= \max \{0.0, PLC_{i} - (r_{refill}/H_v) \}
-\end{equation}
+Where $r_{\max,refill}$ is the control parameter `refillMaximumRate` indicating a maximum refill rate. The right part of the equation normalizes the water potential, so that $r_{refill} = r_{refill,\max}$ if $\Psi_{plant,i} = 0$ and $r_{refill} = 0$ if $\Psi_{plant,i} <= -1.5MPa$. The proportion of conductance lost in stems and leaves is then updated using:
+\begin{eqnarray}
+PLC_{leaf, i} &=& \max \{0.0, PLC_{leaf, i} - (r_{refill}/H_v) \} \\
+PLC_{stem, i} &=& \max \{0.0, PLC_{stem, i} - (r_{refill}/H_v) \}
+\end{eqnarray}
 where $H_v$ is the Huber value (sapwood area to leaf area ratio) in units of $cm^2 \cdot m^{-2}$.
 
 

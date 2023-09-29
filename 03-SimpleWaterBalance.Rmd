@@ -27,7 +27,7 @@ The following are state variables in the model under all simulations:
 Additional state variables depend on the activation of specific control flags:
 
 + *If snow accumulation/melting is considered*, the model tracks $S_{snow}$, the snow water equivalent (in mm) of the snow pack storage over the surface.
-+ *If stem cavitation is not completely reversible*, the model tracks $PLC_{i}$, the proportion of stem conductivity lost by plants of cohort $i$.
++ *If stem cavitation is not completely reversible*, the model tracks $PLC_{stem, i}$ and $PLC_{leaf, i}$, the proportion of conductivity lost the stem and leaves, respectively, of plants of cohort $i$.
 + *If the degree of rhizosphere overlap between plant cohorts is not total* (i.e. if `rhizosphereOverlap = "none"` or `rhizosphereOverlap = "partial"`), the model also tracks $W_{i,s}$, the proportion of soil moisture in relation to field capacity for layer $s$ within the areal fraction of the stand covered by the woody cohort $i$.
 
 ## Water balance {#soilwaterbalance}
@@ -131,6 +131,7 @@ A fourth set of parameters are related to transpiration and photosynthesis (`par
 | $T_{max, sqLAI}$ |       | `Tmax_LAIsq` | Empirical coefficient relating squared LAI with the ratio of maximum transpiration over potential evapotranspiration (see section \@ref(maximumtranspiration)). |
 | $\Psi_{extract}$ | $MPa$ | `Psi_Extract` |  The water potential at which plant transpiration is 50% of its maximum (see section \@ref(actualtranspiration)).|
 | $c_{extract}$ |  | `Exp_Extract` |  Parameter of the Weibull function regulating transpiration reduction (see section \@ref(actualtranspiration)).|
+| $c_{leaf}$, $d_{leaf}$ | (unitless), MPa | `VCleaf_c`, `VCleaf_d` | Parameters of the vulnerability curve for leaf xylem |
 | $c_{stem}$, $d_{stem}$ | (unitless), MPa | `VCstem_c`, `VCstem_d` | Parameters of the vulnerability curve for stem xylem |
 | $WUE_{\max}$ | $g\, C \cdot mm^{-1}$ |  `WUE` |  Water use efficiency at VPD = 1kPa and without light or CO2 limitations (see section \@ref(basicphotosynthesis)).  |
 | $WUE_{PAR}$ |  |  `WUE_par` |  Coefficient describing the progressive decay of WUE with lower light levels (see section \@ref(basicphotosynthesis)). |
@@ -167,16 +168,18 @@ The other relevant control parameters for the basic water balance model are:
 + `rockyLayerDrainage [= TRUE]`:  Whether water exceeding the field capacity of the deepest layer can be drained via macropore flow towards a non-reachable compartment, only for layers with > 95\% rocks (see section \@ref(runoff)).
 + `unlimitedSoilWater [=FALSE]`: Boolean flag to indicate the simulation of plant transpiration assuming that soil water is always at field capacity.
 + `unfoldingDD [= 300]`: Degree-days for complete leaf unfolding after budburst has occurred ($S_{unf}^*$; see section \@ref(leafphenobudburst)).
++ `fireHazardResults [= FALSE]`: Boolean flag to force calculation of daily fire hazard.
 + `rhizosphereOverlap [="total]`: A string indicating the degree of rhizosphere spatial overlap between plant cohorts:
    + `"none"` - no overlap (independent water pools).
    + `"partial"` - partial overlap determined by coarse root volume.
    + `"total"` - total overlap (plants extract from common soil pools).
 + `verticalLayerSize [= 100]`: Size of vertical layers (in cm) for the calculation of light extinction (see section \@ref(leafdistribution)).
 + `windMeasurementHeight [ = 200]`: Height (in cm) over the canopy corresponding to wind measurements.
-+ `cavitationRefill [= "total"]`: A string indicating how refilling of embolized conduits is done  (see section \@ref(irreversiblecavitation). Allowed values are: 
++ `cavitationRefill [= "annual"]`: A string indicating how refilling of embolized conduits is done  (see section \@ref(irreversiblecavitation). Allowed values are: 
   + `"none"` - no refilling.
   + `"annual"` - every first day of the year.
   + `"total"` - instantaneous complete refilling.
+  + `"rate"` - following a rate of new sapwood formation.
 
 ### Model output {#basicwaterbalanceoutput}
 
@@ -200,7 +203,8 @@ Elements `WaterBalance`, `Soil`, `Stand` and `FireHazard` are data frames with d
 |`Transpiration`| $Tr_{i}$ | mm | Transpiration per unit ground area.|
 |`GrossPhotosynthesis`| $A_{g,i}$ | $g\,C \cdot m^{-2}$ | Gross photosynthesis per unit ground area.|
 |`PlantPsi` | $\Psi_{plant,i}$ | $MPa$ | Plant water potential.|
-|`StemPLC` | $PLC_{i}$ | [0-1] | Degree of stem embolisation.|
+|`LeafPLC` | $PLC_{leaf,i}$ | [0-1] | Degree of leaf embolisation.|
+|`StemPLC` | $PLC_{stem, i}$ | [0-1] | Degree of stem embolisation.|
 | `PlantWaterBalance` | | mm | Internal daily plant water balance (balance of soil extraction and transpiration). |
 | `LeafRWC`| $RWC_{leaf, i}$ | % | Mean leaf relative water content. |
 | `StemRWC`| $RWC_{stem, i}$ | % | Mean stem relative water content. |
