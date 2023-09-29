@@ -19,7 +19,7 @@ We devote this chapter to describe the background necessary to understand how pl
 
 The advanced water balance model of **medfate** implements different hydraulic architectures depending on the transpiration sub-model:
 
-+ If `transpirationMode = "Sperry"` and `capacitance = FALSE`, the hydraulic network is described using $(S \times 2 + 2 + 1)$ resistance elements, with soil being represented in $S$ different soil layers. For each soil layer there is a rhizosphere element in series with a root xylem element. The $S$ soil layers are in parallel up to the root crown. From there there are two stem xylem segments and a final leaf segment, all in series (Fig. \@ref(fig:hydraulicsnetwork)). 
++ If `transpirationMode = "Sperry"`, the hydraulic network is described using $(S \times 2 + 2 + 1)$ resistance elements, with soil being represented in $S$ different soil layers. For each soil layer there is a rhizosphere element in series with a root xylem element. The $S$ soil layers are in parallel up to the root crown. From there there are two stem xylem segments and a final leaf segment, all in series (Fig. \@ref(fig:hydraulicsnetwork)). 
 
 
 ```{r hydraulicsnetwork, out.width='80%', fig.align="center", fig.cap="Schematic representation of hydraulics in a whole-plant network", echo=FALSE}
@@ -1048,4 +1048,26 @@ A supply function of the soil-plant hydraulic network defines a set steady-state
 
 ## Cochard's sub-model of plant hydraulics {#hydraulicscochard}
 
-In SurEau-Ecos [@ruffault_sureau-ecos_2022] the soil–plant system is discretized into three soil layers and two plant compartments: a leaf and a “stem”
+### Constitutive equations
+
+Water dynamics of the SPA system in SurEau-Ecos [@ruffault_sureau-ecos_2022] are governed by partial differential equations for water mass conservation. 
+
+The water balance of each of the four plant compartments (symplasm and apoplasm for leaf and stem, respectively) is determined according to a generic equation. For a given compartment $i$, the water balance differential equation is:
+\begin{equation}
+C_i \cdot \frac{\mathrm{d}\Psi_i}{\mathrm{d}t} + \sum_{j}{K_{ij}\cdot (\Psi_i - \Psi_j)} - S = 0
+\end{equation}
+and solved at each time step. In the above equation $\Psi_i$ would be the water potential of the compartment (i.e. $\Psi_{leaf,symp}$, $\Psi_{leaf, apo}$, $\Psi_{stem, symp}$ or $\Psi_{stem, apo}$; see Fig. \@ref(fig:hydraulicssureau)); $C_i$ is the capacitance associated to the compartment and defined generically as:
+\begin{equation}
+C_i = \frac{Q_i}{\Psi_i}
+\end{equation}
+where $Q_i$ is the water volume content of the compartment; $K_{ij}$ is the conductance between two compartments and $S$ represents a flow outside the compartment (i.e. cuticular or stomatal transpiration losses, or water released from cavitation).
+
+### Plant and soil conductances
+
+### Capacitances
+
+### Cavitation flux
+
+### Numerical scheme
+
+Three numerical schemes were presented and compared in @ruffault_sureau-ecos_2022 to solve the system of differential equations, but only the semi-implicit solving approach has been implemented in **medfate**.

@@ -341,7 +341,14 @@ div.csl-indent {
 <li class="chapter" data-level="10.4.4" data-path="planthydraulics.html"><a href="planthydraulics.html#supply-function-of-a-root-system"><i class="fa fa-check"></i><b>10.4.4</b> Supply function of a root system</a></li>
 <li class="chapter" data-level="10.4.5" data-path="planthydraulics.html"><a href="planthydraulics.html#supplycontinuum"><i class="fa fa-check"></i><b>10.4.5</b> Supply function of the soil-plant continuum</a></li>
 </ul></li>
-<li class="chapter" data-level="10.5" data-path="planthydraulics.html"><a href="planthydraulics.html#hydraulicscochard"><i class="fa fa-check"></i><b>10.5</b> Cochard’s sub-model of plant hydraulics</a></li>
+<li class="chapter" data-level="10.5" data-path="planthydraulics.html"><a href="planthydraulics.html#hydraulicscochard"><i class="fa fa-check"></i><b>10.5</b> Cochard’s sub-model of plant hydraulics</a>
+<ul>
+<li class="chapter" data-level="10.5.1" data-path="planthydraulics.html"><a href="planthydraulics.html#constitutive-equations"><i class="fa fa-check"></i><b>10.5.1</b> Constitutive equations</a></li>
+<li class="chapter" data-level="10.5.2" data-path="planthydraulics.html"><a href="planthydraulics.html#plant-and-soil-conductances"><i class="fa fa-check"></i><b>10.5.2</b> Plant and soil conductances</a></li>
+<li class="chapter" data-level="10.5.3" data-path="planthydraulics.html"><a href="planthydraulics.html#capacitances"><i class="fa fa-check"></i><b>10.5.3</b> Capacitances</a></li>
+<li class="chapter" data-level="10.5.4" data-path="planthydraulics.html"><a href="planthydraulics.html#cavitation-flux"><i class="fa fa-check"></i><b>10.5.4</b> Cavitation flux</a></li>
+<li class="chapter" data-level="10.5.5" data-path="planthydraulics.html"><a href="planthydraulics.html#numerical-scheme"><i class="fa fa-check"></i><b>10.5.5</b> Numerical scheme</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html"><i class="fa fa-check"></i><b>11</b> Leaf/canopy photosynthesis</a>
 <ul>
@@ -368,7 +375,7 @@ div.csl-indent {
 <li class="chapter" data-level="12.1.1" data-path="transpirationsperrycochard.html"><a href="transpirationsperrycochard.html#water-supply-and-sunlitshade-photosynthesis-functions"><i class="fa fa-check"></i><b>12.1.1</b> Water supply and sunlit/shade photosynthesis functions</a></li>
 <li class="chapter" data-level="12.1.2" data-path="transpirationsperrycochard.html"><a href="transpirationsperrycochard.html#stomatalregulation"><i class="fa fa-check"></i><b>12.1.2</b> Leaf stomatal regulation by profit maximization</a></li>
 </ul></li>
-<li class="chapter" data-level="12.2" data-path="transpirationsperrycochard.html"><a href="transpirationsperrycochard.html#stomatal-regulation-under-cochards-sub-model"><i class="fa fa-check"></i><b>12.2</b> Stomatal regulation under Cochard’s sub-model</a></li>
+<li class="chapter" data-level="12.2" data-path="transpirationsperrycochard.html"><a href="transpirationsperrycochard.html#stomatal-regulation-and-transpiration-under-cochards-sub-model"><i class="fa fa-check"></i><b>12.2</b> Stomatal regulation and transpiration under Cochard’s sub-model</a></li>
 <li class="chapter" data-level="12.3" data-path="transpirationsperrycochard.html"><a href="transpirationsperrycochard.html#scalingtranspirationphotosynthesis"><i class="fa fa-check"></i><b>12.3</b> Cohort-level transpiration and photosynthesis</a></li>
 <li class="chapter" data-level="12.4" data-path="transpirationsperrycochard.html"><a href="transpirationsperrycochard.html#cavitationrefill"><i class="fa fa-check"></i><b>12.4</b> Cavitation and conduit refilling</a></li>
 </ul></li>
@@ -697,7 +704,7 @@ div.csl-indent {
 <h2><span class="header-section-number">10.1</span> Hydraulic architecture<a href="planthydraulics.html#hydraulicnetworks" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The advanced water balance model of <strong>medfate</strong> implements different hydraulic architectures depending on the transpiration sub-model:</p>
 <ul>
-<li>If <code>transpirationMode = "Sperry"</code> and <code>capacitance = FALSE</code>, the hydraulic network is described using <span class="math inline">\((S \times 2 + 2 + 1)\)</span> resistance elements, with soil being represented in <span class="math inline">\(S\)</span> different soil layers. For each soil layer there is a rhizosphere element in series with a root xylem element. The <span class="math inline">\(S\)</span> soil layers are in parallel up to the root crown. From there there are two stem xylem segments and a final leaf segment, all in series (Fig. <a href="planthydraulics.html#fig:hydraulicsnetwork">10.1</a>).</li>
+<li>If <code>transpirationMode = "Sperry"</code>, the hydraulic network is described using <span class="math inline">\((S \times 2 + 2 + 1)\)</span> resistance elements, with soil being represented in <span class="math inline">\(S\)</span> different soil layers. For each soil layer there is a rhizosphere element in series with a root xylem element. The <span class="math inline">\(S\)</span> soil layers are in parallel up to the root crown. From there there are two stem xylem segments and a final leaf segment, all in series (Fig. <a href="planthydraulics.html#fig:hydraulicsnetwork">10.1</a>).</li>
 </ul>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:hydraulicsnetwork"></span>
 <img src="figures/hydraulics_network.jpg" alt="Schematic representation of hydraulics in a whole-plant network" width="80%" />
@@ -1085,8 +1092,33 @@ Figure 10.17: Water potential in network elements corresponding to overall flow 
 </div>
 <div id="hydraulicscochard" class="section level2 hasAnchor" number="10.5">
 <h2><span class="header-section-number">10.5</span> Cochard’s sub-model of plant hydraulics<a href="planthydraulics.html#hydraulicscochard" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>In SurEau-Ecos <span class="citation">(<a href="#ref-ruffault_sureau-ecos_2022">Ruffault <em>et al.</em> 2022</a>)</span> the soil–plant system is discretized into three soil layers and two plant compartments: a leaf and a “stem”</p>
+<div id="constitutive-equations" class="section level3 hasAnchor" number="10.5.1">
+<h3><span class="header-section-number">10.5.1</span> Constitutive equations<a href="planthydraulics.html#constitutive-equations" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Water dynamics of the SPA system in SurEau-Ecos <span class="citation">(<a href="#ref-ruffault_sureau-ecos_2022">Ruffault <em>et al.</em> 2022</a>)</span> are governed by partial differential equations for water mass conservation.</p>
+<p>The water balance of each of the four plant compartments (symplasm and apoplasm for leaf and stem, respectively) is determined according to a generic equation. For a given compartment <span class="math inline">\(i\)</span>, the water balance differential equation is:
+<span class="math display">\[\begin{equation}
+C_i \cdot \frac{\mathrm{d}\Psi_i}{\mathrm{d}t} + \sum_{j}{K_{ij}\cdot (\Psi_i - \Psi_j)} - S = 0
+\end{equation}\]</span>
+and solved at each time step. In the above equation <span class="math inline">\(\Psi_i\)</span> would be the water potential of the compartment (i.e. <span class="math inline">\(\Psi_{leaf,symp}\)</span>, <span class="math inline">\(\Psi_{leaf, apo}\)</span>, <span class="math inline">\(\Psi_{stem, symp}\)</span> or <span class="math inline">\(\Psi_{stem, apo}\)</span>; see Fig. <a href="planthydraulics.html#fig:hydraulicssureau">10.2</a>); <span class="math inline">\(C_i\)</span> is the capacitance associated to the compartment and defined generically as:
+<span class="math display">\[\begin{equation}
+C_i = \frac{Q_i}{\Psi_i}
+\end{equation}\]</span>
+where <span class="math inline">\(Q_i\)</span> is the water volume content of the compartment; <span class="math inline">\(K_{ij}\)</span> is the conductance between two compartments and <span class="math inline">\(S\)</span> represents a flow outside the compartment (i.e. cuticular or stomatal transpiration losses, or water released from cavitation).</p>
+</div>
+<div id="plant-and-soil-conductances" class="section level3 hasAnchor" number="10.5.2">
+<h3><span class="header-section-number">10.5.2</span> Plant and soil conductances<a href="planthydraulics.html#plant-and-soil-conductances" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+</div>
+<div id="capacitances" class="section level3 hasAnchor" number="10.5.3">
+<h3><span class="header-section-number">10.5.3</span> Capacitances<a href="planthydraulics.html#capacitances" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+</div>
+<div id="cavitation-flux" class="section level3 hasAnchor" number="10.5.4">
+<h3><span class="header-section-number">10.5.4</span> Cavitation flux<a href="planthydraulics.html#cavitation-flux" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+</div>
+<div id="numerical-scheme" class="section level3 hasAnchor" number="10.5.5">
+<h3><span class="header-section-number">10.5.5</span> Numerical scheme<a href="planthydraulics.html#numerical-scheme" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Three numerical schemes were presented and compared in <span class="citation">Ruffault <em>et al.</em> (<a href="#ref-ruffault_sureau-ecos_2022">2022</a>)</span> to solve the system of differential equations, but only the semi-implicit solving approach has been implemented in <strong>medfate</strong>.</p>
 
+</div>
 </div>
 </div>
 <h3>Bibliography<a href="bibliography.html#bibliography" class="anchor-section" aria-label="Anchor link to header"></a></h3>
