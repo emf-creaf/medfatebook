@@ -176,9 +176,9 @@ The advanced water balance model requires many functional parameters to be speci
 |--------|-------|----| ---------------------------------------------|
 |        |       |  `PhenologyType`  | Leaf phenology type (oneflush-evergreen, progressive-evergreen, winter-deciduous, winter-semideciduous)|
 | $LD$ | years  | `LeafDuration` | Average duration of leaves (in years). |
-| $S^*_{eco,i}$ | $^{\circ} \mathrm{C}$ | `Sgdd` | Degree days corresponding to leaf budburst (see section \@ref(leafphenobudburst)). |
+| $S^*_{eco}$ | $^{\circ} \mathrm{C}$ | `Sgdd` | Degree days corresponding to leaf budburst (see section \@ref(leafphenobudburst)). |
 | $T_{eco}$ | $^{\circ} \mathrm{C}$ | `Tbgdd` | Base temperature for the calculation of degree days to leaf budburst (see section \@ref(leafphenobudburst)). |
-| $S^*_{sen,i}$ | $^{\circ} \mathrm{C}$ | `Ssen` | Degree days corresponding to leaf senescence (see section \@ref(leafphenosenescence)). |
+| $S^*_{sen}$ | $^{\circ} \mathrm{C}$ | `Ssen` | Degree days corresponding to leaf senescence (see section \@ref(leafphenosenescence)). |
 | $Ph_{sen}$ | hours | `Phsen` | Photoperiod corresponding to start counting senescence degree-days (see section \@ref(leafphenosenescence)). |
 | $T_{sen}$ | $^{\circ} \mathrm{C}$ | `Tbsen` | Base temperature for the calculation of degree days to leaf senescence (see section \@ref(leafphenosenescence)). |
 
@@ -186,21 +186,21 @@ A second set of functional parameters relate to light extinction and water inter
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
-| $k_{PAR,i}$ | (unitless) | `kPAR` | Extinction coefficient for diffuse PAR |
-| $\alpha_{SWR,i}$ | [0-1] | `alphaSWR` | Short-wave radiation leaf absorbance coefficient |
-| $\gamma_{SWR,i}$ | [0-1] |`gammaSWR` | Short-wave radiation leaf reflectance (albedo) |
-| $s_{water, i}$ | $mm\,H_2O·LAI^{-1}$ | `g` | Crown water storage capacity (i.e. depth of water that can be retained by leaves and branches) per LAI unit |
+| $k_{PAR}$ | (unitless) | `kPAR` | Extinction coefficient for diffuse PAR |
+| $\alpha_{SWR}$ | [0-1] | `alphaSWR` | Short-wave radiation leaf absorbance coefficient |
+| $\gamma_{SWR}$ | [0-1] |`gammaSWR` | Short-wave radiation leaf reflectance (albedo) |
+| $s_{water}$ | $mm\,H_2O·LAI^{-1}$ | `g` | Crown water storage capacity (i.e. depth of water that can be retained by leaves and branches) per LAI unit |
 
 A third set includes parameters related to plant anatomic and morphological attributes (`paramsAnatomy`):
 
 | Symbol | Units | R param | Description                             |
 |--------|-------|---------|-----------------------------------------|
-| $H_{med,i}$  | $cm$ | `Hmed` | Median plant height |
-| $1/H_{v,i}$  | $m^2 \cdot m^{-2}$ | `Al2As` | Ratio of leaf area to sapwood area |
-|  $LW_i$   | $cm$  | `LeafWidth` | Leaf width |
-| $SLA_i$  | $m^2 \cdot kg^{-1}$ | `SLA` | Specific leaf area |
-| $\rho_{leaf,i}$ | $g \cdot cm^{-3}$ | `LeafDensity` | Leaf tissue density |
-| $\rho_{wood,i}$ | $g \cdot cm^{-3}$ | `WoodDensity` | Wood tissue density |
+| $H_{med}$  | $cm$ | `Hmed` | Median plant height |
+| $1/H_{v}$  | $m^2 \cdot m^{-2}$ | `Al2As` | Ratio of leaf area to sapwood area |
+|  $LW$   | $cm$  | `LeafWidth` | Leaf width |
+| $SLA$  | $m^2 \cdot kg^{-1}$ | `SLA` | Specific leaf area |
+| $\rho_{leaf}$ | $g \cdot cm^{-3}$ | `LeafDensity` | Leaf tissue density |
+| $\rho_{wood}$ | $g \cdot cm^{-3}$ | `WoodDensity` | Wood tissue density |
 | $\rho_{fineroot}$ | $g \cdot cm^{-3}$ | `FineRootDensity` | Fine root tissue density |
 | $SRL$ | $cm \cdot g^{-1}$ | `SRL` | Specific root length |
 | $RLD$ | $cm \cdot cm^{-3}$ | `RLD` | Fine root length density (i.e. density of root length per soil volume) |
@@ -210,35 +210,42 @@ A fourth set of parameters are related to transpiration and photosynthesis (`par
 
 | Symbol | Units | R param | Description                             |
 |--------|-------|---------|-----------------------------------------|
-| $g_{swmin,i}$ | $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$ | `Gwmin` | Minimum stomatal conductance to water vapour |
-| $g_{swmax,i}$ | $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$ | `Gwmax` | Maximum stomatal conductance to water vapour |
-| $J_{max, 298,i}$ | $\mu mol\, e \cdot m^{-2} \cdot s^{-1}$ | `Jmax298` | Maximum rate of electron transport at 298K |
-| $V_{max, 298,i}$ | $\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$ | `Vmax298` | Rubisco's maximum carboxylation rate at 298K |
+| $g_{swmin}$ | $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$ | `Gwmin` | Minimum stomatal conductance to water vapour |
+| $g_{swmax}$ | $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$ | `Gwmax` | Maximum stomatal conductance to water vapour |
+| $J_{max, 298}$ | $\mu mol\, e \cdot m^{-2} \cdot s^{-1}$ | `Jmax298` | Maximum rate of electron transport at 298K |
+| $V_{max, 298}$ | $\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$ | `Vmax298` | Rubisco's maximum carboxylation rate at 298K |
 | $K_{stem,max,ref}$ | $kg \cdot s^{-1} \cdot m^{-1} \cdot MPa^{-1}$ | `Kmax_stemxylem` | Maximum stem sapwood reference conductivity per leaf area unit |
 | $K_{root,max,ref}$ | $kg \cdot s^{-1} \cdot m^{-1} \cdot MPa^{-1}$ | `Kmax_rootxylem` | Maximum root sapwood reference conductivity per leaf area unit |
-| $k_{leaf, \max,i}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | `VCleaf_kmax` | Maximum leaf conductance (per leaf area unit) |
-| $k_{stem, \max,i}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | `VCstem_kmax` | Maximum stem conductance (per leaf area unit) |
-| $k_{root, \max,i,s}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | `VCroot_kmax` | Maximum root conductance (per leaf area unit) for each soil layer |
-|$k_{rhizo,\max, i,s}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | `VGrhizo_kmax` | Maximum hydraulic conductance of the rhizosphere for each soil layer |
-| $c_{leaf,i}$, $d_{leaf,i}$ | (unitless), MPa | `VCleaf_c`, `VCleaf_d` | Parameters of the vulnerability curve for leaves |
-| $c_{stem,i}$, $d_{stem,i}$ | (unitless), MPa | `VCstem_c`, `VCstem_d` | Parameters of the vulnerability curve for stem xylem |
-| $c_{root,i}$, $d_{root,i}$ | (unitless), MPa | `VCroot_c`, `VCroot_d` | Parameters of the vulnerability curve for root xylem |
+| $k_{leaf, \max}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | `VCleaf_kmax` | Maximum leaf conductance (per leaf area unit) |
+| $k_{stem, \max}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | `VCstem_kmax` | Maximum stem conductance (per leaf area unit) |
+| $k_{root, \max,s}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | `VCroot_kmax` | Maximum root conductance (per leaf area unit) for each soil layer |
+|$k_{rhizo,\max, s}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | `VGrhizo_kmax` | Maximum hydraulic conductance of the rhizosphere for each soil layer |
+| $c_{leaf}$, $d_{leaf}$ | (unitless), MPa | `VCleaf_c`, `VCleaf_d` | Parameters of the vulnerability curve for leaves (Weibull) |
+| $\Psi_{50, leaf}$, $slope_{leaf}$ | MPa, %/MPa | `VCleaf_P50`, `VCleaf_slope` | Parameters of the vulnerability curve for leaves (Sigmoid) |
+| $c_{stem}$, $d_{stem}$ | (unitless), MPa | `VCstem_c`, `VCstem_d` | Parameters of the vulnerability curve for stem xylem (Weibull) |
+| $\Psi_{50,stem}$, $slope_{stem}$ | MPa, %/MPa | `VCstem_P50`, `VCstem_slope` | Parameters of the vulnerability curve for stem xylem (Sigmoid) |
+| $c_{root}$, $d_{root}$ | (unitless), MPa | `VCroot_c`, `VCroot_d` | Parameters of the vulnerability curve for root xylem (Weibull) |
+| $\Psi_{50,root}$, $slope_{root}$ | MPa, %/MPa | `VCroot_P50`, `VCroot_slope` | Parameters of the vulnerability curve for root xylem (Sigmoid) |
+| $T_{gs, optim}$ |  $^{\circ} \mathrm{C}$ | `Gs_Toptim`| Temperature corresponding to maximal stomatal conductance (Cochard sub-model) |
+| $T_{gs, sens}$ | | `Gs_Tsens` | Stomatal sensitivity to temperature (Cochard sub-model) |
+| $\Psi_{50,gs}$ | MPa | `Gs_P50`| Water potential causing 50% reduction in stomatal conductance (Cochard sub-model) |
+| $slope_{gs}$ | %/MPa | `Gs_slope` | Rate of decrease in stomatal conductance at $\Psi_{50,gs}$ (Cochard sub-model) |
 
-It is important to mention that stem- and root-level hydraulic conductances (i.e. $k_{stem, \max}$ and $k_{root, \max}$) are not given as inputs by the user, but are the result from scaling tissue-level conductivity parameters (i.e. $K_{stem,max,ref}$ and $K_{root,max,ref}$) according to plant size (see \@ref(scalingkstem) and \@ref(scalingkroot) for details). 
+It is important to mention that stem- and root-level hydraulic conductances (i.e. $k_{stem, \max}$ and $k_{root, \max}$) are not given as inputs by the user, but are the result from scaling tissue-level conductivity parameters (i.e. $K_{stem,max,ref}$ and $K_{root,max,ref}$) according to plant size (see \@ref(scalingkstem) and \@ref(scalingkroot) for details). Similarly, parameters of Weibull vulnerability curves are estimated from the input in form of $\Psi_{50}$, $\Psi_{12}$ and $\Psi_{88}$ available in `SpParams`. The $slope$ of the Sigmoid vulnerability curves can also be estimated from the same values, or provided by the user directly as a column in `SpParams`.
 
 A fifth (final) set of parameters are related to water storage and water relations in plant tissues (`paramsWaterStorage`):
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
 | $LFMC_{\max}$ | % | `maxFMC` | Maximum live fuel moisture content, corresponding to fine fuels (< 6.35 mm twigs and leaves). |
-| $\epsilon_{leaf,i}$ | MPa | `LeafEPS` | Modulus of elasticity of leaves |
-| $\epsilon_{stem,i}$ | MPa | `StemEPS` | Modulus of elasticity of symplastic xylem tissue |
-| $\pi_{0,leaf,i}$ | MPa | `LeafPI0` | Osmotic potential at full turgor of leaves |
-| $\pi_{0,stem,i}$ | MPa | `StemPI0` | Osmotic potential at full turgor of symplastic xylem tissue |
-| $f_{apo,leaf,i}$ | [0-1] | `LeafAF` | Apoplastic fraction in leaf tissues |
-| $f_{apo,stem,i}$ | [0-1] | `StemAF` | Apoplastic fraction in stem tissues |
-| $V_{leaf,i}$ | $l \cdot m^{-2}$ | `Vleaf` | Leaf water capacity per leaf area unit |
-| $V_{sapwood,i}$ | $l \cdot m^{-2}$ | `Vsapwood` | Sapwood water capacity per leaf area unit |
+| $\epsilon_{leaf}$ | MPa | `LeafEPS` | Modulus of elasticity of leaves |
+| $\epsilon_{stem}$ | MPa | `StemEPS` | Modulus of elasticity of symplastic xylem tissue |
+| $\pi_{0,leaf}$ | MPa | `LeafPI0` | Osmotic potential at full turgor of leaves |
+| $\pi_{0,stem}$ | MPa | `StemPI0` | Osmotic potential at full turgor of symplastic xylem tissue |
+| $f_{apo,leaf}$ | [0-1] | `LeafAF` | Apoplastic fraction in leaf tissues |
+| $f_{apo,stem}$ | [0-1] | `StemAF` | Apoplastic fraction in stem tissues |
+| $V_{leaf}$ | $l \cdot m^{-2}$ | `Vleaf` | Leaf water capacity per leaf area unit |
+| $V_{sapwood}$ | $l \cdot m^{-2}$ | `Vsapwood` | Sapwood water capacity per leaf area unit |
 
 Vegetation functional attributes are normally filled for each cohort by function `spwbInput()` or `forest2spwbInput()` from species identity. However, different parameters can be specified for different cohorts of the same species if desired (see section \@ref(functionaltraits)). 
 
@@ -251,7 +258,7 @@ Control parameters modulate the overall behaviour of water balance simulations (
 3. `multiLayerBalance` is a boolean flag to indicate that multi-layer energy balance is desired (by default `multiLayerBalance = FALSE`).
 4. `nsubsteps`  defines the number of substeps for multi-layer energy balance calculations. By default `nsubsteps = 3600`, so that substeps are 1 sec if `ndailysteps = 24`.
 
-The other control parameters relevant for the advanced water balance model are:
+Other relevant control parameters relevant for the advanced water balance model are:
 
 + `defaultWindSpeed [= 2.5]`: Default value for wind speed (in $m \cdot s^{-1}$) when this is missing (only used for leaf fall, see section \@ref(leafphenology)).
 + `defaultCO2 [=386]`: Default atmospheric (abovecanopy) $CO_2$ concentration (in micromol $CO_2 \cdot mol^{-1}$ = ppm). This value will be used whenever $CO_2$ concentration is not specified in the weather input.
@@ -271,11 +278,29 @@ The other control parameters relevant for the advanced water balance model are:
   + `"total"` - instantaneous complete refilling.
   + `"rate"` - following a rate of new sapwood formation.
 + `refillMaximumRate [= 0.05]`: Maximum rate of conduit refilling (see section \@ref(cavitationrefill)).
-+ `klatstem [= 0.01]`: Stem symplastic-apoplastic lateral conductance (in $mmol·s^{-1}·m^{-2}·MPa^{-1}$). Only relevant when `capacitance = TRUE` (see section \@ref(hydraulicswithcompartments)).
-+ `klatleaf [= 0.01]`: Leaf symplastic-apoplastic lateral conductance (in $mmol·s^{-1}·m^{-2}·MPa^{-1}$). Only relevant when `capacitance = TRUE` (see section \@ref(hydraulicswithcompartments)).
-+ `numericParams`: A list with params for numerical approximation routines.
 
-In addition, a number of control parameters are used to modify how hydraulic parameters are estimated when calling function `spwbInput()`: 
+A set of parameters is only relevant for `transpirationMode = "Sperry"`:
+
++ `numericParams`: A list with parameters for numerical approximation routines:
+  + `maxNsteps [= 400]` - Maximum number of steps in supply function.
+  + `ntrial [= 200]` - Number of iteration trials when finding root of equation system.
+  + `psiTol [= 0.0001]` - Tolerance value for water potential.
+  + `ETol [= 0.0001]` - Tolerance value for flow.
+  
+whereas another set is only relevant for `transpirationMode = "Cochard"`:
+
++ `capacitance [= TRUE]`: Whether the effect of (symplasmic or apoplasmic) plant water compartments is considered in simulations.
++ `C_SApoInit [= 2.0e-5]`: Maximum capacitance of the stem apoplasm (mmol·m-2).
++ `C_LApoInit [= 1.0e-5]`: Maximum capacitance of the leaf apoplasm (mmol·m-2).
++ `k_SSym [= 0.26]`: Conductance from stem apoplasm to stem symplasm (mmol·s-1·m-2).
++ `TPhase_gmin [= 37.5]`: Temperature for transition phase of gmin.
++ `Q10_1_gmin [= 1.2]`: Temperature dependance of gmin when T ≤ TPhase.
++ `Q10_2_gmin [= 4.8]`: Temperature dependance of gmin when T > TPhase.
++ `JarvisPAR [= 0.003]`: Parameter regulating the response of stomatal conductance to light (PAR) in the Jarvis model.
++ `gCrown0 [= 0.150]`: Reference crown conductance (mol·s-1·m-2).
++ `fTRBToLeaf [= 0.8]`: Fraction of surface of bark exposed to air per leaf area.
+
+Finally, a number of control parameters are used to modify how hydraulic parameters are estimated when calling function `spwbInput()`: 
 
 + `taper [= TRUE]`: Whether taper of xylem conduits is accounted for when estimating aboveground stem conductance from xylem conductivity.
 + `fracRootResistance [= 0.40]`: Fraction of plant total resistance (leaf+stem+root) that corresponds to root system. 
@@ -286,7 +311,7 @@ In addition, a number of control parameters are used to modify how hydraulic par
 
 #### Daily output
 
-Functions `spwb()` and `pwb()` with `transpirationMode = "Sperry"` return a list of a class with the same name. The first four elements of this list (i.e., `latitude`, `topography`, `weather` and `spwbInput`) are simply copies of model inputs. The next element is `spwbOutput`, which contains the state of the input object at the end of the simulation (this can be used to perform further simulations starting with current values of state variables). The remainng elements are:
+Functions `spwb()` and `pwb()` with `transpirationMode = "Sperry"` or `transpirationMode = "Cochard"` return a list of a class with the same name. The first four elements of this list (i.e., `latitude`, `topography`, `weather` and `spwbInput`) are simply copies of model inputs. The next element is `spwbOutput`, which contains the state of the input object at the end of the simulation (this can be used to perform further simulations starting with current values of state variables). The remainng elements are:
 
 | Element | Description                                                |
 |---------|------------------------------------------------------------|
@@ -304,25 +329,26 @@ Compared to the output of the basic water balance \@ref(basicwaterbalanceoutput)
 
 | Element | Symbol    | Units | Description                               |
 |---------|-----------|-------|-------------------------------------------|
-|`LAI`| $LAI^{\phi}_i$ | $m^2 \cdot m^{-2}$ | Leaf area index (expanded).|
-|`LAIlive`| $LAI^{live}_i$ | $m^2 \cdot m^{-2}$ | Leaf area index (live).|
+|`LAI`| $LAI^{\phi}$ | $m^2 \cdot m^{-2}$ | Leaf area index (expanded).|
+|`LAIlive`| $LAI^{live}$ | $m^2 \cdot m^{-2}$ | Leaf area index (live).|
 |`AbsorbedSWR` |  | MJ | Shortwave radiation absorbed per ground area.|
 |`AbsorbedLWR` |  | MJ | Longwave radiation absorbed per ground area.|
-|`Transpiration`| $Tr_{i}$ | mm | Transpiration per ground area.|
-|`GrossPhotosynthesis`| $A_{g,i}$ | $g\,C \cdot m^{-2}$ | Gross photosynthesis per ground area.|
-|`NetPhotosynthesis`| $A_{n,i}$ | $g\,C \cdot m^{-2}$ | Net photosynthesis per ground area.|
-| `dEdP` | $dE/d\Psi_{i}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | Derivative of the (aboveground) supply function. |
+|`Transpiration`| $Tr$ | mm | Transpiration per ground area.|
+|`GrossPhotosynthesis`| $A_{g}$ | $g\,C \cdot m^{-2}$ | Gross photosynthesis per ground area.|
+|`NetPhotosynthesis`| $A_{n}$ | $g\,C \cdot m^{-2}$ | Net photosynthesis per ground area.|
+| `dEdP` | $dE/d\Psi_{leaf}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | Derivative of the (aboveground) supply function. |
 | `PlantWaterBalance` | | mm | Internal daily plant water balance (balance of soil extraction and transpiration). |
-| `LeafPsiMin`| $\Psi_{md, i}$ | MPa | Minimum (midday) 'average leaf' water potential. |
-| `LeafPsiMax`| $\Psi_{pd, i}$ | MPa | Maximum (predawn) 'average leaf' water potential. |
-| `StemPsi`| $\Psi_{stem, i}$ | MPa | Minimum stem water potential. |
-| `RootPsi`| $\Psi_{rootcrown, i}$ | MPa | Minimum root-crown water potential. |
-| `RhizoPsi`| $\Psi_{rootsurf, i,s}$ | MPa | Minimum root surface water potential for each soil layer. |
-| `StemPLC`| $PLC_{stem,i}$ | MPa | Proportion of stem conductance loss. |
-| `LeafRWC`| $RWC_{leaf, i}$ | % | Mean leaf relative water content. |
-| `StemRWC`| $RWC_{stem, i}$ | % | Mean stem relative water content. |
-| `LFMC`| $LFMC_{i}$ | % | Live fuel moisture content (as percent of dry weight), corresponding to fine fuels (< 6.35 mm twigs and leaves). |
-| `PlantStress` | $DDS_i$ | [0-1] | Drought stress level suffered by each plant cohort (relative whole-plant conductance).|
+| `LeafPsiMin`| $\Psi_{md}$ | MPa | Minimum (midday) 'average leaf' water potential. |
+| `LeafPsiMax`| $\Psi_{pd}$ | MPa | Maximum (predawn) 'average leaf' water potential. |
+| `StemPsi`| $\Psi_{stem}$ | MPa | Minimum stem water potential. |
+| `RootPsi`| $\Psi_{rootcrown}$ | MPa | Minimum root-crown water potential. |
+| `RhizoPsi`| $\Psi_{rootsurf,s}$ | MPa | Minimum root surface water potential for each soil layer. |
+| `LeafPLC`| $PLC_{leaf}$ | MPa | Proportion of leaf conductance loss. |
+| `StemPLC`| $PLC_{stem}$ | MPa | Proportion of stem conductance loss. |
+| `LeafRWC`| $RWC_{leaf}$ | % | Mean leaf relative water content. |
+| `StemRWC`| $RWC_{stem}$ | % | Mean stem relative water content. |
+| `LFMC`| $LFMC$ | % | Live fuel moisture content (as percent of dry weight), corresponding to fine fuels (< 6.35 mm twigs and leaves). |
+| `PlantStress` | $DDS$ | [0-1] | Drought stress level suffered by each plant cohort (relative whole-plant conductance).|
 
 The following table describes the child elements of `SunlitLeaves` and `ShadeLeaves`, each of them a data frame with dates in rows and plant cohorts in columns:
 
@@ -330,7 +356,10 @@ The following table describes the child elements of `SunlitLeaves` and `ShadeLea
 |---------|--------|-------|-------------------------------------------|
 | `LeafPsiMin`|$\Psi_{md, i}^{sunlit}$, $\Psi_{md, i}^{shade}$ | MPa | Minimum (midday) (sunlit or shade) leaf water potential. |
 | `LeafPsiMax`| $\Psi_{pd, i}^{sunlit}$, $\Psi_{pd, i}^{shade}$| MPa | Maximum (predawn) (sunlit or shade) leaf water potential. |
-| `GW`| $g_{w,i}^{sunlit}$, $g_{w,i}^{shade}$| $mol \cdot s^{-1} \cdot m^{-2}$ | Stomatal conductance to water vapour. |
+| `TempMin`| $T_{leaf, \min}^{sunlit}$, $T_{leaf,\min}^{shade}$|  $^{\circ} \mathrm{C}$ | Minimum leaf temperature. |
+| `TempMax`| $T_{leaf, \max}^{sunlit}$, $T_{leaf,\max}^{shade}$|  $^{\circ} \mathrm{C}$ | Maximum leaf temperature. |
+| `GSWMin`| $g_{w,i}^{sunlit}$, $g_{w,i}^{shade}$| $mol \cdot s^{-1} \cdot m^{-2}$ | Minimum stomatal conductance to water vapour. |
+| `GSWMax`| $g_{w,i}^{sunlit}$, $g_{w,i}^{shade}$| $mol \cdot s^{-1} \cdot m^{-2}$ | Maximum stomatal conductance to water vapour. |
 
 The output of simulations can be inspected using `plot`, `shinyplot` and `summary` functions specific to `spwb` objects (examples are given in the corresponding package *vignette*).
 

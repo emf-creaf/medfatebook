@@ -721,22 +721,24 @@ for(i in 1:length(pres)) {
                      krootmax, rootc,rootd, 
                      kstemmax, stemc, stemd,
                      kleafmax, leafc, leafd)
-  hn1 <- list("psisoil" = psiSoilLayers1,
+  control <- defaultControl("Sperry")
+  hn1 <- list("numericParams" = control$numericParams,
+              "psisoil" = psiSoilLayers1,
              "krhizomax" = krhizomaxvec1, "nsoil" = s$VG_n, "alphasoil" = s$VG_alpha,
              "krootmax" = krootmaxvec, "rootc" = rootc, "rootd" = rootd,
              "kstemmax" = kstemmax, "stemc" = stemc, "stemd" = stemd,
              "kleafmax" = kleafmax, "leafc" = leafc, "leafd" = leafd,
              "PLCstem" =plcCav, "PLCleaf" =plcCav)
-  sfn1 = hydraulics_supplyFunctionNetwork(hn1, maxNsteps = 400)
+  sfn1 = hydraulics_supplyFunctionNetwork(hn1)
   hn2 <- hn1
   hn2$psisoil <- psiSoilLayers2
-  sfn2 = hydraulics_supplyFunctionNetwork(hn2, maxNsteps = 400)
+  sfn2 = hydraulics_supplyFunctionNetwork(hn2)
   hn3 <- hn1
   hn3$psisoil <- psiSoilLayers3
-  sfn3 = hydraulics_supplyFunctionNetwork(hn3, maxNsteps = 400)
+  sfn3 = hydraulics_supplyFunctionNetwork(hn3)
   hn4 <- hn1
   hn4$psisoil <- psiSoilLayers4
-  sfn4 = hydraulics_supplyFunctionNetwork(hn4, maxNsteps = 400)
+  sfn4 = hydraulics_supplyFunctionNetwork(hn4)
   if(i==1) {
     plot(-sfn1$psiLeaf, sfn1$E ,type="l", ylab="Flow rate  (mmol·m-2·s-1)", 
        xlab = "Leaf Pressure (-MPa)",  main="",  xlim=c(0, 7), ylim=c(0,max(sfn1$E)), lwd=1, col = col1)

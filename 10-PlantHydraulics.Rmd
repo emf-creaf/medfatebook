@@ -12,14 +12,14 @@ col3pale = "light blue"
 col4pale = "green"
 ```
 
-We devote this chapter to describe the background necessary to understand how plant hydraulics is implemented in the advanced water balance model of **medfate**. Section \@ref(hydraulicnetworks) introduces the hydraulic networks from which to choose, depending on the sub-model of plant hydraulics employed (i.e. either `transpirationMode = "Sperry"` or `transpirationMode = "Cochard"`). After that, in sections \@ref(vulnerabilitycurves) and  \@ref(plantwatercontent) we present the building blocks of models of plant hydraulics, i.e. how to represent in a model the water content of plant tissues and the water flow through vascular elements. In sections \@ref(supplyfunctions) and \@ref(hydraulicswithcompartments) we describe in detail the plant hydraulics sub-models presented in @DeCaceres2021. Finally, in  \@ref(hydraulicscochard) we describe the sub-model of plant hydraulics that was presented in @ruffault_sureau-ecos_2022 and was added to **medfate**.
+We devote this chapter to describe the background necessary to understand how plant hydraulics is implemented in the advanced water balance model of **medfate**. Section \@ref(hydraulicnetworks) introduces the hydraulic networks from which to choose, depending on the sub-model of plant hydraulics employed (i.e. either `transpirationMode = "Sperry"` or `transpirationMode = "Cochard"`). After that, in sections \@ref(vulnerabilitycurves) and  \@ref(plantwatercontent) we present the building blocks of models of plant hydraulics, i.e. how to represent in a model the water content of plant tissues and the water flow through vascular elements. In section \@ref(supplyfunctions) we describe in detail the plant hydraulic sub-model presented in @DeCaceres2021 (without water compartments), and in  \@ref(hydraulicscochard) we describe the sub-model of plant hydraulics that was presented in @ruffault_sureau-ecos_2022 and was added to **medfate**.
 
 
 ## Hydraulic architecture {#hydraulicnetworks}
 
 The advanced water balance model of **medfate** implements different hydraulic architectures depending on the transpiration sub-model:
 
-+ If `transpirationMode = "Sperry"`, the hydraulic network is described using $(S \times 2 + 2 + 1)$ resistance elements, with soil being represented in $S$ different soil layers. For each soil layer there is a rhizosphere element in series with a root xylem element. The $S$ soil layers are in parallel up to the root crown. From there there are two stem xylem segments and a final leaf segment, all in series (Fig. \@ref(fig:hydraulicsnetwork)). 
++ If `transpirationMode = "Sperry"`, the hydraulic network is described using $(S \times 2 + 1 + 1)$ resistance elements, with soil being represented in $S$ different soil layers. For each soil layer there is a rhizosphere element in series with a root xylem element. The $S$ soil layers are in parallel up to the root crown. From there there is one stem xylem segment and a final leaf segment in series (Fig. \@ref(fig:hydraulicsnetwork)). 
 
 
 ```{r hydraulicsnetwork, out.width='80%', fig.align="center", fig.cap="Schematic representation of hydraulics in a whole-plant network", echo=FALSE}
@@ -661,54 +661,56 @@ Having all these maximum conductances, we can now build the supply functions for
 ```{r supplyrootsystem, fig.width=8, fig.height=4.5, fig.align = "center", fig.cap = '(ref:supplyrootsystem-cap)', echo=FALSE}
 par(mar=c(4,4,2,1), mfrow=c(1,2))
 psiMax = -7.0
-hn11 <- list("psisoil" = psiSoilLayers1,
+control <- defaultControl("Sperry")
+numericParams <- control$numericParams
+hn11 <- list("numericParams" = numericParams, "psisoil" = psiSoilLayers1,
              "krhizomax" = krhizomaxvec1,"nsoil" = rep(n1,3), "alphasoil" = rep(alpha1,3),
              "krootmax" = krootmaxvec,"rootc" = rootc, "rootd" = rootd)
-supplyRS11 = hydraulics_supplyFunctionBelowground(hn11,maxNsteps = 400)
-hn12 <- list("psisoil" = psiSoilLayers2,
+supplyRS11 = hydraulics_supplyFunctionBelowground(hn11)
+hn12 <- list("numericParams" = numericParams, "psisoil" = psiSoilLayers2,
              "krhizomax" = krhizomaxvec1,"nsoil" = rep(n1,3), "alphasoil" = rep(alpha1,3),
              "krootmax" = krootmaxvec,"rootc" = rootc, "rootd" = rootd)
-supplyRS12 = hydraulics_supplyFunctionBelowground(hn12, maxNsteps = 400)
-hn13 <- list("psisoil" = psiSoilLayers3,
+supplyRS12 = hydraulics_supplyFunctionBelowground(hn12)
+hn13 <- list("numericParams" = numericParams, "psisoil" = psiSoilLayers3,
              "krhizomax" = krhizomaxvec1,"nsoil" = rep(n1,3), "alphasoil" = rep(alpha1,3),
              "krootmax" = krootmaxvec,"rootc" = rootc, "rootd" = rootd)
-supplyRS13 = hydraulics_supplyFunctionBelowground(hn13, maxNsteps = 400)
-hn14 <- list("psisoil" = psiSoilLayers4,
+supplyRS13 = hydraulics_supplyFunctionBelowground(hn13)
+hn14 <- list("numericParams" = numericParams, "psisoil" = psiSoilLayers4,
              "krhizomax" = krhizomaxvec1,"nsoil" = rep(n1,3), "alphasoil" = rep(alpha1,3),
              "krootmax" = krootmaxvec,"rootc" = rootc, "rootd" = rootd)
-supplyRS14 = hydraulics_supplyFunctionBelowground(hn14, maxNsteps = 400)
-hn21 <- list("psisoil" = psiSoilLayers1,
+supplyRS14 = hydraulics_supplyFunctionBelowground(hn14)
+hn21 <- list("numericParams" = numericParams, "psisoil" = psiSoilLayers1,
              "krhizomax" = krhizomaxvec2,"nsoil" = rep(n2,3), "alphasoil" = rep(alpha2,3),
              "krootmax" = krootmaxvec,"rootc" = rootc, "rootd" = rootd)
-supplyRS21 = hydraulics_supplyFunctionBelowground(hn21,maxNsteps = 400)
-hn22 <- list("psisoil" = psiSoilLayers2,
+supplyRS21 = hydraulics_supplyFunctionBelowground(hn21)
+hn22 <- list("numericParams" = numericParams, "psisoil" = psiSoilLayers2,
              "krhizomax" = krhizomaxvec2,"nsoil" = rep(n2,3), "alphasoil" = rep(alpha2,3),
              "krootmax" = krootmaxvec,"rootc" = rootc, "rootd" = rootd)
-supplyRS22 = hydraulics_supplyFunctionBelowground(hn22,maxNsteps = 400)
-hn23 <- list("psisoil" = psiSoilLayers3,
+supplyRS22 = hydraulics_supplyFunctionBelowground(hn22)
+hn23 <- list("numericParams" = numericParams, "psisoil" = psiSoilLayers3,
              "krhizomax" = krhizomaxvec2,"nsoil" = rep(n2,3), "alphasoil" = rep(alpha2,3),
              "krootmax" = krootmaxvec,"rootc" = rootc, "rootd" = rootd)
-supplyRS23 = hydraulics_supplyFunctionBelowground(hn23, maxNsteps = 400)
-hn24 <- list("psisoil" = psiSoilLayers4,
+supplyRS23 = hydraulics_supplyFunctionBelowground(hn23)
+hn24 <- list("numericParams" = numericParams, "psisoil" = psiSoilLayers4,
              "krhizomax" = krhizomaxvec2,"nsoil" = rep(n2,3), "alphasoil" = rep(alpha2,3),
              "krootmax" = krootmaxvec,"rootc" = rootc, "rootd" = rootd)
-supplyRS24 = hydraulics_supplyFunctionBelowground(hn24, maxNsteps = 400)
-hn31 <- list("psisoil" = psiSoilLayers1,
+supplyRS24 = hydraulics_supplyFunctionBelowground(hn24)
+hn31 <- list("numericParams" = numericParams, "psisoil" = psiSoilLayers1,
              "krhizomax" = krhizomaxvec3,"nsoil" = rep(n3,3), "alphasoil" = rep(alpha3,3),
              "krootmax" = krootmaxvec,"rootc" = rootc, "rootd" = rootd)
-supplyRS31 = hydraulics_supplyFunctionBelowground(hn31, maxNsteps = 400)
-hn32 <- list("psisoil" = psiSoilLayers2,
+supplyRS31 = hydraulics_supplyFunctionBelowground(hn31)
+hn32 <- list("numericParams" = numericParams, "psisoil" = psiSoilLayers2,
              "krhizomax" = krhizomaxvec3,"nsoil" = rep(n3,3), "alphasoil" = rep(alpha3,3),
              "krootmax" = krootmaxvec,"rootc" = rootc, "rootd" = rootd)
-supplyRS32 = hydraulics_supplyFunctionBelowground(hn32, maxNsteps = 400)
-hn33 <- list("psisoil" = psiSoilLayers3,
+supplyRS32 = hydraulics_supplyFunctionBelowground(hn32)
+hn33 <- list("numericParams" = numericParams, "psisoil" = psiSoilLayers3,
              "krhizomax" = krhizomaxvec3,"nsoil" = rep(n3,3), "alphasoil" = rep(alpha3,3),
              "krootmax" = krootmaxvec,"rootc" = rootc, "rootd" = rootd)
-supplyRS33 = hydraulics_supplyFunctionBelowground(hn33, maxNsteps = 400)
-hn34 <- list("psisoil" = psiSoilLayers4,
+supplyRS33 = hydraulics_supplyFunctionBelowground(hn33)
+hn34 <- list("numericParams" = numericParams, "psisoil" = psiSoilLayers4,
              "krhizomax" = krhizomaxvec3,"nsoil" = rep(n3,3), "alphasoil" = rep(alpha3,3),
              "krootmax" = krootmaxvec,"rootc" = rootc, "rootd" = rootd)
-supplyRS34 = hydraulics_supplyFunctionBelowground(hn34, maxNsteps = 400)
+supplyRS34 = hydraulics_supplyFunctionBelowground(hn34)
 plot(-supplyRS11$psiRoot, supplyRS11$E, type="l", col=col1, ylab="Flow rate  (mmol·m-2·s-1)", 
      xlab = "Root crown pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,max(supplyRS11$E)), lwd=1, main  = "E")
 lines(-supplyRS12$psiRoot, supplyRS12$E, lty=1, col=col2)
@@ -832,54 +834,57 @@ The following figure shows network supply functions for each soil texture and st
 ```{r supplynetwork, fig.width=8, fig.height=4, fig.align = "center", fig.cap = '(ref:supplynetwork-cap)', echo=FALSE}
 par(mar=c(4,4,2,1), mfrow=c(1,2))
 psiMax = -7.0
-hn11 <- list("psisoil" = psiSoilLayers1,
+hn11 <- list("numericParams" = numericParams,
+             "psisoil" = psiSoilLayers1,
              "krhizomax" = krhizomaxvec1, "nsoil" = rep(n1,3), "alphasoil" = rep(alpha1,3),
              "krootmax" = krootmaxvec, "rootc" = rootc, "rootd" = rootd,
              "kstemmax" = kstemmax, "stemc" = stemc, "stemd" = stemd,
              "kleafmax" = kleafmax, "leafc" = leafc, "leafd" = leafd,
              "PLCstem" =0.0, "PLCleaf" = 0.0)
-supplyNetwork11 = hydraulics_supplyFunctionNetwork(hn11, maxNsteps = 400)
+supplyNetwork11 = hydraulics_supplyFunctionNetwork(hn11)
 hn12 <- hn11
 hn12$psisoil <- psiSoilLayers2
-supplyNetwork12 = hydraulics_supplyFunctionNetwork(hn12, maxNsteps = 400)
+supplyNetwork12 = hydraulics_supplyFunctionNetwork(hn12)
 hn13 <- hn11
 hn13$psisoil <- psiSoilLayers3
-supplyNetwork13 = hydraulics_supplyFunctionNetwork(hn13, maxNsteps = 400)
+supplyNetwork13 = hydraulics_supplyFunctionNetwork(hn13)
 hn14 <- hn11
 hn14$psisoil <- psiSoilLayers4
-supplyNetwork14 = hydraulics_supplyFunctionNetwork(hn14, maxNsteps = 400)
-hn21 <- list("psisoil" = psiSoilLayers1,
+supplyNetwork14 = hydraulics_supplyFunctionNetwork(hn14)
+hn21 <- list("numericParams" = numericParams,
+             "psisoil" = psiSoilLayers1,
              "krhizomax" = krhizomaxvec2, "nsoil" = rep(n2,3), "alphasoil" = rep(alpha2,3),
              "krootmax" = krootmaxvec, "rootc" = rootc, "rootd" = rootd,
              "kstemmax" = kstemmax, "stemc" = stemc, "stemd" = stemd,
              "kleafmax" = kleafmax, "leafc" = leafc, "leafd" = leafd,
              "PLCstem" =0.0, "PLCleaf" = 0.0)
-supplyNetwork21 = hydraulics_supplyFunctionNetwork(hn21, maxNsteps = 400)
+supplyNetwork21 = hydraulics_supplyFunctionNetwork(hn21)
 hn22 <- hn21
 hn22$psisoil <- psiSoilLayers2
-supplyNetwork22 = hydraulics_supplyFunctionNetwork(hn22, maxNsteps = 400)
+supplyNetwork22 = hydraulics_supplyFunctionNetwork(hn22)
 hn23 <- hn21
 hn23$psisoil <- psiSoilLayers3
-supplyNetwork23 = hydraulics_supplyFunctionNetwork(hn23, maxNsteps = 400)
+supplyNetwork23 = hydraulics_supplyFunctionNetwork(hn23)
 hn24 <- hn21
 hn24$psisoil <- psiSoilLayers4
-supplyNetwork24 = hydraulics_supplyFunctionNetwork(hn24, maxNsteps = 400)
-hn31 <- list("psisoil" = psiSoilLayers1,
+supplyNetwork24 = hydraulics_supplyFunctionNetwork(hn24)
+hn31 <- list("numericParams" = numericParams,
+             "psisoil" = psiSoilLayers1,
              "krhizomax" = krhizomaxvec3, "nsoil" = rep(n3,3), "alphasoil" = rep(alpha3,3),
              "krootmax" = krootmaxvec, "rootc" = rootc, "rootd" = rootd,
              "kstemmax" = kstemmax, "stemc" = stemc, "stemd" = stemd,
              "kleafmax" = kleafmax, "leafc" = leafc, "leafd" = leafd,
              "PLCstem" =0.0, "PLCleaf" = 0.0)
-supplyNetwork31 = hydraulics_supplyFunctionNetwork(hn31, maxNsteps = 400)
+supplyNetwork31 = hydraulics_supplyFunctionNetwork(hn31)
 hn32 <- hn31
 hn32$psisoil <- psiSoilLayers2
-supplyNetwork32 = hydraulics_supplyFunctionNetwork(hn32, maxNsteps = 400)
+supplyNetwork32 = hydraulics_supplyFunctionNetwork(hn32)
 hn33 <- hn31
 hn33$psisoil <- psiSoilLayers3
-supplyNetwork33 = hydraulics_supplyFunctionNetwork(hn33, maxNsteps = 400)
+supplyNetwork33 = hydraulics_supplyFunctionNetwork(hn33)
 hn34 <- hn31
 hn34$psisoil <- psiSoilLayers4
-supplyNetwork34 = hydraulics_supplyFunctionNetwork(hn34, maxNsteps = 400)
+supplyNetwork34 = hydraulics_supplyFunctionNetwork(hn34)
 plot(-supplyNetwork11$psiLeaf, supplyNetwork11$E, type="l", col=col1, ylab="Flow rate  (mmol·m-2·s-1)", 
      xlab = "Leaf pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,max(supplyNetwork11$E)), lwd=1, main="original")
 lines(-supplyNetwork12$psiLeaf, supplyNetwork12$E, lty=1, col=col2)
@@ -898,51 +903,51 @@ legend("topleft", bty="n", legend=textures, lwd=1, lty=1:3, cex=0.8)
 hn11emb <- hn11
 hn11emb$PLCstem <- plcCav
 hn11emb$PLCleaf <- plcCav
-supplyNetwork11emb = hydraulics_supplyFunctionNetwork(hn11emb, maxNsteps = 400)
+supplyNetwork11emb = hydraulics_supplyFunctionNetwork(hn11emb)
 hn12emb <- hn12
 hn12emb$PLCstem <- plcCav
 hn12emb$PLCleaf <- plcCav
-supplyNetwork12emb = hydraulics_supplyFunctionNetwork(hn12emb, maxNsteps = 400)
+supplyNetwork12emb = hydraulics_supplyFunctionNetwork(hn12emb)
 hn13emb <- hn13
 hn13emb$PLCstem <- plcCav
 hn13emb$PLCleaf <- plcCav
-supplyNetwork13emb = hydraulics_supplyFunctionNetwork(hn13emb, maxNsteps = 400)
+supplyNetwork13emb = hydraulics_supplyFunctionNetwork(hn13emb)
 hn14emb <- hn14
 hn14emb$PLCstem <- plcCav
 hn14emb$PLCleaf <- plcCav
-supplyNetwork14emb = hydraulics_supplyFunctionNetwork(hn14emb, maxNsteps = 400)
+supplyNetwork14emb = hydraulics_supplyFunctionNetwork(hn14emb)
 hn21emb <- hn21
 hn21emb$PLCstem <- plcCav
 hn21emb$PLCleaf <- plcCav
-supplyNetwork21emb = hydraulics_supplyFunctionNetwork(hn21emb, maxNsteps = 400)
+supplyNetwork21emb = hydraulics_supplyFunctionNetwork(hn21emb)
 hn22emb <- hn22
 hn22emb$PLCstem <- plcCav
 hn22emb$PLCleaf <- plcCav
-supplyNetwork22emb = hydraulics_supplyFunctionNetwork(hn22emb, maxNsteps = 400)
+supplyNetwork22emb = hydraulics_supplyFunctionNetwork(hn22emb)
 hn23emb <- hn23
 hn23emb$PLCstem <- plcCav
 hn23emb$PLCleaf <- plcCav
-supplyNetwork23emb = hydraulics_supplyFunctionNetwork(hn23emb, maxNsteps = 400)
+supplyNetwork23emb = hydraulics_supplyFunctionNetwork(hn23emb)
 hn24emb <- hn24
 hn24emb$PLCstem <- plcCav
 hn24emb$PLCleaf <- plcCav
-supplyNetwork24emb = hydraulics_supplyFunctionNetwork(hn24emb, maxNsteps = 400)
+supplyNetwork24emb = hydraulics_supplyFunctionNetwork(hn24emb)
 hn31emb <- hn31
 hn31emb$PLCstem <- plcCav
 hn31emb$PLCleaf <- plcCav
-supplyNetwork31emb = hydraulics_supplyFunctionNetwork(hn31emb, maxNsteps = 400)
+supplyNetwork31emb = hydraulics_supplyFunctionNetwork(hn31emb)
 hn32emb <- hn32
 hn32emb$PLCstem <- plcCav
 hn32emb$PLCleaf <- plcCav
-supplyNetwork32emb = hydraulics_supplyFunctionNetwork(hn32emb, maxNsteps = 400)
+supplyNetwork32emb = hydraulics_supplyFunctionNetwork(hn32emb)
 hn33emb <- hn33
 hn33emb$PLCstem <- plcCav
 hn33emb$PLCleaf <- plcCav
-supplyNetwork33emb = hydraulics_supplyFunctionNetwork(hn33emb, maxNsteps = 400)
+supplyNetwork33emb = hydraulics_supplyFunctionNetwork(hn33emb)
 hn34emb <- hn34
 hn34emb$PLCstem <- plcCav
 hn34emb$PLCleaf <- plcCav
-supplyNetwork34emb = hydraulics_supplyFunctionNetwork(hn34emb, maxNsteps = 400)
+supplyNetwork34emb = hydraulics_supplyFunctionNetwork(hn34emb)
 plot(-supplyNetwork11emb$psiLeaf, supplyNetwork11emb$E, type="l", col=col1, ylab="Flow rate  (mmol·m-2·s-1)",
      xlab = "Leaf pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,max(supplyNetwork11$E)), lwd=1, main="after cavitation")
 lines(-supplyNetwork12emb$psiLeaf, supplyNetwork12emb$E, lty=1, col=col2)

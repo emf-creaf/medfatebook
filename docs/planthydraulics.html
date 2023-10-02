@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-09-29" />
+<meta name="date" content="2023-10-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -355,7 +355,7 @@ div.csl-indent {
 <li class="chapter" data-level="11.1" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leafenergybalancephoto"><i class="fa fa-check"></i><b>11.1</b> Leaf energy balance, gas exchange and photosynthesis</a>
 <ul>
 <li class="chapter" data-level="11.1.1" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leaf-temperature"><i class="fa fa-check"></i><b>11.1.1</b> Leaf temperature</a></li>
-<li class="chapter" data-level="11.1.2" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leaf-vapor-pressure-deficit"><i class="fa fa-check"></i><b>11.1.2</b> Leaf vapor pressure deficit</a></li>
+<li class="chapter" data-level="11.1.2" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leafVPD"><i class="fa fa-check"></i><b>11.1.2</b> Leaf vapor pressure deficit</a></li>
 <li class="chapter" data-level="11.1.3" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leaf-gas-exchange"><i class="fa fa-check"></i><b>11.1.3</b> Leaf gas exchange</a></li>
 <li class="chapter" data-level="11.1.4" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leafphotosynthesis"><i class="fa fa-check"></i><b>11.1.4</b> Leaf photosynthesis</a></li>
 </ul></li>
@@ -699,12 +699,12 @@ div.csl-indent {
             <section class="normal" id="section-">
 <div id="planthydraulics" class="section level1 hasAnchor" number="10">
 <h1><span class="header-section-number">Chapter 10</span> Plant hydraulics<a href="planthydraulics.html#planthydraulics" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>We devote this chapter to describe the background necessary to understand how plant hydraulics is implemented in the advanced water balance model of <strong>medfate</strong>. Section <a href="planthydraulics.html#hydraulicnetworks">10.1</a> introduces the hydraulic networks from which to choose, depending on the sub-model of plant hydraulics employed (i.e. either <code>transpirationMode = "Sperry"</code> or <code>transpirationMode = "Cochard"</code>). After that, in sections <a href="planthydraulics.html#vulnerabilitycurves">10.2</a> and <a href="planthydraulics.html#plantwatercontent">10.3</a> we present the building blocks of models of plant hydraulics, i.e. how to represent in a model the water content of plant tissues and the water flow through vascular elements. In sections <a href="planthydraulics.html#supplyfunctions">10.4</a> and <a href="#hydraulicswithcompartments"><strong>??</strong></a> we describe in detail the plant hydraulics sub-models presented in <span class="citation">De Cáceres <em>et al.</em> (<a href="#ref-DeCaceres2021">2021</a>)</span>. Finally, in <a href="planthydraulics.html#hydraulicscochard">10.5</a> we describe the sub-model of plant hydraulics that was presented in <span class="citation">Ruffault <em>et al.</em> (<a href="#ref-ruffault_sureau-ecos_2022">2022</a>)</span> and was added to <strong>medfate</strong>.</p>
+<p>We devote this chapter to describe the background necessary to understand how plant hydraulics is implemented in the advanced water balance model of <strong>medfate</strong>. Section <a href="planthydraulics.html#hydraulicnetworks">10.1</a> introduces the hydraulic networks from which to choose, depending on the sub-model of plant hydraulics employed (i.e. either <code>transpirationMode = "Sperry"</code> or <code>transpirationMode = "Cochard"</code>). After that, in sections <a href="planthydraulics.html#vulnerabilitycurves">10.2</a> and <a href="planthydraulics.html#plantwatercontent">10.3</a> we present the building blocks of models of plant hydraulics, i.e. how to represent in a model the water content of plant tissues and the water flow through vascular elements. In section <a href="planthydraulics.html#supplyfunctions">10.4</a> we describe in detail the plant hydraulic sub-model presented in <span class="citation">De Cáceres <em>et al.</em> (<a href="#ref-DeCaceres2021">2021</a>)</span> (without water compartments), and in <a href="planthydraulics.html#hydraulicscochard">10.5</a> we describe the sub-model of plant hydraulics that was presented in <span class="citation">Ruffault <em>et al.</em> (<a href="#ref-ruffault_sureau-ecos_2022">2022</a>)</span> and was added to <strong>medfate</strong>.</p>
 <div id="hydraulicnetworks" class="section level2 hasAnchor" number="10.1">
 <h2><span class="header-section-number">10.1</span> Hydraulic architecture<a href="planthydraulics.html#hydraulicnetworks" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The advanced water balance model of <strong>medfate</strong> implements different hydraulic architectures depending on the transpiration sub-model:</p>
 <ul>
-<li>If <code>transpirationMode = "Sperry"</code>, the hydraulic network is described using <span class="math inline">\((S \times 2 + 2 + 1)\)</span> resistance elements, with soil being represented in <span class="math inline">\(S\)</span> different soil layers. For each soil layer there is a rhizosphere element in series with a root xylem element. The <span class="math inline">\(S\)</span> soil layers are in parallel up to the root crown. From there there are two stem xylem segments and a final leaf segment, all in series (Fig. <a href="planthydraulics.html#fig:hydraulicsnetwork">10.1</a>).</li>
+<li>If <code>transpirationMode = "Sperry"</code>, the hydraulic network is described using <span class="math inline">\((S \times 2 + 1 + 1)\)</span> resistance elements, with soil being represented in <span class="math inline">\(S\)</span> different soil layers. For each soil layer there is a rhizosphere element in series with a root xylem element. The <span class="math inline">\(S\)</span> soil layers are in parallel up to the root crown. From there there is one stem xylem segment and a final leaf segment in series (Fig. <a href="planthydraulics.html#fig:hydraulicsnetwork">10.1</a>).</li>
 </ul>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:hydraulicsnetwork"></span>
 <img src="figures/hydraulics_network.jpg" alt="Schematic representation of hydraulics in a whole-plant network" width="80%" />

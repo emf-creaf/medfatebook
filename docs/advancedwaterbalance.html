@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-09-29" />
+<meta name="date" content="2023-10-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -355,7 +355,7 @@ div.csl-indent {
 <li class="chapter" data-level="11.1" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leafenergybalancephoto"><i class="fa fa-check"></i><b>11.1</b> Leaf energy balance, gas exchange and photosynthesis</a>
 <ul>
 <li class="chapter" data-level="11.1.1" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leaf-temperature"><i class="fa fa-check"></i><b>11.1.1</b> Leaf temperature</a></li>
-<li class="chapter" data-level="11.1.2" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leaf-vapor-pressure-deficit"><i class="fa fa-check"></i><b>11.1.2</b> Leaf vapor pressure deficit</a></li>
+<li class="chapter" data-level="11.1.2" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leafVPD"><i class="fa fa-check"></i><b>11.1.2</b> Leaf vapor pressure deficit</a></li>
 <li class="chapter" data-level="11.1.3" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leaf-gas-exchange"><i class="fa fa-check"></i><b>11.1.3</b> Leaf gas exchange</a></li>
 <li class="chapter" data-level="11.1.4" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leafphotosynthesis"><i class="fa fa-check"></i><b>11.1.4</b> Leaf photosynthesis</a></li>
 </ul></li>
@@ -881,7 +881,7 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <td>Average duration of leaves (in years).</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(S^*_{eco,i}\)</span></td>
+<td><span class="math inline">\(S^*_{eco}\)</span></td>
 <td><span class="math inline">\(^{\circ} \mathrm{C}\)</span></td>
 <td><code>Sgdd</code></td>
 <td>Degree days corresponding to leaf budburst (see section <a href="leafphenologylight.html#leafphenobudburst">4.1.2</a>).</td>
@@ -893,7 +893,7 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <td>Base temperature for the calculation of degree days to leaf budburst (see section <a href="leafphenologylight.html#leafphenobudburst">4.1.2</a>).</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(S^*_{sen,i}\)</span></td>
+<td><span class="math inline">\(S^*_{sen}\)</span></td>
 <td><span class="math inline">\(^{\circ} \mathrm{C}\)</span></td>
 <td><code>Ssen</code></td>
 <td>Degree days corresponding to leaf senescence (see section <a href="leafphenologylight.html#leafphenosenescence">4.1.3</a>).</td>
@@ -930,25 +930,25 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\(k_{PAR,i}\)</span></td>
+<td><span class="math inline">\(k_{PAR}\)</span></td>
 <td>(unitless)</td>
 <td><code>kPAR</code></td>
 <td>Extinction coefficient for diffuse PAR</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(\alpha_{SWR,i}\)</span></td>
+<td><span class="math inline">\(\alpha_{SWR}\)</span></td>
 <td>[0-1]</td>
 <td><code>alphaSWR</code></td>
 <td>Short-wave radiation leaf absorbance coefficient</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(\gamma_{SWR,i}\)</span></td>
+<td><span class="math inline">\(\gamma_{SWR}\)</span></td>
 <td>[0-1]</td>
 <td><code>gammaSWR</code></td>
 <td>Short-wave radiation leaf reflectance (albedo)</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(s_{water, i}\)</span></td>
+<td><span class="math inline">\(s_{water}\)</span></td>
 <td><span class="math inline">\(mm\,H_2O·LAI^{-1}\)</span></td>
 <td><code>g</code></td>
 <td>Crown water storage capacity (i.e. depth of water that can be retained by leaves and branches) per LAI unit</td>
@@ -973,37 +973,37 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\(H_{med,i}\)</span></td>
+<td><span class="math inline">\(H_{med}\)</span></td>
 <td><span class="math inline">\(cm\)</span></td>
 <td><code>Hmed</code></td>
 <td>Median plant height</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(1/H_{v,i}\)</span></td>
+<td><span class="math inline">\(1/H_{v}\)</span></td>
 <td><span class="math inline">\(m^2 \cdot m^{-2}\)</span></td>
 <td><code>Al2As</code></td>
 <td>Ratio of leaf area to sapwood area</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(LW_i\)</span></td>
+<td><span class="math inline">\(LW\)</span></td>
 <td><span class="math inline">\(cm\)</span></td>
 <td><code>LeafWidth</code></td>
 <td>Leaf width</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(SLA_i\)</span></td>
+<td><span class="math inline">\(SLA\)</span></td>
 <td><span class="math inline">\(m^2 \cdot kg^{-1}\)</span></td>
 <td><code>SLA</code></td>
 <td>Specific leaf area</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(\rho_{leaf,i}\)</span></td>
+<td><span class="math inline">\(\rho_{leaf}\)</span></td>
 <td><span class="math inline">\(g \cdot cm^{-3}\)</span></td>
 <td><code>LeafDensity</code></td>
 <td>Leaf tissue density</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(\rho_{wood,i}\)</span></td>
+<td><span class="math inline">\(\rho_{wood}\)</span></td>
 <td><span class="math inline">\(g \cdot cm^{-3}\)</span></td>
 <td><code>WoodDensity</code></td>
 <td>Wood tissue density</td>
@@ -1052,25 +1052,25 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\(g_{swmin,i}\)</span></td>
+<td><span class="math inline">\(g_{swmin}\)</span></td>
 <td><span class="math inline">\(mol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span></td>
 <td><code>Gwmin</code></td>
 <td>Minimum stomatal conductance to water vapour</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(g_{swmax,i}\)</span></td>
+<td><span class="math inline">\(g_{swmax}\)</span></td>
 <td><span class="math inline">\(mol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span></td>
 <td><code>Gwmax</code></td>
 <td>Maximum stomatal conductance to water vapour</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(J_{max, 298,i}\)</span></td>
+<td><span class="math inline">\(J_{max, 298}\)</span></td>
 <td><span class="math inline">\(\mu mol\, e \cdot m^{-2} \cdot s^{-1}\)</span></td>
 <td><code>Jmax298</code></td>
 <td>Maximum rate of electron transport at 298K</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(V_{max, 298,i}\)</span></td>
+<td><span class="math inline">\(V_{max, 298}\)</span></td>
 <td><span class="math inline">\(\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}\)</span></td>
 <td><code>Vmax298</code></td>
 <td>Rubisco’s maximum carboxylation rate at 298K</td>
@@ -1088,50 +1088,92 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <td>Maximum root sapwood reference conductivity per leaf area unit</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(k_{leaf, \max,i}\)</span></td>
+<td><span class="math inline">\(k_{leaf, \max}\)</span></td>
 <td><span class="math inline">\(mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}\)</span></td>
 <td><code>VCleaf_kmax</code></td>
 <td>Maximum leaf conductance (per leaf area unit)</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(k_{stem, \max,i}\)</span></td>
+<td><span class="math inline">\(k_{stem, \max}\)</span></td>
 <td><span class="math inline">\(mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}\)</span></td>
 <td><code>VCstem_kmax</code></td>
 <td>Maximum stem conductance (per leaf area unit)</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(k_{root, \max,i,s}\)</span></td>
+<td><span class="math inline">\(k_{root, \max,s}\)</span></td>
 <td><span class="math inline">\(mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}\)</span></td>
 <td><code>VCroot_kmax</code></td>
 <td>Maximum root conductance (per leaf area unit) for each soil layer</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(k_{rhizo,\max, i,s}\)</span></td>
+<td><span class="math inline">\(k_{rhizo,\max, s}\)</span></td>
 <td><span class="math inline">\(mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}\)</span></td>
 <td><code>VGrhizo_kmax</code></td>
 <td>Maximum hydraulic conductance of the rhizosphere for each soil layer</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(c_{leaf,i}\)</span>, <span class="math inline">\(d_{leaf,i}\)</span></td>
+<td><span class="math inline">\(c_{leaf}\)</span>, <span class="math inline">\(d_{leaf}\)</span></td>
 <td>(unitless), MPa</td>
 <td><code>VCleaf_c</code>, <code>VCleaf_d</code></td>
-<td>Parameters of the vulnerability curve for leaves</td>
+<td>Parameters of the vulnerability curve for leaves (Weibull)</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(c_{stem,i}\)</span>, <span class="math inline">\(d_{stem,i}\)</span></td>
-<td>(unitless), MPa</td>
-<td><code>VCstem_c</code>, <code>VCstem_d</code></td>
-<td>Parameters of the vulnerability curve for stem xylem</td>
+<td><span class="math inline">\(\Psi_{50, leaf}\)</span>, <span class="math inline">\(slope_{leaf}\)</span></td>
+<td>MPa, %/MPa</td>
+<td><code>VCleaf_P50</code>, <code>VCleaf_slope</code></td>
+<td>Parameters of the vulnerability curve for leaves (Sigmoid)</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(c_{root,i}\)</span>, <span class="math inline">\(d_{root,i}\)</span></td>
+<td><span class="math inline">\(c_{stem}\)</span>, <span class="math inline">\(d_{stem}\)</span></td>
+<td>(unitless), MPa</td>
+<td><code>VCstem_c</code>, <code>VCstem_d</code></td>
+<td>Parameters of the vulnerability curve for stem xylem (Weibull)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\Psi_{50,stem}\)</span>, <span class="math inline">\(slope_{stem}\)</span></td>
+<td>MPa, %/MPa</td>
+<td><code>VCstem_P50</code>, <code>VCstem_slope</code></td>
+<td>Parameters of the vulnerability curve for stem xylem (Sigmoid)</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(c_{root}\)</span>, <span class="math inline">\(d_{root}\)</span></td>
 <td>(unitless), MPa</td>
 <td><code>VCroot_c</code>, <code>VCroot_d</code></td>
-<td>Parameters of the vulnerability curve for root xylem</td>
+<td>Parameters of the vulnerability curve for root xylem (Weibull)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\Psi_{50,root}\)</span>, <span class="math inline">\(slope_{root}\)</span></td>
+<td>MPa, %/MPa</td>
+<td><code>VCroot_P50</code>, <code>VCroot_slope</code></td>
+<td>Parameters of the vulnerability curve for root xylem (Sigmoid)</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(T_{gs, optim}\)</span></td>
+<td><span class="math inline">\(^{\circ} \mathrm{C}\)</span></td>
+<td><code>Gs_Toptim</code></td>
+<td>Temperature corresponding to maximal stomatal conductance (Cochard sub-model)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(T_{gs, sens}\)</span></td>
+<td></td>
+<td><code>Gs_Tsens</code></td>
+<td>Stomatal sensitivity to temperature (Cochard sub-model)</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\Psi_{50,gs}\)</span></td>
+<td>MPa</td>
+<td><code>Gs_P50</code></td>
+<td>Water potential causing 50% reduction in stomatal conductance (Cochard sub-model)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(slope_{gs}\)</span></td>
+<td>%/MPa</td>
+<td><code>Gs_slope</code></td>
+<td>Rate of decrease in stomatal conductance at <span class="math inline">\(\Psi_{50,gs}\)</span> (Cochard sub-model)</td>
 </tr>
 </tbody>
 </table>
-<p>It is important to mention that stem- and root-level hydraulic conductances (i.e. <span class="math inline">\(k_{stem, \max}\)</span> and <span class="math inline">\(k_{root, \max}\)</span>) are not given as inputs by the user, but are the result from scaling tissue-level conductivity parameters (i.e. <span class="math inline">\(K_{stem,max,ref}\)</span> and <span class="math inline">\(K_{root,max,ref}\)</span>) according to plant size (see <a href="modelparametrization.html#scalingkstem">A.4.1</a> and <a href="modelparametrization.html#scalingkroot">A.4.3</a> for details).</p>
+<p>It is important to mention that stem- and root-level hydraulic conductances (i.e. <span class="math inline">\(k_{stem, \max}\)</span> and <span class="math inline">\(k_{root, \max}\)</span>) are not given as inputs by the user, but are the result from scaling tissue-level conductivity parameters (i.e. <span class="math inline">\(K_{stem,max,ref}\)</span> and <span class="math inline">\(K_{root,max,ref}\)</span>) according to plant size (see <a href="modelparametrization.html#scalingkstem">A.4.1</a> and <a href="modelparametrization.html#scalingkroot">A.4.3</a> for details). Similarly, parameters of Weibull vulnerability curves are estimated from the input in form of <span class="math inline">\(\Psi_{50}\)</span>, <span class="math inline">\(\Psi_{12}\)</span> and <span class="math inline">\(\Psi_{88}\)</span> available in <code>SpParams</code>. The <span class="math inline">\(slope\)</span> of the Sigmoid vulnerability curves can also be estimated from the same values, or provided by the user directly as a column in <code>SpParams</code>.</p>
 <p>A fifth (final) set of parameters are related to water storage and water relations in plant tissues (<code>paramsWaterStorage</code>):</p>
 <table>
 <colgroup>
@@ -1156,49 +1198,49 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <td>Maximum live fuel moisture content, corresponding to fine fuels (&lt; 6.35 mm twigs and leaves).</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(\epsilon_{leaf,i}\)</span></td>
+<td><span class="math inline">\(\epsilon_{leaf}\)</span></td>
 <td>MPa</td>
 <td><code>LeafEPS</code></td>
 <td>Modulus of elasticity of leaves</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(\epsilon_{stem,i}\)</span></td>
+<td><span class="math inline">\(\epsilon_{stem}\)</span></td>
 <td>MPa</td>
 <td><code>StemEPS</code></td>
 <td>Modulus of elasticity of symplastic xylem tissue</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(\pi_{0,leaf,i}\)</span></td>
+<td><span class="math inline">\(\pi_{0,leaf}\)</span></td>
 <td>MPa</td>
 <td><code>LeafPI0</code></td>
 <td>Osmotic potential at full turgor of leaves</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(\pi_{0,stem,i}\)</span></td>
+<td><span class="math inline">\(\pi_{0,stem}\)</span></td>
 <td>MPa</td>
 <td><code>StemPI0</code></td>
 <td>Osmotic potential at full turgor of symplastic xylem tissue</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(f_{apo,leaf,i}\)</span></td>
+<td><span class="math inline">\(f_{apo,leaf}\)</span></td>
 <td>[0-1]</td>
 <td><code>LeafAF</code></td>
 <td>Apoplastic fraction in leaf tissues</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(f_{apo,stem,i}\)</span></td>
+<td><span class="math inline">\(f_{apo,stem}\)</span></td>
 <td>[0-1]</td>
 <td><code>StemAF</code></td>
 <td>Apoplastic fraction in stem tissues</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(V_{leaf,i}\)</span></td>
+<td><span class="math inline">\(V_{leaf}\)</span></td>
 <td><span class="math inline">\(l \cdot m^{-2}\)</span></td>
 <td><code>Vleaf</code></td>
 <td>Leaf water capacity per leaf area unit</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(V_{sapwood,i}\)</span></td>
+<td><span class="math inline">\(V_{sapwood}\)</span></td>
 <td><span class="math inline">\(l \cdot m^{-2}\)</span></td>
 <td><code>Vsapwood</code></td>
 <td>Sapwood water capacity per leaf area unit</td>
@@ -1216,7 +1258,7 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <li><code>multiLayerBalance</code> is a boolean flag to indicate that multi-layer energy balance is desired (by default <code>multiLayerBalance = FALSE</code>).</li>
 <li><code>nsubsteps</code> defines the number of substeps for multi-layer energy balance calculations. By default <code>nsubsteps = 3600</code>, so that substeps are 1 sec if <code>ndailysteps = 24</code>.</li>
 </ol>
-<p>The other control parameters relevant for the advanced water balance model are:</p>
+<p>Other relevant control parameters relevant for the advanced water balance model are:</p>
 <ul>
 <li><code>defaultWindSpeed [= 2.5]</code>: Default value for wind speed (in <span class="math inline">\(m \cdot s^{-1}\)</span>) when this is missing (only used for leaf fall, see section <a href="leafphenologylight.html#leafphenology">4.1</a>).</li>
 <li><code>defaultCO2 [=386]</code>: Default atmospheric (abovecanopy) <span class="math inline">\(CO_2\)</span> concentration (in micromol <span class="math inline">\(CO_2 \cdot mol^{-1}\)</span> = ppm). This value will be used whenever <span class="math inline">\(CO_2\)</span> concentration is not specified in the weather input.</li>
@@ -1238,11 +1280,31 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <li><code>"rate"</code> - following a rate of new sapwood formation.</li>
 </ul></li>
 <li><code>refillMaximumRate [= 0.05]</code>: Maximum rate of conduit refilling (see section <a href="transpirationsperrycochard.html#cavitationrefill">12.4</a>).</li>
-<li><code>klatstem [= 0.01]</code>: Stem symplastic-apoplastic lateral conductance (in <span class="math inline">\(mmol·s^{-1}·m^{-2}·MPa^{-1}\)</span>). Only relevant when <code>capacitance = TRUE</code> (see section <a href="#hydraulicswithcompartments"><strong>??</strong></a>).</li>
-<li><code>klatleaf [= 0.01]</code>: Leaf symplastic-apoplastic lateral conductance (in <span class="math inline">\(mmol·s^{-1}·m^{-2}·MPa^{-1}\)</span>). Only relevant when <code>capacitance = TRUE</code> (see section <a href="#hydraulicswithcompartments"><strong>??</strong></a>).</li>
-<li><code>numericParams</code>: A list with params for numerical approximation routines.</li>
 </ul>
-<p>In addition, a number of control parameters are used to modify how hydraulic parameters are estimated when calling function <code>spwbInput()</code>:</p>
+<p>A set of parameters is only relevant for <code>transpirationMode = "Sperry"</code>:</p>
+<ul>
+<li><code>numericParams</code>: A list with parameters for numerical approximation routines:
+<ul>
+<li><code>maxNsteps [= 400]</code> - Maximum number of steps in supply function.</li>
+<li><code>ntrial [= 200]</code> - Number of iteration trials when finding root of equation system.</li>
+<li><code>psiTol [= 0.0001]</code> - Tolerance value for water potential.</li>
+<li><code>ETol [= 0.0001]</code> - Tolerance value for flow.</li>
+</ul></li>
+</ul>
+<p>whereas another set is only relevant for <code>transpirationMode = "Cochard"</code>:</p>
+<ul>
+<li><code>capacitance [= TRUE]</code>: Whether the effect of (symplasmic or apoplasmic) plant water compartments is considered in simulations.</li>
+<li><code>C_SApoInit [= 2.0e-5]</code>: Maximum capacitance of the stem apoplasm (mmol·m-2).</li>
+<li><code>C_LApoInit [= 1.0e-5]</code>: Maximum capacitance of the leaf apoplasm (mmol·m-2).</li>
+<li><code>k_SSym [= 0.26]</code>: Conductance from stem apoplasm to stem symplasm (mmol·s-1·m-2).</li>
+<li><code>TPhase_gmin [= 37.5]</code>: Temperature for transition phase of gmin.</li>
+<li><code>Q10_1_gmin [= 1.2]</code>: Temperature dependance of gmin when T ≤ TPhase.</li>
+<li><code>Q10_2_gmin [= 4.8]</code>: Temperature dependance of gmin when T &gt; TPhase.</li>
+<li><code>JarvisPAR [= 0.003]</code>: Parameter regulating the response of stomatal conductance to light (PAR) in the Jarvis model.</li>
+<li><code>gCrown0 [= 0.150]</code>: Reference crown conductance (mol·s-1·m-2).</li>
+<li><code>fTRBToLeaf [= 0.8]</code>: Fraction of surface of bark exposed to air per leaf area.</li>
+</ul>
+<p>Finally, a number of control parameters are used to modify how hydraulic parameters are estimated when calling function <code>spwbInput()</code>:</p>
 <ul>
 <li><code>taper [= TRUE]</code>: Whether taper of xylem conduits is accounted for when estimating aboveground stem conductance from xylem conductivity.</li>
 <li><code>fracRootResistance [= 0.40]</code>: Fraction of plant total resistance (leaf+stem+root) that corresponds to root system.</li>
@@ -1253,7 +1315,7 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <h3><span class="header-section-number">7.5.4</span> Model output<a href="advancedwaterbalance.html#advancedwaterbalanceoutput" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="daily-output" class="section level4 hasAnchor" number="7.5.4.1">
 <h4><span class="header-section-number">7.5.4.1</span> Daily output<a href="advancedwaterbalance.html#daily-output" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<p>Functions <code>spwb()</code> and <code>pwb()</code> with <code>transpirationMode = "Sperry"</code> return a list of a class with the same name. The first four elements of this list (i.e., <code>latitude</code>, <code>topography</code>, <code>weather</code> and <code>spwbInput</code>) are simply copies of model inputs. The next element is <code>spwbOutput</code>, which contains the state of the input object at the end of the simulation (this can be used to perform further simulations starting with current values of state variables). The remainng elements are:</p>
+<p>Functions <code>spwb()</code> and <code>pwb()</code> with <code>transpirationMode = "Sperry"</code> or <code>transpirationMode = "Cochard"</code> return a list of a class with the same name. The first four elements of this list (i.e., <code>latitude</code>, <code>topography</code>, <code>weather</code> and <code>spwbInput</code>) are simply copies of model inputs. The next element is <code>spwbOutput</code>, which contains the state of the input object at the end of the simulation (this can be used to perform further simulations starting with current values of state variables). The remainng elements are:</p>
 <table>
 <colgroup>
 <col width="13%" />
@@ -1323,13 +1385,13 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <tbody>
 <tr class="odd">
 <td><code>LAI</code></td>
-<td><span class="math inline">\(LAI^{\phi}_i\)</span></td>
+<td><span class="math inline">\(LAI^{\phi}\)</span></td>
 <td><span class="math inline">\(m^2 \cdot m^{-2}\)</span></td>
 <td>Leaf area index (expanded).</td>
 </tr>
 <tr class="even">
 <td><code>LAIlive</code></td>
-<td><span class="math inline">\(LAI^{live}_i\)</span></td>
+<td><span class="math inline">\(LAI^{live}\)</span></td>
 <td><span class="math inline">\(m^2 \cdot m^{-2}\)</span></td>
 <td>Leaf area index (live).</td>
 </tr>
@@ -1347,25 +1409,25 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 </tr>
 <tr class="odd">
 <td><code>Transpiration</code></td>
-<td><span class="math inline">\(Tr_{i}\)</span></td>
+<td><span class="math inline">\(Tr\)</span></td>
 <td>mm</td>
 <td>Transpiration per ground area.</td>
 </tr>
 <tr class="even">
 <td><code>GrossPhotosynthesis</code></td>
-<td><span class="math inline">\(A_{g,i}\)</span></td>
+<td><span class="math inline">\(A_{g}\)</span></td>
 <td><span class="math inline">\(g\,C \cdot m^{-2}\)</span></td>
 <td>Gross photosynthesis per ground area.</td>
 </tr>
 <tr class="odd">
 <td><code>NetPhotosynthesis</code></td>
-<td><span class="math inline">\(A_{n,i}\)</span></td>
+<td><span class="math inline">\(A_{n}\)</span></td>
 <td><span class="math inline">\(g\,C \cdot m^{-2}\)</span></td>
 <td>Net photosynthesis per ground area.</td>
 </tr>
 <tr class="even">
 <td><code>dEdP</code></td>
-<td><span class="math inline">\(dE/d\Psi_{i}\)</span></td>
+<td><span class="math inline">\(dE/d\Psi_{leaf}\)</span></td>
 <td><span class="math inline">\(mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}\)</span></td>
 <td>Derivative of the (aboveground) supply function.</td>
 </tr>
@@ -1377,61 +1439,67 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 </tr>
 <tr class="even">
 <td><code>LeafPsiMin</code></td>
-<td><span class="math inline">\(\Psi_{md, i}\)</span></td>
+<td><span class="math inline">\(\Psi_{md}\)</span></td>
 <td>MPa</td>
 <td>Minimum (midday) ‘average leaf’ water potential.</td>
 </tr>
 <tr class="odd">
 <td><code>LeafPsiMax</code></td>
-<td><span class="math inline">\(\Psi_{pd, i}\)</span></td>
+<td><span class="math inline">\(\Psi_{pd}\)</span></td>
 <td>MPa</td>
 <td>Maximum (predawn) ‘average leaf’ water potential.</td>
 </tr>
 <tr class="even">
 <td><code>StemPsi</code></td>
-<td><span class="math inline">\(\Psi_{stem, i}\)</span></td>
+<td><span class="math inline">\(\Psi_{stem}\)</span></td>
 <td>MPa</td>
 <td>Minimum stem water potential.</td>
 </tr>
 <tr class="odd">
 <td><code>RootPsi</code></td>
-<td><span class="math inline">\(\Psi_{rootcrown, i}\)</span></td>
+<td><span class="math inline">\(\Psi_{rootcrown}\)</span></td>
 <td>MPa</td>
 <td>Minimum root-crown water potential.</td>
 </tr>
 <tr class="even">
 <td><code>RhizoPsi</code></td>
-<td><span class="math inline">\(\Psi_{rootsurf, i,s}\)</span></td>
+<td><span class="math inline">\(\Psi_{rootsurf,s}\)</span></td>
 <td>MPa</td>
 <td>Minimum root surface water potential for each soil layer.</td>
 </tr>
 <tr class="odd">
+<td><code>LeafPLC</code></td>
+<td><span class="math inline">\(PLC_{leaf}\)</span></td>
+<td>MPa</td>
+<td>Proportion of leaf conductance loss.</td>
+</tr>
+<tr class="even">
 <td><code>StemPLC</code></td>
-<td><span class="math inline">\(PLC_{stem,i}\)</span></td>
+<td><span class="math inline">\(PLC_{stem}\)</span></td>
 <td>MPa</td>
 <td>Proportion of stem conductance loss.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>LeafRWC</code></td>
-<td><span class="math inline">\(RWC_{leaf, i}\)</span></td>
+<td><span class="math inline">\(RWC_{leaf}\)</span></td>
 <td>%</td>
 <td>Mean leaf relative water content.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>StemRWC</code></td>
-<td><span class="math inline">\(RWC_{stem, i}\)</span></td>
+<td><span class="math inline">\(RWC_{stem}\)</span></td>
 <td>%</td>
 <td>Mean stem relative water content.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>LFMC</code></td>
-<td><span class="math inline">\(LFMC_{i}\)</span></td>
+<td><span class="math inline">\(LFMC\)</span></td>
 <td>%</td>
 <td>Live fuel moisture content (as percent of dry weight), corresponding to fine fuels (&lt; 6.35 mm twigs and leaves).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>PlantStress</code></td>
-<td><span class="math inline">\(DDS_i\)</span></td>
+<td><span class="math inline">\(DDS\)</span></td>
 <td>[0-1]</td>
 <td>Drought stress level suffered by each plant cohort (relative whole-plant conductance).</td>
 </tr>
@@ -1467,10 +1535,28 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <td>Maximum (predawn) (sunlit or shade) leaf water potential.</td>
 </tr>
 <tr class="odd">
-<td><code>GW</code></td>
+<td><code>TempMin</code></td>
+<td><span class="math inline">\(T_{leaf, \min}^{sunlit}\)</span>, <span class="math inline">\(T_{leaf,\min}^{shade}\)</span></td>
+<td><span class="math inline">\(^{\circ} \mathrm{C}\)</span></td>
+<td>Minimum leaf temperature.</td>
+</tr>
+<tr class="even">
+<td><code>TempMax</code></td>
+<td><span class="math inline">\(T_{leaf, \max}^{sunlit}\)</span>, <span class="math inline">\(T_{leaf,\max}^{shade}\)</span></td>
+<td><span class="math inline">\(^{\circ} \mathrm{C}\)</span></td>
+<td>Maximum leaf temperature.</td>
+</tr>
+<tr class="odd">
+<td><code>GSWMin</code></td>
 <td><span class="math inline">\(g_{w,i}^{sunlit}\)</span>, <span class="math inline">\(g_{w,i}^{shade}\)</span></td>
 <td><span class="math inline">\(mol \cdot s^{-1} \cdot m^{-2}\)</span></td>
-<td>Stomatal conductance to water vapour.</td>
+<td>Minimum stomatal conductance to water vapour.</td>
+</tr>
+<tr class="even">
+<td><code>GSWMax</code></td>
+<td><span class="math inline">\(g_{w,i}^{sunlit}\)</span>, <span class="math inline">\(g_{w,i}^{shade}\)</span></td>
+<td><span class="math inline">\(mol \cdot s^{-1} \cdot m^{-2}\)</span></td>
+<td>Maximum stomatal conductance to water vapour.</td>
 </tr>
 </tbody>
 </table>
