@@ -19,7 +19,7 @@ We devote this chapter to describe the background necessary to understand how pl
 
 The advanced water balance model of **medfate** implements different hydraulic architectures depending on the transpiration sub-model:
 
-+ If `transpirationMode = "Sperry"`, the hydraulic network is described using $(S \times 2 + 1 + 1)$ resistance elements, with soil being represented in $S$ different soil layers. For each soil layer there is a rhizosphere element in series with a root xylem element. The $S$ soil layers are in parallel up to the root crown. From there there is one stem xylem segment and a final leaf segment in series (Fig. \@ref(fig:hydraulicsnetwork)). 
++ If `transpirationMode = "Sperry"`, the hydraulic network is described using $(S \times 2 + 1 + 1)$ resistance elements, with soil being represented in $S$ different soil layers. For each soil layer there is a rhizosphere element in series with a root xylem element. The $S$ soil layers are in parallel up to the root crown. From there there is one stem xylem segment and a final leaf xylem segment in series (Fig. \@ref(fig:hydraulicsnetwork)). Stem cavitation affects the resistance between the root crown ($\Psi_{rootcrown}$) and the stem ($\Psi_{stem}$), whereas leaf cavitation affects the resistance between the stem ($\Psi_{stem}$) and the leaf ($\Psi_{leaf}$)
 
 
 ```{r hydraulicsnetwork, out.width='80%', fig.align="center", fig.cap="Schematic representation of hydraulics in a whole-plant network", echo=FALSE}
@@ -27,7 +27,7 @@ knitr::include_graphics("figures/hydraulics_network.jpg")
 ```
 
 
-+ If `transpirationMode = "Cochard"`, the soil–plant system in SurEau-ECOS [@ruffault_sureau-ecos_2022] is discretized into three soil layers and two plant compartments  (Fig. \@ref(fig:hydraulicssureau)): a leaf and a "stem". Each of the two plant organs contains an apoplasm and a symplasm. The stem apoplasm and symplasm include water volumes of all non-leaf compartments, i.e., trunk, root and branches. Symplasmic capacitances mostly buffer water fluxes during well-watered conditions, whereas apoplasm capacitances come into play when cavitation occurs. Water can leaf the plant via three flows, through stomata, leaf cuticules and stem cuticules.
++ If `transpirationMode = "Cochard"`, the soil–plant system in SurEau-ECOS [@ruffault_sureau-ecos_2022] is discretized into three soil layers and two plant compartments  (Fig. \@ref(fig:hydraulicssureau)): a leaf and a stem. Each of the two plant organs contains an apoplasm and a symplasm. The stem apoplasm and symplasm include water volumes of all non-leaf compartments, i.e., trunk, root and branches. Symplasmic capacitances (i.e. $C_{LSym}$ and $C_{SSym}$) mostly buffer water fluxes during well-watered conditions, whereas apoplasm capacitances  (i.e. $C_{LApo}$ and $C_{SApo}$) come into play when cavitation occurs. Water can leaf the plant via three flows, through stomata ($E_{stom}$), leaf cuticules ($E_{cuti,leaf}$) and stem cuticules ($E_{cuti,stem}$). The architecture is completed with nodes for the fine root surface of each soil layer ($\Psi_{rootsurf}$) and for the root crown ($\Psi_{rootcrown}$), but these elements do not correspond to water compartments. Stem cavitation affects the conductances of the pathways between root surfaces ($\Psi_{rootsurf}$) and the root crown ($\Psi_{rootcrown}$), as well as the conductance between the root crown and the stem apoplasm ($\Psi_{stem, apo}$). Leaf cavitation affects the conductance between the stem apoplasm ($\Psi_{stem, apo}$) and the leaf apoplasms ($\Psi_{leaf, apo}$).
 
 ```{r hydraulicssureau, out.width='80%', fig.align="center", fig.cap="Schematic representation of hydraulics in a network with water storage compartments according to the design of SurEau-ECOS", echo=FALSE}
 knitr::include_graphics("figures/hydraulics_sureau.jpg")
@@ -1061,13 +1061,18 @@ The water balance of each of the four plant compartments (symplasm and apoplasm 
 \begin{equation}
 C_i \cdot \frac{\mathrm{d}\Psi_i}{\mathrm{d}t} + \sum_{j}{K_{ij}\cdot (\Psi_i - \Psi_j)} - S = 0
 \end{equation}
-and solved at each time step. In the above equation $\Psi_i$ would be the water potential of the compartment (i.e. $\Psi_{leaf,symp}$, $\Psi_{leaf, apo}$, $\Psi_{stem, symp}$ or $\Psi_{stem, apo}$; see Fig. \@ref(fig:hydraulicssureau)); $C_i$ is the capacitance associated to the compartment and defined generically as:
+and solved at each time step. In the above equation $\Psi_i$ and $\Psi_j$ would be the water potential of compartments $i$ and $j$, respectively (i.e. $\Psi_{leaf,symp}$, $\Psi_{leaf, apo}$, $\Psi_{stem, symp}$ or $\Psi_{stem, apo}$; see Fig. \@ref(fig:hydraulicssureau)); $C_i$ is the capacitance associated to the compartment $i$ and defined generically as:
 \begin{equation}
 C_i = \frac{Q_i}{\Psi_i}
 \end{equation}
-where $Q_i$ is the water volume content of the compartment; $K_{ij}$ is the conductance between two compartments and $S$ represents a flow outside the compartment (i.e. cuticular or stomatal transpiration losses, or water released from cavitation).
+where $Q_i$ is the water volume content of the compartment; $K_{ij}$ is the conductance between the two compartments and $S$ represents a flow outside the target compartment (i.e. cuticular or stomatal transpiration losses, or water released from cavitation).
 
 ### Plant and soil conductances
+
+Overall plant conductance $k_{plant}$ is defined as the sum of resistances across the hydraulic network:
+\begin{equation}
+k_{plant} = \left(\frac{1}{\sum_{s=1}^{S}{k_{root2stem, s}}} + \frac{1}{k_{stem2leaf}} + \frac{1}{k_{leaf,symp}}\right)^{-1}
+\end{equation}
 
 ### Capacitances
 

@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-10-02" />
+<meta name="date" content="2023-10-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -774,14 +774,19 @@ Figure 12.4: Profit function as a function of stomatal conductance, correspondin
 <div id="stomatal-regulation-and-transpiration-under-cochards-sub-model" class="section level2 hasAnchor" number="12.2">
 <h2><span class="header-section-number">12.2</span> Stomatal regulation and transpiration under Cochard’s sub-model<a href="transpirationsperrycochard.html#stomatal-regulation-and-transpiration-under-cochards-sub-model" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>When <code>transpirationMode = "Cochard"</code>, plants lose water through stomatal transpiration (<span class="math inline">\(E_{stom}\)</span>), cuticular transpiration of the leaf (<span class="math inline">\(E_{leaf,cuti}\)</span>) and cuticular transpiration of the stem (<span class="math inline">\(E_{stem, cuti}\)</span>), see Fig. <a href="planthydraulics.html#fig:hydraulicssureau">10.2</a>.</p>
-<p>The total plant transpiration <span class="math inline">\(E_{Plant}\)</span> is decomposed as the sum of the leaf transpiration and wood cuticular transpiration:
+<p>The total plant transpiration <span class="math inline">\(E_{Plant}\)</span> is decomposed as the sum of the average leaf transpiration and wood cuticular transpiration:
 <span class="math display">\[\begin{equation}
-E_{plant} = E_{leaf} + E_{stem, cuti}
+E_{plant} = E_{leaf, average} + E_{stem, cuti}
 \end{equation}\]</span>
-where <span class="math inline">\(E_{leaf}\)</span> is computed as:
-<span class="math display">\[\begin{equation}
-E_{leaf} =  E_{stom} + E_{leaf, cuti}
+where <span class="math inline">\(E_{leaf, average}\)</span> is computed as the weighted average of sunlit and shade leaf transpiration</p>
+<p><span class="math display">\[\begin{equation}
+E_{leaf, average} = \frac{E_{sunlit} \cdot LAI^{sunlit} + E_{leaf, shade} \cdot LAI^{shade}}{LAI^{\phi}}
 \end{equation}\]</span></p>
+<p>In turn, <span class="math inline">\(E_{leaf, sunlit}\)</span> and <span class="math inline">\(E_{leaf, shade}\)</span> are the result of:
+<span class="math display">\[\begin{eqnarray}
+E_{leaf, sunlit} =  E_{sunlit, stom} + E_{sunlit, cuti} \\
+E_{leaf, shade} =  E_{shade, stom} + E_{shade, cuti}
+\end{eqnarray}\]</span></p>
 </div>
 <div id="scalingtranspirationphotosynthesis" class="section level2 hasAnchor" number="12.3">
 <h2><span class="header-section-number">12.3</span> Cohort-level transpiration and photosynthesis<a href="transpirationsperrycochard.html#scalingtranspirationphotosynthesis" class="anchor-section" aria-label="Anchor link to header"></a></h2>

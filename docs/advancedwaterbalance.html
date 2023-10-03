@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-10-02" />
+<meta name="date" content="2023-10-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1264,12 +1264,12 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <li><code>defaultCO2 [=386]</code>: Default atmospheric (abovecanopy) <span class="math inline">\(CO_2\)</span> concentration (in micromol <span class="math inline">\(CO_2 \cdot mol^{-1}\)</span> = ppm). This value will be used whenever <span class="math inline">\(CO_2\)</span> concentration is not specified in the weather input.</li>
 <li><code>snowpack [= TRUE]</code>: Whether dynamics of snow pack are included (see section <a href="hydrology.html#snowpack">5.2</a>).</li>
 <li><code>leafPhenology [= TRUE]</code>: Whether leaf phenology is simulated for winter-deciduous species (see section <a href="leafphenologylight.html#leafphenology">4.1</a>). If <code>FALSE</code> then all species are assumed to be evergreen.</li>
+<li><code>bareSoilEvaporation [= TRUE]</code>: Whether evaporation from the soil surface is simulated (see section <a href="hydrology.html#soilevaporation">5.5</a>).</li>
 <li><code>rockyLayerDrainage [= TRUE]</code>: Whether water exceeding the field capacity of the deepest layer can be drained via macropore flow towards a non-reachable compartment, only for layers with &gt; 95% rocks (see section <a href="hydrology.html#runoff">5.4</a>).</li>
 <li><code>windMeasurementHeight [= 200]</code>: Distance (in cm) above the top of the canopy corresponding to the measurement of wind speed.</li>
 <li><code>boundaryLayerSize [= 2000]</code>: Size of the canopy boundary layer (in cm). The boundary layer causes the model to define vertical layers above the top of the canopy. The parameter is only relevant when multi-layer canopy energy balance is performed.</li>
 <li><code>unlimitedSoilWater [=FALSE]</code>: Boolean flag to indicate the simulation of plant transpiration assuming that soil water is always at field capacity.</li>
 <li><code>plantWaterPools [=FALSE]</code>: Boolean flag to indicate the simulation of water balance assuming that each cohort has its own water pools.</li>
-<li><code>cuticularTranspiration [=TRUE]</code>: Boolean flag to indicate the simulation of cuticular transpiration (at night or when stomata are fully closed) according to minimum stomatal conductance (see section <a href="transpirationsperrycochard.html#stomatalregulation">12.1.2</a>).</li>
 <li><code>thermalCapacityLAI [= 1000000]</code>: Canopy thermal capacitance per LAI unit (see section <a href="closecanopysoilenergybalance.html#canopycapacitancetemperature">13.1.3</a>).</li>
 <li><code>verticalLayerSize [= 100]</code>: The size of vertical layers (in <span class="math inline">\(cm\)</span>) for leaf area distribution and light extinction calculations (see section <a href="model-inputs.html#leafdistribution">2.4.5</a>).</li>
 <li><code>cavitationRefill [= "annual"]</code>: A string indicating how refilling of embolized conduits is done (see section <a href="transpirationsperrycochard.html#cavitationrefill">12.4</a>. Allowed values are:
@@ -1293,13 +1293,17 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 </ul>
 <p>whereas another set is only relevant for <code>transpirationMode = "Cochard"</code>:</p>
 <ul>
-<li><code>capacitance [= TRUE]</code>: Whether the effect of (symplasmic or apoplasmic) plant water compartments is considered in simulations.</li>
+<li><code>plantCapacitance [= TRUE]</code>: Whether the effect of (symplasmic or apoplasmic) plant water compartments is considered in simulations.</li>
+<li><code>leafCuticularTranspiration [= TRUE]</code>: Whether the effect of leaf cuticular transpiration is considered in simulations.</li>
+<li><code>stemCuticularTranspiration [= TRUE]</code>: Whether the effect of stem cuticular transpiration is considered in simulations.</li>
 <li><code>C_SApoInit [= 2.0e-5]</code>: Maximum capacitance of the stem apoplasm (mmol·m-2).</li>
 <li><code>C_LApoInit [= 1.0e-5]</code>: Maximum capacitance of the leaf apoplasm (mmol·m-2).</li>
 <li><code>k_SSym [= 0.26]</code>: Conductance from stem apoplasm to stem symplasm (mmol·s-1·m-2).</li>
+<li><code>k_LSym [= 2.0]</code>: Conductance from leaf apoplasm to leaf symplasm (mmol·s-1·m-2).</li>
+<li><code>gs_NightFrac [= 0.05]</code>: Stomatal conductance at night as fraction of maximum stomatal conductance ([0-1]).</li>
 <li><code>TPhase_gmin [= 37.5]</code>: Temperature for transition phase of gmin.</li>
-<li><code>Q10_1_gmin [= 1.2]</code>: Temperature dependance of gmin when T ≤ TPhase.</li>
-<li><code>Q10_2_gmin [= 4.8]</code>: Temperature dependance of gmin when T &gt; TPhase.</li>
+<li><code>Q10_1_gmin [= 1.2]</code>: Temperature dependence of gmin when T ≤ TPhase.</li>
+<li><code>Q10_2_gmin [= 4.8]</code>: Temperature dependence of gmin when T &gt; TPhase.</li>
 <li><code>JarvisPAR [= 0.003]</code>: Parameter regulating the response of stomatal conductance to light (PAR) in the Jarvis model.</li>
 <li><code>gCrown0 [= 0.150]</code>: Reference crown conductance (mol·s-1·m-2).</li>
 <li><code>fTRBToLeaf [= 0.8]</code>: Fraction of surface of bark exposed to air per leaf area.</li>

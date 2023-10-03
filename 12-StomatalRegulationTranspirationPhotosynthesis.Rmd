@@ -329,14 +329,21 @@ abline(v=Gmax, col="gray", lwd=1.5)
 
 When `transpirationMode = "Cochard"`, plants lose water through stomatal transpiration ($E_{stom}$), cuticular transpiration of the leaf ($E_{leaf,cuti}$) and cuticular transpiration of the stem ($E_{stem, cuti}$), see Fig. \@ref(fig:hydraulicssureau).
 
-The total plant transpiration $E_{Plant}$ is decomposed as the sum of the leaf transpiration and wood cuticular transpiration: 
+The total plant transpiration $E_{Plant}$ is decomposed as the sum of the average leaf transpiration and wood cuticular transpiration: 
 \begin{equation}
-E_{plant} = E_{leaf} + E_{stem, cuti}
+E_{plant} = E_{leaf, average} + E_{stem, cuti}
 \end{equation}
-where $E_{leaf}$ is computed as:
+where $E_{leaf, average}$ is computed as the weighted average of sunlit and shade leaf transpiration
+
 \begin{equation}
-E_{leaf} =  E_{stom} + E_{leaf, cuti}
+ E_{leaf, average} = \frac{E_{sunlit} \cdot LAI^{sunlit} + E_{leaf, shade} \cdot LAI^{shade}}{LAI^{\phi}}
 \end{equation}
+
+In turn, $E_{leaf, sunlit}$ and $E_{leaf, shade}$ are the result of:
+\begin{eqnarray}
+E_{leaf, sunlit} =  E_{sunlit, stom} + E_{sunlit, cuti} \\
+E_{leaf, shade} =  E_{shade, stom} + E_{shade, cuti}
+\end{eqnarray}
 
 
 ## Cohort-level transpiration and photosynthesis {#scalingtranspirationphotosynthesis}
