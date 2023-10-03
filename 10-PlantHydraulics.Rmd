@@ -33,7 +33,7 @@ knitr::include_graphics("figures/hydraulics_network.jpg")
 knitr::include_graphics("figures/hydraulics_sureau.jpg")
 ```
 
-The two architectures share as common elements the nodes corresponding to bulk soil  ($\Psi_{soil}$) and root surface ($\Psi_{rootsurf}$) for each soil layer, as well as the water potential at the root crown ($\Psi_{rootcrown}$). Since the architecture of `transpirationModel = "Sperry"` considers plant xylem elements only, the stem water potential ($\Psi_{stem}$) can be considered analogous to the apoplasmic stem water potential of Sureau-ECOS ($\Psi_{stem,apo}$). Similarly its leaf water potential ($\Psi_{leaf}$) can be considered equivalent to the apoplasmic stem water potential of Sureau-ECOS ($\Psi_{leaf,apo}$). Important differences between the two architectures include the additional consideration of plant capacitance effects and (explicit) cuticular transpiration flows in Sureau-ECOS (Fig. \@ref(fig:hydraulicsnetwork)). The two models also differ in how stomatal regulation, water flows and water potentials are solved. These differences are described in the following sub-sections as well as in chapter \@ref(transpirationsperrycochard).
+The two architectures share as common elements the nodes corresponding to bulk soil  ($\Psi_{soil}$) and root surface ($\Psi_{rootsurf}$) for each soil layer, as well as the water potential at the root crown ($\Psi_{rootcrown}$). Since the architecture of `transpirationModel = "Sperry"` considers plant xylem elements only, the stem water potential ($\Psi_{stem}$) can be considered analogous to the apoplasmic stem water potential of Sureau-ECOS ($\Psi_{stem,apo}$). Similarly its leaf water potential ($\Psi_{leaf}$) can be considered equivalent to the apoplasmic stem water potential of Sureau-ECOS ($\Psi_{leaf,apo}$). Symplasmic compartments of Sureau-ECOS do not have equivalents in the Sperry architecture, but the water potential of symplasmic compartments can be assumed to be equal to those of their corresponding apoplasmic compartments. Important differences between the two architectures include the additional consideration of (i) plant capacitance effects, (ii) cavitation flows and (iii) cuticular transpiration flows that are only available in Sureau-ECOS (Fig. \@ref(fig:hydraulicsnetwork)). The two models also differ in how stomatal regulation, water flows and water potentials are solved. These differences are described in the following sub-sections as well as in chapter \@ref(transpirationsperrycochard).
 
 ## Vulnerability curves {#vulnerabilitycurves}
 
@@ -237,14 +237,8 @@ for(i in 1:length(psi)) rwc_a[i] =moisture_apoplasticRWC(psi[i], 3, -4)
 plot(psi, rwc_a, type="l", xlab="Water potential (MPa)", ylab = "Apoplastic RWC")
 ```
 
-Since cavitation in leaves is assumed reversible we have that the relative water content of the apoplastic fraction in leaves ($RWC_{leaf,apo}$) will follow the leaf xylem water potential as indicated above. In stems, however, cavitation may be non-reversible, so $RWC_{stem,apo}$ will be dictated by the current level of embolisation, which is represented by $PLC_{stem}$ and not by the current xylem water potential: 
-\begin{equation}
-RWC_{stem,apo} = 1 - PLC_{stem}
-\end{equation}
-If water compartments are not considered, $PLC_{stem}$ is determined by $\Psi_{stem, cav}$, the minimum stem water potential experienced so far. When water comparments are considered, increases in  $PLC_{stem}$ follow decreases in stem water content and the water released can contribute to the transpirational stream [@Martin-StPaul2017]. This will be treated in the next section. 
 
-
-### Average relative water content of a segment {#averagerelativewatercontent}
+### Average relative water content of a compartment {#averagerelativewatercontent}
 
 The average relative water content in a given segment or organ ($RWC$) can be obtained by calculating  $RWC_{apo}$ and $RWC_{sym}$ followed by assuming a constant apoplastic fraction $f_{apo}$:
 
@@ -262,14 +256,12 @@ LFMC = RWC \cdot \Theta \cdot \frac{\rho_{H_2O}}{\rho} = RWC \cdot LFMC_{max}
 \end{equation}
 where $\Theta$ is the tissue porosity ($cm^3$ of water per $cm^3$ of tissue), $\rho$ is the density of the tissue and $\rho_{H_2O}$ is the density of water. In practice estimates of maximum fuel moisture content $LFMC_{max}$ are easier to obtain than porosity estimates, so it is more straightforward to estimate $LFMC$ as the product of $RWC$ and $LFMC_{max}$. 
 
-In medfate, $LFMC$ estimates are assumed to correspond to fine fuels (i.e. leaves and twigs of < 6.5 mm) but are estimated from leaf water content. The relative water content of leaves, and hence its $LFMC$, are estimated using (see \@ref(averagerelativewatercontent)):
+In medfate, $LFMC$ estimates are assumed to correspond to fine fuels (i.e. leaves and twigs of < 6.5 mm) and are estimated from stem and leaf water content:
 \begin{equation}
-LFMC = (RWC_{apo, leaf} \cdot f_{apo, leaf} + RWC_{sym,leaf} \cdot (1 - f_{apo,leaf})) \cdot LFMC_{max}
+LFMC = (RWC^{leaf} \cdot (1.0/r_{6.35})  + RWC^{stem} \cdot (1.0 - (1.0/r_{6.35}))) \cdot LFMC_{max}
 \end{equation}
-where $RWC_{apo,leaf}$ and $RWC_{sym,leaf}$ are the relative water content of apoplastic and symplastic leaf tissue and $f_{apo,leaf}$ is the fraction of apoplastic tissue in leaves.
+where $r_{6.35}$ is the ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm; $RWC^{leaf}$ is the relative water content of in leaves and $RWC^{stem}$ is the relative water content of in stem, respectively (already averaging symplasmic and apoplasmic tissues).
 
-The package allows estimating $LFMC$ from the output of `spwb()` or `growth()` using function `moisture_cohortFMC()`, but the post-processing function performs slightly different calculations depending on the complexity of the water balance. Basic soil water balance produces, among other outputs, the daily water potential of each plant cohort, $\Psi_{plant}$ (representing an weighted average of soil layer water potentials using fine root distribution as weights) and an estimate of the level of stem cavitation, $PLC_{stem}$. Daily $LFMC$ estimates can be obtained from this output if we use $RWC_{apo, leaf} = 1 - PLC_{stem}$ and calculate  $RWC_{sym, leaf}$ from $\Psi_{plant}$ using symplasmic leaf pressure-volume curves (see \@ref(pressurevolumecurves)).
-When using basic water balance, function `moisture_cohortFMC()` takes daily values $\Psi_{plant}$ and $PLC_{stem}$ from the simulation output, but parameters $\pi_{0,leaf}$, $\epsilon_{leaf}$ (i.e. pressure-volume curve parameters), $f_{apo,leaf}$ and $LFMC_{max}$ are drawn from the data frame `SpParams` of species parameter values. Unlike the basic water balance, the advanced water balance explicitly tracks the water potential in different plant segments and distinguishes between apoplastic and symplastic tissues. In this case, $RWC_{apo,leaf}$ and $RWC_{sym,leaf}$ are obtained directly from the plant water balance, and only $LFMC_{max}$ is drawn from the data frame `SpParams`.
 
 
 ## Sperry's sub-model of plant hydraulics {#supplyfunctions}
@@ -1058,26 +1050,82 @@ A supply function of the soil-plant hydraulic network defines a set steady-state
 
 Water dynamics of the SPA system in SurEau-Ecos [@ruffault_sureau-ecos_2022] are governed by partial differential equations for water mass conservation. 
 
-The water balance of each of the four plant compartments (symplasm and apoplasm for leaf and stem, respectively) is determined according to a generic equation. For a given compartment $i$, the water balance differential equation is:
+The water balance of each of the four plant compartments (symplasm and apoplasm for leaf and stem, respectively) is determined according to a generic equation. For a given plant compartment $i$, the water balance differential equation is:
 \begin{equation}
-C_i \cdot \frac{\mathrm{d}\Psi_i}{\mathrm{d}t} + \sum_{j}{K_{ij}\cdot (\Psi_i - \Psi_j)} - S = 0
+C_i \cdot \frac{\mathrm{d}\Psi_i}{\mathrm{d}t} + \sum_{j}{k_{ij}\cdot (\Psi_i - \Psi_j)} - S = 0
 \end{equation}
 and solved at each time step. In the above equation $\Psi_i$ and $\Psi_j$ would be the water potential of compartments $i$ and $j$, respectively (i.e. $\Psi_{leaf,symp}$, $\Psi_{leaf, apo}$, $\Psi_{stem, symp}$ or $\Psi_{stem, apo}$; see Fig. \@ref(fig:hydraulicssureau)); $C_i$ is the capacitance associated to the compartment $i$ and defined generically as:
 \begin{equation}
 C_i = \frac{Q_i}{\Psi_i}
 \end{equation}
-where $Q_i$ is the water volume content of the compartment; $K_{ij}$ is the conductance between the two compartments and $S$ represents a flow outside the target compartment (i.e. cuticular or stomatal transpiration losses, or water released from cavitation).
+where $Q_i$ is the water volume content of the compartment; $k_{ij}$ is the conductance between the two compartments and $S$ represents an outflow of the target compartment. Flows in/out of compartments are stem cuticular transpiration ($E_{cuti,stem}$), leaf cuticular transpiration ($E_{cuti, leaf}$), leaf stomatal transpiration ($E_{stom}$), stem cavitation flux ($F_{cav, stem}$) and leaf cavitation flux ($F_{cav,leaf}$).
 
 ### Plant and soil conductances
 
-Overall plant conductance $k_{plant}$ is defined as the sum of resistances across the hydraulic network:
+Overall plant conductance $k_{plant}$ is defined as the sum of resistances across the hydraulic network Fig. \@ref(fig:hydraulicssureau):
 \begin{equation}
-k_{plant} = \left(\frac{1}{\sum_{s=1}^{S}{k_{root2stem, s}}} + \frac{1}{k_{stem2leaf}} + \frac{1}{k_{leaf,symp}}\right)^{-1}
+k_{plant} = \left(\frac{1}{\sum_{s=1}^{S}{k_{root, s}}} + \frac{1}{k_{stem, apo}}+ \frac{1}{k_{leaf, apo}} + \frac{1}{k_{leaf,symp}}\right)^{-1}
 \end{equation}
 
-### Capacitances
+Whenever needed, for each soil layer $s$, the conductance from the root surface to the root crown is updated using the current level of $PLC_{stem}$:
+\begin{equation}
+k_{root,s} = k_{root,\max,s} \cdot (1.0 - PLC_{stem})
+\end{equation}
+whereas the conductance from the root crown to the stem apoplasm is updated similarly:
+\begin{equation}
+k_{stem, apo} = k_{stem, apo, \max} \cdot (1.0 - PLC_{stem})
+\end{equation}
+and the conductance from the stem apoplasm to the leaf apoplasm is updated using the current level of $PLC_{leaf}$:
+\begin{equation}
+k_{leaf, apo} = k_{leaf, apo, \max} \cdot (1.0 - PLC_{leaf})
+\end{equation}
 
-### Cavitation flux
+Unlike plant conductances, which are updated at short time steps, the conductance in the bulk soil for each soil layer ($k_{soil,s}$) is updated once per day, from $\Psi_{soil, s}$ and using Van Genuchten equations.
+
+### Plant capacitances
+Symplasmic reservoirs behave as variable plant capacitances related to the pressure volume curve, which corresponds to the water quantity ($Q$) changes in symplasmic cells, i.e.: 
+\begin{equation}
+\mathrm{d}Q/\mathrm{d}t = C \cdot (\mathrm{d} \Psi /\mathrm{d}t)
+\end{equation}
+from which we get an expression to update $C$:
+\begin{equation}
+C = \frac{\mathrm{d}Q}{\mathrm{d} \Psi} =  Q^{sat} \cdot \frac{\mathrm{d} RWC}{\mathrm{d} \Psi}
+\end{equation}
+where $Q^{sat}$ is the water volume of the compartment at saturation. From the former general equation, the capacitance of the leaf symplasm ($C_{LSym}$; in $mmol \cdot MPa^{-1} \cdot m^{-2}$) is updated using the derivative of the leaf symplasmic pressure-volume curve ($RWC_{sym}^{leaf}$) with respect to $\Psi_{leaf,sym}$ [@ruffault_sureau-ecos_2022]:
+\begin{equation}
+C_{LSym} = Q^{sat}_{LSym} \cdot \frac{\mathrm{d} RWC_{sym}^{leaf}(\Psi_{leaf,sym})}{\mathrm{d} \Psi_{leaf,sym}}
+\end{equation}
+and the capacitance of the stem symplasm ($C_{SSym}$; in $mmol \cdot MPa^{-1} \cdot m^{-2}$) is updated analogously:
+\begin{equation}
+C_{SSym} = Q^{sat}_{SSym} \cdot \frac{\mathrm{d} RWC_{sym}^{stem}(\Psi_{stem,sym})}{\mathrm{d} \Psi_{stem,sym}}
+\end{equation}
+
+Equations for derivatives of the relative water content are given in @ruffault_sureau-ecos_2022.
+
+### Cavitation flows
+
+SurEau-Ecos also considers the capacitance effect of xylem cavitation [@Holtta2009], i.e., the water released to the streamflow when cavitation occurs [@ruffault_sureau-ecos_2022]. The non-cavitated part of the xylem receives a water flux from the cavitated part and is then transferred to adjacent compartments. The amount of water corresponding to a new cavitation event ($F_{cav}$) is derived from the quantity of water in the apoplasm at saturation ($Q^{sat}_{apo}$) and the temporal variations in PLC as follows:
+
+\begin{equation}
+F_{cav} = Q^{sat} \cdot \max \left( \frac{\mathrm{d}PLC}{\mathrm{d}t} , 0\right)
+\end{equation}
+
+This flux is linearized in temporal variations in $\Psi$ in order to express this flux in the form of a Darcy’s law. For that purpose an equivalent conductance $k_{cav}$ is introduced as follows:
+\begin{eqnarray}
+F_{cav} &=& Q^{sat} \cdot \max \left( \frac{\mathrm{d}PLC}{\mathrm{d} \Psi} \cdot \frac{\mathrm{d} \Psi}{\mathrm{d} t} , 0\right) \\
+        &\approx& k_{cav} \cdot \max(\Psi_{cav} - \Psi , 0)
+\end{eqnarray}
+where $\Psi_{cav}$ is the minimum value of $\Psi$ reached for the apoplasmic compartment, $\mathrm{d}PLC / \mathrm{d} \Psi$ is the derivative of $PLC$ with respect to $\Psi$ and $k_{cav}$ is:
+
+\begin{equation}
+k_{cav} = - \frac{Q^{sat} \cdot (\mathrm{d}PLC / \mathrm{d} \Psi)}{\mathrm{dt}}
+\end{equation}
+
+The equation for $\mathrm{d}PLC / \mathrm{d} \Psi$ is given in @ruffault_sureau-ecos_2022.
+
+### Transpiration flows
+
+Stem cuticular transpiration ($E_{cuti,stem}$), leaf cuticular transpiration ($E_{cuti, leaf}$) and leaf stomatal transpiration ($E_{stom}$) are described in section \@ref(transpirationcochard).
 
 ### Numerical scheme
 
