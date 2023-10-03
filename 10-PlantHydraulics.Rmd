@@ -17,7 +17,7 @@ We devote this chapter to describe the background necessary to understand how pl
 
 ## Hydraulic architecture {#hydraulicnetworks}
 
-The advanced water balance model of **medfate** implements different hydraulic architectures depending on the transpiration sub-model:
+The hydraulic architecture of a model describes the set of water compartments and resistances to water flow that are explicitly considered, often implying a simplification and discretization of real plant hydraulic pathways. The advanced water balance model of **medfate** implements different hydraulic architectures depending on the transpiration sub-model:
 
 + If `transpirationMode = "Sperry"`, the hydraulic network is described using $(S \times 2 + 1 + 1)$ resistance elements, with soil being represented in $S$ different soil layers. For each soil layer there is a rhizosphere element in series with a root xylem element. The $S$ soil layers are in parallel up to the root crown. From there there is one stem xylem segment and a final leaf xylem segment in series (Fig. \@ref(fig:hydraulicsnetwork)). Stem cavitation affects the resistance between the root crown ($\Psi_{rootcrown}$) and the stem ($\Psi_{stem}$), whereas leaf cavitation affects the resistance between the stem ($\Psi_{stem}$) and the leaf ($\Psi_{leaf}$)
 
@@ -33,6 +33,7 @@ knitr::include_graphics("figures/hydraulics_network.jpg")
 knitr::include_graphics("figures/hydraulics_sureau.jpg")
 ```
 
+The two architectures share as common elements the nodes corresponding to bulk soil  ($\Psi_{soil}$) and root surface ($\Psi_{rootsurf}$) for each soil layer, as well as the water potential at the root crown ($\Psi_{rootcrown}$). Since the architecture of `transpirationModel = "Sperry"` considers plant xylem elements only, the stem water potential ($\Psi_{stem}$) can be considered analogous to the apoplasmic stem water potential of Sureau-ECOS ($\Psi_{stem,apo}$). Similarly its leaf water potential ($\Psi_{leaf}$) can be considered equivalent to the apoplasmic stem water potential of Sureau-ECOS ($\Psi_{leaf,apo}$). Important differences between the two architectures include the additional consideration of plant capacitance effects and (explicit) cuticular transpiration flows in Sureau-ECOS (Fig. \@ref(fig:hydraulicsnetwork)). The two models also differ in how stomatal regulation, water flows and water potentials are solved. These differences are described in the following sub-sections as well as in chapter \@ref(transpirationsperrycochard).
 
 ## Vulnerability curves {#vulnerabilitycurves}
 
