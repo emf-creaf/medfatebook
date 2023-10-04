@@ -327,7 +327,9 @@ abline(v=Gmax, col="gray", lwd=1.5)
 
 ## Stomatal regulation and transpiration under Cochard's sub-model {#transpirationcochard}
 
-When `transpirationMode = "Cochard"`, plants lose water through stomatal transpiration ($E_{stom}$), cuticular transpiration of the leaf ($E_{leaf,cuti}$) and cuticular transpiration of the stem ($E_{stem, cuti}$), see Fig. \@ref(fig:hydraulicssureau).
+### Transpiration flows
+
+In Sureau-ECOS [@ruffault_sureau-ecos_2022], plants lose water through stomatal transpiration ($E_{stom}$), cuticular transpiration of the leaf ($E_{leaf,cuti}$) and cuticular transpiration of the stem ($E_{stem, cuti}$), see Fig. \@ref(fig:hydraulicssureau). 
 
 The total plant transpiration $E_{Plant}$ is decomposed as the sum of the average leaf transpiration and wood cuticular transpiration: 
 \begin{equation}
@@ -339,12 +341,49 @@ where $E_{leaf, average}$ is computed as the weighted average of sunlit and shad
  E_{leaf, average} = \frac{E_{sunlit} \cdot LAI^{sunlit} + E_{leaf, shade} \cdot LAI^{shade}}{LAI^{\phi}}
 \end{equation}
 
-In turn, $E_{leaf, sunlit}$ and $E_{leaf, shade}$ are the result of:
+In turn, $E_{leaf, sunlit}$ and $E_{leaf, shade}$ are the result of considering stomatal transpiration and cuticular transpiration:
 \begin{eqnarray}
-E_{leaf, sunlit} =  E_{sunlit, stom} + E_{sunlit, cuti} \\
-E_{leaf, shade} =  E_{shade, stom} + E_{shade, cuti}
+E_{leaf} &=&  E_{stom} + E_{leaf, cuti} \\
+ &=&  \left( \frac{1}{g_{stom} + g_{leaf, cuti}} + \frac{1}{g_{bound}}+ \frac{1}{g_{crown}}\right)^{-1} \cdot \frac{VPD_{leaf}}{P_{atm}}
 \end{eqnarray}
 
+where $VPD_{leaf}$ (in MPa) is the vapor pressure deficit of the leaf, $P_{atm}$ is the atmospheric pressure, $g_{stom}$ is the stomatal conductance, $g_{leaf,cuti}$ is the cuticular conductance of the leaf, $g_{bound}$ is the conductance of the leaf boundary layer and $g_{crown}$ is the conductance of the tree crown. Finally, $E_{stem, cuti}$ is calculated as follows:
+\begin{equation}
+E_{stem, cuti} =  \left( \frac{1}{g_{stem, cuti}} + \frac{1}{g_{bound}}+ \frac{1}{g_{crown}}\right)^{-1} \cdot \frac{VPD_{air}}{P_{atm}}
+\end{equation}
+where $VPD_{air}$ is the vapour pressure deficit in the canopy air:
+\begin{equation}
+VPD_{air} = e_{sat}(T_{air}) - e_{air}
+\end{equation}
+
+### Cuticular conductances
+
+$g_{leaf,cuti}$ is a function of leaf temperature ($T_{leaf}$), which is based on a single or double Q10 equation depending on whether leaf temperature is above or below the transition phase temperature ($T_{phase}$). If $T_{leaf} \leq T_{phase}$ we have:
+\begin{equation}
+g_{leaf,cuti} = g_{leaf,cuti,20} \cdot Q_{10a}^{\frac{T_{leaf} - 20}{10}}
+\end{equation}
+whereas if $T_{leaf} > T_{phase}$ we have:
+\begin{equation}
+g_{leaf,cuti} = g_{leaf,cuti,20} \cdot Q_{10a}^{\frac{T_{leaf} - 20}{10}} \cdot Q_{10b}^{\frac{T_{leaf} - T_{phase}}{10}}
+\end{equation}
+
+Unlike $g_{leaf,cuti}$, $g_{stem, cuti}$ is assumed non temperature dependent.
+
+### Stomatal conductance
+
+$g_{stom}$ is the stomatal conductance taking into account the dependence of stomata on light, temperature and $CO_2$ concentration [missing currently], as well as water status: 
+
+\begin{equation}
+g_{stom} = \lambda(\Psi_{leaf,sym}) · g_{stom, jarvis} 
+\end{equation}
+
+where $g_{stom,jarvis}$ is the stomatal conductance without water stress and is determined as a function of light, temperature and CO2 concentration following Jarvis (1976). $\lambda$ is a regulation factor that varies between 0 and 1 to represent stomatal closure according to leaf symplasmic water potential ($\Psi_{leaf,sym}$) using sigmoid-type function:
+
+\begin{equation}
+\lambda(\Psi_{leaf,sym}) = 1 - \left(1 + e^{(slope_{gs}/25) \cdot (\Psi_{leaf,sym} - \Psi50_{gs}}) \right)^{-1}
+\end{equation}
+
+depending on the potential at 50 % of stomatal closure ($\Psi50_{gs}$) and a shape parameter ($slope_{gs}$) describing the rate of decrease in stomatal conductance per unit of water potential drop.
 
 ## Cohort-level transpiration and photosynthesis {#scalingtranspirationphotosynthesis}
 
