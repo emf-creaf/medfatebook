@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-10-04" />
+<meta name="date" content="2023-10-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -375,6 +375,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="12.1.1" data-path="transpirationsperrycochard.html"><a href="transpirationsperrycochard.html#water-supply-and-sunlitshade-photosynthesis-functions"><i class="fa fa-check"></i><b>12.1.1</b> Water supply and sunlit/shade photosynthesis functions</a></li>
 <li class="chapter" data-level="12.1.2" data-path="transpirationsperrycochard.html"><a href="transpirationsperrycochard.html#stomatalregulation"><i class="fa fa-check"></i><b>12.1.2</b> Leaf stomatal regulation by profit maximization</a></li>
+<li class="chapter" data-level="12.1.3" data-path="transpirationsperrycochard.html"><a href="transpirationsperrycochard.html#cohort-level-transpiration"><i class="fa fa-check"></i><b>12.1.3</b> Cohort-level transpiration</a></li>
 </ul></li>
 <li class="chapter" data-level="12.2" data-path="transpirationsperrycochard.html"><a href="transpirationsperrycochard.html#transpirationcochard"><i class="fa fa-check"></i><b>12.2</b> Stomatal regulation and transpiration under Cochard’s sub-model</a>
 <ul>
@@ -776,6 +777,15 @@ Figure 12.4: Profit function as a function of stomatal conductance, correspondin
 </div>
 </div>
 </div>
+<div id="cohort-level-transpiration" class="section level3 hasAnchor" number="12.1.3">
+<h3><span class="header-section-number">12.1.3</span> Cohort-level transpiration<a href="transpirationsperrycochard.html#cohort-level-transpiration" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In the previous section, we considered stomatal regulation at the leaf level only. At the plant cohort level, the gain function could be build from a crown photosynthesis function <span class="math inline">\(A(\Psi_{leaf})\)</span>, as shown in section <a href="plantphotosynthesis.html#crownphotosynthesis">11.2</a>. However, applying the profit maximization approach for a single crown photosynthesis function would imply the assumption that the same stomatal aperture occurs in all leaves of the plant cohort, independently of whether they are in shade or sunlit. A more realistic approach is to determine stomatal regulation by profit maximization for sunlit and shade leaves separately. The gain function and profit maximization calculations conducted for each leaf type yield instantaneous leaf water potentials <span class="math inline">\(\Psi^{sunlit}_{leaf}\)</span> and <span class="math inline">\(\Psi^{shade}_{leaf}\)</span> and instantaneous flow values <span class="math inline">\(E^{shade}\)</span> and <span class="math inline">\(E^{sunlit}\)</span> from the supply functions. The corresponding photosynthesis functions allow determining values for leaf temperatures <span class="math inline">\(T_{leaf}^{sunlit}\)</span> and <span class="math inline">\(T_{leaf}^{shade}\)</span>, vapour pressure deficits <span class="math inline">\(VPD_{leaf}^{sunlit}\)</span> <span class="math inline">\(VPD_{leaf}^{shade}\)</span>, stomatal conductance <span class="math inline">\(g_{sw}^{sunlit}\)</span> and <span class="math inline">\(g_{sw}^{shade}\)</span> and net photosynthesis rates <span class="math inline">\(A_{n}^{sunlit}\)</span> and <span class="math inline">\(A_{n}^{shade}\)</span>. This is a lot of useful information at the leaf level for each plant cohort <span class="math inline">\(i\)</span>, but we also need transpiration and photosynthesis values at the plant cohort-level.</p>
+<p>The average instantaneous flow rate (<span class="math inline">\(E_i^{average}\)</span>, in <span class="math inline">\(mmol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>) per leaf area unit of plant cohort <span class="math inline">\(i\)</span> is the weighed average:
+<span class="math display">\[\begin{equation}
+E_i^{average} = \frac{E_{i}^{shade} \cdot LAI_i^{sunlit} + E_{i}^{shade} \cdot LAI_i^{shade}}{LAI_i^{\phi}}
+\end{equation}\]</span>
+where <span class="math inline">\(LAI_i^{sunlit}\)</span> and <span class="math inline">\(LAI_i^{shade}\)</span> are the cohorts LAI values for sunlit and shade leaves, from eq. <a href="radiationbalance.html#eq:sunlitshadelai">(9.1)</a>, and <span class="math inline">\(LAI_i^{\phi}\)</span> is the leaf area index of plant cohort <span class="math inline">\(i\)</span>. The model then uses the hydraulic supply function to find the transpiration rate <span class="math inline">\(E_i\)</span> numerically closest to <span class="math inline">\(E_i^{average}\)</span> (remember that the supply function is build in discrete steps). Finding the <span class="math inline">\(E_i\)</span> value numerically closest to <span class="math inline">\(E_i^{average}\)</span> determines the <span class="math inline">\(E_{i,t}\)</span> the instantaneous transpiration flow for current time step <span class="math inline">\(t\)</span>, and also leads to setting values for <span class="math inline">\(t\)</span> of several other variables, such as water potentials (<span class="math inline">\(\Psi_{leaf, i,t}\)</span>, <span class="math inline">\(\Psi_{stem, i,t}\)</span>, <span class="math inline">\(\Psi_{rootcrown, i,t}\)</span>, …), the slope of the supply function (<span class="math inline">\((d E/d\Psi_{i})_t\)</span>), and instantaneous soil water extraction rates (<span class="math inline">\(E_{i,s,t}\)</span>).</p>
+</div>
 </div>
 <div id="transpirationcochard" class="section level2 hasAnchor" number="12.2">
 <h2><span class="header-section-number">12.2</span> Stomatal regulation and transpiration under Cochard’s sub-model<a href="transpirationsperrycochard.html#transpirationcochard" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -786,7 +796,7 @@ Figure 12.4: Profit function as a function of stomatal conductance, correspondin
 <span class="math display">\[\begin{equation}
 E_{plant} = E_{leaf, average} + E_{stem, cuti}
 \end{equation}\]</span>
-where <span class="math inline">\(E_{leaf, average}\)</span> is computed as the weighted average of sunlit and shade leaf transpiration</p>
+where <span class="math inline">\(E_{leaf, average}\)</span> is computed as the weighted average of sunlit and shade leaf transpiration:</p>
 <p><span class="math display">\[\begin{equation}
 E_{leaf, average} = \frac{E_{sunlit} \cdot LAI^{sunlit} + E_{leaf, shade} \cdot LAI^{shade}}{LAI^{\phi}}
 \end{equation}\]</span></p>
@@ -795,7 +805,8 @@ E_{leaf, average} = \frac{E_{sunlit} \cdot LAI^{sunlit} + E_{leaf, shade} \cdot 
 E_{leaf} &amp;=&amp;  E_{stom} + E_{leaf, cuti} \\
 &amp;=&amp;  \left( \frac{1}{g_{stom} + g_{leaf, cuti}} + \frac{1}{g_{bound}}+ \frac{1}{g_{crown}}\right)^{-1} \cdot \frac{VPD_{leaf}}{P_{atm}}
 \end{eqnarray}\]</span></p>
-<p>where <span class="math inline">\(VPD_{leaf}\)</span> (in MPa) is the vapor pressure deficit of the leaf, <span class="math inline">\(P_{atm}\)</span> is the atmospheric pressure, <span class="math inline">\(g_{stom}\)</span> is the stomatal conductance, <span class="math inline">\(g_{leaf,cuti}\)</span> is the cuticular conductance of the leaf, <span class="math inline">\(g_{bound}\)</span> is the conductance of the leaf boundary layer and <span class="math inline">\(g_{crown}\)</span> is the conductance of the tree crown. Finally, <span class="math inline">\(E_{stem, cuti}\)</span> is calculated as follows:
+<p>where <span class="math inline">\(VPD_{leaf}\)</span> (in MPa) is the vapor pressure deficit of the leaf, <span class="math inline">\(P_{atm}\)</span> is the atmospheric pressure, <span class="math inline">\(g_{stom}\)</span> is the stomatal conductance, <span class="math inline">\(g_{leaf,cuti}\)</span> is the cuticular conductance of the leaf, <span class="math inline">\(g_{bound}\)</span> is the conductance of the leaf boundary layer and <span class="math inline">\(g_{crown}\)</span> is the conductance of the tree crown. Note that sunlit and shade leaves will differ in <span class="math inline">\(g_{stom}\)</span>, <span class="math inline">\(g_{leaf,cuti}\)</span> and <span class="math inline">\(VPD_{leaf}\)</span>, because of their different radiation and heat balance.</p>
+<p>Finally, <span class="math inline">\(E_{stem, cuti}\)</span> is calculated as follows:
 <span class="math display">\[\begin{equation}
 E_{stem, cuti} =  \left( \frac{1}{g_{stem, cuti}} + \frac{1}{g_{bound}}+ \frac{1}{g_{crown}}\right)^{-1} \cdot \frac{VPD_{air}}{P_{atm}}
 \end{equation}\]</span>
@@ -814,29 +825,24 @@ whereas if <span class="math inline">\(T_{leaf} &gt; T_{phase}\)</span> we have:
 <span class="math display">\[\begin{equation}
 g_{leaf,cuti} = g_{leaf,cuti,20} \cdot Q_{10a}^{\frac{T_{leaf} - 20}{10}} \cdot Q_{10b}^{\frac{T_{leaf} - T_{phase}}{10}}
 \end{equation}\]</span></p>
-<p>Unlike <span class="math inline">\(g_{leaf,cuti}\)</span>, <span class="math inline">\(g_{stem, cuti}\)</span> is assumed non temperature dependent.</p>
+<p>Sunlit and shade leaves will have different <span class="math inline">\(g_{leaf,cuti}\)</span> because of their different temperature. Unlike <span class="math inline">\(g_{leaf,cuti}\)</span>, <span class="math inline">\(g_{stem, cuti}\)</span> is assumed non temperature dependent.</p>
 </div>
 <div id="stomatal-conductance" class="section level3 hasAnchor" number="12.2.3">
 <h3><span class="header-section-number">12.2.3</span> Stomatal conductance<a href="transpirationsperrycochard.html#stomatal-conductance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p><span class="math inline">\(g_{stom}\)</span> is the stomatal conductance taking into account the dependence of stomata on light, temperature and <span class="math inline">\(CO_2\)</span> concentration [missing currently], as well as water status:</p>
+<p><span class="math inline">\(g_{stom}\)</span> is the stomatal conductance taking into account the dependence of stomata on light and temperature, as well as water status:</p>
 <p><span class="math display">\[\begin{equation}
 g_{stom} = \lambda(\Psi_{leaf,sym}) · g_{stom, jarvis}
 \end{equation}\]</span></p>
-<p>where <span class="math inline">\(g_{stom,jarvis}\)</span> is the stomatal conductance without water stress and is determined as a function of light, temperature and CO2 concentration following Jarvis (1976). <span class="math inline">\(\lambda\)</span> is a regulation factor that varies between 0 and 1 to represent stomatal closure according to leaf symplasmic water potential (<span class="math inline">\(\Psi_{leaf,sym}\)</span>) using sigmoid-type function:</p>
+<p>where <span class="math inline">\(g_{stom,jarvis}\)</span> is the stomatal conductance without water stress and is determined as a function of light and temperature following Jarvis (1976). <span class="math inline">\(\lambda\)</span> is a regulation factor that varies between 0 and 1 to represent stomatal closure according to leaf symplasmic water potential (<span class="math inline">\(\Psi_{leaf,sym}\)</span>) using sigmoid-type function:</p>
 <p><span class="math display">\[\begin{equation}
 \lambda(\Psi_{leaf,sym}) = 1 - \left(1 + e^{(slope_{gs}/25) \cdot (\Psi_{leaf,sym} - \Psi50_{gs}}) \right)^{-1}
 \end{equation}\]</span></p>
 <p>depending on the potential at 50 % of stomatal closure (<span class="math inline">\(\Psi50_{gs}\)</span>) and a shape parameter (<span class="math inline">\(slope_{gs}\)</span>) describing the rate of decrease in stomatal conductance per unit of water potential drop.</p>
+<p>With the current implementation, <span class="math inline">\(\lambda\)</span> will be the same for sunlit and shade leaves (i.e. there is only one symplasmic water potential for both kind of leaves), but <span class="math inline">\(g_{stom, jarvis}\)</span> will differ because of the different light and temperature conditions.</p>
 </div>
 </div>
 <div id="scalingtranspirationphotosynthesis" class="section level2 hasAnchor" number="12.3">
 <h2><span class="header-section-number">12.3</span> Cohort-level transpiration and photosynthesis<a href="transpirationsperrycochard.html#scalingtranspirationphotosynthesis" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>In the previous section, we considered stomatal regulation at the leaf level only. At the plant cohort level, the gain function could be build from a crown photosynthesis function <span class="math inline">\(A(\Psi_{leaf})\)</span>, as shown in section <a href="plantphotosynthesis.html#crownphotosynthesis">11.2</a>. However, applying the profit maximization approach for a single crown photosynthesis function would imply the assumption that the same stomatal aperture occurs in all leaves of the plant cohort, independently of whether they are in shade or sunlit. A more realistic approach is to determine stomatal regulation by profit maximization for sunlit and shade leaves separately. The gain function and profit maximization calculations conducted for each leaf type yield instantaneous leaf water potentials <span class="math inline">\(\Psi^{sunlit}_{leaf}\)</span> and <span class="math inline">\(\Psi^{shade}_{leaf}\)</span> and instantaneous flow values <span class="math inline">\(E^{shade}\)</span> and <span class="math inline">\(E^{sunlit}\)</span> from the supply functions. The corresponding photosynthesis functions allow determining values for leaf temperatures <span class="math inline">\(T_{leaf}^{sunlit}\)</span> and <span class="math inline">\(T_{leaf}^{shade}\)</span>, vapour pressure deficits <span class="math inline">\(VPD_{leaf}^{sunlit}\)</span> <span class="math inline">\(VPD_{leaf}^{shade}\)</span>, stomatal conductance <span class="math inline">\(g_{sw}^{sunlit}\)</span> and <span class="math inline">\(g_{sw}^{shade}\)</span> and net photosynthesis rates <span class="math inline">\(A_{n}^{sunlit}\)</span> and <span class="math inline">\(A_{n}^{shade}\)</span>. This is a lot of useful information at the leaf level for each plant cohort <span class="math inline">\(i\)</span>, but we also need transpiration and photosynthesis values at the plant cohort-level.</p>
-<p>The average instantaneous flow rate (<span class="math inline">\(E_i^{average}\)</span>, in <span class="math inline">\(mmol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>) per leaf area unit of plant cohort <span class="math inline">\(i\)</span> is the weighed average:
-<span class="math display">\[\begin{equation}
-E_i^{average} = \frac{E_{i}^{shade} \cdot LAI_i^{sunlit} + E_{i}^{shade} \cdot LAI_i^{shade}}{LAI_i^{\phi}}
-\end{equation}\]</span>
-where <span class="math inline">\(LAI_i^{sunlit}\)</span> and <span class="math inline">\(LAI_i^{shade}\)</span> are the cohorts LAI values for sunlit and shade leaves, from eq. <a href="radiationbalance.html#eq:sunlitshadelai">(9.1)</a>, and <span class="math inline">\(LAI_i^{\phi}\)</span> is the leaf area index of plant cohort <span class="math inline">\(i\)</span>. The model then uses the hydraulic supply function to find the transpiration rate <span class="math inline">\(E_i\)</span> numerically closest to <span class="math inline">\(E_i^{average}\)</span> (remember that the supply function is build in discrete steps). Finding the <span class="math inline">\(E_i\)</span> value numerically closest to <span class="math inline">\(E_i^{average}\)</span> determines the <span class="math inline">\(E_{i,t}\)</span> the instantaneous transpiration flow for current time step <span class="math inline">\(t\)</span>, and also leads to setting values for <span class="math inline">\(t\)</span> of several other variables, such as water potentials (<span class="math inline">\(\Psi_{leaf, i,t}\)</span>, <span class="math inline">\(\Psi_{stem, i,t}\)</span>, <span class="math inline">\(\Psi_{rootcrown, i,t}\)</span>, …), the slope of the supply function (<span class="math inline">\((d E/d\Psi_{i})_t\)</span>), and instantaneous soil water extraction rates (<span class="math inline">\(E_{i,s,t}\)</span>).</p>
 <p>The amount of transpiration from the plant cohort in a given time step <span class="math inline">\(t\)</span> (<span class="math inline">\(Tr_{i,t}\)</span>, in <span class="math inline">\(l \cdot m^{-2}\)</span> of ground area, i.e. in mm) is:
 <span class="math display" id="eq:cohorttranspiration">\[\begin{equation}
 Tr_{i,t} = E_{i,t} \cdot LAI_i^{\phi} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
@@ -846,8 +852,8 @@ where <span class="math inline">\(0.01802\)</span> is the molar weight (in <span
 <span class="math display" id="eq:cohortextraction">\[\begin{equation}
 Ex_{i,s,t} = E_{i,s,t} \cdot LAI_i^{\phi} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
 \tag{12.2}
-\end{equation}\]</span>
-If plant water storage is not considered, one should have that soil extraction equals transpiration:
+\end{equation}\]</span></p>
+<p>If plant capacitance is not considered, one should have that soil extraction equals transpiration:
 <span class="math display">\[\begin{equation}
 Tr_{i,t} = Ex_{i,t} = \sum_s {Ex_{i,s,t}}
 \end{equation}\]</span></p>
