@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-10-08" />
+<meta name="date" content="2023-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -324,7 +324,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="10.2.1" data-path="planthydraulics.html"><a href="planthydraulics.html#xylem-vulnerability-curves"><i class="fa fa-check"></i><b>10.2.1</b> Xylem vulnerability curves</a></li>
 <li class="chapter" data-level="10.2.2" data-path="planthydraulics.html"><a href="planthydraulics.html#rhizosphere-vulnerability-curve"><i class="fa fa-check"></i><b>10.2.2</b> Rhizosphere vulnerability curve</a></li>
-<li class="chapter" data-level="10.2.3" data-path="planthydraulics.html"><a href="planthydraulics.html#xylem-sap-viscosity"><i class="fa fa-check"></i><b>10.2.3</b> Xylem sap viscosity</a></li>
+<li class="chapter" data-level="10.2.3" data-path="planthydraulics.html"><a href="planthydraulics.html#sapviscosity"><i class="fa fa-check"></i><b>10.2.3</b> Xylem sap viscosity</a></li>
 </ul></li>
 <li class="chapter" data-level="10.3" data-path="planthydraulics.html"><a href="planthydraulics.html#plantwatercontent"><i class="fa fa-check"></i><b>10.3</b> Water content of plant tissues</a>
 <ul>
@@ -715,16 +715,16 @@ div.csl-indent {
 <h3><span class="header-section-number">9.1.1</span> Direct and diffuse irradiance across the canopy<a href="radiationbalance.html#irradiancecanopy" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The average irradiance reaching the top of each canopy layer <span class="math inline">\(j\)</span> is calculated separately for direct beam and diffuse radiation (the same equations are valid for SWR or PAR, but with different coefficients):
 <span class="math display">\[\begin{eqnarray}
-I_{beam,j} &amp;=&amp; (1 - \gamma_i) \cdot I_{beam} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{b}\cdot \alpha_i^{0.5}\cdot LAI^{all}_{i,h}}}\right]\\
+I_{beam,j} &amp;=&amp; (1 - \gamma_i) \cdot I_{beam} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{b,i}\cdot \alpha_i^{0.5}\cdot LAI^{all}_{i,h}}}\right]\\
 I_{dif,j} &amp;=&amp; (1 - \gamma_i) \cdot I_{dif} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{d,i}\cdot \alpha_i^{0.5}\cdot LAI^{all}_{i,h}}}\right]
 \end{eqnarray}\]</span>
-where <span class="math inline">\(I_{beam}\)</span> and <span class="math inline">\(I_{dif}\)</span> are the direct and diffuse irradiance at the top of the canopy (in <span class="math inline">\(W \cdot m^{-2}\)</span>), <span class="math inline">\(\gamma_i\)</span> is the leaf reflectance (<span class="math inline">\(\gamma_{SWR, i}\)</span> is an input parameter, whereas <span class="math inline">\(\gamma_{PAR, i} = 0.8 \cdot \gamma_{SWR, i}\)</span>), <span class="math inline">\(k_{b} = 0.8\)</span> is the extinction coefficient for direct light, <span class="math inline">\(k_{d,i}\)</span> is the extinction coefficient of cohort <span class="math inline">\(i\)</span> for diffuse light (i.e. <span class="math inline">\(k_{PAR,i}\)</span> or <span class="math inline">\(k_{SWR,i}\)</span>) and <span class="math inline">\(\alpha_i\)</span> is the absorbance coefficient (<span class="math inline">\(\alpha_{SWR,i}\)</span> is an input parameter, whereas <span class="math inline">\(\alpha_{PAR,i} = \alpha_{SWR,i} \cdot 1.35\)</span>).</p>
+where <span class="math inline">\(I_{beam}\)</span> and <span class="math inline">\(I_{dif}\)</span> are the direct and diffuse irradiance at the top of the canopy (in <span class="math inline">\(W \cdot m^{-2}\)</span>), <span class="math inline">\(\gamma_i\)</span> is the leaf reflectance (<span class="math inline">\(\gamma_{SWR, i}\)</span> is an input parameter, whereas <span class="math inline">\(\gamma_{PAR, i} = 0.8 \cdot \gamma_{SWR, i}\)</span>), <span class="math inline">\(k_{b,i}\)</span> is the extinction coefficient of cohort <span class="math inline">\(i\)</span> for direct light, <span class="math inline">\(k_{d,i}\)</span> is the extinction coefficient of cohort <span class="math inline">\(i\)</span> for diffuse light (i.e. <span class="math inline">\(k_{PAR,i}\)</span> or <span class="math inline">\(k_{SWR,i}\)</span>) and <span class="math inline">\(\alpha_i\)</span> is the absorbance coefficient (<span class="math inline">\(\alpha_{SWR,i}\)</span> is an input parameter, whereas <span class="math inline">\(\alpha_{PAR,i} = \alpha_{SWR,i} \cdot 1.35\)</span>).</p>
 </div>
 <div id="sunlit-and-shade-leaves" class="section level3 hasAnchor" number="9.1.2">
 <h3><span class="header-section-number">9.1.2</span> Sunlit and shade leaves<a href="radiationbalance.html#sunlit-and-shade-leaves" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>It is generally accepted that sunlit and shade leaves need to be treated separately for photosynthesis calculations <span class="citation">(<a href="#ref-DePury1997">De Pury &amp; Farquhar 1997</a>)</span>. This separation is necessary because photosynthesis of shade leaves has an essentially linear response to irradiance, while photosynthesis of leaves in sunflecks is often light saturated and independent of irradiance. The proportion of sunlit leaves, i.e. leaves in a canopy layer <span class="math inline">\(j\)</span> that the direct light beams (sunflecks) reach is:
 <span class="math display">\[\begin{equation}
-f_{SL, j}  = \exp\left( \sum_{k&gt;j}^{l}{\sum_{i}^{c}{-k_{b} \cdot LAI^{all}_{i,k}}}\right) \cdot \exp\left( \sum_{i}^{c}{-k_{b} \cdot 0.5\cdot LAI^{all}_{i,j}}\right)
+f_{SL, j}  = \exp\left( \sum_{k&gt;j}^{l}{\sum_{i}^{c}{-k_{b,i} \cdot LAI^{all}_{i,k}}}\right) \cdot \exp\left( \sum_{i}^{c}{-k_{b,j} \cdot 0.5\cdot LAI^{all}_{i,j}}\right)
 \end{equation}\]</span></p>
 <p>From this we can derive the (expanded) leaf area of each layer that is affected by direct light beams (i.e. the amount of sunlit and shade leaves):
 <span class="math display" id="eq:sunlitshadelai">\[\begin{eqnarray}
@@ -762,9 +762,9 @@ Figure 9.1: The left panel shows irradiance per layer of diffuse and direct PAR 
 \end{equation}\]</span></p>
 <p>The amount of absorbed scattered beam radiation per leaf area unit of cohort <span class="math inline">\(i\)</span> within a given canopy layer <span class="math inline">\(j\)</span> is calculated as:
 <span class="math display">\[\begin{eqnarray}
-\Phi_{sca,i,j} &amp;=&amp; I_{b,j} \cdot k_{b} \cdot (A - B) \\
-             A &amp;=&amp;  \alpha_i^{0.5}\cdot \exp \left( \sum_{h}^{c}{-k_{b}\cdot \alpha_i \cdot 0.5\cdot LAI^{all}_{h,i}}\right) \\
-             B &amp;=&amp; \frac{\alpha_i}{(1-\gamma_i)}\cdot \exp\left( \sum_{h}^{c}{-k_{b}\cdot 0.5\cdot LAI^{all}_{h,i}}\right)
+\Phi_{sca,i,j} &amp;=&amp; I_{b,j} \cdot k_{b,j} \cdot (A - B) \\
+             A &amp;=&amp;  \alpha_i^{0.5}\cdot \exp \left( \sum_{h}^{c}{-k_{b,i}\cdot \alpha_i \cdot 0.5\cdot LAI^{all}_{h,i}}\right) \\
+             B &amp;=&amp; \frac{\alpha_i}{(1-\gamma_i)}\cdot \exp\left( \sum_{h}^{c}{-k_{b,i}\cdot 0.5\cdot LAI^{all}_{h,i}}\right)
 \end{eqnarray}\]</span></p>
 <p>Finally, the direct radiation absorbed by a unit of sunlit leaf area of cohort <span class="math inline">\(i\)</span> in a canopy layer <span class="math inline">\(j\)</span> does not depend on the position of the canopy layer and is:
 <span class="math display">\[\begin{equation}
@@ -812,10 +812,10 @@ K_{abs,ca} = \sum_j^l{K_{abs,j}} = \sum_i^c{K_{abs,i}} =\sum_i^c{\sum_j^l{K_{abs
 <h3><span class="header-section-number">9.1.4</span> Short-wave radiation absorbed by the soil<a href="radiationbalance.html#shortwaveradiationsoilabs" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The instantaneous shortwave radiation reaching the soil is calculated separately for direct beam and diffuse radiation:
 <span class="math display">\[\begin{eqnarray}
-I_{beam, soil} &amp;=&amp;  I_{beam} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{b}\cdot \alpha_i^{0.5} \cdot LAI^{all}_{i,h}}}\right]\\
+I_{beam, soil} &amp;=&amp;  I_{beam} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{b,i}\cdot \alpha_i^{0.5} \cdot LAI^{all}_{i,h}}}\right]\\
 I_{dif, soil} &amp;=&amp; I_{dif} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{d,i}\cdot LAI^{all}_{i,h}}}\right]
 \end{eqnarray}\]</span>
-where <span class="math inline">\(I_{beam}\)</span> and <span class="math inline">\(I_{dif}\)</span> are the direct and diffuse irrradiance at the top of the canopy, <span class="math inline">\(k_{b}\)</span> is the extinction coefficient for direct light (<span class="math inline">\(k_{b} = 0.8\)</span>) and <span class="math inline">\(k_{d,i}\)</span> is the extinction coefficient of cohort <span class="math inline">\(i\)</span> for diffuse SWR. From these, the SWR absorbed by the soil (<span class="math inline">\(K_{abs,soil}\)</span>) is found by:
+where <span class="math inline">\(I_{beam}\)</span> and <span class="math inline">\(I_{dif}\)</span> are the direct and diffuse irrradiance at the top of the canopy, <span class="math inline">\(k_{b,i}\)</span> is the extinction coefficient of cohort <span class="math inline">\(i\)</span> for direct light and <span class="math inline">\(k_{d,i}\)</span> is the extinction coefficient of cohort <span class="math inline">\(i\)</span> for diffuse SWR. From these, the SWR absorbed by the soil (<span class="math inline">\(K_{abs,soil}\)</span>) is found by:
 <span class="math display">\[\begin{equation}
 K_{abs,soil} = (1 - \gamma_{SWR, soil})\cdot (I_{beam, soil} + I_{dif, soil})
 \end{equation}\]</span>

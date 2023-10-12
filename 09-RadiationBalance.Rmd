@@ -12,16 +12,16 @@ In section \@ref(directdiffuseSWR) we explained how the model estimates instanta
 
 The average irradiance reaching the top of each canopy layer $j$ is calculated separately for direct beam and diffuse radiation (the same equations are valid for SWR or PAR, but with different coefficients):
 \begin{eqnarray}
-I_{beam,j} &=& (1 - \gamma_i) \cdot I_{beam} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{b}\cdot \alpha_i^{0.5}\cdot LAI^{all}_{i,h}}}\right]\\
+I_{beam,j} &=& (1 - \gamma_i) \cdot I_{beam} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{b,i}\cdot \alpha_i^{0.5}\cdot LAI^{all}_{i,h}}}\right]\\
 I_{dif,j} &=& (1 - \gamma_i) \cdot I_{dif} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{d,i}\cdot \alpha_i^{0.5}\cdot LAI^{all}_{i,h}}}\right]
 \end{eqnarray}
-where $I_{beam}$ and $I_{dif}$ are the direct and diffuse irradiance at the top of the canopy (in $W \cdot m^{-2}$), $\gamma_i$ is the leaf reflectance ($\gamma_{SWR, i}$ is an input parameter, whereas $\gamma_{PAR, i} = 0.8 \cdot \gamma_{SWR, i}$), $k_{b} = 0.8$ is the extinction coefficient for direct light, $k_{d,i}$ is the extinction coefficient of cohort $i$ for diffuse light (i.e. $k_{PAR,i}$ or $k_{SWR,i}$) and $\alpha_i$ is the absorbance coefficient ($\alpha_{SWR,i}$ is an input parameter, whereas $\alpha_{PAR,i} = \alpha_{SWR,i} \cdot 1.35$).
+where $I_{beam}$ and $I_{dif}$ are the direct and diffuse irradiance at the top of the canopy (in $W \cdot m^{-2}$), $\gamma_i$ is the leaf reflectance ($\gamma_{SWR, i}$ is an input parameter, whereas $\gamma_{PAR, i} = 0.8 \cdot \gamma_{SWR, i}$), $k_{b,i}$ is the extinction coefficient of cohort $i$ for direct light, $k_{d,i}$ is the extinction coefficient of cohort $i$ for diffuse light (i.e. $k_{PAR,i}$ or $k_{SWR,i}$) and $\alpha_i$ is the absorbance coefficient ($\alpha_{SWR,i}$ is an input parameter, whereas $\alpha_{PAR,i} = \alpha_{SWR,i} \cdot 1.35$).
 
 ### Sunlit and shade leaves
 
 It is generally accepted that sunlit and shade leaves need to be treated separately for photosynthesis calculations [@DePury1997]. This separation is necessary because photosynthesis of shade leaves has an essentially linear response to irradiance, while photosynthesis of leaves in sunflecks is often light saturated and independent of irradiance. The proportion of sunlit leaves, i.e. leaves in a canopy layer $j$ that the direct light beams (sunflecks) reach is:
 \begin{equation}
-f_{SL, j}  = \exp\left( \sum_{k>j}^{l}{\sum_{i}^{c}{-k_{b} \cdot LAI^{all}_{i,k}}}\right) \cdot \exp\left( \sum_{i}^{c}{-k_{b} \cdot 0.5\cdot LAI^{all}_{i,j}}\right)
+f_{SL, j}  = \exp\left( \sum_{k>j}^{l}{\sum_{i}^{c}{-k_{b,i} \cdot LAI^{all}_{i,k}}}\right) \cdot \exp\left( \sum_{i}^{c}{-k_{b,j} \cdot 0.5\cdot LAI^{all}_{i,j}}\right)
 \end{equation}
 
 From this we can derive the (expanded) leaf area of each layer that is affected by direct light beams (i.e. the amount of sunlit and shade leaves):
@@ -85,9 +85,9 @@ The amount of absorbed diffuse radiation per leaf area unit of cohort $i$ within
 
 The amount of absorbed scattered beam radiation per leaf area unit of cohort $i$ within a given canopy layer $j$ is calculated as:
 \begin{eqnarray}
-\Phi_{sca,i,j} &=& I_{b,j} \cdot k_{b} \cdot (A - B) \\
-             A &=&  \alpha_i^{0.5}\cdot \exp \left( \sum_{h}^{c}{-k_{b}\cdot \alpha_i \cdot 0.5\cdot LAI^{all}_{h,i}}\right) \\
-             B &=& \frac{\alpha_i}{(1-\gamma_i)}\cdot \exp\left( \sum_{h}^{c}{-k_{b}\cdot 0.5\cdot LAI^{all}_{h,i}}\right) 
+\Phi_{sca,i,j} &=& I_{b,j} \cdot k_{b,j} \cdot (A - B) \\
+             A &=&  \alpha_i^{0.5}\cdot \exp \left( \sum_{h}^{c}{-k_{b,i}\cdot \alpha_i \cdot 0.5\cdot LAI^{all}_{h,i}}\right) \\
+             B &=& \frac{\alpha_i}{(1-\gamma_i)}\cdot \exp\left( \sum_{h}^{c}{-k_{b,i}\cdot 0.5\cdot LAI^{all}_{h,i}}\right) 
 \end{eqnarray}
 
 Finally, the direct radiation absorbed by a unit of sunlit leaf area of cohort $i$ in a canopy layer $j$ does not depend on the position of the canopy layer and is:
@@ -156,10 +156,10 @@ K_{abs,ca} = \sum_j^l{K_{abs,j}} = \sum_i^c{K_{abs,i}} =\sum_i^c{\sum_j^l{K_{abs
 ### Short-wave radiation absorbed by the soil {#shortwaveradiationsoilabs}
 The instantaneous shortwave radiation reaching the soil is calculated separately for direct beam and diffuse radiation:
 \begin{eqnarray}
-I_{beam, soil} &=&  I_{beam} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{b}\cdot \alpha_i^{0.5} \cdot LAI^{all}_{i,h}}}\right]\\
+I_{beam, soil} &=&  I_{beam} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{b,i}\cdot \alpha_i^{0.5} \cdot LAI^{all}_{i,h}}}\right]\\
 I_{dif, soil} &=& I_{dif} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{d,i}\cdot LAI^{all}_{i,h}}}\right]
 \end{eqnarray}
-where $I_{beam}$ and $I_{dif}$ are the direct and diffuse irrradiance at the top of the canopy, $k_{b}$ is the extinction coefficient for direct light ($k_{b} = 0.8$) and $k_{d,i}$ is the extinction coefficient of cohort $i$ for diffuse SWR. From these, the SWR absorbed by the soil ($K_{abs,soil}$) is found by:
+where $I_{beam}$ and $I_{dif}$ are the direct and diffuse irrradiance at the top of the canopy, $k_{b,i}$ is the extinction coefficient of cohort $i$ for direct light and $k_{d,i}$ is the extinction coefficient of cohort $i$ for diffuse SWR. From these, the SWR absorbed by the soil ($K_{abs,soil}$) is found by:
 \begin{equation}
 K_{abs,soil} = (1 - \gamma_{SWR, soil})\cdot (I_{beam, soil} + I_{dif, soil})
 \end{equation}
