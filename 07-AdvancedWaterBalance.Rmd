@@ -125,7 +125,7 @@ For every day to be simulated, the model performs the following steps:
 4. Increase soil water content due to net rainfall ($Pr_{net}$), surface runon ($Ro$) and snow melt ($Sm$), after accounting for surface runoff ($Ru$) and deep drainage ($Dd$) (section \@ref(runoff)).
 5. Decrease soil water content due to bare soil evaporation ($Es$), if snow is not present (section \@ref(soilevaporation)), and herbaceous transpiration ($Tr_{herb}$; section \@ref(herbaceoustranspiration)).
 6. Determine sub-daily air temperature and direct/diffuse irradiance variations (chapter \@ref(subdailytemplight)).
-7. Determine shortwave radiation absorbed by plant cohorts and the soil at sub-daily steps (sections \@ref(shortwaveradiationcanopyabs) and \@ref(shortwaveradiationsoilabs)).
+7. Determine the proportion of sunlit/shade leaves (section \@ref(sunlitshadeleaves)), the shortwave radiation absorbed by plant cohorts  (sections \@ref(shortwaveradiationcanopyabs) and the soil (section \@ref(shortwaveradiationsoilabs)) at sub-daily steps.
 8. If `transpirationMode = "Sperry"`, update the water supply function of each plant cohort, according to the hydraulic model and the current soil water potential (chapter \@ref(planthydraulics)). If plant capacitance effects are considered, the supply function involves only the soil-to-stem part of the hydraulic pathway. Otherwise, it describes the complete soil-to-leaf pathway.
 9. Determine instantaneous plant cohort transpiration, photosynthesis rates and close soil/canopy energy balance at sub-daily steps (chapters \@ref(transpirationsperrycochard) and \@ref(closecanopysoilenergybalance)). This involves the following actions for each sub-daily step:
     a. Determine long-wave radiation exchange between soil, canopy layers and atmosphere (section \@ref(longwaveradiation)).
@@ -186,7 +186,7 @@ A second set of functional parameters relate to light extinction and water inter
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
-| $k_{b}$ | (unitless) | `kDIR` | Extinction coefficient for direct light |
+| $\lambda_{leaf}$ | degrees | `LeafAngle` | The (average) angle between the leaf plane and the horizontal plane (i.e. leaf zenith angle) |
 | $k_{PAR}$ | (unitless) | `kPAR` | Extinction coefficient for diffuse PAR |
 | $\alpha_{SWR}$ | [0-1] | `alphaSWR` | Short-wave radiation leaf absorbance coefficient |
 | $\gamma_{SWR}$ | [0-1] |`gammaSWR` | Short-wave radiation leaf reflectance (albedo) |

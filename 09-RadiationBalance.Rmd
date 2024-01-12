@@ -1,8 +1,10 @@
 # Radiation transfer {#radiationbalance}
 
-In the previous chapter we detailed sub-daily variation in temperature and radiation inputs. Here we deal with the absorption of diffuse and direct shortwave radiation through the canopy as well as the long-wave radiation balance for canopy layers and the soil layer. These are necessary to estimate the different components of the canopy and soil energy balances (see eqs. \@ref(eq:canopyenergybalance), \@ref(eq:canopylayerenergybalance) and \@ref(eq:soilenergybalance)) as well as to determine leaf energy balance, transpiration and photosynthesis (chapters \@ref(plantphotosynthesis) and \@ref(transpirationsperrycochard)). Short-wave radiation (SWR) absorption can be determined for all sub-daily steps once the variation of atmospheric inputs are known. In contrast, the long-wave radiation (LWR) balance for any surface depends on its temperature and therefore, net LWR for canopy and soil layers need to be determined at each sub-daily step after closing the energy balance of the previous step (see chapter \@ref(closecanopysoilenergybalance)). 
+Radiation transfer is not the same throughout the day, but changes with solar hour. This is represented using $\beta$, the solar elevation angle (see [section 4.3 of the reference manual](http://emf-creaf.github.io/meteolandbook/solarradiation.html#potential-radiation) for package **meteoland**).
+ In the previous chapter we detailed sub-daily variation in temperature and radiation. Here we deal with the absorption of diffuse and direct shortwave radiation through the canopy as well as the long-wave radiation balance for canopy layers and the soil layer. These are necessary to estimate the different components of the canopy and soil energy balances (see eqs. \@ref(eq:canopyenergybalance), \@ref(eq:canopylayerenergybalance) and \@ref(eq:soilenergybalance)) as well as to determine leaf energy balance, transpiration and photosynthesis (chapters \@ref(plantphotosynthesis) and \@ref(transpirationsperrycochard)). Short-wave radiation (SWR) absorption can be determined for all sub-daily steps once the variation of atmospheric inputs are known. In contrast, the long-wave radiation (LWR) balance for any surface depends on its temperature and therefore, net LWR for canopy and soil layers need to be determined at each sub-daily step after closing the energy balance of the previous step (see chapter \@ref(closecanopysoilenergybalance)). 
 
 The vertical distribution of leaves in the stand is a key element of radiation transfer. As explained in section \@ref(leafdistribution), the canopy is divided into vertical layers (whose size is determined by the control parameter `verticalLayerSize`), and the expanded and dead leaf area index of each cohort within each layer is determined. Let $l$ be the number of canopy layers, $c$ the number of plant cohorts, and $LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}$ be the leaf area index of cohort $i$ in layer $j$. 
+
 
 ## Short-wave radiation {#shortwaveradiation}
 
@@ -17,14 +19,39 @@ I_{dif,j} &=& (1 - \gamma_i) \cdot I_{dif} \cdot \exp\left[ \sum_{h=j+1}^{l}{\su
 \end{eqnarray}
 where $I_{beam}$ and $I_{dif}$ are the direct and diffuse irradiance at the top of the canopy (in $W \cdot m^{-2}$), $\gamma_i$ is the leaf reflectance ($\gamma_{SWR, i}$ is an input parameter, whereas $\gamma_{PAR, i} = 0.8 \cdot \gamma_{SWR, i}$), $k_{b,i}$ is the extinction coefficient of cohort $i$ for direct light, $k_{d,i}$ is the extinction coefficient of cohort $i$ for diffuse light (i.e. $k_{PAR,i}$ or $k_{SWR,i}$) and $\alpha_i$ is the absorbance coefficient ($\alpha_{SWR,i}$ is an input parameter, whereas $\alpha_{PAR,i} = \alpha_{SWR,i} \cdot 1.35$).
 
-### Sunlit and shade leaves
+Plant leaves are not disposed horizontally but have an inclination (i.e. a leaf angle $\lambda_{leaf}$) which may change from one species to the other and determines radiation extinction along with solar elevation. The extinction coefficient for direct light, $k_b$, depends on the leaf angle ($\lambda_{leaf}$) and the solar elevation angle ($\beta$), as described in @sellers_canopy_1985. First $\lambda_{leaf}$ is used to determine $\chi_{leaf}$, a parameter describing the departure of leaf angle distribution from the spherical distribution (which assumes all angles as equally probable):
+
+\begin{equation}
+\chi_{leaf}(\lambda_{leaf}) = 2.0 \cdot \cos(\lambda_{leaf}) - 1.0
+\end{equation}
+$\chi_{leaf}$ equals 0 for +1 for horizontal leaves (i.e. for $\lambda_{leaf} = 0$ degrees), 0 for random leaves (i.e. for $\lambda_{leaf} = 60$ degrees) and -1 for vertical leaves (i.e. for $\lambda_{leaf} = 90$ degrees). $\chi_{leaf}$ and \beta are then used to estimate $G_b$ the relative projected area of leaves in the direction of the solar beam:
+
+\begin{equation}
+G_b(\lambda_{leaf}, \beta) = \phi_1 + \phi_2 \cdot \sin(\beta);
+\end{equation}
+where $\phi_1 = 0.5 - 0.633\cdot \chi_{leaf} - 0.33\cdot \chi_{leaf}^2$ and $\phi_2 = 0.877 \cdot (1 - 2\cdot \phi_1)$ for $-0.4 \leq \chi_{leaf} \leq 0.6$. Finally, $k_b$ is estimated as:
+
+\begin{equation}
+k_b = \frac{G_b(\lambda_{leaf}, \beta)}{\sin(\beta)}
+\end{equation}
+
+The calculations can be illustrated with function `light_directExtinctionCoefficient()`:
+
+```{r}
+solarElevation <- 40 # in degrees
+leafAngle <- 60 # in degrees
+
+kb <- light_directExtinctionCoefficient(leafAngle*(pi/180), solarElevation*(pi/180))
+kb
+```
+
+### Sunlit and shade leaves {#sunlitshadeleaves}
 
 It is generally accepted that sunlit and shade leaves need to be treated separately for photosynthesis calculations [@DePury1997]. This separation is necessary because photosynthesis of shade leaves has an essentially linear response to irradiance, while photosynthesis of leaves in sunflecks is often light saturated and independent of irradiance. The proportion of sunlit leaves, i.e. leaves in a canopy layer $j$ that the direct light beams (sunflecks) reach is:
 \begin{equation}
 f_{SL, j}  = \exp\left( \sum_{k>j}^{l}{\sum_{i}^{c}{-k_{b,i} \cdot LAI^{all}_{i,k}}}\right) \cdot \exp\left( \sum_{i}^{c}{-k_{b,j} \cdot 0.5\cdot LAI^{all}_{i,j}}\right)
 \end{equation}
-
-From this we can derive the (expanded) leaf area of each layer that is affected by direct light beams (i.e. the amount of sunlit and shade leaves):
+where it is assumed that only half the leaf area of layer $j$ contributes self-shading. Note that since $k_b$ depends on the time of the day, also $f_{SL_j}$ may be different depending on the solar hour. From fraction $f_{SL,j}$ we can derive the (expanded) leaf area of each layer that is affected by direct light beams (i.e. the amount of sunlit and shade leaves):
 \begin{eqnarray}
 LAI^{sunlit}_{i,j} &=& f_{SL,j} \cdot LAI^{\phi}_{i,j} \\
 LAI^{shade}_{i,j} &=& (1 - f_{SL,j}) \cdot LAI^{\phi}_{i,j}
@@ -39,7 +66,10 @@ nlayer = 10
 LAIlayerlive = matrix(rep(LAI/nlayer,nlayer),nlayer,1)
 LAIlayermax = matrix(rep(LAI/nlayer,nlayer),nlayer,1)
 LAIlayerdead = matrix(0,nlayer,1)
-kb = 0.8
+```
+
+We will also define the coefficients of diffuse extinction, leaf absorbance and leaf reflection:
+```{r}
 kd_PAR = 0.5
 kd_SWR = kd_PAR/1.35
 alpha_PAR = 0.9
@@ -48,7 +78,7 @@ gamma_SWR = 0.05
 alpha_SWR = 0.7
 ```
 
-This canopy definition leads to a percentage of the above-canopy irradiance reaching each layer [@Anten2016]. Extinction of direct radiation also defines the proportion of leaves of each layer that are affected by sunflecks (i.e. the proportion of sunlit leaves). Both outcomes are illustrated in the figure below:
+These definitions, and that of direct extinction coefficient, lead to a percentage of the above-canopy irradiance reaching each layer [@Anten2016]. Extinction of direct radiation also defines the proportion of leaves of each layer that are affected by sunflecks (i.e. the proportion of sunlit leaves). Both outcomes are illustrated in the figure below:
 
 (ref:irradianceperlayer) The left panel shows irradiance per layer of diffuse and direct PAR and SWR assuming a LAI of 2 equally distributed among layers (see function `light_layerIrradianceFraction()`). The right panel shows the corresponding proportions of sunlit and shade leaves in each layer (see function `light_layerSunlitFraction()`).
 
@@ -92,9 +122,10 @@ The amount of absorbed scattered beam radiation per leaf area unit of cohort $i$
 
 Finally, the direct radiation absorbed by a unit of sunlit leaf area of cohort $i$ in a canopy layer $j$ does not depend on the position of the canopy layer and is:
 \begin{equation}
-\Phi_{dir,i,j} = I_{beam} \cdot \alpha_i \cdot 0.5/\sin{\beta}
+\Phi_{dir,i,j} = I_{beam} \cdot \alpha_i \cdot k_{b,i}
 \end{equation}
-where $\beta$ is the solar elevation angle in radians, which changes throughout the day (see [section 4.3 of the reference manual](http://emf-creaf.github.io/meteolandbook/solarradiation.html#potential-radiation) for package **meteoland**). The amount of light absorbed by sunlit/shaded foliage of cohort $i$ in layer $j$ per leaf area unit ($\Phi^{sunlit}_{i,j}$ and $\Phi^{shade}_{i,j}$, respectively) is:
+
+Once these components are known, the amount of light absorbed by sunlit/shaded foliage of cohort $i$ in layer $j$ per leaf area unit ($\Phi^{sunlit}_{i,j}$ and $\Phi^{shade}_{i,j}$, respectively) is:
 \begin{eqnarray}
 \Phi^{sunlit}_{i,j} &=& \Phi_{dif,i,j} + \Phi_{sca,i,j} + \Phi_{dir,i,j} \\
 \Phi^{shade}_{i,j} &=& \Phi_{dif,i,j} + \Phi_{sca,i,j}
@@ -116,10 +147,10 @@ Solar elevation is the angle between the sun and the horizon (i.e. the complemen
 
 ```{r absorbanceperlayer, echo=FALSE, fig.width=7, fig.height=4, fig.align="center", fig.cap='(ref:absorbanceperlayer-cap)'}
 abs_PAR = light_cohortSunlitShadeAbsorbedRadiation(PAR_direct, PAR_diffuse,
-                                             Ibfpar, Idfpar, beta = solarElevation, 
+                                             Ibfpar, Idfpar, 
                                              LAIlayerlive, LAIlayerdead, kb, kd_PAR, alpha_PAR, gamma_PAR)
 abs_SWR = light_cohortSunlitShadeAbsorbedRadiation(SWR_direct, SWR_diffuse,
-                                             Ibfswr, Idfswr, beta = solarElevation, 
+                                             Ibfswr, Idfswr, 
                                              LAIlayerlive, LAIlayerdead, kb, kd_SWR, alpha_SWR, gamma_SWR)
 par(mar=c(4,4,1,1), mfrow=c(1,2))
 absRadSL = abs_SWR$I_sunlit[,1]

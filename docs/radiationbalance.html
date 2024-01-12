@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 9 Radiation transfer | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.35 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 9 Radiation transfer | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2023-10-12" />
+<meta name="date" content="2024-01-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -306,7 +306,7 @@ div.csl-indent {
 <li class="chapter" data-level="9.1" data-path="radiationbalance.html"><a href="radiationbalance.html#shortwaveradiation"><i class="fa fa-check"></i><b>9.1</b> Short-wave radiation</a>
 <ul>
 <li class="chapter" data-level="9.1.1" data-path="radiationbalance.html"><a href="radiationbalance.html#irradiancecanopy"><i class="fa fa-check"></i><b>9.1.1</b> Direct and diffuse irradiance across the canopy</a></li>
-<li class="chapter" data-level="9.1.2" data-path="radiationbalance.html"><a href="radiationbalance.html#sunlit-and-shade-leaves"><i class="fa fa-check"></i><b>9.1.2</b> Sunlit and shade leaves</a></li>
+<li class="chapter" data-level="9.1.2" data-path="radiationbalance.html"><a href="radiationbalance.html#sunlitshadeleaves"><i class="fa fa-check"></i><b>9.1.2</b> Sunlit and shade leaves</a></li>
 <li class="chapter" data-level="9.1.3" data-path="radiationbalance.html"><a href="radiationbalance.html#shortwaveradiationcanopyabs"><i class="fa fa-check"></i><b>9.1.3</b> Short-wave radiation absorbed by canopy elements</a></li>
 <li class="chapter" data-level="9.1.4" data-path="radiationbalance.html"><a href="radiationbalance.html#shortwaveradiationsoilabs"><i class="fa fa-check"></i><b>9.1.4</b> Short-wave radiation absorbed by the soil</a></li>
 </ul></li>
@@ -706,7 +706,8 @@ div.csl-indent {
             <section class="normal" id="section-">
 <div id="radiationbalance" class="section level1 hasAnchor" number="9">
 <h1><span class="header-section-number">Chapter 9</span> Radiation transfer<a href="radiationbalance.html#radiationbalance" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>In the previous chapter we detailed sub-daily variation in temperature and radiation inputs. Here we deal with the absorption of diffuse and direct shortwave radiation through the canopy as well as the long-wave radiation balance for canopy layers and the soil layer. These are necessary to estimate the different components of the canopy and soil energy balances (see eqs. <a href="advancedwaterbalance.html#eq:canopyenergybalance">(7.3)</a>, <a href="advancedwaterbalance.html#eq:canopylayerenergybalance">(7.4)</a> and <a href="advancedwaterbalance.html#eq:soilenergybalance">(7.5)</a>) as well as to determine leaf energy balance, transpiration and photosynthesis (chapters <a href="plantphotosynthesis.html#plantphotosynthesis">11</a> and <a href="transpirationsperrycochard.html#transpirationsperrycochard">12</a>). Short-wave radiation (SWR) absorption can be determined for all sub-daily steps once the variation of atmospheric inputs are known. In contrast, the long-wave radiation (LWR) balance for any surface depends on its temperature and therefore, net LWR for canopy and soil layers need to be determined at each sub-daily step after closing the energy balance of the previous step (see chapter <a href="closecanopysoilenergybalance.html#closecanopysoilenergybalance">13</a>).</p>
+<p>Radiation transfer is not the same throughout the day, but changes with solar hour. This is represented using <span class="math inline">\(\beta\)</span>, the solar elevation angle (see <a href="http://emf-creaf.github.io/meteolandbook/solarradiation.html#potential-radiation">section 4.3 of the reference manual</a> for package <strong>meteoland</strong>).
+In the previous chapter we detailed sub-daily variation in temperature and radiation. Here we deal with the absorption of diffuse and direct shortwave radiation through the canopy as well as the long-wave radiation balance for canopy layers and the soil layer. These are necessary to estimate the different components of the canopy and soil energy balances (see eqs. <a href="advancedwaterbalance.html#eq:canopyenergybalance">(7.3)</a>, <a href="advancedwaterbalance.html#eq:canopylayerenergybalance">(7.4)</a> and <a href="advancedwaterbalance.html#eq:soilenergybalance">(7.5)</a>) as well as to determine leaf energy balance, transpiration and photosynthesis (chapters <a href="plantphotosynthesis.html#plantphotosynthesis">11</a> and <a href="transpirationsperrycochard.html#transpirationsperrycochard">12</a>). Short-wave radiation (SWR) absorption can be determined for all sub-daily steps once the variation of atmospheric inputs are known. In contrast, the long-wave radiation (LWR) balance for any surface depends on its temperature and therefore, net LWR for canopy and soil layers need to be determined at each sub-daily step after closing the energy balance of the previous step (see chapter <a href="closecanopysoilenergybalance.html#closecanopysoilenergybalance">13</a>).</p>
 <p>The vertical distribution of leaves in the stand is a key element of radiation transfer. As explained in section <a href="model-inputs.html#leafdistribution">2.4.5</a>, the canopy is divided into vertical layers (whose size is determined by the control parameter <code>verticalLayerSize</code>), and the expanded and dead leaf area index of each cohort within each layer is determined. Let <span class="math inline">\(l\)</span> be the number of canopy layers, <span class="math inline">\(c\)</span> the number of plant cohorts, and <span class="math inline">\(LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}\)</span> be the leaf area index of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span>.</p>
 <div id="shortwaveradiation" class="section level2 hasAnchor" number="9.1">
 <h2><span class="header-section-number">9.1</span> Short-wave radiation<a href="radiationbalance.html#shortwaveradiation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -719,33 +720,52 @@ I_{beam,j} &amp;=&amp; (1 - \gamma_i) \cdot I_{beam} \cdot \exp\left[ \sum_{h=j+
 I_{dif,j} &amp;=&amp; (1 - \gamma_i) \cdot I_{dif} \cdot \exp\left[ \sum_{h=j+1}^{l}{\sum_{i}^{c}{-k_{d,i}\cdot \alpha_i^{0.5}\cdot LAI^{all}_{i,h}}}\right]
 \end{eqnarray}\]</span>
 where <span class="math inline">\(I_{beam}\)</span> and <span class="math inline">\(I_{dif}\)</span> are the direct and diffuse irradiance at the top of the canopy (in <span class="math inline">\(W \cdot m^{-2}\)</span>), <span class="math inline">\(\gamma_i\)</span> is the leaf reflectance (<span class="math inline">\(\gamma_{SWR, i}\)</span> is an input parameter, whereas <span class="math inline">\(\gamma_{PAR, i} = 0.8 \cdot \gamma_{SWR, i}\)</span>), <span class="math inline">\(k_{b,i}\)</span> is the extinction coefficient of cohort <span class="math inline">\(i\)</span> for direct light, <span class="math inline">\(k_{d,i}\)</span> is the extinction coefficient of cohort <span class="math inline">\(i\)</span> for diffuse light (i.e. <span class="math inline">\(k_{PAR,i}\)</span> or <span class="math inline">\(k_{SWR,i}\)</span>) and <span class="math inline">\(\alpha_i\)</span> is the absorbance coefficient (<span class="math inline">\(\alpha_{SWR,i}\)</span> is an input parameter, whereas <span class="math inline">\(\alpha_{PAR,i} = \alpha_{SWR,i} \cdot 1.35\)</span>).</p>
+<p>Plant leaves are not disposed horizontally but have an inclination (i.e. a leaf angle <span class="math inline">\(\lambda_{leaf}\)</span>) which may change from one species to the other and determines radiation extinction along with solar elevation. The extinction coefficient for direct light, <span class="math inline">\(k_b\)</span>, depends on the leaf angle (<span class="math inline">\(\lambda_{leaf}\)</span>) and the solar elevation angle (<span class="math inline">\(\beta\)</span>), as described in <span class="citation">Sellers (<a href="#ref-sellers_canopy_1985">1985</a>)</span>. First <span class="math inline">\(\lambda_{leaf}\)</span> is used to determine <span class="math inline">\(\chi_{leaf}\)</span>, a parameter describing the departure of leaf angle distribution from the spherical distribution (which assumes all angles as equally probable):</p>
+<p><span class="math display">\[\begin{equation}
+\chi_{leaf}(\lambda_{leaf}) = 2.0 \cdot \cos(\lambda_{leaf}) - 1.0
+\end{equation}\]</span>
+<span class="math inline">\(\chi_{leaf}\)</span> equals 0 for +1 for horizontal leaves (i.e. for <span class="math inline">\(\lambda_{leaf} = 0\)</span> degrees), 0 for random leaves (i.e. for <span class="math inline">\(\lambda_{leaf} = 60\)</span> degrees) and -1 for vertical leaves (i.e. for <span class="math inline">\(\lambda_{leaf} = 90\)</span> degrees). <span class="math inline">\(\chi_{leaf}\)</span> and are then used to estimate <span class="math inline">\(G_b\)</span> the relative projected area of leaves in the direction of the solar beam:</p>
+<p><span class="math display">\[\begin{equation}
+G_b(\lambda_{leaf}, \beta) = \phi_1 + \phi_2 \cdot \sin(\beta);
+\end{equation}\]</span>
+where <span class="math inline">\(\phi_1 = 0.5 - 0.633\cdot \chi_{leaf} - 0.33\cdot \chi_{leaf}^2\)</span> and <span class="math inline">\(\phi_2 = 0.877 \cdot (1 - 2\cdot \phi_1)\)</span> for <span class="math inline">\(-0.4 \leq \chi_{leaf} \leq 0.6\)</span>. Finally, <span class="math inline">\(k_b\)</span> is estimated as:</p>
+<p><span class="math display">\[\begin{equation}
+k_b = \frac{G_b(\lambda_{leaf}, \beta)}{\sin(\beta)}
+\end{equation}\]</span></p>
+<p>The calculations can be illustrated with function <code>light_directExtinctionCoefficient()</code>:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="radiationbalance.html#cb11-1" tabindex="-1"></a>solarElevation <span class="ot">&lt;-</span> <span class="dv">40</span> <span class="co"># in degrees</span></span>
+<span id="cb11-2"><a href="radiationbalance.html#cb11-2" tabindex="-1"></a>leafAngle <span class="ot">&lt;-</span> <span class="dv">60</span> <span class="co"># in degrees</span></span>
+<span id="cb11-3"><a href="radiationbalance.html#cb11-3" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="radiationbalance.html#cb11-4" tabindex="-1"></a>kb <span class="ot">&lt;-</span> <span class="fu">light_directExtinctionCoefficient</span>(leafAngle<span class="sc">*</span>(pi<span class="sc">/</span><span class="dv">180</span>), solarElevation<span class="sc">*</span>(pi<span class="sc">/</span><span class="dv">180</span>))</span>
+<span id="cb11-5"><a href="radiationbalance.html#cb11-5" tabindex="-1"></a>kb</span></code></pre></div>
+<pre><code>## [1] 0.7778619</code></pre>
 </div>
-<div id="sunlit-and-shade-leaves" class="section level3 hasAnchor" number="9.1.2">
-<h3><span class="header-section-number">9.1.2</span> Sunlit and shade leaves<a href="radiationbalance.html#sunlit-and-shade-leaves" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="sunlitshadeleaves" class="section level3 hasAnchor" number="9.1.2">
+<h3><span class="header-section-number">9.1.2</span> Sunlit and shade leaves<a href="radiationbalance.html#sunlitshadeleaves" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>It is generally accepted that sunlit and shade leaves need to be treated separately for photosynthesis calculations <span class="citation">(<a href="#ref-DePury1997">De Pury &amp; Farquhar 1997</a>)</span>. This separation is necessary because photosynthesis of shade leaves has an essentially linear response to irradiance, while photosynthesis of leaves in sunflecks is often light saturated and independent of irradiance. The proportion of sunlit leaves, i.e. leaves in a canopy layer <span class="math inline">\(j\)</span> that the direct light beams (sunflecks) reach is:
 <span class="math display">\[\begin{equation}
 f_{SL, j}  = \exp\left( \sum_{k&gt;j}^{l}{\sum_{i}^{c}{-k_{b,i} \cdot LAI^{all}_{i,k}}}\right) \cdot \exp\left( \sum_{i}^{c}{-k_{b,j} \cdot 0.5\cdot LAI^{all}_{i,j}}\right)
-\end{equation}\]</span></p>
-<p>From this we can derive the (expanded) leaf area of each layer that is affected by direct light beams (i.e. the amount of sunlit and shade leaves):
+\end{equation}\]</span>
+where it is assumed that only half the leaf area of layer <span class="math inline">\(j\)</span> contributes self-shading. Note that since <span class="math inline">\(k_b\)</span> depends on the time of the day, also <span class="math inline">\(f_{SL_j}\)</span> may be different depending on the solar hour. From fraction <span class="math inline">\(f_{SL,j}\)</span> we can derive the (expanded) leaf area of each layer that is affected by direct light beams (i.e. the amount of sunlit and shade leaves):
 <span class="math display" id="eq:sunlitshadelai">\[\begin{eqnarray}
 LAI^{sunlit}_{i,j} &amp;=&amp; f_{SL,j} \cdot LAI^{\phi}_{i,j} \\
 LAI^{shade}_{i,j} &amp;=&amp; (1 - f_{SL,j}) \cdot LAI^{\phi}_{i,j}
 \tag{9.1}
 \end{eqnarray}\]</span></p>
 <p>As an example we will consider a canopy of one species of LAI = 2, divided into ten layers with constant leaf density:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="radiationbalance.html#cb11-1" tabindex="-1"></a>LAI <span class="ot">=</span> <span class="dv">2</span></span>
-<span id="cb11-2"><a href="radiationbalance.html#cb11-2" tabindex="-1"></a>nlayer <span class="ot">=</span> <span class="dv">10</span></span>
-<span id="cb11-3"><a href="radiationbalance.html#cb11-3" tabindex="-1"></a>LAIlayerlive <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
-<span id="cb11-4"><a href="radiationbalance.html#cb11-4" tabindex="-1"></a>LAIlayermax <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
-<span id="cb11-5"><a href="radiationbalance.html#cb11-5" tabindex="-1"></a>LAIlayerdead <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,nlayer,<span class="dv">1</span>)</span>
-<span id="cb11-6"><a href="radiationbalance.html#cb11-6" tabindex="-1"></a>kb <span class="ot">=</span> <span class="fl">0.8</span></span>
-<span id="cb11-7"><a href="radiationbalance.html#cb11-7" tabindex="-1"></a>kd_PAR <span class="ot">=</span> <span class="fl">0.5</span></span>
-<span id="cb11-8"><a href="radiationbalance.html#cb11-8" tabindex="-1"></a>kd_SWR <span class="ot">=</span> kd_PAR<span class="sc">/</span><span class="fl">1.35</span></span>
-<span id="cb11-9"><a href="radiationbalance.html#cb11-9" tabindex="-1"></a>alpha_PAR <span class="ot">=</span> <span class="fl">0.9</span></span>
-<span id="cb11-10"><a href="radiationbalance.html#cb11-10" tabindex="-1"></a>gamma_PAR <span class="ot">=</span> <span class="fl">0.04</span></span>
-<span id="cb11-11"><a href="radiationbalance.html#cb11-11" tabindex="-1"></a>gamma_SWR <span class="ot">=</span> <span class="fl">0.05</span></span>
-<span id="cb11-12"><a href="radiationbalance.html#cb11-12" tabindex="-1"></a>alpha_SWR <span class="ot">=</span> <span class="fl">0.7</span></span></code></pre></div>
-<p>This canopy definition leads to a percentage of the above-canopy irradiance reaching each layer <span class="citation">(<a href="#ref-Anten2016">Anten &amp; Bastiaans 2016</a>)</span>. Extinction of direct radiation also defines the proportion of leaves of each layer that are affected by sunflecks (i.e. the proportion of sunlit leaves). Both outcomes are illustrated in the figure below:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="radiationbalance.html#cb13-1" tabindex="-1"></a>LAI <span class="ot">=</span> <span class="dv">2</span></span>
+<span id="cb13-2"><a href="radiationbalance.html#cb13-2" tabindex="-1"></a>nlayer <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb13-3"><a href="radiationbalance.html#cb13-3" tabindex="-1"></a>LAIlayerlive <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
+<span id="cb13-4"><a href="radiationbalance.html#cb13-4" tabindex="-1"></a>LAIlayermax <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
+<span id="cb13-5"><a href="radiationbalance.html#cb13-5" tabindex="-1"></a>LAIlayerdead <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,nlayer,<span class="dv">1</span>)</span></code></pre></div>
+<p>We will also define the coefficients of diffuse extinction, leaf absorbance and leaf reflection:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="radiationbalance.html#cb14-1" tabindex="-1"></a>kd_PAR <span class="ot">=</span> <span class="fl">0.5</span></span>
+<span id="cb14-2"><a href="radiationbalance.html#cb14-2" tabindex="-1"></a>kd_SWR <span class="ot">=</span> kd_PAR<span class="sc">/</span><span class="fl">1.35</span></span>
+<span id="cb14-3"><a href="radiationbalance.html#cb14-3" tabindex="-1"></a>alpha_PAR <span class="ot">=</span> <span class="fl">0.9</span></span>
+<span id="cb14-4"><a href="radiationbalance.html#cb14-4" tabindex="-1"></a>gamma_PAR <span class="ot">=</span> <span class="fl">0.04</span></span>
+<span id="cb14-5"><a href="radiationbalance.html#cb14-5" tabindex="-1"></a>gamma_SWR <span class="ot">=</span> <span class="fl">0.05</span></span>
+<span id="cb14-6"><a href="radiationbalance.html#cb14-6" tabindex="-1"></a>alpha_SWR <span class="ot">=</span> <span class="fl">0.7</span></span></code></pre></div>
+<p>These definitions, and that of direct extinction coefficient, lead to a percentage of the above-canopy irradiance reaching each layer <span class="citation">(<a href="#ref-Anten2016">Anten &amp; Bastiaans 2016</a>)</span>. Extinction of direct radiation also defines the proportion of leaves of each layer that are affected by sunflecks (i.e. the proportion of sunlit leaves). Both outcomes are illustrated in the figure below:</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:irradianceperlayer"></span>
 <img src="medfatebook_files/figure-html/irradianceperlayer-1.png" alt="The left panel shows irradiance per layer of diffuse and direct PAR and SWR assuming a LAI of 2 equally distributed among layers (see function light_layerIrradianceFraction()). The right panel shows the corresponding proportions of sunlit and shade leaves in each layer (see function light_layerSunlitFraction())." width="768" />
@@ -768,20 +788,20 @@ Figure 9.1: The left panel shows irradiance per layer of diffuse and direct PAR 
 \end{eqnarray}\]</span></p>
 <p>Finally, the direct radiation absorbed by a unit of sunlit leaf area of cohort <span class="math inline">\(i\)</span> in a canopy layer <span class="math inline">\(j\)</span> does not depend on the position of the canopy layer and is:
 <span class="math display">\[\begin{equation}
-\Phi_{dir,i,j} = I_{beam} \cdot \alpha_i \cdot 0.5/\sin{\beta}
-\end{equation}\]</span>
-where <span class="math inline">\(\beta\)</span> is the solar elevation angle in radians, which changes throughout the day (see <a href="http://emf-creaf.github.io/meteolandbook/solarradiation.html#potential-radiation">section 4.3 of the reference manual</a> for package <strong>meteoland</strong>). The amount of light absorbed by sunlit/shaded foliage of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> per leaf area unit (<span class="math inline">\(\Phi^{sunlit}_{i,j}\)</span> and <span class="math inline">\(\Phi^{shade}_{i,j}\)</span>, respectively) is:
+\Phi_{dir,i,j} = I_{beam} \cdot \alpha_i \cdot k_{b,i}
+\end{equation}\]</span></p>
+<p>Once these components are known, the amount of light absorbed by sunlit/shaded foliage of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> per leaf area unit (<span class="math inline">\(\Phi^{sunlit}_{i,j}\)</span> and <span class="math inline">\(\Phi^{shade}_{i,j}\)</span>, respectively) is:
 <span class="math display" id="eq:absorbedsunlitshadeperleafarea">\[\begin{eqnarray}
 \Phi^{sunlit}_{i,j} &amp;=&amp; \Phi_{dif,i,j} + \Phi_{sca,i,j} + \Phi_{dir,i,j} \\
 \Phi^{shade}_{i,j} &amp;=&amp; \Phi_{dif,i,j} + \Phi_{sca,i,j}
 \tag{9.2}
 \end{eqnarray}\]</span></p>
 <p>Let us show how all this works in an example. Regarding incoming light, we assume the following direct and diffuse irradiance at the top of the canopy:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="radiationbalance.html#cb12-1" tabindex="-1"></a>solarElevation <span class="ot">=</span> <span class="fl">0.67</span></span>
-<span id="cb12-2"><a href="radiationbalance.html#cb12-2" tabindex="-1"></a>SWR_direct <span class="ot">=</span> <span class="dv">1100</span></span>
-<span id="cb12-3"><a href="radiationbalance.html#cb12-3" tabindex="-1"></a>SWR_diffuse <span class="ot">=</span> <span class="dv">300</span></span>
-<span id="cb12-4"><a href="radiationbalance.html#cb12-4" tabindex="-1"></a>PAR_direct <span class="ot">=</span> <span class="dv">550</span></span>
-<span id="cb12-5"><a href="radiationbalance.html#cb12-5" tabindex="-1"></a>PAR_diffuse <span class="ot">=</span> <span class="dv">150</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="radiationbalance.html#cb15-1" tabindex="-1"></a>solarElevation <span class="ot">=</span> <span class="fl">0.67</span></span>
+<span id="cb15-2"><a href="radiationbalance.html#cb15-2" tabindex="-1"></a>SWR_direct <span class="ot">=</span> <span class="dv">1100</span></span>
+<span id="cb15-3"><a href="radiationbalance.html#cb15-3" tabindex="-1"></a>SWR_diffuse <span class="ot">=</span> <span class="dv">300</span></span>
+<span id="cb15-4"><a href="radiationbalance.html#cb15-4" tabindex="-1"></a>PAR_direct <span class="ot">=</span> <span class="dv">550</span></span>
+<span id="cb15-5"><a href="radiationbalance.html#cb15-5" tabindex="-1"></a>PAR_diffuse <span class="ot">=</span> <span class="dv">150</span></span></code></pre></div>
 <p>Solar elevation is the angle between the sun and the horizon (i.e. the complement of the zenith angle). Under these conditions, and for the same canopy used for fig. <a href="radiationbalance.html#fig:irradianceperlayer">9.1</a>, the amount of PAR and SWR absorbed per unit of leaf area at each canopy layer is <span class="citation">(<a href="#ref-Anten2016">Anten &amp; Bastiaans 2016</a>)</span>:</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:absorbanceperlayer"></span>
@@ -883,6 +903,9 @@ De Pury, D.G.G. &amp; Farquhar, G.D. (1997). <a href="https://doi.org/10.1111/j.
 </div>
 <div id="ref-Flerchinger2009" class="csl-entry">
 Flerchinger, G.N., Xiao, W., Sauer, T.J. &amp; Yu, Q. (2009). <a href="https://doi.org/10.1016/j.njas.2009.07.004">Simulation of within-canopy radiation exchange</a>. <em>NJAS - Wageningen Journal of Life Sciences</em>, 57, 5–15.
+</div>
+<div id="ref-sellers_canopy_1985" class="csl-entry">
+Sellers, P.J. (1985). <a href="https://doi.org/10.1080/01431168508948283">Canopy reflectance, photosynthesis and transpiration</a>. <em>International Journal of Remote Sensing</em>, 6, 1335–1372.
 </div>
 </div>
             </section>
