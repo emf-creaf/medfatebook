@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 2 Model inputs | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 2 Model inputs | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-01-16" />
+<meta name="date" content="2024-02-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -709,11 +709,11 @@ div.csl-indent {
 <p>This chapter describes the inputs required by simulation models of <strong>medfate</strong> and <strong>medfateland</strong> packages. First, we describe the R structures required for the two packages. Then, we provide the details for four different kinds of inputs:</p>
 <ol style="list-style-type: decimal">
 <li><em>Vegetation existing in the forest stand</em>. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in <code>spwb()</code> calls, but becomes dynamic in calls to <code>growth()</code> or <code>fordyn()</code>. Hence, in these functions the input vegetation describes the starting point.</li>
-<li><em>Information on the physical structure of soil</em>. Soil information is also required but, unlike vegetation, soil’s physical structure is considered static.</li>
-<li><em>Climatic forcing</em>. Weather is always a dynamic input that defines the temporal variation of environmental conditions in which physical and biological processes occur.</li>
-<li><em>Topographic and geographic information</em>. Topography and latitude are also required, because internal calculations of some physical variables require them.</li>
+<li><em>Information on the physical structure of soil</em>. Soil information is also required but, unlike vegetation, the soil physical structure is considered static.</li>
+<li><em>Climatic forcing</em>. Daily weather series are always required, defining the temporal extent of the simulation and the temporal variation of environmental conditions in which physical and biological processes occur.</li>
+<li><em>Topographic information and geographic location</em>. Topography and latitude are also required, because internal calculations of some physical variables require them.</li>
 </ol>
-<p>The last section describes additional input parameters that are used to specify global options of simulation functions.</p>
+<p>The last section (<a href="model-inputs.html#controlparameters">2.6</a>) describes additional input parameters that are used to specify global options of simulation functions.</p>
 <p>Since preparing inputs for simulations can be daunting for most users, package <a href="https://github.com/emf-creaf/medfateutils"><strong>medfateutils</strong></a> provides a set of utility functions aimed at facilitating the preparation of vegetation and soil inputs, whereas package <a href="https://github.com/emf-creaf/meteoland"><strong>meteoland</strong></a> provides functions to assess daily weather over landscapes.</p>
 <div id="input-structures" class="section level2 hasAnchor" number="2.1">
 <h2><span class="header-section-number">2.1</span> Input structures<a href="model-inputs.html#input-structures" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -721,7 +721,7 @@ div.csl-indent {
 <h3><span class="header-section-number">2.1.1</span> Input structures in medfate<a href="model-inputs.html#inputstructuresmedfate" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Package <strong>medfate</strong> deals with simulations at stand level and, hence, the data structures defined in the package are meant to encapsulate information about a target forest stands and the properties of the soil where it grows:</p>
 <ul>
-<li>S3 class <code>soil</code> is a list of soil physical properties, including both parameters and state variables. Soil objects are described in subsection <a href="model-inputs.html#soilinitialization">2.3.3</a>.</li>
+<li>S3 class <code>soil</code> is a list that is initialized using soil physical properties, but the object includes also soil parameters and state variables. Soil objects are described in subsection <a href="model-inputs.html#soilinitialization">2.3.3</a>.</li>
 <li>S3 class <code>forest</code> is a list of forest inventory data (i.e. mainly tree and shrub measurements, but can include herbaceous vegetation) corresponding to a single forest stand. Forest plot objects are described in subsection <a href="model-inputs.html#forestobjects">2.4.4</a>.</li>
 <li>S3 classes <code>spwbInput</code> and <code>growthInput</code> are lists containing all the vegetation parameters and state variables necessary to run water-balance simulations (function <code>spwb()</code> and alike) and forest growth simulations (function <code>growth()</code> and alike). Objects of classes <code>spwbInput</code> and <code>growthInput</code> are created using functions whose input includes a <code>forest</code> object and a <code>soil</code> object.</li>
 </ul>
@@ -797,7 +797,7 @@ Figure 2.1: Schematic workflow of input creation for simulation functions in med
 </tr>
 <tr class="even">
 <td><code>meteo</code></td>
-<td>Weather data frames</td>
+<td>Weather data frames (see <a href="model-inputs.html#meteoinput">2.5</a>)</td>
 <td>Optional</td>
 </tr>
 <tr class="odd">
@@ -816,51 +816,36 @@ Figure 2.1: Schematic workflow of input creation for simulation functions in med
 <td>Required for <code>fordyn_scenario()</code></td>
 </tr>
 <tr class="even">
-<td><code>represented_area</code></td>
-<td>Area represented by each stand or cell</td>
-<td>Required for <code>fordyn_scenario()</code> and <code>*_land()</code></td>
+<td><code>represented_area_ha</code></td>
+<td>Area represented by each stand, in hectares</td>
+<td>Required for <code>fordyn_scenario()</code></td>
 </tr>
 <tr class="odd">
-<td><code>waterOrder</code></td>
-<td>Integers indicating cell processing order.</td>
-<td>Required for <code>*_land()</code></td>
-</tr>
-<tr class="even">
-<td><code>waterQ</code></td>
-<td>Lists of water discharge values to neighbors.</td>
-<td>Required for <code>*_land()</code></td>
-</tr>
-<tr class="odd">
-<td><code>queenNeigh</code></td>
-<td>Lists of integers identifying the (up to 8) queen neighbors.</td>
-<td>Required for <code>*_land()</code></td>
-</tr>
-<tr class="even">
 <td><code>channel</code></td>
 <td>Logical values indicating whether cells belong to the channel network.</td>
 <td>Required for <code>*_land()</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>depth_to_bedrock</code></td>
 <td>Depth to bedrock (mm).</td>
 <td>Required for <code>*_land()</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>bedrock_conductivity</code></td>
 <td>Bedrock (saturated) conductivity (in m·day-1).</td>
 <td>Required for <code>*_land()</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>bedrock_porosity</code></td>
 <td>Bedrock porosity ([0-1]).</td>
 <td>Required for <code>*_land()</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>snowpack</code></td>
 <td>Snow water equivalent content of the snowpack (mm).</td>
 <td>Required for <code>*_land()</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>aquifer</code></td>
 <td>Water content of the aquifer in each cell.</td>
 <td>Required for <code>*_land()</code></td>
@@ -934,7 +919,14 @@ Figure 2.1: Schematic workflow of input creation for simulation functions in med
 </tr>
 </tbody>
 </table>
-<p>The percent volume of silt is 100% minus the percent volume of clay and sand. Whenever possible, soil physical properties should be measured in soil profiles conducted at the target forest plot (although soil profiles rarely reach rooting depths of deeply-rooted plants). Soil input data should be arranged in a <code>data.frame</code> with soil layers in rows and physical variables in columns (see function <code>defaultSoilParams()</code>).</p>
+<p>The percent volume of silt is 100% minus the percent volume of clay and sand. Whenever possible, soil physical properties should be measured in soil profiles conducted at the target forest plot (although soil profiles rarely reach rooting depths of deeply-rooted plants). Soil input data should be arranged in a <code>data.frame</code> with soil layers in rows and physical variables in columns (see function <code>defaultSoilParams()</code>). The following is an example with four soil layers:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="model-inputs.html#cb4-1" tabindex="-1"></a>soildf <span class="ot">&lt;-</span> <span class="fu">defaultSoilParams</span>()</span>
+<span id="cb4-2"><a href="model-inputs.html#cb4-2" tabindex="-1"></a>soildf</span></code></pre></div>
+<pre><code>##   widths clay sand om  bd rfc
+## 1    300   25   25 NA 1.5  25
+## 2    700   25   25 NA 1.5  45
+## 3   1000   25   25 NA 1.5  75
+## 4   2000   25   25 NA 1.5  95</code></pre>
 <p>Package <a href="https://github.com/emf-creaf/medfateutils"><strong>medfateutils</strong></a> includes a function <code>soilgridsParams()</code> to fetch soil information from <a href="https://soilgrids.org/">SoilGrids.org</a>, a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.</p>
 <p>The depth of a given soil layer <span class="math inline">\(s\)</span> (<span class="math inline">\(Z_s\)</span>; in mm) is defined as the sum of layer widths from the surface to the target layer:
 <span class="math display">\[\begin{equation}
@@ -961,6 +953,7 @@ where <span class="math inline">\(\theta(\psi)\)</span> is the water retention, 
 Figure 2.2: Water retention curves under the Saxton and Van Genuchten models, for the same physical attributes (25% sand, 25% clay, 50% silt and bulk density of <span class="math inline">\(1.5 g \cdot cm^{-3}\)</span>). Parameters of the Van Genuchten curve have been estimated using pedotransfer functions given in <span class="citation">Tóth <em>et al.</em> (<a href="#ref-Toth2015">2015</a>)</span>.
 </p>
 </div>
+<p>Hydraulic conductivity governs the rate of water flow for a unit gradient in potential. It decreases sharply as soil becomes dry, and the relationship also depends on soil texture. The Saxton and Van Genuchten models also describe and parameterize the relationship between conductivity and soil water potential.</p>
 </div>
 <div id="soilinitialization" class="section level3 hasAnchor" number="2.3.3">
 <h3><span class="header-section-number">2.3.3</span> Soil initialization<a href="model-inputs.html#soilinitialization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -983,7 +976,7 @@ Figure 2.2: Water retention curves under the Saxton and Van Genuchten models, fo
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\(P_{macro, s}\)</span></td>
+<td><span class="math inline">\(P_{macro}\)</span></td>
 <td>%</td>
 <td><code>macro</code></td>
 <td>Percentage of macroporosity corresponding to each soil layers</td>
@@ -1001,40 +994,34 @@ Figure 2.2: Water retention curves under the Saxton and Van Genuchten models, fo
 <td>Extinction parameter to regulate the amount of water extracted from each soil layer when simulating evaporation from bare soil (see <a href="hydrology.html#soilevaporation">5.5</a>)</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(\theta_{sat, s}\)</span></td>
+<td><span class="math inline">\(\theta_{sat}\)</span></td>
 <td><span class="math inline">\(m^3 \cdot m^{-3}\)</span></td>
 <td><code>VG_theta_sat</code></td>
-<td>Volumetric soil moisture at saturation</td>
+<td>Volumetric soil moisture at saturation for each soil layer</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(\theta_{res, s}\)</span></td>
+<td><span class="math inline">\(\theta_{res}\)</span></td>
 <td><span class="math inline">\(m^3 \cdot m^{-3}\)</span></td>
 <td><code>VG_theta_res</code></td>
-<td>Residual volumetric soil moisture</td>
+<td>Residual volumetric soil moisture for each soil layer</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(n_s\)</span></td>
+<td><span class="math inline">\(n\)</span></td>
 <td></td>
 <td><code>VG_n</code></td>
-<td>Parameter <span class="math inline">\(n\)</span> of the Van Genuchten <span class="citation">(<a href="#ref-Genuchten1980">1980</a>)</span> model</td>
+<td>Parameter <span class="math inline">\(n\)</span> of the Van Genuchten <span class="citation">(<a href="#ref-Genuchten1980">1980</a>)</span> model for each soil layer</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(\alpha_s\)</span></td>
+<td><span class="math inline">\(\alpha\)</span></td>
 <td><span class="math inline">\(MPa^{-1}\)</span></td>
 <td><code>VG_alpha</code></td>
-<td>Parameter <span class="math inline">\(\alpha\)</span> of the Van Genuchten <span class="citation">(<a href="#ref-Genuchten1980">1980</a>)</span> model</td>
+<td>Parameter <span class="math inline">\(\alpha\)</span> of the Van Genuchten <span class="citation">(<a href="#ref-Genuchten1980">1980</a>)</span> model for each soil layer</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(K_{sat,s}\)</span></td>
-<td><span class="math inline">\(mmol \cdot s^{-1} \cdot m^{-1} \cdot MPa^{-1}\)</span></td>
+<td><span class="math inline">\(K_{sat}\)</span></td>
+<td><span class="math inline">\(mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}\)</span></td>
 <td><code>Ksat</code></td>
-<td>Saturated soil conductivity</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(K_{drain}\)</span></td>
-<td><span class="math inline">\(mm \cdot d^{-1}\)</span></td>
-<td><code>Kdrain</code></td>
-<td>Hydraulic conductivity for deep drainage.</td>
+<td>Saturated soil conductivity for each soil layer</td>
 </tr>
 </tbody>
 </table>
@@ -1043,7 +1030,14 @@ Figure 2.2: Water retention curves under the Saxton and Van Genuchten models, fo
 <li>Using the USDA texture classification and the average texture class parameters given by <span class="citation">Carsel &amp; Parrish (<a href="#ref-Carsel1988">1988</a>)</span>.</li>
 <li>Directly from the soil texture, organic matter and bulk density, using the pedotransfer functions in <span class="citation">Tóth <em>et al.</em> (<a href="#ref-Toth2015">2015</a>)</span>.</li>
 </ol>
-<p>Soil layer saturated conductivity (<span class="math inline">\(K_{sat,s}\)</span>) is estimated using <span class="citation">Saxton &amp; Rawls (<a href="#ref-Saxton2006">2006</a>)</span> or <span class="citation">Saxton <em>et al.</em> (<a href="#ref-Saxton1986">1986</a>)</span>, depending on whether an estimate of organic mater is available. <span class="math inline">\(K_{drain}\)</span> is currently initialized from soil saturated conductivity in the deepest soil layer, but should be defined depending on the permeability of the bedrock material.</p>
+<p>Parameter <span class="math inline">\(\alpha\)</span> of the Van Genuchten model is given in <span class="math inline">\(MPa^{-1}\)</span>, but it can be transformed to <span class="math inline">\(cm^{-1}\)</span> using the relationship:</p>
+<p><span class="math display">\[\begin{equation}
+1\, cm = 0.00009804139432\,\,MPa,
+\end{equation}\]</span></p>
+<p>which can also be applied to water potential units. Soil layer saturated conductivity (<span class="math inline">\(K_{sat}\)</span>) is estimated using <span class="citation">Saxton &amp; Rawls (<a href="#ref-Saxton2006">2006</a>)</span> or <span class="citation">Saxton <em>et al.</em> (<a href="#ref-Saxton1986">1986</a>)</span>, depending on whether an estimate of organic mater is available. <span class="math inline">\(K_{sat}\)</span> is given in physiological units <span class="math inline">\(mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}\)</span>, but they can be transformed into <span class="math inline">\(cm\cdot day^{-1}\)</span> using:</p>
+<p><span class="math display">\[\begin{equation}
+1\, cm\cdot day^{-1} = 655.2934\,\,mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}
+\end{equation}\]</span></p>
 <p>Besides defining soil parameters, function <code>soil()</code> also initializes <em>soil state variables</em>: soil moisture content, soil temperature (although set to a missing value) and water table depth. Users can edit the <code>soil</code> object manually (it is actually a <code>list</code>), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements.</p>
 </div>
 <div id="water-content-and-water-table-depth" class="section level3 hasAnchor" number="2.3.4">
@@ -1272,8 +1266,8 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 <div id="forestobjects" class="section level3 hasAnchor" number="2.4.4">
 <h3><span class="header-section-number">2.4.4</span> Forest plot objects<a href="model-inputs.html#forestobjects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>While the previous section described the structural forest variables required to run simulations in <strong>medfate</strong>, forest plot data input in the package is easier if one uses a format that follows closely forest inventory plot descriptions. In this format, each forest plot is represented in an object of class <code>forest</code>, a list that contains several elements. Here we use an example forest stand provided with the package:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="model-inputs.html#cb4-1" tabindex="-1"></a><span class="fu">data</span>(exampleforestMED)</span>
-<span id="cb4-2"><a href="model-inputs.html#cb4-2" tabindex="-1"></a>exampleforestMED</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="model-inputs.html#cb6-1" tabindex="-1"></a><span class="fu">data</span>(exampleforestMED)</span>
+<span id="cb6-2"><a href="model-inputs.html#cb6-2" tabindex="-1"></a>exampleforestMED</span></code></pre></div>
 <pre><code>## $treeData
 ##            Species   N   DBH Height Z50  Z95
 ## 1 Pinus halepensis 168 37.55    800 100  600
@@ -1293,7 +1287,7 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 ## [1] &quot;forest&quot; &quot;list&quot;</code></pre>
 <p>The most important items of <code>forest</code> are the two data frames describing woody vegetation, <code>treeData</code> (for trees) and <code>shrubData</code> for shrubs, but the herbaceous layer can also be described using <code>herbCover</code> and <code>herbHeight</code>. With the aim to help users in the task of constructing <code>forest</code> objects, package <a href="https://github.com/emf-creaf/medfateutils"><strong>medfateutils</strong></a> includes functions to map user data in into tables <code>treeData</code> and <code>shrubData</code>.</p>
 <p><code>forest</code> objects are a convenient format to start calculations with <strong>medfate</strong>, because there are many static functions that take forest objects as input. For example, a <code>summary.forest()</code> function provides the basal area, density, cover and leaf area index of the forest stand, and its different components:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="model-inputs.html#cb6-1" tabindex="-1"></a><span class="fu">summary</span>(exampleforestMED, SpParamsMED)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="model-inputs.html#cb8-1" tabindex="-1"></a><span class="fu">summary</span>(exampleforestMED, SpParamsMED)</span></code></pre></div>
 <pre><code>## Tree BA (m2/ha): 25.0333016  adult trees: 25.0333016  saplings: 0 
 ## Density (ind/ha) adult trees: 552  saplings: 0  shrubs (estimated): 749.4923076 
 ## Cover (%) adult trees: 100  saplings: 0  shrubs: 3.75  herbs: 10 
@@ -1524,14 +1518,14 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <div id="controlparameters" class="section level2 hasAnchor" number="2.6">
 <h2><span class="header-section-number">2.6</span> Simulation control<a href="model-inputs.html#controlparameters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Simulation control parameters are a list of global parameter values, initialized using function <code>defaultControl()</code>, that the user can modify to change the general behavior of simulation functions. Here is the set of global control parameters currently accepted in <strong>medfate</strong>:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="model-inputs.html#cb8-1" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="model-inputs.html#cb10-1" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
 <pre><code>##   [1] &quot;fillMissingRootParams&quot;            &quot;fillMissingSpParams&quot;              &quot;verbose&quot;                         
 ##   [4] &quot;subdailyResults&quot;                  &quot;standResults&quot;                     &quot;soilResults&quot;                     
 ##   [7] &quot;plantResults&quot;                     &quot;leafResults&quot;                      &quot;temperatureResults&quot;              
 ##  [10] &quot;fireHazardResults&quot;                &quot;fireHazardStandardWind&quot;           &quot;fireHazardStandardDFMC&quot;          
 ##  [13] &quot;transpirationMode&quot;                &quot;soilFunctions&quot;                    &quot;defaultWindSpeed&quot;                
 ##  [16] &quot;defaultCO2&quot;                       &quot;snowpack&quot;                         &quot;leafPhenology&quot;                   
-##  [19] &quot;bareSoilEvaporation&quot;              &quot;rockyLayerDrainage&quot;               &quot;unlimitedSoilWater&quot;              
+##  [19] &quot;bareSoilEvaporation&quot;              &quot;lowerBoundary&quot;                    &quot;unlimitedSoilWater&quot;              
 ##  [22] &quot;rhizosphereOverlap&quot;               &quot;unfoldingDD&quot;                      &quot;verticalLayerSize&quot;               
 ##  [25] &quot;windMeasurementHeight&quot;            &quot;cavitationRefillStem&quot;             &quot;cavitationRefillLeaves&quot;          
 ##  [28] &quot;hydraulicRedistributionFraction&quot;  &quot;ndailysteps&quot;                      &quot;nsubsteps&quot;                       
