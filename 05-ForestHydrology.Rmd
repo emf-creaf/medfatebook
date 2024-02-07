@@ -91,15 +91,13 @@ legend("bottomright",lty=1:length(Cm), legend=paste("S =",Cm), bty="n")
 
 ## Runoff, infiltration and percolation {#runoff}
 
-The amount of water that reaches the soil is the sum of net rainfall ($Pr_{net}$), runon ($Ro$, in mm) and melted snow ($Sm$). The amount of water infiltrating into the soil is $Pr_{net} + Sm + Ro - Ru$, where $Ru$ (in mm) is the water lost by surface runoff (see function `hydrology_infiltrationAmount()`). 
+The amount of rainfall water that reaches the soil is the sum of net rainfall ($Pr_{net}$) and runon ($Ro$, in mm). The amount of rainfall water infiltrating into the soil is $Pr_{net} + Ro - Ru$, where $Ru$ (in mm) is the rainfall water lost by surface runoff (see function `hydrology_infiltrationAmount()`). Note that snow melt ($Sm$) does not participate from infiltration/runoff partitioning, because melting rates are assumed to be slow enough to infiltrate completely.
 
 Surface runoff, is calculated using the USDA SCS curve number method, as in @Boughton1989:
 \begin{equation}
-Ru=\frac{(Pr_{net} + Ro + Sm - 0.2 \cdot V_{fc, soil})^2}{(Pr_{net} + Ro + Sm - 0.8 \cdot V_{fc, soil})}
+Ru=\frac{(Pr_{net} + Ro - 0.2 \cdot V_{fc, soil})^2}{(Pr_{net} + Ro - 0.8 \cdot V_{fc, soil})}
 \end{equation}
 where $V_{fc, soil}$ (in mm) is the overall soil water retention capacity. 
-
-Following @Granier1999, part of the water reaching one soil layer percolates quickly through the macropores. The amount of water reaching each layer through macropores is modelled using an extinction function that depends on macroporosity (see function `hydrology_infiltrationRepartition`). The remaining water is retained by the micropores refilling the current soil layer. When this soil layer reaches its field capacity the excess of water also percolates to the soil layer below. 
 
 (ref:infiltration-cap) Examples of infiltration/runoff calculation for different values of net rainfall and overall retention capacity, $V_{soil}$, calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively.
 
@@ -154,10 +152,7 @@ lines(NP,NP-hydrology_infiltrationAmount(NP, V[5]), lty=5)
 legend("topleft", bty="n", lty=1:5, legend=c(paste("d =", SoilDepth,"Vsoil =",round(V),"mm")))
 ```
 
-Percolation in deepest layer may be treated differently in the model. If it is a rocky layer (i.e if rock fragment content > 95\%) and `rockyLayerDrainage = FALSE`, the model assumes that most cracks in the rock are not hydraulically connected to groundwater, so that they conform water pockets from which plants can extract water. Hence, in this situation the percolation excess occurs only if saturation is surpassed. Otherwise, percolation excess is estimated if field capacity is surpassed, as in the other soil layers. When a percolation excess exists, the remaining water fills soil layers over field capacity up to saturation, from bottom to top. If the soil becomes saturated and there is still an excess of water, this is assumed as infiltration excess and added to the surface runoff ($Ru$).
-
-Deep drainage ($Dd$) is estimated after percolation of soil water inputs. First, hydraulic head is estimated summing the amount of water contained in macropores across soil layers (i.e. water over field capacity). Then, an estimation of the daily maximum drainage is obtained by multiplying hydraulic head by the saturated vertical hydraulic conductivity $K_{drain}$. Drainage of saturated water is then applied from top to bottom until the maximum drainage is achieved or macropores are empty in all soil layers. As before, the drainage from the deepest rocky layer may be prevented if `rockyLayerDrainage = FALSE`.
-
+Note that percolation of rainfall infiltrating into the soil Following @Granier1999, part of the water reaching one soil layer percolates quickly through the macropores. The amount of water reaching each soil layer through macropores is modelled using an extinction function that depends on macroporosity (see function `hydrology_infiltrationRepartition`). The remaining water is retained by the micropores refilling the current soil layer.
 
 ## Bare soil evaporation {#soilevaporation}
 
@@ -299,6 +294,89 @@ Tr_{herb}=Tr_{herb,\max} \cdot \exp \left \{\ln{(0.5)}\cdot \left[ \frac{\Psi_1}
 (\#eq:herbaceoustranspiration)
 \end{equation}
 
-## Water movement in the bulk soil {#richards}
+## Vertical water movement within the soil {#richards}
 
-TO BE WRITTEN
+In this chapter we describe water movement within the soil, whose design was taken from chapter 8 of @bonan_climate_2019, and much of the present text has been summarized and adapted from this source. 
+
+### Darcian flow and Richards' equation
+
+Water flows in the soil **from high to low potential** as described by Darcy's law. The **total potential** is the sum of the **matric** potential ($\Psi_{s}$, here expressed in $m$, see \@ref(soilinitialization)) and vertical **depth** $z$ (also in $m$). The vertical depth $z$ is taken as positive in the upward direction, so that $z = 0$ is the ground surface. In the vertical dimension the **flux** $Q$, i.e. rate of water movement (in $m s^{-1}$), according to Darcy's law is:
+\begin{equation}
+Q = -K(\theta)\cdot \frac{\delta (\Psi + z)}{\delta z} = -K(\theta)\cdot \frac{\delta \Psi}{\delta z} - K(\theta)
+\end{equation}
+Consider a volume of soil with horizontal area $\Delta x \Delta y$, thickness $\Delta z$ and with non-rock proportion $\lambda = 1 - P_{rocks}$. The mass flux entering the parcel from above is $\rho_{w} Q_{in} \Delta x \Delta y$ and the flux out of it is $\rho_{w} Q_{out} \Delta x \Delta y$. Conservation requires that the difference between fluxes and source/sinks equals the rate of change in water storage. The mass of water in the soil volume is  $\rho_{w} \theta \Delta x \Delta y \Delta z \lambda$ so the change in water over a time interval $\Delta t$ is: 
+
+\begin{equation}
+\rho_{w} \frac{\Delta \theta}{\Delta t} \Delta x \Delta y \Delta z \lambda  = - \rho_{w} (Q_{in} - Q_{out}) \Delta x \Delta y 
+\end{equation}
+
+and gives the continuity equation:
+
+\begin{equation}
+\frac{\Delta \theta}{\Delta t} \lambda  = - \frac{(Q_{in} - Q_{out})}{\Delta z} 
+\end{equation}
+
+which expressed in the notation of calculus is:
+
+\begin{equation}
+\frac{\delta \theta}{\delta t} \lambda  = - \frac{\delta Q}{\delta z}
+\end{equation}
+
+
+Substituting Darcy's law for $Q$ gives the Richards equation:
+
+\begin{equation}
+\frac{\delta \theta}{\delta t} \lambda = \frac{\delta}{\delta z} \left[ K(\theta) \frac{\delta \Psi}{\delta z} + K(\theta) \right] = K(\theta) \frac{\delta^2 \Psi}{\delta^2 z} + \frac{\delta K}{\delta z} \frac{\delta \Psi}{\delta z} + \frac{\delta K}{\delta z}
+\end{equation}
+
+The former is known as the *mixed-form* Richards equation, because it includes $\theta$ on the left hand and the vertical gradient in matric potential $\Psi$ on the right hand. The *head-based* or $\Psi$-*based form* expresses the left hand term using $\Psi$ as dependent variable:
+
+\begin{equation}
+C(\Psi) \frac{\delta \Psi}{\delta t} \lambda =  K(\Psi) \frac{\delta^2 \Psi}{\delta^2 z} + \frac{\delta K}{\delta z} \frac{\delta \Psi}{\delta z} + \frac{\delta K}{\delta z}
+\end{equation}
+
+where $C(\Psi) = \delta \theta / \delta \Psi$ is known as the specific moisture capacity or **capacitance**, in $m^{-1}$.
+
+### Finite difference approximation
+
+The finite difference approximation for the Richards equation represents the soil as a network of $N$ discrete nodal points that vary in space and time. The network is presented in Fig. \@ref(fig:soilflows). 
+
+```{r soilflows, out.width='80%', fig.align="center", fig.cap="Schematic representation of network of soil nodes", echo=FALSE}
+knitr::include_graphics("figures/soil_flows.png")
+```
+
+For reasons of numerical stability, Richards equation is solved using an implicit time discretization win which the spatial derivatives $\delta K / \delta z$, $\delta \Psi / \delta z$ and  $\delta^2 \Psi / \delta ^2 z$ are written numerically using a central difference approximation at time $n+1$, and the time derivative uses a backward difference approximation at $n+1$. 
+
+Soil layer $i$ has a thickness $\Delta z_i$. Water content $\theta_i$, matric potential $\Psi_i$ and hydraulic conductivity $K_i$ are defined at the center of the layer at depth $z_i$ and are uniform over the layer. Water inputs/outputs from other processes (i.e. infiltration, snow melt, bare soil evaporation, herbaceous transpiration and woody plant uptake/redistribution) are represented as a source/sink term $S_i$ for each node $i$. 
+
+For a given intermediate layer $1 < i < N$, the outward flux $Q_i$ between layers $i$ and $i+1$ is defined using:
+
+\begin{equation}
+Q_i =  -\frac{K_{i+1/2}}{\Delta z_{i+1/2}} (\Psi_i - \Psi_{i+1}) - K_{i+1/2}
+\end{equation}
+
+where $z_{i+1/2} = z_i - z_{i+1}$ and $K_{i+1/2} = 0.5(K_i + K_{i+1})$ replaces the vertically varying hydraulic conductivity within the two layers with an effective conductivity for an equivalent homogeneous medium. The inward flux $Q_{i-1}$ between layers $i-1$ and $i$ is defined similarly:
+
+\begin{equation}
+Q_{i-1} =  -\frac{K_{i-1/2}}{\Delta z_{i-1/2}} (\Psi_{i-1} - \Psi_{i}) - K_{i-1/2}
+\end{equation}
+
+where $z_{i-1/2} = z_{i-1} - z_{i}$ and $K_{i-1/2} = 0.5(K_{i-1} + K_{i})$. If we apply the fluxes to the water balance equation, with fluxes and capacitance expressed for time $n+1$, and considering the $S_i$ source/sink term (in $m s^{-1}$), we obtain the following $\Psi$-based form:
+
+\begin{equation}
+\frac{\Delta z_i}{\Delta t} C_i^{n+1} (\Psi_i^{n+1} - \Psi_i^n) \lambda_i =  \frac{K_{i-1/2}^{n+1}}{\Delta z_{i-1/2}} (\Psi_{i-1}^{n+1} - \Psi_i^{n+1}) - \frac{K_{i+1/2}^{n+1}}{\Delta z_{i+1/2}} (\Psi_i^{n+1} - \Psi_{i+1}^{n+1}) \\ + K_{i-1/2}^{n+1} - K_{i+1/2}^{n+1} + S^{n+1}_i
+\end{equation}
+
+For the first layer ($i=1$) the boundary condition is defined so that there is no inward flux (but a source/sink term is added), which yields the following $\Psi$-based form:
+
+\begin{equation}
+\frac{\Delta z_1}{\Delta t} C_1^{n+1} (\Psi_1^{n+1} - \Psi_1^n) \lambda_1 =  - \frac{K_{1+1/2}^{n+1}}{\Delta z_{1+1/2}} (\Psi_1^{n+1} - \Psi_{2}^{n+1}) - K_{1+1/2}^{n+1} + S^{n+1}_1
+\end{equation}
+
+Finally, for the last layer ($i=N$) a free drainage condition is specified as boundary condition, where $Q_N = K_N$, which yields the following $\Psi$-based form:
+
+\begin{equation}
+\frac{\Delta z_N}{\Delta t} C_N^{n+1} (\Psi_N^{n+1} - \Psi_N^n) \lambda_N =  \frac{K_{N-1/2}^{n+1}}{\Delta z_{N-1/2}} (\Psi_{N-1}^{n+1} - \Psi_{N}^{n+1}) +  K_{N-1/2}^{n+1} - K_{N}^{n+1} + S^{n+1}_N
+\end{equation}
+
+The numerical form of the $\Psi$-based Richards equation for a soil with $N$ layers is a tridiagonal system of $N$ equations with $N$ unknown values $\Psi$ at time $n+1$. An additional complexity is that $\Psi$ at $n+1$ also appears through $K$ and $C$. The solution requires linearizing with respect to $\Psi$ through various methods. Here the **predictor-corrector** method is employed, a two-step solution that solves the equation twice [@haverkamp_comparison_1977]. The predictor step uses explicit linearization to solve for $\Psi$ over one-half of a full time step ($\Delta t/2$) at time $n +1/2$ with $K$ and $C$ from time $n$. The resulting values for $\Psi$ are used to evaluate $K$ and $C$ at $n+1/2$. The corrector step uses these to obtain $\Psi$ over the full time step ($\Delta t$) at $n+1$. An implicit solution is used for the predictor step and the Crank-Nicolson method is used for the corrector step.

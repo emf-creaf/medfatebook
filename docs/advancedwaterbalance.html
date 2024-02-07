@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-02-06" />
+<meta name="date" content="2024-02-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -256,7 +256,11 @@ div.csl-indent {
 <li class="chapter" data-level="5.4" data-path="hydrology.html"><a href="hydrology.html#runoff"><i class="fa fa-check"></i><b>5.4</b> Runoff, infiltration and percolation</a></li>
 <li class="chapter" data-level="5.5" data-path="hydrology.html"><a href="hydrology.html#soilevaporation"><i class="fa fa-check"></i><b>5.5</b> Bare soil evaporation</a></li>
 <li class="chapter" data-level="5.6" data-path="hydrology.html"><a href="hydrology.html#herbaceoustranspiration"><i class="fa fa-check"></i><b>5.6</b> Transpiration of the herbaceous layer</a></li>
-<li class="chapter" data-level="5.7" data-path="hydrology.html"><a href="hydrology.html#richards"><i class="fa fa-check"></i><b>5.7</b> Water movement in the bulk soil</a></li>
+<li class="chapter" data-level="5.7" data-path="hydrology.html"><a href="hydrology.html#richards"><i class="fa fa-check"></i><b>5.7</b> Vertical water movement within the soil</a>
+<ul>
+<li class="chapter" data-level="5.7.1" data-path="hydrology.html"><a href="hydrology.html#darcian-flow-and-richards-equation"><i class="fa fa-check"></i><b>5.7.1</b> Darcian flow and Richards’ equation</a></li>
+<li class="chapter" data-level="5.7.2" data-path="hydrology.html"><a href="hydrology.html#finite-difference-approximation"><i class="fa fa-check"></i><b>5.7.2</b> Finite difference approximation</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Woody plant transpiration, photosynthesis and water status</a>
 <ul>
@@ -716,7 +720,7 @@ div.csl-indent {
 <div id="advanceddesign" class="section level2 hasAnchor" number="7.1">
 <h2><span class="header-section-number">7.1</span> Design principles<a href="advancedwaterbalance.html#advanceddesign" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The model performs soil/plant water balance and soil/canopy energy balance for a given forest stand and for the period corresponding to input weather data. Soil water balance is calculated on a daily step basis whereas energy balances and plant transpiration are determined at subdaily steps (typically 1h steps). The model considers only the vertical spatial dimension of the stand, and not the horizontal distribution of plants within it. Still, the forest stand is divided into: (a) canopy vertical layers; (b) woody plant cohorts of different species and a herbaceous layer.</p>
-<p>Hydrological processes are the same as in chapter <a href="basicwaterbalance.html#basicwaterbalance">3</a>. Thus, the model includes water interception loss <span class="citation">(<a href="#ref-Gash1995">Gash <em>et al.</em> 1995</a>)</span>, plant transpiration, evaporation from soil <span class="citation">(<a href="#ref-Ritchie1972">Ritchie 1972</a>)</span>, transpiration of the herbaceous layer and partition between infiltration and runoff <span class="citation">(<a href="#ref-Boughton1989">Boughton 1989</a>)</span>. Infiltration is partitioned among soil layers, depending on macroporosity, and water exceeding soil water holding capacity is lost via deep drainage. Snow pack dynamics can also be simulated.</p>
+<p>Hydrological processes are the same as in chapter <a href="basicwaterbalance.html#basicwaterbalance">3</a>. Thus, the model includes water interception loss <span class="citation">(<a href="#ref-Gash1995">Gash <em>et al.</em> 1995</a>)</span>, plant transpiration, evaporation from soil <span class="citation">(<a href="#ref-Ritchie1972">Ritchie 1972</a>)</span>, transpiration of the herbaceous layer, partition between infiltration and runoff <span class="citation">(<a href="#ref-Boughton1989">Boughton 1989</a>)</span>, Darcian vertical water movement <span class="citation">(<a href="#ref-bonan_climate_2019">Bonan 2019</a>)</span> and deep drainage.</p>
 <p>A great deal of the complexity of the advanced model concerns the estimation of woody plant transpiration and photosynthesis. The model simulates stomatal regulation of gas exchange separately for sunlit and shade leaves at sub-daily steps, involving detailed calculations of plant hydraulics, leaf energy balance and photosynthesis. Compared to the basic water balance model of chapter <a href="basicwaterbalance.html#basicwaterbalance">3</a>, the higher level of complexity of the advanced model allows a more precise estimation of carbon and water flows, as well as a more nuanced evaluation of plant water status.</p>
 <p>To calculate radiation balance and incident PAR at the leaf level, the leaf area of each plant cohort is divided into vertical layers according to its crown limits. Photosynthesis and transpiration of sunlit and shade leaves are treated separately <span class="citation">(<a href="#ref-DePury1997">De Pury &amp; Farquhar 1997</a>)</span>. Given an input direct and diffuse short-wave irradiance at the top of the canopy, the amount of light absorbed by sunlit leaves, shade leaves and the soil follows the model of <span class="citation">Anten &amp; Bastiaans (<a href="#ref-Anten2016">2016</a>)</span>. The scheme for long-wave radiation transfer between the atmosphere, the different canopy layers and the soil follows the SHAW model <span class="citation">(<a href="#ref-Flerchinger2009">Flerchinger <em>et al.</em> 2009</a>)</span>.</p>
 <p>Energy balances are conducted at two levels: the canopy (or canopy layers) level and the leaf level. The model keeps track of temperature variation within the canopy (i.e. canopy energy balance) and in the uppermost soil surface (i.e. soil energy balance) as the result of energy exchanges between them and with the atmosphere. Heat conduction also occurs among soil layers. Energy balance can be performed assuming a single canopy layer, with soil and canopy energy balance equations being similar to those of Best et al. <span class="citation">(<a href="#ref-Best2011">2011</a>)</span> for JULES. Alternatively, energy balance can be conducted for each vertical layer following <span class="citation">Bonan <em>et al.</em> (<a href="#ref-Bonan2014">2014</a>)</span>. In this case, the model allows considering within-canopy gradients in temperature, water vapor pressure, and <span class="math inline">\(CO_2\)</span> as well as the turbulent transport of heat, water vapor and <span class="math inline">\(CO_2\)</span> between canopy layers <span class="citation">(<a href="#ref-Ma2019">Ma &amp; Liu 2019</a>)</span>, determined using a canopy turbulence model by <span class="citation">Katul <em>et al.</em> (<a href="#ref-Katul2004">2004</a>)</span>.</p>
@@ -1279,7 +1283,6 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <li><code>snowpack [= TRUE]</code>: Whether dynamics of snow pack are included (see section <a href="hydrology.html#snowpack">5.2</a>).</li>
 <li><code>leafPhenology [= TRUE]</code>: Whether leaf phenology is simulated for winter-deciduous species (see section <a href="leafphenologylight.html#leafphenology">4.1</a>). If <code>FALSE</code> then all species are assumed to be evergreen.</li>
 <li><code>bareSoilEvaporation [= TRUE]</code>: Whether evaporation from the soil surface is simulated (see section <a href="hydrology.html#soilevaporation">5.5</a>).</li>
-<li><code>rockyLayerDrainage [= TRUE]</code>: Whether water exceeding the field capacity of the deepest layer can be drained via macropore flow towards a non-reachable compartment, only for layers with &gt; 95% rocks (see section <a href="hydrology.html#runoff">5.4</a>).</li>
 <li><code>sapFluidityVariation [= TRUE]</code>: Flag to indicate that temperature affects sap fluidity (see <a href="planthydraulics.html#sapviscosity">10.2.3</a>).</li>
 <li><code>windMeasurementHeight [= 200]</code>: Distance (in cm) above the top of the canopy corresponding to the measurement of wind speed.</li>
 <li><code>boundaryLayerSize [= 2000]</code>: Size of the canopy boundary layer (in cm). The boundary layer causes the model to define vertical layers above the top of the canopy. The parameter is only relevant when multi-layer canopy energy balance is performed.</li>
@@ -1287,7 +1290,7 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <li><code>plantWaterPools [=FALSE]</code>: Boolean flag to indicate the simulation of water balance assuming that each cohort has its own water pools.</li>
 <li><code>thermalCapacityLAI [= 1000000]</code>: Canopy thermal capacitance per LAI unit (see section <a href="closecanopysoilenergybalance.html#canopycapacitancetemperature">13.1.3</a>).</li>
 <li><code>verticalLayerSize [= 100]</code>: The size of vertical layers (in <span class="math inline">\(cm\)</span>) for leaf area distribution and light extinction calculations (see section <a href="model-inputs.html#leafdistribution">2.4.5</a>).</li>
-<li><code>cavitationRefill [= "annual"]</code>: A string indicating how refilling of embolized conduits is done (see section <a href="transpirationsperrycochard.html#cavitationrefill">12.4</a>. Allowed values are:
+<li><code>cavitationRefillStem/cavitationRefillLeaves [= "annual"]</code>: A string indicating how refilling of embolized conduits is done (see section <a href="transpirationsperrycochard.html#cavitationrefill">12.4</a>. Allowed values are:
 <ul>
 <li><code>"none"</code> - no refilling.</li>
 <li><code>"annual"</code> - every first day of the year.</li>
@@ -1596,6 +1599,9 @@ Anten, N.P.R. &amp; Bastiaans, L. (2016). The use of canopy models to analyze li
 </div>
 <div id="ref-Best2011" class="csl-entry">
 Best, M.J., Pryor, M., Clark, D.B., Rooney, G.G., Essery, R.L.H., Ménard, C.B., <em>et al.</em> (2011). <a href="https://doi.org/10.5194/gmd-4-677-2011">The <span>Joint</span> <span>UK</span> <span>Land</span> <span>Environment</span> <span>Simulator</span> (<span>JULES</span>), model description – <span>Part</span> 1: <span>Energy</span> and water fluxes</a>. <em>Geoscientific Model Development</em>, 4, 677–699.
+</div>
+<div id="ref-bonan_climate_2019" class="csl-entry">
+Bonan, G. (2019). <em><a href="https://doi.org/10.1017/9781107339217">Climate change and terrestrial ecosystem modeling</a></em>. Cambridge University Press, Cambridge, UK.
 </div>
 <div id="ref-Bonan2014" class="csl-entry">
 Bonan, G.B., Williams, M., Fisher, R.A. &amp; Oleson, K.W. (2014). <a href="https://doi.org/10.5194/gmd-7-2193-2014">Modeling stomatal conductance in the earth system: <span>Linking</span> leaf water-use efficiency and water transport along the soil-plant-atmosphere continuum</a>. <em>Geoscientific Model Development</em>, 7, 2193–2222.

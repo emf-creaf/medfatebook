@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-02-06" />
+<meta name="date" content="2024-02-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -256,7 +256,11 @@ div.csl-indent {
 <li class="chapter" data-level="5.4" data-path="hydrology.html"><a href="hydrology.html#runoff"><i class="fa fa-check"></i><b>5.4</b> Runoff, infiltration and percolation</a></li>
 <li class="chapter" data-level="5.5" data-path="hydrology.html"><a href="hydrology.html#soilevaporation"><i class="fa fa-check"></i><b>5.5</b> Bare soil evaporation</a></li>
 <li class="chapter" data-level="5.6" data-path="hydrology.html"><a href="hydrology.html#herbaceoustranspiration"><i class="fa fa-check"></i><b>5.6</b> Transpiration of the herbaceous layer</a></li>
-<li class="chapter" data-level="5.7" data-path="hydrology.html"><a href="hydrology.html#richards"><i class="fa fa-check"></i><b>5.7</b> Water movement in the bulk soil</a></li>
+<li class="chapter" data-level="5.7" data-path="hydrology.html"><a href="hydrology.html#richards"><i class="fa fa-check"></i><b>5.7</b> Vertical water movement within the soil</a>
+<ul>
+<li class="chapter" data-level="5.7.1" data-path="hydrology.html"><a href="hydrology.html#darcian-flow-and-richards-equation"><i class="fa fa-check"></i><b>5.7.1</b> Darcian flow and Richards’ equation</a></li>
+<li class="chapter" data-level="5.7.2" data-path="hydrology.html"><a href="hydrology.html#finite-difference-approximation"><i class="fa fa-check"></i><b>5.7.2</b> Finite difference approximation</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Woody plant transpiration, photosynthesis and water status</a>
 <ul>
@@ -753,13 +757,12 @@ Figure 5.1: Examples of canopy interception with different <span class="math inl
 </div>
 <div id="runoff" class="section level2 hasAnchor" number="5.4">
 <h2><span class="header-section-number">5.4</span> Runoff, infiltration and percolation<a href="hydrology.html#runoff" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The amount of water that reaches the soil is the sum of net rainfall (<span class="math inline">\(Pr_{net}\)</span>), runon (<span class="math inline">\(Ro\)</span>, in mm) and melted snow (<span class="math inline">\(Sm\)</span>). The amount of water infiltrating into the soil is <span class="math inline">\(Pr_{net} + Sm + Ro - Ru\)</span>, where <span class="math inline">\(Ru\)</span> (in mm) is the water lost by surface runoff (see function <code>hydrology_infiltrationAmount()</code>).</p>
+<p>The amount of rainfall water that reaches the soil is the sum of net rainfall (<span class="math inline">\(Pr_{net}\)</span>) and runon (<span class="math inline">\(Ro\)</span>, in mm). The amount of rainfall water infiltrating into the soil is <span class="math inline">\(Pr_{net} + Ro - Ru\)</span>, where <span class="math inline">\(Ru\)</span> (in mm) is the rainfall water lost by surface runoff (see function <code>hydrology_infiltrationAmount()</code>). Note that snow melt (<span class="math inline">\(Sm\)</span>) does not participate from infiltration/runoff partitioning, because melting rates are assumed to be slow enough to infiltrate completely.</p>
 <p>Surface runoff, is calculated using the USDA SCS curve number method, as in <span class="citation">Boughton (<a href="#ref-Boughton1989">1989</a>)</span>:
 <span class="math display">\[\begin{equation}
-Ru=\frac{(Pr_{net} + Ro + Sm - 0.2 \cdot V_{fc, soil})^2}{(Pr_{net} + Ro + Sm - 0.8 \cdot V_{fc, soil})}
+Ru=\frac{(Pr_{net} + Ro - 0.2 \cdot V_{fc, soil})^2}{(Pr_{net} + Ro - 0.8 \cdot V_{fc, soil})}
 \end{equation}\]</span>
 where <span class="math inline">\(V_{fc, soil}\)</span> (in mm) is the overall soil water retention capacity.</p>
-<p>Following <span class="citation">Granier <em>et al.</em> (<a href="#ref-Granier1999">1999</a>)</span>, part of the water reaching one soil layer percolates quickly through the macropores. The amount of water reaching each layer through macropores is modelled using an extinction function that depends on macroporosity (see function <code>hydrology_infiltrationRepartition</code>). The remaining water is retained by the micropores refilling the current soil layer. When this soil layer reaches its field capacity the excess of water also percolates to the soil layer below.</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:infiltration"></span>
 <img src="medfatebook_files/figure-html/infiltration-1.png" alt="Examples of infiltration/runoff calculation for different values of net rainfall and overall retention capacity, \(V_{soil}\), calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively." width="768" />
@@ -767,8 +770,7 @@ where <span class="math inline">\(V_{fc, soil}\)</span> (in mm) is the overall s
 Figure 5.2: Examples of infiltration/runoff calculation for different values of net rainfall and overall retention capacity, <span class="math inline">\(V_{soil}\)</span>, calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively.
 </p>
 </div>
-<p>Percolation in deepest layer may be treated differently in the model. If it is a rocky layer (i.e if rock fragment content &gt; 95%) and <code>rockyLayerDrainage = FALSE</code>, the model assumes that most cracks in the rock are not hydraulically connected to groundwater, so that they conform water pockets from which plants can extract water. Hence, in this situation the percolation excess occurs only if saturation is surpassed. Otherwise, percolation excess is estimated if field capacity is surpassed, as in the other soil layers. When a percolation excess exists, the remaining water fills soil layers over field capacity up to saturation, from bottom to top. If the soil becomes saturated and there is still an excess of water, this is assumed as infiltration excess and added to the surface runoff (<span class="math inline">\(Ru\)</span>).</p>
-<p>Deep drainage (<span class="math inline">\(Dd\)</span>) is estimated after percolation of soil water inputs. First, hydraulic head is estimated summing the amount of water contained in macropores across soil layers (i.e. water over field capacity). Then, an estimation of the daily maximum drainage is obtained by multiplying hydraulic head by the saturated vertical hydraulic conductivity <span class="math inline">\(K_{drain}\)</span>. Drainage of saturated water is then applied from top to bottom until the maximum drainage is achieved or macropores are empty in all soil layers. As before, the drainage from the deepest rocky layer may be prevented if <code>rockyLayerDrainage = FALSE</code>.</p>
+<p>Note that percolation of rainfall infiltrating into the soil Following <span class="citation">Granier <em>et al.</em> (<a href="#ref-Granier1999">1999</a>)</span>, part of the water reaching one soil layer percolates quickly through the macropores. The amount of water reaching each soil layer through macropores is modelled using an extinction function that depends on macroporosity (see function <code>hydrology_infiltrationRepartition</code>). The remaining water is retained by the micropores refilling the current soil layer.</p>
 </div>
 <div id="soilevaporation" class="section level2 hasAnchor" number="5.5">
 <h2><span class="header-section-number">5.5</span> Bare soil evaporation<a href="hydrology.html#soilevaporation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -815,13 +817,77 @@ Tr_{herb}=Tr_{herb,\max} \cdot \exp \left \{\ln{(0.5)}\cdot \left[ \frac{\Psi_1}
 \end{equation}\]</span></p>
 </div>
 <div id="richards" class="section level2 hasAnchor" number="5.7">
-<h2><span class="header-section-number">5.7</span> Water movement in the bulk soil<a href="hydrology.html#richards" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>TO BE WRITTEN</p>
+<h2><span class="header-section-number">5.7</span> Vertical water movement within the soil<a href="hydrology.html#richards" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In this chapter we describe water movement within the soil, whose design was taken from chapter 8 of <span class="citation">Bonan (<a href="#ref-bonan_climate_2019">2019</a>)</span>, and much of the present text has been summarized and adapted from this source.</p>
+<div id="darcian-flow-and-richards-equation" class="section level3 hasAnchor" number="5.7.1">
+<h3><span class="header-section-number">5.7.1</span> Darcian flow and Richards’ equation<a href="hydrology.html#darcian-flow-and-richards-equation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Water flows in the soil <strong>from high to low potential</strong> as described by Darcy’s law. The <strong>total potential</strong> is the sum of the <strong>matric</strong> potential (<span class="math inline">\(\Psi_{s}\)</span>, here expressed in <span class="math inline">\(m\)</span>, see <a href="model-inputs.html#soilinitialization">2.3.3</a>) and vertical <strong>depth</strong> <span class="math inline">\(z\)</span> (also in <span class="math inline">\(m\)</span>). The vertical depth <span class="math inline">\(z\)</span> is taken as positive in the upward direction, so that <span class="math inline">\(z = 0\)</span> is the ground surface. In the vertical dimension the <strong>flux</strong> <span class="math inline">\(Q\)</span>, i.e. rate of water movement (in <span class="math inline">\(m s^{-1}\)</span>), according to Darcy’s law is:
+<span class="math display">\[\begin{equation}
+Q = -K(\theta)\cdot \frac{\delta (\Psi + z)}{\delta z} = -K(\theta)\cdot \frac{\delta \Psi}{\delta z} - K(\theta)
+\end{equation}\]</span>
+Consider a volume of soil with horizontal area <span class="math inline">\(\Delta x \Delta y\)</span>, thickness <span class="math inline">\(\Delta z\)</span> and with non-rock proportion <span class="math inline">\(\lambda = 1 - P_{rocks}\)</span>. The mass flux entering the parcel from above is <span class="math inline">\(\rho_{w} Q_{in} \Delta x \Delta y\)</span> and the flux out of it is <span class="math inline">\(\rho_{w} Q_{out} \Delta x \Delta y\)</span>. Conservation requires that the difference between fluxes and source/sinks equals the rate of change in water storage. The mass of water in the soil volume is <span class="math inline">\(\rho_{w} \theta \Delta x \Delta y \Delta z \lambda\)</span> so the change in water over a time interval <span class="math inline">\(\Delta t\)</span> is:</p>
+<p><span class="math display">\[\begin{equation}
+\rho_{w} \frac{\Delta \theta}{\Delta t} \Delta x \Delta y \Delta z \lambda  = - \rho_{w} (Q_{in} - Q_{out}) \Delta x \Delta y
+\end{equation}\]</span></p>
+<p>and gives the continuity equation:</p>
+<p><span class="math display">\[\begin{equation}
+\frac{\Delta \theta}{\Delta t} \lambda  = - \frac{(Q_{in} - Q_{out})}{\Delta z}
+\end{equation}\]</span></p>
+<p>which expressed in the notation of calculus is:</p>
+<p><span class="math display">\[\begin{equation}
+\frac{\delta \theta}{\delta t} \lambda  = - \frac{\delta Q}{\delta z}
+\end{equation}\]</span></p>
+<p>Substituting Darcy’s law for <span class="math inline">\(Q\)</span> gives the Richards equation:</p>
+<p><span class="math display">\[\begin{equation}
+\frac{\delta \theta}{\delta t} \lambda = \frac{\delta}{\delta z} \left[ K(\theta) \frac{\delta \Psi}{\delta z} + K(\theta) \right] = K(\theta) \frac{\delta^2 \Psi}{\delta^2 z} + \frac{\delta K}{\delta z} \frac{\delta \Psi}{\delta z} + \frac{\delta K}{\delta z}
+\end{equation}\]</span></p>
+<p>The former is known as the <em>mixed-form</em> Richards equation, because it includes <span class="math inline">\(\theta\)</span> on the left hand and the vertical gradient in matric potential <span class="math inline">\(\Psi\)</span> on the right hand. The <em>head-based</em> or <span class="math inline">\(\Psi\)</span>-<em>based form</em> expresses the left hand term using <span class="math inline">\(\Psi\)</span> as dependent variable:</p>
+<p><span class="math display">\[\begin{equation}
+C(\Psi) \frac{\delta \Psi}{\delta t} \lambda =  K(\Psi) \frac{\delta^2 \Psi}{\delta^2 z} + \frac{\delta K}{\delta z} \frac{\delta \Psi}{\delta z} + \frac{\delta K}{\delta z}
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(C(\Psi) = \delta \theta / \delta \Psi\)</span> is known as the specific moisture capacity or <strong>capacitance</strong>, in <span class="math inline">\(m^{-1}\)</span>.</p>
+</div>
+<div id="finite-difference-approximation" class="section level3 hasAnchor" number="5.7.2">
+<h3><span class="header-section-number">5.7.2</span> Finite difference approximation<a href="hydrology.html#finite-difference-approximation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The finite difference approximation for the Richards equation represents the soil as a network of <span class="math inline">\(N\)</span> discrete nodal points that vary in space and time. The network is presented in Fig. <a href="hydrology.html#fig:soilflows">5.4</a>.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:soilflows"></span>
+<img src="figures/soil_flows.png" alt="Schematic representation of network of soil nodes" width="80%" />
+<p class="caption">
+Figure 5.4: Schematic representation of network of soil nodes
+</p>
+</div>
+<p>For reasons of numerical stability, Richards equation is solved using an implicit time discretization win which the spatial derivatives <span class="math inline">\(\delta K / \delta z\)</span>, <span class="math inline">\(\delta \Psi / \delta z\)</span> and <span class="math inline">\(\delta^2 \Psi / \delta ^2 z\)</span> are written numerically using a central difference approximation at time <span class="math inline">\(n+1\)</span>, and the time derivative uses a backward difference approximation at <span class="math inline">\(n+1\)</span>.</p>
+<p>Soil layer <span class="math inline">\(i\)</span> has a thickness <span class="math inline">\(\Delta z_i\)</span>. Water content <span class="math inline">\(\theta_i\)</span>, matric potential <span class="math inline">\(\Psi_i\)</span> and hydraulic conductivity <span class="math inline">\(K_i\)</span> are defined at the center of the layer at depth <span class="math inline">\(z_i\)</span> and are uniform over the layer. Water inputs/outputs from other processes (i.e. infiltration, snow melt, bare soil evaporation, herbaceous transpiration and woody plant uptake/redistribution) are represented as a source/sink term <span class="math inline">\(S_i\)</span> for each node <span class="math inline">\(i\)</span>.</p>
+<p>For a given intermediate layer <span class="math inline">\(1 &lt; i &lt; N\)</span>, the outward flux <span class="math inline">\(Q_i\)</span> between layers <span class="math inline">\(i\)</span> and <span class="math inline">\(i+1\)</span> is defined using:</p>
+<p><span class="math display">\[\begin{equation}
+Q_i =  -\frac{K_{i+1/2}}{\Delta z_{i+1/2}} (\Psi_i - \Psi_{i+1}) - K_{i+1/2}
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(z_{i+1/2} = z_i - z_{i+1}\)</span> and <span class="math inline">\(K_{i+1/2} = 0.5(K_i + K_{i+1})\)</span> replaces the vertically varying hydraulic conductivity within the two layers with an effective conductivity for an equivalent homogeneous medium. The inward flux <span class="math inline">\(Q_{i-1}\)</span> between layers <span class="math inline">\(i-1\)</span> and <span class="math inline">\(i\)</span> is defined similarly:</p>
+<p><span class="math display">\[\begin{equation}
+Q_{i-1} =  -\frac{K_{i-1/2}}{\Delta z_{i-1/2}} (\Psi_{i-1} - \Psi_{i}) - K_{i-1/2}
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(z_{i-1/2} = z_{i-1} - z_{i}\)</span> and <span class="math inline">\(K_{i-1/2} = 0.5(K_{i-1} + K_{i})\)</span>. If we apply the fluxes to the water balance equation, with fluxes and capacitance expressed for time <span class="math inline">\(n+1\)</span>, and considering the <span class="math inline">\(S_i\)</span> source/sink term (in <span class="math inline">\(m s^{-1}\)</span>), we obtain the following <span class="math inline">\(\Psi\)</span>-based form:</p>
+<p><span class="math display">\[\begin{equation}
+\frac{\Delta z_i}{\Delta t} C_i^{n+1} (\Psi_i^{n+1} - \Psi_i^n) \lambda_i =  \frac{K_{i-1/2}^{n+1}}{\Delta z_{i-1/2}} (\Psi_{i-1}^{n+1} - \Psi_i^{n+1}) - \frac{K_{i+1/2}^{n+1}}{\Delta z_{i+1/2}} (\Psi_i^{n+1} - \Psi_{i+1}^{n+1}) \\ + K_{i-1/2}^{n+1} - K_{i+1/2}^{n+1} + S^{n+1}_i
+\end{equation}\]</span></p>
+<p>For the first layer (<span class="math inline">\(i=1\)</span>) the boundary condition is defined so that there is no inward flux (but a source/sink term is added), which yields the following <span class="math inline">\(\Psi\)</span>-based form:</p>
+<p><span class="math display">\[\begin{equation}
+\frac{\Delta z_1}{\Delta t} C_1^{n+1} (\Psi_1^{n+1} - \Psi_1^n) \lambda_1 =  - \frac{K_{1+1/2}^{n+1}}{\Delta z_{1+1/2}} (\Psi_1^{n+1} - \Psi_{2}^{n+1}) - K_{1+1/2}^{n+1} + S^{n+1}_1
+\end{equation}\]</span></p>
+<p>Finally, for the last layer (<span class="math inline">\(i=N\)</span>) a free drainage condition is specified as boundary condition, where <span class="math inline">\(Q_N = K_N\)</span>, which yields the following <span class="math inline">\(\Psi\)</span>-based form:</p>
+<p><span class="math display">\[\begin{equation}
+\frac{\Delta z_N}{\Delta t} C_N^{n+1} (\Psi_N^{n+1} - \Psi_N^n) \lambda_N =  \frac{K_{N-1/2}^{n+1}}{\Delta z_{N-1/2}} (\Psi_{N-1}^{n+1} - \Psi_{N}^{n+1}) +  K_{N-1/2}^{n+1} - K_{N}^{n+1} + S^{n+1}_N
+\end{equation}\]</span></p>
+<p>The numerical form of the <span class="math inline">\(\Psi\)</span>-based Richards equation for a soil with <span class="math inline">\(N\)</span> layers is a tridiagonal system of <span class="math inline">\(N\)</span> equations with <span class="math inline">\(N\)</span> unknown values <span class="math inline">\(\Psi\)</span> at time <span class="math inline">\(n+1\)</span>. An additional complexity is that <span class="math inline">\(\Psi\)</span> at <span class="math inline">\(n+1\)</span> also appears through <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span>. The solution requires linearizing with respect to <span class="math inline">\(\Psi\)</span> through various methods. Here the <strong>predictor-corrector</strong> method is employed, a two-step solution that solves the equation twice <span class="citation">(<a href="#ref-haverkamp_comparison_1977">Haverkamp <em>et al.</em> 1977</a>)</span>. The predictor step uses explicit linearization to solve for <span class="math inline">\(\Psi\)</span> over one-half of a full time step (<span class="math inline">\(\Delta t/2\)</span>) at time <span class="math inline">\(n +1/2\)</span> with <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span> from time <span class="math inline">\(n\)</span>. The resulting values for <span class="math inline">\(\Psi\)</span> are used to evaluate <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span> at <span class="math inline">\(n+1/2\)</span>. The corrector step uses these to obtain <span class="math inline">\(\Psi\)</span> over the full time step (<span class="math inline">\(\Delta t\)</span>) at <span class="math inline">\(n+1\)</span>. An implicit solution is used for the predictor step and the Crank-Nicolson method is used for the corrector step.</p>
 
+</div>
 </div>
 </div>
 <h3>Bibliography<a href="bibliography.html#bibliography" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bonan_climate_2019" class="csl-entry">
+Bonan, G. (2019). <em><a href="https://doi.org/10.1017/9781107339217">Climate change and terrestrial ecosystem modeling</a></em>. Cambridge University Press, Cambridge, UK.
+</div>
 <div id="ref-Boughton1989" class="csl-entry">
 Boughton, W. (1989). <a href="http://www.publish.csiro.au/?paper=SR9890511">A review of the <span>USDA</span> <span>SCS</span> curve number method</a>. <em>Australian Journal of Soil Research</em>, 27, 511–523.
 </div>
@@ -836,6 +902,9 @@ Gash, J., Lloyd, C. &amp; Lachaud, G. (1995). <a href="https://doi.org/10.1016/0
 </div>
 <div id="ref-Granier1999" class="csl-entry">
 Granier, A., Bréda, N., Biron, P. &amp; Villette, S. (1999). <a href="https://doi.org/10.1016/S0304-3800(98)00205-1">A lumped water balance model to evaluate duration and intensity of drought constraints in forest stands</a>. <em>Ecological Modelling</em>, 116, 269–283.
+</div>
+<div id="ref-haverkamp_comparison_1977" class="csl-entry">
+Haverkamp, R., Vauclin, M., Touma, J., Wierenga, P.J. &amp; Vachaud, G. (1977). <a href="https://doi.org/10.2136/sssaj1977.03615995004100020024x">A <span>Comparison</span> of <span>Numerical</span> <span>Simulation</span> <span>Models</span> <span>For</span> <span>One</span>‐<span>Dimensional</span> <span>Infiltration</span></a>. <em>Soil Science Society of America Journal</em>, 41, 285–294.
 </div>
 <div id="ref-Kergoat1998" class="csl-entry">
 Kergoat, L. (1998). <a href="https://doi.org/10.1016/S0022-1694(98)00211-X">A model for hydrological equilibrium of leaf area index on a global scale</a>. <em>Journal of Hydrology</em>, 212-213, 268–286.
