@@ -89,9 +89,13 @@ legend("bottomright",lty=1:length(Cm), legend=paste("S =",Cm), bty="n")
 
 
 
-## Runoff, infiltration and percolation {#runoff}
+## Runon, runoff, infiltration and percolation {#runoff}
 
-The amount of rainfall water that reaches the soil is the sum of net rainfall ($Pr_{net}$) and runon ($Ro$, in mm). The amount of rainfall water infiltrating into the soil is $Pr_{net} + Ro - Ru$, where $Ru$ (in mm) is the rainfall water lost by surface runoff (see function `hydrology_infiltrationAmount()`). Note that snow melt ($Sm$) does not participate from infiltration/runoff partitioning, because melting rates are assumed to be slow enough to infiltrate completely.
+Water from rainfall events is divided between runoff and infiltration. In consrast, snow melt ($Sm$) does not participate from infiltration/runoff partitioning, because melting rates are assumed to be slow enough to infiltrate completely (see \@ref(richards)).
+
+### Runon, runoff and infiltration
+
+The amount of rainfall event water that reaches the soil is the sum of net rainfall ($Pr_{net}$) and runon ($Ro$, in mm), if any. The amount of rainfall event water infiltrating into the soil is $If = Pr_{net} + Ro - Ru$, where $Ru$ (in mm) is the rainfall water lost by surface runoff (see function `hydrology_infiltrationAmount()`). 
 
 Surface runoff, is calculated using the USDA SCS curve number method, as in @Boughton1989:
 \begin{equation}
@@ -152,7 +156,9 @@ lines(NP,NP-hydrology_infiltrationAmount(NP, V[5]), lty=5)
 legend("topleft", bty="n", lty=1:5, legend=c(paste("d =", SoilDepth,"Vsoil =",round(V),"mm")))
 ```
 
-Note that percolation of rainfall infiltrating into the soil Following @Granier1999, part of the water reaching one soil layer percolates quickly through the macropores. The amount of water reaching each soil layer through macropores is modelled using an extinction function that depends on macroporosity (see function `hydrology_infiltrationRepartition`). The remaining water is retained by the micropores refilling the current soil layer.
+### Percolation
+
+Rainfall infiltrating into the soil is divided among soil layers. Following @Granier1999, part of the water reaching one soil layer percolates quickly through the macropores whereas the other fills micropores (and may contribute to the vertical, unsaturated, flow). The amount of water reaching the micropores of each soil layer $s$, i.e. $If_s$, is modelled using an extinction function that depends on macroporosity (see function `hydrology_infiltrationRepartition`).
 
 ## Bare soil evaporation {#soilevaporation}
 
@@ -177,9 +183,9 @@ The amount of water actually evaporated from the soil, $Es$, is then calculated 
 Es = \min(PE_{soil}, SE_{soil})
 \end{equation}
 
-Finally, $Es$ is distributed along the soil profile according to an exponential decay function with an extinction coefficient $\kappa_{soil}$ [@Mouillot2001]. Figure \@ref(fig:soilevaporation) shows the cumulative evaporation from soils for different values of maximum evaporation rate and extinction coefficient. When the extinction coefficient is smaller a higher proportion of the evaporated water is removed from the subsoil and less from the topsoil. This causes more water being available to calculate $t$ in the next step.
+Figure \@ref(fig:soilevaporation) shows the cumulative evaporation from soils for different values of maximum evaporation rate.
 
-(ref:soilevaporation-cap) Cumulative bare soil evaporation for different values of maximum evaporation rate ($\gamma_{soil}$) and extinction coefficient ($\kappa_{soil}$). Three soil layers (0 – 30 cm; 30 – 150 cm; 150 – 400 cm) are initialized at field capacity ($V_1 = 50 mm$; $V_2 = 201 mm$; $V_3 = 35 mm$). $PE_{soil}$ was assumed not to be limiting. 
+(ref:soilevaporation-cap) Cumulative bare soil evaporation for different values of maximum evaporation rate ($\gamma_{soil}$). Topsoil layer (0 – 30 cm) is initialized at field capacity ($V_1 = 50 mm$). $PE_{soil}$ was assumed not to be limiting. 
 
 ```{r soilevaporation, fig.width=5, fig.height=4, echo=FALSE, fig.align='center', fig.cap='(ref:soilevaporation-cap)'}
 
@@ -203,27 +209,16 @@ RL_micro = SS_micro
 RL_gravel = 95
 
 
-RunEvaporation<-function(Gsoil, Ksoil, d1,d2,d3, numDays = 15){
+RunEvaporation<-function(Gsoil, d1,d2,d3, numDays = 15){
   PET = 100 #Not limited by PET
   Lground = 1
   
   Theta_FC1=soil_psi2thetaSX(TS_clay, TS_sand, -33) #in m3/m3
-  Theta_FC2=soil_psi2thetaSX(SS_clay, SS_sand, -33) #in m3/m3
-  Theta_FC3=soil_psi2thetaSX(RL_clay, RL_sand, -33) #in m3/m3
   pcTS_gravel = 1-(TS_gravel/100)
-  pcSS_gravel = 1-(SS_gravel/100)
-  pcRL_gravel = 1-(RL_gravel/100)
   MaxVol1 = (d1*Theta_FC1*pcTS_gravel)
-  MaxVol2 = (d2*Theta_FC2*pcSS_gravel)
-  MaxVol3 = (d3*Theta_FC3*pcRL_gravel)
-  Ssoil = MaxVol1 + MaxVol2 + MaxVol3
 
   W1=rep(0, numDays)
-  W2=rep(0, numDays)
-  W3=rep(0, numDays)
   W1[1] = 1
-  W2[1] = 1
-  W3[1] = 1
   Esoil = rep(NA,numDays)
   EsoilCum = rep(NA,numDays)
   t = rep(NA, numDays)
@@ -232,25 +227,16 @@ RunEvaporation<-function(Gsoil, Ksoil, d1,d2,d3, numDays = 15){
     Esoil[i] = hydrology_soilEvaporationAmount(DEF=(MaxVol1*(1 - W1[i])), PETs = PET*Lground, Gsoil = Gsoil)
     if(i==1) EsoilCum[i] = Esoil[i]
     else EsoilCum[i] = EsoilCum[i-1]+Esoil[i]
-    #Exponential decay to divide bare soil evaporation among layers
-    Esoil1 = Esoil[i]*(1-exp(-Ksoil*d1))
-    Esoil2 = Esoil[i]*(exp(-Ksoil*d1)-exp(-Ksoil*(d1+d2)))
-    Esoil3 = Esoil[i]*(exp(-Ksoil*(d1+d2)))
     if(i<numDays){
-      W1[i+1] = max(W1[i]-(Esoil1)/MaxVol1,0)
-      W2[i+1] = max(min(W2[i]-(Esoil2)/MaxVol2,1),0)
-      W3[i+1] = max(min(W3[i]-(Esoil3)/MaxVol3,1),0)
+      W1[i+1] = max(W1[i]-(Esoil[i])/MaxVol1,0)
     }  
   }
   return(list(Esoil = Esoil, EsoilCum = EsoilCum))  
 }
 
-E11=RunEvaporation(Gsoil=1, Ksoil = 0.05, d1=300, d2=1200, d3= 2500)
-E12=RunEvaporation(Gsoil=2, Ksoil = 0.05, d1=300, d2=1200, d3= 2500)
-E13=RunEvaporation(Gsoil=3, Ksoil = 0.05, d1=300, d2=1200, d3= 2500)
-E21=RunEvaporation(Gsoil=1, Ksoil = 0.005, d1=300, d2=1200, d3= 2500)
-E22=RunEvaporation(Gsoil=2, Ksoil = 0.005, d1=300, d2=1200, d3= 2500)
-E23=RunEvaporation(Gsoil=3, Ksoil = 0.005, d1=300, d2=1200, d3= 2500)
+E11=RunEvaporation(Gsoil=1, d1=300, d2=1200, d3= 2500)
+E12=RunEvaporation(Gsoil=2, d1=300, d2=1200, d3= 2500)
+E13=RunEvaporation(Gsoil=3, d1=300, d2=1200, d3= 2500)
 
 
 par(mar=c(4,4,1,1))
@@ -262,18 +248,9 @@ lines(x=1:length(E12$EsoilCum), y=E12$EsoilCum, lty=2)
 points(x=1:length(E12$EsoilCum), y=E12$EsoilCum, pch=1)
 lines(x=1:length(E13$EsoilCum), y=E13$EsoilCum, lty=3)
 points(x=1:length(E13$EsoilCum), y=E13$EsoilCum, pch=1)
-lines(x=1:length(E21$EsoilCum), y=E21$EsoilCum, lty=1)
-points(x=1:length(E21$EsoilCum), y=E21$EsoilCum, pch=2)
-lines(x=1:length(E22$EsoilCum), y=E22$EsoilCum, lty=2)
-points(x=1:length(E22$EsoilCum), y=E22$EsoilCum, pch=2)
-lines(x=1:length(E23$EsoilCum), y=E23$EsoilCum, lty=3)
-points(x=1:length(E23$EsoilCum), y=E23$EsoilCum, pch=2)
-legend("topleft", lty=rep(1:3,2), pch=c(1,1,1,2,2,2), legend=c("Gsoil = 1 Ksoil = 0.05", 
-                                    "Gsoil = 2 Ksoil = 0.05", 
-                                    "Gsoil = 3 Ksoil = 0.05",
-                                    "Gsoil = 1 Ksoil = 0.005", 
-                                    "Gsoil = 2 Ksoil = 0.005", 
-                                    "Gsoil = 3 Ksoil = 0.005"), cex = 0.7, bty="n")
+legend("topleft", lty=1:3, legend=c("Gsoil = 1", 
+                                    "Gsoil = 2", 
+                                    "Gsoil = 3"), cex = 0.7, bty="n")
 ```
 
 ## Transpiration of the herbaceous layer {#herbaceoustranspiration}
@@ -287,12 +264,13 @@ Thus, the more dense the woody plant canopy, the lower herbaceous transpiration 
 \frac{Tr_{herb,\max}}{PET}= -0.006\cdot (LAI_{herb})^2+0.134\cdot LAI_{herb}
 \end{equation}
 
-Finally, actual herbaceous transpiration ($Tr_{herb}$) is reduced according to the water potential in the topmost soil layer ($\Psi_1$), assuming that transpiration reduction follows Weibull function with fixed coefficients:
+Finally, actual herbaceous transpiration for a given soil layer $s$ ($Tr_{herb,s}$) is reduced according to the soil water potential ($\Psi_s$), assuming that transpiration reduction follows Weibull function with fixed coefficients:
 
 \begin{equation}
-Tr_{herb}=Tr_{herb,\max} \cdot \exp \left \{\ln{(0.5)}\cdot \left[ \frac{\Psi_1}{-1.5} \right] ^2 \right \} 
+Tr_{herb, s}= FRP_{herb,s} \cdot Tr_{herb,\max} \cdot \exp \left \{\ln{(0.5)}\cdot \left[ \frac{\Psi_i}{-1.5} \right] ^2 \right \} 
 (\#eq:herbaceoustranspiration)
 \end{equation}
+where $FRP_{herb,s}$ is the proportion of fine roots in layer $s$, defined using $Z_{50} = 50 mm$ and $Z_{95} = 500 mm$ (see \@ref(rootdistribution)). 
 
 ## Vertical water movement within the soil {#richards}
 
@@ -383,12 +361,12 @@ The numerical form of the $\Psi$-based Richards equation for a soil with $N$ lay
 
 Source/sink terms are defined as follows for the first layer ($i=1$):
 \begin{equation}
-S_1 = I_1 + Sm - Es_1 - Tr_{herb} - Tr_{woody,1}
+S_1 = If_1 + Sm - Es - Tr_{herb,1} - Ex_{woody,1}
 \end{equation}
 and for $1 < i \leq N$:
 \begin{equation}
-S_i = I_i - Es_i - Tr_{woody,i}
+S_i = If_i - Tr_{herb,i} - Ex_{woody,i}
 \end{equation}
-where $I$ is infiltration, $Sm$ is snow melt, $Tr_{herb}$ is herbaceous transpiration, $Tr_{woody}$ is woody plant transpiration and $Es$ is bare soikl evaporation. All right-hand terms are converted from $mm/day$ to instantaneous rates ($m/s$) for proper units in $S$.
+where $Sm$ is snow melt, $Es$ is bare soil evaporation, $If_i$ is infiltration amount into layer $i$,  $Tr_{herb, i}$ is herbaceous uptake from layer $i$ and $Ex_{woody}$ is woody plant uptake from layer $i$. All right-hand terms are converted from $mm/day$ to instantaneous rates ($m/s$) for proper units in $S$.
 
 Function `hydrology_soilFlows()` implements the vertical water movement flows, given a soil and source/sink vector for each layer. **24 time steps** of 1 hour are used for vertical water simulation of each day. 

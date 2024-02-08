@@ -253,7 +253,11 @@ div.csl-indent {
 <li class="chapter" data-level="5.1" data-path="hydrology.html"><a href="hydrology.html#precipitation"><i class="fa fa-check"></i><b>5.1</b> Snow and rainfall</a></li>
 <li class="chapter" data-level="5.2" data-path="hydrology.html"><a href="hydrology.html#snowpack"><i class="fa fa-check"></i><b>5.2</b> Snow pack dynamics</a></li>
 <li class="chapter" data-level="5.3" data-path="hydrology.html"><a href="hydrology.html#interception"><i class="fa fa-check"></i><b>5.3</b> Rainfall interception loss</a></li>
-<li class="chapter" data-level="5.4" data-path="hydrology.html"><a href="hydrology.html#runoff"><i class="fa fa-check"></i><b>5.4</b> Runoff, infiltration and percolation</a></li>
+<li class="chapter" data-level="5.4" data-path="hydrology.html"><a href="hydrology.html#runoff"><i class="fa fa-check"></i><b>5.4</b> Runon, runoff, infiltration and percolation</a>
+<ul>
+<li class="chapter" data-level="5.4.1" data-path="hydrology.html"><a href="hydrology.html#runon-runoff-and-infiltration"><i class="fa fa-check"></i><b>5.4.1</b> Runon, runoff and infiltration</a></li>
+<li class="chapter" data-level="5.4.2" data-path="hydrology.html"><a href="hydrology.html#percolation"><i class="fa fa-check"></i><b>5.4.2</b> Percolation</a></li>
+</ul></li>
 <li class="chapter" data-level="5.5" data-path="hydrology.html"><a href="hydrology.html#soilevaporation"><i class="fa fa-check"></i><b>5.5</b> Bare soil evaporation</a></li>
 <li class="chapter" data-level="5.6" data-path="hydrology.html"><a href="hydrology.html#herbaceoustranspiration"><i class="fa fa-check"></i><b>5.6</b> Transpiration of the herbaceous layer</a></li>
 <li class="chapter" data-level="5.7" data-path="hydrology.html"><a href="hydrology.html#richards"><i class="fa fa-check"></i><b>5.7</b> Vertical water movement within the soil</a>
@@ -756,8 +760,11 @@ Figure 5.1: Examples of canopy interception with different <span class="math inl
 </div>
 </div>
 <div id="runoff" class="section level2 hasAnchor" number="5.4">
-<h2><span class="header-section-number">5.4</span> Runoff, infiltration and percolation<a href="hydrology.html#runoff" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The amount of rainfall water that reaches the soil is the sum of net rainfall (<span class="math inline">\(Pr_{net}\)</span>) and runon (<span class="math inline">\(Ro\)</span>, in mm). The amount of rainfall water infiltrating into the soil is <span class="math inline">\(Pr_{net} + Ro - Ru\)</span>, where <span class="math inline">\(Ru\)</span> (in mm) is the rainfall water lost by surface runoff (see function <code>hydrology_infiltrationAmount()</code>). Note that snow melt (<span class="math inline">\(Sm\)</span>) does not participate from infiltration/runoff partitioning, because melting rates are assumed to be slow enough to infiltrate completely.</p>
+<h2><span class="header-section-number">5.4</span> Runon, runoff, infiltration and percolation<a href="hydrology.html#runoff" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Water from rainfall events is divided between runoff and infiltration. In consrast, snow melt (<span class="math inline">\(Sm\)</span>) does not participate from infiltration/runoff partitioning, because melting rates are assumed to be slow enough to infiltrate completely (see <a href="hydrology.html#richards">5.7</a>).</p>
+<div id="runon-runoff-and-infiltration" class="section level3 hasAnchor" number="5.4.1">
+<h3><span class="header-section-number">5.4.1</span> Runon, runoff and infiltration<a href="hydrology.html#runon-runoff-and-infiltration" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The amount of rainfall event water that reaches the soil is the sum of net rainfall (<span class="math inline">\(Pr_{net}\)</span>) and runon (<span class="math inline">\(Ro\)</span>, in mm), if any. The amount of rainfall event water infiltrating into the soil is <span class="math inline">\(If = Pr_{net} + Ro - Ru\)</span>, where <span class="math inline">\(Ru\)</span> (in mm) is the rainfall water lost by surface runoff (see function <code>hydrology_infiltrationAmount()</code>).</p>
 <p>Surface runoff, is calculated using the USDA SCS curve number method, as in <span class="citation">Boughton (<a href="#ref-Boughton1989">1989</a>)</span>:
 <span class="math display">\[\begin{equation}
 Ru=\frac{(Pr_{net} + Ro - 0.2 \cdot V_{fc, soil})^2}{(Pr_{net} + Ro - 0.8 \cdot V_{fc, soil})}
@@ -770,7 +777,11 @@ where <span class="math inline">\(V_{fc, soil}\)</span> (in mm) is the overall s
 Figure 5.2: Examples of infiltration/runoff calculation for different values of net rainfall and overall retention capacity, <span class="math inline">\(V_{soil}\)</span>, calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively.
 </p>
 </div>
-<p>Note that percolation of rainfall infiltrating into the soil Following <span class="citation">Granier <em>et al.</em> (<a href="#ref-Granier1999">1999</a>)</span>, part of the water reaching one soil layer percolates quickly through the macropores. The amount of water reaching each soil layer through macropores is modelled using an extinction function that depends on macroporosity (see function <code>hydrology_infiltrationRepartition</code>). The remaining water is retained by the micropores refilling the current soil layer.</p>
+</div>
+<div id="percolation" class="section level3 hasAnchor" number="5.4.2">
+<h3><span class="header-section-number">5.4.2</span> Percolation<a href="hydrology.html#percolation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Rainfall infiltrating into the soil is divided among soil layers. Following <span class="citation">Granier <em>et al.</em> (<a href="#ref-Granier1999">1999</a>)</span>, part of the water reaching one soil layer percolates quickly through the macropores whereas the other fills micropores (and may contribute to the vertical, unsaturated, flow). The amount of water reaching the micropores of each soil layer <span class="math inline">\(s\)</span>, i.e. <span class="math inline">\(If_s\)</span>, is modelled using an extinction function that depends on macroporosity (see function <code>hydrology_infiltrationRepartition</code>).</p>
+</div>
 </div>
 <div id="soilevaporation" class="section level2 hasAnchor" number="5.5">
 <h2><span class="header-section-number">5.5</span> Bare soil evaporation<a href="hydrology.html#soilevaporation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -791,12 +802,12 @@ The amount of water actually evaporated from the soil, <span class="math inline"
 <p><span class="math display">\[\begin{equation}
 Es = \min(PE_{soil}, SE_{soil})
 \end{equation}\]</span></p>
-<p>Finally, <span class="math inline">\(Es\)</span> is distributed along the soil profile according to an exponential decay function with an extinction coefficient <span class="math inline">\(\kappa_{soil}\)</span> <span class="citation">(<a href="#ref-Mouillot2001">Mouillot <em>et al.</em> 2001</a>)</span>. Figure <a href="hydrology.html#fig:soilevaporation">5.3</a> shows the cumulative evaporation from soils for different values of maximum evaporation rate and extinction coefficient. When the extinction coefficient is smaller a higher proportion of the evaporated water is removed from the subsoil and less from the topsoil. This causes more water being available to calculate <span class="math inline">\(t\)</span> in the next step.</p>
+<p>Figure <a href="hydrology.html#fig:soilevaporation">5.3</a> shows the cumulative evaporation from soils for different values of maximum evaporation rate.</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:soilevaporation"></span>
-<img src="medfatebook_files/figure-html/soilevaporation-1.png" alt="Cumulative bare soil evaporation for different values of maximum evaporation rate (\(\gamma_{soil}\)) and extinction coefficient (\(\kappa_{soil}\)). Three soil layers (0 – 30 cm; 30 – 150 cm; 150 – 400 cm) are initialized at field capacity (\(V_1 = 50 mm\); \(V_2 = 201 mm\); \(V_3 = 35 mm\)). \(PE_{soil}\) was assumed not to be limiting." width="480" />
+<img src="medfatebook_files/figure-html/soilevaporation-1.png" alt="Cumulative bare soil evaporation for different values of maximum evaporation rate (\(\gamma_{soil}\)). Topsoil layer (0 – 30 cm) is initialized at field capacity (\(V_1 = 50 mm\)). \(PE_{soil}\) was assumed not to be limiting." width="480" />
 <p class="caption">
-Figure 5.3: Cumulative bare soil evaporation for different values of maximum evaporation rate (<span class="math inline">\(\gamma_{soil}\)</span>) and extinction coefficient (<span class="math inline">\(\kappa_{soil}\)</span>). Three soil layers (0 – 30 cm; 30 – 150 cm; 150 – 400 cm) are initialized at field capacity (<span class="math inline">\(V_1 = 50 mm\)</span>; <span class="math inline">\(V_2 = 201 mm\)</span>; <span class="math inline">\(V_3 = 35 mm\)</span>). <span class="math inline">\(PE_{soil}\)</span> was assumed not to be limiting.
+Figure 5.3: Cumulative bare soil evaporation for different values of maximum evaporation rate (<span class="math inline">\(\gamma_{soil}\)</span>). Topsoil layer (0 – 30 cm) is initialized at field capacity (<span class="math inline">\(V_1 = 50 mm\)</span>). <span class="math inline">\(PE_{soil}\)</span> was assumed not to be limiting.
 </p>
 </div>
 </div>
@@ -810,11 +821,12 @@ Thus, the more dense the woody plant canopy, the lower herbaceous transpiration 
 <span class="math display">\[\begin{equation}
 \frac{Tr_{herb,\max}}{PET}= -0.006\cdot (LAI_{herb})^2+0.134\cdot LAI_{herb}
 \end{equation}\]</span></p>
-<p>Finally, actual herbaceous transpiration (<span class="math inline">\(Tr_{herb}\)</span>) is reduced according to the water potential in the topmost soil layer (<span class="math inline">\(\Psi_1\)</span>), assuming that transpiration reduction follows Weibull function with fixed coefficients:</p>
+<p>Finally, actual herbaceous transpiration for a given soil layer <span class="math inline">\(s\)</span> (<span class="math inline">\(Tr_{herb,s}\)</span>) is reduced according to the soil water potential (<span class="math inline">\(\Psi_s\)</span>), assuming that transpiration reduction follows Weibull function with fixed coefficients:</p>
 <p><span class="math display" id="eq:herbaceoustranspiration">\[\begin{equation}
-Tr_{herb}=Tr_{herb,\max} \cdot \exp \left \{\ln{(0.5)}\cdot \left[ \frac{\Psi_1}{-1.5} \right] ^2 \right \}
+Tr_{herb, s}= FRP_{herb,s} \cdot Tr_{herb,\max} \cdot \exp \left \{\ln{(0.5)}\cdot \left[ \frac{\Psi_i}{-1.5} \right] ^2 \right \}
 \tag{5.1}
-\end{equation}\]</span></p>
+\end{equation}\]</span>
+where <span class="math inline">\(FRP_{herb,s}\)</span> is the proportion of fine roots in layer <span class="math inline">\(s\)</span>, defined using <span class="math inline">\(Z_{50} = 50 mm\)</span> and <span class="math inline">\(Z_{95} = 500 mm\)</span> (see <a href="model-inputs.html#rootdistribution">2.4.6</a>).</p>
 </div>
 <div id="richards" class="section level2 hasAnchor" number="5.7">
 <h2><span class="header-section-number">5.7</span> Vertical water movement within the soil<a href="hydrology.html#richards" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -881,13 +893,13 @@ Q_{i-1} =  -\frac{K_{i-1/2}}{\Delta z_{i-1/2}} (\Psi_{i-1} - \Psi_{i}) - K_{i-1/
 <p>The numerical form of the <span class="math inline">\(\Psi\)</span>-based Richards equation for a soil with <span class="math inline">\(N\)</span> layers is a tridiagonal system of <span class="math inline">\(N\)</span> equations with <span class="math inline">\(N\)</span> unknown values <span class="math inline">\(\Psi\)</span> at time <span class="math inline">\(n+1\)</span>. An additional complexity is that <span class="math inline">\(\Psi\)</span> at <span class="math inline">\(n+1\)</span> also appears through <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span>. The solution requires linearizing with respect to <span class="math inline">\(\Psi\)</span> through various methods. Here the <strong>predictor-corrector</strong> method is employed, a two-step solution that solves the equation twice <span class="citation">(<a href="#ref-haverkamp_comparison_1977">Haverkamp <em>et al.</em> 1977</a>)</span>. The predictor step uses explicit linearization to solve for <span class="math inline">\(\Psi\)</span> over one-half of a full time step (<span class="math inline">\(\Delta t/2\)</span>) at time <span class="math inline">\(n +1/2\)</span> with <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span> from time <span class="math inline">\(n\)</span>. The resulting values for <span class="math inline">\(\Psi\)</span> are used to evaluate <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span> at <span class="math inline">\(n+1/2\)</span>. The corrector step uses these to obtain <span class="math inline">\(\Psi\)</span> over the full time step (<span class="math inline">\(\Delta t\)</span>) at <span class="math inline">\(n+1\)</span>. An implicit solution is used for the predictor step and the Crank-Nicolson method is used for the corrector step.</p>
 <p>Source/sink terms are defined as follows for the first layer (<span class="math inline">\(i=1\)</span>):
 <span class="math display">\[\begin{equation}
-S_1 = I_1 + Sm - Es_1 - Tr_{herb} - Tr_{woody,1}
+S_1 = If_1 + Sm - Es - Tr_{herb,1} - Ex_{woody,1}
 \end{equation}\]</span>
 and for <span class="math inline">\(1 &lt; i \leq N\)</span>:
 <span class="math display">\[\begin{equation}
-S_i = I_i - Es_i - Tr_{woody,i}
+S_i = If_i - Tr_{herb,i} - Ex_{woody,i}
 \end{equation}\]</span>
-where <span class="math inline">\(I\)</span> is infiltration, <span class="math inline">\(Sm\)</span> is snow melt, <span class="math inline">\(Tr_{herb}\)</span> is herbaceous transpiration, <span class="math inline">\(Tr_{woody}\)</span> is woody plant transpiration and <span class="math inline">\(Es\)</span> is bare soikl evaporation. All right-hand terms are converted from <span class="math inline">\(mm/day\)</span> to instantaneous rates (<span class="math inline">\(m/s\)</span>) for proper units in <span class="math inline">\(S\)</span>.</p>
+where <span class="math inline">\(Sm\)</span> is snow melt, <span class="math inline">\(Es\)</span> is bare soil evaporation, <span class="math inline">\(If_i\)</span> is infiltration amount into layer <span class="math inline">\(i\)</span>, <span class="math inline">\(Tr_{herb, i}\)</span> is herbaceous uptake from layer <span class="math inline">\(i\)</span> and <span class="math inline">\(Ex_{woody}\)</span> is woody plant uptake from layer <span class="math inline">\(i\)</span>. All right-hand terms are converted from <span class="math inline">\(mm/day\)</span> to instantaneous rates (<span class="math inline">\(m/s\)</span>) for proper units in <span class="math inline">\(S\)</span>.</p>
 <p>Function <code>hydrology_soilFlows()</code> implements the vertical water movement flows, given a soil and source/sink vector for each layer. <strong>24 time steps</strong> of 1 hour are used for vertical water simulation of each day.</p>
 
 </div>
