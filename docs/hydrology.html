@@ -258,7 +258,7 @@ div.csl-indent {
 <li class="chapter" data-level="5.6" data-path="hydrology.html"><a href="hydrology.html#herbaceoustranspiration"><i class="fa fa-check"></i><b>5.6</b> Transpiration of the herbaceous layer</a></li>
 <li class="chapter" data-level="5.7" data-path="hydrology.html"><a href="hydrology.html#richards"><i class="fa fa-check"></i><b>5.7</b> Vertical water movement within the soil</a>
 <ul>
-<li class="chapter" data-level="5.7.1" data-path="hydrology.html"><a href="hydrology.html#darcian-flow-and-richards-equation"><i class="fa fa-check"></i><b>5.7.1</b> Darcian flow and Richards’ equation</a></li>
+<li class="chapter" data-level="5.7.1" data-path="hydrology.html"><a href="hydrology.html#darcian-flow-and-richards-equation"><i class="fa fa-check"></i><b>5.7.1</b> Darcian flow and Richards equation</a></li>
 <li class="chapter" data-level="5.7.2" data-path="hydrology.html"><a href="hydrology.html#finite-difference-approximation"><i class="fa fa-check"></i><b>5.7.2</b> Finite difference approximation</a></li>
 </ul></li>
 </ul></li>
@@ -820,7 +820,7 @@ Tr_{herb}=Tr_{herb,\max} \cdot \exp \left \{\ln{(0.5)}\cdot \left[ \frac{\Psi_1}
 <h2><span class="header-section-number">5.7</span> Vertical water movement within the soil<a href="hydrology.html#richards" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In this chapter we describe water movement within the soil, whose design was taken from chapter 8 of <span class="citation">Bonan (<a href="#ref-bonan_climate_2019">2019</a>)</span>, and much of the present text has been summarized and adapted from this source.</p>
 <div id="darcian-flow-and-richards-equation" class="section level3 hasAnchor" number="5.7.1">
-<h3><span class="header-section-number">5.7.1</span> Darcian flow and Richards’ equation<a href="hydrology.html#darcian-flow-and-richards-equation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<h3><span class="header-section-number">5.7.1</span> Darcian flow and Richards equation<a href="hydrology.html#darcian-flow-and-richards-equation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Water flows in the soil <strong>from high to low potential</strong> as described by Darcy’s law. The <strong>total potential</strong> is the sum of the <strong>matric</strong> potential (<span class="math inline">\(\Psi_{s}\)</span>, here expressed in <span class="math inline">\(m\)</span>, see <a href="model-inputs.html#soilinitialization">2.3.3</a>) and vertical <strong>depth</strong> <span class="math inline">\(z\)</span> (also in <span class="math inline">\(m\)</span>). The vertical depth <span class="math inline">\(z\)</span> is taken as positive in the upward direction, so that <span class="math inline">\(z = 0\)</span> is the ground surface. In the vertical dimension the <strong>flux</strong> <span class="math inline">\(Q\)</span>, i.e. rate of water movement (in <span class="math inline">\(m s^{-1}\)</span>), according to Darcy’s law is:
 <span class="math display">\[\begin{equation}
 Q = -K(\theta)\cdot \frac{\delta (\Psi + z)}{\delta z} = -K(\theta)\cdot \frac{\delta \Psi}{\delta z} - K(\theta)
@@ -845,7 +845,7 @@ Consider a volume of soil with horizontal area <span class="math inline">\(\Delt
 <p><span class="math display">\[\begin{equation}
 C(\Psi) \frac{\delta \Psi}{\delta t} \lambda =  K(\Psi) \frac{\delta^2 \Psi}{\delta^2 z} + \frac{\delta K}{\delta z} \frac{\delta \Psi}{\delta z} + \frac{\delta K}{\delta z}
 \end{equation}\]</span></p>
-<p>where <span class="math inline">\(C(\Psi) = \delta \theta / \delta \Psi\)</span> is known as the specific moisture capacity or <strong>capacitance</strong>, in <span class="math inline">\(m^{-1}\)</span>.</p>
+<p>where <span class="math inline">\(C(\Psi) = \delta \theta / \delta \Psi\)</span> is known as the <strong>specific moisture capacity</strong>, in <span class="math inline">\(m^{-1}\)</span>.</p>
 </div>
 <div id="finite-difference-approximation" class="section level3 hasAnchor" number="5.7.2">
 <h3><span class="header-section-number">5.7.2</span> Finite difference approximation<a href="hydrology.html#finite-difference-approximation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -879,6 +879,16 @@ Q_{i-1} =  -\frac{K_{i-1/2}}{\Delta z_{i-1/2}} (\Psi_{i-1} - \Psi_{i}) - K_{i-1/
 \frac{\Delta z_N}{\Delta t} C_N^{n+1} (\Psi_N^{n+1} - \Psi_N^n) \lambda_N =  \frac{K_{N-1/2}^{n+1}}{\Delta z_{N-1/2}} (\Psi_{N-1}^{n+1} - \Psi_{N}^{n+1}) +  K_{N-1/2}^{n+1} - K_{N}^{n+1} + S^{n+1}_N
 \end{equation}\]</span></p>
 <p>The numerical form of the <span class="math inline">\(\Psi\)</span>-based Richards equation for a soil with <span class="math inline">\(N\)</span> layers is a tridiagonal system of <span class="math inline">\(N\)</span> equations with <span class="math inline">\(N\)</span> unknown values <span class="math inline">\(\Psi\)</span> at time <span class="math inline">\(n+1\)</span>. An additional complexity is that <span class="math inline">\(\Psi\)</span> at <span class="math inline">\(n+1\)</span> also appears through <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span>. The solution requires linearizing with respect to <span class="math inline">\(\Psi\)</span> through various methods. Here the <strong>predictor-corrector</strong> method is employed, a two-step solution that solves the equation twice <span class="citation">(<a href="#ref-haverkamp_comparison_1977">Haverkamp <em>et al.</em> 1977</a>)</span>. The predictor step uses explicit linearization to solve for <span class="math inline">\(\Psi\)</span> over one-half of a full time step (<span class="math inline">\(\Delta t/2\)</span>) at time <span class="math inline">\(n +1/2\)</span> with <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span> from time <span class="math inline">\(n\)</span>. The resulting values for <span class="math inline">\(\Psi\)</span> are used to evaluate <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span> at <span class="math inline">\(n+1/2\)</span>. The corrector step uses these to obtain <span class="math inline">\(\Psi\)</span> over the full time step (<span class="math inline">\(\Delta t\)</span>) at <span class="math inline">\(n+1\)</span>. An implicit solution is used for the predictor step and the Crank-Nicolson method is used for the corrector step.</p>
+<p>Source/sink terms are defined as follows for the first layer (<span class="math inline">\(i=1\)</span>):
+<span class="math display">\[\begin{equation}
+S_1 = I_1 + Sm - Es_1 - Tr_{herb} - Tr_{woody,1}
+\end{equation}\]</span>
+and for <span class="math inline">\(1 &lt; i \leq N\)</span>:
+<span class="math display">\[\begin{equation}
+S_i = I_i - Es_i - Tr_{woody,i}
+\end{equation}\]</span>
+where <span class="math inline">\(I\)</span> is infiltration, <span class="math inline">\(Sm\)</span> is snow melt, <span class="math inline">\(Tr_{herb}\)</span> is herbaceous transpiration, <span class="math inline">\(Tr_{woody}\)</span> is woody plant transpiration and <span class="math inline">\(Es\)</span> is bare soikl evaporation. All right-hand terms are converted from <span class="math inline">\(mm/day\)</span> to instantaneous rates (<span class="math inline">\(m/s\)</span>) for proper units in <span class="math inline">\(S\)</span>.</p>
+<p>Function <code>hydrology_soilFlows()</code> implements the vertical water movement flows, given a soil and source/sink vector for each layer. <strong>24 time steps</strong> of 1 hour are used for vertical water simulation of each day.</p>
 
 </div>
 </div>
