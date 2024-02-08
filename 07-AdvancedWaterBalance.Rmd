@@ -119,15 +119,14 @@ Unlike @Best2011, the model considers the snow pack and the uppermost soil layer
 
 For every day to be simulated, the model performs the following steps:
 
-1. Update leaf area values according to the phenology of species (sections \@ref(leafphenology)).
-2. If snow dynamics are included, increase snow pack from snow precipitation ($Ps$) and decrease it following snow melt ($Sm$) (section \@ref(snowpack)).
-3. Determine rainfall interception loss ($In$) and net rainfall ($Pr_{net}$) (section \@ref(interception)).
-4. Increase soil water content due to net rainfall ($Pr_{net}$), surface runon ($Ro$) and snow melt ($Sm$), after accounting for surface runoff ($Ru$) and deep drainage ($Dd$) (section \@ref(runoff)).
-5. Decrease soil water content due to bare soil evaporation ($Es$), if snow is not present (section \@ref(soilevaporation)), and herbaceous transpiration ($Tr_{herb}$; section \@ref(herbaceoustranspiration)).
-6. Determine sub-daily air temperature and direct/diffuse irradiance variations (chapter \@ref(subdailytemplight)).
-7. Determine the proportion of sunlit/shade leaves (section \@ref(sunlitshadeleaves)), the shortwave radiation absorbed by plant cohorts  (sections \@ref(shortwaveradiationcanopyabs) and the soil (section \@ref(shortwaveradiationsoilabs)) at sub-daily steps.
-8. If `transpirationMode = "Sperry"`, update the water supply function of each plant cohort, according to the hydraulic model and the current soil water potential (chapter \@ref(planthydraulics)). If plant capacitance effects are considered, the supply function involves only the soil-to-stem part of the hydraulic pathway. Otherwise, it describes the complete soil-to-leaf pathway.
-9. Determine instantaneous plant cohort transpiration, photosynthesis rates and close soil/canopy energy balance at sub-daily steps (chapters \@ref(transpirationsperrycochard) and \@ref(closecanopysoilenergybalance)). This involves the following actions for each sub-daily step:
+1. Update leaf area values according to the phenology of species and recalculate radiation extinction (sections \@ref(leafphenology) and \@ref(basiclightextinction)).
+2. Determine rainfall interception loss ($In$) and net rainfall ($Pr_{net}$) (section \@ref(interception)). The amount of water reaching the soil surface from the rainfall event is the sum of net rainfall ($Pr_{net}$) and surface runon ($Ro$), if given. If snow dynamics are included, increase snow pack from snow precipitation ($Ps$) and decrease it following snow melt ($Sm$) (section \@ref(snowpack)).
+3. Divide the amount of water reaching the soil surface from the rainfall event between infiltration and surface runoff ($Ru$) (section \@ref(runoff)). Determine the infiltration reaching each soil layer.
+4. Determine bare soil evaporation ($Es$), if snow is not present (section \@ref(soilevaporation)), and herbaceous transpiration ($Tr_{herb}$; section \@ref(herbaceoustranspiration)).
+5. Determine sub-daily air temperature and direct/diffuse irradiance variations (chapter \@ref(subdailytemplight)).
+6. Determine the proportion of sunlit/shade leaves (section \@ref(sunlitshadeleaves)), the shortwave radiation absorbed by plant cohorts  (sections \@ref(shortwaveradiationcanopyabs) and the soil (section \@ref(shortwaveradiationsoilabs)) at sub-daily steps.
+7. If `transpirationMode = "Sperry"`, update the water supply function of each plant cohort, according to the hydraulic model and the current soil water potential (chapter \@ref(planthydraulics)). 
+8. Determine instantaneous plant cohort transpiration, photosynthesis rates and close soil/canopy energy balance at sub-daily steps (chapters \@ref(transpirationsperrycochard) and \@ref(closecanopysoilenergybalance)). This involves the following actions for each sub-daily step:
     a. Determine long-wave radiation exchange between soil, canopy layers and atmosphere (section \@ref(longwaveradiation)).
     b. If `transpirationMode = "Sperry"`, for each woody cohort:
 
@@ -144,10 +143,12 @@ For every day to be simulated, the model performs the following steps:
     d. Scale transpiration ($Tr_{woody}$) and net photosynthesis ($A_n$) from sunlit/shade leaves to the plant cohort level (section \@ref(scalingtranspirationphotosynthesis)).
     e. Scale water extraction from soil layers ($Ex_{woody}$) to the woody plant cohort level.
     f. Complete energy balance of the canopy and the soil, after translating plant transpiration, evaporation from bare soil, snow melt and interception loss to latent heat and calculating convective heat exchange for both the canopy and the soil. Alternatively, perform energy balance for individual canopy layers, while including turbulent heat exchange and turbulent transport of water vapor and $CO_2$ between layers (chapter \@ref(closecanopysoilenergybalance)).
-10. Determine day-level photosynthesis and transpiration from instantaneous rates and update soil moisture (section \@ref(daylevelphototransp)), effectively closing the soil water balance at the daily scale.
-11. Determine drought stress for each woody plant cohort (section \@ref(advanceddroughtstress)).
+9. Determine day-level photosynthesis and transpiration from instantaneous rates and update soil moisture (section \@ref(daylevelphototransp)). Determine drought stress for each woody plant cohort (section \@ref(advanceddroughtstress)).
+10. Determine vertical water movement within the soil, while considering soil layer source/sinks from infiltration, bare soil evaporation and herbaceous transpiration and woody plant extraction/redistribution (section \@ref(richards)). This updates soil moisture and lower boundary condition of water movement corresponds to deep drainage ($Dd$). 
+11. If fire hazard calculations are requested, estimate live and dead fuel moisture and potential fire behaviour (chapter \@ref(fuelandfirebehavior)).
 
-Details of the formulation of each of these processes are provided within the referred chapters and sections (some processes have been already described in previous chapters/sections).
+
+Steps 1-4 are the same as described in the basic model, and steps 10-11 here correspond to steps 6-7 in the basic model. The set of steps corresponds to simulations if plant water pools *are not* considered, so that only the water balance of the overall soil matters. If plant water pools *are* considered, steps 1-3 are the same, because they apply to the whole forest stand (note that at present infiltration does not depend on antecedent conditions). However, step 4 is performed for each water pool separately, steps 7 and 9 also involves defining woody plant water uptake from different plant water pools depending on the proportion of fine roots of each woody cohort in each pool (see \@ref(transpirationpools)). Step 10 is first performed on the soil corresponding to each pool and, finally, overall soil moisture is updated using pool proportions as weights. In this case, deep drainage for the overall soil is determined so as to force the water balance closure.
 
 ## Inputs and outputs
 
