@@ -23,11 +23,17 @@ where $Rad$ is solar radiation ($MJ \cdot m^{-2}$), $L^{SWR}_{ground}$ is the fr
 
 ## Rainfall interception loss {#interception}
 
-As mentioned above, interception loss is only modelled for liquid precipitation (i.e. snow interception is not modelled). Rainfall interception loss, $In$, is estimated using the @Gash1995 analytical interception model for sparse canopies, where rain is assumed to fall in a single event during the day. First, the amount of rainfall needed to saturate the canopy is calculated: 
+As mentioned above, interception loss is only modelled for liquid precipitation (i.e. snow interception is not modelled). Rainfall interception loss, $In$, is estimated using either the @Gash1995 or @liu_evaluation_2001 models. 
+
+### Gash (1995) model
+
+In the @Gash1995 analytical interception model for sparse canopies, rain is assumed to fall in a single event during the day. First, the amount of rainfall needed to saturate the canopy is calculated: 
 \begin{equation}
 P_G = - \frac{S_{canopy}/C_{canopy}}{ER_{ratio}} \cdot \ln(1-ER_{ratio})
 \end{equation}
-where $S_{canopy}$ is the canopy water storage capacity (in mm) –  i.e. the minimum amount of water needed to saturate the canopy –, $C_{canopy}$ is the canopy cover and $ER_{ratio}$ is the ratio of evaporation rate to rainfall rate during the rainfall event. Although interception models are normally applied to single-canopy stands, we apply the sparse Gash model to the whole stand (including shrubs and the herbaceous layer). Moreover, in our implementation stem interception is lumped with crown interception, so that $S_{canopy}$ represents both. Following @Watanabe1996 we estimate $S_{canopy}$, the canopy water storage capacity, from adjusted LAI values:
+where $S_{canopy}$ is the canopy water storage capacity (in mm) –  i.e. the minimum amount of water needed to saturate the canopy –, $C_{canopy}$ is the canopy cover and $ER_{ratio}$ is the ratio of evaporation rate to rainfall rate during the rainfall event. Although interception models are normally applied to single-canopy stands, we apply the sparse Gash model to the whole stand (including shrubs and the herbaceous layer). Moreover, in our implementation stem interception is lumped with crown interception, so that $S_{canopy}$ represents both. 
+
+Following @Watanabe1996 we estimate $S_{canopy}$, the canopy water storage capacity, from adjusted LAI values:
 \begin{equation}
 S_{canopy}=LAI_{herb}+\sum_{i}{s_{water,i}\cdot LAI_{i}^{\phi}}
 \end{equation}
@@ -42,7 +48,7 @@ In = C_{canopy}\cdot Pr\: {if}\: Pr \leq P_G
 \end{eqnarray}
 where $Pr$ is the daily gross rainfall (in mm). Net rainfall ($Pr_{net}$, also in mm) includes throughfall and stemflow, and is calculated as the difference between gross rainfall and interception loss. Fig. \@ref(fig:interception) below shows examples of relative throughfall (including stemflow), calculated according to the Gash et al [-@Gash1995]  interception model, under different situations (see function `hydrology_rainInterception()`). 
 
-(ref:interception-cap) Examples of canopy interception with different $S_{canopy}$ (canopy water storage capacity), $ER_{ratio}$ (ratio between evaporation and rainfall rates) and $p$ (throughfall coefficient; $p = 1 - C_{canopy}$).
+(ref:interception-cap) Examples of canopy interception with different $S_{canopy}$ (canopy water storage capacity), $ER_{ratio}$ (ratio between evaporation and rainfall rates) and $p$ (throughfall coefficient; $p = 1 - C_{canopy}$), using the Gash (1995) model.
 
 ```{r interception, echo=FALSE, fig.width=8, fig.height=8,  fig.align='center', fig.cap='(ref:interception-cap)'}
 par(mfrow=c(2,2), mar=c(5,5,5,1))
@@ -88,20 +94,27 @@ legend("bottomright",lty=1:length(Cm), legend=paste("S =",Cm), bty="n")
 ```
 
 
+### Liu (2001) model
+
+In the single-storm form of the @liu_evaluation_2001 model is similar to the @Gash1995 model in terms of its inputs. Rainfall interception during a single storm can be predicted by gross rainfall amount $P_G$, the ratio of evaporation rate to rainfall rate during the rainfall event, $ER_{ratio}$, canopy gap fraction ($C_{canopy}$) and storage capacity ($S_{canopy}$):
+
+\begin{equation}
+In = S_{canopy} \cdot \left[ 1.0 - \exp\left(-P_G \cdot \left( \frac{C_{canopy}} {S_{canopy}} \right) \right) \right] \cdot (1.0 - (ER/C_{canopy})) + (ER\cdot P_G)
+\end{equation}
 
 ## Runon, runoff, infiltration and percolation {#runoff}
 
-Water from rainfall events is divided between runoff and infiltration. In consrast, snow melt ($Sm$) does not participate from infiltration/runoff partitioning, because melting rates are assumed to be slow enough to infiltrate completely (see \@ref(richards)).
+Water from rainfall events is divided between runoff and infiltration, and infiltrated water is distributed among soil layers assuming a circulation through large macropores. In contrast, snow melt ($Sm$) does not participate from infiltration/runoff partitioning and percolation, because melting rates are assumed to be slow enough to infiltrate completely in the topmost layer.
 
-### Runon, runoff and infiltration
+The amount of rainfall event water that reaches the soil is the sum of net rainfall ($Pr_{net}$) and runon ($Ro$, in mm), if any. The amount of rainfall event water infiltrating into the soil is $If = Pr_{net} + Ro - Ru$, where $Ru$ (in mm) is the rainfall water lost by surface runoff. Infiltration can be estimated using either @Boughton1989 or the @green_studies_1911 model.
 
-The amount of rainfall event water that reaches the soil is the sum of net rainfall ($Pr_{net}$) and runon ($Ro$, in mm), if any. The amount of rainfall event water infiltrating into the soil is $If = Pr_{net} + Ro - Ru$, where $Ru$ (in mm) is the rainfall water lost by surface runoff (see function `hydrology_infiltrationAmount()`). 
+### Boughton (1989) model
 
-Surface runoff, is calculated using the USDA SCS curve number method, as in @Boughton1989:
+Surface runoff $Ru$ can be estimated using the USDA SCS curve number method, following @Boughton1989:
 \begin{equation}
 Ru=\frac{(Pr_{net} + Ro - 0.2 \cdot V_{fc, soil})^2}{(Pr_{net} + Ro - 0.8 \cdot V_{fc, soil})}
 \end{equation}
-where $V_{fc, soil}$ (in mm) is the overall soil water retention capacity. 
+where $V_{fc, soil}$ (in mm) is the overall soil water retention capacity. The @Boughton1989 model is available in function `hydrology_infiltrationBoughton()` and examples of its behaviour are given in the figure below.
 
 (ref:infiltration-cap) Examples of infiltration/runoff calculation for different values of net rainfall and overall retention capacity, $V_{soil}$, calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively.
 
@@ -138,23 +151,63 @@ MaxVol2 = (d2*Theta_FC2*pcSS_gravel)
 MaxVol3 = (d3*Theta_FC3*pcRL_gravel)
 V = MaxVol1+MaxVol2+MaxVol3
 
+infiltration <- function(NP, V) {
+  res <- rep(NA, length(NP))
+  for(i in 1:length(NP)) {
+    res[i] <- hydrology_infiltrationBoughton(NP[i], V)
+  }
+  return(res)
+}
 par(mar=c(5,5,1,1), mfrow=c(1,2))
 NP = seq(0,60, by=1)
-plot(NP,hydrology_infiltrationAmount(NP, V[1]), type="l", xlim=c(0,60), ylim=c(0,60), 
+plot(NP,infiltration(NP, V[1]), type="l", xlim=c(0,60), ylim=c(0,60), 
      ylab="Infiltration (mm)", xlab="Net rainfall (mm)", frame=FALSE)
-lines(NP,hydrology_infiltrationAmount(NP, V[2]), lty=2)
-lines(NP,hydrology_infiltrationAmount(NP, V[3]), lty=3)
-lines(NP,hydrology_infiltrationAmount(NP, V[4]), lty=4)
-lines(NP,hydrology_infiltrationAmount(NP, V[5]), lty=5)
+lines(NP,infiltration(NP, V[2]), lty=2)
+lines(NP,infiltration(NP, V[3]), lty=3)
+lines(NP,infiltration(NP, V[4]), lty=4)
+lines(NP,infiltration(NP, V[5]), lty=5)
 legend("topleft", bty="n", lty=1:5, legend=c(paste("d =", SoilDepth, "Vsoil =",round(V),"mm")))
-plot(NP,NP-hydrology_infiltrationAmount(NP, V[1]), type="l", xlim=c(0,60), ylim=c(0,60), 
+plot(NP,NP-infiltration(NP, V[1]), type="l", xlim=c(0,60), ylim=c(0,60), 
      ylab="Runoff (mm)", xlab="Net rainfall (mm)", frame=FALSE)
-lines(NP,NP-hydrology_infiltrationAmount(NP, V[2]), lty=2)
-lines(NP,NP-hydrology_infiltrationAmount(NP, V[3]), lty=3)
-lines(NP,NP-hydrology_infiltrationAmount(NP, V[4]), lty=4)
-lines(NP,NP-hydrology_infiltrationAmount(NP, V[5]), lty=5)
+lines(NP,NP-infiltration(NP, V[2]), lty=2)
+lines(NP,NP-infiltration(NP, V[3]), lty=3)
+lines(NP,NP-infiltration(NP, V[4]), lty=4)
+lines(NP,NP-infiltration(NP, V[5]), lty=5)
 legend("topleft", bty="n", lty=1:5, legend=c(paste("d =", SoilDepth,"Vsoil =",round(V),"mm")))
 ```
+
+### Green-Ampt (1911) model
+The description of the  @green_studies_1911 model has been adapted from chapter 9 of @bonan_climate_2019. The Green-Ampt equation uses the concept of a horizontal wetting front at some distance $L_w$ into the soil. The soil above $L_w$ is saturated (i.e. $\theta_{sat}$), whreas soil below the wetting front has a uniform content $\theta_{dry}$ corresponding to conditions prior to the rainfall event. Darcy's law provides the flux of water $i_c$ infiltrating into the soil from the surface to the wetting front at depth $z = -L_w$:
+
+\begin{equation}
+i_c = K_{sat} \left[\frac{|\Psi_w| }{L_w} + 1  \right]
+\end{equation}
+where $\Psi_w$ is the matric potential at the wetting front. The total cumulative infiltrated water $I_c$ at time $t$ is the time integral of $i_c$, and is also equal to the $L_w$ multiplied by the change in water, i.e. $\Delta \theta = \theta_{sat} - \theta_{dry}$:
+\begin{equation}
+I_c = \Delta \theta L_w
+\end{equation}
+The infiltration rate can also be expressed as the time derivative of $I_c$, i.e.:
+\begin{equation}
+i_c = \frac{dI_c}{dt} = \Delta \theta \frac{dL_w}{dt}
+\end{equation}
+Combining the two equations for $i_c$ we obtain:
+\begin{equation}
+\Delta \theta \frac{dL_w}{dt} =  K_{sat} \left[\frac{|\Psi_w| }{L_w} + 1  \right]
+\end{equation}
+and substituting $I_c/\Delta \theta$ for $L_w$ gives:
+\begin{equation}
+\frac{dI_c}{dt} =  K_{sat} \left[\frac{|\Psi_w| \Delta \theta}{I_c} + 1  \right]
+\end{equation}
+By rearranging terms and integrating we obtain an expression for $I_c(t)$:
+\begin{equation}
+I_c(t) =  K_{sat}t  + |\Psi_w| \Delta \theta \ln\left[1 + \frac{I_c(t)}{|\Psi_w| \Delta \theta} \right]
+\end{equation}
+This equation defines the cumulative infiltration to time $t$ as a function of $K_{sat}$, \Psi_{w}, $\theta_{sat}$ and $\theta_{dry}$. Because $I_c$ appears on both sides of the equation, it must be found using numerical root-finding (the Newton-Raphson method in our case). To estimate $\Psi_{w}$ the following equation is used:
+\begin{equation}
+\Psi_{w} = \left(\frac{2b + 3}{2b + 6} \right)\Psi_{sat}
+\end{equation}
+
+Parameter $\theta_dry$ is the volumetric content of the topmost soil layer (antecendent soil conditions), and parameters $\theta_{sat}$, $\Psi_{sat}$, $K_{sat}$ and $b$ are estimated using Campbell's water retention curves from the texture of the topmost layer. The @green_studies_1911 model is available in function `hydrology_infiltrationGreenAmpt()`.
 
 ### Percolation
 

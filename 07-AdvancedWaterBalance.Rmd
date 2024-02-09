@@ -13,7 +13,7 @@ The following model overview is structured as in chapter \@ref(basicwaterbalance
 
 The model performs soil/plant water balance and soil/canopy energy balance for a given forest stand and for the period corresponding to input weather data. Soil water balance is calculated on a daily step basis whereas energy balances and plant transpiration are determined at subdaily steps (typically 1h steps). The model considers only the vertical spatial dimension of the stand, and not the horizontal distribution of plants within it. Still, the forest stand is divided into: (a) canopy vertical layers; (b) woody plant cohorts of different species and a herbaceous layer. 
 
-Hydrological processes are the same as in chapter \@ref(basicwaterbalance). Thus, the model includes water interception loss [@Gash1995], plant transpiration, evaporation from soil [@Ritchie1972], transpiration of the herbaceous layer, partition between infiltration and runoff [@Boughton1989], Darcian vertical water movement [@bonan_climate_2019] and deep drainage. 
+Hydrological processes are the same as in chapter \@ref(basicwaterbalance). Thus, the model includes water interception loss [@Gash1995; @liu_evaluation_2001], plant transpiration, evaporation from soil [@Ritchie1972], transpiration of the herbaceous layer, partition between infiltration and runoff [@Boughton1989; @green_studies_1911], Darcian vertical water movement [@bonan_climate_2019] and deep drainage. 
 
 A great deal of the complexity of the advanced model concerns the estimation of woody plant transpiration and photosynthesis. The model simulates stomatal regulation of gas exchange separately for sunlit and shade leaves at sub-daily steps, involving detailed calculations of plant hydraulics, leaf energy balance and photosynthesis. Compared to the basic water balance model of chapter \@ref(basicwaterbalance), the higher level of complexity of the advanced model allows a more precise estimation of carbon and water flows, as well as a more nuanced evaluation of plant water status.
 
@@ -148,7 +148,7 @@ For every day to be simulated, the model performs the following steps:
 11. If fire hazard calculations are requested, estimate live and dead fuel moisture and potential fire behaviour (chapter \@ref(fuelandfirebehavior)).
 
 
-Steps 1-4 are the same as described in the basic model, and steps 10-11 here correspond to steps 6-7 in the basic model. The set of steps corresponds to simulations if plant water pools *are not* considered, so that only the water balance of the overall soil matters. If plant water pools *are* considered, steps 1-3 are the same, because they apply to the whole forest stand (note that at present infiltration does not depend on antecedent conditions). However, step 4 is performed for each water pool separately, steps 7 and 9 also involves defining woody plant water uptake from different plant water pools depending on the proportion of fine roots of each woody cohort in each pool (see \@ref(transpirationpools)). Flows from those steps are then averaged at the stand level. Step 10 is first performed on the soil corresponding to each pool and, finally, on the overall soil, using in each case the corresponding source/sink terms.
+Steps 1-4 are the same as described in the basic model, and steps 10-11 here correspond to steps 6-7 in the basic model. The set of steps corresponds to simulations if plant water pools *are not* considered, so that only the water balance of the overall soil matters. If plant water pools *are* considered, steps 1-2 are the same, because they apply to the whole forest stand (note that at present infiltration does not depend on antecedent conditions). However, steps 3 and 4 are performed for each water pool separately because they depend on antecedent soil moisture. Steps 7-9 also involve defining woody plant water uptake from different plant water pools depending on the proportion of fine roots of each woody cohort in each pool (see \@ref(transpirationpools)). Soil water flows from all those steps are then averaged at the stand level. Step 10 is first performed on the soil corresponding to each pool and, finally, on the overall soil, using in each case the corresponding source/sink terms.
 
 ## Inputs and outputs
 
@@ -267,11 +267,18 @@ Other relevant control parameters relevant for the advanced water balance model 
 + `snowpack [= TRUE]`:  Whether dynamics of snow pack are included (see section \@ref(snowpack)).
 + `leafPhenology [= TRUE]`:  Whether leaf phenology is simulated for winter-deciduous species (see section \@ref(leafphenology)). If `FALSE` then all species are assumed to be evergreen.
 + `bareSoilEvaporation [= TRUE]`:  Whether evaporation from the soil surface is simulated (see section \@ref(soilevaporation)).
++ `interceptionMode [= "Gash1995"]`: Infiltration model, either "Gash1995" or "Liu2001"; see section \@ref(interception).
++ `infiltrationMode [= "GreenAmpt1911"]`: Infiltration model, either "GreenAmpt1911" or "Boughton1989"; see section \@ref(runoff).
 + `sapFluidityVariation [= TRUE]`: Flag to indicate that temperature affects sap fluidity (see \@ref(sapviscosity)).
 + `windMeasurementHeight [= 200]`: Distance (in cm) above the top of the canopy corresponding to the measurement of wind speed.
 + `boundaryLayerSize [= 2000]`: Size of the canopy boundary layer (in cm). The boundary layer causes the model to define vertical layers above the top of the canopy. The parameter is only relevant when multi-layer canopy energy balance is performed.
 + `unlimitedSoilWater [=FALSE]`: Boolean flag to indicate the simulation of plant transpiration assuming that soil water is always at field capacity.
-+ `plantWaterPools [=FALSE]`: Boolean flag to indicate the simulation of water balance assuming that each cohort has its own water pools.
++ `interceptionMode [= "Gash1995"]`: Infiltration model, either "Gash1995" or "Liu2001".
++ `infiltrationMode [= "Green-Ampt"]`: Infiltration model, either "Green-Ampt" or "Boughton".
++ `rhizosphereOverlap [="total]`: A string indicating the degree of rhizosphere spatial overlap between plant cohorts:
+   + `"none"` - no overlap (independent water pools).
+   + `"partial"` - partial overlap determined by coarse root volume.
+   + `"total"` - total overlap (plants extract from common soil pools).
 + `thermalCapacityLAI [= 1000000]`: Canopy thermal capacitance per LAI unit (see section \@ref(canopycapacitancetemperature)).
 + `verticalLayerSize [= 100]`: The size of vertical layers (in $cm$) for leaf area distribution and light extinction calculations (see section \@ref(leafdistribution)).
 + `cavitationRefillStem/cavitationRefillLeaves [= "annual"]`: A string indicating how refilling of embolized conduits is done  (see section \@ref(cavitationrefill). Allowed values are: 
