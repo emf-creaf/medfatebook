@@ -361,9 +361,9 @@ In contrast, growth simulation requires updating the structure of vegetation, i.
 
 ## Metereological input {#meteoinput}
 
-Weather input data must include variables calculated at the **daily** scale. Weather data should be arranged in a data frame with days in **rows** and variables in **columns**. Dates are needed in **medfate** to estimate parameters like solar declination or the day of the year ($DOY$). Importantly, *dates* should be included as row names (in format *year-month-day*) of the input meteorology data frame.
+Weather input data must include variables calculated at the **daily** scale. Weather data should be arranged in a data frame with days in **rows** and variables in **columns**. Dates are needed in **medfate** to estimate parameters like solar declination or the day of the year ($DOY$). Importantly, *dates* should be included as **row names** (in format *year-month-day*) of the input meteorology data frame, or as a column named *dates* with objects of class `Date`.
 
-The following table indicates the symbols, units, definitions and the variable name in R of all weather variables. Some of them are optional, as indicated in the right-most column.
+Some weather variables must be present always, whereas others are optional, meaning that the package can estimate them if missing. The following table indicates the symbols, units, definitions and the variable name in R of input weather variables that are always **required**: 
 
 | Symbol | Units | R param | Description                        | Optional |
 |--------|-------|---------|------------------------------------|----------|
@@ -373,12 +373,18 @@ The following table indicates the symbols, units, definitions and the variable n
 | $RH_{max}$ | % | `MaxRelativeHumidity` | Maximum relative humidity | No |
 | $P$ | $L \cdot m^{-2} = mm$ | `Precipitation` | Precipitation (either rainfall or snow). | No |
 | $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds | No |
+
+Whereas the following table lists the same attributes for input weather variables that are **optional**: 
+
+| Symbol | Units | R param | Description                        | Optional |
+|--------|-------|---------|------------------------------------|----------|
 | $u$ | $m \cdot s^{-1}$ | `WindSpeed` | Wind speed | Yes |
+| $R_{int}$ | $mm \cdot  h^{-1}$ | `RainfallIntensity` | Rainfall intensity | Yes |
 | $C_{atm}$ | $ppm$ | `CO2` | Atmospheric (above-canopy) $CO_2$ concentration | Yes |
 | $P_{atm}$ | $kPa$ | `Patm` | Surface atmospheric pressure | Yes |
 | $P_{fire}$ | [0-1] | `FireProbability` | Probability of wildfire occurrence | Yes |
 
-While the weather variables listed in the table above are input requirements, **medfate** derives other atmospheric variables from them, using also topographic information (see [utility functions](http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual):
+While the weather variables listed in the tables above are provided as inputs, **medfate** derives other atmospheric variables from them, using also topographic information (see [utility functions](http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual):
 
 | Symbol | Units | R param | Description                        |
 |--------|-------|---------|------------------------------------|

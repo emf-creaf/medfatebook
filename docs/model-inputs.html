@@ -1385,8 +1385,8 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 </div>
 <div id="meteoinput" class="section level2 hasAnchor" number="2.5">
 <h2><span class="header-section-number">2.5</span> Metereological input<a href="model-inputs.html#meteoinput" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Weather input data must include variables calculated at the <strong>daily</strong> scale. Weather data should be arranged in a data frame with days in <strong>rows</strong> and variables in <strong>columns</strong>. Dates are needed in <strong>medfate</strong> to estimate parameters like solar declination or the day of the year (<span class="math inline">\(DOY\)</span>). Importantly, <em>dates</em> should be included as row names (in format <em>year-month-day</em>) of the input meteorology data frame.</p>
-<p>The following table indicates the symbols, units, definitions and the variable name in R of all weather variables. Some of them are optional, as indicated in the right-most column.</p>
+<p>Weather input data must include variables calculated at the <strong>daily</strong> scale. Weather data should be arranged in a data frame with days in <strong>rows</strong> and variables in <strong>columns</strong>. Dates are needed in <strong>medfate</strong> to estimate parameters like solar declination or the day of the year (<span class="math inline">\(DOY\)</span>). Importantly, <em>dates</em> should be included as <strong>row names</strong> (in format <em>year-month-day</em>) of the input meteorology data frame, or as a column named <em>dates</em> with objects of class <code>Date</code>.</p>
+<p>Some weather variables must be present always, whereas others are optional, meaning that the package can estimate them if missing. The following table indicates the symbols, units, definitions and the variable name in R of input weather variables that are always <strong>required</strong>:</p>
 <table>
 <colgroup>
 <col width="11%" />
@@ -1447,6 +1447,27 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <td>Solar radiation after accounting for clouds</td>
 <td>No</td>
 </tr>
+</tbody>
+</table>
+<p>Whereas the following table lists the same attributes for input weather variables that are <strong>optional</strong>:</p>
+<table>
+<colgroup>
+<col width="11%" />
+<col width="10%" />
+<col width="12%" />
+<col width="51%" />
+<col width="14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Units</th>
+<th>R param</th>
+<th>Description</th>
+<th>Optional</th>
+</tr>
+</thead>
+<tbody>
 <tr class="odd">
 <td><span class="math inline">\(u\)</span></td>
 <td><span class="math inline">\(m \cdot s^{-1}\)</span></td>
@@ -1455,20 +1476,27 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <td>Yes</td>
 </tr>
 <tr class="even">
+<td><span class="math inline">\(R_{int}\)</span></td>
+<td><span class="math inline">\(mm \cdot h^{-1}\)</span></td>
+<td><code>RainfallIntensity</code></td>
+<td>Rainfall intensity</td>
+<td>Yes</td>
+</tr>
+<tr class="odd">
 <td><span class="math inline">\(C_{atm}\)</span></td>
 <td><span class="math inline">\(ppm\)</span></td>
 <td><code>CO2</code></td>
 <td>Atmospheric (above-canopy) <span class="math inline">\(CO_2\)</span> concentration</td>
 <td>Yes</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(P_{atm}\)</span></td>
 <td><span class="math inline">\(kPa\)</span></td>
 <td><code>Patm</code></td>
 <td>Surface atmospheric pressure</td>
 <td>Yes</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(P_{fire}\)</span></td>
 <td>[0-1]</td>
 <td><code>FireProbability</code></td>
@@ -1477,7 +1505,7 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 </tr>
 </tbody>
 </table>
-<p>While the weather variables listed in the table above are input requirements, <strong>medfate</strong> derives other atmospheric variables from them, using also topographic information (see <a href="http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils">utility functions</a> of the <strong>meteoland</strong> reference manual):</p>
+<p>While the weather variables listed in the tables above are provided as inputs, <strong>medfate</strong> derives other atmospheric variables from them, using also topographic information (see <a href="http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils">utility functions</a> of the <strong>meteoland</strong> reference manual):</p>
 <table>
 <colgroup>
 <col width="13%" />
