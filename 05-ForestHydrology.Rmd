@@ -162,11 +162,11 @@ Surface runoff $Ru$ can be estimated using the USDA SCS curve number method, fol
 \begin{equation}
 Ru=\frac{(Pr_{net} + Ro - 0.2 \cdot V_{fc, soil})^2}{(Pr_{net} + Ro - 0.8 \cdot V_{fc, soil})}
 \end{equation}
-where $V_{fc, soil}$ (in mm) is the overall soil water retention capacity. The @Boughton1989 model is available in function `hydrology_infiltrationBoughton()` and examples of its behaviour are given in the figure below.
+where $V_{fc, soil}$ (in mm) is the overall soil water retention capacity. The @Boughton1989 model is available in function `hydrology_infiltrationBoughton()` and examples of its behavior are given in the figure below.
 
-(ref:infiltration-cap) Examples of infiltration/runoff calculation for different values of net rainfall and overall retention capacity, $V_{soil}$, calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively.
+(ref:infiltrationBoughton-cap) Examples of infiltration/runoff calculation using the Boughton (1989) model for different values of net rainfall and overall retention capacity, $V_{soil}$, calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively.
 
-```{r infiltration, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap='(ref:infiltration-cap)'}
+```{r infiltrationBoughton, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap='(ref:infiltrationBoughton-cap)'}
 par(mfrow=c(1,2), mar=c(5,5,5,1))
 
 SoilDepth = c(200,400,800,1200,1500)
@@ -250,12 +250,62 @@ By rearranging terms and integrating we obtain an expression for $I_c(t)$:
 \begin{equation}
 I_c(t) =  K_{sat}t  + |\Psi_w| \Delta \theta \ln\left[1 + \frac{I_c(t)}{|\Psi_w| \Delta \theta} \right]
 \end{equation}
-This equation defines the cumulative infiltration to time $t$ as a function of $K_{sat}$, \Psi_{w}, $\theta_{sat}$ and $\theta_{dry}$. Because $I_c$ appears on both sides of the equation, it must be found using numerical root-finding (the Newton-Raphson method in our case). To estimate $\Psi_{w}$ the following equation is used:
+This equation defines the cumulative infiltration to time $t$ as a function of $K_{sat}$, $\Psi_{w}$, $\theta_{sat}$ and $\theta_{dry}$. Because $I_c$ appears on both sides of the equation, it must be found using numerical root-finding (the Newton-Raphson method in our case). To estimate $\Psi_{w}$ the following equation is used:
 \begin{equation}
 \Psi_{w} = \left(\frac{2b + 3}{2b + 6} \right)\Psi_{sat}
 \end{equation}
 
-Parameter $\theta_dry$ is the volumetric content of the topmost soil layer (antecendent soil conditions), and parameters $\theta_{sat}$, $\Psi_{sat}$, $K_{sat}$ and $b$ are estimated using Campbell's water retention curves from the texture of the topmost layer. The @green_studies_1911 model is available in function `hydrology_infiltrationGreenAmpt()`.
+Parameter $\theta_{dry}$ is the volumetric content of the topmost soil layer (antecendent soil conditions), and parameters $\theta_{sat}$, $\Psi_{sat}$, $K_{sat}$ and $b$ are estimated using Campbell's water retention curves from the texture of the topmost layer. The infiltration time $t$ (in $h$) is estimated from the sum of net rainfall ($Pr_{net}$) and runon ($Ro$) (both in $mm$) using rainfall intensity of the rainfall event ($mm/h$). The @green_studies_1911 model is available in function `hydrology_infiltrationGreenAmpt()` and examples of its behavior are given in the figure below.
+
+
+(ref:infiltrationGreenAmpt-cap) Examples of infiltration using the Green-Ampt (1911) model for different values of net rainfall. The left panel shows the infiltration for different soil textural types, assuming a $\theta_{dry} = 0.3$. The right panel shows the infiltration for different values of $\theta_{dry}$, assuming a silt loam soil. In both cases rainfall intensity is assumed $6\,mm/h$.
+
+```{r infiltrationGreenAmpt, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap='(ref:infiltrationGreenAmpt-cap)'}
+par(mfrow=c(1,2), mar=c(5,5,5,1))
+
+df <- defaultSoilParams()
+df$clay <- 15
+df$sand <- 25
+
+s <- soil(df)
+
+infiltration <- function(NP, usda, theta_dry) {
+  t = pmin(NP/6, 24)
+  cp = soil_campbellParamsClappHornberger(usda)
+  b = cp["b"]
+  psi_w = cp["psi_sat_cm"]*((2.0*b + 3.0)/(2*b + 6.0))
+  theta_sat = cp["theta_sat"]
+  K_sat = cp["K_sat_cm_h"]
+  res <- rep(NA, length(NP))
+  for(i in 1:length(NP)) {
+    res[i] <- hydrology_infiltrationGreenAmpt(t[i], 
+                                              psi_w = psi_w, 
+                                              Ksat = K_sat, 
+                                              theta_sat = theta_sat,
+                                              theta_dry = theta_dry)
+  }
+  res <- pmin(res, NP)
+  return(res)
+}
+
+usdaTypes = c("Loamy sand", "Silt loam", "Sandy clay loam", "Silty clay", "Sandy clay")
+par(mar=c(5,5,1,1), mfrow=c(1,2))
+NP = seq(0,60, by=1)
+plot(NP,infiltration(NP, usdaTypes[1], 0.3), type="l", xlim=c(0,60), ylim=c(0,60), 
+     ylab="Infiltration (mm)", xlab="Net rainfall (mm)", frame=FALSE)
+lines(NP,infiltration(NP, usdaTypes[2], 0.3), lty=2)
+lines(NP,infiltration(NP, usdaTypes[3], 0.3), lty=3)
+lines(NP,infiltration(NP, usdaTypes[4], 0.3), lty=4)
+lines(NP,infiltration(NP, usdaTypes[5], 0.3), lty=5)
+legend("topleft", bty="n", lty=1:5, legend=usdaTypes)
+plot(NP,infiltration(NP, usdaTypes[2], 0.1), type="l", xlim=c(0,60), ylim=c(0,60), 
+     ylab="Infiltration (mm)", xlab="Net rainfall (mm)", frame=FALSE)
+lines(NP,infiltration(NP, usdaTypes[2], 0.2), lty=2)
+lines(NP,infiltration(NP, usdaTypes[2], 0.3), lty=3)
+lines(NP,infiltration(NP, usdaTypes[2], 0.4), lty=4)
+lines(NP,infiltration(NP, usdaTypes[2], 0.5), lty=5)
+legend("topleft", bty="n", lty=1:5, legend=paste0("theta_dry = ", seq(0.1, 0.5, by=0.1)))
+```
 
 ### Percolation
 

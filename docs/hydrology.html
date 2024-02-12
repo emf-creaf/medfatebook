@@ -794,12 +794,12 @@ Figure 5.2: Examples of canopy interception with different <span class="math inl
 <span class="math display">\[\begin{equation}
 Ru=\frac{(Pr_{net} + Ro - 0.2 \cdot V_{fc, soil})^2}{(Pr_{net} + Ro - 0.8 \cdot V_{fc, soil})}
 \end{equation}\]</span>
-where <span class="math inline">\(V_{fc, soil}\)</span> (in mm) is the overall soil water retention capacity. The <span class="citation">Boughton (<a href="#ref-Boughton1989">1989</a>)</span> model is available in function <code>hydrology_infiltrationBoughton()</code> and examples of its behaviour are given in the figure below.</p>
+where <span class="math inline">\(V_{fc, soil}\)</span> (in mm) is the overall soil water retention capacity. The <span class="citation">Boughton (<a href="#ref-Boughton1989">1989</a>)</span> model is available in function <code>hydrology_infiltrationBoughton()</code> and examples of its behavior are given in the figure below.</p>
 
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:infiltration"></span>
-<img src="medfatebook_files/figure-html/infiltration-1.png" alt="Examples of infiltration/runoff calculation for different values of net rainfall and overall retention capacity, \(V_{soil}\), calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively." width="768" />
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:infiltrationBoughton"></span>
+<img src="medfatebook_files/figure-html/infiltrationBoughton-1.png" alt="Examples of infiltration/runoff calculation using the Boughton (1989) model for different values of net rainfall and overall retention capacity, \(V_{soil}\), calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively." width="768" />
 <p class="caption">
-Figure 5.3: Examples of infiltration/runoff calculation for different values of net rainfall and overall retention capacity, <span class="math inline">\(V_{soil}\)</span>, calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively.
+Figure 5.3: Examples of infiltration/runoff calculation using the Boughton (1989) model for different values of net rainfall and overall retention capacity, <span class="math inline">\(V_{soil}\)</span>, calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively.
 </p>
 </div>
 </div>
@@ -829,11 +829,18 @@ By rearranging terms and integrating we obtain an expression for <span class="ma
 <span class="math display">\[\begin{equation}
 I_c(t) =  K_{sat}t  + |\Psi_w| \Delta \theta \ln\left[1 + \frac{I_c(t)}{|\Psi_w| \Delta \theta} \right]
 \end{equation}\]</span>
-This equation defines the cumulative infiltration to time <span class="math inline">\(t\)</span> as a function of <span class="math inline">\(K_{sat}\)</span>, _{w}, <span class="math inline">\(\theta_{sat}\)</span> and <span class="math inline">\(\theta_{dry}\)</span>. Because <span class="math inline">\(I_c\)</span> appears on both sides of the equation, it must be found using numerical root-finding (the Newton-Raphson method in our case). To estimate <span class="math inline">\(\Psi_{w}\)</span> the following equation is used:
+This equation defines the cumulative infiltration to time <span class="math inline">\(t\)</span> as a function of <span class="math inline">\(K_{sat}\)</span>, <span class="math inline">\(\Psi_{w}\)</span>, <span class="math inline">\(\theta_{sat}\)</span> and <span class="math inline">\(\theta_{dry}\)</span>. Because <span class="math inline">\(I_c\)</span> appears on both sides of the equation, it must be found using numerical root-finding (the Newton-Raphson method in our case). To estimate <span class="math inline">\(\Psi_{w}\)</span> the following equation is used:
 <span class="math display">\[\begin{equation}
 \Psi_{w} = \left(\frac{2b + 3}{2b + 6} \right)\Psi_{sat}
 \end{equation}\]</span></p>
-<p>Parameter <span class="math inline">\(\theta_dry\)</span> is the volumetric content of the topmost soil layer (antecendent soil conditions), and parameters <span class="math inline">\(\theta_{sat}\)</span>, <span class="math inline">\(\Psi_{sat}\)</span>, <span class="math inline">\(K_{sat}\)</span> and <span class="math inline">\(b\)</span> are estimated using Campbell’s water retention curves from the texture of the topmost layer. The <span class="citation">Green &amp; Ampt (<a href="#ref-green_studies_1911">1911</a>)</span> model is available in function <code>hydrology_infiltrationGreenAmpt()</code>.</p>
+<p>Parameter <span class="math inline">\(\theta_{dry}\)</span> is the volumetric content of the topmost soil layer (antecendent soil conditions), and parameters <span class="math inline">\(\theta_{sat}\)</span>, <span class="math inline">\(\Psi_{sat}\)</span>, <span class="math inline">\(K_{sat}\)</span> and <span class="math inline">\(b\)</span> are estimated using Campbell’s water retention curves from the texture of the topmost layer. The infiltration time <span class="math inline">\(t\)</span> (in <span class="math inline">\(h\)</span>) is estimated from the sum of net rainfall (<span class="math inline">\(Pr_{net}\)</span>) and runon (<span class="math inline">\(Ro\)</span>) (both in <span class="math inline">\(mm\)</span>) using rainfall intensity of the rainfall event (<span class="math inline">\(mm/h\)</span>). The <span class="citation">Green &amp; Ampt (<a href="#ref-green_studies_1911">1911</a>)</span> model is available in function <code>hydrology_infiltrationGreenAmpt()</code> and examples of its behavior are given in the figure below.</p>
+
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:infiltrationGreenAmpt"></span>
+<img src="medfatebook_files/figure-html/infiltrationGreenAmpt-1.png" alt="Examples of infiltration using the Green-Ampt (1911) model for different values of net rainfall. The left panel shows the infiltration for different soil textural types, assuming a \(\theta_{dry} = 0.3\). The right panel shows the infiltration for different values of \(\theta_{dry}\), assuming a silt loam soil. In both cases rainfall intensity is assumed \(6\,mm/h\)." width="768" />
+<p class="caption">
+Figure 5.4: Examples of infiltration using the Green-Ampt (1911) model for different values of net rainfall. The left panel shows the infiltration for different soil textural types, assuming a <span class="math inline">\(\theta_{dry} = 0.3\)</span>. The right panel shows the infiltration for different values of <span class="math inline">\(\theta_{dry}\)</span>, assuming a silt loam soil. In both cases rainfall intensity is assumed <span class="math inline">\(6\,mm/h\)</span>.
+</p>
+</div>
 </div>
 <div id="percolation" class="section level3 hasAnchor" number="5.4.3">
 <h3><span class="header-section-number">5.4.3</span> Percolation<a href="hydrology.html#percolation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -859,12 +866,12 @@ The amount of water actually evaporated from the soil, <span class="math inline"
 <p><span class="math display">\[\begin{equation}
 Es = \min(PE_{soil}, SE_{soil})
 \end{equation}\]</span></p>
-<p>Figure <a href="hydrology.html#fig:soilevaporation">5.4</a> shows the cumulative evaporation from soils for different values of maximum evaporation rate.</p>
+<p>Figure <a href="hydrology.html#fig:soilevaporation">5.5</a> shows the cumulative evaporation from soils for different values of maximum evaporation rate.</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:soilevaporation"></span>
 <img src="medfatebook_files/figure-html/soilevaporation-1.png" alt="Cumulative bare soil evaporation for different values of maximum evaporation rate (\(\gamma_{soil}\)). Topsoil layer (0 – 30 cm) is initialized at field capacity (\(V_1 = 50 mm\)). \(PE_{soil}\) was assumed not to be limiting." width="480" />
 <p class="caption">
-Figure 5.4: Cumulative bare soil evaporation for different values of maximum evaporation rate (<span class="math inline">\(\gamma_{soil}\)</span>). Topsoil layer (0 – 30 cm) is initialized at field capacity (<span class="math inline">\(V_1 = 50 mm\)</span>). <span class="math inline">\(PE_{soil}\)</span> was assumed not to be limiting.
+Figure 5.5: Cumulative bare soil evaporation for different values of maximum evaporation rate (<span class="math inline">\(\gamma_{soil}\)</span>). Topsoil layer (0 – 30 cm) is initialized at field capacity (<span class="math inline">\(V_1 = 50 mm\)</span>). <span class="math inline">\(PE_{soil}\)</span> was assumed not to be limiting.
 </p>
 </div>
 </div>
@@ -918,11 +925,11 @@ C(\Psi) \frac{\delta \Psi}{\delta t} \lambda =  K(\Psi) \frac{\delta^2 \Psi}{\de
 </div>
 <div id="finite-difference-approximation" class="section level3 hasAnchor" number="5.7.2">
 <h3><span class="header-section-number">5.7.2</span> Finite difference approximation<a href="hydrology.html#finite-difference-approximation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The finite difference approximation for the Richards equation represents the soil as a network of <span class="math inline">\(N\)</span> discrete nodal points that vary in space and time. The network is presented in Fig. <a href="hydrology.html#fig:soilflows">5.5</a>.</p>
+<p>The finite difference approximation for the Richards equation represents the soil as a network of <span class="math inline">\(N\)</span> discrete nodal points that vary in space and time. The network is presented in Fig. <a href="hydrology.html#fig:soilflows">5.6</a>.</p>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:soilflows"></span>
 <img src="figures/soil_flows.png" alt="Schematic representation of network of soil nodes" width="80%" />
 <p class="caption">
-Figure 5.5: Schematic representation of network of soil nodes
+Figure 5.6: Schematic representation of network of soil nodes
 </p>
 </div>
 <p>For reasons of numerical stability, Richards equation is solved using an implicit time discretization win which the spatial derivatives <span class="math inline">\(\delta K / \delta z\)</span>, <span class="math inline">\(\delta \Psi / \delta z\)</span> and <span class="math inline">\(\delta^2 \Psi / \delta ^2 z\)</span> are written numerically using a central difference approximation at time <span class="math inline">\(n+1\)</span>, and the time derivative uses a backward difference approximation at <span class="math inline">\(n+1\)</span>.</p>
