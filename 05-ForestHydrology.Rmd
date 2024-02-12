@@ -31,7 +31,7 @@ In the @Gash1995 analytical interception model for sparse canopies, rain is assu
 \begin{equation}
 P_G = - \frac{S_{canopy}/C_{canopy}}{ER_{ratio}} \cdot \ln(1-ER_{ratio})
 \end{equation}
-where $S_{canopy}$ is the canopy water storage capacity (in mm) –  i.e. the minimum amount of water needed to saturate the canopy –, $C_{canopy}$ is the canopy cover and $ER_{ratio}$ is the ratio of evaporation rate to rainfall rate during the rainfall event. Although interception models are normally applied to single-canopy stands, we apply the sparse Gash model to the whole stand (including shrubs and the herbaceous layer). Moreover, in our implementation stem interception is lumped with crown interception, so that $S_{canopy}$ represents both. 
+where $S_{canopy}$ is the canopy water storage capacity (in mm) –  i.e. the minimum amount of water needed to saturate the canopy –, $C_{canopy}$ is the canopy cover and $ER_{ratio}$ is the ratio of evaporation rate to rainfall intensity during the rainfall event ($R_{int}$; in $mm \cdot h^{-1}$). Although interception models are normally applied to single-canopy stands, we apply the sparse Gash model to the whole stand (including shrubs and the herbaceous layer). Moreover, in our implementation stem interception is lumped with crown interception, so that $S_{canopy}$ represents both. 
 
 Following @Watanabe1996 we estimate $S_{canopy}$, the canopy water storage capacity, from adjusted LAI values:
 \begin{equation}
@@ -39,7 +39,6 @@ S_{canopy}=LAI_{herb}+\sum_{i}{s_{water,i}\cdot LAI_{i}^{\phi}}
 \end{equation}
 where $s_{water,i}$ is the depth of water that can be retained by leaves, branches and stems of cohort $i$ per unit of leaf area index ($mm \cdot LAI^{-1}$). To estimate the stand cover, $C_{canopy}$, we use the complement of the percentage of PAR that reaches the ground, i.e. $C_{canopy} = 1 - L^{PAR}_{ground}$ [@Deguchi2006].
 
-Simplifying assumptions are made to determine $ER_{ratio}$. Values of the evaporation-to-rainfall ratio are calculated from daily potential evapotranspiration and rainfall, while accounting for seasonal variation in rainfall intensity ($mm \cdot h^{-1}$). Minimum values for rainfall intensity are assumed for convective storms ($5.6\,mm \cdot h^{-1}$) and synoptic storms ($1.5\,mm \cdot h^{-1}$) from @Miralles2010. Synoptic storms are assumed between December and June, and convective storms are assumed for the remaining months, as typical in the Mediterranean Basin.
 
 The amount of water evaporated from interception ($In$, in mm), is calculated as:
 \begin{eqnarray}
@@ -255,10 +254,10 @@ This equation defines the cumulative infiltration to time $t$ as a function of $
 \Psi_{w} = \left(\frac{2b + 3}{2b + 6} \right)\Psi_{sat}
 \end{equation}
 
-Parameter $\theta_{dry}$ is the volumetric content of the topmost soil layer (antecendent soil conditions), and parameters $\theta_{sat}$, $\Psi_{sat}$, $K_{sat}$ and $b$ are estimated using Campbell's water retention curves from the texture of the topmost layer. The infiltration time $t$ (in $h$) is estimated from the sum of net rainfall ($Pr_{net}$) and runon ($Ro$) (both in $mm$) using rainfall intensity of the rainfall event ($mm/h$). The @green_studies_1911 model is available in function `hydrology_infiltrationGreenAmpt()` and examples of its behavior are given in the figure below.
+Parameter $\theta_{dry}$ is the volumetric content of the topmost soil layer (antecendent soil conditions), and parameters $\theta_{sat}$, $\Psi_{sat}$, $K_{sat}$ and $b$ are estimated using Campbell's water retention curves from the texture of the topmost layer. The infiltration time $t$ (in $h$) is estimated from the sum of net rainfall ($Pr_{net}$) and runon ($Ro$) (both in $mm$) using rainfall intensity of the rainfall event ($R_{int}$; in $mm/h$). The @green_studies_1911 model is available in function `hydrology_infiltrationGreenAmpt()` and examples of its behavior are given in the figure below.
 
 
-(ref:infiltrationGreenAmpt-cap) Examples of infiltration using the Green-Ampt (1911) model for different values of net rainfall. The left panel shows the infiltration for different soil textural types, assuming a $\theta_{dry} = 0.3$. The right panel shows the infiltration for different values of $\theta_{dry}$, assuming a silt loam soil. In both cases rainfall intensity is assumed $6\,mm/h$.
+(ref:infiltrationGreenAmpt-cap) Examples of infiltration using the Green-Ampt (1911) model for different values of net rainfall. The left panel shows the infiltration for different soil textural types, assuming a $\theta_{dry} = 0.3$. The right panel shows the infiltration for different values of $\theta_{dry}$, assuming a silt loam soil. In both cases rainfall intensity is assumed $R_{int} = 6\,mm/h$.
 
 ```{r infiltrationGreenAmpt, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap='(ref:infiltrationGreenAmpt-cap)'}
 par(mfrow=c(1,2), mar=c(5,5,5,1))

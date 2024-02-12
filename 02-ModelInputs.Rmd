@@ -361,9 +361,19 @@ In contrast, growth simulation requires updating the structure of vegetation, i.
 
 ## Metereological input {#meteoinput}
 
-Weather input data must include variables calculated at the **daily** scale. Weather data should be arranged in a data frame with days in **rows** and variables in **columns**. Dates are needed in **medfate** to estimate parameters like solar declination or the day of the year ($DOY$). Importantly, *dates* should be included as **row names** (in format *year-month-day*) of the input meteorology data frame, or as a column named *dates* with objects of class `Date`.
+Weather input data must include variables calculated at the **daily** scale. Weather data should be arranged in a data frame with days in **rows** and variables in **columns**. 
 
-Some weather variables must be present always, whereas others are optional, meaning that the package can estimate them if missing. The following table indicates the symbols, units, definitions and the variable name in R of input weather variables that are always **required**: 
+Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018], but other sources are possible.
+ 
+### Date format
+Dates are needed in **medfate** to estimate parameters like solar declination or the day of the year ($DOY$). Dates can be specified in the input data frame either:
+
+  + As data frame **row names** (in string format *year-month-day*)
+  + As `Date` elements in a column called `"dates"`.
+
+### Required weather variables
+
+Some weather variables must be present always in the input data frame, whereas others are optional, meaning that the package can estimate them if missing. The following table indicates the symbols, units, definitions and the variable name in R of input weather variables that are always **required**: 
 
 | Symbol | Units | R param | Description                        | Optional |
 |--------|-------|---------|------------------------------------|----------|
@@ -374,7 +384,9 @@ Some weather variables must be present always, whereas others are optional, mean
 | $P$ | $L \cdot m^{-2} = mm$ | `Precipitation` | Precipitation (either rainfall or snow). | No |
 | $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds | No |
 
-Whereas the following table lists the same attributes for input weather variables that are **optional**: 
+### Optional weather variables
+
+The following table lists the same attributes for input weather variables that are **optional**: 
 
 | Symbol | Units | R param | Description                        | Optional |
 |--------|-------|---------|------------------------------------|----------|
@@ -383,6 +395,15 @@ Whereas the following table lists the same attributes for input weather variable
 | $C_{atm}$ | $ppm$ | `CO2` | Atmospheric (above-canopy) $CO_2$ concentration | Yes |
 | $P_{atm}$ | $kPa$ | `Patm` | Surface atmospheric pressure | Yes |
 | $P_{fire}$ | [0-1] | `FireProbability` | Probability of wildfire occurrence | Yes |
+
+
+Missing wind speed ($u$) and $CO_2$ values will be replaced by defaults defined in control parameters. As an alternative to providing daily atmospheric $CO_2$ concentration values, simulation functions allow the user to provide $CO_2$ concentration values in **annual** time steps using a separate vector. 
+
+When missing, atmospheric pressure ($P_{atm}$) is also derived from elevation using an [utility function](http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils) available in **meteoland**. 
+
+Missing rainfall intensity ($R_{int}$) values will be estimated from $DOY$ using function `hydrology_rainfallIntensity()`. Minimum values for rainfall intensity are assumed for convective storms ($5.6\,mm \cdot h^{-1}$) and synoptic storms ($1.5\,mm \cdot h^{-1}$) from @Miralles2010. Synoptic storms are assumed between December and June, and convective storms are assumed for the remaining months, as typical in the Mediterranean Basin.
+
+### Derived weather variables
 
 While the weather variables listed in the tables above are provided as inputs, **medfate** derives other atmospheric variables from them, using also topographic information (see [utility functions](http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual):
 
@@ -393,9 +414,7 @@ While the weather variables listed in the tables above are provided as inputs, *
 | $T_{mean}$ | $^{\circ} \mathrm{C}$ | `MeanTemperature` | Mean daily temperature |
 | $PET$ | $L \cdot m^{-2} = mm$ | `PET` | Potential evapotranspiration, calculated using Penman's (1948) equation |
 
-Missing wind speed ($u$) and $CO_2$ values will be replaced by defaults defined in control parameters. As an alternative to providing daily atmospheric $CO_2$ concentration values, simulation functions allow the user to provide $CO_2$ concentration values in **annual** time steps using a separate vector. When missing, atmospheric pressure ($P_{atm}$) is also derived from elevation using an [utility function](http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils) available in **meteoland**.
 
- Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package **meteoland** [@DeCaceres2018], but other sources are possible.
 
 ## Simulation control {#controlparameters}
 

@@ -218,7 +218,13 @@ div.csl-indent {
 <li class="chapter" data-level="2.4.8" data-path="model-inputs.html"><a href="model-inputs.html#functionaltraits"><i class="fa fa-check"></i><b>2.4.8</b> Functional traits and vegetation initialization</a></li>
 <li class="chapter" data-level="2.4.9" data-path="model-inputs.html"><a href="model-inputs.html#update-of-structural-variables-during-simulations"><i class="fa fa-check"></i><b>2.4.9</b> Update of structural variables during simulations</a></li>
 </ul></li>
-<li class="chapter" data-level="2.5" data-path="model-inputs.html"><a href="model-inputs.html#meteoinput"><i class="fa fa-check"></i><b>2.5</b> Metereological input</a></li>
+<li class="chapter" data-level="2.5" data-path="model-inputs.html"><a href="model-inputs.html#meteoinput"><i class="fa fa-check"></i><b>2.5</b> Metereological input</a>
+<ul>
+<li class="chapter" data-level="2.5.1" data-path="model-inputs.html"><a href="model-inputs.html#date-format"><i class="fa fa-check"></i><b>2.5.1</b> Date format</a></li>
+<li class="chapter" data-level="2.5.2" data-path="model-inputs.html"><a href="model-inputs.html#required-weather-variables"><i class="fa fa-check"></i><b>2.5.2</b> Required weather variables</a></li>
+<li class="chapter" data-level="2.5.3" data-path="model-inputs.html"><a href="model-inputs.html#optional-weather-variables"><i class="fa fa-check"></i><b>2.5.3</b> Optional weather variables</a></li>
+<li class="chapter" data-level="2.5.4" data-path="model-inputs.html"><a href="model-inputs.html#derived-weather-variables"><i class="fa fa-check"></i><b>2.5.4</b> Derived weather variables</a></li>
+</ul></li>
 <li class="chapter" data-level="2.6" data-path="model-inputs.html"><a href="model-inputs.html#controlparameters"><i class="fa fa-check"></i><b>2.6</b> Simulation control</a></li>
 </ul></li>
 <li class="part"><span><b>II Basic water balance modelling</b></span></li>
@@ -1385,8 +1391,19 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 </div>
 <div id="meteoinput" class="section level2 hasAnchor" number="2.5">
 <h2><span class="header-section-number">2.5</span> Metereological input<a href="model-inputs.html#meteoinput" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Weather input data must include variables calculated at the <strong>daily</strong> scale. Weather data should be arranged in a data frame with days in <strong>rows</strong> and variables in <strong>columns</strong>. Dates are needed in <strong>medfate</strong> to estimate parameters like solar declination or the day of the year (<span class="math inline">\(DOY\)</span>). Importantly, <em>dates</em> should be included as <strong>row names</strong> (in format <em>year-month-day</em>) of the input meteorology data frame, or as a column named <em>dates</em> with objects of class <code>Date</code>.</p>
-<p>Some weather variables must be present always, whereas others are optional, meaning that the package can estimate them if missing. The following table indicates the symbols, units, definitions and the variable name in R of input weather variables that are always <strong>required</strong>:</p>
+<p>Weather input data must include variables calculated at the <strong>daily</strong> scale. Weather data should be arranged in a data frame with days in <strong>rows</strong> and variables in <strong>columns</strong>.</p>
+<p>Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package <strong>meteoland</strong> <span class="citation">(<a href="#ref-DeCaceres2018">De Cáceres <em>et al.</em> 2018</a>)</span>, but other sources are possible.</p>
+<div id="date-format" class="section level3 hasAnchor" number="2.5.1">
+<h3><span class="header-section-number">2.5.1</span> Date format<a href="model-inputs.html#date-format" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Dates are needed in <strong>medfate</strong> to estimate parameters like solar declination or the day of the year (<span class="math inline">\(DOY\)</span>). Dates can be specified in the input data frame either:</p>
+<ul>
+<li>As data frame <strong>row names</strong> (in string format <em>year-month-day</em>)</li>
+<li>As <code>Date</code> elements in a column called <code>"dates"</code>.</li>
+</ul>
+</div>
+<div id="required-weather-variables" class="section level3 hasAnchor" number="2.5.2">
+<h3><span class="header-section-number">2.5.2</span> Required weather variables<a href="model-inputs.html#required-weather-variables" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Some weather variables must be present always in the input data frame, whereas others are optional, meaning that the package can estimate them if missing. The following table indicates the symbols, units, definitions and the variable name in R of input weather variables that are always <strong>required</strong>:</p>
 <table>
 <colgroup>
 <col width="11%" />
@@ -1449,7 +1466,10 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 </tr>
 </tbody>
 </table>
-<p>Whereas the following table lists the same attributes for input weather variables that are <strong>optional</strong>:</p>
+</div>
+<div id="optional-weather-variables" class="section level3 hasAnchor" number="2.5.3">
+<h3><span class="header-section-number">2.5.3</span> Optional weather variables<a href="model-inputs.html#optional-weather-variables" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The following table lists the same attributes for input weather variables that are <strong>optional</strong>:</p>
 <table>
 <colgroup>
 <col width="11%" />
@@ -1505,6 +1525,12 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 </tr>
 </tbody>
 </table>
+<p>Missing wind speed (<span class="math inline">\(u\)</span>) and <span class="math inline">\(CO_2\)</span> values will be replaced by defaults defined in control parameters. As an alternative to providing daily atmospheric <span class="math inline">\(CO_2\)</span> concentration values, simulation functions allow the user to provide <span class="math inline">\(CO_2\)</span> concentration values in <strong>annual</strong> time steps using a separate vector.</p>
+<p>When missing, atmospheric pressure (<span class="math inline">\(P_{atm}\)</span>) is also derived from elevation using an <a href="http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils">utility function</a> available in <strong>meteoland</strong>.</p>
+<p>Missing rainfall intensity (<span class="math inline">\(R_{int}\)</span>) values will be estimated from <span class="math inline">\(DOY\)</span> using function <code>hydrology_rainfallIntensity()</code>. Minimum values for rainfall intensity are assumed for convective storms (<span class="math inline">\(5.6\,mm \cdot h^{-1}\)</span>) and synoptic storms (<span class="math inline">\(1.5\,mm \cdot h^{-1}\)</span>) from <span class="citation">Miralles <em>et al.</em> (<a href="#ref-Miralles2010">2010</a>)</span>. Synoptic storms are assumed between December and June, and convective storms are assumed for the remaining months, as typical in the Mediterranean Basin.</p>
+</div>
+<div id="derived-weather-variables" class="section level3 hasAnchor" number="2.5.4">
+<h3><span class="header-section-number">2.5.4</span> Derived weather variables<a href="model-inputs.html#derived-weather-variables" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>While the weather variables listed in the tables above are provided as inputs, <strong>medfate</strong> derives other atmospheric variables from them, using also topographic information (see <a href="http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils">utility functions</a> of the <strong>meteoland</strong> reference manual):</p>
 <table>
 <colgroup>
@@ -1548,8 +1574,7 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 </tr>
 </tbody>
 </table>
-<p>Missing wind speed (<span class="math inline">\(u\)</span>) and <span class="math inline">\(CO_2\)</span> values will be replaced by defaults defined in control parameters. As an alternative to providing daily atmospheric <span class="math inline">\(CO_2\)</span> concentration values, simulation functions allow the user to provide <span class="math inline">\(CO_2\)</span> concentration values in <strong>annual</strong> time steps using a separate vector. When missing, atmospheric pressure (<span class="math inline">\(P_{atm}\)</span>) is also derived from elevation using an <a href="http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils">utility function</a> available in <strong>meteoland</strong>.</p>
-<p>Since it allows producing data frames with appropriate variable units and row/column names, we recommend meteorological input to be generated using package <strong>meteoland</strong> <span class="citation">(<a href="#ref-DeCaceres2018">De Cáceres <em>et al.</em> 2018</a>)</span>, but other sources are possible.</p>
+</div>
 </div>
 <div id="controlparameters" class="section level2 hasAnchor" number="2.6">
 <h2><span class="header-section-number">2.6</span> Simulation control<a href="model-inputs.html#controlparameters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -1618,6 +1643,9 @@ De Cáceres, M., Martin-StPaul, N., Turco, M., Cabon, A. &amp; Granda, V. (2018)
 </div>
 <div id="ref-Genuchten1980" class="csl-entry">
 Genuchten, M.V. (1980). <a href="https://dl.sciencesocieties.org/publications/sssaj/abstracts/44/5/SS0440050892">A closed-form equation for predicting the hydraulic conductivity of unsaturated soils</a>. <em>Soil science society of America journal</em>, 44, 892–898.
+</div>
+<div id="ref-Miralles2010" class="csl-entry">
+Miralles, D.G., Gash, J.H., Holmes, T.R.H., Jeu, R.A.M. de &amp; Dolman, A.J. (2010). <a href="https://doi.org/10.1029/2009JD013530">Global canopy interception from satellite observations</a>. <em>Journal of Geophysical Research</em>, 115, D16122.
 </div>
 <div id="ref-Ruffault2013" class="csl-entry">
 Ruffault, J., Martin-StPaul, N.K., Rambal, S. &amp; Mouillot, F. (2013). <a href="https://doi.org/10.1007/s10584-012-0559-5">Differential regional responses in drought length, intensity and timing to recent climate changes in a <span>Mediterranean</span> forested ecosystem</a>. <em>Climatic Change</em>, 117, 103–117.
