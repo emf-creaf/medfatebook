@@ -46,11 +46,11 @@ The amount of water evaporated from interception ($In$, in mm), is calculated as
 In = C_{canopy}\cdot P_G+C_{canopy}\cdot ER_{ratio}\cdot(Pr-P_G) \: {if}\: Pr > P_G \\
 In = C_{canopy}\cdot Pr\: {if}\: Pr \leq P_G
 \end{eqnarray}
-where $Pr$ is the daily gross rainfall (in mm). Net rainfall ($Pr_{net}$, also in mm) includes throughfall and stemflow, and is calculated as the difference between gross rainfall and interception loss. Fig. \@ref(fig:interception) below shows examples of relative throughfall (including stemflow), calculated according to the Gash et al [-@Gash1995]  interception model, under different situations (see function `hydrology_rainInterception()`). 
+where $Pr$ is the daily gross rainfall (in mm). Net rainfall ($Pr_{net}$, also in mm) includes throughfall and stemflow, and is calculated as the difference between gross rainfall and interception loss. Fig. \@ref(fig:interceptionGash) below shows examples of relative throughfall (including stemflow), calculated according to the Gash et al [-@Gash1995]  interception model, under different situations (see function `hydrology_rainInterception()`). 
 
-(ref:interception-cap) Examples of canopy interception with different $S_{canopy}$ (canopy water storage capacity), $ER_{ratio}$ (ratio between evaporation and rainfall rates) and $p$ (throughfall coefficient; $p = 1 - C_{canopy}$), using the Gash (1995) model.
+(ref:interceptionGash-cap) Examples of canopy interception with different $S_{canopy}$ (canopy water storage capacity), $ER_{ratio}$ (ratio between evaporation and rainfall rates) and $p$ (throughfall coefficient; $p = 1 - C_{canopy}$), using the Gash (1995) model.
 
-```{r interception, echo=FALSE, fig.width=8, fig.height=8,  fig.align='center', fig.cap='(ref:interception-cap)'}
+```{r interceptionGash, echo=FALSE, fig.width=8, fig.height=8,  fig.align='center', fig.cap='(ref:interceptionGash-cap)'}
 par(mfrow=c(2,2), mar=c(5,5,5,1))
 throughfallMatrixGash<-function(P = seq(1,50, by=1), Cm = seq(1,5, by=1), ER = 0.08,p=0.8) {
   m2<-P-hydrology_rainInterception(P,Cm[1],p,ER=ER)
@@ -101,6 +101,54 @@ In the single-storm form of the @liu_evaluation_2001 model is similar to the @Ga
 \begin{equation}
 In = S_{canopy} \cdot \left[ 1.0 - \exp\left(-P_G \cdot \left( \frac{C_{canopy}} {S_{canopy}} \right) \right) \right] \cdot (1.0 - (ER/C_{canopy})) + (ER\cdot P_G)
 \end{equation}
+
+Fig. \@ref(fig:interceptionLiu) below shows examples of relative throughfall (including stemflow), calculated according to the Liu et al [-@liu_evaluation_2001]  interception model, under different situations (see function `hydrology_rainInterception()`). 
+
+(ref:interceptionLiu-cap) Examples of canopy interception with different $S_{canopy}$ (canopy water storage capacity), $ER_{ratio}$ (ratio between evaporation and rainfall rates) and $p$ (throughfall coefficient; $p = 1 - C_{canopy}$), using the Liu (2001) model.
+
+```{r interceptionLiu, echo=FALSE, fig.width=8, fig.height=8,  fig.align='center', fig.cap='(ref:interceptionLiu-cap)'}
+par(mfrow=c(2,2), mar=c(5,5,5,1))
+throughfallMatrixLiu<-function(P = seq(1,50, by=1), Cm = seq(1,5, by=1), ER = 0.08,p=0.8) {
+  m2<-P-hydrology_rainInterception(P,Cm[1],p,ER=ER, model = "Liu2001")
+  for(i in 2:length(Cm)) {
+    m2<-rbind(m2,P-hydrology_rainInterception(P,Cm[i],p,ER=ER, model = "Liu2001"))
+  }
+  colnames(m2)<-P
+  rownames(m2)<-Cm
+  return(m2)
+}
+
+Cm = c(0.5,seq(1,4, by=1))
+P = seq(1,50, by=1)
+
+m2 = throughfallMatrixLiu(P=P, p=0.2, Cm=Cm,ER = 0.05)
+rt = sweep(m2,2,P,"/")*100
+matplot(t(rt), type="l", axes=TRUE, ylab="Relative throughfall (%)", 
+        xlab="Gross rainfall (mm)", xlim=c(0,length(P)), 
+        lty=1:length(Cm), col="black", ylim=c(0,100))
+title(main="p = 0.2 E/R = 0.05")
+m2 = throughfallMatrixLiu(P=P, p=0.8, Cm=Cm,ER = 0.05)
+rt = sweep(m2,2,P,"/")*100
+matplot(t(rt), type="l", axes=TRUE, ylab="Relative throughfall (%)", 
+        xlab="Gross rainfall (mm)", xlim=c(0,length(P)), 
+        lty=1:length(Cm), col="black", ylim=c(0,100))
+title(main="p = 0.8 E/R = 0.05")
+m2 = throughfallMatrixLiu(P=P, p=0.2, Cm=Cm,ER = 0.2)
+rt = sweep(m2,2,P,"/")*100
+matplot(t(rt), type="l", axes=TRUE, ylab="Relative throughfall (%)", 
+        xlab="Gross rainfall (mm)", xlim=c(0,length(P)), 
+        lty=1:length(Cm), col="black", ylim=c(0,100))
+title(main="p = 0.2 E/R = 0.2")
+m2 = throughfallMatrixLiu(P=P, p=0.8, Cm=Cm,ER = 0.2)
+rt = sweep(m2,2,P,"/")*100
+matplot(t(rt), type="l", axes=TRUE, ylab="Relative throughfall (%)", 
+        xlab="Gross rainfall (mm)", xlim=c(0,length(P)), 
+        lty=1:length(Cm), col="black", ylim=c(0,100))
+title(main="p = 0.8 E/R = 0.2")
+
+legend("bottomright",lty=1:length(Cm), legend=paste("S =",Cm), bty="n")
+```
+
 
 ## Runon, runoff, infiltration and percolation {#runoff}
 

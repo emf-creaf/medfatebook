@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-02-09" />
+<meta name="date" content="2024-02-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -759,10 +759,10 @@ where <span class="math inline">\(s_{water,i}\)</span> is the depth of water tha
 In = C_{canopy}\cdot P_G+C_{canopy}\cdot ER_{ratio}\cdot(Pr-P_G) \: {if}\: Pr &gt; P_G \\
 In = C_{canopy}\cdot Pr\: {if}\: Pr \leq P_G
 \end{eqnarray}\]</span>
-where <span class="math inline">\(Pr\)</span> is the daily gross rainfall (in mm). Net rainfall (<span class="math inline">\(Pr_{net}\)</span>, also in mm) includes throughfall and stemflow, and is calculated as the difference between gross rainfall and interception loss. Fig. <a href="hydrology.html#fig:interception">5.1</a> below shows examples of relative throughfall (including stemflow), calculated according to the Gash et al <span class="citation">(<a href="#ref-Gash1995">1995</a>)</span> interception model, under different situations (see function <code>hydrology_rainInterception()</code>).</p>
+where <span class="math inline">\(Pr\)</span> is the daily gross rainfall (in mm). Net rainfall (<span class="math inline">\(Pr_{net}\)</span>, also in mm) includes throughfall and stemflow, and is calculated as the difference between gross rainfall and interception loss. Fig. <a href="hydrology.html#fig:interceptionGash">5.1</a> below shows examples of relative throughfall (including stemflow), calculated according to the Gash et al <span class="citation">(<a href="#ref-Gash1995">1995</a>)</span> interception model, under different situations (see function <code>hydrology_rainInterception()</code>).</p>
 
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:interception"></span>
-<img src="medfatebook_files/figure-html/interception-1.png" alt="Examples of canopy interception with different \(S_{canopy}\) (canopy water storage capacity), \(ER_{ratio}\) (ratio between evaporation and rainfall rates) and \(p\) (throughfall coefficient; \(p = 1 - C_{canopy}\)), using the Gash (1995) model." width="768" />
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:interceptionGash"></span>
+<img src="medfatebook_files/figure-html/interceptionGash-1.png" alt="Examples of canopy interception with different \(S_{canopy}\) (canopy water storage capacity), \(ER_{ratio}\) (ratio between evaporation and rainfall rates) and \(p\) (throughfall coefficient; \(p = 1 - C_{canopy}\)), using the Gash (1995) model." width="768" />
 <p class="caption">
 Figure 5.1: Examples of canopy interception with different <span class="math inline">\(S_{canopy}\)</span> (canopy water storage capacity), <span class="math inline">\(ER_{ratio}\)</span> (ratio between evaporation and rainfall rates) and <span class="math inline">\(p\)</span> (throughfall coefficient; <span class="math inline">\(p = 1 - C_{canopy}\)</span>), using the Gash (1995) model.
 </p>
@@ -774,6 +774,14 @@ Figure 5.1: Examples of canopy interception with different <span class="math inl
 <p><span class="math display">\[\begin{equation}
 In = S_{canopy} \cdot \left[ 1.0 - \exp\left(-P_G \cdot \left( \frac{C_{canopy}} {S_{canopy}} \right) \right) \right] \cdot (1.0 - (ER/C_{canopy})) + (ER\cdot P_G)
 \end{equation}\]</span></p>
+<p>Fig. <a href="hydrology.html#fig:interceptionLiu">5.2</a> below shows examples of relative throughfall (including stemflow), calculated according to the Liu et al <span class="citation">(<a href="#ref-liu_evaluation_2001">2001</a>)</span> interception model, under different situations (see function <code>hydrology_rainInterception()</code>).</p>
+
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:interceptionLiu"></span>
+<img src="medfatebook_files/figure-html/interceptionLiu-1.png" alt="Examples of canopy interception with different \(S_{canopy}\) (canopy water storage capacity), \(ER_{ratio}\) (ratio between evaporation and rainfall rates) and \(p\) (throughfall coefficient; \(p = 1 - C_{canopy}\)), using the Liu (2001) model." width="768" />
+<p class="caption">
+Figure 5.2: Examples of canopy interception with different <span class="math inline">\(S_{canopy}\)</span> (canopy water storage capacity), <span class="math inline">\(ER_{ratio}\)</span> (ratio between evaporation and rainfall rates) and <span class="math inline">\(p\)</span> (throughfall coefficient; <span class="math inline">\(p = 1 - C_{canopy}\)</span>), using the Liu (2001) model.
+</p>
+</div>
 </div>
 </div>
 <div id="runoff" class="section level2 hasAnchor" number="5.4">
@@ -791,7 +799,7 @@ where <span class="math inline">\(V_{fc, soil}\)</span> (in mm) is the overall s
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:infiltration"></span>
 <img src="medfatebook_files/figure-html/infiltration-1.png" alt="Examples of infiltration/runoff calculation for different values of net rainfall and overall retention capacity, \(V_{soil}\), calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively." width="768" />
 <p class="caption">
-Figure 5.2: Examples of infiltration/runoff calculation for different values of net rainfall and overall retention capacity, <span class="math inline">\(V_{soil}\)</span>, calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively.
+Figure 5.3: Examples of infiltration/runoff calculation for different values of net rainfall and overall retention capacity, <span class="math inline">\(V_{soil}\)</span>, calculated from different soil depths (topsoil+subsoil) and assuming that soil texture is 15% clay and 25% sand. Rock fragment content was 25% and 40% for the topsoil and subsoil, respectively.
 </p>
 </div>
 </div>
@@ -823,7 +831,7 @@ I_c(t) =  K_{sat}t  + |\Psi_w| \Delta \theta \ln\left[1 + \frac{I_c(t)}{|\Psi_w|
 \end{equation}\]</span>
 This equation defines the cumulative infiltration to time <span class="math inline">\(t\)</span> as a function of <span class="math inline">\(K_{sat}\)</span>, _{w}, <span class="math inline">\(\theta_{sat}\)</span> and <span class="math inline">\(\theta_{dry}\)</span>. Because <span class="math inline">\(I_c\)</span> appears on both sides of the equation, it must be found using numerical root-finding (the Newton-Raphson method in our case). To estimate <span class="math inline">\(\Psi_{w}\)</span> the following equation is used:
 <span class="math display">\[\begin{equation}
-\Psi_{w} = \left(\frac{2b + 3}{2b + 6} \right)\Psi_sat
+\Psi_{w} = \left(\frac{2b + 3}{2b + 6} \right)\Psi_{sat}
 \end{equation}\]</span></p>
 <p>Parameter <span class="math inline">\(\theta_dry\)</span> is the volumetric content of the topmost soil layer (antecendent soil conditions), and parameters <span class="math inline">\(\theta_{sat}\)</span>, <span class="math inline">\(\Psi_{sat}\)</span>, <span class="math inline">\(K_{sat}\)</span> and <span class="math inline">\(b\)</span> are estimated using Campbell’s water retention curves from the texture of the topmost layer. The <span class="citation">Green &amp; Ampt (<a href="#ref-green_studies_1911">1911</a>)</span> model is available in function <code>hydrology_infiltrationGreenAmpt()</code>.</p>
 </div>
@@ -851,12 +859,12 @@ The amount of water actually evaporated from the soil, <span class="math inline"
 <p><span class="math display">\[\begin{equation}
 Es = \min(PE_{soil}, SE_{soil})
 \end{equation}\]</span></p>
-<p>Figure <a href="hydrology.html#fig:soilevaporation">5.3</a> shows the cumulative evaporation from soils for different values of maximum evaporation rate.</p>
+<p>Figure <a href="hydrology.html#fig:soilevaporation">5.4</a> shows the cumulative evaporation from soils for different values of maximum evaporation rate.</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:soilevaporation"></span>
 <img src="medfatebook_files/figure-html/soilevaporation-1.png" alt="Cumulative bare soil evaporation for different values of maximum evaporation rate (\(\gamma_{soil}\)). Topsoil layer (0 – 30 cm) is initialized at field capacity (\(V_1 = 50 mm\)). \(PE_{soil}\) was assumed not to be limiting." width="480" />
 <p class="caption">
-Figure 5.3: Cumulative bare soil evaporation for different values of maximum evaporation rate (<span class="math inline">\(\gamma_{soil}\)</span>). Topsoil layer (0 – 30 cm) is initialized at field capacity (<span class="math inline">\(V_1 = 50 mm\)</span>). <span class="math inline">\(PE_{soil}\)</span> was assumed not to be limiting.
+Figure 5.4: Cumulative bare soil evaporation for different values of maximum evaporation rate (<span class="math inline">\(\gamma_{soil}\)</span>). Topsoil layer (0 – 30 cm) is initialized at field capacity (<span class="math inline">\(V_1 = 50 mm\)</span>). <span class="math inline">\(PE_{soil}\)</span> was assumed not to be limiting.
 </p>
 </div>
 </div>
@@ -910,11 +918,11 @@ C(\Psi) \frac{\delta \Psi}{\delta t} \lambda =  K(\Psi) \frac{\delta^2 \Psi}{\de
 </div>
 <div id="finite-difference-approximation" class="section level3 hasAnchor" number="5.7.2">
 <h3><span class="header-section-number">5.7.2</span> Finite difference approximation<a href="hydrology.html#finite-difference-approximation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The finite difference approximation for the Richards equation represents the soil as a network of <span class="math inline">\(N\)</span> discrete nodal points that vary in space and time. The network is presented in Fig. <a href="hydrology.html#fig:soilflows">5.4</a>.</p>
+<p>The finite difference approximation for the Richards equation represents the soil as a network of <span class="math inline">\(N\)</span> discrete nodal points that vary in space and time. The network is presented in Fig. <a href="hydrology.html#fig:soilflows">5.5</a>.</p>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:soilflows"></span>
 <img src="figures/soil_flows.png" alt="Schematic representation of network of soil nodes" width="80%" />
 <p class="caption">
-Figure 5.4: Schematic representation of network of soil nodes
+Figure 5.5: Schematic representation of network of soil nodes
 </p>
 </div>
 <p>For reasons of numerical stability, Richards equation is solved using an implicit time discretization win which the spatial derivatives <span class="math inline">\(\delta K / \delta z\)</span>, <span class="math inline">\(\delta \Psi / \delta z\)</span> and <span class="math inline">\(\delta^2 \Psi / \delta ^2 z\)</span> are written numerically using a central difference approximation at time <span class="math inline">\(n+1\)</span>, and the time derivative uses a backward difference approximation at <span class="math inline">\(n+1\)</span>.</p>
