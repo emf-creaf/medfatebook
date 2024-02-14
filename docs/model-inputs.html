@@ -1585,49 +1585,54 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <h2><span class="header-section-number">2.6</span> Simulation control<a href="model-inputs.html#controlparameters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Simulation control parameters are a list of global parameter values, initialized using function <code>defaultControl()</code>, that the user can modify to change the general behavior of simulation functions. Here is the set of global control parameters currently accepted in <strong>medfate</strong>:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="model-inputs.html#cb10-1" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
-<pre><code>##   [1] &quot;fillMissingRootParams&quot;            &quot;fillMissingSpParams&quot;              &quot;verbose&quot;                         
-##   [4] &quot;subdailyResults&quot;                  &quot;standResults&quot;                     &quot;soilResults&quot;                     
-##   [7] &quot;plantResults&quot;                     &quot;leafResults&quot;                      &quot;temperatureResults&quot;              
-##  [10] &quot;fireHazardResults&quot;                &quot;fireHazardStandardWind&quot;           &quot;fireHazardStandardDFMC&quot;          
-##  [13] &quot;transpirationMode&quot;                &quot;soilFunctions&quot;                    &quot;defaultWindSpeed&quot;                
-##  [16] &quot;defaultCO2&quot;                       &quot;defaultRainfallIntensityPerMonth&quot; &quot;snowpack&quot;                        
-##  [19] &quot;leafPhenology&quot;                    &quot;bareSoilEvaporation&quot;              &quot;unlimitedSoilWater&quot;              
-##  [22] &quot;interceptionMode&quot;                 &quot;infiltrationMode&quot;                 &quot;rhizosphereOverlap&quot;              
-##  [25] &quot;unfoldingDD&quot;                      &quot;verticalLayerSize&quot;                &quot;windMeasurementHeight&quot;           
-##  [28] &quot;equalLeafStemVC&quot;                  &quot;cavitationRefillStem&quot;             &quot;cavitationRefillLeaves&quot;          
-##  [31] &quot;hydraulicRedistributionFraction&quot;  &quot;ndailysteps&quot;                      &quot;nsubsteps&quot;                       
-##  [34] &quot;taper&quot;                            &quot;multiLayerBalance&quot;                &quot;sapFluidityVariation&quot;            
-##  [37] &quot;TPhase_gmin&quot;                      &quot;Q10_1_gmin&quot;                       &quot;Q10_2_gmin&quot;                      
-##  [40] &quot;rootRadialConductance&quot;            &quot;averageFracRhizosphereResistance&quot; &quot;thermalCapacityLAI&quot;              
-##  [43] &quot;boundaryLayerSize&quot;                &quot;refillMaximumRate&quot;                &quot;sunlitShade&quot;                     
-##  [46] &quot;numericParams&quot;                    &quot;leafCavitationEffects&quot;            &quot;stomatalSubmodel&quot;                
-##  [49] &quot;plantCapacitance&quot;                 &quot;cavitationFlux&quot;                   &quot;soilDisconnection&quot;               
-##  [52] &quot;leafCuticularTranspiration&quot;       &quot;stemCuticularTranspiration&quot;       &quot;C_SApoInit&quot;                      
-##  [55] &quot;C_LApoInit&quot;                       &quot;k_SSym&quot;                           &quot;fractionLeafSymplasm&quot;            
-##  [58] &quot;gs_NightFrac&quot;                     &quot;JarvisPAR&quot;                        &quot;fTRBToLeaf&quot;                      
-##  [61] &quot;gCrown0&quot;                          &quot;subdailyCarbonBalance&quot;            &quot;allowDessication&quot;                
-##  [64] &quot;allowStarvation&quot;                  &quot;sinkLimitation&quot;                   &quot;shrubDynamics&quot;                   
-##  [67] &quot;herbDynamics&quot;                     &quot;allocationStrategy&quot;               &quot;phloemConductanceFactor&quot;         
-##  [70] &quot;nonSugarConcentration&quot;            &quot;equilibriumOsmoticConcentration&quot;  &quot;minimumRelativeStarchForGrowth&quot;  
-##  [73] &quot;constructionCosts&quot;                &quot;senescenceRates&quot;                  &quot;maximumRelativeGrowthRates&quot;      
-##  [76] &quot;mortalityMode&quot;                    &quot;mortalityBaselineRate&quot;            &quot;mortalityRelativeSugarThreshold&quot; 
-##  [79] &quot;mortalityRWCThreshold&quot;            &quot;recrTreeDBH&quot;                      &quot;recrTreeDensity&quot;                 
-##  [82] &quot;ingrowthTreeDBH&quot;                  &quot;ingrowthTreeDensity&quot;              &quot;allowSeedBankDynamics&quot;           
-##  [85] &quot;allowRecruitment&quot;                 &quot;allowResprouting&quot;                 &quot;recruitmentMode&quot;                 
-##  [88] &quot;removeEmptyCohorts&quot;               &quot;minimumTreeCohortDensity&quot;         &quot;minimumShrubCohortCover&quot;         
-##  [91] &quot;dynamicallyMergeCohorts&quot;          &quot;seedRain&quot;                         &quot;seedProductionTreeHeight&quot;        
-##  [94] &quot;seedProductionShrubHeight&quot;        &quot;probRecr&quot;                         &quot;minTempRecr&quot;                     
-##  [97] &quot;minMoistureRecr&quot;                  &quot;minFPARRecr&quot;                      &quot;recrTreeHeight&quot;                  
-## [100] &quot;recrShrubCover&quot;                   &quot;recrShrubHeight&quot;                  &quot;recrTreeZ50&quot;                     
-## [103] &quot;recrShrubZ50&quot;                     &quot;recrTreeZ95&quot;                      &quot;recrShrubZ95&quot;</code></pre>
+<pre><code>##   [1] &quot;fillMissingRootParams&quot;            &quot;fillMissingSpParams&quot;              &quot;fillMissingWithGenusParams&quot;      
+##   [4] &quot;verbose&quot;                          &quot;subdailyResults&quot;                  &quot;standResults&quot;                    
+##   [7] &quot;soilResults&quot;                      &quot;plantResults&quot;                     &quot;leafResults&quot;                     
+##  [10] &quot;temperatureResults&quot;               &quot;fireHazardResults&quot;                &quot;fireHazardStandardWind&quot;          
+##  [13] &quot;fireHazardStandardDFMC&quot;           &quot;transpirationMode&quot;                &quot;soilFunctions&quot;                   
+##  [16] &quot;defaultWindSpeed&quot;                 &quot;defaultCO2&quot;                       &quot;defaultRainfallIntensityPerMonth&quot;
+##  [19] &quot;snowpack&quot;                         &quot;leafPhenology&quot;                    &quot;bareSoilEvaporation&quot;             
+##  [22] &quot;unlimitedSoilWater&quot;               &quot;interceptionMode&quot;                 &quot;infiltrationMode&quot;                
+##  [25] &quot;rhizosphereOverlap&quot;               &quot;unfoldingDD&quot;                      &quot;verticalLayerSize&quot;               
+##  [28] &quot;windMeasurementHeight&quot;            &quot;equalLeafStemVC&quot;                  &quot;cavitationRefillStem&quot;            
+##  [31] &quot;cavitationRefillLeaves&quot;           &quot;hydraulicRedistributionFraction&quot;  &quot;ndailysteps&quot;                     
+##  [34] &quot;nsubsteps&quot;                        &quot;taper&quot;                            &quot;multiLayerBalance&quot;               
+##  [37] &quot;sapFluidityVariation&quot;             &quot;TPhase_gmin&quot;                      &quot;Q10_1_gmin&quot;                      
+##  [40] &quot;Q10_2_gmin&quot;                       &quot;rootRadialConductance&quot;            &quot;averageFracRhizosphereResistance&quot;
+##  [43] &quot;thermalCapacityLAI&quot;               &quot;boundaryLayerSize&quot;                &quot;refillMaximumRate&quot;               
+##  [46] &quot;sunlitShade&quot;                      &quot;numericParams&quot;                    &quot;leafCavitationEffects&quot;           
+##  [49] &quot;stomatalSubmodel&quot;                 &quot;plantCapacitance&quot;                 &quot;cavitationFlux&quot;                  
+##  [52] &quot;soilDisconnection&quot;                &quot;leafCuticularTranspiration&quot;       &quot;stemCuticularTranspiration&quot;      
+##  [55] &quot;C_SApoInit&quot;                       &quot;C_LApoInit&quot;                       &quot;k_SSym&quot;                          
+##  [58] &quot;fractionLeafSymplasm&quot;             &quot;gs_NightFrac&quot;                     &quot;JarvisPAR&quot;                       
+##  [61] &quot;fTRBToLeaf&quot;                       &quot;gCrown0&quot;                          &quot;subdailyCarbonBalance&quot;           
+##  [64] &quot;allowDessication&quot;                 &quot;allowStarvation&quot;                  &quot;sinkLimitation&quot;                  
+##  [67] &quot;shrubDynamics&quot;                    &quot;herbDynamics&quot;                     &quot;allocationStrategy&quot;              
+##  [70] &quot;phloemConductanceFactor&quot;          &quot;nonSugarConcentration&quot;            &quot;equilibriumOsmoticConcentration&quot; 
+##  [73] &quot;minimumRelativeStarchForGrowth&quot;   &quot;constructionCosts&quot;                &quot;senescenceRates&quot;                 
+##  [76] &quot;maximumRelativeGrowthRates&quot;       &quot;mortalityMode&quot;                    &quot;mortalityBaselineRate&quot;           
+##  [79] &quot;mortalityRelativeSugarThreshold&quot;  &quot;mortalityRWCThreshold&quot;            &quot;recrTreeDBH&quot;                     
+##  [82] &quot;recrTreeDensity&quot;                  &quot;ingrowthTreeDBH&quot;                  &quot;ingrowthTreeDensity&quot;             
+##  [85] &quot;allowSeedBankDynamics&quot;            &quot;allowRecruitment&quot;                 &quot;allowResprouting&quot;                
+##  [88] &quot;recruitmentMode&quot;                  &quot;removeEmptyCohorts&quot;               &quot;minimumTreeCohortDensity&quot;        
+##  [91] &quot;minimumShrubCohortCover&quot;          &quot;dynamicallyMergeCohorts&quot;          &quot;seedRain&quot;                        
+##  [94] &quot;seedProductionTreeHeight&quot;         &quot;seedProductionShrubHeight&quot;        &quot;probRecr&quot;                        
+##  [97] &quot;minTempRecr&quot;                      &quot;minMoistureRecr&quot;                  &quot;minFPARRecr&quot;                     
+## [100] &quot;recrTreeHeight&quot;                   &quot;recrShrubCover&quot;                   &quot;recrShrubHeight&quot;                 
+## [103] &quot;recrTreeZ50&quot;                      &quot;recrShrubZ50&quot;                     &quot;recrTreeZ95&quot;                     
+## [106] &quot;recrShrubZ95&quot;</code></pre>
 <p>Control parameters are employed when initializing vegetation inputs and state variables using functions <code>forest2spwbInput()</code> and <code>forest2growthInput()</code>, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as <code>spwb()</code> or <code>growth()</code>. Function <code>fordyn()</code> is different than the other simulation functions, because the list control parameters is directly passed to the function (see <a href="model-inputs.html#inputstructuresmedfate">2.1.1</a>).</p>
 <p>Even if the list of control parameters is long, not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), and most of them should not be altered from their default values. However, there are a set of parameters that are worth learning:</p>
 <ul>
 <li><code>verbose [=TRUE]</code>: Whether extra console output is desired during simulations.</li>
-<li><code>fillMissingRootParams [= TRUE]</code>: Boolean flag to indicate that initialization functions should provide estimates for <code>Z50</code> and <code>Z95</code> if these are lacking in the forest data. Note that if <code>fillMissingRootParams</code> is set to <code>FALSE</code> then simulations may fail if the user does not provide values for <code>Z50</code> and <code>Z95</code> in tree or shrub data.</li>
-<li><code>fillMissingSpParams [=TRUE]</code>: Boolean flag to indicate that initialization functions should provide estimates for functional parameters if these are lacking in the species parameter table <code>SpParams</code>. Note that if <code>fillMissingSpParams</code> is set to <code>FALSE</code> then simulations may fail if the user does not provide values for required parameters.</li>
 <li><code>transpirationMode [="Granier"]</code> is an important control parameter, because it allows the user to switch between the <em>basic</em> (i.e. <code>"Granier"</code>) and <em>advanced</em> (i.e., either <code>"Sperry"</code> or <code>"Cochard"</code>) water balance models, corresponding to chapters <a href="basicwaterbalance.html#basicwaterbalance">3</a> and <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>, respectively.</li>
 <li><code>rhizosphereOverlap [="total"]</code> is also a relevant parameter, since changing its default value allows considering that plants extract soil water from partially or totally unrelated water pools, as explained in <a href="model-inputs.html#plantwaterpools">2.4.7</a>.</li>
+</ul>
+<p>Some parameters are only relevant for parameter estimation at the stage of initialization:</p>
+<ul>
+<li><code>fillMissingRootParams [= TRUE]</code>: Boolean flag to indicate that initialization functions should provide estimates for <code>Z50</code> and <code>Z95</code> if these are lacking in the forest data. Note that if <code>fillMissingRootParams</code> is set to <code>FALSE</code> then simulations may fail if the user does not provide values for <code>Z50</code> and <code>Z95</code> in tree or shrub data.</li>
+<li><code>fillMissingSpParams [=TRUE]</code>: Boolean flag to indicate that initialization functions should provide estimates for functional parameters if these are lacking in the species parameter table <code>SpParams</code>. Note that if <code>fillMissingSpParams</code> is set to <code>FALSE</code> then simulations may fail if the user does not provide values for required parameters.</li>
+<li><code>fillMissingWithGenusParams [=TRUE]</code>: Boolean flag to indicate that initializing functions should provide estimates from genus value, if species-level values are missing in the species parameter table <code>SpParams</code> but genus-level ones are not.</li>
 </ul>
 
 </div>
