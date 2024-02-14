@@ -151,6 +151,13 @@ which can also be applied to water potential units. Soil layer saturated conduct
 
 Besides defining soil parameters, function `soil()` also initializes *soil state variables*: soil moisture content, soil temperature (although set to a missing value) and water table depth.  Users can edit the `soil` object manually (it is actually a `list`), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements. 
 
+Saturated conductivity ($K_{sat}$) is corrected for bulk density ($BD$) of the soil layer, because compact soils have lower conductivity [@rahimi_evaluation_2011]:
+
+\begin{equation}
+K_{sat} = K_{sat,ref} \cdot \left( \frac{\rho_{s} - BD}{\rho_{s} - BD_{ref}} \right)^3
+\end{equation}
+where $K_{sat,ref}$ is the reference conductivity according to soil texture, $\rho_{s} = 2.73 \,g\cdot cm^{-3}$ is density of soil particles, $BD_{ref} = 1.2\,g\cdot cm^{-3}$ is the reference bulk density.
+
 ### Water content and water table depth
 
 The *volume of water* ($V_s$ in $mm = l \cdot m^{-2}$ of ground area) in a soil layer $s$ is calculated from its water potential ($\Psi_s$) and water retention curve using:
