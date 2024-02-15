@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-02-14" />
+<meta name="date" content="2024-02-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -212,11 +212,12 @@ div.csl-indent {
 <li class="chapter" data-level="2.4.2" data-path="model-inputs.html"><a href="model-inputs.html#structural-attributes-of-herbaceous-vegetation"><i class="fa fa-check"></i><b>2.4.2</b> Structural attributes of herbaceous vegetation</a></li>
 <li class="chapter" data-level="2.4.3" data-path="model-inputs.html"><a href="model-inputs.html#leaf-area-index-of-the-forest-stand"><i class="fa fa-check"></i><b>2.4.3</b> Leaf area index of the forest stand</a></li>
 <li class="chapter" data-level="2.4.4" data-path="model-inputs.html"><a href="model-inputs.html#forestobjects"><i class="fa fa-check"></i><b>2.4.4</b> Forest plot objects</a></li>
-<li class="chapter" data-level="2.4.5" data-path="model-inputs.html"><a href="model-inputs.html#leafdistribution"><i class="fa fa-check"></i><b>2.4.5</b> Vertical leaf distribution</a></li>
-<li class="chapter" data-level="2.4.6" data-path="model-inputs.html"><a href="model-inputs.html#rootdistribution"><i class="fa fa-check"></i><b>2.4.6</b> Vertical root distribution</a></li>
-<li class="chapter" data-level="2.4.7" data-path="model-inputs.html"><a href="model-inputs.html#plantwaterpools"><i class="fa fa-check"></i><b>2.4.7</b> Water pools and root horizontal distribution</a></li>
-<li class="chapter" data-level="2.4.8" data-path="model-inputs.html"><a href="model-inputs.html#functionaltraits"><i class="fa fa-check"></i><b>2.4.8</b> Functional traits and vegetation initialization</a></li>
-<li class="chapter" data-level="2.4.9" data-path="model-inputs.html"><a href="model-inputs.html#update-of-structural-variables-during-simulations"><i class="fa fa-check"></i><b>2.4.9</b> Update of structural variables during simulations</a></li>
+<li class="chapter" data-level="2.4.5" data-path="model-inputs.html"><a href="model-inputs.html#single-cohort-forests"><i class="fa fa-check"></i><b>2.4.5</b> Single-cohort forests</a></li>
+<li class="chapter" data-level="2.4.6" data-path="model-inputs.html"><a href="model-inputs.html#leafdistribution"><i class="fa fa-check"></i><b>2.4.6</b> Vertical leaf distribution</a></li>
+<li class="chapter" data-level="2.4.7" data-path="model-inputs.html"><a href="model-inputs.html#rootdistribution"><i class="fa fa-check"></i><b>2.4.7</b> Vertical root distribution</a></li>
+<li class="chapter" data-level="2.4.8" data-path="model-inputs.html"><a href="model-inputs.html#plantwaterpools"><i class="fa fa-check"></i><b>2.4.8</b> Water pools and root horizontal distribution</a></li>
+<li class="chapter" data-level="2.4.9" data-path="model-inputs.html"><a href="model-inputs.html#functionaltraits"><i class="fa fa-check"></i><b>2.4.9</b> Functional traits and vegetation initialization</a></li>
+<li class="chapter" data-level="2.4.10" data-path="model-inputs.html"><a href="model-inputs.html#update-of-structural-variables-during-simulations"><i class="fa fa-check"></i><b>2.4.10</b> Update of structural variables during simulations</a></li>
 </ul></li>
 <li class="chapter" data-level="2.5" data-path="model-inputs.html"><a href="model-inputs.html#meteoinput"><i class="fa fa-check"></i><b>2.5</b> Metereological input</a>
 <ul>
@@ -1089,7 +1090,7 @@ Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\thet
 <div id="vegetationinput" class="section level2 hasAnchor" number="2.4">
 <h2><span class="header-section-number">2.4</span> Vegetation description<a href="model-inputs.html#vegetationinput" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The representation of vegetation within a target forest stand is done in <strong>medfate</strong> primarily by means of <strong>cohorts of woody plants</strong> (i.e. trees and shrubs). A woody plant cohort represents a set of woody plants that belong to the same species (or functional group) and are more or less of the same <em>size</em>. For example, trees in a stand may be grouped by species and diameter class, whereas shrubs may be grouped by species and height. In practice however, plant cohorts are entities that are treated separately when modeling the forest stand. This representation in plant cohorts was chosen so that package functions can be easily applied to <strong>forest inventory data</strong>, for example from national forest surveys. The description of woody plant cohorts includes a measure of <em>abundance</em> of the cohort in the stand, which in the case of trees is <em>density</em> as stems per hectare and for shrubs is <em>percent cover</em> (shrubs are often multi-stemmed). The difference in measurement units for abundance is the main motivation for distinguishing between tree cohorts and shrub cohorts, rather than their size or growth form. Additionally, the description of vegetation in the forest stand may include the cover and mean height of a <strong>herbaceous layer</strong>. The presence or abundance of herbs is not always recorded in forest inventory surveys, but may be relevant vegetation component in open habitats like shrublands.</p>
-<p>Note that one limitation of the representation of vegetation in <strong>medfate</strong> is that it is not spatially-explicit (i.e. plants cannot have explicit coordinates within forest stands) and hence spatial (horizontal) interactions between plant cannot be taken into account explicitly (but see <a href="model-inputs.html#plantwaterpools">2.4.7</a>).</p>
+<p>Note that one limitation of the representation of vegetation in <strong>medfate</strong> is that it is not spatially-explicit (i.e. plants cannot have explicit coordinates within forest stands) and hence spatial (horizontal) interactions between plant cannot be taken into account explicitly (but see <a href="model-inputs.html#plantwaterpools">2.4.8</a>).</p>
 <div id="structural-attributes-of-woody-plant-cohorts" class="section level3 hasAnchor" number="2.4.1">
 <h3><span class="header-section-number">2.4.1</span> Structural attributes of woody plant cohorts<a href="model-inputs.html#structural-attributes-of-woody-plant-cohorts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>A woody plant cohort <span class="math inline">\(i\)</span> is either a <em>tree cohort</em> or a <em>shrub cohort</em>, and is defined using a set of structural attributes shown in the following table, where columns <strong>spwb</strong>, <strong>growth</strong> and <strong>fordyn</strong> indicate whether attributes are required by simulation functions <code>spwb()/pwb()</code>, <code>growth()</code> and <code>fordyn()</code>, respectively:</p>
@@ -1314,8 +1315,44 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 ## Fuel loading (kg/m2) total: 0.5588728  adult trees: 0.5255004  saplings: 0  shrubs: 0.0140795  herbs: 0.019293 
 ## PAR ground (%): 40.0075402  SWR ground (%): 50.7329667</code></pre>
 </div>
-<div id="leafdistribution" class="section level3 hasAnchor" number="2.4.5">
-<h3><span class="header-section-number">2.4.5</span> Vertical leaf distribution<a href="model-inputs.html#leafdistribution" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="single-cohort-forests" class="section level3 hasAnchor" number="2.4.5">
+<h3><span class="header-section-number">2.4.5</span> Single-cohort forests<a href="model-inputs.html#single-cohort-forests" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Although <strong>medfate</strong> has been designed to perform simulations on multi-cohort forests, it can also handle simulations where vegetation is described using a single cohort. Functions <code>tree2forest()</code> and <code>shrub2forest()</code> allow defining single-cohort forests from attributes. For example a holm oak (<em>Quercus ilex</em>) forest of 4-m height and having a leaf area index of <span class="math inline">\(2\, m^2\cdot m^{-2}\)</span> can be defined using:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="model-inputs.html#cb10-1" tabindex="-1"></a>oak_forest <span class="ot">&lt;-</span><span class="fu">tree2forest</span>(<span class="st">&quot;Quercus ilex&quot;</span>, <span class="at">Height=</span> <span class="dv">400</span>, <span class="at">LAI =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p>The function will return a <code>forest</code> object where most attributes are empty:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="model-inputs.html#cb11-1" tabindex="-1"></a>oak_forest</span></code></pre></div>
+<pre><code>## $treeData
+##        Species DBH Height  N Z50 Z95 LAI
+## 1 Quercus ilex  NA    400 NA  NA  NA   2
+## 
+## $shrubData
+## [1] Species Height  Cover   Z50     Z95    
+## &lt;0 rows&gt; (or 0-length row.names)
+## 
+## $herbCover
+## [1] NA
+## 
+## $herbHeight
+## [1] NA
+## 
+## $seedBank
+## [1] Species Percent
+## &lt;0 rows&gt; (or 0-length row.names)
+## 
+## attr(,&quot;class&quot;)
+## [1] &quot;forest&quot; &quot;list&quot;</code></pre>
+<p>Nevertheless, the object is well defined, for example we can summarize it using:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="model-inputs.html#cb13-1" tabindex="-1"></a><span class="fu">summary</span>(oak_forest, SpParamsMED)</span></code></pre></div>
+<pre><code>## Tree BA (m2/ha): 0  adult trees: 0  saplings: 0 
+## Density (ind/ha) adult trees: 0  saplings: 0  shrubs (estimated): 0 
+## Cover (%) adult trees: 0  saplings: 0  shrubs: 0  herbs: 0 
+## LAI (m2/m2) total: 2  adult trees: 0  saplings: 0  shrubs: 0  herbs: 0 
+## Fuel loading (kg/m2) total: 0.5698237  adult trees: 0  saplings: 0  shrubs: 0  herbs: 0 
+## PAR ground (%): 33.2871084  SWR ground (%): 44.2721305</code></pre>
+<p>Since density and diameter have not been provided, simulations in this case will be restricted to function <code>spwb()/pwb()</code>. Moreover, note that when defining single-cohort forests all possible interactions with functionally distinct plants are neglected.</p>
+</div>
+<div id="leafdistribution" class="section level3 hasAnchor" number="2.4.6">
+<h3><span class="header-section-number">2.4.6</span> Vertical leaf distribution<a href="model-inputs.html#leafdistribution" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The vegetation input structures allow the package to determine the vertical distribution of leaves in the stand. The leaf area of any woody plant cohort is assumed to be distributed vertically following a <strong>truncated Gaussian function</strong> whose standardized values -1.5 and 1.5 correspond to crown base height (<span class="math inline">\(H_{crown,i}\)</span>; in <span class="math inline">\(cm\)</span>) and total plant height (<span class="math inline">\(H_i\)</span>), respectively. Crown base height is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort (<span class="math inline">\(CR_i\)</span>; a proportion between 0 and 1), which in turn can be estimated as explained in <a href="allometricmodels.html#eq:CrownHeight">(21.6)</a>.</p>
 <p>Simulation models in <strong>medfate</strong> divide the vertical dimension into vertical layers (by default are 100 cm width, but see control parameter <code>verticalLayerSize</code>). Let us define <span class="math inline">\(LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}\)</span> as the leaf area index of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> including both functional leaves and dead leaves standing on branches. The truncated Gaussian distribution defines the <span class="math inline">\(LAI_{i,j}^{\phi}\)</span> and <span class="math inline">\(LAI_{i,j}^{dead}\)</span> for all plant cohorts and vertical layers.</p>
 <p>Dividing the leaf area of a given layer by its width, one obtains the <em>leaf area density</em> (<span class="math inline">\(LAD\)</span> in <span class="math inline">\(m^2 \cdot m^{-3}\)</span>). Figure <a href="model-inputs.html#fig:leafareadensity">2.3</a> illustrates the leaf area density profile (see function <code>vprofile_leafAreaDensity()</code>) corresponding to the forest stand described in the example <code>forest</code> object that we showed above.</p>
@@ -1334,8 +1371,8 @@ Figure 2.4: Leaf area density distribution in a forest stand, including the herb
 </p>
 </div>
 </div>
-<div id="rootdistribution" class="section level3 hasAnchor" number="2.4.6">
-<h3><span class="header-section-number">2.4.6</span> Vertical root distribution<a href="model-inputs.html#rootdistribution" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="rootdistribution" class="section level3 hasAnchor" number="2.4.7">
+<h3><span class="header-section-number">2.4.7</span> Vertical root distribution<a href="model-inputs.html#rootdistribution" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Roots can be distinguished functionally into two different organs: <strong>coarse roots</strong> are responsible for mechanical support and transport of water and nutrients towards the stem, whereas <strong>fine roots</strong> are responsible for absorbing water and nutrients.</p>
 <p>Analogously to the aboveground vegetation parameters, inputs describing depths corresponding to 50% and 95% of fine roots (<span class="math inline">\(Z_{50,i}\)</span> and <span class="math inline">\(Z_{95,i}\)</span>) are used to completely specify the distribution of roots across soil layers. The root system of each plant cohort <span class="math inline">\(i\)</span> is described using <span class="math inline">\(FRP_{i,s}\)</span>, the proportion of fine roots (with respect to the whole plant) in each soil layer <span class="math inline">\(s\)</span>. <span class="math inline">\(FRP_{i,s}\)</span> values are normally defined using the linear dose response model <span class="citation">(<a href="#ref-Schenk2002">Schenk &amp; Jackson 2002</a>; <a href="#ref-Collins2007">Collins &amp; Bras 2007</a>)</span>:
 <span class="math display">\[\begin{eqnarray}
@@ -1352,8 +1389,8 @@ Figure 2.5: Examples of root density profile according to the linear dose respon
 </div>
 <p>The actual input to simulation functions <code>spwb()</code>, <code>growth()</code> and alike, describes fine root distribution using the matrix of <span class="math inline">\(FRP_{i,s}\)</span> values - not <span class="math inline">\(Z_{50,i}\)</span> and <span class="math inline">\(Z_{95,i}\)</span> -, which means that the proportions of fine roots can be modified manually or be defined by another model. In fact, <strong>medfate</strong> also allows calculating <span class="math inline">\(FRP_{i,s}\)</span> values assuming a conic distribution of fine roots (see <code>root_conicDistribution()</code>).</p>
 </div>
-<div id="plantwaterpools" class="section level3 hasAnchor" number="2.4.7">
-<h3><span class="header-section-number">2.4.7</span> Water pools and root horizontal distribution<a href="model-inputs.html#plantwaterpools" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="plantwaterpools" class="section level3 hasAnchor" number="2.4.8">
+<h3><span class="header-section-number">2.4.8</span> Water pools and root horizontal distribution<a href="model-inputs.html#plantwaterpools" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>By default, models in <strong>medfate</strong> assume that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). Therefore, it neglects spatial variation in soil moisture, against moisture variation patterns observed in mixed stands <span class="citation">(<a href="#ref-Schume2004">Schume <em>et al.</em> 2004</a>)</span>. However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can also be simulated if required by the user (see parameter <code>rhizosphereOverlap</code> in <a href="model-inputs.html#controlparameters">2.6</a>). This involves considering that a given plant cohort will perform water uptake from the <strong>water pool</strong> surrounding its roots, whereas it may not have access to the water beneath other plants. However, there can exist some degree of horizontal overlap between water pools exploited by different plants.</p>
 <p>Considering water pools involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many water pools as plant cohorts, with proportions defined by their LAI values:
 <span class="math display">\[\begin{equation}
@@ -1382,14 +1419,14 @@ AreaPool_{i} = 10000 \cdot f_{pool,i}/N_{i}
 If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the roots of the individual do not exceed the area of the pool, in other words <span class="math inline">\(fr_{i,s,i} = 1\)</span> and <span class="math inline">\(fr_{i,s,j} = 0\)</span> for all <span class="math inline">\(j \neq i\)</span>. If
 <span class="math inline">\(Area_{i,s} &gt; AreaPool_{i}\)</span> then the excess should be counted as overlap with the other pools. Assuming that plants are randomly distributed (i.e. no clumping) the probability of finding the pool of a cohort is equal to the proportion of its water pool (see function <code>root_horizontalProportions()</code>). All these calculations were done assuming <span class="math inline">\(Vol_{i}\)</span> were known. Estimation of <span class="math inline">\(Vol_{i}\)</span> depends on the complexity of the water balance model and is explained in <a href="modelparametrization.html#horizontalrootoverlap">A.4.6</a>.</p>
 </div>
-<div id="functionaltraits" class="section level3 hasAnchor" number="2.4.8">
-<h3><span class="header-section-number">2.4.8</span> Functional traits and vegetation initialization<a href="model-inputs.html#functionaltraits" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="functionaltraits" class="section level3 hasAnchor" number="2.4.9">
+<h3><span class="header-section-number">2.4.9</span> Functional traits and vegetation initialization<a href="model-inputs.html#functionaltraits" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Besides the physical representation of vegetation, forest ecosystem models require information regarding plant functional traits, because this influences the outcome of physical, physiological and hydrological processes. In the following chapters, we will indicate for each simulated process its required plant functional parameters. A description of all parameters is provided in data frame <code>SpParamsDefinition</code> included in the package.</p>
 <p>Normally, functional traits are described at the species level because infra-specific parameters are hard to get. Even at the species level, many functional (e.g. physiological) traits are hard to obtain, so in <strong>medfate</strong> we provide a default species parameter table for woody species found in Spain, with many of them occurring elsewhere in the Mediterranean Basin (<code>SpParamsMED</code>). User can modify this data frame to account for intra-specific trait variation (see function <code>modifySpParams()</code>).</p>
 <p>The package provides functions <code>forest2spwbInput()</code> and <code>forest2growthInput()</code> that prepare the <code>forest</code> vegetation input for simulation functions <code>spwb()</code> and <code>growth()</code>, respectively (see <a href="model-inputs.html#inputstructuresmedfate">2.1.1</a>). This initialization mostly consists in compiling the necessary functional traits from the species parameter table, following the <span class="math inline">\(SP_i\)</span> attribute of woody plant cohorts. Some new model parameters are estimated from the initial ones, while taking into account the structural attributes of cohorts (an example of these derived quantities is stem conductance, which estimated from stem xylem conductivity, Huber value and plant height). Users can take the output of these initialization functions and replace parameter values for specific plant cohorts (see function <code>modifyCohortParams()</code>).</p>
 </div>
-<div id="update-of-structural-variables-during-simulations" class="section level3 hasAnchor" number="2.4.9">
-<h3><span class="header-section-number">2.4.9</span> Update of structural variables during simulations<a href="model-inputs.html#update-of-structural-variables-during-simulations" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="update-of-structural-variables-during-simulations" class="section level3 hasAnchor" number="2.4.10">
+<h3><span class="header-section-number">2.4.10</span> Update of structural variables during simulations<a href="model-inputs.html#update-of-structural-variables-during-simulations" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Vegetation characteristics stay constant during simulations using functions <code>spwb()</code> or <code>pwb()</code>, although the actual (unfolded) leaf area and dead leaf area may vary depending on leaf phenology.</p>
 <p>In contrast, growth simulation requires updating the structure of vegetation, i.e. plant heights, tree diameters, tree density and shrub cover. Function <code>growth()</code> can modify any of the vegetation attributes. Finally, function <code>fordyn()</code> modifies not only structural variables of the initial cohorts but also involves the removal of dead (or cut) woody cohorts and recruitment of new woody cohorts during simulations.</p>
 </div>
@@ -1584,49 +1621,66 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <div id="controlparameters" class="section level2 hasAnchor" number="2.6">
 <h2><span class="header-section-number">2.6</span> Simulation control<a href="model-inputs.html#controlparameters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Simulation control parameters are a list of global parameter values, initialized using function <code>defaultControl()</code>, that the user can modify to change the general behavior of simulation functions. Here is the set of global control parameters currently accepted in <strong>medfate</strong>:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="model-inputs.html#cb10-1" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
-<pre><code>##   [1] &quot;fillMissingRootParams&quot;            &quot;fillMissingSpParams&quot;              &quot;fillMissingWithGenusParams&quot;      
-##   [4] &quot;verbose&quot;                          &quot;subdailyResults&quot;                  &quot;standResults&quot;                    
-##   [7] &quot;soilResults&quot;                      &quot;plantResults&quot;                     &quot;leafResults&quot;                     
-##  [10] &quot;temperatureResults&quot;               &quot;fireHazardResults&quot;                &quot;fireHazardStandardWind&quot;          
-##  [13] &quot;fireHazardStandardDFMC&quot;           &quot;transpirationMode&quot;                &quot;soilFunctions&quot;                   
-##  [16] &quot;defaultWindSpeed&quot;                 &quot;defaultCO2&quot;                       &quot;defaultRainfallIntensityPerMonth&quot;
-##  [19] &quot;snowpack&quot;                         &quot;leafPhenology&quot;                    &quot;bareSoilEvaporation&quot;             
-##  [22] &quot;unlimitedSoilWater&quot;               &quot;interceptionMode&quot;                 &quot;infiltrationMode&quot;                
-##  [25] &quot;rhizosphereOverlap&quot;               &quot;unfoldingDD&quot;                      &quot;verticalLayerSize&quot;               
-##  [28] &quot;windMeasurementHeight&quot;            &quot;equalLeafStemVC&quot;                  &quot;cavitationRefillStem&quot;            
-##  [31] &quot;cavitationRefillLeaves&quot;           &quot;hydraulicRedistributionFraction&quot;  &quot;ndailysteps&quot;                     
-##  [34] &quot;nsubsteps&quot;                        &quot;taper&quot;                            &quot;multiLayerBalance&quot;               
-##  [37] &quot;sapFluidityVariation&quot;             &quot;TPhase_gmin&quot;                      &quot;Q10_1_gmin&quot;                      
-##  [40] &quot;Q10_2_gmin&quot;                       &quot;rootRadialConductance&quot;            &quot;averageFracRhizosphereResistance&quot;
-##  [43] &quot;thermalCapacityLAI&quot;               &quot;boundaryLayerSize&quot;                &quot;refillMaximumRate&quot;               
-##  [46] &quot;sunlitShade&quot;                      &quot;numericParams&quot;                    &quot;leafCavitationEffects&quot;           
-##  [49] &quot;stomatalSubmodel&quot;                 &quot;plantCapacitance&quot;                 &quot;cavitationFlux&quot;                  
-##  [52] &quot;soilDisconnection&quot;                &quot;leafCuticularTranspiration&quot;       &quot;stemCuticularTranspiration&quot;      
-##  [55] &quot;C_SApoInit&quot;                       &quot;C_LApoInit&quot;                       &quot;k_SSym&quot;                          
-##  [58] &quot;fractionLeafSymplasm&quot;             &quot;gs_NightFrac&quot;                     &quot;JarvisPAR&quot;                       
-##  [61] &quot;fTRBToLeaf&quot;                       &quot;gCrown0&quot;                          &quot;subdailyCarbonBalance&quot;           
-##  [64] &quot;allowDessication&quot;                 &quot;allowStarvation&quot;                  &quot;sinkLimitation&quot;                  
-##  [67] &quot;shrubDynamics&quot;                    &quot;herbDynamics&quot;                     &quot;allocationStrategy&quot;              
-##  [70] &quot;phloemConductanceFactor&quot;          &quot;nonSugarConcentration&quot;            &quot;equilibriumOsmoticConcentration&quot; 
-##  [73] &quot;minimumRelativeStarchForGrowth&quot;   &quot;constructionCosts&quot;                &quot;senescenceRates&quot;                 
-##  [76] &quot;maximumRelativeGrowthRates&quot;       &quot;mortalityMode&quot;                    &quot;mortalityBaselineRate&quot;           
-##  [79] &quot;mortalityRelativeSugarThreshold&quot;  &quot;mortalityRWCThreshold&quot;            &quot;recrTreeDBH&quot;                     
-##  [82] &quot;recrTreeDensity&quot;                  &quot;ingrowthTreeDBH&quot;                  &quot;ingrowthTreeDensity&quot;             
-##  [85] &quot;allowSeedBankDynamics&quot;            &quot;allowRecruitment&quot;                 &quot;allowResprouting&quot;                
-##  [88] &quot;recruitmentMode&quot;                  &quot;removeEmptyCohorts&quot;               &quot;minimumTreeCohortDensity&quot;        
-##  [91] &quot;minimumShrubCohortCover&quot;          &quot;dynamicallyMergeCohorts&quot;          &quot;seedRain&quot;                        
-##  [94] &quot;seedProductionTreeHeight&quot;         &quot;seedProductionShrubHeight&quot;        &quot;probRecr&quot;                        
-##  [97] &quot;minTempRecr&quot;                      &quot;minMoistureRecr&quot;                  &quot;minFPARRecr&quot;                     
-## [100] &quot;recrTreeHeight&quot;                   &quot;recrShrubCover&quot;                   &quot;recrShrubHeight&quot;                 
-## [103] &quot;recrTreeZ50&quot;                      &quot;recrShrubZ50&quot;                     &quot;recrTreeZ95&quot;                     
-## [106] &quot;recrShrubZ95&quot;</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="model-inputs.html#cb15-1" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
+<pre><code>##   [1] &quot;fillMissingRootParams&quot;            &quot;fillMissingSpParams&quot;             
+##   [3] &quot;fillMissingWithGenusParams&quot;       &quot;verbose&quot;                         
+##   [5] &quot;subdailyResults&quot;                  &quot;standResults&quot;                    
+##   [7] &quot;soilResults&quot;                      &quot;plantResults&quot;                    
+##   [9] &quot;leafResults&quot;                      &quot;temperatureResults&quot;              
+##  [11] &quot;fireHazardResults&quot;                &quot;fireHazardStandardWind&quot;          
+##  [13] &quot;fireHazardStandardDFMC&quot;           &quot;transpirationMode&quot;               
+##  [15] &quot;soilFunctions&quot;                    &quot;defaultWindSpeed&quot;                
+##  [17] &quot;defaultCO2&quot;                       &quot;defaultRainfallIntensityPerMonth&quot;
+##  [19] &quot;snowpack&quot;                         &quot;leafPhenology&quot;                   
+##  [21] &quot;bareSoilEvaporation&quot;              &quot;unlimitedSoilWater&quot;              
+##  [23] &quot;interceptionMode&quot;                 &quot;infiltrationMode&quot;                
+##  [25] &quot;rhizosphereOverlap&quot;               &quot;unfoldingDD&quot;                     
+##  [27] &quot;verticalLayerSize&quot;                &quot;windMeasurementHeight&quot;           
+##  [29] &quot;equalLeafStemVC&quot;                  &quot;cavitationRefillStem&quot;            
+##  [31] &quot;cavitationRefillLeaves&quot;           &quot;hydraulicRedistributionFraction&quot; 
+##  [33] &quot;ndailysteps&quot;                      &quot;nsubsteps&quot;                       
+##  [35] &quot;taper&quot;                            &quot;multiLayerBalance&quot;               
+##  [37] &quot;sapFluidityVariation&quot;             &quot;TPhase_gmin&quot;                     
+##  [39] &quot;Q10_1_gmin&quot;                       &quot;Q10_2_gmin&quot;                      
+##  [41] &quot;rootRadialConductance&quot;            &quot;averageFracRhizosphereResistance&quot;
+##  [43] &quot;thermalCapacityLAI&quot;               &quot;boundaryLayerSize&quot;               
+##  [45] &quot;refillMaximumRate&quot;                &quot;sunlitShade&quot;                     
+##  [47] &quot;numericParams&quot;                    &quot;leafCavitationEffects&quot;           
+##  [49] &quot;stomatalSubmodel&quot;                 &quot;plantCapacitance&quot;                
+##  [51] &quot;cavitationFlux&quot;                   &quot;soilDisconnection&quot;               
+##  [53] &quot;leafCuticularTranspiration&quot;       &quot;stemCuticularTranspiration&quot;      
+##  [55] &quot;C_SApoInit&quot;                       &quot;C_LApoInit&quot;                      
+##  [57] &quot;k_SSym&quot;                           &quot;fractionLeafSymplasm&quot;            
+##  [59] &quot;gs_NightFrac&quot;                     &quot;JarvisPAR&quot;                       
+##  [61] &quot;fTRBToLeaf&quot;                       &quot;gCrown0&quot;                         
+##  [63] &quot;subdailyCarbonBalance&quot;            &quot;allowDessication&quot;                
+##  [65] &quot;allowStarvation&quot;                  &quot;sinkLimitation&quot;                  
+##  [67] &quot;shrubDynamics&quot;                    &quot;herbDynamics&quot;                    
+##  [69] &quot;allocationStrategy&quot;               &quot;phloemConductanceFactor&quot;         
+##  [71] &quot;nonSugarConcentration&quot;            &quot;equilibriumOsmoticConcentration&quot; 
+##  [73] &quot;minimumRelativeStarchForGrowth&quot;   &quot;constructionCosts&quot;               
+##  [75] &quot;senescenceRates&quot;                  &quot;maximumRelativeGrowthRates&quot;      
+##  [77] &quot;mortalityMode&quot;                    &quot;mortalityBaselineRate&quot;           
+##  [79] &quot;mortalityRelativeSugarThreshold&quot;  &quot;mortalityRWCThreshold&quot;           
+##  [81] &quot;recrTreeDBH&quot;                      &quot;recrTreeDensity&quot;                 
+##  [83] &quot;ingrowthTreeDBH&quot;                  &quot;ingrowthTreeDensity&quot;             
+##  [85] &quot;allowSeedBankDynamics&quot;            &quot;allowRecruitment&quot;                
+##  [87] &quot;allowResprouting&quot;                 &quot;recruitmentMode&quot;                 
+##  [89] &quot;removeEmptyCohorts&quot;               &quot;minimumTreeCohortDensity&quot;        
+##  [91] &quot;minimumShrubCohortCover&quot;          &quot;dynamicallyMergeCohorts&quot;         
+##  [93] &quot;seedRain&quot;                         &quot;seedProductionTreeHeight&quot;        
+##  [95] &quot;seedProductionShrubHeight&quot;        &quot;probRecr&quot;                        
+##  [97] &quot;minTempRecr&quot;                      &quot;minMoistureRecr&quot;                 
+##  [99] &quot;minFPARRecr&quot;                      &quot;recrTreeHeight&quot;                  
+## [101] &quot;recrShrubCover&quot;                   &quot;recrShrubHeight&quot;                 
+## [103] &quot;recrTreeZ50&quot;                      &quot;recrShrubZ50&quot;                    
+## [105] &quot;recrTreeZ95&quot;                      &quot;recrShrubZ95&quot;</code></pre>
 <p>Control parameters are employed when initializing vegetation inputs and state variables using functions <code>forest2spwbInput()</code> and <code>forest2growthInput()</code>, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as <code>spwb()</code> or <code>growth()</code>. Function <code>fordyn()</code> is different than the other simulation functions, because the list control parameters is directly passed to the function (see <a href="model-inputs.html#inputstructuresmedfate">2.1.1</a>).</p>
 <p>Even if the list of control parameters is long, not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), and most of them should not be altered from their default values. However, there are a set of parameters that are worth learning:</p>
 <ul>
 <li><code>verbose [=TRUE]</code>: Whether extra console output is desired during simulations.</li>
 <li><code>transpirationMode [="Granier"]</code> is an important control parameter, because it allows the user to switch between the <em>basic</em> (i.e. <code>"Granier"</code>) and <em>advanced</em> (i.e., either <code>"Sperry"</code> or <code>"Cochard"</code>) water balance models, corresponding to chapters <a href="basicwaterbalance.html#basicwaterbalance">3</a> and <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>, respectively.</li>
-<li><code>rhizosphereOverlap [="total"]</code> is also a relevant parameter, since changing its default value allows considering that plants extract soil water from partially or totally unrelated water pools, as explained in <a href="model-inputs.html#plantwaterpools">2.4.7</a>.</li>
+<li><code>rhizosphereOverlap [="total"]</code> is also a relevant parameter, since changing its default value allows considering that plants extract soil water from partially or totally unrelated water pools, as explained in <a href="model-inputs.html#plantwaterpools">2.4.8</a>.</li>
 </ul>
 <p>Some parameters are only relevant for parameter estimation at the stage of initialization:</p>
 <ul>

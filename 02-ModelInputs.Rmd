@@ -272,6 +272,26 @@ The most important items of `forest` are the two data frames describing woody ve
 summary(exampleforestMED, SpParamsMED)
 ```
 
+### Single-cohort forests
+
+Although **medfate** has been designed to perform simulations on multi-cohort forests, it can also handle simulations where vegetation is described using a single cohort. Functions `tree2forest()` and `shrub2forest()` allow defining single-cohort forests from attributes. For example a holm oak (*Quercus ilex*) forest of 4-m height and having a leaf area index of $2\, m^2\cdot m^{-2}$ can be defined using:
+
+```{r}
+oak_forest <-tree2forest("Quercus ilex", Height= 400, LAI = 2)
+```
+
+The function will return a `forest` object where most attributes are empty:
+```{r}
+oak_forest
+```
+
+Nevertheless, the object is well defined, for example we can summarize it using: 
+
+```{r}
+summary(oak_forest, SpParamsMED)
+```
+
+Since density and diameter have not been provided, simulations in this case will be restricted to function `spwb()/pwb()`. Moreover, note that when defining single-cohort forests all possible interactions with functionally distinct plants are neglected.
 
 ### Vertical leaf distribution {#leafdistribution}
 
