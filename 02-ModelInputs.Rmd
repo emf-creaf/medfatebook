@@ -260,8 +260,8 @@ LAI^{all}_{stand} &=& LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody}+LAI^{d
 
 While the previous section described the structural forest variables required to run simulations in **medfate**, forest plot data input in the package is easier if one uses a format that follows closely forest inventory plot descriptions. In this format, each forest plot is represented in an object of class `forest`, a list that contains several elements. Here we use an example forest stand provided with the package:
 ```{r}
-data(exampleforestMED)
-exampleforestMED
+data(exampleforest)
+exampleforest
 ```
 
 The most important items of `forest` are the two data frames describing woody vegetation, `treeData` (for trees) and `shrubData` for shrubs, but the herbaceous layer can also be described using `herbCover` and `herbHeight`. With the aim to help users in the task of constructing `forest` objects, package [**medfateutils**](https://github.com/emf-creaf/medfateutils) includes functions to map user data in into tables `treeData` and `shrubData`.
@@ -269,7 +269,7 @@ The most important items of `forest` are the two data frames describing woody ve
 `forest` objects are a convenient format to start calculations with **medfate**, because there are many static functions that take forest objects as input. For example, a `summary.forest()` function provides the basal area, density, cover and leaf area index of the forest stand, and its different components:
 
 ```{r}
-summary(exampleforestMED, SpParamsMED)
+summary(exampleforest, SpParamsMED)
 ```
 
 ### Single-cohort forests
@@ -302,9 +302,9 @@ Simulation models in **medfate** divide the vertical dimension into vertical lay
 Dividing the leaf area of a given layer by its width, one obtains the *leaf area density* ($LAD$ in $m^2 \cdot m^{-3}$). Figure \@ref(fig:leafareadensity) illustrates the leaf area density profile (see function `vprofile_leafAreaDensity()`) corresponding to the forest stand described in the example `forest` object that we showed above. 
 
 ```{r leafareadensity, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap="Leaf area density distribution of woody vegetation in a forest stand. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution."}
-g1<-vprofile_leafAreaDensity(exampleforestMED, SpParamsMED, z = seq(0,1000, by=1), byCohorts = T)
+g1<-vprofile_leafAreaDensity(exampleforest, SpParamsMED, z = seq(0,1000, by=1), byCohorts = T)
 g1 <- g1 + theme(legend.background = element_blank(), legend.position = c(0.8,0.8))
-g2<-vprofile_leafAreaDensity(exampleforestMED, SpParamsMED, z = seq(0,1000, by=1))
+g2<-vprofile_leafAreaDensity(exampleforest, SpParamsMED, z = seq(0,1000, by=1))
 plot_grid(g1, g2, nrow=1, ncol=2)
 ```
 
@@ -313,9 +313,9 @@ The leaf area density profile determines the light extinction rates through the 
 When present, we can include herbaceous vegetation (i.e. $LAI_{herb}$) in the leaf area density profile. Its vertical distribution is also assumed to follow a truncated Gaussian function:
 
 ```{r leafareadensityherbs, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap="Leaf area density distribution in a forest stand, including the herbaceous layer. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution."}
-g1<-vprofile_leafAreaDensity(exampleforestMED, SpParamsMED, z = seq(0,1000, by=1), byCohorts = T, includeHerbs = TRUE)
+g1<-vprofile_leafAreaDensity(exampleforest, SpParamsMED, z = seq(0,1000, by=1), byCohorts = T, includeHerbs = TRUE)
 g1 <- g1 + theme(legend.background = element_blank(), legend.position = c(0.8,0.8))
-g2<-vprofile_leafAreaDensity(exampleforestMED, SpParamsMED, z = seq(0,1000, by=1), includeHerbs = TRUE)
+g2<-vprofile_leafAreaDensity(exampleforest, SpParamsMED, z = seq(0,1000, by=1), includeHerbs = TRUE)
 plot_grid(g1, g2, nrow=1, ncol=2)
 ```
 
@@ -332,7 +332,7 @@ where $Y_i(z)$ is the cumulative fraction of fine root mass located between surf
 The linear dose response model is quite flexible with respect to fine root distribution (see function `root_ldrDistribution()`). The following figure shows the fine root distribution profile of the same cohorts as in fig. \@ref(fig:leafareadensity) (see `vprofile_rootDistribution()`):
 
 ```{r root-distribution, echo = FALSE, fig.width=5, fig.height=4, fig.align = 'center', fig.cap = "Examples of root density profile according to the linear dose response model."}
-vprofile_rootDistribution(exampleforestMED, SpParamsMED)
+vprofile_rootDistribution(exampleforest, SpParamsMED)
 ```
 
 
