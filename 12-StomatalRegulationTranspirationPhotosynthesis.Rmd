@@ -424,8 +424,8 @@ Instantaneous net photosynthesis per leaf area of sunlit and shade leaves in a g
  (\#eq:cohortnetphotosynthesis)
 \end{equation}
 
-## Cavitation and conduit refilling {#cavitationrefill}
-Like with the basic water balance model, the advanced water balance model is normally run assuming that although soil drought may reduce transpiration. Embolized xylem conduits may be automatically refilled when soil moisture recovers if `cavitation = "total"`. Automatic refilling is always assumed for root segments, but not for leaves and stems. There are three other options to deal with leaf and stem xylem cavitation besides automatic refilling. Any of them cause the model to keep track of the proportion of lost conductance in the leaf and stem xylem of the plant cohort $i$ ($PLC_{leaf,i}$ and $PLC_{stem,i}$) at successive time steps:
+## Cavitation and conduit refilling {#cavitationrecovery}
+Like with the basic water balance model, the advanced water balance model is normally run assuming that although soil drought may reduce transpiration. Embolized xylem conduits may be automatically refilled when soil moisture recovers if `cavitationRecovery = "total"`. Automatic refilling is always assumed for root segments, but not for leaves and stems. There are three other options to deal with leaf and stem xylem cavitation besides automatic refilling. Any of them cause the model to keep track of the proportion of lost conductance in the leaf and stem xylem of the plant cohort $i$ ($PLC_{leaf,i}$ and $PLC_{stem,i}$) at successive time steps:
 \begin{eqnarray}
 PLC_{leaf,i, t} &=& \max \{PLC_{leaf,i, t-1}, 1 - k_{leaf,i}(\Psi_{leaf})/k_{max,leaf,i} \} \\
 PLC_{stem,i, t} &=& \max \{PLC_{stem,i, t-1}, 1 - k_{stem,i}(\Psi_{stem})/k_{max,stem,i} \}
@@ -433,11 +433,11 @@ PLC_{stem,i, t} &=& \max \{PLC_{stem,i, t-1}, 1 - k_{stem,i}(\Psi_{stem})/k_{max
 
 When water compartments are not considered, this equation is evaluated every hour time step, whereas it is evaluated every 1s with water compartments, as part of the constitutive equations (see  \@ref(constitutiveequations)).
 
-For simulations of less than one year one can use `cavitationRefill = "none"` to keep track of the maximum drought stress. However, for simulations of several years, it is normally advisable to allow recovery. If `cavitation = "annual"`, $PLC_{leaf,i}$ and $PLC_{stem,i}$ values are set to zero at the beginning of each year, assuming that embolized plants overcome the conductance loss by creating new xylem tissue. Finally, if `cavitationRefill = "rate"` the model simulates stem refilling at daily steps as a function of symplasmic water potential. First, a daily recovery rate ($r_{refill}$; in $cm^2 \cdot m^{-2} \cdot day^{-1}$) is estimated as a function of $\Psi_{symp,stem}$:
+For simulations of less than one year one can use `cavitationRecovery = "none"` to keep track of the maximum drought stress. However, for simulations of several years, it is normally advisable to allow recovery. If `cavitationRecovery = "annual"`, $PLC_{leaf,i}$ and $PLC_{stem,i}$ values are set to zero at the beginning of each year, assuming that embolized plants overcome the conductance loss by creating new xylem tissue. Finally, if `cavitationRecovery = "rate"` the model simulates stem refilling at daily steps as a function of symplasmic water potential. First, a daily recovery rate ($r_{refill}$; in $cm^2 \cdot m^{-2} \cdot day^{-1}$) is estimated as a function of $\Psi_{symp,stem}$:
 \begin{equation}
 r_{refill}(\Psi_{symp,stem}) = r_{\max,refill} \cdot \max \{0.0, (\Psi_{symp,stem} + 1.5)/1.5\}
 \end{equation}
-Where $r_{\max,refill}$ is the control parameter `refillMaximumRate` indicating a maximum refill rate. The right part of the equation normalizes the water potential, so that $r_{refill} = r_{refill,\max}$ if $\Psi_{symp,stem} = 0$ and $r_{refill} = 0$ if $\Psi_{symp,stem} <= -1.5MPa$. The proportion of conductance lost in leaves and stem are then updated using:
+Where $r_{\max,refill}$ is the control parameter `cavitationRecoveryMaximumRate` indicating a maximum refill rate. The right part of the equation normalizes the water potential, so that $r_{refill} = r_{refill,\max}$ if $\Psi_{symp,stem} = 0$ and $r_{refill} = 0$ if $\Psi_{symp,stem} <= -1.5MPa$. The proportion of conductance lost in leaves and stem are then updated using:
 \begin{eqnarray}
 PLC_{leaf, i} &=& \max \{0.0, PLC_{leaf, i} - (r_{refill}/H_v) \} \\
 PLC_{stem, i} &=& \max \{0.0, PLC_{stem, i} - (r_{refill}/H_v) \}

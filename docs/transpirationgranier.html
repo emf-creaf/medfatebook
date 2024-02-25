@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-02-16" />
+<meta name="date" content="2024-02-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -405,7 +405,7 @@ div.csl-indent {
 <li class="chapter" data-level="12.2.3" data-path="transpirationsperrycochard.html"><a href="transpirationsperrycochard.html#stomatal-conductance"><i class="fa fa-check"></i><b>12.2.3</b> Stomatal conductance</a></li>
 </ul></li>
 <li class="chapter" data-level="12.3" data-path="transpirationsperrycochard.html"><a href="transpirationsperrycochard.html#scalingtranspirationphotosynthesis"><i class="fa fa-check"></i><b>12.3</b> Cohort-level transpiration and photosynthesis</a></li>
-<li class="chapter" data-level="12.4" data-path="transpirationsperrycochard.html"><a href="transpirationsperrycochard.html#cavitationrefill"><i class="fa fa-check"></i><b>12.4</b> Cavitation and conduit refilling</a></li>
+<li class="chapter" data-level="12.4" data-path="transpirationsperrycochard.html"><a href="transpirationsperrycochard.html#cavitationrecovery"><i class="fa fa-check"></i><b>12.4</b> Cavitation and conduit refilling</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html"><i class="fa fa-check"></i><b>13</b> Closing energy balances</a>
 <ul>
@@ -886,16 +886,16 @@ Leaf-phenological status is included to prevent winter deciduous plants from suf
 </div>
 <div id="irreversiblecavitation" class="section level3 hasAnchor" number="6.2.2">
 <h3><span class="header-section-number">6.2.2</span> Cavitation and hydraulic recovery<a href="transpirationgranier.html#irreversiblecavitation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The water balance model is normally run assuming that although soil drought may reduce transpiration, embolized xylem conduits are automatically refilled when soil moisture recovers (in other words, cavitation is reversible and <code>cavitationRefill = "total"</code>). It is possible to simulate irreversible cavitation by setting <code>cavitationRefill = "none"</code>, <code>cavitationRefill = "rate"</code> or <code>cavitation = "annual"</code> in the control parameters. Any of these options cause the model to keep track of the maximum value of cavitation so far experienced using the proportion of of lost conductance for leaves and the stem the plant cohort <span class="math inline">\(i\)</span> (<span class="math inline">\(PLC_{leaf, i}\)</span> and <span class="math inline">\(PLC_{stem, i}\)</span>), which are modelled from <span class="math inline">\(\Psi_{plant}\)</span> using Weibull functions:
+<p>The water balance model is normally run assuming that although soil drought may reduce transpiration, embolized xylem conduits are automatically refilled when soil moisture recovers (in other words, cavitation is reversible and <code>cavitationRecovery = "total"</code>). It is possible to simulate irreversible cavitation by setting <code>cavitationRecovery = "none"</code>, <code>cavitationRecovery = "rate"</code> or <code>cavitationRecovery = "annual"</code> in the control parameters. Any of these options cause the model to keep track of the maximum value of cavitation so far experienced using the proportion of of lost conductance for leaves and the stem the plant cohort <span class="math inline">\(i\)</span> (<span class="math inline">\(PLC_{leaf, i}\)</span> and <span class="math inline">\(PLC_{stem, i}\)</span>), which are modelled from <span class="math inline">\(\Psi_{plant}\)</span> using Weibull functions:
 <span class="math display">\[\begin{eqnarray}
 PLC_{leaf, i} &amp;=&amp; \max \left \{PLC_{leaf, i}, 1 - \exp \left \{ \left[ \frac{\Psi_{plant,i}}{d_{leaf}} \right] ^{c_{leaf}} \right \} \right \} \\
 PLC_{stem, i} &amp;=&amp; \max \left \{PLC_{stem, i}, 1 - \exp \left \{ \left[ \frac{\Psi_{plant,i}}{d_{stem}} \right] ^{c_{stem}} \right \} \right \}
 \end{eqnarray}\]</span></p>
-<p>For simulations of less than one year one can use <code>cavitationRefill = "none"</code> to keep track of the maximum cavitation. However, for simulations of several years, it is normally advisable to allow recovery. If <code>cavitation = "annual"</code>, <span class="math inline">\(PLC_{leaf, i}\)</span> and <span class="math inline">\(PLC_{stem, i}\)</span> values are set to zero at the beginning of each year, assuming that embolized plants overcome the conductance loss by creating new xylem tissue. Finally, if <code>cavitationRefill = "rate"</code> the model simulates stem refilling at daily steps as a function of symplasmic water potential. First, a daily recovery rate (<span class="math inline">\(r_{refill}\)</span>; in <span class="math inline">\(cm^2 \cdot m^{-2} \cdot day^{-1}\)</span>) is estimated as a function of <span class="math inline">\(\Psi_{plant,i}\)</span>:
+<p>For simulations of less than one year one can use <code>cavitationRecovery = "none"</code> to keep track of the maximum cavitation. However, for simulations of several years, it is normally advisable to allow recovery. If <code>cavitationRecovery = "annual"</code>, <span class="math inline">\(PLC_{leaf, i}\)</span> and <span class="math inline">\(PLC_{stem, i}\)</span> values are set to zero at the beginning of each year, assuming that embolized plants overcome the conductance loss by creating new xylem tissue. Finally, if <code>cavitationRecovery = "rate"</code> the model simulates stem refilling at daily steps as a function of symplasmic water potential. First, a daily recovery rate (<span class="math inline">\(r_{refill}\)</span>; in <span class="math inline">\(cm^2 \cdot m^{-2} \cdot day^{-1}\)</span>) is estimated as a function of <span class="math inline">\(\Psi_{plant,i}\)</span>:
 <span class="math display">\[\begin{equation}
 r_{refill}(\Psi_{plant,i}) = r_{\max,refill} \cdot \max \{0.0, (\Psi_{plant,i} + 1.5)/1.5\}
 \end{equation}\]</span>
-Where <span class="math inline">\(r_{\max,refill}\)</span> is the control parameter <code>refillMaximumRate</code> indicating a maximum refill rate. The right part of the equation normalizes the water potential, so that <span class="math inline">\(r_{refill} = r_{refill,\max}\)</span> if <span class="math inline">\(\Psi_{plant,i} = 0\)</span> and <span class="math inline">\(r_{refill} = 0\)</span> if <span class="math inline">\(\Psi_{plant,i} &lt;= -1.5MPa\)</span>. The proportion of conductance lost in stems and leaves is then updated using:
+Where <span class="math inline">\(r_{\max,refill}\)</span> is the control parameter <code>cavitationRecoveryMaximumRate</code> indicating a maximum refill rate. The right part of the equation normalizes the water potential, so that <span class="math inline">\(r_{refill} = r_{refill,\max}\)</span> if <span class="math inline">\(\Psi_{plant,i} = 0\)</span> and <span class="math inline">\(r_{refill} = 0\)</span> if <span class="math inline">\(\Psi_{plant,i} &lt;= -1.5MPa\)</span>. The proportion of conductance lost in stems and leaves is then updated using:
 <span class="math display">\[\begin{eqnarray}
 PLC_{leaf, i} &amp;=&amp; \max \{0.0, PLC_{leaf, i} - (r_{refill}/H_v) \} \\
 PLC_{stem, i} &amp;=&amp; \max \{0.0, PLC_{stem, i} - (r_{refill}/H_v) \}
