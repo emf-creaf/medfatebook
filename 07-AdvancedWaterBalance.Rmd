@@ -283,15 +283,16 @@ Other relevant control parameters relevant for the advanced water balance model 
 + `thermalCapacityLAI [= 1000000]`: Canopy thermal capacitance per LAI unit (see section \@ref(canopycapacitancetemperature)).
 + `verticalLayerSize [= 100]`: The size of vertical layers (in $cm$) for leaf area distribution and light extinction calculations (see section \@ref(leafdistribution)).
 + `segmentedXylemVulnerability [=TRUE]`: If `FALSE` leaf and root vulnerability curves will be equal to those of stem.
-+ `cavitationRecoveryStem/cavitationRecoveryLeaves [= "annual"]`: A string indicating how refilling of embolized conduits is done  (see section \@ref(cavitationrecovery). Allowed values are: 
-  + `"none"` - no refilling.
-  + `"annual"` - every first day of the year.
-  + `"total"` - instantaneous complete refilling.
-  + `"rate"` - following a rate of new sapwood formation.
-+ `cavitationRecoveryMaximumRate [= 0.05]`: Maximum rate of conduit refilling (see section \@ref(cavitationrecovery)).
++ `leafCavitationRecovery / stemCavitationRecovery [= "rate"]`: A string indicating how to model recovery of xylem conductance  (see section \@ref(cavitationRecovery)). Allowed values are: 
+  + `"none"` - no recovery.
+  + `"annual"` - complete recovery every first day of the year.
+  + `"total"` - instantaneous complete recovery.
+  + `"rate"` - following a rate of new leaf or sapwood formation.
++ `cavitationRecoveryMaximumRate [= 0.05]`: Maximum rate of conductance recovery (see section \@ref(cavitationRecovery)).
 
 A set of parameters is only relevant for `transpirationMode = "Sperry"`:
 
++ `leafCavitationEffects / stemCavitationEffects [= FALSE/TRUE]`: A flag indicating whether cavitation effects on conductance of leaves and stem are applied. 
 + `numericParams`: A list with parameters for numerical approximation routines:
   + `maxNsteps [= 400]` - Maximum number of steps in supply function.
   + `ntrial [= 200]` - Number of iteration trials when finding root of equation system.
@@ -308,9 +309,7 @@ whereas another set is only relevant for `transpirationMode = "Cochard"`:
 + `k_SSym [= 0.26]`: Conductance from stem apoplasm to stem symplasm (mmol·s-1·m-2).
 + `k_LSym [= 2.0]`: Conductance from leaf apoplasm to leaf symplasm (mmol·s-1·m-2).
 + `gs_NightFrac [= 0.05]`: Stomatal conductance at night as fraction of maximum stomatal conductance ([0-1]).
-+ `TPhase_gmin [= 37.5]`: Temperature for transition phase of gmin.
-+ `Q10_1_gmin [= 1.2]`: Temperature dependence of gmin when T ≤ TPhase.
-+ `Q10_2_gmin [= 4.8]`: Temperature dependence of gmin when T > TPhase.
++ `stomatalSubmodel [= "Baldocchi"]`: Stomatal regulation sub-model, either "Jarvis" or "Baldocchi".
 + `JarvisPAR [= 0.003]`: Parameter regulating the response of stomatal conductance to light (PAR) in the Jarvis model.
 + `gCrown0 [= 0.150]`: Reference crown conductance (mol·s-1·m-2).
 + `fTRBToLeaf [= 0.8]`: Fraction of surface of bark exposed to air per leaf area.

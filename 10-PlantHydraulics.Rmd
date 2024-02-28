@@ -19,7 +19,7 @@ We devote this chapter to describe the background necessary to understand how pl
 
 The hydraulic architecture of a model describes the set of water compartments and resistances to water flow that are explicitly considered, often implying a simplification and discretization of real plant hydraulic pathways. The advanced water balance model of **medfate** implements different hydraulic architectures depending on the transpiration sub-model:
 
-+ If `transpirationMode = "Sperry"`, the hydraulic network is described using $(S \times 2 + 1 + 1)$ resistance elements, with soil being represented in $S$ different soil layers. For each soil layer there is a rhizosphere element in series with a root xylem element. The $S$ soil layers are in parallel up to the root crown. From there there is one stem xylem segment and a final leaf xylem segment in series (Fig. \@ref(fig:hydraulicsnetwork)). Stem cavitation affects the resistance between the root crown ($\Psi_{rootcrown}$) and the stem ($\Psi_{stem}$), whereas leaf cavitation affects the resistance between the stem ($\Psi_{stem}$) and the leaf ($\Psi_{leaf}$)
++ If `transpirationMode = "Sperry"`, the hydraulic network is described using $(S \times 2 + 1 + 1)$ resistance elements, with soil being represented in $S$ different soil layers. For each soil layer there is a rhizosphere element in series with a root xylem element. The $S$ soil layers are in parallel up to the root crown. From there there is one stem xylem segment and a final leaf xylem segment in series (Fig. \@ref(fig:hydraulicsnetwork)). When considered (via control parameter `stemCavitationEffects`), stem cavitation affects the resistance between the root crown ($\Psi_{rootcrown}$) and the stem ($\Psi_{stem}$). Similarly, when considered (via control parameter `leafCavitationEffects`) leaf cavitation affects the resistance between the stem ($\Psi_{stem}$) and the leaf ($\Psi_{leaf}$)
 
 
 ```{r hydraulicsnetwork, out.width='80%', fig.align="center", fig.cap="Schematic representation of hydraulics in a whole-plant network", echo=FALSE}
@@ -828,6 +828,8 @@ The following figure shows network supply functions for each soil texture and st
 par(mar=c(4,4,2,1), mfrow=c(1,2))
 psiMax = -7.0
 hn11 <- list("numericParams" = numericParams,
+             "stemCavitationEffects" = TRUE,
+             "leafCavitationEffects" = FALSE,
              "psisoil" = psiSoilLayers1,
              "krhizomax" = krhizomaxvec1, "nsoil" = rep(n1,3), "alphasoil" = rep(alpha1,3),
              "krootmax" = krootmaxvec, "rootc" = rootc, "rootd" = rootd,
@@ -845,6 +847,8 @@ hn14 <- hn11
 hn14$psisoil <- psiSoilLayers4
 supplyNetwork14 = hydraulics_supplyFunctionNetwork(hn14)
 hn21 <- list("numericParams" = numericParams,
+             "stemCavitationEffects" = TRUE,
+             "leafCavitationEffects" = FALSE,
              "psisoil" = psiSoilLayers1,
              "krhizomax" = krhizomaxvec2, "nsoil" = rep(n2,3), "alphasoil" = rep(alpha2,3),
              "krootmax" = krootmaxvec, "rootc" = rootc, "rootd" = rootd,
@@ -862,6 +866,8 @@ hn24 <- hn21
 hn24$psisoil <- psiSoilLayers4
 supplyNetwork24 = hydraulics_supplyFunctionNetwork(hn24)
 hn31 <- list("numericParams" = numericParams,
+             "stemCavitationEffects" = TRUE,
+             "leafCavitationEffects" = FALSE,
              "psisoil" = psiSoilLayers1,
              "krhizomax" = krhizomaxvec3, "nsoil" = rep(n3,3), "alphasoil" = rep(alpha3,3),
              "krootmax" = krootmaxvec, "rootc" = rootc, "rootd" = rootd,
