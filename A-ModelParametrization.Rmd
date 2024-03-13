@@ -32,8 +32,8 @@ The following tables describe how the different functional parameters are dealt 
 |--------|------|:----------------------------------- |:-------:|:-------:|:-------:|
 | $H_{max}$  | `Hmed` | Maximum plant height | Yes | No | No |
 | $H_{med}$  | `Hmed` | Median plant height | Yes | No | No |
-| $f_{HD,min}$ | `fHDmin` | Minimum height-to-diameter ratio | Yes | No | No 
-| $f_{HD,max}$ | `fHDmax` | Maximum height-to-diameter ratio | Yes | No | No |
+| $Z_{50}$  | `Z50` | Depth above which 50% of the fine root mass is located | No | No | \@ref(imputationRootingDepth) |
+| $Z_{95}$  | `Z95` | Depth above which 95% of the fine root mass is located  | Yes | No | No |
 
 **Allometric coefficients**
 
@@ -45,6 +45,8 @@ The following tables describe how the different functional parameters are dealt 
 | $a_{fbt}$, $b_{fbt}$, $c_{fbt}$ | `a_fbt`, `b_fbt`, `c_fbt` | Coefficients to calculate foliar biomass of an individual tree  | No | No | \@ref(imputationTreeAllometries) |
 | $a_{cr}$, $b_{1cr}$, $b_{2cr}$, $b_{3cr}$, $c_{1cr}$, $c_{2cr}$ | `a_cr`, `b_1cr`, `b_2cr`, `b_3cr`, `c_1cr`, `c_2cr` | Coefficients to calculate crown ratio of trees | No | No | \@ref(imputationTreeAllometries) |
 | $a_{cw}$, $b_{cw}$ | `a_cw`, `b_cw` | Regression coefficients used to calculate the crown width of trees | No | No | \@ref(imputationTreeAllometries) |
+| $f_{HD,min}$ | `fHDmin` | Minimum height-to-diameter ratio | No | No | \@ref(imputationTreeAllometries) |
+| $f_{HD,max}$ | `fHDmax` | Maximum height-to-diameter ratio | No | No | \@ref(imputationTreeAllometries) |
 
 **Leaf phenology**
 
@@ -181,6 +183,13 @@ The following figure summarizes the percentage of missing values in `SpParamsMED
 knitr::include_graphics("figures/imputation.png")
 ```
 
+### Rooting depth {#imputationRootingDepth}
+
+Parameter $Z_{95}$ is a strict parameter, but $Z_{50}$ can be imputated when missing, using the following formula:
+\begin{equation}
+ Z_{50}  = \exp(\log(Z_{95})/1.4)
+\end{equation}
+
 
 ### Shrub allometric coefficients {#imputationShrubAllometries}
 
@@ -212,6 +221,8 @@ Missing tree allometric coefficients are replaced with values depending on wheth
 | $b_{3cr}$ | -0.00012 | 0.00018 | 
 | $c_{1cr}$ | -0.004 | -0.007 | 
 | $c_{2cr}$ | -0.159 | 0.000 | 
+| $fHD_{min}$ | 80 | 40 | 
+| $fHD_{max}$ | 120 | 140 | 
 
 ### Leaf width, specific leaf area and fine foliar ratio {#imputationLWSLA}
 
