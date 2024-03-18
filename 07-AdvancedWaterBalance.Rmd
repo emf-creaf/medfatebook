@@ -5,9 +5,18 @@
 This chapter provides an overview of the advanced water and energy balance model available in **medfate**. It shares some characteristics with the basic water balance model described in previous chapters. Like the previous one, the model is run using function `spwb()`, for a set of days, or function `spwb_day()`, for a single day. Compared to the basic model, the advanced water balance model adds more detail in some processes (radiation transfer, plant hydraulics and photosynthesis) and incorporates other processes that were missing (canopy/soil energy balances and plant water balance). Importantly, two alternative approaches are possible regarding *plant hydraulics* and *stomatal conductance* sub-models:
 
   + If `transpirationMode = "Sperry"`, the sub-models of plant hydraulics and stomatal conductance follow @Sperry2016 and were described in detail in @DeCaceres2021. 
-  + If `transpirationMode = "Cochard"`, the sub-models of plant hydraulics and stomatal conductance follow SurEau-ECOS and were described in @ruffault_sureau-ecos_2022. 
+  + If `transpirationMode = "Sureau"`, the sub-models of plant hydraulics and stomatal conductance follow SurEau-ECOS and were described in @ruffault_sureau-ecos_2022. 
 
 The following model overview is structured as in chapter \@ref(basicwaterbalance). Process formulations shared with the basic water balance model were presented in previous chapters and will not be repeated. The chapters following this one provide a detailed description of those sub-modules that are exclusive of the advanced model. Whenever necessary, we will detail the difference between the two sub-models of plant hydraulics and stomatal conductance corresponding to @DeCaceres2021 and @ruffault_sureau-ecos_2022. We recommend readers to familiarize themselves with basic water balance modelling processes before reading this and the subsequent chapters. In addition, users of this model should have a background on the processes implemented to fully understand and exploit model outputs. Since the scope of this book is focused on the model, interested readers should address relevant eco-physiological bibliography complement the material exposed here.
+
+## About Sureau
+
+SurEau is a comprehensive plant hydraulic model that already knows different versions. The first and most detailed version was developed in C by Hervé Cochard (Sureau.c, @cochard_sureau_2021), which follows a preliminary version coded in Excell and in R that has been used to understand the stomatal functioning of plants around the world [@Martin-StPaul2017].
+
+In Sureau.c , the plant is relatively well detailed (large roots, trunk, branches, leaves, buds and even flowers). The numerical resolution of the calculations is done according to an explicit scheme, where the elementary transfers of water between each compartment must be calculated at very small time-steps to avoid numerical instabilities known as the Courant–Friedrichs–Lewy condition (for a tree time step must be around 0.001s). This complexity is an advantage for exploring questions about the physiological functioning of the tree. However, the computational demand is also a limit for large-scale application of the model and for integration in dynamic vegetation or land surface models.
+
+Researchers from INRAE-URFM (François Pimont, Julien Ruffault, Nicolas Martin-StPaul at Avignon) and INRAE-PIAF (Hervé Cochard, at Clermont-Ferrand) therefore joined forces to develop a new version, coded in R native, where the numerical scheme for solving water transport calculations was improved (SurEau-Ecos, @ruffault_sureau-ecos_2022). They implemented two alternative resolution schemes (the so called semi-implicit and implicit) allowing to solves the water transport accounting for capacitance and cavitation at much larger time steps (of the order of 10 to 30 minutes). In this version the authors also used a tree simplified to only two organs: leaves and stems (and therefore four compartments with an apoplasm and a symplasm for each organ) to facilitate parameterization. This advance has been decisive for **medfate** because it made the model compatible in terms of plant structure and and computational demand. In **medfate** we refer to `Sureau` when this model is used for the computation of transpiration and plant water related processes.
+
 
 ## Design principles {#advanceddesign}
 
@@ -27,7 +36,7 @@ Plant hydraulics and stomatal regulation follow different designs depending on t
 
 + If `transpirationMode = "Sperry"`, plant hydraulics follows the steady-state approach of Sperry et al. [-@Sperry1998] model, and stomatal regulation follows the profit maximization approach of Sperry et al. [-@Sperry2016]. 
 
-+ If `transpirationMode = "Cochard"`, plant water compartments are always included, and water flows follow Darcy's law, as described in @ruffault_sureau-ecos_2022. In this case, stomatal regulation follows a Jarvis-type model.
++ If `transpirationMode = "Sureau"`, plant water compartments are always included, and water flows follow Darcy's law, as described in @ruffault_sureau-ecos_2022. In this case, stomatal regulation follows a Jarvis-type model.
 
 Like in the basic water model, the advanced model assumes by default that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can be simulated. In this case, hydrological processes are replicated for the fraction of soil corresponding to each cohort. Transpiration of each plant cohort depends on the soil moisture beneath itself and, depending on root overlap, on the soil moisture beneath other plant cohorts.
 
@@ -41,7 +50,7 @@ The following are state variables in the model under all simulations:
 
 Additional state variables depend on the activation of specific control flags (see subsection \@ref(advancedwaterbalancecontrol)):
 
-+ If `transpirationMode = "Cochard"`, the model also tracks $\Psi_{apo, stem,i}$, the water potential of the stem apoplastic compartment, as well as the water potential of stem and leaf symplastic compartments, $\Psi_{symp, stem,i}$ and $\Psi_{symp, leaf,i}$ respectively.
++ If `transpirationMode = "Sureau"`, the model also tracks $\Psi_{apo, stem,i}$, the water potential of the stem apoplastic compartment, as well as the water potential of stem and leaf symplastic compartments, $\Psi_{symp, stem,i}$ and $\Psi_{symp, leaf,i}$ respectively.
 + *If stem cavitation is not completely reversible*, the model tracks $PLC_{stem, i}$ and $PLC_{leaf, i}$, the proportion of conductivity lost the stem and leaves, respectively, of plants of cohort $i$.
 + *If plant water pools are considered*, the model also tracks $W_{i,s}$, the proportion of soil moisture in relation to field capacity for layer $s$ within the areal fraction of stand covered by cohort $i$.
 + *If multi-layer canopy energy balance is activated*, the model tracks for each vertical layer $j \in \{1,l\}$: 
@@ -126,14 +135,14 @@ For every day to be simulated, the model performs the following steps:
 5. Determine sub-daily air temperature and direct/diffuse irradiance variations (chapter \@ref(subdailytemplight)).
 6. Determine the proportion of sunlit/shade leaves (section \@ref(sunlitshadeleaves)), the shortwave radiation absorbed by plant cohorts  (sections \@ref(shortwaveradiationcanopyabs) and the soil (section \@ref(shortwaveradiationsoilabs)) at sub-daily steps.
 7. If `transpirationMode = "Sperry"`, update the water supply function of each plant cohort, according to the hydraulic model and the current soil water potential (chapter \@ref(planthydraulics)). 
-8. Determine instantaneous plant cohort transpiration, photosynthesis rates and close soil/canopy energy balance at sub-daily steps (chapters \@ref(transpirationsperrycochard) and \@ref(closecanopysoilenergybalance)). This involves the following actions for each sub-daily step:
+8. Determine instantaneous plant cohort transpiration, photosynthesis rates and close soil/canopy energy balance at sub-daily steps (chapters \@ref(transpirationsperrysureau) and \@ref(closecanopysoilenergybalance)). This involves the following actions for each sub-daily step:
     a. Determine long-wave radiation exchange between soil, canopy layers and atmosphere (section \@ref(longwaveradiation)).
     b. If `transpirationMode = "Sperry"`, for each woody cohort:
 
         i. Calculate leaf energy balance and photosynthesis (for shade and sunlit leaves of each plant cohort) corresponding to each transpiration value of the supply function (section \@ref(leafenergybalancephoto)). If plant capacitance effects are considered this concerns the stem-to-leaf hydraulic supply function.
         ii. Determine stomatal conductance, transpiration and photosynthesis on shade and sunlit leaves of each plant cohort according to Sperry's [-@Sperry2016] profit maximization strategy (section \@ref(stomatalregulation)).
         
-    c. If `transpirationMode = "Cochard"`, for each plant cohort repeat the following in small sub-steps (e.g. 10 min):
+    c. If `transpirationMode = "Sureau"`, for each plant cohort repeat the following in small sub-steps (e.g. 10 min):
 
        i. Perform energy balance of sunlit and shade leaves (section \@ref(leafenergybalancephoto)), according to the current transpiration flow.
         ii. Re-estimate leaf and stem cuticular transpiration.
@@ -228,10 +237,10 @@ A fourth set of parameters are related to transpiration and photosynthesis (`par
 | $\Psi_{50,stem}$, $slope_{stem}$ | MPa, %/MPa | `VCstem_P50`, `VCstem_slope` | Parameters of the vulnerability curve for stem xylem (Sigmoid) |
 | $c_{root}$, $d_{root}$ | (unitless), MPa | `VCroot_c`, `VCroot_d` | Parameters of the vulnerability curve for root xylem (Weibull) |
 | $\Psi_{50,root}$, $slope_{root}$ | MPa, %/MPa | `VCroot_P50`, `VCroot_slope` | Parameters of the vulnerability curve for root xylem (Sigmoid) |
-| $T_{gs, optim}$ |  $^{\circ} \mathrm{C}$ | `Gs_Toptim`| Temperature corresponding to maximal stomatal conductance (Cochard sub-model) |
-| $T_{gs, sens}$ | | `Gs_Tsens` | Stomatal sensitivity to temperature (Cochard sub-model) |
-| $\Psi_{50,gs}$ | MPa | `Gs_P50`| Water potential causing 50% reduction in stomatal conductance (Cochard sub-model) |
-| $slope_{gs}$ | %/MPa | `Gs_slope` | Rate of decrease in stomatal conductance at $\Psi_{50,gs}$ (Cochard sub-model) |
+| $T_{gs, optim}$ |  $^{\circ} \mathrm{C}$ | `Gs_Toptim`| Temperature corresponding to maximal stomatal conductance (Sureau sub-model) |
+| $T_{gs, sens}$ | | `Gs_Tsens` | Stomatal sensitivity to temperature (Sureau sub-model) |
+| $\Psi_{50,gs}$ | MPa | `Gs_P50`| Water potential causing 50% reduction in stomatal conductance (Sureau sub-model) |
+| $slope_{gs}$ | %/MPa | `Gs_slope` | Rate of decrease in stomatal conductance at $\Psi_{50,gs}$ (Sureau sub-model) |
 
 It is important to mention that stem- and root-level hydraulic conductances (i.e. $k_{stem, \max}$ and $k_{root, \max}$) are not given as inputs by the user, but are the result from scaling tissue-level conductivity parameters (i.e. $K_{stem,max,ref}$ and $K_{root,max,ref}$) according to plant size (see \@ref(scalingkstem) and \@ref(scalingkroot) for details). Similarly, parameters of Weibull vulnerability curves are estimated from the input in form of $\Psi_{50}$, $\Psi_{12}$ and $\Psi_{88}$ available in `SpParams`. The $slope$ of the Sigmoid vulnerability curves can also be estimated from the same values, or provided by the user directly as a column in `SpParams`.
 
@@ -255,7 +264,7 @@ Vegetation functional attributes are normally filled for each cohort by function
 
 Control parameters modulate the overall behaviour of water balance simulations (see section \@ref(controlparameters)). There are three **key control parameters**:
 
-1. `transpirationMode` defines the transpiration model. If `transpirationMode = "Sperry"` or `transpirationMode = "Cochard"` then the advanced water balance model is run with the corresponding plant hydraulics and stomatal regulation sub-models. In advanced water balance models, the water retention curve model is forced to be that of Van Genuchten, i.e. `soilFunctions = "VG"` (see section \@ref(waterretentioncurves)). 
+1. `transpirationMode` defines the transpiration model. If `transpirationMode = "Sperry"` or `transpirationMode = "Sureau"` then the advanced water balance model is run with the corresponding plant hydraulics and stomatal regulation sub-models. In advanced water balance models, the water retention curve model is forced to be that of Van Genuchten, i.e. `soilFunctions = "VG"` (see section \@ref(waterretentioncurves)). 
 2. `ndailysteps` defines the number of daily steps. By default `ndailysteps = 24`, so that steps are hours, but users can increase the temporal resolution, for example to half hour substeps by setting `ndailysteps = 48`.
 3. `multiLayerBalance` is a boolean flag to indicate that multi-layer energy balance is desired (by default `multiLayerBalance = FALSE`).
 4. `nsubsteps`  defines the number of substeps for multi-layer energy balance calculations. By default `nsubsteps = 3600`, so that substeps are 1 sec if `ndailysteps = 24`.
@@ -299,7 +308,7 @@ A set of parameters is only relevant for `transpirationMode = "Sperry"`:
   + `psiTol [= 0.0001]` - Tolerance value for water potential.
   + `ETol [= 0.0001]` - Tolerance value for flow.
   
-whereas another set is only relevant for `transpirationMode = "Cochard"`:
+whereas another set is only relevant for `transpirationMode = "Sureau"`:
 
 + `plantCapacitance [= TRUE]`: Whether the effect of (symplasmic or apoplasmic) plant water compartments is considered in simulations.
 + `leafCuticularTranspiration [= TRUE]`: Whether the effect of leaf cuticular transpiration is considered in simulations.
@@ -325,7 +334,7 @@ Finally, a number of control parameters are used to modify how hydraulic paramet
 
 #### Daily output
 
-Functions `spwb()` and `pwb()` with `transpirationMode = "Sperry"` or `transpirationMode = "Cochard"` return a list of a class with the same name. The first four elements of this list (i.e., `latitude`, `topography`, `weather` and `spwbInput`) are simply copies of model inputs. The next element is `spwbOutput`, which contains the state of the input object at the end of the simulation (this can be used to perform further simulations starting with current values of state variables). The remainng elements are:
+Functions `spwb()` and `pwb()` with `transpirationMode = "Sperry"` or `transpirationMode = "Sureau"` return a list of a class with the same name. The first four elements of this list (i.e., `latitude`, `topography`, `weather` and `spwbInput`) are simply copies of model inputs. The next element is `spwbOutput`, which contains the state of the input object at the end of the simulation (this can be used to perform further simulations starting with current values of state variables). The remainng elements are:
 
 | Element | Description                                                |
 |---------|------------------------------------------------------------|
@@ -379,4 +388,4 @@ The output of simulations can be inspected using `plot`, `shinyplot` and `summar
 
 #### Sub-daily output
 
-Calling function `spwb_day()` with the advanced water balance model results in sub-daily results for the simulated date. When running the advanced water balance model with function `spwb()` one can request sub-daily results to be included with the function output. This is done via setting  `subdailyResults = TRUE` in the control parameter list. In that case, the output list of `spwb()` will include an element `subdaily`, whose sub-elements correspond to the results of `spwb_day()` for each date simulated. Refer to the documentation of functions `spwb_day()` and `transp_transpirationSperry()` or `transp_transpirationCochard()` for details of sub-daily output.
+Calling function `spwb_day()` with the advanced water balance model results in sub-daily results for the simulated date. When running the advanced water balance model with function `spwb()` one can request sub-daily results to be included with the function output. This is done via setting  `subdailyResults = TRUE` in the control parameter list. In that case, the output list of `spwb()` will include an element `subdaily`, whose sub-elements correspond to the results of `spwb_day()` for each date simulated. Refer to the documentation of functions `spwb_day()` and `transp_transpirationSperry()` or `transp_transpirationSureau()` for details of sub-daily output.

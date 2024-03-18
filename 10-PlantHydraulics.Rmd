@@ -12,7 +12,7 @@ col3pale = "light blue"
 col4pale = "green"
 ```
 
-We devote this chapter to describe the background necessary to understand how plant hydraulics is implemented in the advanced water balance model of **medfate**. Section \@ref(hydraulicnetworks) introduces the hydraulic networks from which to choose, depending on the sub-model of plant hydraulics employed (i.e. either `transpirationMode = "Sperry"` or `transpirationMode = "Cochard"`). After that, in sections \@ref(vulnerabilitycurves) and  \@ref(plantwatercontent) we present the building blocks of models of plant hydraulics, i.e. how to represent in a model the water content of plant tissues and the water flow through vascular elements. In section \@ref(supplyfunctions) we describe in detail the plant hydraulic sub-model presented in @DeCaceres2021 (without water compartments), and in  \@ref(hydraulicscochard) we describe the sub-model of plant hydraulics that was presented in @ruffault_sureau-ecos_2022 and was added to **medfate**.
+We devote this chapter to describe the background necessary to understand how plant hydraulics is implemented in the advanced water balance model of **medfate**. Section \@ref(hydraulicnetworks) introduces the hydraulic networks from which to choose, depending on the sub-model of plant hydraulics employed (i.e. either `transpirationMode = "Sperry"` or `transpirationMode = "Sureau"`). After that, in sections \@ref(vulnerabilitycurves) and  \@ref(plantwatercontent) we present the building blocks of models of plant hydraulics, i.e. how to represent in a model the water content of plant tissues and the water flow through vascular elements. In section \@ref(supplyfunctions) we describe in detail the plant hydraulic sub-model presented in @DeCaceres2021 (without water compartments), and in  \@ref(hydraulicssureau) we describe the sub-model of plant hydraulics that was presented in @ruffault_sureau-ecos_2022 and was added to **medfate**.
 
 
 ## Hydraulic architecture {#hydraulicnetworks}
@@ -27,13 +27,13 @@ knitr::include_graphics("figures/hydraulics_network.jpg")
 ```
 
 
-+ If `transpirationMode = "Cochard"`, the soil–plant system in SurEau-ECOS [@ruffault_sureau-ecos_2022] is discretized into three soil layers and two plant compartments  (Fig. \@ref(fig:hydraulicssureau)): a leaf and a stem. Each of the two plant organs contains an apoplasm and a symplasm. The stem apoplasm and symplasm include water volumes of all non-leaf compartments, i.e., trunk, root and branches. Symplasmic capacitances (i.e. $C_{LSym}$ and $C_{SSym}$) mostly buffer water fluxes during well-watered conditions, whereas apoplasm capacitances  (i.e. $C_{LApo}$ and $C_{SApo}$) come into play when cavitation occurs. Water can leaf the plant via three flows, through stomata ($E_{stom}$), leaf cuticules ($E_{cuti,leaf}$) and stem cuticules ($E_{cuti,stem}$). The architecture is completed with nodes for the fine root surface of each soil layer ($\Psi_{rootsurf}$) and for the root crown ($\Psi_{rootcrown}$), but these elements do not correspond to water compartments. Stem cavitation affects the conductances of the pathways between root surfaces ($\Psi_{rootsurf}$) and the root crown ($\Psi_{rootcrown}$), as well as the conductance between the root crown and the stem apoplasm ($\Psi_{stem, apo}$). Leaf cavitation affects the conductance between the stem apoplasm ($\Psi_{stem, apo}$) and the leaf apoplasms ($\Psi_{leaf, apo}$).
++ If `transpirationMode = "Sureau"`, the soil–plant system in SurEau-ECOS [@ruffault_sureau-ecos_2022] is discretized into three soil layers and two plant compartments  (Fig. \@ref(fig:hydraulicssureau)): a leaf and a stem. Each of the two plant organs contains an apoplasm and a symplasm. The stem apoplasm and symplasm include water volumes of all non-leaf compartments, i.e., trunk, root and branches. Symplasmic capacitances (i.e. $C_{LSym}$ and $C_{SSym}$) mostly buffer water fluxes during well-watered conditions, whereas apoplasm capacitances  (i.e. $C_{LApo}$ and $C_{SApo}$) come into play when cavitation occurs. Water can leaf the plant via three flows, through stomata ($E_{stom}$), leaf cuticules ($E_{cuti,leaf}$) and stem cuticules ($E_{cuti,stem}$). The architecture is completed with nodes for the fine root surface of each soil layer ($\Psi_{rootsurf}$) and for the root crown ($\Psi_{rootcrown}$), but these elements do not correspond to water compartments. Stem cavitation affects the conductances of the pathways between root surfaces ($\Psi_{rootsurf}$) and the root crown ($\Psi_{rootcrown}$), as well as the conductance between the root crown and the stem apoplasm ($\Psi_{stem, apo}$). Leaf cavitation affects the conductance between the stem apoplasm ($\Psi_{stem, apo}$) and the leaf apoplasms ($\Psi_{leaf, apo}$).
 
 ```{r hydraulicssureau, out.width='80%', fig.align="center", fig.cap="Schematic representation of hydraulics in a network with water storage compartments according to the design of SurEau-ECOS", echo=FALSE}
 knitr::include_graphics("figures/hydraulics_sureau.jpg")
 ```
 
-The two architectures share as common elements the nodes corresponding to bulk soil  ($\Psi_{soil}$) and root surface ($\Psi_{rootsurf}$) for each soil layer, as well as the water potential at the root crown ($\Psi_{rootcrown}$). Since the architecture of `transpirationModel = "Sperry"` considers plant xylem elements only, the stem water potential ($\Psi_{stem}$) can be considered analogous to the apoplasmic stem water potential of Sureau-ECOS ($\Psi_{stem,apo}$). Similarly its leaf water potential ($\Psi_{leaf}$) can be considered equivalent to the apoplasmic stem water potential of Sureau-ECOS ($\Psi_{leaf,apo}$). Symplasmic compartments of Sureau-ECOS do not have equivalents in the Sperry architecture, but the water potential of symplasmic compartments can be assumed to be equal to those of their corresponding apoplasmic compartments. Important differences between the two architectures include the additional consideration of (i) plant capacitance effects, (ii) cavitation flows and (iii) cuticular transpiration flows that are only available in Sureau-ECOS (Fig. \@ref(fig:hydraulicsnetwork)). The two models also differ in how stomatal regulation, water flows and water potentials are solved. These differences are described in the following sub-sections as well as in chapter \@ref(transpirationsperrycochard).
+The two architectures share as common elements the nodes corresponding to bulk soil  ($\Psi_{soil}$) and root surface ($\Psi_{rootsurf}$) for each soil layer, as well as the water potential at the root crown ($\Psi_{rootcrown}$). Since the architecture of `transpirationModel = "Sperry"` considers plant xylem elements only, the stem water potential ($\Psi_{stem}$) can be considered analogous to the apoplasmic stem water potential of Sureau-ECOS ($\Psi_{stem,apo}$). Similarly its leaf water potential ($\Psi_{leaf}$) can be considered equivalent to the apoplasmic stem water potential of Sureau-ECOS ($\Psi_{leaf,apo}$). Symplasmic compartments of Sureau-ECOS do not have equivalents in the Sperry architecture, but the water potential of symplasmic compartments can be assumed to be equal to those of their corresponding apoplasmic compartments. Important differences between the two architectures include the additional consideration of (i) plant capacitance effects, (ii) cavitation flows and (iii) cuticular transpiration flows that are only available in Sureau-ECOS (Fig. \@ref(fig:hydraulicsnetwork)). The two models also differ in how stomatal regulation, water flows and water potentials are solved. These differences are described in the following sub-sections as well as in chapter \@ref(transpirationsperrysureau).
 
 ## Vulnerability curves {#vulnerabilitycurves}
 
@@ -105,7 +105,7 @@ The dash-dot line between 0 and $\Psi_{cav} = -2.5$ MPa indicates the modificati
 
 #### Sigmoid vulnerability curves
 
-When `transpirationMode = "Cochard"`, xylem tissues are assigned a two-parameter sigmoid function as the vulnerability curve $k(\Psi)$:
+When `transpirationMode = "Sureau"`, xylem tissues are assigned a two-parameter sigmoid function as the vulnerability curve $k(\Psi)$:
 \begin{equation}
 k(\Psi) = \frac{k_{max}}{1 + e^{(slope/25) \cdot (\Psi - \Psi_{50})}}
 (\#eq:xylemvulnerabilitysigmoid)
@@ -275,7 +275,7 @@ E_i = \int_{\Psi_{up}}^{\Psi_{down}}{k_i(\Psi) d\Psi}
 \end{equation}
 where $\Psi_{up}$ and $\Psi_{down}$ are the upstream and downstream water potential values, respectively. The integral transform assumes infinite discretization of the flow path. 
 
-The supply function can be defined for individual elements of the continuum or for the whole soil-plant continuum using different hydraulic networks. Supply functions are used in the Sperry's sub-model to determine photosynthesis, stomatal conductance and transpiration (see chapters  \@ref(plantphotosynthesis) and \@ref(transpirationsperrycochard)).
+The supply function can be defined for individual elements of the continuum or for the whole soil-plant continuum using different hydraulic networks. Supply functions are used in the Sperry's sub-model to determine photosynthesis, stomatal conductance and transpiration (see chapters  \@ref(plantphotosynthesis) and \@ref(transpirationsperrysureau)).
 
 In the following subsections we illustrate the supply function for different cases.
 
@@ -1050,7 +1050,7 @@ legend("topleft", bty="n", legend=c("Leaf","Stem","Root crown", "Rhizo 1", "Rhiz
 
 A supply function of the soil-plant hydraulic network defines a set steady-state flows and corresponding water potentials given fixed values of soil moisture. Hence, supply functions need to be updated whenever soil moisture is updated, i.e. once a day in the water balance model (see subsection \@ref(advancedwaterbalancescheduling)). This frequency should be enough in most cases, since soil water potentials change more slowly than plant water potentials.
 
-## Cochard's sub-model of plant hydraulics {#hydraulicscochard}
+## Sureau's sub-model of plant hydraulics {#hydraulicssureau}
 
 ### Constitutive equations
 
@@ -1131,7 +1131,7 @@ The equation for $\mathrm{d}PLC / \mathrm{d} \Psi$ is given in @ruffault_sureau-
 
 ### Transpiration flows
 
-Stem cuticular transpiration ($E_{cuti,stem}$), leaf cuticular transpiration ($E_{cuti, leaf}$) and leaf stomatal transpiration ($E_{stom}$) are described in section \@ref(transpirationcochard).
+Stem cuticular transpiration ($E_{cuti,stem}$), leaf cuticular transpiration ($E_{cuti, leaf}$) and leaf stomatal transpiration ($E_{stom}$) are described in section \@ref(transpirationsureau).
 
 ### Numerical scheme
 
