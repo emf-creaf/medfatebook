@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-03-18" />
+<meta name="date" content="2024-03-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -970,6 +970,10 @@ where <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)
 where <span class="math inline">\(\theta(\psi)\)</span> is the water retention, <span class="math inline">\(\theta_{sat}\)</span> is the saturated water content, <span class="math inline">\(\theta_{res}\)</span> is the residual water content, <span class="math inline">\(\alpha\)</span> is related to the inverse of the air entry pressure, and <span class="math inline">\(n\)</span> is a measure of the pore-size distribution.</li>
 </ol>
 
+<pre><code>## Warning: A numeric `legend.position` argument in `theme()` was deprecated in ggplot2 3.5.0.
+## ℹ Please use the `legend.position.inside` argument of `theme()` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.</code></pre>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:retention-curves"></span>
 <img src="medfatebook_files/figure-html/retention-curves-1.png" alt="Water retention curves under the Saxton and Van Genuchten models, for the same physical attributes (25% sand, 25% clay, 50% silt and bulk density of \(1.5 g \cdot cm^{-3}\)). Parameters of the Van Genuchten curve have been estimated using pedotransfer functions given in Tóth et al. (2015)." width="384" />
 <p class="caption">
@@ -1288,8 +1292,8 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 <div id="forestobjects" class="section level3 hasAnchor" number="2.4.4">
 <h3><span class="header-section-number">2.4.4</span> Forest plot objects<a href="model-inputs.html#forestobjects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>While the previous section described the structural forest variables required to run simulations in <strong>medfate</strong>, forest plot data input in the package is easier if one uses a format that follows closely forest inventory plot descriptions. In this format, each forest plot is represented in an object of class <code>forest</code>, a list that contains several elements. Here we use an example forest stand provided with the package:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="model-inputs.html#cb6-1" tabindex="-1"></a><span class="fu">data</span>(exampleforest)</span>
-<span id="cb6-2"><a href="model-inputs.html#cb6-2" tabindex="-1"></a>exampleforest</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="model-inputs.html#cb7-1" tabindex="-1"></a><span class="fu">data</span>(exampleforest)</span>
+<span id="cb7-2"><a href="model-inputs.html#cb7-2" tabindex="-1"></a>exampleforest</span></code></pre></div>
 <pre><code>## $treeData
 ##            Species   N   DBH Height Z50  Z95
 ## 1 Pinus halepensis 168 37.55    800 100  600
@@ -1313,7 +1317,7 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 ## [1] &quot;forest&quot; &quot;list&quot;</code></pre>
 <p>The most important items of <code>forest</code> are the two data frames describing woody vegetation, <code>treeData</code> (for trees) and <code>shrubData</code> for shrubs, but the herbaceous layer can also be described using <code>herbCover</code> and <code>herbHeight</code>. With the aim to help users in the task of constructing <code>forest</code> objects, package <a href="https://github.com/emf-creaf/medfateutils"><strong>medfateutils</strong></a> includes functions to map user data in into tables <code>treeData</code> and <code>shrubData</code>.</p>
 <p><code>forest</code> objects are a convenient format to start calculations with <strong>medfate</strong>, because there are many static functions that take forest objects as input. For example, a <code>summary.forest()</code> function provides the basal area, density, cover and leaf area index of the forest stand, and its different components:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="model-inputs.html#cb8-1" tabindex="-1"></a><span class="fu">summary</span>(exampleforest, SpParamsMED)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="model-inputs.html#cb9-1" tabindex="-1"></a><span class="fu">summary</span>(exampleforest, SpParamsMED)</span></code></pre></div>
 <pre><code>## Tree BA (m2/ha): 25.0333016  adult trees: 25.0333016  saplings: 0 
 ## Density (ind/ha) adult trees: 552  saplings: 0  shrubs (estimated): 749.4923076 
 ## Cover (%) adult trees: 100  saplings: 0  shrubs: 3.75  herbs: 10 
@@ -1324,9 +1328,9 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 <div id="single-cohort-forests" class="section level3 hasAnchor" number="2.4.5">
 <h3><span class="header-section-number">2.4.5</span> Single-cohort forests<a href="model-inputs.html#single-cohort-forests" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Although <strong>medfate</strong> has been designed to perform simulations on multi-cohort forests, it can also handle simulations where vegetation is described using a single cohort. Functions <code>tree2forest()</code> and <code>shrub2forest()</code> allow defining single-cohort forests from attributes. For example a holm oak (<em>Quercus ilex</em>) forest of 4-m height and having a leaf area index of <span class="math inline">\(2\, m^2\cdot m^{-2}\)</span> can be defined using:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="model-inputs.html#cb10-1" tabindex="-1"></a>oak_forest <span class="ot">&lt;-</span><span class="fu">tree2forest</span>(<span class="st">&quot;Quercus ilex&quot;</span>, <span class="at">Height=</span> <span class="dv">400</span>, <span class="at">LAI =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="model-inputs.html#cb11-1" tabindex="-1"></a>oak_forest <span class="ot">&lt;-</span><span class="fu">tree2forest</span>(<span class="st">&quot;Quercus ilex&quot;</span>, <span class="at">Height=</span> <span class="dv">400</span>, <span class="at">LAI =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p>The function will return a <code>forest</code> object where most attributes are empty:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="model-inputs.html#cb11-1" tabindex="-1"></a>oak_forest</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="model-inputs.html#cb12-1" tabindex="-1"></a>oak_forest</span></code></pre></div>
 <pre><code>## $treeData
 ##        Species DBH Height  N Z50 Z95 LAI
 ## 1 Quercus ilex  NA    400 NA  NA  NA   2
@@ -1348,7 +1352,7 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 ## attr(,&quot;class&quot;)
 ## [1] &quot;forest&quot; &quot;list&quot;</code></pre>
 <p>Nevertheless, the object is well defined, for example we can summarize it using:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="model-inputs.html#cb13-1" tabindex="-1"></a><span class="fu">summary</span>(oak_forest, SpParamsMED)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="model-inputs.html#cb14-1" tabindex="-1"></a><span class="fu">summary</span>(oak_forest, SpParamsMED)</span></code></pre></div>
 <pre><code>## Tree BA (m2/ha): 0  adult trees: 0  saplings: 0 
 ## Density (ind/ha) adult trees: 0  saplings: 0  shrubs (estimated): 0 
 ## Cover (%) adult trees: 0  saplings: 0  shrubs: 0  herbs: 0 
@@ -1627,7 +1631,7 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <div id="controlparameters" class="section level2 hasAnchor" number="2.6">
 <h2><span class="header-section-number">2.6</span> Simulation control<a href="model-inputs.html#controlparameters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Simulation control parameters are a list of global parameter values, initialized using function <code>defaultControl()</code>, that the user can modify to change the general behavior of simulation functions. Here is the set of global control parameters currently accepted in <strong>medfate</strong>:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="model-inputs.html#cb15-1" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="model-inputs.html#cb16-1" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
 <pre><code>##   [1] &quot;fillMissingRootParams&quot;            &quot;fillMissingSpParams&quot;              &quot;fillMissingWithGenusParams&quot;      
 ##   [4] &quot;verbose&quot;                          &quot;subdailyResults&quot;                  &quot;standResults&quot;                    
 ##   [7] &quot;soilResults&quot;                      &quot;plantResults&quot;                     &quot;leafResults&quot;                     
