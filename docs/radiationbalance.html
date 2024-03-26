@@ -756,18 +756,18 @@ where <span class="math inline">\(\phi_1 = 0.5 - 0.633\cdot \chi_{leaf} - 0.33\c
 k_b = \frac{G_b(\lambda_{leaf}, \beta)}{\sin(\beta)}
 \end{equation}\]</span></p>
 <p>The calculations can be illustrated with function <code>light_directionalExtinctionCoefficient()</code>:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="radiationbalance.html#cb19-1" tabindex="-1"></a>solarElevation <span class="ot">&lt;-</span> <span class="dv">40</span> <span class="co"># in degrees</span></span>
-<span id="cb19-2"><a href="radiationbalance.html#cb19-2" tabindex="-1"></a>meanLeafAngle <span class="ot">&lt;-</span> <span class="dv">60</span> <span class="co"># in degrees</span></span>
-<span id="cb19-3"><a href="radiationbalance.html#cb19-3" tabindex="-1"></a>sdLeafAngle <span class="ot">&lt;-</span> <span class="dv">20</span></span>
-<span id="cb19-4"><a href="radiationbalance.html#cb19-4" tabindex="-1"></a></span>
-<span id="cb19-5"><a href="radiationbalance.html#cb19-5" tabindex="-1"></a><span class="do">## Parameters of the beta distribution</span></span>
-<span id="cb19-6"><a href="radiationbalance.html#cb19-6" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">light_leafAngleBetaParameters</span>(meanLeafAngle<span class="sc">*</span>(pi<span class="sc">/</span><span class="dv">180</span>), sdLeafAngle<span class="sc">*</span>(pi<span class="sc">/</span><span class="dv">180</span>))</span>
-<span id="cb19-7"><a href="radiationbalance.html#cb19-7" tabindex="-1"></a>beta</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="radiationbalance.html#cb18-1" tabindex="-1"></a>solarElevation <span class="ot">&lt;-</span> <span class="dv">40</span> <span class="co"># in degrees</span></span>
+<span id="cb18-2"><a href="radiationbalance.html#cb18-2" tabindex="-1"></a>meanLeafAngle <span class="ot">&lt;-</span> <span class="dv">60</span> <span class="co"># in degrees</span></span>
+<span id="cb18-3"><a href="radiationbalance.html#cb18-3" tabindex="-1"></a>sdLeafAngle <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb18-4"><a href="radiationbalance.html#cb18-4" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="radiationbalance.html#cb18-5" tabindex="-1"></a><span class="do">## Parameters of the beta distribution</span></span>
+<span id="cb18-6"><a href="radiationbalance.html#cb18-6" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">light_leafAngleBetaParameters</span>(meanLeafAngle<span class="sc">*</span>(pi<span class="sc">/</span><span class="dv">180</span>), sdLeafAngle<span class="sc">*</span>(pi<span class="sc">/</span><span class="dv">180</span>))</span>
+<span id="cb18-7"><a href="radiationbalance.html#cb18-7" tabindex="-1"></a>beta</span></code></pre></div>
 <pre><code>##        p        q 
 ## 2.333333 1.166667</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="radiationbalance.html#cb21-1" tabindex="-1"></a><span class="do">## Direct beam extinction coefficient for solar elevation</span></span>
-<span id="cb21-2"><a href="radiationbalance.html#cb21-2" tabindex="-1"></a>kb <span class="ot">&lt;-</span> <span class="fu">light_directionalExtinctionCoefficient</span>(beta[<span class="st">&quot;p&quot;</span>], beta[<span class="st">&quot;q&quot;</span>], solarElevation<span class="sc">*</span>(pi<span class="sc">/</span><span class="dv">180</span>))</span>
-<span id="cb21-3"><a href="radiationbalance.html#cb21-3" tabindex="-1"></a>kb</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="radiationbalance.html#cb20-1" tabindex="-1"></a><span class="do">## Direct beam extinction coefficient for solar elevation</span></span>
+<span id="cb20-2"><a href="radiationbalance.html#cb20-2" tabindex="-1"></a>kb <span class="ot">&lt;-</span> <span class="fu">light_directionalExtinctionCoefficient</span>(beta[<span class="st">&quot;p&quot;</span>], beta[<span class="st">&quot;q&quot;</span>], solarElevation<span class="sc">*</span>(pi<span class="sc">/</span><span class="dv">180</span>))</span>
+<span id="cb20-3"><a href="radiationbalance.html#cb20-3" tabindex="-1"></a>kb</span></code></pre></div>
 <pre><code>## [1] 0.7696812</code></pre>
 </div>
 <div id="sunlitshadeleaves" class="section level3 hasAnchor" number="9.1.2">
@@ -783,17 +783,17 @@ LAI^{shade}_{i,j} &amp;=&amp; (1 - f_{SL,j}) \cdot LAI^{\phi}_{i,j}
 \tag{9.1}
 \end{eqnarray}\]</span></p>
 <p>As an example we will consider a canopy of one species of LAI = 2, divided into ten layers with constant leaf density:</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="radiationbalance.html#cb23-1" tabindex="-1"></a>LAI <span class="ot">=</span> <span class="dv">2</span></span>
-<span id="cb23-2"><a href="radiationbalance.html#cb23-2" tabindex="-1"></a>nlayer <span class="ot">=</span> <span class="dv">10</span></span>
-<span id="cb23-3"><a href="radiationbalance.html#cb23-3" tabindex="-1"></a>LAIlayerlive <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
-<span id="cb23-4"><a href="radiationbalance.html#cb23-4" tabindex="-1"></a>LAIlayermax <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
-<span id="cb23-5"><a href="radiationbalance.html#cb23-5" tabindex="-1"></a>LAIlayerdead <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,nlayer,<span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="radiationbalance.html#cb22-1" tabindex="-1"></a>LAI <span class="ot">=</span> <span class="dv">2</span></span>
+<span id="cb22-2"><a href="radiationbalance.html#cb22-2" tabindex="-1"></a>nlayer <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb22-3"><a href="radiationbalance.html#cb22-3" tabindex="-1"></a>LAIlayerlive <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
+<span id="cb22-4"><a href="radiationbalance.html#cb22-4" tabindex="-1"></a>LAIlayermax <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(LAI<span class="sc">/</span>nlayer,nlayer),nlayer,<span class="dv">1</span>)</span>
+<span id="cb22-5"><a href="radiationbalance.html#cb22-5" tabindex="-1"></a>LAIlayerdead <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,nlayer,<span class="dv">1</span>)</span></code></pre></div>
 <p>We will also define the coefficients of diffuse extinction, leaf absorbance and leaf reflection for PAR and SWR:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="radiationbalance.html#cb24-1" tabindex="-1"></a>alpha_PAR <span class="ot">&lt;-</span> <span class="fl">0.9</span></span>
-<span id="cb24-2"><a href="radiationbalance.html#cb24-2" tabindex="-1"></a>alpha_SWR <span class="ot">&lt;-</span> <span class="fl">0.7</span></span>
-<span id="cb24-3"><a href="radiationbalance.html#cb24-3" tabindex="-1"></a>gamma_PAR <span class="ot">&lt;-</span> <span class="fl">0.04</span></span>
-<span id="cb24-4"><a href="radiationbalance.html#cb24-4" tabindex="-1"></a>gamma_SWR <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
-<span id="cb24-5"><a href="radiationbalance.html#cb24-5" tabindex="-1"></a>clumping <span class="ot">&lt;-</span> <span class="fl">0.75</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="radiationbalance.html#cb23-1" tabindex="-1"></a>alpha_PAR <span class="ot">&lt;-</span> <span class="fl">0.9</span></span>
+<span id="cb23-2"><a href="radiationbalance.html#cb23-2" tabindex="-1"></a>alpha_SWR <span class="ot">&lt;-</span> <span class="fl">0.7</span></span>
+<span id="cb23-3"><a href="radiationbalance.html#cb23-3" tabindex="-1"></a>gamma_PAR <span class="ot">&lt;-</span> <span class="fl">0.04</span></span>
+<span id="cb23-4"><a href="radiationbalance.html#cb23-4" tabindex="-1"></a>gamma_SWR <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb23-5"><a href="radiationbalance.html#cb23-5" tabindex="-1"></a>clumping <span class="ot">&lt;-</span> <span class="fl">0.75</span></span></code></pre></div>
 <p>These definitions, and that of direct extinction coefficient, lead to a percentage of the above-canopy irradiance reaching each layer <span class="citation">(<a href="#ref-Anten2016">Anten &amp; Bastiaans 2016</a>)</span>. Extinction of direct radiation also defines the proportion of leaves of each layer that are affected by sunflecks (i.e. the proportion of sunlit leaves). Both outcomes are illustrated in the figure below:</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:irradianceperlayer"></span>
@@ -826,19 +826,19 @@ Figure 9.1: The left panel shows irradiance per layer of diffuse and direct PAR 
 \tag{9.2}
 \end{eqnarray}\]</span></p>
 <p>Let us show how all this works in an example. Regarding incoming light, we assume the following direct and diffuse irradiance at the top of the canopy:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="radiationbalance.html#cb25-1" tabindex="-1"></a>solarElevation <span class="ot">=</span> <span class="fl">0.67</span></span>
-<span id="cb25-2"><a href="radiationbalance.html#cb25-2" tabindex="-1"></a>SWR_direct <span class="ot">=</span> <span class="dv">1100</span></span>
-<span id="cb25-3"><a href="radiationbalance.html#cb25-3" tabindex="-1"></a>SWR_diffuse <span class="ot">=</span> <span class="dv">300</span></span>
-<span id="cb25-4"><a href="radiationbalance.html#cb25-4" tabindex="-1"></a>PAR_direct <span class="ot">=</span> <span class="dv">550</span></span>
-<span id="cb25-5"><a href="radiationbalance.html#cb25-5" tabindex="-1"></a>PAR_diffuse <span class="ot">=</span> <span class="dv">150</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="radiationbalance.html#cb24-1" tabindex="-1"></a>solarElevation <span class="ot">=</span> <span class="fl">0.67</span></span>
+<span id="cb24-2"><a href="radiationbalance.html#cb24-2" tabindex="-1"></a>SWR_direct <span class="ot">=</span> <span class="dv">1100</span></span>
+<span id="cb24-3"><a href="radiationbalance.html#cb24-3" tabindex="-1"></a>SWR_diffuse <span class="ot">=</span> <span class="dv">300</span></span>
+<span id="cb24-4"><a href="radiationbalance.html#cb24-4" tabindex="-1"></a>PAR_direct <span class="ot">=</span> <span class="dv">550</span></span>
+<span id="cb24-5"><a href="radiationbalance.html#cb24-5" tabindex="-1"></a>PAR_diffuse <span class="ot">=</span> <span class="dv">150</span></span></code></pre></div>
 <p>Solar elevation is the angle between the sun and the horizon (i.e. the complement of the zenith angle). Under these conditions, and for the same canopy used for fig. <a href="radiationbalance.html#fig:irradianceperlayer">9.1</a>, the amount of PAR and SWR absorbed per unit of leaf area at each canopy layer is <span class="citation">(<a href="#ref-Anten2016">Anten &amp; Bastiaans 2016</a>)</span>:</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="radiationbalance.html#cb26-1" tabindex="-1"></a>ZF <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.178</span>, <span class="fl">0.514</span>, <span class="fl">0.308</span>) <span class="do">##Standard overcast sky</span></span>
-<span id="cb26-2"><a href="radiationbalance.html#cb26-2" tabindex="-1"></a>Zangles <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">15.0</span>, <span class="fl">45.0</span>, <span class="fl">75.0</span>); </span>
-<span id="cb26-3"><a href="radiationbalance.html#cb26-3" tabindex="-1"></a>KDIFF <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="dv">3</span>, <span class="dv">1</span>); </span>
-<span id="cb26-4"><a href="radiationbalance.html#cb26-4" tabindex="-1"></a><span class="cf">for</span>(k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>){</span>
-<span id="cb26-5"><a href="radiationbalance.html#cb26-5" tabindex="-1"></a>  KDIFF[k,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">light_directionalExtinctionCoefficient</span>(beta[<span class="st">&quot;p&quot;</span>], beta[<span class="st">&quot;q&quot;</span>], Zangles[k]<span class="sc">*</span>(pi<span class="sc">/</span><span class="fl">180.0</span>));</span>
-<span id="cb26-6"><a href="radiationbalance.html#cb26-6" tabindex="-1"></a>}</span>
-<span id="cb26-7"><a href="radiationbalance.html#cb26-7" tabindex="-1"></a>KDIFF</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="radiationbalance.html#cb25-1" tabindex="-1"></a>ZF <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.178</span>, <span class="fl">0.514</span>, <span class="fl">0.308</span>) <span class="do">##Standard overcast sky</span></span>
+<span id="cb25-2"><a href="radiationbalance.html#cb25-2" tabindex="-1"></a>Zangles <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">15.0</span>, <span class="fl">45.0</span>, <span class="fl">75.0</span>); </span>
+<span id="cb25-3"><a href="radiationbalance.html#cb25-3" tabindex="-1"></a>KDIFF <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="dv">3</span>, <span class="dv">1</span>); </span>
+<span id="cb25-4"><a href="radiationbalance.html#cb25-4" tabindex="-1"></a><span class="cf">for</span>(k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>){</span>
+<span id="cb25-5"><a href="radiationbalance.html#cb25-5" tabindex="-1"></a>  KDIFF[k,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">light_directionalExtinctionCoefficient</span>(beta[<span class="st">&quot;p&quot;</span>], beta[<span class="st">&quot;q&quot;</span>], Zangles[k]<span class="sc">*</span>(pi<span class="sc">/</span><span class="fl">180.0</span>));</span>
+<span id="cb25-6"><a href="radiationbalance.html#cb25-6" tabindex="-1"></a>}</span>
+<span id="cb25-7"><a href="radiationbalance.html#cb25-7" tabindex="-1"></a>KDIFF</span></code></pre></div>
 <pre><code>##           [,1]
 ## [1,] 1.9888914
 ## [2,] 0.6926432

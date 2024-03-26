@@ -868,12 +868,16 @@ g_{stom} = \lambda(\Psi_{leaf,sym}) · g_{stom, jarvis}
 <h2><span class="header-section-number">12.3</span> Cohort-level transpiration and photosynthesis<a href="transpirationsperrysureau.html#scalingtranspirationphotosynthesis" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The amount of transpiration from the plant cohort in a given time step <span class="math inline">\(t\)</span> (<span class="math inline">\(Tr_{i,t}\)</span>, in <span class="math inline">\(l \cdot m^{-2}\)</span> of ground area, i.e. in mm) is:
 <span class="math display" id="eq:cohorttranspiration">\[\begin{equation}
-Tr_{i,t} = E_{i,t} \cdot LAI_i^{\phi} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
+Tr_{i,t} = E_{i,t} \cdot LAI_i^{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
 \tag{12.1}
 \end{equation}\]</span>
-where <span class="math inline">\(0.01802\)</span> is the molar weight (in <span class="math inline">\(kg = l\)</span>) of water and <span class="math inline">\(\Delta t_{step} = 86400/n_t\)</span> the size of the time step in seconds, being <span class="math inline">\(n_t\)</span> the number of time steps. Soil extraction rates (<span class="math inline">\(Ex\)</span>) are scaled to the cohort level as done for transpiration:
+where <span class="math inline">\(0.01802\)</span> is the molar weight (in <span class="math inline">\(kg = l\)</span>) of water and <span class="math inline">\(\Delta t_{step} = 86400/n_t\)</span> the size of the time step in seconds, being <span class="math inline">\(n_t\)</span> the number of time steps. <span class="math inline">\(f_{dry}\)</span> is the fraction of the canopy that is assumed dry, which is necessary to avoid overestimating total evapo-transpiration. In non-rainy days <span class="math inline">\(f_{dry} = 1\)</span> whereas in rainy days it is derived from comparing the daily evaporation due to rainfall interception (<span class="math inline">\(In\)</span>; in <span class="math inline">\(mm\)</span>) with Penman’s potential evapo-transpiration (<span class="math inline">\(PET\)</span>; in <span class="math inline">\(mm\)</span>):</p>
+<p><span class="math display">\[\begin{equation}
+f_{dry} = 1.0 - \frac{In}{PET}
+\end{equation}\]</span></p>
+<p>Soil extraction rates (<span class="math inline">\(Ex\)</span>) are scaled to the cohort level as done for transpiration:
 <span class="math display" id="eq:cohortextraction">\[\begin{equation}
-Ex_{i,s,t} = E_{i,s,t} \cdot LAI_i^{\phi} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
+Ex_{i,s,t} = E_{i,s,t} \cdot LAI_i^{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
 \tag{12.2}
 \end{equation}\]</span></p>
 <p>If plant capacitance is not considered, one should have that soil extraction equals transpiration:

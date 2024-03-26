@@ -741,11 +741,12 @@ LE_{can} = \lambda_v(T_{can}) \cdot \left(\frac{In_{t} + \sum_{i=1}^{c}{Tr_{i,t}
 \tag{13.1}
 \end{equation}\]</span>
 where <span class="math inline">\(\lambda_v(T_{can})\)</span> is the latent heat of vaporization at temperature <span class="math inline">\(T_{can}\)</span> (in <span class="math inline">\(J·kg^{-1}\)</span>), <span class="math inline">\(Tr_{i,t}\)</span> is the amount (in <span class="math inline">\(mm = kg \cdot m^{-2}\)</span>) of transpiration for cohort <span class="math inline">\(i\)</span> during time step <span class="math inline">\(t\)</span> <a href="transpirationsperrysureau.html#eq:cohorttranspiration">(12.1)</a>, and <span class="math inline">\(In_{t}\)</span> is the amount of intercepted water evaporated from the canopy for time step <span class="math inline">\(t\)</span> (total daily interception <span class="math inline">\(In\)</span> is divided into timesteps according to the proportion of shortwave radiation absorbed by the canopy at each time step).</p>
-<p>The latent heat exchange between the soil and the atmosphere (<span class="math inline">\(LE_{soil}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>) comes either from water evaporated from the soil surface or snow melting (both in <span class="math inline">\(mm = kg \cdot m^{-2}\)</span>). They do not occur simultaneously, but can be expressed in the same equation:
-<span class="math display" id="eq:soillatentheat">\[\begin{equation}
-LE_{soil} = \frac{ \lambda_v(T_{soil}) \cdot Es_{t} + \lambda_{f} \cdot Sm_{t}}{\Delta t_{step}}
+<p>The latent heat exchange between the soil and the atmosphere comes either as vaporisation latent heat from water evaporated from the soil surface (<span class="math inline">\(LE_{vap, soil}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>) or fusion latent heat due to snow melting (<span class="math inline">\(LE_{fus, soil}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>). Both of them are estimated from water flows in <span class="math inline">\(mm = kg \cdot m^{-2}\)</span> using:
+<span class="math display" id="eq:soillatentheat">\[\begin{eqnarray}
+LE_{vap, soil} &amp;=&amp; \frac{\lambda_v(T_{soil}) \cdot Es_{t}}{\Delta t_{step}} \\
+LE_{fus, soil} &amp;=&amp; \frac{\lambda_{f} \cdot Sm_{t}}{\Delta t_{step}}
 \tag{13.2}
-\end{equation}\]</span>
+\end{eqnarray}\]</span>
 where <span class="math inline">\(\lambda_v(T_{soil})\)</span> is the latent heat of vaporization at temperature <span class="math inline">\(T_{soil}\)</span> and <span class="math inline">\(\lambda_{f} = 0.33355J·kg^{-1}\)</span> is the latent heat of fusion. As before, daily evaporation from bare soil (<span class="math inline">\(Es\)</span>) and snow melt water equivalent (<span class="math inline">\(Sm\)</span>) are divided into time steps according to the proportion of shortwave radiation absorbed by the soil layer each step.</p>
 </div>
 <div id="convective-energy" class="section level3 hasAnchor" number="13.1.2">
@@ -812,7 +813,7 @@ E_{j,t} = 10^{-3} \cdot 0.01802\cdot \sum_{i=1}^{c}{E_{i,t}^{sunlit}\cdot LAI_{i
 \tag{13.5}
 \end{equation}\]</span>
 where <span class="math inline">\(E_{i,t}^{sunlit}\)</span> and <span class="math inline">\(E_{i,t}^{shade}\)</span> are the instantaneous transpiration rates (in <span class="math inline">\(mmol\,H_2O\cdot m^{-2}\cdot s^{-1}\)</span>) of sunlit and shade leaves, respectively, of cohort <span class="math inline">\(i\)</span> during time step <span class="math inline">\(t\)</span>; and <span class="math inline">\(LAI_{i,j}^{sunlit}\)</span> and <span class="math inline">\(LAI_{i,j}^{shade}\)</span> are the leaf area index of sunlit and shade leaves, respectively, of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> <a href="radiationbalance.html#eq:sunlitshadelai">(9.1)</a>.</p>
-<p>Latent heat derived from soil water evaporation of snow melting (<span class="math inline">\(LE_{soil}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>) is estimated as in the single-canopy case, using eq. <a href="closecanopysoilenergybalance.html#eq:soillatentheat">(13.2)</a>.</p>
+<p>Latent heat derived from soil water evaporation and snow melting (<span class="math inline">\(LE_{vap, soil}\)</span> and <span class="math inline">\(LE_{fus, soil}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>) is estimated as in the single-canopy case, using eq. <a href="closecanopysoilenergybalance.html#eq:soillatentheat">(13.2)</a>.</p>
 </div>
 <div id="sensible-heat-between-leaves-and-the-canopy-air-space" class="section level3 hasAnchor" number="13.2.2">
 <h3><span class="header-section-number">13.2.2</span> Sensible heat between leaves and the canopy air space<a href="closecanopysoilenergybalance.html#sensible-heat-between-leaves-and-the-canopy-air-space" class="anchor-section" aria-label="Anchor link to header"></a></h3>
