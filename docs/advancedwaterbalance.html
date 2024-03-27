@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-03-26" />
+<meta name="date" content="2024-03-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -419,7 +419,7 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="13.2" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html#multi-layer-canopy"><i class="fa fa-check"></i><b>13.2</b> Multi-layer canopy</a>
 <ul>
-<li class="chapter" data-level="13.2.1" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html#latent-heat-1"><i class="fa fa-check"></i><b>13.2.1</b> Latent heat</a></li>
+<li class="chapter" data-level="13.2.1" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html#latent-heat-of-vaporization"><i class="fa fa-check"></i><b>13.2.1</b> Latent heat of vaporization</a></li>
 <li class="chapter" data-level="13.2.2" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html#sensible-heat-between-leaves-and-the-canopy-air-space"><i class="fa fa-check"></i><b>13.2.2</b> Sensible heat between leaves and the canopy air space</a></li>
 <li class="chapter" data-level="13.2.3" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html#turbulent-heat-exchange"><i class="fa fa-check"></i><b>13.2.3</b> Turbulent heat exchange</a></li>
 <li class="chapter" data-level="13.2.4" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html#canopy-and-soil-temperature-changes"><i class="fa fa-check"></i><b>13.2.4</b> Canopy and soil temperature changes</a></li>
@@ -805,9 +805,9 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 </div>
 <div id="single-layer-canopy-energy-balance" class="section level3 hasAnchor" number="7.4.2">
 <h3><span class="header-section-number">7.4.2</span> Single-layer canopy energy balance<a href="advancedwaterbalance.html#single-layer-canopy-energy-balance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>For the sake of performing energy balance, the canopy can be considered a single layer that exchanges energy with the soil and the atmosphere <span class="citation">(<a href="#ref-Best2011">Best <em>et al.</em> 2011</a>)</span>. First, it absorbs shortwave radiation from the atmosphere (<span class="math inline">\(K_{abs,can}\)</span>) and long-wave radiation resulting from net radiation balance (<span class="math inline">\(L_{net,can}\)</span>). Other energy fluxes considered are convective exchanges between the canopy and atmosphere (<span class="math inline">\(H_{can,atm}\)</span>) and between the canopy and the soil (<span class="math inline">\(H_{can,soil}\)</span>). Finally, energy is released from the canopy to the atmosphere through latent heat (<span class="math inline">\(LE_{can}\)</span>) produced via transpiration (<span class="math inline">\(Tr\)</span>) and evaporation of water intercepted by the canopy (<span class="math inline">\(In\)</span>). Combining all energy flows (all of them in <span class="math inline">\(W \cdot m^{-2}\)</span>), the instantaneous energy balance equation for the canopy is:
+<p>For the sake of performing energy balance, the canopy can be considered a single layer that exchanges energy with the soil and the atmosphere <span class="citation">(<a href="#ref-Best2011">Best <em>et al.</em> 2011</a>)</span>. First, it absorbs shortwave radiation from the atmosphere (<span class="math inline">\(K_{abs,can}\)</span>) and long-wave radiation resulting from net radiation balance (<span class="math inline">\(L_{net,can}\)</span>). Other energy fluxes considered are convective exchanges between the canopy and atmosphere (<span class="math inline">\(H_{can,atm}\)</span>) and between the canopy and the soil (<span class="math inline">\(H_{can,soil}\)</span>). Energy is absorbed from the canopy through latent heat of vaporization (<span class="math inline">\(LE_{vap, can}\)</span>) produced via transpiration (<span class="math inline">\(Tr\)</span>) and evaporation of water intercepted by the canopy (<span class="math inline">\(In\)</span>); or via latent heat of fusion due to snow melt (<span class="math inline">\(LE_{fus, snow}\)</span>). Combining all energy flows (all of them in <span class="math inline">\(W \cdot m^{-2}\)</span>), the instantaneous energy balance equation for the canopy is:
 <span class="math display" id="eq:canopyenergybalance">\[\begin{equation}
-  TC_{can} \cdot \frac{\delta T_{can}}{\delta t} = K_{abs,can} + L_{net,can}  - LE_{can} - H_{can,atm} - H_{can,soil}
+  TC_{can} \cdot \frac{\delta T_{can}}{\delta t} = K_{abs,can} + L_{net,can}  - LE_{vap, can} - LE_{fus, snow}- H_{can,atm} - H_{can,soil}
 \tag{7.3}
 \end{equation}\]</span>
 where <span class="math inline">\(TC_{can}\)</span> is the canopy thermal capacitance (in <span class="math inline">\(J \cdot m^{-2} \cdot K^{-1}\)</span>).</p>
@@ -816,16 +816,16 @@ where <span class="math inline">\(TC_{can}\)</span> is the canopy thermal capaci
 <h3><span class="header-section-number">7.4.3</span> Multiple-layer canopy energy balance<a href="advancedwaterbalance.html#multiple-layer-canopy-energy-balance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Alternatively, the model allows performing an energy balance for each vertical layer in the canopy, including its heat storage capacity <span class="citation">(<a href="#ref-Ma2019">Ma &amp; Liu 2019</a>)</span>. The energy balance equation for canopy layer <span class="math inline">\(j\)</span> is:
 <span class="math display" id="eq:canopylayerenergybalance">\[\begin{equation}
-  TC_{j} \cdot \frac{\delta T_{air,j}}{\delta t} = K_{abs,j} + L_{net,j}  - LE_{j} + H_{j}
+  TC_{j} \cdot \frac{\delta T_{air,j}}{\delta t} = K_{abs,j} + L_{net,j}  - LE_{vap, j} + H_{j}
 \tag{7.4}
 \end{equation}\]</span>
-where <span class="math inline">\(K_{abs,j}\)</span> is the short-wave radiation absorbed by leaves in the layer, <span class="math inline">\(L_{net,j}\)</span> is the net long-wave radiation balance of the layer, <span class="math inline">\(LE_{j}\)</span> is the latent heat flux and <span class="math inline">\(H_j\)</span> is the sensible heat flux, which includes heat coming from leaves or soil surfaces as well as turbulent heat transport from adjacent layers. Finally, <span class="math inline">\(TC_{j}\)</span> is the thermal capacitance (in <span class="math inline">\(J \cdot m^{-2} \cdot K^{-1}\)</span>) of canopy layer <span class="math inline">\(j\)</span>.</p>
+where <span class="math inline">\(K_{abs,j}\)</span> is the short-wave radiation absorbed by leaves in the layer, <span class="math inline">\(L_{net,j}\)</span> is the net long-wave radiation balance of the layer, <span class="math inline">\(LE_{vap, j}\)</span> is the latent heat flux and <span class="math inline">\(H_j\)</span> is the sensible heat flux, which includes heat coming from leaves or soil surfaces as well as turbulent heat transport from adjacent layers. Latent heat of fusion (<span class="math inline">\(LE_{fus, snow}\)</span>) needs to be subtracted from the bottom layer. Finally, <span class="math inline">\(TC_{j}\)</span> is the thermal capacitance (in <span class="math inline">\(J \cdot m^{-2} \cdot K^{-1}\)</span>) of canopy layer <span class="math inline">\(j\)</span>.</p>
 </div>
 <div id="soil-energy-balance" class="section level3 hasAnchor" number="7.4.4">
 <h3><span class="header-section-number">7.4.4</span> Soil energy balance<a href="advancedwaterbalance.html#soil-energy-balance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Like the canopy, the uppermost soil layer absorbs short-wave radiation from the atmosphere (<span class="math inline">\(K_{abs,soil}\)</span>) and has a net long-wave radiation balance (<span class="math inline">\(L_{net,soil}\)</span>). The uppermost soil layer also exchanges heat with the canopy (<span class="math inline">\(H_{can,soil}\)</span>) and releases energy in the form of latent heat, which includes fusion latent heat due to snow melt (<span class="math inline">\(LE_{fus, soil}\)</span>) and vaporization latent heat due to evaporation from the soil surface (<span class="math inline">\(LE_{vap, soil}\)</span>). Finally, the soil layer exchanges thermal energy by conduction with the layer below (<span class="math inline">\(G_{1,2}\)</span>) The energy balance equation for the uppermost soil layer is:
+<p>Like the canopy, the uppermost soil layer absorbs short-wave radiation from the atmosphere (<span class="math inline">\(K_{abs,soil}\)</span>) and has a net long-wave radiation balance (<span class="math inline">\(L_{net,soil}\)</span>). The uppermost soil layer also exchanges heat with the canopy (<span class="math inline">\(H_{can,soil}\)</span>) and releases energy in the form of latent heat of vaporisation due to evaporation from the soil surface (<span class="math inline">\(LE_{vap, soil}\)</span>). Finally, the soil layer exchanges thermal energy by conduction with the layer below (<span class="math inline">\(G_{1,2}\)</span>) The energy balance equation for the uppermost soil layer is:
 <span class="math display" id="eq:soilenergybalance">\[\begin{equation}
-  TC_{soil, 1} \cdot \frac{\delta T_{soil, 1}}{\delta t} = K_{abs,soil} + L_{net,soil} + H_{can,soil} - LE_{fus, soil} - LE_{vap, soil} - G_{1,2}
+  TC_{soil, 1} \cdot \frac{\delta T_{soil, 1}}{\delta t} = K_{abs,soil} + L_{net,soil} + H_{can,soil} -  LE_{vap, soil} - G_{1,2}
 \tag{7.5}
 \end{equation}\]</span>
 where <span class="math inline">\(TC_{soil,1}\)</span> is the thermal capacitance of soil layer 1 (the uppermost layer).</p>

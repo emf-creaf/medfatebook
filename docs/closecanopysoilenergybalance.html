@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-03-26" />
+<meta name="date" content="2024-03-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -419,7 +419,7 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="13.2" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html#multi-layer-canopy"><i class="fa fa-check"></i><b>13.2</b> Multi-layer canopy</a>
 <ul>
-<li class="chapter" data-level="13.2.1" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html#latent-heat-1"><i class="fa fa-check"></i><b>13.2.1</b> Latent heat</a></li>
+<li class="chapter" data-level="13.2.1" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html#latent-heat-of-vaporization"><i class="fa fa-check"></i><b>13.2.1</b> Latent heat of vaporization</a></li>
 <li class="chapter" data-level="13.2.2" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html#sensible-heat-between-leaves-and-the-canopy-air-space"><i class="fa fa-check"></i><b>13.2.2</b> Sensible heat between leaves and the canopy air space</a></li>
 <li class="chapter" data-level="13.2.3" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html#turbulent-heat-exchange"><i class="fa fa-check"></i><b>13.2.3</b> Turbulent heat exchange</a></li>
 <li class="chapter" data-level="13.2.4" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html#canopy-and-soil-temperature-changes"><i class="fa fa-check"></i><b>13.2.4</b> Canopy and soil temperature changes</a></li>
@@ -735,19 +735,25 @@ div.csl-indent {
 <p>The first part of the section describes the calculation of latent heat and convective energy exchanges between the soil, canopy and atmosphere layers. These are the remaining energy components that are needed to close the energy balances of the canopy (eq. <a href="advancedwaterbalance.html#eq:canopyenergybalance">(7.3)</a>) and soil layers (eqs. <a href="advancedwaterbalance.html#eq:soilenergybalance">(7.5)</a> and <a href="advancedwaterbalance.html#eq:deepsoilenergybalance">(7.6)</a>). Temperature changes applied to the canopy and soil layers are also described.</p>
 <div id="latent-heat" class="section level3 hasAnchor" number="13.1.1">
 <h3><span class="header-section-number">13.1.1</span> Latent heat<a href="closecanopysoilenergybalance.html#latent-heat" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Canopy exchanges of latent heat include latent heat exchanged from plant transpiration and evaporation of rain intercepted by the canopy. In the single-layer canopy energy balance, latent heat exchange for the whole canopy (<span class="math inline">\(LE_{can}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>) is calculated as:
+<p>Canopy exchanges of latent heat include latent heat exchanged from plant transpiration and evaporation of rain intercepted by the canopy. In the single-layer canopy energy balance, vaporisation latent heat exchange for the whole canopy (<span class="math inline">\(LE_{vap, can}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>) is calculated as:
 <span class="math display" id="eq:canopylatentheat">\[\begin{equation}
-LE_{can} = \lambda_v(T_{can}) \cdot \left(\frac{In_{t} + \sum_{i=1}^{c}{Tr_{i,t}}}{\Delta t_{step}} \right)
+LE_{vap, can} = \lambda_v(T_{can}) \cdot \left(\frac{In_{t} + \sum_{i=1}^{c}{Tr_{i,t}}}{\Delta t_{step}} \right)
 \tag{13.1}
 \end{equation}\]</span>
 where <span class="math inline">\(\lambda_v(T_{can})\)</span> is the latent heat of vaporization at temperature <span class="math inline">\(T_{can}\)</span> (in <span class="math inline">\(J·kg^{-1}\)</span>), <span class="math inline">\(Tr_{i,t}\)</span> is the amount (in <span class="math inline">\(mm = kg \cdot m^{-2}\)</span>) of transpiration for cohort <span class="math inline">\(i\)</span> during time step <span class="math inline">\(t\)</span> <a href="transpirationsperrysureau.html#eq:cohorttranspiration">(12.1)</a>, and <span class="math inline">\(In_{t}\)</span> is the amount of intercepted water evaporated from the canopy for time step <span class="math inline">\(t\)</span> (total daily interception <span class="math inline">\(In\)</span> is divided into timesteps according to the proportion of shortwave radiation absorbed by the canopy at each time step).</p>
-<p>The latent heat exchange between the soil and the atmosphere comes either as vaporisation latent heat from water evaporated from the soil surface (<span class="math inline">\(LE_{vap, soil}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>) or fusion latent heat due to snow melting (<span class="math inline">\(LE_{fus, soil}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>). Both of them are estimated from water flows in <span class="math inline">\(mm = kg \cdot m^{-2}\)</span> using:
-<span class="math display" id="eq:soillatentheat">\[\begin{eqnarray}
-LE_{vap, soil} &amp;=&amp; \frac{\lambda_v(T_{soil}) \cdot Es_{t}}{\Delta t_{step}} \\
-LE_{fus, soil} &amp;=&amp; \frac{\lambda_{f} \cdot Sm_{t}}{\Delta t_{step}}
+<p>Fusion latent heat due to snow melting (<span class="math inline">\(LE_{fus, soil}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>) is estimated using:
+<span class="math display" id="eq:snowlatentheat">\[\begin{equation}
+LE_{fus, snow} = \frac{\lambda_{f} \cdot Sm_{t}}{\Delta t_{step}}
 \tag{13.2}
-\end{eqnarray}\]</span>
-where <span class="math inline">\(\lambda_v(T_{soil})\)</span> is the latent heat of vaporization at temperature <span class="math inline">\(T_{soil}\)</span> and <span class="math inline">\(\lambda_{f} = 0.33355J·kg^{-1}\)</span> is the latent heat of fusion. As before, daily evaporation from bare soil (<span class="math inline">\(Es\)</span>) and snow melt water equivalent (<span class="math inline">\(Sm\)</span>) are divided into time steps according to the proportion of shortwave radiation absorbed by the soil layer each step.</p>
+\end{equation}\]</span>
+where <span class="math inline">\(\lambda_{f} = 0.33355J·kg^{-1}\)</span> is the latent heat of fusion.
+The latent heat exchange between the soil and the atmosphere comes as vaporisation latent heat from water evaporated from the soil surface (<span class="math inline">\(LE_{vap, soil}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>). It is estimated from water flow in <span class="math inline">\(mm = kg \cdot m^{-2}\)</span> using:
+<span class="math display" id="eq:soillatentheat">\[\begin{equation}
+LE_{vap, soil} = \frac{\lambda_v(T_{soil}) \cdot Es_{t}}{\Delta t_{step}}
+\tag{13.3}
+\end{equation}\]</span>
+where <span class="math inline">\(\lambda_v(T_{soil})\)</span> is the latent heat of vaporization at temperature <span class="math inline">\(T_{soil}\)</span>.</p>
+<p>As before, daily evaporation from bare soil (<span class="math inline">\(Es\)</span>) and snow melt water equivalent (<span class="math inline">\(Sm\)</span>) are divided into time steps according to the proportion of shortwave radiation absorbed by the soil layer each step.</p>
 </div>
 <div id="convective-energy" class="section level3 hasAnchor" number="13.1.2">
 <h3><span class="header-section-number">13.1.2</span> Convective energy<a href="closecanopysoilenergybalance.html#convective-energy" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -767,7 +773,7 @@ where <span class="math inline">\(\rho_{atm}\)</span> and <span class="math inli
 where <span class="math inline">\(TC_{can}\)</span> is the canopy thermal capacitance (in <span class="math inline">\(J \cdot m^{-2} \cdot K^{-1}\)</span>) and <span class="math inline">\(\Delta t_{step} = 86400/n_t\)</span> is the size of the time step in seconds. Canopy thermal capacitance depends on the leaf area index of the stand:
 <span class="math display" id="eq:canopythermalcapacitance">\[\begin{equation}
 TC_{can} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{stand} + 1.2 \cdot (LAI_{stand}^{phi} + \cdot LAI_{stand}^{dead})}{2}
-\tag{13.3}
+\tag{13.4}
 \end{equation}\]</span>
 where <span class="math inline">\(TC_{LAI}\)</span> is the thermal capacitance per LAI unit, which is specified by the control parameter <code>thermalCapacityLAI</code>. By using both the maximum leaf area of the stand, <span class="math inline">\(LAI_{stand}\)</span>, and its current live/dead leaf area (<span class="math inline">\(LAI_{stand}^{phi}+LAI_{stand}^{dead}\)</span>) it is assumed that part of thermal capacitance corresponds to stems and branches, so that capacitance does not drop to zero for deciduous canopies.</p>
 </div>
@@ -780,7 +786,7 @@ where <span class="math inline">\(TC_{LAI}\)</span> is the thermal capacitance p
 where the energy balance on each soil layer <span class="math inline">\(s\)</span> depends on the balance between energy coming from above (<span class="math inline">\(G_{s-1,s}\)</span>) and energy going to below (<span class="math inline">\(G_{s,s+1}\)</span>) and <span class="math inline">\(C_{soil,s}\)</span>, the thermal capacitance of soil layer <span class="math inline">\(s\)</span>. Energy inflow to the first (uppermost) layer (i.e. <span class="math inline">\(G_{0,1}\)</span>) is the result of energy exchanges between the soil layer and the canopy and atmosphere, i.e. from eq. <a href="advancedwaterbalance.html#eq:soilenergybalance">(7.5)</a>:
 <span class="math display" id="eq:soilenergyinflow">\[\begin{equation}
 G_{0,1} =  K_{soil} + L_{net,soil} + H_{can,soil} - LE_{soil}
-\tag{13.4}
+\tag{13.5}
 \end{equation}\]</span>
 Heat conduction between layers <span class="math inline">\(s\)</span> and <span class="math inline">\(s+1\)</span> (i.e. <span class="math inline">\(G_{s,s+1}\)</span>) depend on the soil temperature gradient (see function <code>soil_temperatureGradient()</code>:
 <span class="math display">\[\begin{equation}
@@ -797,11 +803,11 @@ where <span class="math inline">\(d_s\)</span> is the soil width of layer <span 
 <div id="multi-layer-canopy" class="section level2 hasAnchor" number="13.2">
 <h2><span class="header-section-number">13.2</span> Multi-layer canopy<a href="closecanopysoilenergybalance.html#multi-layer-canopy" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>A multi-layer canopy energy balance requires the calculation of sensible heat and latent heat exchanges between the air in each canopy layer and the leaves it contains. In addition, one has to consider heat exchanges between each layer and the ones below/above, derived from turbulent flow.</p>
-<div id="latent-heat-1" class="section level3 hasAnchor" number="13.2.1">
-<h3><span class="header-section-number">13.2.1</span> Latent heat<a href="closecanopysoilenergybalance.html#latent-heat-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The latent heat for a given canopy layer <span class="math inline">\(j\)</span> (<span class="math inline">\(LE_{j}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>) includes transpiration and evaporation of intercepted rain, and is estimated analogously to the single-canopy case (eq. <a href="closecanopysoilenergybalance.html#eq:canopylatentheat">(13.1)</a>):
+<div id="latent-heat-of-vaporization" class="section level3 hasAnchor" number="13.2.1">
+<h3><span class="header-section-number">13.2.1</span> Latent heat of vaporization<a href="closecanopysoilenergybalance.html#latent-heat-of-vaporization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The latent heat of vaporization for a given canopy layer <span class="math inline">\(j\)</span> (<span class="math inline">\(LE_{vap, j}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>) includes transpiration and evaporation of intercepted rain, and is estimated analogously to the single-canopy case (eq. <a href="closecanopysoilenergybalance.html#eq:canopylatentheat">(13.1)</a>):
 <span class="math display">\[\begin{equation}
-LE_{j} = \lambda_v(T_{air,j}) \cdot \left(\frac{In_{j,t}}{\Delta t_{step}} + E_{j,t}\right)
+LE_{vap, j} = \lambda_v(T_{air,j}) \cdot \left(\frac{In_{j,t}}{\Delta t_{step}} + E_{j,t}\right)
 \end{equation}\]</span>
 where <span class="math inline">\(\lambda_v(T_{air,j})\)</span> is the latent heat of vaporization at temperature <span class="math inline">\(T_{air,j}\)</span> (in <span class="math inline">\(J·kg^{-1}\)</span>), <span class="math inline">\(In_{j,t}\)</span> is the intercepted water that is evaporated from the canopy layer, determined by dividing <span class="math inline">\(In_{t}\)</span> among canopy layers according to the fraction of total LAI in each one:
 <span class="math display">\[\begin{equation}
@@ -810,10 +816,10 @@ In_{j,t} = In_{t} \cdot \frac{\sum_{i=1}{LAI_{i,j}^{\phi}}}{LAI^{\phi}_{stand}}
 and <span class="math inline">\(E_{j,t}\)</span> is the instantaneous transpiration rate in layer <span class="math inline">\(j\)</span> (in <span class="math inline">\(kg\,H_2O\cdot m^{-2}\cdot s^{-1}\)</span>), given by:
 <span class="math display" id="eq:cohortlayertranspiration">\[\begin{equation}
 E_{j,t} = 10^{-3} \cdot 0.01802\cdot \sum_{i=1}^{c}{E_{i,t}^{sunlit}\cdot LAI_{i,j}^{sunlit} + E_{i,t}^{shade}\cdot LAI_{i,j}^{shade}}
-\tag{13.5}
+\tag{13.6}
 \end{equation}\]</span>
 where <span class="math inline">\(E_{i,t}^{sunlit}\)</span> and <span class="math inline">\(E_{i,t}^{shade}\)</span> are the instantaneous transpiration rates (in <span class="math inline">\(mmol\,H_2O\cdot m^{-2}\cdot s^{-1}\)</span>) of sunlit and shade leaves, respectively, of cohort <span class="math inline">\(i\)</span> during time step <span class="math inline">\(t\)</span>; and <span class="math inline">\(LAI_{i,j}^{sunlit}\)</span> and <span class="math inline">\(LAI_{i,j}^{shade}\)</span> are the leaf area index of sunlit and shade leaves, respectively, of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> <a href="radiationbalance.html#eq:sunlitshadelai">(9.1)</a>.</p>
-<p>Latent heat derived from soil water evaporation and snow melting (<span class="math inline">\(LE_{vap, soil}\)</span> and <span class="math inline">\(LE_{fus, soil}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>) is estimated as in the single-canopy case, using eq. <a href="closecanopysoilenergybalance.html#eq:soillatentheat">(13.2)</a>.</p>
+<p>Latent heat derived from soil water evaporation and snow melting (<span class="math inline">\(LE_{vap, soil}\)</span> and <span class="math inline">\(LE_{fus, snow}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>) are estimated as in the single-canopy case, using eqs. <a href="closecanopysoilenergybalance.html#eq:soillatentheat">(13.3)</a> and <a href="closecanopysoilenergybalance.html#eq:snowlatentheat">(13.2)</a>.</p>
 </div>
 <div id="sensible-heat-between-leaves-and-the-canopy-air-space" class="section level3 hasAnchor" number="13.2.2">
 <h3><span class="header-section-number">13.2.2</span> Sensible heat between leaves and the canopy air space<a href="closecanopysoilenergybalance.html#sensible-heat-between-leaves-and-the-canopy-air-space" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -854,14 +860,14 @@ And, finally, the topmost layer (i.e. <span class="math inline">\(j=l\)</span>)
 <span class="math display">\[\begin{equation}
 \Delta T_{air,j} =  \Delta t_{substep} \cdot \frac{K_{abs,j} + L_{net,j} - LE_{j} + H_{leaf,j} + (\delta F_{H}/\delta z)_j}{TC_{j}}
 \end{equation}\]</span>
-where <span class="math inline">\(TC_{j}\)</span> is the thermal capacitance of canopy layer <span class="math inline">\(j\)</span> (in <span class="math inline">\(J \cdot m^{-2} \cdot K^{-1}\)</span>), found analogously to <span class="math inline">\(TC_{can}\)</span> (eq. <a href="closecanopysoilenergybalance.html#eq:canopythermalcapacitance">(13.3)</a>):
+where <span class="math inline">\(TC_{j}\)</span> is the thermal capacitance of canopy layer <span class="math inline">\(j\)</span> (in <span class="math inline">\(J \cdot m^{-2} \cdot K^{-1}\)</span>), found analogously to <span class="math inline">\(TC_{can}\)</span> (eq. <a href="closecanopysoilenergybalance.html#eq:canopythermalcapacitance">(13.4)</a>):
 <span class="math display">\[\begin{equation}
 TC_{j} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{j} + 1.2 \cdot (LAI_{j}^{phi} + \cdot LAI_{j}^{dead})}{2}
 \end{equation}\]</span>
 <span class="math inline">\(\Delta t_{substep}\)</span> is the time step for closing the energy balance, which has to be smaller than <span class="math inline">\(\Delta t_{step}\)</span> to avoid numerical instabilities due to turbulent flow.</p>
-<p>When simulating a multiple-layer energy balance, we have to replace <span class="math inline">\(H_{can,soil}\)</span> by <span class="math inline">\(H_{1,soil}\)</span> in the energy inflow of soil layer 1: <a href="closecanopysoilenergybalance.html#eq:soilenergyinflow">(13.4)</a>:
+<p>When simulating a multiple-layer energy balance, we have to replace <span class="math inline">\(H_{can,soil}\)</span> by <span class="math inline">\(H_{1,soil}\)</span> in the energy inflow of soil layer 1: <a href="closecanopysoilenergybalance.html#eq:soilenergyinflow">(13.5)</a>:
 <span class="math display">\[\begin{equation}
-G_{0,1} =  K_{soil} + L_{net,soil} + H_{1,soil} - LE_{soil}
+G_{0,1} =  K_{soil} + L_{net,soil} + H_{1,soil} - LE_{vap, soil}
 \end{equation}\]</span>
 Soil temperature changes are estimated in the same way as for single-canopy energy balance, except that a smaller temporal step is used:
 <span class="math display">\[\begin{equation}
@@ -879,14 +885,14 @@ The one-dimensional scalar flux balance for an homogeneous turbulent flow can be
 <span class="math display" id="eq:scalarconservation">\[\begin{eqnarray}
 (\delta [CO_{2}]/\delta t)_j &amp;=&amp; (\delta F_{[CO_2]}/\delta z)_j + S_{[CO_2],j} \\
 (\delta [H_2O]/\delta t)_j &amp;=&amp; (\delta F_{[H_2O]}/\delta z)_j + S_{[H_2O],j}
-\tag{13.6}
+\tag{13.7}
 \end{eqnarray}\]</span>
 where <span class="math inline">\((\delta F_{[CO_2]}/\delta z)_j\)</span> and <span class="math inline">\((\delta F_{[H_2O]}/\delta z)_j\)</span> are the gradients of vertical flux of <span class="math inline">\(CO_2\)</span> and <span class="math inline">\(H_2O\)</span> in layer <span class="math inline">\(j\)</span>, respectively; and <span class="math inline">\(S_{[H_2O],j}\)</span> and <span class="math inline">\(S_{[CO_2],j}\)</span> are the source strengths for <span class="math inline">\([H_2O]\)</span> (in <span class="math inline">\(kg\,H_2O\cdot m^{-3} \cdot s^{-1}\)</span>) and <span class="math inline">\([CO_2]\)</span> (in <span class="math inline">\(mg\,CO_2 \cdot m^{-3} \cdot s^{-1}\)</span>) in layer <span class="math inline">\(j\)</span>, respectively, which derive from transpiration (source of water) and photosynthesis (sink of <span class="math inline">\(CO_2\)</span>):
 <span class="math display">\[\begin{eqnarray}
 S_{[H_2O],j} &amp;=&amp;  \frac{(In_{j,t}/\Delta t) + E_{j,t}}{\Delta z} \\
 S_{[CO_2],j} &amp;=&amp; - \frac{A_{n, j,t}}{\Delta z}
 \end{eqnarray}\]</span>
-where <span class="math inline">\(E_{j,t}\)</span> and <span class="math inline">\(A_{n,j,t}\)</span> are the instantaneous transpiration and photosynthesis rates in layer <span class="math inline">\(j\)</span>. The former was already defined in eq. <a href="closecanopysoilenergybalance.html#eq:cohortlayertranspiration">(13.5)</a>, whereas the latter (<span class="math inline">\(A_{n, j,t}\)</span>; in <span class="math inline">\(mg\,CO_2\cdot m^{-2} \cdot s^{-1}\)</span>) is defined analogously:
+where <span class="math inline">\(E_{j,t}\)</span> and <span class="math inline">\(A_{n,j,t}\)</span> are the instantaneous transpiration and photosynthesis rates in layer <span class="math inline">\(j\)</span>. The former was already defined in eq. <a href="closecanopysoilenergybalance.html#eq:cohortlayertranspiration">(13.6)</a>, whereas the latter (<span class="math inline">\(A_{n, j,t}\)</span>; in <span class="math inline">\(mg\,CO_2\cdot m^{-2} \cdot s^{-1}\)</span>) is defined analogously:
 <span class="math display">\[\begin{equation}
 A_{n, j,t} = 10^{-3} \cdot 44.01 \cdot \sum_{i=1}^{c}{A_{n,i,t}^{sunlit}\cdot LAI_{i,j}^{sunlit} + A_{n,i,t}^{shade}\cdot LAI_{i,j}^{shade}}
 \end{equation}\]</span>
@@ -909,7 +915,7 @@ and for the top layer (<span class="math inline">\(j=l\)</span>) we have:
 (\delta F_{[H_2O]}/\delta z)_l = - \frac{c_p \cdot \rho_{l} \cdot ([H_2O]_{atm} - [H_2O]_{l-1})\cdot \bar{uw}_l}{2 \cdot \Delta z \cdot (\delta u/\delta z)_l} \\
 (\delta F_{[CO_2]}/\delta z)_l = - \frac{c_p \cdot \rho_{j} \cdot ([CO_2]_{atm} - [CO_2]_{l-1})\cdot \bar{uw}_l}{2 \cdot \Delta z \cdot (\delta u/\delta z)_l}
 \end{eqnarray}\]</span></p>
-<p>Equation <a href="closecanopysoilenergybalance.html#eq:scalarconservation">(13.6)</a> is solved via discretization both in terms of space (vertical layers) and time, the latter using <span class="math inline">\(\Delta t_{substep}\)</span> as for the energy balance.</p>
+<p>Equation <a href="closecanopysoilenergybalance.html#eq:scalarconservation">(13.7)</a> is solved via discretization both in terms of space (vertical layers) and time, the latter using <span class="math inline">\(\Delta t_{substep}\)</span> as for the energy balance.</p>
 
 </div>
 </div>

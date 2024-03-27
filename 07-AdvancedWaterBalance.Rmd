@@ -90,9 +90,9 @@ Unlike the basic water balance, in this model water balance components contribut
 
 ### Single-layer canopy energy balance
 
-For the sake of performing energy balance, the canopy can be considered a single layer that exchanges energy with the soil and the atmosphere [@Best2011]. First, it absorbs shortwave radiation from the atmosphere ($K_{abs,can}$) and long-wave radiation resulting from net radiation balance  ($L_{net,can}$). Other energy fluxes considered are convective exchanges between the canopy and atmosphere ($H_{can,atm}$) and between the canopy and the soil ($H_{can,soil}$). Finally, energy is released from the canopy to the atmosphere through latent heat ($LE_{can}$) produced via transpiration ($Tr$) and evaporation of water intercepted by the canopy ($In$). Combining all energy flows (all of them in $W \cdot m^{-2}$), the instantaneous energy balance equation for the canopy is:
+For the sake of performing energy balance, the canopy can be considered a single layer that exchanges energy with the soil and the atmosphere [@Best2011]. First, it absorbs shortwave radiation from the atmosphere ($K_{abs,can}$) and long-wave radiation resulting from net radiation balance  ($L_{net,can}$). Other energy fluxes considered are convective exchanges between the canopy and atmosphere ($H_{can,atm}$) and between the canopy and the soil ($H_{can,soil}$). Energy is absorbed from the canopy through latent heat of vaporization ($LE_{vap, can}$) produced via transpiration ($Tr$) and evaporation of water intercepted by the canopy ($In$); or via latent heat of fusion due to snow melt ($LE_{fus, snow}$). Combining all energy flows (all of them in $W \cdot m^{-2}$), the instantaneous energy balance equation for the canopy is:
 \begin{equation}
-  TC_{can} \cdot \frac{\delta T_{can}}{\delta t} = K_{abs,can} + L_{net,can}  - LE_{can} - H_{can,atm} - H_{can,soil} 
+  TC_{can} \cdot \frac{\delta T_{can}}{\delta t} = K_{abs,can} + L_{net,can}  - LE_{vap, can} - LE_{fus, snow}- H_{can,atm} - H_{can,soil} 
 (\#eq:canopyenergybalance)
 \end{equation}
 where $TC_{can}$ is the canopy thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$). 
@@ -100,16 +100,16 @@ where $TC_{can}$ is the canopy thermal capacitance (in $J \cdot m^{-2} \cdot K^{
 ### Multiple-layer canopy energy balance
 Alternatively, the model allows performing an energy balance for each vertical layer in the canopy, including its heat storage capacity [@Ma2019]. The energy balance equation for canopy layer $j$ is:
 \begin{equation}
-  TC_{j} \cdot \frac{\delta T_{air,j}}{\delta t} = K_{abs,j} + L_{net,j}  - LE_{j} + H_{j} 
+  TC_{j} \cdot \frac{\delta T_{air,j}}{\delta t} = K_{abs,j} + L_{net,j}  - LE_{vap, j} + H_{j} 
 (\#eq:canopylayerenergybalance)
 \end{equation}
-where $K_{abs,j}$ is the short-wave radiation absorbed by leaves in the layer, $L_{net,j}$ is the net long-wave radiation balance of the layer, $LE_{j}$ is the latent heat flux and $H_j$ is the sensible heat flux, which includes heat coming from leaves or soil surfaces as well as turbulent heat transport from adjacent layers. Finally, $TC_{j}$ is the thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$) of canopy layer $j$.
+where $K_{abs,j}$ is the short-wave radiation absorbed by leaves in the layer, $L_{net,j}$ is the net long-wave radiation balance of the layer, $LE_{vap, j}$ is the latent heat flux and $H_j$ is the sensible heat flux, which includes heat coming from leaves or soil surfaces as well as turbulent heat transport from adjacent layers. Latent heat of fusion ($LE_{fus, snow}$) needs to be subtracted from the bottom layer. Finally, $TC_{j}$ is the thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$) of canopy layer $j$.
 
 ### Soil energy balance
 
-Like the canopy, the uppermost soil layer absorbs short-wave radiation from the atmosphere ($K_{abs,soil}$) and has a net long-wave radiation balance ($L_{net,soil}$). The uppermost soil layer also exchanges heat with the canopy ($H_{can,soil}$) and releases energy in the form of latent heat, which includes fusion latent heat due to snow melt ($LE_{fus, soil}$) and vaporization latent heat due to evaporation from the soil surface ($LE_{vap, soil}$). Finally, the soil layer exchanges thermal energy by conduction with the layer below ($G_{1,2}$) The energy balance equation for the uppermost soil layer is:
+Like the canopy, the uppermost soil layer absorbs short-wave radiation from the atmosphere ($K_{abs,soil}$) and has a net long-wave radiation balance ($L_{net,soil}$). The uppermost soil layer also exchanges heat with the canopy ($H_{can,soil}$) and releases energy in the form of latent heat of vaporisation due to evaporation from the soil surface ($LE_{vap, soil}$). Finally, the soil layer exchanges thermal energy by conduction with the layer below ($G_{1,2}$) The energy balance equation for the uppermost soil layer is:
 \begin{equation}
-  TC_{soil, 1} \cdot \frac{\delta T_{soil, 1}}{\delta t} = K_{abs,soil} + L_{net,soil} + H_{can,soil} - LE_{fus, soil} - LE_{vap, soil} - G_{1,2}
+  TC_{soil, 1} \cdot \frac{\delta T_{soil, 1}}{\delta t} = K_{abs,soil} + L_{net,soil} + H_{can,soil} -  LE_{vap, soil} - G_{1,2}
 (\#eq:soilenergybalance)
 \end{equation}
 where $TC_{soil,1}$ is the thermal capacitance of soil layer 1 (the uppermost layer). 
