@@ -22,7 +22,7 @@ Researchers from INRAE-URFM (François Pimont, Julien Ruffault, Nicolas Martin-S
 
 The model performs soil/plant water balance and soil/canopy energy balance for a given forest stand and for the period corresponding to input weather data. Soil water balance is calculated on a daily step basis whereas energy balances and plant transpiration are determined at subdaily steps (typically 1h steps). The model considers only the vertical spatial dimension of the stand, and not the horizontal distribution of plants within it. Still, the forest stand is divided into: (a) canopy vertical layers; (b) woody plant cohorts of different species and a herbaceous layer. 
 
-Hydrological processes are the same as in chapter \@ref(basicwaterbalance). Thus, the model includes water interception loss [@Gash1995; @liu_evaluation_2001], plant transpiration, evaporation from soil [@Ritchie1972], transpiration of the herbaceous layer, partition between infiltration and runoff [@Boughton1989; @green_studies_1911], Darcian vertical water movement [@bonan_climate_2019] and deep drainage. 
+Hydrological processes are the same as in chapter \@ref(basicwaterbalance). Thus, the model includes water interception loss [@Gash1995; @liu_evaluation_2001], plant transpiration, evaporation from soil [@Ritchie1972], transpiration of the herbaceous layer, infiltration into the soil matrix [@Boughton1989; @green_studies_1911] and vertical water movement within the soil [@jarvis_modelling_1991; @larsbo_improved_2005]. 
 
 A great deal of the complexity of the advanced model concerns the estimation of woody plant transpiration and photosynthesis. The model simulates stomatal regulation of gas exchange separately for sunlit and shade leaves at sub-daily steps, involving detailed calculations of plant hydraulics, leaf energy balance and photosynthesis. Compared to the basic water balance model of chapter \@ref(basicwaterbalance), the higher level of complexity of the advanced model allows a more precise estimation of carbon and water flows, as well as a more nuanced evaluation of plant water status.
 
@@ -65,11 +65,11 @@ Additional state variables depend on the activation of specific control flags (s
 Daily variations in soil water content ($\Delta{V_{soil}}$ in mm) can be summarized as:
 
 \begin{equation}
-\Delta{V_{soil}} = Pr + Sm - In - Ru - Dd - Es - Tr_{herb} - Ex_{woody}
+\Delta{V_{soil}} = Pr + Sm + Ro - In - Ru - Dd - Es - Tr_{herb} - Ex_{woody}
 (\#eq:advancedwaterbalanceequation)
 \end{equation}
 
-where $Pr$ is precipitation as rainfall, $Sm$ is water reaching the soil from snow melt (if snow-pack dynamics are considered), $In$ is the interception loss (i.e., water evaporated after being intercepted by the canopy), $Ru$ is surface runoff, $Dd$ is deep drainage (i.e. water percolated to layers beyond soil depth), $Es$ is evaporation from soil surface, $Tr_{herb}$ is the transpiration of the herbaceous layer and $Ex_{woody}$ is soil water extraction done by woody plants. 
+where $Pr$ is precipitation as rainfall, $Sm$ is water reaching the soil from snow melt (if snow-pack dynamics are considered), $In$ is the interception loss (i.e., water evaporated after being intercepted by the canopy), $Ro$ is surface runon (only relevant in spatially-explicit simulations), $Ru$ is surface runoff, $Dd$ is deep drainage (i.e. water percolated to layers beyond soil depth), $Es$ is evaporation from soil surface, $Tr_{herb}$ is the transpiration of the herbaceous layer and $Ex_{woody}$ is soil water extraction done by woody plants. 
 
 Although the advanced water balance model includes hydraulic redistribution, this does not change the total amount of water in the soil, so the water balance equation is is very similar to that of the basic water balance model (eq.\@ref(eq:basicwaterbalanceequation)). Soil water extraction ($Ex_{woody}$) and plant transpiration ($Tr_{woody}$) will be equal if capacitance effects are not considered. Otherwise the amount of water stored in the woody plant tissues changes according to:
 \begin{equation}
@@ -79,12 +79,13 @@ Although the advanced water balance model includes hydraulic redistribution, thi
 
 While the above describes the default water balance equation, variations can occur depending on specific control flags: 
 
-a. *If snow dynamics are considered*, the water balance of the snow pack is defined as:
+a. *If snow dynamics are considered* [`snowpack`], the water balance of the snow pack is defined as:
 \begin{equation}
 \Delta{S_{snow}} = Ps - Sm
 \end{equation}
 where $Ps$ is precipitation as snowfall and $Sm$ is snow melt. Evaporation from bare soil cannot occur if there is a snow pack over the soil surface (i.e., if $S_{snow}>0$ then $Es = 0$). 
-b. *If plant water pools are considered*, the water balance equation applies not only to the soil of the overall stand but also to the soil beneath each plant cohort. The fraction of stand area covered by each cohort is used to keep the water balance at the two scales aligned. Moreover, the water balances of soils beneath the different plant cohort are more or less correlated depending on root overlap.
+b. *If plant water pools are considered* [`rhizosphereOverlap`], the water balance equation applies not only to the soil of the overall stand but also to the soil beneath each plant cohort. The fraction of stand area covered by each cohort is used to keep the water balance at the two scales aligned. Moreover, the water balances of soils beneath the different plant cohort are more or less correlated depending on root overlap.
+c. Whether soil flows are simulated using a *single domain* or a *dual-permeability domain* [`soilDomains`] affects the infiltration amounts (and hence runoff), in the latter including infiltration via macropores. 
 
 Unlike the basic water balance, in this model water balance components contributing to latent heat ($Es$, $Tr_{woody}$, $Tr_{herb}$, $In$ and $Sm$) are included in the energy balance equations of the canopy and soil, therefore coupling water and energy balances.
 
@@ -130,7 +131,7 @@ For every day to be simulated, the model performs the following steps:
 
 1. Update leaf area values according to the phenology of species and recalculate radiation extinction (sections \@ref(leafphenology) and \@ref(basiclightextinction)).
 2. Determine rainfall interception loss ($In$) and net rainfall ($Pr_{net}$) (section \@ref(interception)). The amount of water reaching the soil surface from the rainfall event is the sum of net rainfall ($Pr_{net}$) and surface runon ($Ro$), if given. If snow dynamics are included, increase snow pack from snow precipitation ($Ps$) and decrease it following snow melt ($Sm$) (section \@ref(snowpack)).
-3. Divide the amount of water reaching the soil surface from the rainfall event between infiltration and surface runoff ($Ru$) (section \@ref(runoff)). Determine the infiltration reaching each soil layer.
+3. Divide the amount of water reaching the soil surface from the rainfall event between infiltration and surface runoff ($Ru$) (section \@ref(infiltration)). Determine the infiltration reaching each soil layer.
 4. Determine bare soil evaporation ($Es$), if snow is not present (section \@ref(soilevaporation)), and herbaceous transpiration ($Tr_{herb}$; section \@ref(herbaceoustranspiration)).
 5. Determine sub-daily air temperature and direct/diffuse irradiance variations (chapter \@ref(subdailytemplight)).
 6. Determine the proportion of sunlit/shade leaves (section \@ref(sunlitshadeleaves)), the shortwave radiation absorbed by plant cohorts  (sections \@ref(shortwaveradiationcanopyabs) and the soil (section \@ref(shortwaveradiationsoilabs)) at sub-daily steps.
@@ -153,7 +154,7 @@ For every day to be simulated, the model performs the following steps:
     e. Scale water extraction from soil layers ($Ex_{woody}$) to the woody plant cohort level.
     f. Complete energy balance of the canopy and the soil, after translating plant transpiration, evaporation from bare soil, snow melt and interception loss to latent heat and calculating convective heat exchange for both the canopy and the soil. Alternatively, perform energy balance for individual canopy layers, while including turbulent heat exchange and turbulent transport of water vapor and $CO_2$ between layers (chapter \@ref(closecanopysoilenergybalance)).
 9. Determine day-level photosynthesis and transpiration from instantaneous rates and update soil moisture (section \@ref(daylevelphototransp)). Determine drought stress for each woody plant cohort (section \@ref(advanceddroughtstress)).
-10. Determine vertical water movement within the soil, while considering soil layer source/sinks from infiltration, bare soil evaporation and herbaceous transpiration and woody plant extraction/redistribution (section \@ref(richards)). This updates soil moisture and lower boundary condition of water movement corresponds to deep drainage ($Dd$). 
+10. Determine vertical water movement within the soil, while considering soil layer source/sinks from infiltration, bare soil evaporation and herbaceous transpiration and woody plant extraction/redistribution (section \@ref(soilflows)). This updates soil moisture and lower boundary condition of water movement corresponds to deep drainage ($Dd$). 
 11. If fire hazard calculations are requested, estimate live and dead fuel moisture and potential fire behaviour (chapter \@ref(fuelandfirebehavior)).
 
 
@@ -278,7 +279,8 @@ Other relevant control parameters relevant for the advanced water balance model 
 + `leafPhenology [= TRUE]`:  Whether leaf phenology is simulated for winter-deciduous species (see section \@ref(leafphenology)). If `FALSE` then all species are assumed to be evergreen.
 + `bareSoilEvaporation [= TRUE]`:  Whether evaporation from the soil surface is simulated (see section \@ref(soilevaporation)).
 + `interceptionMode [= "Gash1995"]`: Infiltration model, either "Gash1995" or "Liu2001"; see section \@ref(interception).
-+ `infiltrationMode [= "GreenAmpt1911"]`: Infiltration model, either "GreenAmpt1911" or "Boughton1989"; see section \@ref(runoff).
++ `infiltrationMode [= "GreenAmpt1911"]`: Infiltration model, either "GreenAmpt1911" or "Boughton1989"; see section \@ref(infiltration).
++ `soilDomains [= "single"]`: Either "single" (for single domain) or "dual" (for dual-permeability) (see section \@ref(soilflows)).
 + `sapFluidityVariation [= TRUE]`: Flag to indicate that temperature affects sap fluidity (see \@ref(sapviscosity)).
 + `windMeasurementHeight [= 200]`: Distance (in cm) above the top of the canopy corresponding to the measurement of wind speed.
 + `boundaryLayerSize [= 2000]`: Size of the canopy boundary layer (in cm). The boundary layer causes the model to define vertical layers above the top of the canopy. The parameter is only relevant when multi-layer canopy energy balance is performed.

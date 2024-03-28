@@ -149,11 +149,121 @@ legend("bottomright",lty=1:length(Cm), legend=paste("S =",Cm), bty="n")
 ```
 
 
-## Runon, runoff, infiltration and percolation {#runoff}
+## Bare soil evaporation {#soilevaporation}
 
-Water from rainfall events is divided between runoff and infiltration, and infiltrated water is distributed among soil layers assuming a circulation through large macropores. In contrast, snow melt ($Sm$) does not participate from infiltration/runoff partitioning and percolation, because melting rates are assumed to be slow enough to infiltrate completely in the topmost layer.
+Evaporation from the soil surface is the last component of the soil water balance to be calculated before calculating plant transpiration. Bare soil evaporation cannot happen if there is snow over the soil surface (i.e., if $S_{snow}>0$). 
 
-The amount of rainfall event water that reaches the soil is the sum of net rainfall ($Pr_{net}$) and runon ($Ro$, in mm), if any. The amount of rainfall event water infiltrating into the soil is $If = Pr_{net} + Ro - Ru$, where $Ru$ (in mm) is the rainfall water lost by surface runoff. Infiltration can be estimated using either @Boughton1989 or the @green_studies_1911 model.
+Potential evaporation from the soil ($PE_{soil}$; in $mm \cdot day^{-1}$) is defined as the product between $PET$ and $L^{SWR}_{ground}$, the proportion of SWR absorbed by the ground:
+\begin{equation}
+PE_{soil} =  PET \cdot L^{SWR}_{ground}
+\end{equation}
+
+Actual evaporation from the soil surface is modeled as in @Mouillot2001, who in turn followed @Ritchie1972.  First, the model determines $t_{soil}$, the time needed to evaporate the current water deficit (difference between field capacity and current moisture) in the surface soil layer:
+\begin{equation}
+t_{soil} = \left \{ \frac{V_{fc,1}\cdot(1- W_1)}{\gamma_{soil}} \right \}
+\end{equation}
+where $V_{fc,1}$  is the water retention capacity of layer 1, $W_1$ is the proportion of moisture in relation to field capacity of layer 1 and $\gamma_{soil}$ is the maximum daily evaporation ($mm \cdot day^{-1}$). The calculated time is used to determine the ‘supplied’ evaporation, $SE_{soil}$:
+\begin{equation}
+SE_{soil} = \gamma_{soil} \cdot (\sqrt{t_{soil}+1}-\sqrt{1})
+\end{equation}
+The amount of water actually evaporated from the soil, $Es$, is then calculated as the minimum between supply, $SE_{soil}$, and demand [@Federer1982], i.e. $PE_{soil}$ (see function `hydrology_soilEvaporationAmount`): 
+
+\begin{equation}
+Es = \min(PE_{soil}, SE_{soil})
+\end{equation}
+
+Figure \@ref(fig:soilevaporation) shows the cumulative evaporation from soils for different values of maximum evaporation rate.
+
+(ref:soilevaporation-cap) Cumulative bare soil evaporation for different values of maximum evaporation rate ($\gamma_{soil}$). Topsoil layer (0 – 30 cm) is initialized at field capacity ($V_1 = 50 mm$). $PE_{soil}$ was assumed not to be limiting. 
+
+```{r soilevaporation, fig.width=5, fig.height=4, echo=FALSE, fig.align='center', fig.cap='(ref:soilevaporation-cap)'}
+
+TS_clay=10
+TS_silt=65
+TS_sand=25
+TS_gravel=40
+SS_clay=10
+SS_silt=65
+SS_sand = 25
+SS_gravel=40
+TS_macro=0.25
+TS_micro = 0.75
+SS_macro=0.10
+SS_micro=0.90
+#Rock layer is like subsoil but with 95% of rocks
+RL_clay = SS_clay
+RL_sand = SS_sand
+RL_macro = SS_macro
+RL_micro = SS_micro
+RL_gravel = 95
+
+
+RunEvaporation<-function(Gsoil, d1,d2,d3, numDays = 15){
+  PET = 100 #Not limited by PET
+  Lground = 1
+  
+  Theta_FC1=soil_psi2thetaSX(TS_clay, TS_sand, -33) #in m3/m3
+  pcTS_gravel = 1-(TS_gravel/100)
+  MaxVol1 = (d1*Theta_FC1*pcTS_gravel)
+
+  W1=rep(0, numDays)
+  W1[1] = 1
+  Esoil = rep(NA,numDays)
+  EsoilCum = rep(NA,numDays)
+  t = rep(NA, numDays)
+  for(i in 1:numDays){
+    #Evaporation from bare soil
+    Esoil[i] = hydrology_soilEvaporationAmount(DEF=(MaxVol1*(1 - W1[i])), PETs = PET*Lground, Gsoil = Gsoil)
+    if(i==1) EsoilCum[i] = Esoil[i]
+    else EsoilCum[i] = EsoilCum[i-1]+Esoil[i]
+    if(i<numDays){
+      W1[i+1] = max(W1[i]-(Esoil[i])/MaxVol1,0)
+    }  
+  }
+  return(list(Esoil = Esoil, EsoilCum = EsoilCum))  
+}
+
+E11=RunEvaporation(Gsoil=1, d1=300, d2=1200, d3= 2500)
+E12=RunEvaporation(Gsoil=2, d1=300, d2=1200, d3= 2500)
+E13=RunEvaporation(Gsoil=3, d1=300, d2=1200, d3= 2500)
+
+
+par(mar=c(4,4,1,1))
+plot(x=1:length(E11$EsoilCum), y=E11$EsoilCum, ylim=c(0,15), ylab="Cummulative soil evaporation (mm)", xlab="day", type="l", axes=FALSE)
+axis(1, at=1:length(E11$EsoilCum), cex.axis=0.7)
+axis(2)
+points(x=1:length(E11$EsoilCum), y=E11$EsoilCum, pch=1)
+lines(x=1:length(E12$EsoilCum), y=E12$EsoilCum, lty=2)
+points(x=1:length(E12$EsoilCum), y=E12$EsoilCum, pch=1)
+lines(x=1:length(E13$EsoilCum), y=E13$EsoilCum, lty=3)
+points(x=1:length(E13$EsoilCum), y=E13$EsoilCum, pch=1)
+legend("topleft", lty=1:3, legend=c("Gsoil = 1", 
+                                    "Gsoil = 2", 
+                                    "Gsoil = 3"), cex = 0.7, bty="n")
+```
+
+## Transpiration of the herbaceous layer {#herbaceoustranspiration}
+
+Transpiration of herbaceous layer is modelled analogously to the transpiration of woody plants. First, potential evapotranspiration from the herbaceous layer ($PET_{herb}$; in $mm \cdot day^{-1}$) is defined as the product between $PET$ and $L^{SWR}_{herb}$, the proportion of SWR reaching the herbaceous layer:
+\begin{equation}
+PET_{herb} =  PET \cdot L^{SWR}_{herb}
+\end{equation}
+Thus, the more dense the woody plant canopy, the lower herbaceous transpiration will be. Maximum herbaceous transpiration $Tr_{herb, \max}$ depends on both $PET_{herb}$ and the amount of transpiring surface, i.e. $LAI_{herb}$. To estimate $Tr_{\max}$ the model uses the empirical equation of @Granier1999, as in section \@ref(maximumtranspiration):
+\begin{equation}
+\frac{Tr_{herb,\max}}{PET}= -0.006\cdot (LAI_{herb})^2+0.134\cdot LAI_{herb}
+\end{equation}
+
+Finally, actual herbaceous transpiration for a given soil layer $s$ ($Tr_{herb,s}$) is reduced according to the soil water potential ($\Psi_s$), assuming that transpiration reduction follows Weibull function with fixed coefficients:
+
+\begin{equation}
+Tr_{herb, s}= FRP_{herb,s} \cdot Tr_{herb,\max} \cdot \exp \left \{\ln{(0.5)}\cdot \left[ \frac{\Psi_i}{-1.5} \right] ^2 \right \} 
+(\#eq:herbaceoustranspiration)
+\end{equation}
+where $FRP_{herb,s}$ is the proportion of fine roots in layer $s$, defined using $Z_{50} = 50 mm$ and $Z_{95} = 500 mm$ (see \@ref(rootdistribution)). 
+
+## Infiltration {#infiltration}
+
+The amount of rainfall event water that reaches the soil is the sum of net rainfall ($Pr_{net}$) and runon ($Ro$, in mm), if any. The amount of rainfall event water infiltrating into the soil matrix ($If$) is estimated using either the @Boughton1989 or the @green_studies_1911 models.
 
 ### Boughton (1989) model
 
@@ -306,133 +416,31 @@ lines(NP,infiltration(NP, usdaTypes[2], 0.5), lty=5)
 legend("topleft", bty="n", lty=1:5, legend=paste0("theta_dry = ", seq(0.1, 0.5, by=0.1)))
 ```
 
-### Percolation
+## Soil water balance and flows {#soilflows}
 
-Rainfall infiltrating into the soil is divided among soil layers. Following @Granier1999, part of the water reaching one soil layer percolates quickly through the macropores whereas the other fills micropores (and may contribute to the vertical, unsaturated, flow). The amount of water reaching the micropores of each soil layer $s$, i.e. $If_s$, is modelled using an extinction function that depends on macroporosity (see function `hydrology_infiltrationRepartition`).
+### Design of soil water flows
 
-## Bare soil evaporation {#soilevaporation}
+In this chapter we describe water movement into, out of, and within the soil. The water input to the soil is the sum of net rainfall ($Pr_{net}$, i.e. rainfall minus interception), snow melt ($Sm$) and (if simulations are done in a spatially-explicit context) runon from an adjacent location ($Ro$). Water movement can be performed using either the common single domain model (`soilDomains = "single"`) or the dual permeability model (`soilDomains = "dual"`), which follows with some modifications the MACRO model [@jarvis_modelling_1991; @larsbo_improved_2005]. 
 
-Evaporation from the soil surface is the last component of the soil water balance to be calculated before calculating plant transpiration. Bare soil evaporation cannot happen if there is snow over the soil surface (i.e., if $S_{snow}>0$). 
+In the **single-domain model** (panel A in Fig. \@ref(fig:soilflowdesign)), the water coming from rainfall events - i.e. sum of net rainfall ($Pr_{net}$) and run-on ($Ro$) - is divided between infiltration into the soil ($If$) and runoff ($Ru$), following the models explained in \@ref(infiltration). Rainfall infiltrating into the soil is divided among soil layers, in a crude attempt to emulate the effect of preferential flows (but without accounting for the increase in infiltration caused by macropores). The amount of water reaching each soil layer is modelled using an extinction function that depends on macroporosity (see function `hydrology_infiltrationRepartition`). In contrast to water from rainfall events, water from snow melt ($Sm$) is assumed to infiltrate slowly and completely into the first layer. Water flows within the soil according to the Richards equation, assuming an homogenous porous media and where fluxes are driven by both gravitational and matric potentials. Root water uptake/redistribution ($Ex$) is taken into account as source/sinks from/to the soil layers. Water leaving the bottom layer (as well as departures from the water balance) is assumed to drain beyond the soil limits (i.e. deep drainage ($Dd$)). 
 
-Potential evaporation from the soil ($PE_{soil}$; in $mm \cdot day^{-1}$) is defined as the product between $PET$ and $L^{SWR}_{ground}$, the proportion of SWR absorbed by the ground:
-\begin{equation}
-PE_{soil} =  PET \cdot L^{SWR}_{ground}
-\end{equation}
+In the **dual-permeability model** (panel B in Fig. \@ref(fig:soilflowdesign)), total porosity is partitioned into two separate flow regions (matrix and macropores), each with its own degree of saturation, conductivity and flow rate. The water coming from rainfall events - i.e. sum of net rainfall ($Pr_{net}$) and run-on ($Ro$) - is divided between infiltration into the soil matrix ($If$; following models in \@ref(infiltration)) and water infiltrating into the macropore domain. Water from snow melt ($Sm$) is assumed to infiltrate slowly and completely into the soil matrix. Fluxes within the soil matrix follow the Richards equation and is driven by both gravity and matric potentials, as in the single-domain model. In contrast, fluxes in the macropore region are gravity-driven only. Saturation of micropores of a given soil matrix layer leads to instantaneous flux into the corresponding macropore layer, whereas water uptake by the soil matrix from the corresponding macropore layer follows a diffusion equation. Root water uptake/redistribution ($Ex$) is taken into account as source/sinks in the soil matrix. Deep drainage ($Dd$) can occur from both the soil matrix or the macropore domain. Finally, saturation excess in the macropore domain leads to accumulation of water in the above layer and, eventually, to surface runoff ($Ru$).  
 
-Actual evaporation from the soil surface is modeled as in @Mouillot2001, who in turn followed @Ritchie1972.  First, the model determines $t_{soil}$, the time needed to evaporate the current water deficit (difference between field capacity and current moisture) in the surface soil layer:
-\begin{equation}
-t_{soil} = \left \{ \frac{V_{fc,1}\cdot(1- W_1)}{\gamma_{soil}} \right \}
-\end{equation}
-where $V_{fc,1}$  is the water retention capacity of layer 1, $W_1$ is the proportion of moisture in relation to field capacity of layer 1 and $\gamma_{soil}$ is the maximum daily evaporation ($mm \cdot day^{-1}$). The calculated time is used to determine the ‘supplied’ evaporation, $SE_{soil}$:
-\begin{equation}
-SE_{soil} = \gamma_{soil} \cdot (\sqrt{t_{soil}+1}-\sqrt{1})
-\end{equation}
-The amount of water actually evaporated from the soil, $Es$, is then calculated as the minimum between supply, $SE_{soil}$, and demand [@Federer1982], i.e. $PE_{soil}$ (see function `hydrology_soilEvaporationAmount`): 
-
-\begin{equation}
-Es = \min(PE_{soil}, SE_{soil})
-\end{equation}
-
-Figure \@ref(fig:soilevaporation) shows the cumulative evaporation from soils for different values of maximum evaporation rate.
-
-(ref:soilevaporation-cap) Cumulative bare soil evaporation for different values of maximum evaporation rate ($\gamma_{soil}$). Topsoil layer (0 – 30 cm) is initialized at field capacity ($V_1 = 50 mm$). $PE_{soil}$ was assumed not to be limiting. 
-
-```{r soilevaporation, fig.width=5, fig.height=4, echo=FALSE, fig.align='center', fig.cap='(ref:soilevaporation-cap)'}
-
-TS_clay=10
-TS_silt=65
-TS_sand=25
-TS_gravel=40
-SS_clay=10
-SS_silt=65
-SS_sand = 25
-SS_gravel=40
-TS_macro=0.25
-TS_micro = 0.75
-SS_macro=0.10
-SS_micro=0.90
-#Rock layer is like subsoil but with 95% of rocks
-RL_clay = SS_clay
-RL_sand = SS_sand
-RL_macro = SS_macro
-RL_micro = SS_micro
-RL_gravel = 95
-
-
-RunEvaporation<-function(Gsoil, d1,d2,d3, numDays = 15){
-  PET = 100 #Not limited by PET
-  Lground = 1
-  
-  Theta_FC1=soil_psi2thetaSX(TS_clay, TS_sand, -33) #in m3/m3
-  pcTS_gravel = 1-(TS_gravel/100)
-  MaxVol1 = (d1*Theta_FC1*pcTS_gravel)
-
-  W1=rep(0, numDays)
-  W1[1] = 1
-  Esoil = rep(NA,numDays)
-  EsoilCum = rep(NA,numDays)
-  t = rep(NA, numDays)
-  for(i in 1:numDays){
-    #Evaporation from bare soil
-    Esoil[i] = hydrology_soilEvaporationAmount(DEF=(MaxVol1*(1 - W1[i])), PETs = PET*Lground, Gsoil = Gsoil)
-    if(i==1) EsoilCum[i] = Esoil[i]
-    else EsoilCum[i] = EsoilCum[i-1]+Esoil[i]
-    if(i<numDays){
-      W1[i+1] = max(W1[i]-(Esoil[i])/MaxVol1,0)
-    }  
-  }
-  return(list(Esoil = Esoil, EsoilCum = EsoilCum))  
-}
-
-E11=RunEvaporation(Gsoil=1, d1=300, d2=1200, d3= 2500)
-E12=RunEvaporation(Gsoil=2, d1=300, d2=1200, d3= 2500)
-E13=RunEvaporation(Gsoil=3, d1=300, d2=1200, d3= 2500)
-
-
-par(mar=c(4,4,1,1))
-plot(x=1:length(E11$EsoilCum), y=E11$EsoilCum, ylim=c(0,15), ylab="Cummulative soil evaporation (mm)", xlab="day", type="l", axes=FALSE)
-axis(1, at=1:length(E11$EsoilCum), cex.axis=0.7)
-axis(2)
-points(x=1:length(E11$EsoilCum), y=E11$EsoilCum, pch=1)
-lines(x=1:length(E12$EsoilCum), y=E12$EsoilCum, lty=2)
-points(x=1:length(E12$EsoilCum), y=E12$EsoilCum, pch=1)
-lines(x=1:length(E13$EsoilCum), y=E13$EsoilCum, lty=3)
-points(x=1:length(E13$EsoilCum), y=E13$EsoilCum, pch=1)
-legend("topleft", lty=1:3, legend=c("Gsoil = 1", 
-                                    "Gsoil = 2", 
-                                    "Gsoil = 3"), cex = 0.7, bty="n")
+```{r soilflowdesign, out.width='100%', fig.align="center", fig.cap="Schematic representation of the (A) single domain and (B) dual-permeability models of flows into, out of and within the soil. Symbols are defined in the main text.", echo=FALSE}
+knitr::include_graphics("figures/soil_flow_design.png")
 ```
-
-## Transpiration of the herbaceous layer {#herbaceoustranspiration}
-
-Transpiration of herbaceous layer is modelled analogously to the transpiration of woody plants. First, potential evapotranspiration from the herbaceous layer ($PET_{herb}$; in $mm \cdot day^{-1}$) is defined as the product between $PET$ and $L^{SWR}_{herb}$, the proportion of SWR reaching the herbaceous layer:
-\begin{equation}
-PET_{herb} =  PET \cdot L^{SWR}_{herb}
-\end{equation}
-Thus, the more dense the woody plant canopy, the lower herbaceous transpiration will be. Maximum herbaceous transpiration $Tr_{herb, \max}$ depends on both $PET_{herb}$ and the amount of transpiring surface, i.e. $LAI_{herb}$. To estimate $Tr_{\max}$ the model uses the empirical equation of @Granier1999, as in section \@ref(maximumtranspiration):
-\begin{equation}
-\frac{Tr_{herb,\max}}{PET}= -0.006\cdot (LAI_{herb})^2+0.134\cdot LAI_{herb}
-\end{equation}
-
-Finally, actual herbaceous transpiration for a given soil layer $s$ ($Tr_{herb,s}$) is reduced according to the soil water potential ($\Psi_s$), assuming that transpiration reduction follows Weibull function with fixed coefficients:
-
-\begin{equation}
-Tr_{herb, s}= FRP_{herb,s} \cdot Tr_{herb,\max} \cdot \exp \left \{\ln{(0.5)}\cdot \left[ \frac{\Psi_i}{-1.5} \right] ^2 \right \} 
-(\#eq:herbaceoustranspiration)
-\end{equation}
-where $FRP_{herb,s}$ is the proportion of fine roots in layer $s$, defined using $Z_{50} = 50 mm$ and $Z_{95} = 500 mm$ (see \@ref(rootdistribution)). 
-
-## Vertical water movement within the soil {#richards}
-
-In this chapter we describe water movement within the soil, whose design was taken from chapter 8 of @bonan_climate_2019, and much of the present text has been summarized and adapted from this source. 
 
 ### Darcian flow and Richards equation
 
-Water flows in the soil **from high to low potential** as described by Darcy's law. The **total potential** is the sum of the **matric** potential ($\Psi_{s}$, here expressed in $m$, see \@ref(soilinitialization)) and vertical **depth** $z$ (also in $m$). The vertical depth $z$ is taken as positive in the upward direction, so that $z = 0$ is the ground surface. In the vertical dimension the **flux** $Q$, i.e. rate of water movement (in $m s^{-1}$), according to Darcy's law is:
+ Water flows in the soil **from high to low potential** as described by Darcy's law. In the soil matrix, the **total potential** is used, i.e. the sum of the **matric** potential ($\Psi_{s}$, here expressed in $m$, see \@ref(soilinitialization)) and vertical **depth** $z$ (also in $m$). The vertical depth $z$ is taken as positive in the upward direction, so that $z = 0$ is the ground surface. In the vertical dimension the **flux** $Q$, i.e. rate of water movement (in $m s^{-1}$), according to Darcy's law is:
 \begin{equation}
 Q = -K(\theta)\cdot \frac{\delta (\Psi + z)}{\delta z} = -K(\theta)\cdot \frac{\delta \Psi}{\delta z} - K(\theta)
 \end{equation}
-where $K(\theta)$ is the hydraulic conductivity (in $m s^{-1}$) that describes the ease with which water can move through the porous media space, and depends on soil moisture ($\theta$). 
+where $K(\theta)$ is the hydraulic conductivity (in $m s^{-1}$) that describes the ease with which water can move through the porous media space, and depends on soil moisture ($\theta$). In the macropore domain, only the vertical depth (i.e. gravity potential) is considered, which leads to a **unit gradient**, and hence the flux $Q$ is simply:
+\begin{equation}
+Q = -K_{ma}(\theta_{ma})
+\end{equation}
+where $K_{ma}$ is the macropore hydraulic conductivity (in $m s^{-1}$), depending on the macropore water content $\theta_{ma}$ (in $m^3\cdot m^{-3}$).
 
 Consider a volume of soil with horizontal area $\Delta x \Delta y$, thickness $\Delta z$ and with non-rock proportion $\lambda = 1 - P_{rocks}$. The mass flux entering the parcel from above is $\rho_{w} Q_{in} \Delta x \Delta y$ and the flux out of it is $\rho_{w} Q_{out} \Delta x \Delta y$. Conservation requires that the difference between fluxes and source/sinks equals the rate of change in water storage. The mass of water in the soil volume is  $\rho_{w} \theta \Delta x \Delta y \Delta z \lambda$ so the change in water over a time interval $\Delta t$ is: 
 
@@ -453,26 +461,30 @@ which expressed in the notation of calculus is:
 \end{equation}
 
 
-Substituting Darcy's law for $Q$ gives the Richards equation:
+Substituting Darcy's law for $Q$, and accounting for (lateral) sources/sinks $S$, gives the Richards equation:
 
 \begin{equation}
-\frac{\delta \theta}{\delta t} \lambda = \frac{\delta}{\delta z} \left[ K(\theta) \frac{\delta \Psi}{\delta z} + K(\theta) \right] = K(\theta) \frac{\delta^2 \Psi}{\delta^2 z} + \frac{\delta K}{\delta z} \frac{\delta \Psi}{\delta z} + \frac{\delta K}{\delta z}
+\frac{\delta \theta}{\delta t} \lambda = \frac{\delta}{\delta z} \left[ K(\theta) \frac{\delta \Psi}{\delta z} + K(\theta) \right] \pm S = K(\theta) \frac{\delta^2 \Psi}{\delta^2 z} + \frac{\delta K}{\delta z} \frac{\delta \Psi}{\delta z}  \frac{\delta K}{\delta z} \pm S
 \end{equation}
 
 The former is known as the *mixed-form* Richards equation, because it includes $\theta$ on the left hand and the vertical gradient in matric potential $\Psi$ on the right hand. The *head-based* or $\Psi$-*based form* expresses the left hand term using $\Psi$ as dependent variable:
 
 \begin{equation}
-C(\Psi) \frac{\delta \Psi}{\delta t} \lambda =  K(\Psi) \frac{\delta^2 \Psi}{\delta^2 z} + \frac{\delta K}{\delta z} \frac{\delta \Psi}{\delta z} + \frac{\delta K}{\delta z}
+C(\Psi) \frac{\delta \Psi}{\delta t} \lambda =  K(\Psi) \frac{\delta^2 \Psi}{\delta^2 z} + \frac{\delta K}{\delta z} \frac{\delta \Psi}{\delta z} + \frac{\delta K}{\delta z} \pm S
 \end{equation}
 
-where $C(\Psi) = \delta \theta / \delta \Psi$ is known as the **specific moisture capacity**, in $m^{-1}$.
+where $C(\Psi) = \delta \theta / \delta \Psi$ is known as the **specific moisture capacity**, in $m^{-1}$. In the macropore domain, the use of the former equation is problematic; a major reason being the lack of information concerning the relationship between $\Psi$ and $\theta$ close to saturation. If we assume capillarity to be negligible in the macropore domain, then $\delta \Psi / \Delta z = 0$ and the corresponding governing equation becomes:
 
-### Finite difference approximation
+\begin{equation}
+\frac{\delta \theta_{ma}}{\delta t} \lambda =  \frac{\delta K_{ma}}{\delta z} \pm S
+\end{equation}
 
-The finite difference approximation for the Richards equation represents the soil as a network of $N$ discrete nodal points that vary in space and time. The network is presented in Fig. \@ref(fig:soilflows). 
+### Finite approximation to flows in the soil matrix
 
-```{r soilflows, out.width='80%', fig.align="center", fig.cap="Schematic representation of network of soil nodes", echo=FALSE}
-knitr::include_graphics("figures/soil_flows.png")
+Water movement in the soil matrix was taken from chapter 8 of @bonan_climate_2019, and much of the present text has been summarized and adapted from this source, with modifications for the exchange with macropore moisture. The finite difference approximation for the Richards equation represents the soil as a network of $N$ discrete nodal points that vary in space and time. The network is presented in Fig. \@ref(fig:soilmatrixflows). 
+
+```{r soilmatrixflows, out.width='80%', fig.align="center", fig.cap="Schematic representation of network of soil nodes", echo=FALSE}
+knitr::include_graphics("figures/soilmatrix_flows.png")
 ```
 
 For reasons of numerical stability, Richards equation is solved using an implicit time discretization win which the spatial derivatives $\delta K / \delta z$, $\delta \Psi / \delta z$ and  $\delta^2 \Psi / \delta ^2 z$ are written numerically using a central difference approximation at time $n+1$, and the time derivative uses a backward difference approximation at $n+1$. 
