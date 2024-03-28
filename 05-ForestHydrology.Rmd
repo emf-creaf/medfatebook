@@ -416,19 +416,32 @@ lines(NP,infiltration(NP, usdaTypes[2], 0.5), lty=5)
 legend("topleft", bty="n", lty=1:5, legend=paste0("theta_dry = ", seq(0.1, 0.5, by=0.1)))
 ```
 
-## Soil water balance and flows {#soilflows}
+## Soil water flows {#soilflows}
 
 ### Design of soil water flows
 
 In this chapter we describe water movement into, out of, and within the soil. The water input to the soil is the sum of net rainfall ($Pr_{net}$, i.e. rainfall minus interception), snow melt ($Sm$) and (if simulations are done in a spatially-explicit context) runon from an adjacent location ($Ro$). Water movement can be performed using either the common single domain model (`soilDomains = "single"`) or the dual permeability model (`soilDomains = "dual"`), which follows with some modifications the MACRO model [@jarvis_modelling_1991; @larsbo_improved_2005]. 
 
-In the **single-domain model** (panel A in Fig. \@ref(fig:soilflowdesign)), the water coming from rainfall events - i.e. sum of net rainfall ($Pr_{net}$) and run-on ($Ro$) - is divided between infiltration into the soil ($If$) and runoff ($Ru$), following the models explained in \@ref(infiltration). Rainfall infiltrating into the soil is divided among soil layers, in a crude attempt to emulate the effect of preferential flows (but without accounting for the increase in infiltration caused by macropores). The amount of water reaching each soil layer is modelled using an extinction function that depends on macroporosity (see function `hydrology_infiltrationRepartition`). In contrast to water from rainfall events, water from snow melt ($Sm$) is assumed to infiltrate slowly and completely into the first layer. Water flows within the soil according to the Richards equation, assuming an homogenous porous media and where fluxes are driven by both gravitational and matric potentials. Root water uptake/redistribution ($Ex$) is taken into account as source/sinks from/to the soil layers. Water leaving the bottom layer (as well as departures from the water balance) is assumed to drain beyond the soil limits (i.e. deep drainage ($Dd$)). 
+In the **single-domain model** (panel A in Fig. \@ref(fig:soilflowdesign)), the water coming from rainfall events - i.e. sum of net rainfall ($Pr_{net}$) and run-on ($Ro$) - is divided between infiltration into the soil ($If$) and runoff ($Ru$), following the models explained in \@ref(infiltration). Rainfall infiltrating into the soil is divided among soil layers, in a crude attempt to emulate the effect of preferential flows (but without accounting for the increase in infiltration caused by macropores). The amount of water reaching each soil layer is modelled using an extinction function that depends on macroporosity (see function `hydrology_infiltrationRepartition`). In contrast to water from rainfall events, water from snow melt ($Sm$) is assumed to infiltrate slowly and completely into the first layer. Water flows within the soil according to the Richards equation, assuming an homogenous porous media and where fluxes are driven by both gravitational and matric potentials. Root water uptake/redistribution is taken into account as source/sinks from/to the soil layers along with bare soil evaporation. Water leaving the bottom layer (as well as departures from the water balance) is assumed to drain beyond the soil limits (i.e. deep drainage ($Dd$)). 
 
-In the **dual-permeability model** (panel B in Fig. \@ref(fig:soilflowdesign)), total porosity is partitioned into two separate flow regions (matrix and macropores), each with its own degree of saturation, conductivity and flow rate. The water coming from rainfall events - i.e. sum of net rainfall ($Pr_{net}$) and run-on ($Ro$) - is divided between infiltration into the soil matrix ($If$; following models in \@ref(infiltration)) and water infiltrating into the macropore domain. Water from snow melt ($Sm$) is assumed to infiltrate slowly and completely into the soil matrix. Fluxes within the soil matrix follow the Richards equation and is driven by both gravity and matric potentials, as in the single-domain model. In contrast, fluxes in the macropore region are gravity-driven only. Saturation of micropores of a given soil matrix layer leads to instantaneous flux into the corresponding macropore layer, whereas water uptake by the soil matrix from the corresponding macropore layer follows a diffusion equation. Root water uptake/redistribution ($Ex$) is taken into account as source/sinks in the soil matrix. Deep drainage ($Dd$) can occur from both the soil matrix or the macropore domain. Finally, saturation excess in the macropore domain leads to accumulation of water in the above layer and, eventually, to surface runoff ($Ru$).  
+In the **dual-permeability model** (panel B in Fig. \@ref(fig:soilflowdesign)), total porosity is partitioned into two separate flow regions (matrix and macropores), each with its own degree of saturation, conductivity and flow rate. The water coming from rainfall events - i.e. sum of net rainfall ($Pr_{net}$) and run-on ($Ro$) - is divided between infiltration into the soil matrix ($If$; following models in \@ref(infiltration)) and water infiltrating into the macropore domain. Water from snow melt ($Sm$) is assumed to infiltrate slowly and completely into the soil matrix. Fluxes within the soil matrix follow the Richards equation and is driven by both gravity and matric potentials, as in the single-domain model. In contrast, fluxes in the macropore region are gravity-driven only. Saturation of micropores of a given soil matrix layer leads to instantaneous flux into the corresponding macropore layer, whereas water uptake by the soil matrix from the corresponding macropore layer follows a diffusion equation. Root water uptake/redistribution is taken into account as source/sinks in the soil matrix along with bare soil evaporation. Deep drainage ($Dd$) can occur from both the soil matrix or the macropore domain. Finally, saturation excess in the macropore domain leads to accumulation of water in the above layer and, eventually, to surface runoff ($Ru$).  
 
 ```{r soilflowdesign, out.width='100%', fig.align="center", fig.cap="Schematic representation of the (A) single domain and (B) dual-permeability models of flows into, out of and within the soil. Symbols are defined in the main text.", echo=FALSE}
 knitr::include_graphics("figures/soil_flow_design.png")
 ```
+
+
+Function `hydrology_soilFlows()` performs infiltration and vertical water movement flows, given a soil, net rainfall, snowmelt and source/sink vector for each layer. Source/sink terms are defined as follows for the first layer ($i=1$):
+\begin{equation}
+S_1 = - Es - Tr_{herb,1} - Ex_{woody,1}
+\end{equation}
+and for $1 < i \leq N$:
+\begin{equation}
+S_i = - Tr_{herb,i} - Ex_{woody,i}
+\end{equation}
+where $Es$ is bare soil evaporation, $Tr_{herb, i}$ is herbaceous uptake from layer $i$ and $Ex_{woody}$ is woody plant uptake/redistribution from/to layer $i$. All right-hand terms are converted from $mm/day$ to instantaneous rates ($m/s$) for proper units in $S$. **24 time steps** of 1 hour are used for vertical water simulation of each day. The function updates soil moisture and returns daily fluxes corresponding to infiltration, runoff and deep drainage.
+
+The following sections detail the formulation and numerical solving of soil flows, both under the single-domain and the dual-permeability models.
 
 ### Darcian flow and Richards equation
 
@@ -523,14 +536,4 @@ Finally, for the last layer ($i=N$) a free drainage condition is specified as bo
 
 The numerical form of the $\Psi$-based Richards equation for a soil with $N$ layers is a tridiagonal system of $N$ equations with $N$ unknown values $\Psi$ at time $n+1$. An additional complexity is that $\Psi$ at $n+1$ also appears through $K$ and $C$. The solution requires linearizing with respect to $\Psi$ through various methods. Here the **predictor-corrector** method is employed, a two-step solution that solves the equation twice [@haverkamp_comparison_1977]. The predictor step uses explicit linearization to solve for $\Psi$ over one-half of a full time step ($\Delta t/2$) at time $n +1/2$ with $K$ and $C$ from time $n$. The resulting values for $\Psi$ are used to evaluate $K$ and $C$ at $n+1/2$. The corrector step uses these to obtain $\Psi$ over the full time step ($\Delta t$) at $n+1$. An implicit solution is used for the predictor step and the Crank-Nicolson method is used for the corrector step.
 
-Source/sink terms are defined as follows for the first layer ($i=1$):
-\begin{equation}
-S_1 = If_1 + Sm - Es - Tr_{herb,1} - Ex_{woody,1}
-\end{equation}
-and for $1 < i \leq N$:
-\begin{equation}
-S_i = If_i - Tr_{herb,i} - Ex_{woody,i}
-\end{equation}
-where $Sm$ is snow melt, $Es$ is bare soil evaporation, $If_i$ is infiltration amount into layer $i$,  $Tr_{herb, i}$ is herbaceous uptake from layer $i$ and $Ex_{woody}$ is woody plant uptake from layer $i$. All right-hand terms are converted from $mm/day$ to instantaneous rates ($m/s$) for proper units in $S$.
 
-Function `hydrology_soilFlows()` implements the vertical water movement flows, given a soil and source/sink vector for each layer. **24 time steps** of 1 hour are used for vertical water simulation of each day. 
