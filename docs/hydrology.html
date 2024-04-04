@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-03-28" />
+<meta name="date" content="2024-04-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -908,7 +908,7 @@ Figure 5.5: Examples of infiltration using the Green-Ampt (1911) model for diffe
 Figure 5.6: Schematic representation of the (A) single domain and (B) dual-permeability models of flows into, out of and within the soil. Symbols are defined in the main text.
 </p>
 </div>
-<p>Function <code>hydrology_soilFlows()</code> performs infiltration and vertical water movement flows, given a soil, net rainfall, snowmelt and source/sink vector for each layer. Source/sink terms are defined as follows for the first layer (<span class="math inline">\(i=1\)</span>):
+<p>Function <code>hydrology_soilWaterBalance()</code> performs infiltration and vertical water movement flows, given a soil, net rainfall, snowmelt and source/sink vector for each layer. Source/sink terms are defined as follows for the first layer (<span class="math inline">\(i=1\)</span>):
 <span class="math display">\[\begin{equation}
 S_1 = - Es - Tr_{herb,1} - Ex_{woody,1}
 \end{equation}\]</span>
@@ -950,10 +950,11 @@ where <span class="math inline">\(K_{ma}\)</span> is the macropore hydraulic con
 <p><span class="math display">\[\begin{equation}
 C(\Psi) \frac{\delta \Psi}{\delta t} \lambda =  K(\Psi) \frac{\delta^2 \Psi}{\delta^2 z} + \frac{\delta K}{\delta z} \frac{\delta \Psi}{\delta z} + \frac{\delta K}{\delta z} \pm S
 \end{equation}\]</span></p>
-<p>where <span class="math inline">\(C(\Psi) = \delta \theta / \delta \Psi\)</span> is known as the <strong>specific moisture capacity</strong>, in <span class="math inline">\(m^{-1}\)</span>. In the macropore domain, the use of the former equation is problematic; a major reason being the lack of information concerning the relationship between <span class="math inline">\(\Psi\)</span> and <span class="math inline">\(\theta\)</span> close to saturation. If we assume capillarity to be negligible in the macropore domain, then <span class="math inline">\(\delta \Psi / \Delta z = 0\)</span> and the corresponding governing equation becomes:</p>
+<p>where <span class="math inline">\(C(\Psi) = \delta \theta / \delta \Psi\)</span> is known as the <strong>specific moisture capacity</strong>, in <span class="math inline">\(m^{-1}\)</span>. In the macropore domain, the use of the former equation is problematic; a major reason being the lack of information concerning the relationship between <span class="math inline">\(\Psi\)</span> and <span class="math inline">\(\theta\)</span> close to saturation. If we assume capillarity to be negligible in the macropore domain, then <span class="math inline">\(\delta \Psi / \delta z = 0\)</span> and the corresponding governing equation becomes:</p>
 <p><span class="math display">\[\begin{equation}
 \frac{\delta \theta_{ma}}{\delta t} \lambda =  \frac{\delta K_{ma}}{\delta z} \pm S
 \end{equation}\]</span></p>
+<p>where <span class="math inline">\(\theta_{ma}\)</span> and <span class="math inline">\(K_{ma}\)</span> are the soil moisture and soil conductivity, respectively, in the macropore domain.</p>
 </div>
 <div id="finite-approximation-to-flows-in-the-soil-matrix" class="section level3 hasAnchor" number="5.7.3">
 <h3><span class="header-section-number">5.7.3</span> Finite approximation to flows in the soil matrix<a href="hydrology.html#finite-approximation-to-flows-in-the-soil-matrix" class="anchor-section" aria-label="Anchor link to header"></a></h3>

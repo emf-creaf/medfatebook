@@ -431,7 +431,7 @@ knitr::include_graphics("figures/soil_flow_design.png")
 ```
 
 
-Function `hydrology_soilFlows()` performs infiltration and vertical water movement flows, given a soil, net rainfall, snowmelt and source/sink vector for each layer. Source/sink terms are defined as follows for the first layer ($i=1$):
+Function `hydrology_soilWaterBalance()` performs infiltration and vertical water movement flows, given a soil, net rainfall, snowmelt and source/sink vector for each layer. Source/sink terms are defined as follows for the first layer ($i=1$):
 \begin{equation}
 S_1 = - Es - Tr_{herb,1} - Ex_{woody,1}
 \end{equation}
@@ -486,11 +486,13 @@ The former is known as the *mixed-form* Richards equation, because it includes $
 C(\Psi) \frac{\delta \Psi}{\delta t} \lambda =  K(\Psi) \frac{\delta^2 \Psi}{\delta^2 z} + \frac{\delta K}{\delta z} \frac{\delta \Psi}{\delta z} + \frac{\delta K}{\delta z} \pm S
 \end{equation}
 
-where $C(\Psi) = \delta \theta / \delta \Psi$ is known as the **specific moisture capacity**, in $m^{-1}$. In the macropore domain, the use of the former equation is problematic; a major reason being the lack of information concerning the relationship between $\Psi$ and $\theta$ close to saturation. If we assume capillarity to be negligible in the macropore domain, then $\delta \Psi / \Delta z = 0$ and the corresponding governing equation becomes:
+where $C(\Psi) = \delta \theta / \delta \Psi$ is known as the **specific moisture capacity**, in $m^{-1}$. In the macropore domain, the use of the former equation is problematic; a major reason being the lack of information concerning the relationship between $\Psi$ and $\theta$ close to saturation. If we assume capillarity to be negligible in the macropore domain, then $\delta \Psi / \delta z = 0$ and the corresponding governing equation becomes:
 
 \begin{equation}
 \frac{\delta \theta_{ma}}{\delta t} \lambda =  \frac{\delta K_{ma}}{\delta z} \pm S
 \end{equation}
+
+where $\theta_{ma}$ and $K_{ma}$ are the soil moisture and soil conductivity, respectively, in the macropore domain.
 
 ### Finite approximation to flows in the soil matrix
 
