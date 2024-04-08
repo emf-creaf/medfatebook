@@ -424,7 +424,7 @@ In this chapter we describe water movement into, out of, and within the soil. Th
 
 In the **single-domain model** (panel A in Fig. \@ref(fig:soilflowdesign)), the water coming from rainfall events - i.e. sum of net rainfall ($Pr_{net}$) and run-on ($Ro$) - is divided between infiltration into the soil ($If$) and runoff ($Ru$), following the models explained in \@ref(infiltration). Rainfall infiltrating into the soil is divided among soil layers, in a crude attempt to emulate the effect of preferential flows (but without accounting for the increase in infiltration caused by macropores). The amount of water reaching each soil layer is modelled using an extinction function that depends on macroporosity (see function `hydrology_infiltrationRepartition`). In contrast to water from rainfall events, water from snow melt ($Sm$) is assumed to infiltrate slowly and completely into the first layer. Water flows within the soil according to the Richards equation, assuming an homogenous porous media and where fluxes are driven by both gravitational and matric potentials. Root water uptake/redistribution is taken into account as source/sinks from/to the soil layers along with bare soil evaporation. Water leaving the bottom layer (as well as departures from the water balance) is assumed to drain beyond the soil limits (i.e. deep drainage ($Dd$)). Saturation excess in the topmost layer leads to an increase in runoff ($Ru$) and a corresponding decrease in infiltration ($If$).
 
-In the **dual-permeability model** (panel B in Fig. \@ref(fig:soilflowdesign)), total porosity is partitioned into two separate flow regions (matrix and macropores), each with its own degree of saturation, conductivity and flow rate. The water coming from rainfall events - i.e. sum of net rainfall ($Pr_{net}$) and run-on ($Ro$) - is divided between infiltration into the soil matrix ($If$; following models in \@ref(infiltration)) and water infiltrating into the macropore domain. Water from snow melt ($Sm$) is assumed to infiltrate slowly and completely into the soil matrix. Fluxes within the soil matrix follow the Richards equation and is driven by both gravity and matric potentials, as in the single-domain model. In contrast, fluxes in the macropore region are gravity-driven only. Saturation of micropores of a given soil matrix layer leads to instantaneous flux into the corresponding macropore layer, whereas water uptake by the soil matrix from the corresponding macropore layer follows a diffusion equation. Root water uptake/redistribution is taken into account as source/sinks in the soil matrix along with bare soil evaporation. Deep drainage ($Dd$) can occur from both the soil matrix or the macropore domain. Finally, saturation excess in the macropore domain leads to accumulation of water in the above layer and, eventually, to surface runoff ($Ru$).  
+In the **dual-permeability model** (panel B in Fig. \@ref(fig:soilflowdesign)), total porosity is partitioned into two separate flow regions (matrix and macropores), each with its own degree of saturation, conductivity and flow rate. The water coming from rainfall events - i.e. sum of net rainfall ($Pr_{net}$) and run-on ($Ro$) - is divided between infiltration into the soil matrix ($If$; following models in \@ref(infiltration)) and water infiltrating into the macropore domain. Water from snow melt ($Sm$) is assumed to infiltrate slowly and completely into the soil matrix. Fluxes within the soil matrix follow the Richards equation and is driven by both gravity and matric potentials, as in the single-domain model. In contrast, fluxes in the macropore region are gravity-driven only. Saturation of micropores of a given soil matrix layer leads to a water source into the corresponding macropore layer, whereas water uptake by the soil matrix via capillarity from the corresponding macropore layer follows a diffusion equation. Root water uptake/redistribution is taken into account as source/sinks in the soil matrix along with bare soil evaporation. Deep drainage ($Dd$) can occur from both the soil matrix or the macropore domain. Finally, saturation excess in the macropore domain leads to accumulation of water in the above layer and, eventually, to surface runoff ($Ru$).  
 
 ```{r soilflowdesign, out.width='100%', fig.align="center", fig.cap="Schematic representation of the (A) single domain and (B) dual-permeability models of flows into, out of and within the soil. Symbols are defined in the main text.", echo=FALSE}
 knitr::include_graphics("figures/soil_flow_design.png")
@@ -439,7 +439,7 @@ and for $1 < i \leq N$:
 \begin{equation}
 S_i = - Tr_{herb,i} - Ex_{woody,i}
 \end{equation}
-where $Es$ is bare soil evaporation, $Tr_{herb, i}$ is herbaceous uptake from layer $i$ and $Ex_{woody}$ is woody plant uptake/redistribution from/to layer $i$. All right-hand terms are converted from $mm/day$ to instantaneous rates ($m/s$) for proper units in $S$. By default, **24 time steps** of 1 hour are used for vertical water simulation of each day, but the time step is modified if required to close the water balance of the matrix or micropore domain. The function updates soil moisture and returns daily fluxes corresponding to infiltration, runoff and deep drainage.
+where $Es$ is bare soil evaporation, $Tr_{herb, i}$ is herbaceous uptake from layer $i$ and $Ex_{woody}$ is woody plant uptake/redistribution from/to layer $i$. All right-hand terms are converted from $mm/day$ to instantaneous rates ($m/s$) for proper units in $S$. By default, **24 time steps** of 1 hour are used for vertical water simulation of each day, but the time step is modified if required to close the water balance of the matrix or macropore domains. Function `hydrology_soilWaterBalance()`  updates soil moisture and returns daily fluxes corresponding to infiltration, runoff and deep drainage.
 
 The following sections detail the formulation and numerical solving of soil flows, both under the single-domain and the dual-permeability models.
 
@@ -496,13 +496,24 @@ where $\theta_{ma}$ and $K_{ma}$ are the soil moisture and soil conductivity, re
 
 ### Hydraulic properties in the single-domain model
 
-In single-domain simulations, the Van Genuchten [-@Genuchten1980] model is used to represent the water retention curve:
+In single-domain simulations, the Van Genuchten [-@Genuchten1980] model is used to represent the water retention curve (see section \@ref(waterretentioncurves)):
+
+\begin{equation}
+\theta(\Psi) = \theta_{res}+\frac{\theta_{sat}-\theta_{res}}{\left[1+ |\alpha \cdot \Psi|^n \right]^{m}}
+\end{equation}
+
+where $m = 1-1/n$ is a shape parameter. It can be re-arranged into:
 
 \begin{equation}
 S_e = \frac{\theta(\Psi) - \theta_{res}}{\theta_{sat}-\theta_{res}} = \left(1+ |\alpha \cdot \Psi|^n \right)^{-m}
 \end{equation}
 
-where $S_e$ is the degree of saturation and $m = 1-1/n$ is a shape parameter. The conductivity for a given water potential $\Psi$ is determined in the Van Genuchten model as a function of $S$ using:
+where $S_e$ is the degree of saturation. The specific moisture capacity, $C(\Psi)$, is the derivative $\delta \theta / \delta \Psi$, i.e.:
+
+\begin{equation}
+C(\Psi) = \alpha \cdot m \cdot n \cdot (\theta_{sat} - \theta_{res}) \cdot \frac{|\alpha \cdot \Psi|^{n-1}}{\left(1+ |\alpha \cdot \Psi|^n \right)^{m + 1}}
+\end{equation}
+The hydraulic conductivity $K(\Psi)$ for a given water potential $\Psi$ is determined in the Van Genuchten model as a function of $S_e$ using:
 
 \begin{equation}
 K(\Psi) = K_{sat} \cdot S_e^{l} \cdot \left[ 1 - (1 -  S_e^{1/m})^m \right]^2
