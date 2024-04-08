@@ -422,7 +422,7 @@ legend("topleft", bty="n", lty=1:5, legend=paste0("theta_dry = ", seq(0.1, 0.5, 
 
 In this chapter we describe water movement into, out of, and within the soil. The water input to the soil is the sum of net rainfall ($Pr_{net}$, i.e. rainfall minus interception), snow melt ($Sm$) and (if simulations are done in a spatially-explicit context) runon from an adjacent location ($Ro$). Water movement can be performed using either the common single domain model (`soilDomains = "single"`) or the dual permeability model (`soilDomains = "dual"`), which follows with some modifications the MACRO model [@jarvis_modelling_1991; @larsbo_improved_2005]. 
 
-In the **single-domain model** (panel A in Fig. \@ref(fig:soilflowdesign)), the water coming from rainfall events - i.e. sum of net rainfall ($Pr_{net}$) and run-on ($Ro$) - is divided between infiltration into the soil ($If$) and runoff ($Ru$), following the models explained in \@ref(infiltration). Rainfall infiltrating into the soil is divided among soil layers, in a crude attempt to emulate the effect of preferential flows (but without accounting for the increase in infiltration caused by macropores). The amount of water reaching each soil layer is modelled using an extinction function that depends on macroporosity (see function `hydrology_infiltrationRepartition`). In contrast to water from rainfall events, water from snow melt ($Sm$) is assumed to infiltrate slowly and completely into the first layer. Water flows within the soil according to the Richards equation, assuming an homogenous porous media and where fluxes are driven by both gravitational and matric potentials. Root water uptake/redistribution is taken into account as source/sinks from/to the soil layers along with bare soil evaporation. Water leaving the bottom layer (as well as departures from the water balance) is assumed to drain beyond the soil limits (i.e. deep drainage ($Dd$)). 
+In the **single-domain model** (panel A in Fig. \@ref(fig:soilflowdesign)), the water coming from rainfall events - i.e. sum of net rainfall ($Pr_{net}$) and run-on ($Ro$) - is divided between infiltration into the soil ($If$) and runoff ($Ru$), following the models explained in \@ref(infiltration). Rainfall infiltrating into the soil is divided among soil layers, in a crude attempt to emulate the effect of preferential flows (but without accounting for the increase in infiltration caused by macropores). The amount of water reaching each soil layer is modelled using an extinction function that depends on macroporosity (see function `hydrology_infiltrationRepartition`). In contrast to water from rainfall events, water from snow melt ($Sm$) is assumed to infiltrate slowly and completely into the first layer. Water flows within the soil according to the Richards equation, assuming an homogenous porous media and where fluxes are driven by both gravitational and matric potentials. Root water uptake/redistribution is taken into account as source/sinks from/to the soil layers along with bare soil evaporation. Water leaving the bottom layer (as well as departures from the water balance) is assumed to drain beyond the soil limits (i.e. deep drainage ($Dd$)). Saturation excess in the topmost layer leads to an increase in runoff ($Ru$) and a corresponding decrease in infiltration ($If$).
 
 In the **dual-permeability model** (panel B in Fig. \@ref(fig:soilflowdesign)), total porosity is partitioned into two separate flow regions (matrix and macropores), each with its own degree of saturation, conductivity and flow rate. The water coming from rainfall events - i.e. sum of net rainfall ($Pr_{net}$) and run-on ($Ro$) - is divided between infiltration into the soil matrix ($If$; following models in \@ref(infiltration)) and water infiltrating into the macropore domain. Water from snow melt ($Sm$) is assumed to infiltrate slowly and completely into the soil matrix. Fluxes within the soil matrix follow the Richards equation and is driven by both gravity and matric potentials, as in the single-domain model. In contrast, fluxes in the macropore region are gravity-driven only. Saturation of micropores of a given soil matrix layer leads to instantaneous flux into the corresponding macropore layer, whereas water uptake by the soil matrix from the corresponding macropore layer follows a diffusion equation. Root water uptake/redistribution is taken into account as source/sinks in the soil matrix along with bare soil evaporation. Deep drainage ($Dd$) can occur from both the soil matrix or the macropore domain. Finally, saturation excess in the macropore domain leads to accumulation of water in the above layer and, eventually, to surface runoff ($Ru$).  
 
@@ -439,7 +439,7 @@ and for $1 < i \leq N$:
 \begin{equation}
 S_i = - Tr_{herb,i} - Ex_{woody,i}
 \end{equation}
-where $Es$ is bare soil evaporation, $Tr_{herb, i}$ is herbaceous uptake from layer $i$ and $Ex_{woody}$ is woody plant uptake/redistribution from/to layer $i$. All right-hand terms are converted from $mm/day$ to instantaneous rates ($m/s$) for proper units in $S$. **24 time steps** of 1 hour are used for vertical water simulation of each day. The function updates soil moisture and returns daily fluxes corresponding to infiltration, runoff and deep drainage.
+where $Es$ is bare soil evaporation, $Tr_{herb, i}$ is herbaceous uptake from layer $i$ and $Ex_{woody}$ is woody plant uptake/redistribution from/to layer $i$. All right-hand terms are converted from $mm/day$ to instantaneous rates ($m/s$) for proper units in $S$. By default, **24 time steps** of 1 hour are used for vertical water simulation of each day, but the time step is modified if required to close the water balance of the matrix or micropore domain. The function updates soil moisture and returns daily fluxes corresponding to infiltration, runoff and deep drainage.
 
 The following sections detail the formulation and numerical solving of soil flows, both under the single-domain and the dual-permeability models.
 
@@ -494,6 +494,65 @@ where $C(\Psi) = \delta \theta / \delta \Psi$ is known as the **specific moistur
 
 where $\theta_{ma}$ and $K_{ma}$ are the soil moisture and soil conductivity, respectively, in the macropore domain.
 
+### Hydraulic properties in the single-domain model
+
+In single-domain simulations, the Van Genuchten [-@Genuchten1980] model is used to represent the water retention curve:
+
+\begin{equation}
+S_e = \frac{\theta(\Psi) - \theta_{res}}{\theta_{sat}-\theta_{res}} = \left(1+ |\alpha \cdot \Psi|^n \right)^{-m}
+\end{equation}
+
+where $S_e$ is the degree of saturation and $m = 1-1/n$ is a shape parameter. The conductivity for a given water potential $\Psi$ is determined in the Van Genuchten model as a function of $S$ using:
+
+\begin{equation}
+K(\Psi) = K_{sat} \cdot S_e^{l} \cdot \left[ 1 - (1 -  S_e^{1/m})^m \right]^2
+\end{equation}
+where $K_{sat}$ is the saturated hydraulic conductivity and $l = 0.5$ is the tortuosity factor.
+
+### Hydraulic properties in the dual-permeability model
+
+In MACRO [@jarvis_modelling_1991; @larsbo_improved_2005], a "cut and join" approach is used to define the hydraulic functions. A water potential $\Psi_{b} = -0.1\,m =  -0.98 \,kPa$ partitions the total porosity into matrix pores and macropores, while the corresponding water content, $\theta_{b}$ and hydraulic conductivity $K_b$ represent the saturated state of the soil matrix.
+
+**Matrix domain**
+
+Soil water retention in the matrix is calculated using a modified form of Van Genuchten's  [-@Genuchten1980] equation:
+\begin{equation}
+S_{mi} = \frac{\theta_{mi}(\Psi) - \theta_{res}}{\theta^{fict}_{sat}-\theta_{res}} = \left(1+ |\alpha \cdot \Psi|^n \right)^{-m}
+\end{equation}
+where $\theta^{fict}_{sat} = \theta_{sat} - P_{macro}$ is a fictious saturated content obtained subtracting the proportion of macropores. $\theta_{b}$ is estimated as $\theta_{mi}(\Psi_b)$, whereas $K_b$ is estimated with van Genuchten's $K$ equation but using $S_{mi}(\Psi_b)$ instead of $S_e$. The capacitance in the matrix domain ($C_{mi}$) is estimated using the same equation as the single domain model, but replacing $\theta_{sat}$ by $\theta^{fict}_{sat}$. Finally, the following form is used to describe the unsaturated hydraulic conductivity function in the matrix, using $K_b$ as the matching point:
+
+\begin{equation}
+K_{mi} = K_b \cdot \left( \frac{S_{mi}}{S_{mi}(\Psi_b)} \right)^{l} \cdot \left[ \frac{1 - (1 -  S_{mi}^{1/m})^m}{1 - (1 -  S_{mi}(\Psi_b)^{1/m})^m} \right]^2
+\end{equation}
+where $l = 0.5$ is the tortuosity factor. For water potentials less negative that $\Psi_b$ the hydraulic conductivity is set to $K_b$.
+
+**Macropore domain**
+
+In the macropore domain, the water potential is not defined and flow equations are expressed in $\theta$-*based form*. The degree of saturation in the macropores ($S_{ma}$) is related to soil moisture in the macropores ($\theta_{ma}$) via:
+\begin{equation}
+S_{ma} = \frac{\theta_{ma}}{e_{ma}}
+\end{equation}
+where $e_{ma} = \theta_{sat} - \theta_{b}$. The hydraulic conductivity function in the macropores ($K_{ma}$) is given as a simple power law of the degree of saturation:
+
+\begin{equation}
+K_{ma} = (K_{sat} - K_{b}) \cdot S_{ma}^{n_{ma}}
+\end{equation}
+where $n_{ma} = 2.23$ is a kinematic exponent reflecting macropore size distribution and tortuosity. Unlike in MACRO [@jarvis_modelling_1991], the fact that macroporosity and macropore maximum hydraulic conductivity may not be constant but vary due to swelling and shrinkage is not taken into account.
+
+**Lateral flows**
+
+In the beginning, or at any given step, if $\theta_{mi} > \theta_{b}$, the excess of water is transferred from the matrix to the macropore domain, i.e. it will be used as a source to increase $\theta_{ma}$. However, the macropores have a finite storage capacity for water, $C_{ma}$, equal to:
+\begin{equation}
+C_{ma} = (1 - S_{ma}) \cdot (\theta_{sat} - \theta_b)
+\end{equation}
+Hence, the flow to the macropore domain is limited by $C_{ma}$. The reverse flow, i.e the water uptake by the unsaturated matrix is treated as a first-order approximation to a diffusion equation, assuming a rectangular-slab geometry for the aggregates:
+
+\begin{equation}
+U_w = \left( \frac{G_w\cdot D_w \cdot \gamma_w}{d^2} \right) \cdot (\theta_{b} - \theta_{mi})
+\end{equation}
+where $d$ (in $m$) is an effective diffusion path length, $D_w$ (in $m^2s^{-1}$) is an effective water diffusivity that depends on $S_{ma}$, $G_w = 3$ is a geometry factor and $\gamma_w = 1.0$ is a scaling factor. See details in [@larsbo_improved_2005]. Water uptake by the unsaturated matrix is treated as a source for the matrix domain and as a sink for the macropore domain.
+
+
 ### Finite approximation to flows in the soil matrix
 
 Water movement in the soil matrix was taken from chapter 8 of @bonan_climate_2019, and much of the present text has been summarized and adapted from this source, with modifications for the exchange with macropore moisture. The finite difference approximation for the Richards equation represents the soil as a network of $N$ discrete nodal points that vary in space and time. The network is presented in Fig. \@ref(fig:soilmatrixflows). 
@@ -504,7 +563,7 @@ knitr::include_graphics("figures/soilmatrix_flows.png")
 
 For reasons of numerical stability, Richards equation is solved using an implicit time discretization win which the spatial derivatives $\delta K / \delta z$, $\delta \Psi / \delta z$ and  $\delta^2 \Psi / \delta ^2 z$ are written numerically using a central difference approximation at time $n+1$, and the time derivative uses a backward difference approximation at $n+1$. 
 
-Soil layer $i$ has a thickness $\Delta z_i$. Water content $\theta_i$, matric potential $\Psi_i$ and hydraulic conductivity $K_i$ are defined at the center of the layer at depth $z_i$ and are uniform over the layer. Here $K_i$ values have been corrected by $\lambda_i$, to account for the fact that the amount of stones in the soil reduce the conductivity, which is expressed per soil area unit (so, in fact, all terms in the mass balance equations are multiplied by $\lambda_i$, except the source/sinks). Water inputs/outputs from other processes (i.e. infiltration, snow melt, bare soil evaporation, herbaceous transpiration and woody plant uptake/redistribution) are represented as a source/sink term $S_i$ for each node $i$. 
+Soil layer $i$ has a thickness $\Delta z_i$. Water content $\theta_i$, matric potential $\Psi_i$ and hydraulic conductivity $K_i$ are defined at the center of the layer at depth $z_i$ and are uniform over the layer. Here $K_i$ values have been corrected by $\lambda_i$, to account for the fact that the amount of stones in the soil reduce the conductivity, which is expressed per soil area unit (so, in fact, all terms in the mass balance equations are multiplied by $\lambda_i$, except the source/sinks). Water inputs/outputs from other processes (i.e. infiltration, snow melt, bare soil evaporation, herbaceous transpiration and woody plant uptake/redistribution) are represented as a source/sink term $S_i$ for each node $i$. If simulations are done in the dual-permeability model, $S_i$ can include positive or negative terms due to saturation excess flow into the macropore domain or capillary imbibition from the macropore domain. 
 
 For a given intermediate layer $1 < i < N$, the outward flux $Q_i$ between layers $i$ and $i+1$ is defined using:
 
@@ -538,4 +597,16 @@ Finally, for the last layer ($i=N$) a free drainage condition is specified as bo
 
 The numerical form of the $\Psi$-based Richards equation for a soil with $N$ layers is a tridiagonal system of $N$ equations with $N$ unknown values $\Psi$ at time $n+1$. An additional complexity is that $\Psi$ at $n+1$ also appears through $K$ and $C$. The solution requires linearizing with respect to $\Psi$ through various methods. Here the **predictor-corrector** method is employed, a two-step solution that solves the equation twice [@haverkamp_comparison_1977]. The predictor step uses explicit linearization to solve for $\Psi$ over one-half of a full time step ($\Delta t/2$) at time $n +1/2$ with $K$ and $C$ from time $n$. The resulting values for $\Psi$ are used to evaluate $K$ and $C$ at $n+1/2$. The corrector step uses these to obtain $\Psi$ over the full time step ($\Delta t$) at $n+1$. An implicit solution is used for the predictor step and the Crank-Nicolson method is used for the corrector step.
 
+### Finite approximation to flows in the macropore domain
 
+An implicit solution is used to discretize the local water balance in the macropores of a layer $i$, using:
+\begin{equation}
+\frac{\theta_{ma,i}^{n+1} -\theta_{ma,i}^{n}}{\Delta t} \cdot \lambda_i = \frac{K_{ma, i-1}^{n+1} - K_{ma, i}^{n+1}}{\Delta z_i} + S^{n+1}_{i} 
+\end{equation}
+since $\theta_{ma}$ is related to $S_{ma}$, we can re-express the previous equation into:
+
+\begin{equation}
+S_{ma,i}^{n+1} = S_{ma,i}^{n} + \frac{\Delta t}{\lambda_i \cdot e_{ma, i}} \cdot \left( \frac{K_{ma, i-1}^{n+1} - K_{ma, i}^{n+1}}{\Delta z_i} + S^{n+1}_{i} \right) 
+\end{equation}
+
+In this equation, $K_{ma, i-1}^{n+1}$ represents the conductivity of the layer above for the time step $n+1$, whereas the $K_{ma, i}^{n+1}$ is the conductivity of the current layer for the same time step, hence depending on $S_{ma,i}^{n+1}$. The local water balance is solved for each layer, in turn, from the soil surface downward, assuming a zero flow from the surface $K_{ma, 0}^{n+1} = 0$ (infiltration into macropores is given by $S_{1}^{n+1}$). Then for any given layer $i$, $K_{ma, i-1}^{n+1}$ is already defined and a solution for $S_{ma,i}^{n+1}$ can be found using a bisection method (i.e. internal halving). After solving for all layers, if the capacity of macropores is exceeded in any given layer, the excess is added to the macropore storage of the layer above. Excess of the topmost layer results in runoff via saturation excess.
