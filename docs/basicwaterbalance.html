@@ -758,7 +758,7 @@ div.csl-indent {
 </div>
 <div id="soilwaterbalance" class="section level2 hasAnchor" number="3.3">
 <h2><span class="header-section-number">3.3</span> Water balance<a href="basicwaterbalance.html#soilwaterbalance" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Water balance is performed for both the snow pack and the soil (see fig. <a href="basicwaterbalance.html#fig:waterbalance">3.1</a>). Precipitation (<span class="math inline">\(P\)</span>) is considered be snow precipitation (<span class="math inline">\(Ps\)</span>) or rainfall (<span class="math inline">\(Pr\)</span>), depending on temperature. Thus, we have:
+<p>Water balance is performed for both the snow pack and the soil (fig. <a href="basicwaterbalance.html#fig:waterbalance">3.1</a>). Precipitation (<span class="math inline">\(P\)</span>) is considered be snow precipitation (<span class="math inline">\(Ps\)</span>) or rainfall (<span class="math inline">\(Pr\)</span>), depending on temperature. Thus, we have:
 <span class="math display">\[\begin{equation}
 P = Pr + Ps
 \end{equation}\]</span></p>
@@ -778,9 +778,9 @@ If = Pr_{net} + Sm + Ro - Ie
 \end{equation}\]</span>
 where <span class="math inline">\(Ie\)</span> is the infiltration excess that may occur. Other water inputs into the soil can come via capillarity rise (<span class="math inline">\(Cr\)</span>) from the water table (if present) or via lateral interflow from nearby locations (<span class="math inline">\(Lw\)</span>; if provided, assumed positive in the direction of entering the local soil). There are multiple ways water can leave the soil. Regarding purely physical processes we have the evaporation from soil surface (<span class="math inline">\(Es\)</span>), saturation excess (<span class="math inline">\(Se\)</span>) and deep drainage (<span class="math inline">\(Dd\)</span>). Fluxes mediated by plants are the transpiration made by herbaceous plants (<span class="math inline">\(Tr_{herb}\)</span>) and the transpiration made by woody plants (<span class="math inline">\(Tr_{woody}\)</span>).</p>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:waterbalance"></span>
-<img src="figures/waterbalance.jpg" alt="Schematic representation of soil and snow pack water balance components. Lateral source/sinks and runon are omitted for simplicity." width="100%" />
+<img src="figures/waterbalance.jpg" alt="Schematic representation of soil and snow pack water balance components. Subsurface lateral source/sinks  and surface runon are omitted for simplicity. Green and blue boxes represent outflows corresponding to green and blue water respectively." width="100%" />
 <p class="caption">
-Figure 3.1: Schematic representation of soil and snow pack water balance components. Lateral source/sinks and runon are omitted for simplicity.
+Figure 3.1: Schematic representation of soil and snow pack water balance components. Subsurface lateral source/sinks and surface runon are omitted for simplicity. Green and blue boxes represent outflows corresponding to green and blue water respectively.
 </p>
 </div>
 <p>Taking all input and output terms, daily variations in soil water content (<span class="math inline">\(\Delta{V_{soil}}\)</span> in mm) are then summarized as:
@@ -798,7 +798,7 @@ Ru = Ie + Se
 \Delta{V_{soil}} + \Delta{S_{snow}} = (P + Ro + Lw + Cr) - (Dd + Ru + In + Es + Tr_{herb} + Tr_{woody})
 \tag{3.5}
 \end{equation}\]</span>
-Among inputs, precipitation (<span class="math inline">\(P\)</span>) will the most relevant inflow on most instances. The liquid water fluxes contributing to <strong>blue water</strong> outflow (i.e. entering river networks or leading to ground water) are runoff (<span class="math inline">\(Ru\)</span>) and deep drainage (<span class="math inline">\(Dd\)</span>). Water vapor fluxes (<span class="math inline">\(Es\)</span>, <span class="math inline">\(Tr_{woody}\)</span>, <span class="math inline">\(Tr_{herb}\)</span>, <span class="math inline">\(In\)</span>) contribute to total evapotranspiration, or <strong>green water</strong> (i.e. water vapor returning to the atmosphere).</p>
+Among inputs, precipitation (<span class="math inline">\(P\)</span>) will the most relevant inflow on most instances. The liquid water fluxes contributing to <strong>blue water</strong> outflow (i.e. entering river networks or leading to ground water) are runoff (<span class="math inline">\(Ru\)</span>) and deep drainage (<span class="math inline">\(Dd\)</span>). Water vapor fluxes (<span class="math inline">\(Es\)</span>, <span class="math inline">\(Tr_{woody}\)</span>, <span class="math inline">\(Tr_{herb}\)</span>, <span class="math inline">\(In\)</span>) contribute to total evapotranspiration, or <strong>green water</strong> (i.e. water vapor returning to the atmosphere). These are represented in Fig. <a href="basicwaterbalance.html#fig:waterbalance">3.1</a> using blue/green boxes.</p>
 <p>While the above describes the default water balance equations, variations can occur depending on specific control flags:</p>
 <ol style="list-style-type: lower-alpha">
 <li><em>If snow dynamics are considered</em> [<code>snowpack</code>], evaporation from bare soil cannot occur if there is a snow pack over the soil (i.e., if <span class="math inline">\(S_{snow}&gt;0\)</span> then <span class="math inline">\(Es = 0\)</span>).</li>
@@ -1181,6 +1181,8 @@ Among inputs, precipitation (<span class="math inline">\(P\)</span>) will the mo
 <p>The other relevant control parameters for the basic water balance model are:</p>
 <ul>
 <li><code>soilFunctions [="SX"]</code>: Soil water retention curve and conductivity functions, either ‘SX’ (for Saxton) or ‘VG’ (for Van Genuchten).</li>
+<li><code>ndailysteps [= 24]</code>: Number of steps into which each day is divided for determination of soil water balance (24 equals 1-hour intervals).</li>
+<li><code>max_nsubsteps_soil [= 300]</code>: Maximum number of substeps for soil water balance solving.</li>
 <li><code>defaultWindSpeed [= 2.5]</code>: Default value for wind speed (in <span class="math inline">\(m \cdot s^{-1}\)</span>) when this is missing (only used for leaf fall, see section <a href="leafphenologylight.html#leafphenology">4.1</a>).</li>
 <li><code>defaultCO2 [=386]</code>: Default atmospheric (abovecanopy) <span class="math inline">\(CO_2\)</span> concentration (in micromol <span class="math inline">\(CO_2 \cdot mol^{-1}\)</span> = ppm). This value will be used whenever <span class="math inline">\(CO_2\)</span> concentration is not specified in the weather input.</li>
 <li><code>defaultRainfallIntensityPerMonth [= c(1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 5.6, 5.6, 5.6, 5.6, 5.6, 1.5)]</code>: A vector of twelve values indicating the rainfall intensity (mm/h) per month. By default synoptic storms (1.5 mm/h) are assumed between December and June, and convective storms (5.6 mm/h) are assumed between July and November <span class="citation">(<a href="#ref-Miralles2010">Miralles <em>et al.</em> 2010</a>)</span>.</li>
@@ -1231,15 +1233,15 @@ Among inputs, precipitation (<span class="math inline">\(P\)</span>) will the mo
 </tr>
 <tr class="even">
 <td><code>Soil</code></td>
-<td>Soil variables for each soil layer: Moisture relative to field capacity (<span class="math inline">\(W_s\)</span>), water potential (<span class="math inline">\(\Psi_s\)</span>) and volumetric water content (<span class="math inline">\(V_s\)</span>).</td>
+<td>Soil variables for each soil layer: Moisture relative to field capacity (<span class="math inline">\(W_s\)</span>), water potential (<span class="math inline">\(\Psi_s\)</span>) and volumetric water content (<span class="math inline">\(V_s\)</span>). Only returned if <code>soilResults = TRUE</code>.</td>
 </tr>
 <tr class="odd">
 <td><code>Stand</code></td>
-<td>Stand-level variables, such as <span class="math inline">\(LAI^{\phi}_{stand}\)</span>, <span class="math inline">\(LAI^{dead}_{stand}\)</span>, the water retention capacity of the canopy (<span class="math inline">\(S_{canopy}\)</span>) or the fraction of light reaching the ground (<span class="math inline">\(L^{PAR}_{ground}\)</span> and <span class="math inline">\(L^{SWR}_{ground}\)</span>).</td>
+<td>Stand-level variables, such as <span class="math inline">\(LAI^{\phi}_{stand}\)</span>, <span class="math inline">\(LAI^{dead}_{stand}\)</span>, the water retention capacity of the canopy (<span class="math inline">\(S_{canopy}\)</span>) or the fraction of light reaching the ground (<span class="math inline">\(L^{PAR}_{ground}\)</span> and <span class="math inline">\(L^{SWR}_{ground}\)</span>). Only returned if <code>standResults = TRUE</code>.</td>
 </tr>
 <tr class="even">
 <td><code>Plants</code></td>
-<td>Variables defined at the level of woody plant cohort, such as expanded leaf area (<span class="math inline">\(LAI^{phi}_i\)</span>), transpiration, photosynthesis, water potential, etc.</td>
+<td>Variables defined at the level of woody plant cohort, such as expanded leaf area (<span class="math inline">\(LAI^{phi}_i\)</span>), transpiration, photosynthesis, water potential, etc. Only returned if <code>plantResults = TRUE</code>.</td>
 </tr>
 <tr class="odd">
 <td><code>FireHazard</code></td>

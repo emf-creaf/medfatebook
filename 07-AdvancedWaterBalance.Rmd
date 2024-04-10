@@ -117,12 +117,11 @@ For every day to be simulated, the model performs the following steps:
 
 1. Update leaf area values according to the phenology of species and recalculate radiation extinction (sections \@ref(leafphenology) and \@ref(basiclightextinction)).
 2. Determine rainfall interception loss ($In$) and net rainfall ($Pr_{net}$) (section \@ref(interception)). The amount of water reaching the soil surface from the rainfall event is the sum of net rainfall ($Pr_{net}$) and surface runon ($Ro$), if given. If snow dynamics are included, increase snow pack from snow precipitation ($Ps$) and decrease it following snow melt ($Sm$) (section \@ref(snowpack)).
-3. Divide the amount of water reaching the soil surface from the rainfall event between infiltration and surface runoff ($Ru$) (section \@ref(infiltration)). Determine the infiltration reaching each soil layer.
-4. Determine bare soil evaporation ($Es$), if snow is not present (section \@ref(soilevaporation)), and herbaceous transpiration ($Tr_{herb}$; section \@ref(herbaceoustranspiration)).
-5. Determine sub-daily air temperature and direct/diffuse irradiance variations (chapter \@ref(subdailytemplight)).
-6. Determine the proportion of sunlit/shade leaves (section \@ref(sunlitshadeleaves)), the shortwave radiation absorbed by plant cohorts  (sections \@ref(shortwaveradiationcanopyabs) and the soil (section \@ref(shortwaveradiationsoilabs)) at sub-daily steps.
-7. If `transpirationMode = "Sperry"`, update the water supply function of each plant cohort, according to the hydraulic model and the current soil water potential (chapter \@ref(planthydraulics)). 
-8. Determine instantaneous plant cohort transpiration, photosynthesis rates and close soil/canopy energy balance at sub-daily steps (chapters \@ref(transpirationsperrysureau) and \@ref(closecanopysoilenergybalance)). This involves the following actions for each sub-daily step:
+3. Determine bare soil evaporation ($Es$), if snow is not present (section \@ref(soilevaporation)), and herbaceous transpiration ($Tr_{herb}$; section \@ref(herbaceoustranspiration)).
+4. Determine sub-daily air temperature and direct/diffuse irradiance variations (chapter \@ref(subdailytemplight)).
+5. Determine the proportion of sunlit/shade leaves (section \@ref(sunlitshadeleaves)), the shortwave radiation absorbed by plant cohorts  (sections \@ref(shortwaveradiationcanopyabs) and the soil (section \@ref(shortwaveradiationsoilabs)) at sub-daily steps.
+6. If `transpirationMode = "Sperry"`, update the water supply function of each plant cohort, according to the hydraulic model and the current soil water potential (chapter \@ref(planthydraulics)). 
+7. Determine instantaneous plant cohort transpiration, photosynthesis rates and close soil/canopy energy balance at sub-daily steps (chapters \@ref(transpirationsperrysureau) and \@ref(closecanopysoilenergybalance)). This involves the following actions for each sub-daily step:
     a. Determine long-wave radiation exchange between soil, canopy layers and atmosphere (section \@ref(longwaveradiation)).
     b. If `transpirationMode = "Sperry"`, for each woody cohort:
 
@@ -139,12 +138,12 @@ For every day to be simulated, the model performs the following steps:
     d. Scale transpiration ($Tr_{woody}$) and net photosynthesis ($A_n$) from sunlit/shade leaves to the plant cohort level (section \@ref(scalingtranspirationphotosynthesis)).
     e. Scale water extraction from soil layers ($Ex_{woody}$) to the woody plant cohort level.
     f. Complete energy balance of the canopy and the soil, after translating plant transpiration, evaporation from bare soil, snow melt and interception loss to latent heat and calculating convective heat exchange for both the canopy and the soil. Alternatively, perform energy balance for individual canopy layers, while including turbulent heat exchange and turbulent transport of water vapor and $CO_2$ between layers (chapter \@ref(closecanopysoilenergybalance)).
-9. Determine day-level photosynthesis and transpiration from instantaneous rates and update soil moisture (section \@ref(daylevelphototransp)). Determine drought stress for each woody plant cohort (section \@ref(advanceddroughtstress)).
-10. Determine vertical water movement within the soil, while considering soil layer source/sinks from infiltration, bare soil evaporation and herbaceous transpiration and woody plant extraction/redistribution (section \@ref(soilflows)). This updates soil moisture and lower boundary condition of water movement corresponds to deep drainage ($Dd$). 
-11. If fire hazard calculations are requested, estimate live and dead fuel moisture and potential fire behaviour (chapter \@ref(fuelandfirebehavior)).
+8. Determine day-level photosynthesis and transpiration from instantaneous rates and update soil moisture (section \@ref(daylevelphototransp)). Determine drought stress for each woody plant cohort (section \@ref(advanceddroughtstress)).
+9. Determine rainfall infiltration (section \@ref(infiltration)) and vertical water movement within the soil, while considering soil layer source/sinks from infiltration, bare soil evaporation and herbaceous transpiration and woody plant extraction/redistribution (section \@ref(soilflows)). This updates soil moisture and lower boundary condition of water movement corresponds to deep drainage ($Dd$). 
+10. If fire hazard calculations are requested, estimate live and dead fuel moisture and potential fire behaviour (chapter \@ref(fuelandfirebehavior)).
 
 
-Steps 1-4 are the same as described in the basic model, and steps 10-11 here correspond to steps 6-7 in the basic model. The set of steps corresponds to simulations if plant water pools *are not* considered, so that only the water balance of the overall soil matters. If plant water pools *are* considered, steps 1, 2 and 11 are the same, because they apply to the whole forest stand (note that at present infiltration does not depend on antecedent conditions). However, steps 3 and 4 are performed for each water pool separately because they depend on antecedent soil moisture. Steps 7-9 also involve defining woody plant water uptake from different plant water pools depending on the proportion of fine roots of each woody cohort in each pool (see \@ref(transpirationpools)). Soil water flows from these three steps are then averaged at the stand level. After that, Step 10 is performed on the soil corresponding to each pool, and the resulting drainage estimates are also averaged. Finally, the soil moisture of the overall soil is estimated by averaging the soil moisture of water pools.
+Steps 1-3 are the same as described in the basic model, and steps 9-10 here correspond to steps 5-6 in the basic model. The set of steps corresponds to simulations if plant water pools *are not* considered, so that only the water balance of the overall soil matters. If plant water pools *are* considered, steps 1, 2 and 10 are the same, because they apply to the whole forest stand (note that at present infiltration does not depend on antecedent conditions). However, steps 3 is performed for each water pool separately because it depends on antecedent soil moisture. Steps 6-8 also involve defining woody plant water uptake from different plant water pools depending on the proportion of fine roots of each woody cohort in each pool (see \@ref(transpirationpools)). Soil water flows from these three steps are then averaged at the stand level. After that, Step 9 is performed on the soil corresponding to each pool, and the resulting drainage estimates are also averaged. Finally, the soil moisture of the overall soil is estimated by averaging the soil moisture of water pools.
 
 ## Inputs and outputs
 
@@ -252,12 +251,15 @@ Vegetation functional attributes are normally filled for each cohort by function
 Control parameters modulate the overall behaviour of water balance simulations (see section \@ref(controlparameters)). There are three **key control parameters**:
 
 1. `transpirationMode` defines the transpiration model. If `transpirationMode = "Sperry"` or `transpirationMode = "Sureau"` then the advanced water balance model is run with the corresponding plant hydraulics and stomatal regulation sub-models. In advanced water balance models, the water retention curve model is forced to be that of Van Genuchten, i.e. `soilFunctions = "VG"` (see section \@ref(waterretentioncurves)). 
-2. `ndailysteps` defines the number of daily steps. By default `ndailysteps = 24`, so that steps are hours, but users can increase the temporal resolution, for example to half hour substeps by setting `ndailysteps = 48`.
-3. `multiLayerBalance` is a boolean flag to indicate that multi-layer energy balance is desired (by default `multiLayerBalance = FALSE`).
-4. `nsubsteps`  defines the number of substeps for multi-layer energy balance calculations. By default `nsubsteps = 3600`, so that substeps are 1 sec if `ndailysteps = 24`.
+2. `multiLayerBalance` is a boolean flag to indicate that multi-layer energy balance is desired (by default `multiLayerBalance = FALSE`).
+
 
 Other relevant control parameters relevant for the advanced water balance model are:
 
++ `ndailysteps [= 24]`: Number of steps into which each day is divided for determination of soil water balance, stomatal conductance, transpiration and photosynthesis (24 equals 1-hour intervals).
++ `nsubsteps_canopy [= 3600]`:  Defines the number of substeps for multi-layer energy balance calculations. By default, substeps are 1 sec if `ndailysteps = 24`.
++ `soilDomains [= "single"]`: Either "single" (for single domain) or "dual" (for dual-permeability) (see section \@ref(soilflows)).
++ `max_nsubsteps_soil [= 300]`: Maximum number of substeps for soil water balance solving.
 + `defaultWindSpeed [= 2.5]`: Default value for wind speed (in $m \cdot s^{-1}$) when this is missing (only used for leaf fall, see section \@ref(leafphenology)).
 + `defaultCO2 [=386]`: Default atmospheric (abovecanopy) $CO_2$ concentration (in micromol $CO_2 \cdot mol^{-1}$ = ppm). This value will be used whenever $CO_2$ concentration is not specified in the weather input.
 + `defaultRainfallIntensityPerMonth [= c(1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 5.6, 5.6, 5.6, 5.6, 5.6, 1.5)]`: A vector of twelve values indicating the rainfall intensity (mm/h) per month. By default synoptic storms (1.5 mm/h) are assumed between December and June, and convective storms (5.6 mm/h) are assumed between July and November [@Miralles2010].
@@ -266,7 +268,6 @@ Other relevant control parameters relevant for the advanced water balance model 
 + `bareSoilEvaporation [= TRUE]`:  Whether evaporation from the soil surface is simulated (see section \@ref(soilevaporation)).
 + `interceptionMode [= "Gash1995"]`: Infiltration model, either "Gash1995" or "Liu2001"; see section \@ref(interception).
 + `infiltrationMode [= "GreenAmpt1911"]`: Infiltration model, either "GreenAmpt1911" or "Boughton1989"; see section \@ref(infiltration).
-+ `soilDomains [= "single"]`: Either "single" (for single domain) or "dual" (for dual-permeability) (see section \@ref(soilflows)).
 + `sapFluidityVariation [= TRUE]`: Flag to indicate that temperature affects sap fluidity (see \@ref(sapviscosity)).
 + `windMeasurementHeight [= 200]`: Distance (in cm) above the top of the canopy corresponding to the measurement of wind speed.
 + `boundaryLayerSize [= 2000]`: Size of the canopy boundary layer (in cm). The boundary layer causes the model to define vertical layers above the top of the canopy. The parameter is only relevant when multi-layer canopy energy balance is performed.
@@ -328,12 +329,12 @@ Functions `spwb()` and `pwb()` with `transpirationMode = "Sperry"` or `transpira
 |---------|------------------------------------------------------------|
 | `WaterBalance`| Climatic input and water balance flows (i.e. net precipitation, infiltration, runoff, transpiration...). All of them in $mm = l \cdot m^{-2}$. |
 | `EnergyBalance` | Energy balance components (instantaneous values) for the soil and the canopy |
-| `Temperature` | Minimum and maximum temperature values for topsoil, canopy and atmosphere |
-| `Soil`| Soil variables for each soil layer: Moisture relative to field capacity ($W_s$), water potential ($\Psi_s$) and volumetric water content ($V_s$). |
-| `Stand`| Stand-level variables, such as $LAI^{\phi}_{stand}$, $LAI^{dead}_{stand}$, the water retention capacity of the canopy ($S_{canopy}$) or the fraction of light reaching the ground ($L^{PAR}_{ground}$ and $L^{SWR}_{ground}$).|
-| `Plants`| Plant-level variables, such as $LAI^{phi}_i$, plant transpiration, plant water potential, etc. |
-| `SunlitLeaves` | Leaf-level output variables for sunlit leaves. |
-| `ShadeLeaves` | Leaf-level output variables for shade leaves. |
+| `Temperature` | Minimum and maximum temperature values for topsoil, canopy and atmosphere. Only returned if `temperatureResults = TRUE`. |
+| `Soil`| Soil variables for each soil layer: Moisture relative to field capacity ($W_s$), water potential ($\Psi_s$) and volumetric water content ($V_s$). Only returned if `soilResults = TRUE`. |
+| `Stand`| Stand-level variables, such as $LAI^{\phi}_{stand}$, $LAI^{dead}_{stand}$, the water retention capacity of the canopy ($S_{canopy}$) or the fraction of light reaching the ground ($L^{PAR}_{ground}$ and $L^{SWR}_{ground}$). Only returned if `standResults = TRUE`.|
+| `Plants`| Plant-level variables, such as $LAI^{phi}_i$, plant transpiration, plant water potential, etc. Only returned if `plantResults = TRUE`.|
+| `SunlitLeaves` | Leaf-level output variables for sunlit leaves. Only returned if `leafResults = TRUE`.|
+| `ShadeLeaves` | Leaf-level output variables for shade leaves. Only returned if `leafResults = TRUE`.|
 | `FireHazard`| Fire hazard variables (fuel moisture, rate of spread, fire potentials, etc). Only returned if `fireHazardResults = TRUE`. |
 
 Compared to the output of the basic water balance \@ref(basicwaterbalanceoutput), new output elements are produced. Many results are given as sub-elements of `Plants`, each of them a data frame with dates in rows and plant cohorts in columns:

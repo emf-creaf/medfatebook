@@ -32,7 +32,7 @@ Additional state variables depend on the activation of specific control flags:
 
 ## Water balance {#soilwaterbalance}
 
-Water balance is performed for both the snow pack and the soil (see fig. \@ref(fig:waterbalance)). Precipitation ($P$) is considered be snow precipitation ($Ps$) or rainfall ($Pr$), depending on temperature. Thus, we have:
+Water balance is performed for both the snow pack and the soil (fig. \@ref(fig:waterbalance)). Precipitation ($P$) is considered be snow precipitation ($Ps$) or rainfall ($Pr$), depending on temperature. Thus, we have:
 \begin{equation}
 P = Pr + Ps
 \end{equation}
@@ -54,7 +54,7 @@ If = Pr_{net} + Sm + Ro - Ie
 where $Ie$ is the infiltration excess that may occur. Other water inputs into the soil can come via capillarity rise ($Cr$) from the water table (if present) or via lateral interflow from nearby locations ($Lw$; if provided, assumed positive in the direction of entering the local soil). There are multiple ways water can leave the soil. Regarding purely physical processes we have the evaporation from soil surface ($Es$), saturation excess ($Se$) and deep drainage ($Dd$). Fluxes mediated by plants are the transpiration made by herbaceous plants ($Tr_{herb}$) and the transpiration made by woody plants ($Tr_{woody}$). 
 
 
-```{r waterbalance, out.width='100%', fig.align="center", fig.cap="Schematic representation of soil and snow pack water balance components. Lateral source/sinks and runon are omitted for simplicity.", echo=FALSE}
+```{r waterbalance, out.width='100%', fig.align="center", fig.cap="Schematic representation of soil and snow pack water balance components. Subsurface lateral source/sinks  and surface runon are omitted for simplicity. Green and blue boxes represent outflows corresponding to green and blue water respectively.", echo=FALSE}
 knitr::include_graphics("figures/waterbalance.jpg")
 ```
 
@@ -74,7 +74,7 @@ If we consider soil and snow pack altogether, the water balance of the whole for
 \Delta{V_{soil}} + \Delta{S_{snow}} = (P + Ro + Lw + Cr) - (Dd + Ru + In + Es + Tr_{herb} + Tr_{woody})
 (\#eq:forestwaterbalanceequation)
 \end{equation}
-Among inputs, precipitation ($P$) will the most relevant inflow on most instances. The liquid water fluxes contributing to **blue water** outflow (i.e. entering river networks or leading to ground water) are runoff ($Ru$) and deep drainage ($Dd$). Water vapor fluxes ($Es$, $Tr_{woody}$, $Tr_{herb}$, $In$) contribute to total evapotranspiration, or **green water** (i.e. water vapor returning to the atmosphere).
+Among inputs, precipitation ($P$) will the most relevant inflow on most instances. The liquid water fluxes contributing to **blue water** outflow (i.e. entering river networks or leading to ground water) are runoff ($Ru$) and deep drainage ($Dd$). Water vapor fluxes ($Es$, $Tr_{woody}$, $Tr_{herb}$, $In$) contribute to total evapotranspiration, or **green water** (i.e. water vapor returning to the atmosphere). These are represented in Fig. \@ref(fig:waterbalance) using blue/green boxes.
 
 While the above describes the default water balance equations, variations can occur depending on specific control flags: 
 
@@ -191,6 +191,8 @@ Control parameters modulate the overall behaviour of water balance simulations (
 The other relevant control parameters for the basic water balance model are:
 
 + `soilFunctions [="SX"]`: Soil water retention curve and conductivity functions, either 'SX' (for Saxton) or 'VG' (for Van Genuchten). 
++ `ndailysteps [= 24]`: Number of steps into which each day is divided for determination of soil water balance (24 equals 1-hour intervals).
++ `max_nsubsteps_soil [= 300]`: Maximum number of substeps for soil water balance solving.
 + `defaultWindSpeed [= 2.5]`: Default value for wind speed (in $m \cdot s^{-1}$) when this is missing (only used for leaf fall, see section \@ref(leafphenology)).
 + `defaultCO2 [=386]`: Default atmospheric (abovecanopy) $CO_2$ concentration (in micromol $CO_2 \cdot mol^{-1}$ = ppm). This value will be used whenever $CO_2$ concentration is not specified in the weather input.
 + `defaultRainfallIntensityPerMonth [= c(1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 5.6, 5.6, 5.6, 5.6, 5.6, 1.5)]`: A vector of twelve values indicating the rainfall intensity (mm/h) per month. By default synoptic storms (1.5 mm/h) are assumed between December and June, and convective storms (5.6 mm/h) are assumed between July and November [@Miralles2010].
@@ -222,9 +224,9 @@ Functions `spwb()` and `pwb()` return a list of a class with the same name. The 
 | Element | Description                                                |
 |---------|------------------------------------------------------------|
 | `WaterBalance`| Climatic input and water balance flows of eq.\@ref(eq:basicwaterbalanceequation) (i.e. net precipitation, infiltration, runoff, transpiration...). All of them in $mm = l \cdot m^{-2}$. |
-| `Soil`| Soil variables for each soil layer: Moisture relative to field capacity ($W_s$), water potential ($\Psi_s$) and volumetric water content ($V_s$). |
-| `Stand`| Stand-level variables, such as $LAI^{\phi}_{stand}$, $LAI^{dead}_{stand}$, the water retention capacity of the canopy ($S_{canopy}$) or the fraction of light reaching the ground ($L^{PAR}_{ground}$ and $L^{SWR}_{ground}$).|
-| `Plants`| Variables defined at the level of woody plant cohort, such as expanded leaf area ($LAI^{phi}_i$), transpiration, photosynthesis, water potential, etc. |
+| `Soil`| Soil variables for each soil layer: Moisture relative to field capacity ($W_s$), water potential ($\Psi_s$) and volumetric water content ($V_s$). Only returned if `soilResults = TRUE`. |
+| `Stand`| Stand-level variables, such as $LAI^{\phi}_{stand}$, $LAI^{dead}_{stand}$, the water retention capacity of the canopy ($S_{canopy}$) or the fraction of light reaching the ground ($L^{PAR}_{ground}$ and $L^{SWR}_{ground}$). Only returned if `standResults = TRUE`.|
+| `Plants`| Variables defined at the level of woody plant cohort, such as expanded leaf area ($LAI^{phi}_i$), transpiration, photosynthesis, water potential, etc. Only returned if `plantResults = TRUE`. |
 | `FireHazard`| Fire hazard variables (fuel moisture, rate of spread, fire potentials, etc). Only returned if `fireHazardResults = TRUE`. |
 
 Elements `WaterBalance`, `Soil`, `Stand` and `FireHazard` are data frames with dates in rows and variables in columns, whereas `Plants` is itself a list with several data frames, with dates in rows and woody plant cohorts in columns:
