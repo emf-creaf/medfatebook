@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-04-08" />
+<meta name="date" content="2024-04-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -204,7 +204,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.1" data-path="model-inputs.html"><a href="model-inputs.html#soil-physical-properties"><i class="fa fa-check"></i><b>2.3.1</b> Soil physical properties</a></li>
 <li class="chapter" data-level="2.3.2" data-path="model-inputs.html"><a href="model-inputs.html#waterretentioncurves"><i class="fa fa-check"></i><b>2.3.2</b> Water retention curves</a></li>
 <li class="chapter" data-level="2.3.3" data-path="model-inputs.html"><a href="model-inputs.html#soilinitialization"><i class="fa fa-check"></i><b>2.3.3</b> Soil initialization</a></li>
-<li class="chapter" data-level="2.3.4" data-path="model-inputs.html"><a href="model-inputs.html#water-content-and-water-table-depth"><i class="fa fa-check"></i><b>2.3.4</b> Water content and water table depth</a></li>
+<li class="chapter" data-level="2.3.4" data-path="model-inputs.html"><a href="model-inputs.html#water-content-and-depth-to-saturation"><i class="fa fa-check"></i><b>2.3.4</b> Water content and depth to saturation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="model-inputs.html"><a href="model-inputs.html#vegetationinput"><i class="fa fa-check"></i><b>2.4</b> Vegetation description</a>
 <ul>
@@ -758,22 +758,45 @@ div.csl-indent {
 </div>
 <div id="soilwaterbalance" class="section level2 hasAnchor" number="3.3">
 <h2><span class="header-section-number">3.3</span> Water balance<a href="basicwaterbalance.html#soilwaterbalance" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Daily variations in soil water content (<span class="math inline">\(\Delta{V_{soil}}\)</span> in mm) can be summarized as:</p>
-<p><span class="math display" id="eq:basicwaterbalanceequation">\[\begin{equation}
-\Delta{V_{soil}} = Pr + Sm + Ro - In - Ru - Dd - Es - Tr_{herb} - Tr_{woody}
-\tag{3.1}
+<p>Water balance is performed for both the snow pack and the soil. Precipitation (<span class="math inline">\(P\)</span>) is considered be snow precipitation (<span class="math inline">\(Ps\)</span>) or rainfall (<span class="math inline">\(Pr\)</span>), depending on temperature. Thus, we have:
+<span class="math display">\[\begin{equation}
+P = Pr + Ps
 \end{equation}\]</span></p>
-<p>where <span class="math inline">\(Pr\)</span> is precipitation as rainfall or snow, <span class="math inline">\(Sm\)</span> is water from melting the snow pack (if snow-pack dynamics are considered), <span class="math inline">\(In\)</span> is the interception loss (i.e., water evaporated after being intercepted by the canopy), <span class="math inline">\(Ro\)</span> is surface runon (only relevant in spatially-explicit simulations), <span class="math inline">\(Ru\)</span> is surface runoff, <span class="math inline">\(Dd\)</span> is deep drainage (i.e. water percolated to layers beyond soil depth), <span class="math inline">\(Es\)</span> is evaporation from soil, <span class="math inline">\(Tr_{herb}\)</span> is the transpiration made by herbaceous plants and <span class="math inline">\(Tr_{woody}\)</span> is the transpiration made by woody plants.</p>
-<p>While the above describes the default water balance equations, variations can occur depending on specific control flags:</p>
-<ol style="list-style-type: lower-alpha">
-<li><em>If snow dynamics are considered</em> [<code>snowpack</code>], the water balance of the snow pack (<span class="math inline">\(\Delta{S_{snow}}\)</span> in mm of snow water equivalents) is defined as:
+<p>The water balance of the snow pack (<span class="math inline">\(\Delta{S_{snow}}\)</span> in mm of snow water equivalents) is simply defined as:
 <span class="math display" id="eq:snowbalanceequation">\[\begin{equation}
 \Delta{S_{snow}} = Ps - Sm
+\tag{3.1}
+\end{equation}\]</span>
+where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <span class="math inline">\(Sm\)</span> is snow melt. Interception on canopy surfaces is only modelled for liquid precipitation, which leads to a partioning of <span class="math inline">\(Pr\)</span> into interception loss (<span class="math inline">\(In\)</span>; i.e. water evaporated after being intercepted by the canopy surfaces) and net rainfall (<span class="math inline">\(Pn\)</span>; the sum of throughfall and stem flow):
+<span class="math display">\[\begin{equation}
+Pr = Pn + In
+\end{equation}\]</span>
+Several water sources can contribute to soil infiltration, namely net rainfall (<span class="math inline">\(Pn\)</span>), surface runon from nearby locations (<span class="math inline">\(Ro\)</span>, if provided) and snowmelt (<span class="math inline">\(Sm\)</span>). Given that not all water that reaches the soil surface actually infiltrates, the amount of water entering the first soil layer via infiltration (<span class="math inline">\(If\)</span>) is:
+<span class="math display" id="eq:infiltrationequation">\[\begin{equation}
+If = Pn + Sm + Ro - Ie
 \tag{3.2}
 \end{equation}\]</span>
-where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <span class="math inline">\(Sm\)</span> is snow melt. Evaporation from bare soil cannot occur if there is a snow pack over the soil (i.e., if <span class="math inline">\(S_{snow}&gt;0\)</span> then <span class="math inline">\(Es = 0\)</span>).</li>
-<li><em>If plant water pools are considered</em> [<code>rhizosphereOverlap</code>], the water balance equation applies not only to the soil of the overall stand but also to the soil beneath each woody plant cohort. The fraction of stand area corresponding to the water pool of each cohort is used to keep the water balance at the two scales aligned. Moreover, the water balances of soils beneath the different plant cohort are more or less correlated depending on the degree of rhizosphere overlap.</li>
-<li>Whether soil flows are simulated using a <em>single domain</em> or a <em>dual-permeability domain</em> [<code>soilDomains</code>] affects the infiltration amounts (and hence runoff), in the latter including infiltration via macropores.</li>
+where <span class="math inline">\(Ie\)</span> is the infiltration excess that may occur. Other water inputs into the soil can come via capillarity rise (<span class="math inline">\(Cr\)</span>) from the water table (if present) or via lateral interflow from nearby locations (<span class="math inline">\(Lw\)</span>; if provided, assumed positive in the direction of entering the local soil). There are multiple ways water can leave the soil. Regarding purely physical processes we have the evaporation from soil surface (<span class="math inline">\(Es\)</span>), saturation excess (<span class="math inline">\(Se\)</span>) and deep drainage (<span class="math inline">\(Dd\)</span>). Fluxes mediated by plants are the transpiration made by herbaceous plants (<span class="math inline">\(Tr_{herb}\)</span>) and the transpiration made by woody plants (<span class="math inline">\(Tr_{woody}\)</span>). Taking all input and output terms, daily variations in soil water content (<span class="math inline">\(\Delta{V_{soil}}\)</span> in mm) are then summarized as:
+<span class="math display" id="eq:basicwaterbalanceequation">\[\begin{equation}
+\Delta{V_{soil}} = (If + Lw + Cr) - (Dd + Se + Es + Tr_{herb} + Tr_{woody})
+\tag{3.3}
+\end{equation}\]</span>
+The water leaving the soil via surface runoff (<span class="math inline">\(Ru\)</span>) is defined as the sum of infiltration excess (<span class="math inline">\(Ie\)</span>) and saturation excess (<span class="math inline">\(Se\)</span>):
+<span class="math display" id="eq:runoffequation">\[\begin{equation}
+Ru = Ie + Se
+\tag{3.4}
+\end{equation}\]</span></p>
+<p>If we consider soil and snow pack altogether, the water balance of the whole forest becomes:
+<span class="math display" id="eq:forestwaterbalanceequation">\[\begin{equation}
+\Delta{V_{soil}} + \Delta{S_{snow}} = (P + Ro + Lw + Cr) - (Dd + Ru + In + Es + Tr_{herb} + Tr_{woody})
+\tag{3.5}
+\end{equation}\]</span>
+Among inputs, precipitation (<span class="math inline">\(P\)</span>) will the most relevant inflow on most instances. The liquid water fluxes contributing to <strong>blue water</strong> outflow (i.e. entering river networks or leading to ground water) are runoff (<span class="math inline">\(Ru\)</span>) and deep drainage (<span class="math inline">\(Dd\)</span>). Water vapor fluxes (<span class="math inline">\(Es\)</span>, <span class="math inline">\(Tr_{woody}\)</span>, <span class="math inline">\(Tr_{herb}\)</span>, <span class="math inline">\(In\)</span>) contribute to total evapotranspiration, or <strong>green water</strong> (i.e. water vapor returning to the atmosphere).</p>
+<p>While the above describes the default water balance equations, variations can occur depending on specific control flags:</p>
+<ol style="list-style-type: lower-alpha">
+<li><em>If snow dynamics are considered</em> [<code>snowpack</code>], evaporation from bare soil cannot occur if there is a snow pack over the soil (i.e., if <span class="math inline">\(S_{snow}&gt;0\)</span> then <span class="math inline">\(Es = 0\)</span>).</li>
+<li><em>If plant water pools are considered</em> [<code>rhizosphereOverlap</code>], the soil water balance equation applies not only to the soil of the overall stand but also to the soil beneath each woody plant cohort. The fraction of stand area corresponding to the water pool of each cohort is used to keep the water balance at the two scales aligned. Moreover, the water balances of soils beneath the different plant cohort are more or less correlated depending on the degree of rhizosphere overlap.</li>
+<li><em>If soil flows are simulated using a dual-permeability domain</em> [<code>soilDomains</code>] there are water balance equations for the soil matrix and the macropore domain. Moreover, it affects the infiltration amounts (and hence runoff), in the latter including infiltration via macropores.</li>
 </ol>
 </div>
 <div id="basicwaterbalancescheduling" class="section level2 hasAnchor" number="3.4">
@@ -1197,7 +1220,7 @@ where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <
 <tbody>
 <tr class="odd">
 <td><code>WaterBalance</code></td>
-<td>Climatic input and water balance flows of eq.<a href="basicwaterbalance.html#eq:basicwaterbalanceequation">(3.1)</a> (i.e. net precipitation, infiltration, runoff, transpiration…). All of them in <span class="math inline">\(mm = l \cdot m^{-2}\)</span>.</td>
+<td>Climatic input and water balance flows of eq.<a href="basicwaterbalance.html#eq:basicwaterbalanceequation">(3.3)</a> (i.e. net precipitation, infiltration, runoff, transpiration…). All of them in <span class="math inline">\(mm = l \cdot m^{-2}\)</span>.</td>
 </tr>
 <tr class="even">
 <td><code>Soil</code></td>

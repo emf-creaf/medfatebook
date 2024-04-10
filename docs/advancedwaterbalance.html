@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-04-08" />
+<meta name="date" content="2024-04-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -204,7 +204,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.1" data-path="model-inputs.html"><a href="model-inputs.html#soil-physical-properties"><i class="fa fa-check"></i><b>2.3.1</b> Soil physical properties</a></li>
 <li class="chapter" data-level="2.3.2" data-path="model-inputs.html"><a href="model-inputs.html#waterretentioncurves"><i class="fa fa-check"></i><b>2.3.2</b> Water retention curves</a></li>
 <li class="chapter" data-level="2.3.3" data-path="model-inputs.html"><a href="model-inputs.html#soilinitialization"><i class="fa fa-check"></i><b>2.3.3</b> Soil initialization</a></li>
-<li class="chapter" data-level="2.3.4" data-path="model-inputs.html"><a href="model-inputs.html#water-content-and-water-table-depth"><i class="fa fa-check"></i><b>2.3.4</b> Water content and water table depth</a></li>
+<li class="chapter" data-level="2.3.4" data-path="model-inputs.html"><a href="model-inputs.html#water-content-and-depth-to-saturation"><i class="fa fa-check"></i><b>2.3.4</b> Water content and depth to saturation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="model-inputs.html"><a href="model-inputs.html#vegetationinput"><i class="fa fa-check"></i><b>2.4</b> Vegetation description</a>
 <ul>
@@ -784,28 +784,17 @@ div.csl-indent {
 <h2><span class="header-section-number">7.4</span> Water and energy balances<a href="advancedwaterbalance.html#waterenergybalances" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div id="water-balance" class="section level3 hasAnchor" number="7.4.1">
 <h3><span class="header-section-number">7.4.1</span> Water balance<a href="advancedwaterbalance.html#water-balance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Daily variations in soil water content (<span class="math inline">\(\Delta{V_{soil}}\)</span> in mm) can be summarized as:</p>
-<p><span class="math display" id="eq:advancedwaterbalanceequation">\[\begin{equation}
-\Delta{V_{soil}} = Pr + Sm + Ro - In - Ru - Dd - Es - Tr_{herb} - Ex_{woody}
+<p>The water balance equations for the soil and snowpack of the advanced model are essentially the same as introduced in section <a href="basicwaterbalance.html#soilwaterbalance">3.3</a>, with some minor modifications. Although the advanced water balance model includes hydraulic redistribution, this does not change the total amount of water in the soil, so the water balance equation is is very similar to that of the basic water balance model (eq.<a href="basicwaterbalance.html#eq:basicwaterbalanceequation">(3.3)</a>), but where woody plant water uptake (<span class="math inline">\(Ex_{woody}\)</span>) is used instead of woody transpiration (<span class="math inline">\(Tr_{woody}\)</span>).
+<span class="math display" id="eq:advancedwaterbalanceequation">\[\begin{equation}
+\Delta{V_{soil}} = (If + Lw + Cr) - (Dd + Se + Es + Tr_{herb} + Ex_{woody})
 \tag{7.1}
-\end{equation}\]</span></p>
-<p>where <span class="math inline">\(Pr\)</span> is precipitation as rainfall, <span class="math inline">\(Sm\)</span> is water reaching the soil from snow melt (if snow-pack dynamics are considered), <span class="math inline">\(In\)</span> is the interception loss (i.e., water evaporated after being intercepted by the canopy), <span class="math inline">\(Ro\)</span> is surface runon (only relevant in spatially-explicit simulations), <span class="math inline">\(Ru\)</span> is surface runoff, <span class="math inline">\(Dd\)</span> is deep drainage (i.e. water percolated to layers beyond soil depth), <span class="math inline">\(Es\)</span> is evaporation from soil surface, <span class="math inline">\(Tr_{herb}\)</span> is the transpiration of the herbaceous layer and <span class="math inline">\(Ex_{woody}\)</span> is soil water extraction done by woody plants.</p>
-<p>Although the advanced water balance model includes hydraulic redistribution, this does not change the total amount of water in the soil, so the water balance equation is is very similar to that of the basic water balance model (eq.<a href="basicwaterbalance.html#eq:basicwaterbalanceequation">(3.1)</a>). Soil water extraction (<span class="math inline">\(Ex_{woody}\)</span>) and plant transpiration (<span class="math inline">\(Tr_{woody}\)</span>) will be equal if capacitance effects are not considered. Otherwise the amount of water stored in the woody plant tissues changes according to:
+\end{equation}\]</span>
+where all the other terms were defined in <a href="basicwaterbalance.html#soilwaterbalance">3.3</a>. Soil water extraction (<span class="math inline">\(Ex_{woody}\)</span>) and plant transpiration (<span class="math inline">\(Tr_{woody}\)</span>) will be equal if capacitance effects are not considered. Otherwise the amount of water stored in the woody plant tissues changes according to:
 <span class="math display" id="eq:plantwaterbalance">\[\begin{equation}
 \Delta{V_{plant}} = Ex_{woody} - Tr_{woody}
 \tag{7.2}
 \end{equation}\]</span></p>
-<p>While the above describes the default water balance equation, variations can occur depending on specific control flags:</p>
-<ol style="list-style-type: lower-alpha">
-<li><em>If snow dynamics are considered</em> [<code>snowpack</code>], the water balance of the snow pack is defined as:
-<span class="math display">\[\begin{equation}
-\Delta{S_{snow}} = Ps - Sm
-\end{equation}\]</span>
-where <span class="math inline">\(Ps\)</span> is precipitation as snowfall and <span class="math inline">\(Sm\)</span> is snow melt. Evaporation from bare soil cannot occur if there is a snow pack over the soil surface (i.e., if <span class="math inline">\(S_{snow}&gt;0\)</span> then <span class="math inline">\(Es = 0\)</span>).</li>
-<li><em>If plant water pools are considered</em> [<code>rhizosphereOverlap</code>], the water balance equation applies not only to the soil of the overall stand but also to the soil beneath each plant cohort. The fraction of stand area covered by each cohort is used to keep the water balance at the two scales aligned. Moreover, the water balances of soils beneath the different plant cohort are more or less correlated depending on root overlap.</li>
-<li>Whether soil flows are simulated using a <em>single domain</em> or a <em>dual-permeability domain</em> [<code>soilDomains</code>] affects the infiltration amounts (and hence runoff), in the latter including infiltration via macropores.</li>
-</ol>
-<p>Unlike the basic water balance, in this model water balance components contributing to latent heat (<span class="math inline">\(Es\)</span>, <span class="math inline">\(Tr_{woody}\)</span>, <span class="math inline">\(Tr_{herb}\)</span>, <span class="math inline">\(In\)</span> and <span class="math inline">\(Sm\)</span>) are included in the energy balance equations of the canopy and soil, therefore coupling water and energy balances.</p>
+<p>Variations can occur depending on specific control flags, as explained in section <a href="basicwaterbalance.html#soilwaterbalance">3.3</a>. Unlike the basic water balance, in this model water balance components contributing to latent heat of vaporization (plant transpiration, evaporation from soil surface and rainfall intercepted by canopy surfaces) or latent heat of fusion (snow melt) are included in the energy balance equations of the canopy and soil, therefore coupling water and energy balances.</p>
 </div>
 <div id="single-layer-canopy-energy-balance" class="section level3 hasAnchor" number="7.4.2">
 <h3><span class="header-section-number">7.4.2</span> Single-layer canopy energy balance<a href="advancedwaterbalance.html#single-layer-canopy-energy-balance" class="anchor-section" aria-label="Anchor link to header"></a></h3>

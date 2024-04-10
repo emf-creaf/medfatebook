@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-04-08" />
+<meta name="date" content="2024-04-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -204,7 +204,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.1" data-path="model-inputs.html"><a href="model-inputs.html#soil-physical-properties"><i class="fa fa-check"></i><b>2.3.1</b> Soil physical properties</a></li>
 <li class="chapter" data-level="2.3.2" data-path="model-inputs.html"><a href="model-inputs.html#waterretentioncurves"><i class="fa fa-check"></i><b>2.3.2</b> Water retention curves</a></li>
 <li class="chapter" data-level="2.3.3" data-path="model-inputs.html"><a href="model-inputs.html#soilinitialization"><i class="fa fa-check"></i><b>2.3.3</b> Soil initialization</a></li>
-<li class="chapter" data-level="2.3.4" data-path="model-inputs.html"><a href="model-inputs.html#water-content-and-water-table-depth"><i class="fa fa-check"></i><b>2.3.4</b> Water content and water table depth</a></li>
+<li class="chapter" data-level="2.3.4" data-path="model-inputs.html"><a href="model-inputs.html#water-content-and-depth-to-saturation"><i class="fa fa-check"></i><b>2.3.4</b> Water content and depth to saturation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="model-inputs.html"><a href="model-inputs.html#vegetationinput"><i class="fa fa-check"></i><b>2.4</b> Vegetation description</a>
 <ul>
@@ -732,7 +732,7 @@ div.csl-indent {
             <section class="normal" id="section-">
 <div id="hydrology" class="section level1 hasAnchor" number="5">
 <h1><span class="header-section-number">Chapter 5</span> Forest hydrology<a href="hydrology.html#hydrology" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>Forest hydrological processes are key for soil and plant water balances. This chapter details the design and implementation of most of the vertical hydrological processes included in package <strong>medfate</strong>. These processes determine the value of the water flows mentioned in eq. <a href="basicwaterbalance.html#eq:basicwaterbalanceequation">(3.1)</a>. The only process that is not described here is woody plant transpiration (<span class="math inline">\(Tr_w\)</span>), as it will be covered in detail in chapter <a href="transpirationgranier.html#transpirationgranier">6</a>.</p>
+<p>Forest hydrological processes are key for soil and plant water balances. This chapter details the design and implementation of most of the vertical hydrological processes included in package <strong>medfate</strong>. These processes determine the value of the water flows mentioned in eq. <a href="basicwaterbalance.html#eq:basicwaterbalanceequation">(3.3)</a>. The only process that is not described here is woody plant transpiration (<span class="math inline">\(Tr_w\)</span>), as it will be covered in detail in chapter <a href="transpirationgranier.html#transpirationgranier">6</a>.</p>
 <p>Although each process can be simulated in specific sub-model functions, function <code>hydrology_verticalInputs()</code> allows simulating soil water input processes altogether, including canopy water interception, snow accumulation/melt, soil infiltration and percolation.</p>
 <div id="precipitation" class="section level2 hasAnchor" number="5.1">
 <h2><span class="header-section-number">5.1</span> Snow and rainfall<a href="hydrology.html#precipitation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -1011,7 +1011,7 @@ Hence, the flow to the macropore domain is limited by <span class="math inline">
 <p><span class="math display">\[\begin{equation}
 U_w = \left( \frac{G_w\cdot D_w \cdot \gamma_w}{d^2} \right) \cdot (\theta_{b} - \theta_{mi})
 \end{equation}\]</span>
-where <span class="math inline">\(d\)</span> (in <span class="math inline">\(m\)</span>) is an effective diffusion path length, <span class="math inline">\(D_w\)</span> (in <span class="math inline">\(m^2s^{-1}\)</span>) is an effective water diffusivity that depends on <span class="math inline">\(S_{ma}\)</span>, <span class="math inline">\(G_w = 3\)</span> is a geometry factor and <span class="math inline">\(\gamma_w = 1.0\)</span> is a scaling factor. See details in <span class="citation">(<a href="#ref-larsbo_improved_2005">Larsbo <em>et al.</em> 2005</a>)</span>. Water uptake by the unsaturated matrix is treated as a source for the matrix domain and as a sink for the macropore domain.</p>
+where <span class="math inline">\(d\)</span> (in <span class="math inline">\(m\)</span>) is an effective diffusion path length, <span class="math inline">\(D_w\)</span> (in <span class="math inline">\(m^2s^{-1}\)</span>) is an effective water diffusivity that depends on <span class="math inline">\(S_{ma}\)</span>, <span class="math inline">\(G_w = 3\)</span> is a geometry factor and <span class="math inline">\(\gamma_w = 0.1\)</span> is a scaling factor. See details in <span class="citation">(<a href="#ref-larsbo_improved_2005">Larsbo <em>et al.</em> 2005</a>)</span>. Water uptake by the unsaturated matrix is treated as a source for the matrix domain and as a sink for the macropore domain.</p>
 </div>
 <div id="finite-approximation-to-flows-in-the-soil-matrix" class="section level3 hasAnchor" number="5.7.5">
 <h3><span class="header-section-number">5.7.5</span> Finite approximation to flows in the soil matrix<a href="hydrology.html#finite-approximation-to-flows-in-the-soil-matrix" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -1044,6 +1044,11 @@ Q_{i-1} =  -\frac{K_{i-1/2}}{\Delta z_{i-1/2}} (\Psi_{i-1} - \Psi_{i}) - K_{i-1/
 <p><span class="math display">\[\begin{equation}
 \frac{\Delta z_N}{\Delta t} C_N^{n+1} (\Psi_N^{n+1} - \Psi_N^n) \lambda_N =  \frac{K_{N-1/2}^{n+1}}{\Delta z_{N-1/2}} (\Psi_{N-1}^{n+1} - \Psi_{N}^{n+1}) +  K_{N-1/2}^{n+1} - K_{N}^{n+1} + S^{n+1}_N
 \end{equation}\]</span></p>
+<p>Alternatively, if a water table depth is supplied and is equal or shallower than soil depth, the model can simulate capillarity rise by changing the lower boundary condition to that of a constant saturated layer (i.e. <span class="math inline">\(\Psi_{N+1} = 0\)</span>).</p>
+<p><span class="math display">\[\begin{equation}
+\frac{\Delta z_i}{\Delta t} C_N^{n+1} (\Psi_N^{n+1} - \Psi_N^n) \lambda_i =  \frac{K_{N-1/2}^{n+1}}{\Delta z_{N-1/2}} (\Psi_{N-1}^{n+1} - \Psi_N^{n+1}) - \frac{K_{N+1/2}^{n+1}}{\Delta z_{N+1/2}} (\Psi_N^{n+1} - 0) \\ + K_{N-1/2}^{n+1} - K_{N+1/2}^{n+1} + S^{n+1}_N
+\end{equation}\]</span>
+where <span class="math inline">\(K_{N+1/2} = 0.5(K_{N} + K_{sat})\)</span>.</p>
 <p>The numerical form of the <span class="math inline">\(\Psi\)</span>-based Richards equation for a soil with <span class="math inline">\(N\)</span> layers is a tridiagonal system of <span class="math inline">\(N\)</span> equations with <span class="math inline">\(N\)</span> unknown values <span class="math inline">\(\Psi\)</span> at time <span class="math inline">\(n+1\)</span>. An additional complexity is that <span class="math inline">\(\Psi\)</span> at <span class="math inline">\(n+1\)</span> also appears through <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span>. The solution requires linearizing with respect to <span class="math inline">\(\Psi\)</span> through various methods. Here the <strong>predictor-corrector</strong> method is employed, a two-step solution that solves the equation twice <span class="citation">(<a href="#ref-haverkamp_comparison_1977">Haverkamp <em>et al.</em> 1977</a>)</span>. The predictor step uses explicit linearization to solve for <span class="math inline">\(\Psi\)</span> over one-half of a full time step (<span class="math inline">\(\Delta t/2\)</span>) at time <span class="math inline">\(n +1/2\)</span> with <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span> from time <span class="math inline">\(n\)</span>. The resulting values for <span class="math inline">\(\Psi\)</span> are used to evaluate <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span> at <span class="math inline">\(n+1/2\)</span>. The corrector step uses these to obtain <span class="math inline">\(\Psi\)</span> over the full time step (<span class="math inline">\(\Delta t\)</span>) at <span class="math inline">\(n+1\)</span>. An implicit solution is used for the predictor step and the Crank-Nicolson method is used for the corrector step.</p>
 </div>
 <div id="finite-approximation-to-flows-in-the-macropore-domain" class="section level3 hasAnchor" number="5.7.6">

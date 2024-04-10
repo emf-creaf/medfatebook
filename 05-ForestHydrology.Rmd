@@ -561,7 +561,7 @@ Hence, the flow to the macropore domain is limited by $C_{ma}$. The reverse flow
 \begin{equation}
 U_w = \left( \frac{G_w\cdot D_w \cdot \gamma_w}{d^2} \right) \cdot (\theta_{b} - \theta_{mi})
 \end{equation}
-where $d$ (in $m$) is an effective diffusion path length, $D_w$ (in $m^2s^{-1}$) is an effective water diffusivity that depends on $S_{ma}$, $G_w = 3$ is a geometry factor and $\gamma_w = 1.0$ is a scaling factor. See details in [@larsbo_improved_2005]. Water uptake by the unsaturated matrix is treated as a source for the matrix domain and as a sink for the macropore domain.
+where $d$ (in $m$) is an effective diffusion path length, $D_w$ (in $m^2s^{-1}$) is an effective water diffusivity that depends on $S_{ma}$, $G_w = 3$ is a geometry factor and $\gamma_w = 0.1$ is a scaling factor. See details in [@larsbo_improved_2005]. Water uptake by the unsaturated matrix is treated as a source for the matrix domain and as a sink for the macropore domain.
 
 
 ### Finite approximation to flows in the soil matrix
@@ -605,6 +605,13 @@ Finally, for the last layer ($i=N$) a free drainage condition is specified as bo
 \begin{equation}
 \frac{\Delta z_N}{\Delta t} C_N^{n+1} (\Psi_N^{n+1} - \Psi_N^n) \lambda_N =  \frac{K_{N-1/2}^{n+1}}{\Delta z_{N-1/2}} (\Psi_{N-1}^{n+1} - \Psi_{N}^{n+1}) +  K_{N-1/2}^{n+1} - K_{N}^{n+1} + S^{n+1}_N
 \end{equation}
+
+Alternatively, if a water table depth is supplied and is equal or shallower than soil depth, the model can simulate capillarity rise by changing the lower boundary condition to that of a constant saturated layer (i.e. $\Psi_{N+1} = 0$).
+
+\begin{equation}
+\frac{\Delta z_i}{\Delta t} C_N^{n+1} (\Psi_N^{n+1} - \Psi_N^n) \lambda_i =  \frac{K_{N-1/2}^{n+1}}{\Delta z_{N-1/2}} (\Psi_{N-1}^{n+1} - \Psi_N^{n+1}) - \frac{K_{N+1/2}^{n+1}}{\Delta z_{N+1/2}} (\Psi_N^{n+1} - 0) \\ + K_{N-1/2}^{n+1} - K_{N+1/2}^{n+1} + S^{n+1}_N
+\end{equation}
+where $K_{N+1/2} = 0.5(K_{N} + K_{sat})$.
 
 The numerical form of the $\Psi$-based Richards equation for a soil with $N$ layers is a tridiagonal system of $N$ equations with $N$ unknown values $\Psi$ at time $n+1$. An additional complexity is that $\Psi$ at $n+1$ also appears through $K$ and $C$. The solution requires linearizing with respect to $\Psi$ through various methods. Here the **predictor-corrector** method is employed, a two-step solution that solves the equation twice [@haverkamp_comparison_1977]. The predictor step uses explicit linearization to solve for $\Psi$ over one-half of a full time step ($\Delta t/2$) at time $n +1/2$ with $K$ and $C$ from time $n$. The resulting values for $\Psi$ are used to evaluate $K$ and $C$ at $n+1/2$. The corrector step uses these to obtain $\Psi$ over the full time step ($\Delta t$) at $n+1$. An implicit solution is used for the predictor step and the Crank-Nicolson method is used for the corrector step.
 

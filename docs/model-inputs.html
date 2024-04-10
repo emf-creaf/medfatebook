@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-04-08" />
+<meta name="date" content="2024-04-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -204,7 +204,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.1" data-path="model-inputs.html"><a href="model-inputs.html#soil-physical-properties"><i class="fa fa-check"></i><b>2.3.1</b> Soil physical properties</a></li>
 <li class="chapter" data-level="2.3.2" data-path="model-inputs.html"><a href="model-inputs.html#waterretentioncurves"><i class="fa fa-check"></i><b>2.3.2</b> Water retention curves</a></li>
 <li class="chapter" data-level="2.3.3" data-path="model-inputs.html"><a href="model-inputs.html#soilinitialization"><i class="fa fa-check"></i><b>2.3.3</b> Soil initialization</a></li>
-<li class="chapter" data-level="2.3.4" data-path="model-inputs.html"><a href="model-inputs.html#water-content-and-water-table-depth"><i class="fa fa-check"></i><b>2.3.4</b> Water content and water table depth</a></li>
+<li class="chapter" data-level="2.3.4" data-path="model-inputs.html"><a href="model-inputs.html#water-content-and-depth-to-saturation"><i class="fa fa-check"></i><b>2.3.4</b> Water content and depth to saturation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="model-inputs.html"><a href="model-inputs.html#vegetationinput"><i class="fa fa-check"></i><b>2.4</b> Vegetation description</a>
 <ul>
@@ -1065,8 +1065,8 @@ K_{sat} = K_{sat,ref} \cdot \left( \frac{\rho_{s} - BD}{\rho_{s} - BD_{ref}} \ri
 \end{equation}\]</span>
 where <span class="math inline">\(K_{sat,ref}\)</span> is the reference conductivity according to soil texture, <span class="math inline">\(\rho_{s} = 2.73 \,g\cdot cm^{-3}\)</span> is density of soil particles, <span class="math inline">\(BD_{ref} = 1.2\,g\cdot cm^{-3}\)</span> is the reference bulk density.</p>
 </div>
-<div id="water-content-and-water-table-depth" class="section level3 hasAnchor" number="2.3.4">
-<h3><span class="header-section-number">2.3.4</span> Water content and water table depth<a href="model-inputs.html#water-content-and-water-table-depth" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="water-content-and-depth-to-saturation" class="section level3 hasAnchor" number="2.3.4">
+<h3><span class="header-section-number">2.3.4</span> Water content and depth to saturation<a href="model-inputs.html#water-content-and-depth-to-saturation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The <em>volume of water</em> (<span class="math inline">\(V_s\)</span> in <span class="math inline">\(mm = l \cdot m^{-2}\)</span> of ground area) in a soil layer <span class="math inline">\(s\)</span> is calculated from its water potential (<span class="math inline">\(\Psi_s\)</span>) and water retention curve using:
 <span class="math display">\[\begin{equation}
 V_s(\Psi_s) = d_s\cdot ((100-P_{rocks,s})/100)\cdot\theta_{s}(\Psi_s)
@@ -1086,9 +1086,9 @@ where <span class="math inline">\(\theta_{fc,s} = \theta_s(-0.033)\)</span> is t
 <li><em>Water content at wilting point</em> (<span class="math inline">\(V_{wp, s}\)</span>, in mm) is calculated replacing <span class="math inline">\(\theta_{fc,s}\)</span> by <span class="math inline">\(\theta_{wp,s} = \theta_s(-1.5)\)</span>, the moisture at <em>wilting point</em>, i.e. at <span class="math inline">\(\Psi_{fc} = -1.5\)</span> MPa, a conventional amount of soil moisture beyond which plants are assumed have problems extracting water and start to wilt. However, plants can often extract water from much drier soils.</li>
 <li>The <em>amount of extractable water</em> (in mm) is the difference between water content at field capacity and the water content at a conventional minimum water potential, which can be set at wilting point or lower values (by default at -5 MPa in <strong>medfate</strong>).</li>
 </ul>
-<p>The depth of water table is the depth of saturated soil (in mm). In medfate, <em>water table depth</em> (<span class="math inline">\(Z_{wt}\)</span>, in mm) equals soil depth (i.e. <span class="math inline">\(Z_{soil}\)</span>) when all soil layers are below field capacity. When some layers are between field capacity and saturation, water table depth is calculated as:
+<p>The <em>saturated water depth</em> (<span class="math inline">\(Z_{sat}\)</span>, in mm) is not defined (i.e. missing) when all soil layers are below field capacity. When some layers are between field capacity and saturation, depth of the saturated water is calculated as:
 <span class="math display">\[\begin{equation}
-Z_{wt} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\theta_{sat,s}-\theta_{fc,s})\right]}
+Z_{sat} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\theta_{sat,s}-\theta_{fc,s})\right]}
 \end{equation}\]</span></p>
 </div>
 </div>
@@ -1636,13 +1636,13 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 ##   [7] &quot;soilResults&quot;                      &quot;plantResults&quot;                     &quot;leafResults&quot;                     
 ##  [10] &quot;temperatureResults&quot;               &quot;fireHazardResults&quot;                &quot;fireHazardStandardWind&quot;          
 ##  [13] &quot;fireHazardStandardDFMC&quot;           &quot;transpirationMode&quot;                &quot;soilFunctions&quot;                   
-##  [16] &quot;defaultWindSpeed&quot;                 &quot;defaultCO2&quot;                       &quot;defaultRainfallIntensityPerMonth&quot;
-##  [19] &quot;snowpack&quot;                         &quot;leafPhenology&quot;                    &quot;bareSoilEvaporation&quot;             
-##  [22] &quot;unlimitedSoilWater&quot;               &quot;interceptionMode&quot;                 &quot;infiltrationMode&quot;                
-##  [25] &quot;soilDomains&quot;                      &quot;freeDrainage&quot;                     &quot;rhizosphereOverlap&quot;              
-##  [28] &quot;unfoldingDD&quot;                      &quot;verticalLayerSize&quot;                &quot;windMeasurementHeight&quot;           
-##  [31] &quot;segmentedXylemVulnerability&quot;      &quot;stemCavitationRecovery&quot;           &quot;leafCavitationRecovery&quot;          
-##  [34] &quot;hydraulicRedistributionFraction&quot;  &quot;ndailysteps&quot;                      &quot;nsubsteps&quot;                       
+##  [16] &quot;ndailysteps&quot;                      &quot;max_nsubsteps_soil&quot;               &quot;defaultWindSpeed&quot;                
+##  [19] &quot;defaultCO2&quot;                       &quot;defaultRainfallIntensityPerMonth&quot; &quot;snowpack&quot;                        
+##  [22] &quot;leafPhenology&quot;                    &quot;bareSoilEvaporation&quot;              &quot;unlimitedSoilWater&quot;              
+##  [25] &quot;interceptionMode&quot;                 &quot;infiltrationMode&quot;                 &quot;soilDomains&quot;                     
+##  [28] &quot;rhizosphereOverlap&quot;               &quot;unfoldingDD&quot;                      &quot;verticalLayerSize&quot;               
+##  [31] &quot;windMeasurementHeight&quot;            &quot;segmentedXylemVulnerability&quot;      &quot;stemCavitationRecovery&quot;          
+##  [34] &quot;leafCavitationRecovery&quot;           &quot;hydraulicRedistributionFraction&quot;  &quot;nsubsteps_canopy&quot;                
 ##  [37] &quot;taper&quot;                            &quot;multiLayerBalance&quot;                &quot;sapFluidityVariation&quot;            
 ##  [40] &quot;TPhase_gmin&quot;                      &quot;Q10_1_gmin&quot;                       &quot;Q10_2_gmin&quot;                      
 ##  [43] &quot;rootRadialConductance&quot;            &quot;averageFracRhizosphereResistance&quot; &quot;thermalCapacityLAI&quot;              

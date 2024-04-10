@@ -32,25 +32,48 @@ Additional state variables depend on the activation of specific control flags:
 
 ## Water balance {#soilwaterbalance}
 
-Daily variations in soil water content ($\Delta{V_{soil}}$ in mm) can be summarized as:
-
+Water balance is performed for both the snow pack and the soil. Precipitation ($P$) is considered be snow precipitation ($Ps$) or rainfall ($Pr$), depending on temperature. Thus, we have:
 \begin{equation}
-\Delta{V_{soil}} = Pr + Sm + Ro - In - Ru - Dd - Es - Tr_{herb} - Tr_{woody}
-(\#eq:basicwaterbalanceequation)
+P = Pr + Ps
 \end{equation}
 
-where $Pr$ is precipitation as rainfall or snow, $Sm$ is water from melting the snow pack (if snow-pack dynamics are considered), $In$ is the interception loss (i.e., water evaporated after being intercepted by the canopy), $Ro$ is surface runon (only relevant in spatially-explicit simulations), $Ru$ is surface runoff, $Dd$ is deep drainage (i.e. water percolated to layers beyond soil depth), $Es$ is evaporation from soil, $Tr_{herb}$ is the transpiration made by herbaceous plants and $Tr_{woody}$ is the transpiration made by woody plants. 
-
-While the above describes the default water balance equations, variations can occur depending on specific control flags: 
-
-a. *If snow dynamics are considered* [`snowpack`], the water balance of the snow pack ($\Delta{S_{snow}}$ in mm of snow water equivalents) is defined as:
+The water balance of the snow pack ($\Delta{S_{snow}}$ in mm of snow water equivalents) is simply defined as:
 \begin{equation}
 \Delta{S_{snow}} = Ps - Sm
 (\#eq:snowbalanceequation)
 \end{equation}
-where $Ps$ is precipitation as snowfall and $Sm$ is snow melt. Evaporation from bare soil cannot occur if there is a snow pack over the soil (i.e., if $S_{snow}>0$ then $Es = 0$).
-b. *If plant water pools are considered* [`rhizosphereOverlap`], the water balance equation applies not only to the soil of the overall stand but also to the soil beneath each woody plant cohort. The fraction of stand area corresponding to the water pool of each cohort is used to keep the water balance at the two scales aligned. Moreover, the water balances of soils beneath the different plant cohort are more or less correlated depending on the degree of rhizosphere overlap.
-c. Whether soil flows are simulated using a *single domain* or a *dual-permeability domain* [`soilDomains`] affects the infiltration amounts (and hence runoff), in the latter including infiltration via macropores. 
+where $Ps$ is precipitation as snowfall and $Sm$ is snow melt. Interception on canopy surfaces is only modelled for liquid precipitation, which leads to a partioning of $Pr$ into interception loss ($In$; i.e. water evaporated after being intercepted by the canopy surfaces) and net rainfall ($Pn$; the sum of throughfall and stem flow): 
+\begin{equation}
+Pr = Pn + In
+\end{equation}
+Several water sources can contribute to soil infiltration, namely net rainfall ($Pn$), surface runon from nearby locations ($Ro$, if provided) and snowmelt ($Sm$). Given that not all water that reaches the soil surface actually infiltrates, the amount of water entering the first soil layer via infiltration ($If$) is:
+\begin{equation}
+If = Pn + Sm + Ro - Ie
+(\#eq:infiltrationequation)
+\end{equation}
+where $Ie$ is the infiltration excess that may occur. Other water inputs into the soil can come via capillarity rise ($Cr$) from the water table (if present) or via lateral interflow from nearby locations ($Lw$; if provided, assumed positive in the direction of entering the local soil). There are multiple ways water can leave the soil. Regarding purely physical processes we have the evaporation from soil surface ($Es$), saturation excess ($Se$) and deep drainage ($Dd$). Fluxes mediated by plants are the transpiration made by herbaceous plants ($Tr_{herb}$) and the transpiration made by woody plants ($Tr_{woody}$). Taking all input and output terms, daily variations in soil water content ($\Delta{V_{soil}}$ in mm) are then summarized as:
+\begin{equation}
+\Delta{V_{soil}} = (If + Lw + Cr) - (Dd + Se + Es + Tr_{herb} + Tr_{woody})
+(\#eq:basicwaterbalanceequation)
+\end{equation}
+The water leaving the soil via surface runoff ($Ru$) is defined as the sum of infiltration excess ($Ie$) and saturation excess ($Se$):
+\begin{equation}
+Ru = Ie + Se
+(\#eq:runoffequation)
+\end{equation}
+
+If we consider soil and snow pack altogether, the water balance of the whole forest becomes:
+\begin{equation}
+\Delta{V_{soil}} + \Delta{S_{snow}} = (P + Ro + Lw + Cr) - (Dd + Ru + In + Es + Tr_{herb} + Tr_{woody})
+(\#eq:forestwaterbalanceequation)
+\end{equation}
+Among inputs, precipitation ($P$) will the most relevant inflow on most instances. The liquid water fluxes contributing to **blue water** outflow (i.e. entering river networks or leading to ground water) are runoff ($Ru$) and deep drainage ($Dd$). Water vapor fluxes ($Es$, $Tr_{woody}$, $Tr_{herb}$, $In$) contribute to total evapotranspiration, or **green water** (i.e. water vapor returning to the atmosphere).
+
+While the above describes the default water balance equations, variations can occur depending on specific control flags: 
+
+a. *If snow dynamics are considered* [`snowpack`], evaporation from bare soil cannot occur if there is a snow pack over the soil (i.e., if $S_{snow}>0$ then $Es = 0$).
+b. *If plant water pools are considered* [`rhizosphereOverlap`], the soil water balance equation applies not only to the soil of the overall stand but also to the soil beneath each woody plant cohort. The fraction of stand area corresponding to the water pool of each cohort is used to keep the water balance at the two scales aligned. Moreover, the water balances of soils beneath the different plant cohort are more or less correlated depending on the degree of rhizosphere overlap.
+c. *If soil flows are simulated using a dual-permeability domain* [`soilDomains`] there are water balance equations for the soil matrix and the macropore domain. Moreover, it affects the infiltration amounts (and hence runoff), in the latter including infiltration via macropores. 
 
 ## Process scheduling {#basicwaterbalancescheduling}
 
