@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-04-10" />
+<meta name="date" content="2024-04-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1048,7 +1048,7 @@ Q_{i-1} =  -\frac{K_{i-1/2}}{\Delta z_{i-1/2}} (\Psi_{i-1} - \Psi_{i}) - K_{i-1/
 <p><span class="math display">\[\begin{equation}
 \frac{\Delta z_i}{\Delta t} C_N^{n+1} (\Psi_N^{n+1} - \Psi_N^n) \lambda_i =  \frac{K_{N-1/2}^{n+1}}{\Delta z_{N-1/2}} (\Psi_{N-1}^{n+1} - \Psi_N^{n+1}) - \frac{K_{N+1/2}^{n+1}}{\Delta z_{N+1/2}} (\Psi_N^{n+1} - 0) \\ + K_{N-1/2}^{n+1} - K_{N+1/2}^{n+1} + S^{n+1}_N
 \end{equation}\]</span>
-where <span class="math inline">\(K_{N+1/2} = 0.5(K_{N} + K_{sat})\)</span>.</p>
+where <span class="math inline">\(K_{N+1/2} = 0.5(K_{N} + K_{sat})\)</span>. If the water table is shallower than a given layer, it is assumed to be saturated and if not the model simulates water filling until saturation is reached. Gravitational fluxes are set to zero for layers completely below the water table, and in this case deep drainage is evaluated using the water draining from the unsaturated layers.</p>
 <p>The numerical form of the <span class="math inline">\(\Psi\)</span>-based Richards equation for a soil with <span class="math inline">\(N\)</span> layers is a tridiagonal system of <span class="math inline">\(N\)</span> equations with <span class="math inline">\(N\)</span> unknown values <span class="math inline">\(\Psi\)</span> at time <span class="math inline">\(n+1\)</span>. An additional complexity is that <span class="math inline">\(\Psi\)</span> at <span class="math inline">\(n+1\)</span> also appears through <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span>. The solution requires linearizing with respect to <span class="math inline">\(\Psi\)</span> through various methods. Here the <strong>predictor-corrector</strong> method is employed, a two-step solution that solves the equation twice <span class="citation">(<a href="#ref-haverkamp_comparison_1977">Haverkamp <em>et al.</em> 1977</a>)</span>. The predictor step uses explicit linearization to solve for <span class="math inline">\(\Psi\)</span> over one-half of a full time step (<span class="math inline">\(\Delta t/2\)</span>) at time <span class="math inline">\(n +1/2\)</span> with <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span> from time <span class="math inline">\(n\)</span>. The resulting values for <span class="math inline">\(\Psi\)</span> are used to evaluate <span class="math inline">\(K\)</span> and <span class="math inline">\(C\)</span> at <span class="math inline">\(n+1/2\)</span>. The corrector step uses these to obtain <span class="math inline">\(\Psi\)</span> over the full time step (<span class="math inline">\(\Delta t\)</span>) at <span class="math inline">\(n+1\)</span>. An implicit solution is used for the predictor step and the Crank-Nicolson method is used for the corrector step.</p>
 </div>
 <div id="finite-approximation-to-flows-in-the-macropore-domain" class="section level3 hasAnchor" number="5.7.6">
@@ -1062,6 +1062,7 @@ since <span class="math inline">\(\theta_{ma}\)</span> is related to <span class
 S_{ma,i}^{n+1} = S_{ma,i}^{n} + \frac{\Delta t}{\lambda_i \cdot e_{ma, i}} \cdot \left( \frac{K_{ma, i-1}^{n+1} - K_{ma, i}^{n+1}}{\Delta z_i} + S^{n+1}_{i} \right)
 \end{equation}\]</span></p>
 <p>In this equation, <span class="math inline">\(K_{ma, i-1}^{n+1}\)</span> represents the conductivity of the layer above for the time step <span class="math inline">\(n+1\)</span>, whereas the <span class="math inline">\(K_{ma, i}^{n+1}\)</span> is the conductivity of the current layer for the same time step, hence depending on <span class="math inline">\(S_{ma,i}^{n+1}\)</span>. The local water balance is solved for each layer, in turn, from the soil surface downward, assuming a zero flow from the surface <span class="math inline">\(K_{ma, 0}^{n+1} = 0\)</span> (infiltration into macropores is given by <span class="math inline">\(S_{1}^{n+1}\)</span>). Then for any given layer <span class="math inline">\(i\)</span>, <span class="math inline">\(K_{ma, i-1}^{n+1}\)</span> is already defined and a solution for <span class="math inline">\(S_{ma,i}^{n+1}\)</span> can be found using a bisection method (i.e. internal halving). After solving for all layers, if the capacity of macropores is exceeded in any given layer, the excess is added to the macropore storage of the layer above. Excess of the topmost layer results in runoff via saturation excess.</p>
+<p>Like in the matrix domain, if the water table is shallower than a given layer, it is assumed to be saturated and if not the model simulates macropore water filling until saturation is reached. Gravitational fluxes are set to zero for layers completely below the water table, and in this case macropore drainage is evaluated using the water draining from the unsaturated layers.</p>
 
 </div>
 </div>
