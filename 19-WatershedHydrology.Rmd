@@ -44,14 +44,15 @@ At the cell level, daily variations in water content can occur in the *snowpack*
 1. Variations in snowpack water equivalent content follows the balance between snowfall ($Ps$) and snow melt ($Sm$) eq. \@ref(eq:snowbalanceequation):
 \begin{equation}
 \Delta{S_{snow}} = Ps - Sm
+(\#eq:cellsnowpackwaterbalanceequation)
 \end{equation}
 2. Variations in soil water content ($\Delta{V_{soil}}$) follow \@ref(eq:basicwaterbalanceequation):
 \begin{equation}
-\Delta{V_{soil}} = (If + Lw + Cr) - (Dd + Se + Es + Tr_{herb} + Tr_{woody})
+\Delta{V_{soil}} = (If + Lw + Cr) - (Dd + Se + Es + Tr_{herb} + Tr_{woody})  (\#eq:cellsoilwaterbalanceequation)
 \end{equation}
-where the terms were defined in \@ref(soilwaterbalance). Here, the lateral flows (i.e. $Lw$) are specially important, compared to spatially-uncoupled simulations. They are defined as $Lw = \Delta S_{sat}$, the variation in water content derived from the balance between saturated soil lateral inputs and outputs:
+where the terms were defined in \@ref(soilwaterbalance). Here, the lateral flows (i.e. $Lw$) are specially important, compared to spatially-uncoupled simulations. They are defined as $Lw = \Delta S_{lat}$, the variation in water content derived from the balance between soil lateral inputs and outputs:
 \begin{equation}
-Lw = \Delta S_{sat} = S_{sat, in} - S_{sat, out}
+Lw = \Delta S_{lat} = S_{lat, in} - S_{lat, out}
 \end{equation}
 3. Variations in the aquifer water content of a cell are summarized by:
 \begin{equation}
@@ -92,12 +93,12 @@ where $\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}+\Delta{\hat{V}_{soil}}+\De
 For every day to be simulated, the model performs the following steps:
 
  1. Calculation of soil and groundwater hydraulic heads for each cell (see \@ref(subsurfaceflows)).
- 2. Calculation of soil and groundwater lateral flows between adjacent cells, according to hydraulic gradients (see \@ref(subsurfaceflows)).
- 3. Apply changes in cell soil moisture content due to soil lateral flows (i.e. determine $\Delta{S_{sub}}$ for each cell), including the possibility of a return flow to the surface if the soil becomes saturated (i.e. saturation excess flow).
- 4. Apply changes in cell aquifer water content, including the possibility of discharge from the aquifer to the soil and a saturation excess flow (eq. \@ref(eq:cellaquiferwaterbalanceequation)).
- 5. Determine remaining cell flows by processing watershed cells in order of decreasing elevation (i.e. cells at higher elevation are processed before cells at lower elevation). For each cell to be processed:
-    a. For *wildland* or *agriculture* cells, determine snow-pack dynamics, rainfall interception loss, infiltration and runoff, transpiration, soil evaporation processes as described in \@ref(basicwaterbalancescheduling), while including saturation excess flow as well as potential runon ($Ro$) from upslope cells as additional water inputs. For *rock* and *artificial* cells, snow pack dynamics is still processed in these cells, but all runon or rainfall input becomes runoff to be passed downhill, and when the level of the aquifer reaches the surface any discharge also becomes runoff. In the case of *water* cells, snow pack dynamics is also processed, but evaporation from the water surface is not modelled. All liquid water inputs are poured onto the aquifer water content, and runoff can still occur when the aquifer reaches the surface.
-    b. Distribute surface runoff among cells downhill (\@ref(overlandflows)). If a cell does not have downhill neighbors (i.e outlet cell) its runoff becomes water exported from the watershed.
+ 2. Calculation of subsurface and groundwater lateral flows between adjacent cells, according to hydraulic gradients (see \@ref(subsurfaceflows)).
+ 3. Determine the balance of subsurface lateral flows (i.e. determine $\Delta{S_{lat}}$) for each cell.
+ 4. Apply changes in cell aquifer water content due to the balance of groundwater lateral flows ($\Delta{S_{base}}$ in eq. \@ref(eq:cellaquiferwaterbalanceequation)).
+ 5. Determine vertical cell flows by processing watershed cells (sequentially or in parallel), while accounting for subsurface flows and changes in the groundwater level, which complete eqs.  \@ref(eq:cellsnowpackwaterbalanceequation) and \@ref(eq:cellsoilwaterbalanceequation). For *wildland* or *agriculture* cells, determine snow-pack dynamics, rainfall interception loss, infiltration, saturation excess, capillarity rise, deep drainage and transpiration, soil evaporation processes as described in \@ref(basicwaterbalancescheduling). For *rock* and *artificial* cells, snow pack dynamics is still processed in these cells, but all rainfall input or snow melt becomes runoff to be passed downhill. In the case of *water* cells, snow pack dynamics are still processed, but all liquid water (from rain or snow melt) is poured (as deep drainage) down to the aquifer below.
+6. Distribute overland flows among cells downhill (\@ref(overlandflows)). If a cell does not have downhill neighbors (i.e outlet cell) its runoff becomes water exported from the watershed (\@ref(watershedexport)).
+7. Apply vertical flows between soils and the aquifer below, i.e. deep drainage and capillarity rise, to the water balance of the aquifer, completing eq. \@ref(eq:cellaquiferwaterbalanceequation).
 
 
 ## Inputs and outputs
@@ -106,7 +107,7 @@ For every day to be simulated, the model performs the following steps:
 
 Hydrological distributed models demand large amounts of data, information and parameters in order to accurately represent the spatial variability of the main hydrological processes and weather inputs. As mentioned in design principles, watersheds are described in raster (i.e. gridded) mode, each cell representing a patch of vegetation (or another land cover) in a catchment. Rasters do not need to be (should not be) complete, since the model is intended to be used on individual catchments with defined boundaries. 
 
-Given a set of grid cells representing the watershed at a given spatial resolution, input data for `spwb_land()` and `growth_land()` should be specified using `sf` objects. These were described in section \@ref(medfatelandstructures).
+Given a set of grid cells representing the watershed at a given spatial resolution, input data for `spwb_land()` and `growth_land()` should be specified using `sf` objects. These were described in section \@ref(medfatelandstructures). Each row in the `sf` object has to correspond to a single raster cell, but there can be raster cells that are not described in the `sf` object and, hence, correspond to empty cells.
 
 ### Watershed meteorology input
 
@@ -122,11 +123,11 @@ Distributed hydrological models suffer from the need to specify many parameters.
 
   Our model follows Frances et al. [-@Frances2007] in that correction factors are defined for three hydraulic parameters with spatial variation across the watershed:
   
-  + $K_{drain}$ vertical saturated soil conductivity for deep drainage.
-  + $K_{sat}$ horizontal saturated soil conductivity for soil lateral flows.
-  + $K_{base}$ bedrock conductivity for groundwater lateral flows.
+  + $K_{sat, vert}$ saturated soil conductivity for vertical fluxes into, within and out of the soil.
+  + $K_{sat, lat}$ saturated soil conductivity for soil lateral (horizontal) fluxes.
+  + $K_{sat, base}$ bedrock conductivity for groundwater lateral flows.
 
-The effective model parameter for each of these is defined for the spatial (depending on the grid resolution) and temporal (daily) scales of the model. Each effective parameter is split into the input value, assumed to have been estimated at a given spatial and temporal scale, and the corresponding correction factor, i.e. $R_{drain}$, $R_{sat}$ and $R_{base}$. The values for these correction factors should be the target of calibration procedures, assuming that the spatial heterogeneity of effective parameters is adequately covered by the soil and bedrock spatial inputs.
+The effective model parameter for each of these is defined for the spatial (depending on the grid resolution) and temporal (daily) scales of the model. Parameters $K_{sat, vert}$ and $K_{sat, lat}$ are split into the input soil saturated conductivity value $K_{sat}$ (in the case of $K_{sat, lat}$, that corresponding to the topsoil), assumed to have been estimated at a given spatial and temporal scale, and the corresponding correction factor, i.e. $R_{vert}$ or $R_{lat}$. Analogously, $K_{sat, base}$ is split between an input bedrock conductivity value ($K_{bedrock}$, supplied as `bedrock_conductivity` layer) and the correction factor $R_{base}$. The values for these correction factors should be the target of calibration procedures, assuming that the spatial heterogeneity of effective parameters is adequately covered by the soil and bedrock spatial inputs.
   
 ### Model outputs {#watershedbalanceoutput}
 
@@ -135,10 +136,10 @@ Distributed hydrological models can produce very detailed spatial and temporal o
 
 | Element | Description                                                |
 |---------|------------------------------------------------------------|
-| `sf`| An object of class `sf` containing the geometries, final state and temporal summary for each of the landscape cells (values in mm/day, mm/week, mm/month or mm/year depending on summary frequency).|
-| `watershed_balance`| Data frame with spatially-averaged (over watershed cells) components of the water balance corresponding to each temporal summary (values in mm/day, mm/week, mm/month or mm/year depending on summary frequency). |
-| `watershed_soil_balance`| Spatially-averaged (over watershed cells) components of the water balance, including only cells that have defined soils (i.e. *wildland* and *agriculture* cells), corresponding to each temporal summary (values in mm/day, mm/week, mm/month or mm/year depending on summary frequency). |
-| `daily_runoff` | A matrix with daily runoff (in m3/day) at each of the outlet cells of the landscape. |
+| `sf`| An object of class `sf` containing the geometries, final state and temporal summary for each of the landscape cells (values in mm/day, mm/week, mm/month or mm/year depending on summary frequency). Additionally, it can contain full water balance simulation results for specific cells targetted by the user. |
+| `watershed_balance`| Data frame with spatially-averaged (over all watershed cells) components of the daily water balance. |
+| `watershed_soil_balance`|  Data frame with spatially-averaged components of the daily water balance, including only cells that have defined soils (i.e. *wildland* and *agriculture* cells). |
+| `outlet_export_m3` | A matrix with daily runoff (in m3/day) at each of the outlet cells of the landscape. |
 
 ## Process details {#watershedbalancedetails}
 
@@ -146,43 +147,46 @@ Distributed hydrological models can produce very detailed spatial and temporal o
 
 Both soil saturated lateral flow and groundwater lateral flow follow the saturated subsurface flow model of Wigmosta et al. [-@Wigmosta1994], which is based on a kinematic wave approximation. Each grid cell can exchange water with its eight adjacent neighbors. Local hydraulic gradients are approximated by local ground surface slopes, so that each cell will generally receive water from its upslope neighbors and discharge to its downslope neighbors. The rate of saturated flow from cell $i$ to its downgradient neighbors is equal to [@Wigmosta1999]:
 \begin{eqnarray}
-q_{ij} &=& - T_{i}\cdot \tan(\beta_{i,j})\cdot w_j \;\; \beta_{i,j} < 0\\
-q_{ij} &=& 0 \;\; \beta_{i,j} \geq 0 
+q_{ij} &=& - T_{i}\cdot \tan(\beta_{i,j})\cdot w_j \;\;\; \beta_{i,j} < 0\\
+q_{ij} &=& 0 \;\;\; \beta_{i,j} \geq 0 
 \end{eqnarray}
-where $q_{i,k}$ is the flow rate from cell $i$ in the direction towards neighbor $j$, $T_{i}$ is the transmissivity at cell $i$, $\beta_{i,j}$ is the water table slope in the direction of $j$. The transmissivity function for soil saturated lateral flow in cell $i$ ($T_{sat,i}$) is specified using:
+where $q_{i,k}$ is the flux rate (in $m3/day$) from cell $i$ in the direction towards neighbor $j$, $T_{i}$ is the transmissivity (in $m2/day$) at cell $i$, $\beta_{i,j}$ is the water table slope in the direction of $j$ and $w_j$ is the width (in $m$) of cell $j$. The transmissivity function for soil saturated lateral flow in cell $i$ ($T_{lat,i}$) is specified using:
 \begin{equation}
-T_{sat,i} = \frac{R_{sat}\cdot K_{sat,i} \cdot Z_{soil,i}}{n_{sat}} \cdot (1 - Z_{wt,i}/Z_{soil,i})^{n_{sat}}
+T_{sat,i} = \frac{R_{lat}\cdot K_{sat,i} \cdot Z_{soil,i}}{n_{lat}} \cdot (1 - Z_{sat,i}/Z_{soil,i})^{n_{lat}}
 \end{equation}
-where $K_{sat,i}$ is the saturated conductivity of the first (top) soil layer in cell $i$, $Z_{soil,i}$ is the soil depth at cell $i$, $Z_{wt,i}$ is the water table depth at cell $i$ and $n_{sat}$ is a power exponent. $R_{sat}$ is a correction factor (a watershed parameter) for the fact that $K_{sat,i}$ is assessed from soil samples, whereas the parameter in the model is defined at the scale of a grid cell [@Frances2007]. The transmissivity function for groundwater lateral flow in cell $i$ ($T_{base,i}$) is analogous: 
+where $K_{sat,i}$ is the saturated conductivity of the first (top) soil layer in cell $i$, $Z_{soil,i}$ is the soil depth at cell $i$, $Z_{sat,i}$ is the depth of saturated water at cell $i$ (see \@ref(watercontent)) and $n_{lat} = 3$ is a power exponent. $R_{lat}$ is the correction factor (a watershed parameter) for the fact that $K_{sat,i}$ is assessed from soil samples, whereas the parameter in the model is defined at the scale of a grid cell [@Frances2007], as explained above. 
+
+The transmissivity function for groundwater lateral flow in cell $i$ ($T_{base,i}$) is analogous: 
 \begin{equation}
-T_{base,i} = \frac{R_{base}\cdot K_{base,i} \cdot Z_{bedrock,i}}{n_{base}} \cdot (1 - Z_{aquifer,i}/Z_{bedrock,i})^{n_{base}}
+T_{base,i} = \frac{R_{base}\cdot K_{bedrock,i} \cdot Z_{bedrock,i}}{n_{base}} \cdot (1 - Z_{aquifer,i}/Z_{bedrock,i})^{n_{base}}
 \end{equation}
-where $K_{base,i}$ is the bedrock conductivity at cell $i$, $Z_{bedrock,i}$ is the depth of the unaltered bedrock, $Z_{aquifer,i}$ is the depth of the aquifer water table and $n_{base}$ is again a power exponent.
+where $K_{bedrock,i}$ is the bedrock conductivity at cell $i$, $R_{base}$ is the correction factor for base flows, $Z_{bedrock,i}$ is the depth of the unaltered bedrock, $Z_{aquifer,i}$ is the depth of the aquifer water table and $n_{base} = 3$ is again a power exponent.
 
 Saturated lateral flow inputs and outputs for a given cell $i$ are balanced to determine increase or decrease in soil moisture:
 \begin{equation}
-\Delta{S_{sat,i}} = \sum_{j}{q_{sat, ji}} - \sum_{j}{q_{sat, ij}}
+\Delta{S_{lat,i}} = S_{lat, in} - S_{lat, out} = \sum_{j}{q_{lat, ji}} - \sum_{j}{q_{lat, ij}}
 \end{equation}
 and the same occurs for groundwater lateral flows and aquifer balance:
 \begin{equation}
-\Delta{S_{base,i}} = \sum_{j}{q_{base, ji}} - \sum_{j}{q_{base, ij}}
+\Delta{S_{base,i}} = S_{base, in} - S_{base, out} = \sum_{j}{q_{base, ji}} - \sum_{j}{q_{base, ij}}
 \end{equation}
 
 ### Overland flows {#overlandflows}
-To simulate surface runoff routing from one cell to the other, the approach of @Ostendorf1993 is used, as in SIERRA [@Mouillot2001]. Overland water lateral transport for a given day occurs instantaneously (i.e. no velocities are calculated) and depends on topography only. The model determines cell neighbors following the queen rule (up to eight neighbors per cell). The proportion of surface water runoff of cell $i$ that will be added to the infiltration input (runon) of a neighboring cell $j$ is @Ostendorf1993:
+
+To simulate surface runoff routing from one cell to the other, the approach of @Ostendorf1993 is used, as in SIERRA [@Mouillot2001]. Overland water lateral transport for a given day occurs instantaneously (i.e. no velocities are calculated) and depends on topography only. The model determines cell neighbors following the queen rule (up to eight neighbors per cell). The proportion of surface water runoff of cell $i$ that will be added to the input (runon) of a neighboring cell $j$ is @Ostendorf1993:
 \begin{equation}
 q_{ij} = \frac{\Delta z_{ij}/L_{ij}}{\sum_{j}{\Delta z_{ij}/L_{ij}}}
 \end{equation}
 if $\Delta z_{ij} = z_i - z_j > 0$, that is, if the difference in elevation between the two cells is positive (i.e. if $z_j < z_i$). Otherwise there is no overland transport from $i$ to $j$, i.e. $q_{ij} = 0$. $L_{ij}$ indicates the distance between cell $i$ and $j$ (which depends on cell size and on whether the neighboring cell $j$ is diagonal to cell $i$). The summation of the denominator is done only for neighbors at lower elevation, so that $\sum_{i}{q_{ij}} = 1$. The table of $q_{ij}$ values is calculated when initializing distributed watershed objects.
 
-Every day, cells are processed in order from higher to lower elevation. After the daily water balance of a given cell $i$, water runoff $Ru_i$ is divided among the neighboring cells at lower elevation. The runon of a neighbor $j$, $Ro_j$ is updated as:
+Every day, cells are processed in order from higher to lower elevation. For a given cell $i$, runoff is defined as the sum of local balance runoff $Ru_i$ (which includes infiltration excess and saturation excess) and aquifer exfiltration ($Exf_i$). This runoff is divided among the neighboring cells at lower elevation. The runon of a neighbor $j$, $Ro_j$ is updated as:
 
 \begin{equation}
-Ro_j = Ro_j + Ru_i \cdot q_{ij}
+Ro_j = Ro_j + (Ru_i + Exf_i) \cdot q_{ij}
 \end{equation}
 
 Note that a given cell $j$ can receive overland flow from more than one neighbor. 
 
-### Watershed runoff
+### Watershed surface runoff {#watershedexport}
 
-A special situation arises when processing cells that do not have downhill neighbors defined (i.e. where $q_{ij} = 0$ for all $j$), either because they are in flat surfaces or at the watershed boundary. In both cases, these cells should correspond to water bodies or streams connecting to the catchment outlet. Hence, these cells are called *outlet cells* in the model, and the runoff they generate becomes watershed runoff.
+A special situation arises when processing cells that do not have downhill neighbors defined (i.e. where $q_{ij} = 0$ for all $j$), either because they are in flat surfaces or at the watershed boundary. In both cases, these cells should correspond to water bodies or streams connecting to the catchment outlet. Hence, these cells are called *outlet cells* in the model, and the runoff they generate contributes to watershed runoff exported ($Exp$), which is assumed to reach river channels.
