@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-04-15" />
+<meta name="date" content="2024-04-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -735,7 +735,7 @@ div.csl-indent {
 <p>This chapter describes the distributed watershed water balance sub-model implemented in functions <code>spwb_land()</code>, <code>growth_land()</code> and <code>fordyn_land()</code> of package <strong>medfateland</strong> (Fig. <a href="intro.html#fig:designmedfateland">1.3</a>).</p>
 <div id="design-principles-1" class="section level2 hasAnchor" number="19.1">
 <h2><span class="header-section-number">19.1</span> Design principles<a href="watershedhydrology.html#design-principles-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Watersheds are described in raster (i.e. gridded) mode, each cell representing a patch of vegetation (or another land cover) in a catchment. Land cover types are:</p>
+<p>Watersheds are described in raster (i.e. gridded) mode, each cell representing a patch of vegetation (or another land cover) in a catchment. Five land cover types are allowed:</p>
 <ol style="list-style-type: lower-alpha">
 <li><em>wildland</em>: forests, shrublands or grasslands.</li>
 <li><em>agriculture</em>: agricultural lands.</li>
@@ -743,14 +743,14 @@ div.csl-indent {
 <li><em>artificial</em>: urban areas.</li>
 <li><em>water</em>: water bodies.</li>
 </ol>
-<p>Watershed water balance simulations extend the simulation of soil water balance to the landscape scale. Hence, the design of most vertical hydrological processes is the same as those of forest water balance. However, additional water compartments and processes are represented in watershed water balance simulations. Each cell in the watershed may include the following: a snow-pack compartment, one or several soil layers (including a rocky layer down to several meters depth), and a groundwater compartment assumed to be beyond the reach of plant roots. Similar to other models such as TETIS <span class="citation">(<a href="#ref-Frances2007">Francés <em>et al.</em> 2007</a>)</span>, three lateral flows are considered between adjacent cells:</p>
+<p>Watershed water balance simulations extend the simulation of soil water balance to the landscape scale. Hence, the design of most vertical hydrological processes is the same as those of forest water balance. However, additional water compartments and processes are represented in watershed water balance simulations. Each cell in the watershed may include the following: a snow-pack compartment, one or several soil layers (including a rocky layer down to several meters depth), and a groundwater compartment normally beyond the reach of plant roots for most landscape cells. Similar to other models such as TETIS <span class="citation">(<a href="#ref-Frances2007">Francés <em>et al.</em> 2007</a>)</span>, three lateral flows are considered between adjacent cells:</p>
 <ol style="list-style-type: lower-roman">
 <li>Overland surface flows from upper elevation cells.</li>
 <li>Lateral saturated soil flows (i.e. interflow) between adjacent cells.</li>
 <li>Lateral groundwater flow (i.e. baseflow) between adjacent cells.</li>
 </ol>
-<p>Overland surface flows are modeled following T-HYDRO <span class="citation">Ostendorf &amp; Reynolds (<a href="#ref-Ostendorf1993">1993</a>)</span>. Subsurface flows, including both soil saturated flow and groundwater flow, are modeled following the kinematic wave approach of DSHVM <span class="citation">Wigmosta <em>et al.</em> (<a href="#ref-Wigmosta1994">1994</a>)</span>.</p>
-<p>Split-parameter parametrization following <span class="citation">Francés <em>et al.</em> (<a href="#ref-Frances2007">2007</a>)</span>.</p>
+<p>Routing of overland surface flows is modeled following T-HYDRO <span class="citation">Ostendorf &amp; Reynolds (<a href="#ref-Ostendorf1993">1993</a>)</span>. Subsurface flows, including both soil saturated flow and groundwater flow, are modeled following the kinematic wave approximation of DSHVM <span class="citation">Wigmosta <em>et al.</em> (<a href="#ref-Wigmosta1994">1994</a>)</span>.</p>
+<p>Split-parameter parametrization, following <span class="citation">Francés <em>et al.</em> (<a href="#ref-Frances2007">2007</a>)</span>, allows reducing the parameters to be calibrated for practical applications.</p>
 </div>
 <div id="statevariableswatershed" class="section level2 hasAnchor" number="19.2">
 <h2><span class="header-section-number">19.2</span> State variables<a href="watershedhydrology.html#statevariableswatershed" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -758,9 +758,9 @@ div.csl-indent {
 <ul>
 <li><span class="math inline">\(W_s\)</span>, the proportion of soil moisture in relation to field capacity for each soil layer <span class="math inline">\(s\)</span> in the cell.</li>
 <li><span class="math inline">\(S_{snow}\)</span> the snow water equivalent (mm) of the snow pack storage over the cell surface.</li>
-<li><span class="math inline">\(S_{aquifer}\)</span> the water content (mm) in the cell’s aquifer beyond the reach of plant roots.</li>
+<li><span class="math inline">\(S_{aquifer}\)</span> the water content (mm) of the cell’s aquifer lying over the undisturbed bedrock.</li>
 </ul>
-<p>Additional cell state variables in <em>wildland</em> cells concern the water status (or other state variables) of plant cohorts in the cell, and they were described in chapters <a href="basicwaterbalance.html#basicwaterbalance">3</a> and <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>. In the case of cells of other land cover types (i.e. <em>rock</em>, <em>artificial</em> or <em>water</em>) soils are not defined, and neither are soil state variables.</p>
+<p>Additional cell state variables in <em>wildland</em> cells concern the water status (or other state variables) of plant cohorts in the cell, and they were described in chapters <a href="basicwaterbalance.html#basicwaterbalance">3</a> and <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>. In the case of cells of other land cover types (i.e. <em>rock</em>, <em>artificial</em> or <em>water</em>) soils are not defined, and neither are soil state variables. In this case, only <span class="math inline">\(S_{snow}\)</span> and <span class="math inline">\(S_{aquifer}\)</span> are defined.</p>
 </div>
 <div id="watershedbalance" class="section level2 hasAnchor" number="19.3">
 <h2><span class="header-section-number">19.3</span> Water balance<a href="watershedhydrology.html#watershedbalance" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -769,19 +769,27 @@ div.csl-indent {
 <h3><span class="header-section-number">19.3.1</span> Cell level water balance<a href="watershedhydrology.html#cell-level-water-balance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>At the cell level, daily variations in water content can occur in the <em>snowpack</em>, <em>soil</em> or <em>groundwater</em> compartments:</p>
 <ol style="list-style-type: decimal">
-<li>Variations in snowpack water equivalent content follows eq. <a href="basicwaterbalance.html#eq:snowbalanceequation">(3.1)</a>.</li>
-<li>Variations in soil water content (<span class="math inline">\(\Delta{V_{soil}}\)</span>) need to account for additional flows and are summarized as (compare to <a href="basicwaterbalance.html#eq:basicwaterbalanceequation">(3.3)</a>):
-<span class="math display" id="eq:cellsoilwaterbalanceequation">\[\begin{equation}
-  \Delta{V_{soil}} = Pr + Sm + Ro + Ad - In - Ru - Dd - Es - Tr + \Delta{S_{sat}}
-  \tag{19.1}
-  \end{equation}\]</span>
-where <span class="math inline">\(Pr\)</span> is precipitation as rainfall, <span class="math inline">\(Sm\)</span> is snowmelt, <span class="math inline">\(Ro\)</span> is surface <em>runon</em> water entering the cell from neighboring cells at higher elevation, <span class="math inline">\(Ad\)</span> is aquifer discharge, <span class="math inline">\(In\)</span> is rainfall interception loss, <span class="math inline">\(Ru\)</span> is cell surface runoff, <span class="math inline">\(Dd\)</span> is deep drainage towards the aquifer, <span class="math inline">\(Es\)</span> is soil evaporation, <span class="math inline">\(Tr\)</span> is plant transpiration and <span class="math inline">\(\Delta{S_{sat}}\)</span> is the variation in soil water content derived from the balance between saturated soil lateral inputs and outputs.</li>
+<li>Variations in snowpack water equivalent content follows the balance between snowfall (<span class="math inline">\(Ps\)</span>) and snow melt (<span class="math inline">\(Sm\)</span>) eq. <a href="basicwaterbalance.html#eq:snowbalanceequation">(3.1)</a>:
+<span class="math display">\[\begin{equation}
+\Delta{S_{snow}} = Ps - Sm
+\end{equation}\]</span></li>
+<li>Variations in soil water content (<span class="math inline">\(\Delta{V_{soil}}\)</span>) follow <a href="basicwaterbalance.html#eq:basicwaterbalanceequation">(3.3)</a>:
+<span class="math display">\[\begin{equation}
+\Delta{V_{soil}} = (If + Lw + Cr) - (Dd + Se + Es + Tr_{herb} + Tr_{woody})
+\end{equation}\]</span>
+where the terms were defined in <a href="basicwaterbalance.html#soilwaterbalance">3.3</a>. Here, the lateral flows (i.e. <span class="math inline">\(Lw\)</span>) are specially important, compared to spatially-uncoupled simulations. They are defined as <span class="math inline">\(Lw = \Delta S_{sat}\)</span>, the variation in water content derived from the balance between saturated soil lateral inputs and outputs:
+<span class="math display">\[\begin{equation}
+Lw = \Delta S_{sat} = S_{sat, in} - S_{sat, out}
+\end{equation}\]</span></li>
 <li>Variations in the aquifer water content of a cell are summarized by:
 <span class="math display" id="eq:cellaquiferwaterbalanceequation">\[\begin{equation}
-  \Delta{S_{aquifer}} = Dd - Ad - \Delta{S_{base}}
-  \tag{19.2}
+  \Delta{S_{aquifer}} = Dd - Cr - Exf - \Delta{S_{base}}
+  \tag{19.1}
 \end{equation}\]</span>
-where <span class="math inline">\(\Delta{S_{base}}\)</span> is the variation in water content of the aquifer derived from the balance between groundwater lateral inputs and outputs.</li>
+where <span class="math inline">\(Dd\)</span> is deep drainage from the above-lying soil, <span class="math inline">\(Cr\)</span> is capillary rise into the above-lying soil, <span class="math inline">\(Exf\)</span> is the aquifer exfiltration (ocurring when the water table reaches the soil surface), and <span class="math inline">\(\Delta{S_{base}}\)</span> is the variation in water content of the aquifer derived from the balance between groundwater lateral inputs and outputs.
+<span class="math display">\[\begin{equation}
+\Delta S_{base} = S_{base, in} - S_{base, out}
+\end{equation}\]</span></li>
 </ol>
 </div>
 <div id="watershed-water-balance" class="section level3 hasAnchor" number="19.3.2">
@@ -795,18 +803,18 @@ where <span class="math inline">\(\Delta{S_{base}}\)</span> is the variation in 
 where <span class="math inline">\(\hat{Ps}\)</span> and <span class="math inline">\(\hat{Sm}\)</span> are the average snow fall and snow melt over cells.</li>
 <li>Changes in the average soil moisture (<span class="math inline">\(\Delta{\hat{V}_{soil}}\)</span>) are the result of pooling soil inputs and outputs over cells, which yields:
 <span class="math display">\[\begin{equation}
-\Delta{\hat{V}_{soil}} = \hat{Pr} + \hat{Sm} + \hat{Ad} + \hat{Ro} - \hat{Ru} - \hat{In} - \hat{Dd} - \hat{Es} - \hat{Tr}
+\Delta{\hat{V}_{soil}} = (\hat{If} + \hat{Cr}) - (\hat{Dd} + \hat{Se} + \hat{Es} +  \hat{Tr}_{woody} + \hat{Tr}_{herb})
 \end{equation}\]</span>
-where <span class="math inline">\(\hat{Pr}\)</span>, <span class="math inline">\(\hat{Ad}\)</span>, <span class="math inline">\(\hat{Ro}\)</span>, <span class="math inline">\(\hat{Ru}\)</span>, <span class="math inline">\(\hat{In}\)</span>, <span class="math inline">\(\hat{Dd}\)</span>, <span class="math inline">\(\hat{Es}\)</span> and <span class="math inline">\(\hat{Tr}\)</span> are the average (over cells) of precipitation (including rain and snow), aquifer discharge, lateral surface water input (runon), runoff, rainfall interception loss, deep drainage, soil evaporation and plant transpiration, respectively. Lateral saturated soil flows are not included as they cancel out at the watershed level.</li>
-<li>Changes in the average of cell aquifer water content (<span class="math inline">\(\Delta{\hat{S}_{aquifer}}\)</span>) are the result of balancing deep drainage (<span class="math inline">\(Dd\)</span>) from soils and aquifer discharge (<span class="math inline">\(Ad\)</span>):
+where <span class="math inline">\(\hat{If}\)</span>, <span class="math inline">\(\hat{Cr}\)</span>, <span class="math inline">\(\hat{Dd}\)</span>, <span class="math inline">\(\hat{Se}\)</span>, <span class="math inline">\(\hat{Es}\)</span>, <span class="math inline">\(\hat{Tr}_{woody}\)</span> and <span class="math inline">\(\hat{Tr}_{herb}\)</span> are the average (over cells) of infiltration, capillary rise, soil evaporation, plant transpiration and herb transpiration, respectively. Lateral saturated soil flows are not included as they cancel out at the watershed level.</li>
+<li>Changes in the average of cell aquifer water content (<span class="math inline">\(\Delta{\hat{S}_{aquifer}}\)</span>) are the result of balancing deep drainage (<span class="math inline">\(Dd\)</span>) from soils, capillarity rise to soils (<span class="math inline">\(Cr\)</span>) and aquifer exfiltration (<span class="math inline">\(Exf\)</span>):
 <span class="math display">\[\begin{equation}
-  \Delta{\hat{S}_{aquifer}} = \hat{Dd} - \hat{Ad}
+  \Delta{\hat{S}_{aquifer}} = \hat{Dd} - \hat{Cr} - \hat{Exf}
 \end{equation}\]</span></li>
 <li>If we integrate the three water compartments, water balance at the watershed level is given by:
 <span class="math display">\[\begin{equation}
-  \Delta{S_{watershed}} = \hat{Pr} - \hat{In} - \hat{Es} - \hat{Tr} - \hat{Ex}
+  \Delta{S_{watershed}} = \hat{Pr} - (\hat{In} + \hat{Es} + \hat{Tr}_{woody} + \hat{Tr}_{herb}) - \hat{Exp}
 \end{equation}\]</span>
-where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}+\Delta{\hat{V}_{soil}}+\Delta{\hat{S}_{aquifer}}\)</span> is the change in water content in the watershed and <span class="math inline">\(\hat{Ex}\)</span> is the water exported as runoff from cells without neighbors (i.e. catchment outlet cells).</li>
+where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}+\Delta{\hat{V}_{soil}}+\Delta{\hat{S}_{aquifer}}\)</span> is the change in water content in the watershed and <span class="math inline">\(\hat{Exp}\)</span> is the water exported as runoff from cells without neighbors (i.e. catchment outlet cells).</li>
 </ol>
 </div>
 </div>
@@ -817,7 +825,7 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 <li>Calculation of soil and groundwater hydraulic heads for each cell (see <a href="watershedhydrology.html#subsurfaceflows">19.6.1</a>).</li>
 <li>Calculation of soil and groundwater lateral flows between adjacent cells, according to hydraulic gradients (see <a href="watershedhydrology.html#subsurfaceflows">19.6.1</a>).</li>
 <li>Apply changes in cell soil moisture content due to soil lateral flows (i.e. determine <span class="math inline">\(\Delta{S_{sub}}\)</span> for each cell), including the possibility of a return flow to the surface if the soil becomes saturated (i.e. saturation excess flow).</li>
-<li>Apply changes in cell aquifer water content, including the possibility of discharge from the aquifer to the soil and a saturation excess flow (eq. <a href="watershedhydrology.html#eq:cellaquiferwaterbalanceequation">(19.2)</a>).</li>
+<li>Apply changes in cell aquifer water content, including the possibility of discharge from the aquifer to the soil and a saturation excess flow (eq. <a href="watershedhydrology.html#eq:cellaquiferwaterbalanceequation">(19.1)</a>).</li>
 <li>Determine remaining cell flows by processing watershed cells in order of decreasing elevation (i.e. cells at higher elevation are processed before cells at lower elevation). For each cell to be processed:
 <ol style="list-style-type: lower-alpha">
 <li>For <em>wildland</em> or <em>agriculture</em> cells, determine snow-pack dynamics, rainfall interception loss, infiltration and runoff, transpiration, soil evaporation processes as described in <a href="basicwaterbalance.html#basicwaterbalancescheduling">3.4</a>, while including saturation excess flow as well as potential runon (<span class="math inline">\(Ro\)</span>) from upslope cells as additional water inputs. For <em>rock</em> and <em>artificial</em> cells, snow pack dynamics is still processed in these cells, but all runon or rainfall input becomes runoff to be passed downhill, and when the level of the aquifer reaches the surface any discharge also becomes runoff. In the case of <em>water</em> cells, snow pack dynamics is also processed, but evaporation from the water surface is not modelled. All liquid water inputs are poured onto the aquifer water content, and runoff can still occur when the aquifer reaches the surface.</li>
