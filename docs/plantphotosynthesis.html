@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 11 Leaf/canopy photosynthesis | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.38 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.39 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 11 Leaf/canopy photosynthesis | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-04-16" />
+<meta name="date" content="2024-04-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -369,7 +369,7 @@ div.csl-indent {
 <li class="chapter" data-level="10.5" data-path="planthydraulics.html"><a href="planthydraulics.html#hydraulicssureau"><i class="fa fa-check"></i><b>10.5</b> Sureau’s sub-model of plant hydraulics</a>
 <ul>
 <li class="chapter" data-level="10.5.1" data-path="planthydraulics.html"><a href="planthydraulics.html#constitutive-equations"><i class="fa fa-check"></i><b>10.5.1</b> Constitutive equations</a></li>
-<li class="chapter" data-level="10.5.2" data-path="planthydraulics.html"><a href="planthydraulics.html#plant-and-soil-conductances"><i class="fa fa-check"></i><b>10.5.2</b> Plant and soil conductances</a></li>
+<li class="chapter" data-level="10.5.2" data-path="planthydraulics.html"><a href="planthydraulics.html#conductancessureau"><i class="fa fa-check"></i><b>10.5.2</b> Plant and soil conductances</a></li>
 <li class="chapter" data-level="10.5.3" data-path="planthydraulics.html"><a href="planthydraulics.html#plant-capacitances"><i class="fa fa-check"></i><b>10.5.3</b> Plant capacitances</a></li>
 <li class="chapter" data-level="10.5.4" data-path="planthydraulics.html"><a href="planthydraulics.html#cavitation-flows"><i class="fa fa-check"></i><b>10.5.4</b> Cavitation flows</a></li>
 <li class="chapter" data-level="10.5.5" data-path="planthydraulics.html"><a href="planthydraulics.html#transpiration-flows"><i class="fa fa-check"></i><b>10.5.5</b> Transpiration flows</a></li>
@@ -752,6 +752,7 @@ g_{Ha} &amp;=&amp; 0.189 \cdot (u_{leaf}/d)^{0.5}
 where <span class="math inline">\(u_{leaf}\)</span> is the leaf-level wind speed (in <span class="math inline">\(m \cdot s^{-1}\)</span>) and <span class="math inline">\(d\)</span> is 0.72 times the leaf width (species parameter <code>LeafWidth</code> in <span class="math inline">\(cm\)</span>). As before, <span class="math inline">\(u_{leaf}\)</span> corresponds to <span class="math inline">\(u_j\)</span>, the wind-speed at the canopy layer <span class="math inline">\(j\)</span> where the leaf is located (see <a href="windextinction.html#windextinctionprofile">23.2</a>).</p>
 <p>By inspecting eq. <a href="plantphotosynthesis.html#eq:leaftemperatureequation">(11.1)</a>, we can conclude that transpiration flow decreases leaf temperature, whereas radiation increases it and wind speed makes it more similar to the temperature of the surrounding air. The following figures illustrate the effect of varying wind speed and flow rate on <span class="math inline">\(T_{leaf}\)</span> for two contrasted leaf widths (see function <code>biophysics_leafTemperature</code>):</p>
 
+<pre><code>## Package &#39;meteoland&#39; [ver. 2.2.1]</code></pre>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:leaftemperaturewind"></span>
 <img src="medfatebook_files/figure-html/leaftemperaturewind-1.png" alt="Values of \(T_{leaf}\) for two leaf widths and varying values of wind speed and flow rate, calculated for 24ºC air temperature and 740 \(W \cdot m^{-2}\) instantaneous absorbed radiation (including SWR and LWR)." width="768" />
 <p class="caption">
@@ -780,10 +781,10 @@ e_{leaf} = e_{sat}(T_{leaf}) \cdot \exp\left\{\frac{2.17 \cdot \Psi_{leaf}}{T_{l
 \end{equation}\]</span>
 where <span class="math inline">\(e_{sat}(T)\)</span> is a function giving the saturated vapor pressure for temperature <span class="math inline">\(T\)</span> (see <a href="http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils">utility functions</a> of the <strong>meteoland</strong> reference manual). If a single-canopy energy balance is considered, the water vapor pressure of the air surrounding the leaf is taken as the average atmospheric water vapor pressure of the day, i.e. <span class="math inline">\(e_{air} = e_{atm}\)</span>. When a multi-layer canopy energy balance is simulated, <span class="math inline">\(e_{air}\)</span> will correspond to the water vapor pressure <span class="math inline">\(e_{air,j}\)</span> of the canopy layer <span class="math inline">\(j\)</span> where the leaf is located.</p>
 <p>Since <span class="math inline">\(e_{leaf}\)</span> decreases when leaf temperature decreases in eq. <a href="plantphotosynthesis.html#eq:leafvpequation">(11.3)</a>, increasing transpiration decreases leaf VPD as a result of decreasing leaf temperature. To illustrate this effect, let us assume the following values of relative humidity, yielding a <span class="math inline">\(e_{air} = e_{atm} =1.91\, kPa\)</span>:</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="plantphotosynthesis.html#cb57-1" tabindex="-1"></a>RHmin <span class="ot">=</span> <span class="dv">60</span></span>
-<span id="cb57-2"><a href="plantphotosynthesis.html#cb57-2" tabindex="-1"></a>RHmax <span class="ot">=</span> <span class="dv">75</span></span>
-<span id="cb57-3"><a href="plantphotosynthesis.html#cb57-3" tabindex="-1"></a>VPatm <span class="ot">=</span> meteoland<span class="sc">::</span><span class="fu">utils_averageDailyVP</span>(Tmin, Tmax, RHmin, RHmax)</span>
-<span id="cb57-4"><a href="plantphotosynthesis.html#cb57-4" tabindex="-1"></a>VPatm</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="plantphotosynthesis.html#cb59-1" tabindex="-1"></a>RHmin <span class="ot">=</span> <span class="dv">60</span></span>
+<span id="cb59-2"><a href="plantphotosynthesis.html#cb59-2" tabindex="-1"></a>RHmax <span class="ot">=</span> <span class="dv">75</span></span>
+<span id="cb59-3"><a href="plantphotosynthesis.html#cb59-3" tabindex="-1"></a>VPatm <span class="ot">=</span> meteoland<span class="sc">::</span><span class="fu">utils_averageDailyVP</span>(Tmin, Tmax, RHmin, RHmax)</span>
+<span id="cb59-4"><a href="plantphotosynthesis.html#cb59-4" tabindex="-1"></a>VPatm</span></code></pre></div>
 <pre><code>## [1] 1.912181</code></pre>
 <p>The application of the above equation to the <span class="math inline">\(T_{leaf}(\Psi_{leaf})\)</span> curves of fig. <a href="plantphotosynthesis.html#fig:leaftemperaturefunction">11.2</a> yields the following <span class="math inline">\(VPD_{leaf}(\Psi_{leaf})\)</span> curves:</p>
 
@@ -852,10 +853,10 @@ where <span class="math inline">\(c&#39;=0.98\)</span> is a curvature factor. Th
 A = g_{c} \cdot (C_{air}-C_i)
 \end{equation}\]</span>
 where <span class="math inline">\(C_{air}\)</span> is the <span class="math inline">\(CO_{2}\)</span> concentration (in <span class="math inline">\(\mu mol \cdot mol^{-1}\)</span>) in the air surrounding the leaf (beyond the leaf boundary layer). If a single-layer canopy energy balance is used then <span class="math inline">\(C_{air}=C_{atm}\)</span>, the atmospheric <span class="math inline">\(CO_{2}\)</span> concentration (see weather input and parameter in function <code>defaultControl()</code>), whereas if a multi-layer canopy energy balance is used <span class="math inline">\(C_{air}\)</span> corresponds to <span class="math inline">\(C_{air,j}\)</span>, the <span class="math inline">\(CO_2\)</span> concentration in the canopy layer <span class="math inline">\(j\)</span> where the leaf occurs, analogously to <span class="math inline">\(T_{air}\)</span> and <span class="math inline">\(e_{air}\)</span>. Combining the two equations for <span class="math inline">\(A\)</span> and finding the root of the resulting equation using Newton-Raphson method allows determining <span class="math inline">\(C_i\)</span> and therefore <span class="math inline">\(A\)</span>. Thus, after defining PAR photon flux density, atmosphere <span class="math inline">\(CO_{2}\)</span> concentration and maximum rate parameters:</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="plantphotosynthesis.html#cb59-1" tabindex="-1"></a>Q <span class="ot">=</span> <span class="dv">2000</span></span>
-<span id="cb59-2"><a href="plantphotosynthesis.html#cb59-2" tabindex="-1"></a>Catm <span class="ot">=</span> <span class="dv">386</span></span>
-<span id="cb59-3"><a href="plantphotosynthesis.html#cb59-3" tabindex="-1"></a>Vmax298 <span class="ot">=</span> <span class="dv">100</span></span>
-<span id="cb59-4"><a href="plantphotosynthesis.html#cb59-4" tabindex="-1"></a>Jmax298 <span class="ot">=</span> <span class="fl">1.67</span><span class="sc">*</span>Vmax298</span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="plantphotosynthesis.html#cb61-1" tabindex="-1"></a>Q <span class="ot">=</span> <span class="dv">2000</span></span>
+<span id="cb61-2"><a href="plantphotosynthesis.html#cb61-2" tabindex="-1"></a>Catm <span class="ot">=</span> <span class="dv">386</span></span>
+<span id="cb61-3"><a href="plantphotosynthesis.html#cb61-3" tabindex="-1"></a>Vmax298 <span class="ot">=</span> <span class="dv">100</span></span>
+<span id="cb61-4"><a href="plantphotosynthesis.html#cb61-4" tabindex="-1"></a>Jmax298 <span class="ot">=</span> <span class="fl">1.67</span><span class="sc">*</span>Vmax298</span></code></pre></div>
 <p>one can obtain the following <span class="math inline">\(A(\Psi_{leaf})\)</span> curves from <span class="math inline">\(T_{leaf}(\Psi_{leaf})\)</span> and <span class="math inline">\(g_{sw}(\Psi_{leaf})\)</span>:</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:leafphotosynthesisfunction"></span>

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 14 Day-level results | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.38 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.39 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 14 Day-level results | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-04-16" />
+<meta name="date" content="2024-04-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -369,7 +369,7 @@ div.csl-indent {
 <li class="chapter" data-level="10.5" data-path="planthydraulics.html"><a href="planthydraulics.html#hydraulicssureau"><i class="fa fa-check"></i><b>10.5</b> Sureau’s sub-model of plant hydraulics</a>
 <ul>
 <li class="chapter" data-level="10.5.1" data-path="planthydraulics.html"><a href="planthydraulics.html#constitutive-equations"><i class="fa fa-check"></i><b>10.5.1</b> Constitutive equations</a></li>
-<li class="chapter" data-level="10.5.2" data-path="planthydraulics.html"><a href="planthydraulics.html#plant-and-soil-conductances"><i class="fa fa-check"></i><b>10.5.2</b> Plant and soil conductances</a></li>
+<li class="chapter" data-level="10.5.2" data-path="planthydraulics.html"><a href="planthydraulics.html#conductancessureau"><i class="fa fa-check"></i><b>10.5.2</b> Plant and soil conductances</a></li>
 <li class="chapter" data-level="10.5.3" data-path="planthydraulics.html"><a href="planthydraulics.html#plant-capacitances"><i class="fa fa-check"></i><b>10.5.3</b> Plant capacitances</a></li>
 <li class="chapter" data-level="10.5.4" data-path="planthydraulics.html"><a href="planthydraulics.html#cavitation-flows"><i class="fa fa-check"></i><b>10.5.4</b> Cavitation flows</a></li>
 <li class="chapter" data-level="10.5.5" data-path="planthydraulics.html"><a href="planthydraulics.html#transpiration-flows"><i class="fa fa-check"></i><b>10.5.5</b> Transpiration flows</a></li>
@@ -775,11 +775,15 @@ A_{n,i} = \sum_{t=1}^{n_t} {A_{n,i,t}}
 </div>
 <div id="advanceddroughtstress" class="section level2 hasAnchor" number="14.3">
 <h2><span class="header-section-number">14.3</span> Plant drought stress<a href="daylevelresults.html#advanceddroughtstress" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>In order to have an estimate of daily drought stress for the plant cohort, the model uses the stem vulnerability curve of the plant to find the conductance relative to maximum stem conductance and turns it into its complement:</p>
+<p>In order to have an estimate of daily drought stress for the plant cohort, the model uses the complement of relative whole-plant hydraulic conductance. In turn, the relative conductance is determined by dividing the current whole-plant hydraulic conductance by its maximum value:</p>
 <p><span class="math display">\[\begin{equation}
-DDS_i = \phi_i \cdot \left( 1.0 - \frac{k_{stem, i}(\Psi_{rootcrown,i})}{k_{\max stem, i}}\right) = \phi_i \cdot \left(1.0 - e^{-(\Psi_{rootcrown,i}/d_{stem})^{c_{stem}}}\right)
+DDS = \phi \cdot \left( 1.0 - \frac{k_{plant}}{k_{\max plant}}\right)
 \end{equation}\]</span>
-where <span class="math inline">\(\phi_i\)</span> is the leaf phenological status. Note the use of <span class="math inline">\(\Psi_{rootcrown,i}\)</span> (and not <span class="math inline">\(\Psi_{leaf,i}\)</span>) to determine drought stress index. Thus the model tracks the degree of conductance decrease at the beginning of the stem as a measure of drought stress. This choice makes daily drought stress values of the Simple and Complex transpiration modes more comparable (because leaf mid-day water potentials are usually much more negative than soil water potentials) and is a sensible choice if one wants to run the model in irreversible cavitation mode (see below).</p>
+where <span class="math inline">\(\phi_i\)</span> is the leaf phenological status, <span class="math inline">\(k_{plant, i}\)</span> is the current whole-plant hydraulic conductance and <span class="math inline">\(k_{\max plant}\)</span> is the maximum whole-plant conductance. Since <span class="math inline">\(k_{plant}\)</span> varies through the day, average daily values are used for the determination of drought stress. Furthermore, remember than in the Sperry transpiration model we have that the whole-plant conductance is the slope of the vulnerability curve:
+<span class="math display">\[\begin{equation}
+k_{plant} = dE/d\Psi
+\end{equation}\]</span>
+In the Sureau sub-model, <span class="math inline">\(k_{plant}\)</span> is estimated from the resistances across the hydraulic network (see <a href="planthydraulics.html#conductancessureau">10.5.2</a>).</p>
 
 </div>
 </div>

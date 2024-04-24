@@ -45,10 +45,15 @@ Finally, the daily sequence of slopes of the supply function ($dE/d\Psi_{i,t}$) 
 
 ## Plant drought stress {#advanceddroughtstress}
 
-In order to have an estimate of daily drought stress for the plant cohort, the model uses the stem vulnerability curve of the plant to find the conductance relative to maximum stem conductance and turns it into its complement:
+In order to have an estimate of daily drought stress for the plant cohort, the model uses the complement of relative whole-plant hydraulic conductance. In turn, the relative conductance is determined by dividing the current whole-plant hydraulic conductance by its maximum value:
 
 \begin{equation}
-DDS_i = \phi_i \cdot \left( 1.0 - \frac{k_{stem, i}(\Psi_{rootcrown,i})}{k_{\max stem, i}}\right) = \phi_i \cdot \left(1.0 - e^{-(\Psi_{rootcrown,i}/d_{stem})^{c_{stem}}}\right)
+DDS = \phi \cdot \left( 1.0 - \frac{k_{plant}}{k_{\max plant}}\right)
 \end{equation}
-where $\phi_i$ is the leaf phenological status. Note the use of $\Psi_{rootcrown,i}$ (and not $\Psi_{leaf,i}$) to determine drought stress index. Thus the model tracks the degree of conductance decrease at the beginning of the stem as a measure of drought stress. This choice makes daily drought stress values of the Simple and Complex transpiration modes more comparable (because leaf mid-day water potentials are usually much more negative than soil water potentials) and is a sensible choice if one wants to run the model in irreversible cavitation mode (see below).
+where $\phi_i$ is the leaf phenological status, $k_{plant, i}$ is the current whole-plant hydraulic conductance and $k_{\max plant}$ is the maximum whole-plant conductance. Since $k_{plant}$ varies through the day, average daily values are used for the determination of drought stress. Furthermore, remember than in the Sperry transpiration model we have that the whole-plant conductance is the slope of the vulnerability curve:
+\begin{equation}
+k_{plant} = dE/d\Psi
+\end{equation}
+In the Sureau sub-model, $k_{plant}$ is estimated from the resistances across the hydraulic network (see \@ref(conductancessureau)).
+
 
