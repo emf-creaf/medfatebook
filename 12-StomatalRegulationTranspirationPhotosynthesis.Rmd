@@ -336,9 +336,9 @@ The average instantaneous flow rate ($E_i^{average}$, in $mmol\, H_2O \cdot s^{-
 \end{equation}
 where $LAI_i^{sunlit}$ and $LAI_i^{shade}$ are the cohorts LAI values for sunlit and shade leaves, from eq. \@ref(eq:sunlitshadelai), and $LAI_i^{\phi}$ is the leaf area index of plant cohort $i$. The model then uses the hydraulic supply function to find the transpiration rate $E_i$ numerically closest to $E_i^{average}$ (remember that the supply function is build in discrete steps). Finding the $E_i$ value numerically closest to $E_i^{average}$ determines the $E_{i,t}$ the instantaneous transpiration flow for current time step $t$, and also leads to setting values for $t$ of several other variables, such as water potentials ($\Psi_{leaf, i,t}$, $\Psi_{stem, i,t}$, $\Psi_{rootcrown, i,t}$, ...), the slope of the supply function ($(d E/d\Psi_{i})_t$), and instantaneous soil water extraction rates ($E_{i,s,t}$).
 
-## Stomatal regulation and transpiration under Sureau's sub-model {#transpirationsureau}
+## Stomatal regulation and transpiration under Sureau's sub-model 
 
-### Transpiration flows
+### Transpiration flows {#transpirationsureau}
 
 In Sureau-ECOS [@ruffault_sureau-ecos_2022], plants lose water through stomatal transpiration ($E_{stom}$), cuticular transpiration of the leaf ($E_{leaf,cuti}$) and cuticular transpiration of the stem ($E_{stem, cuti}$), see Fig. \@ref(fig:hydraulicssureau). 
 
@@ -369,7 +369,7 @@ where $VPD_{air}$ is the vapour pressure deficit in the canopy air:
 VPD_{air} = e_{sat}(T_{air}) - e_{air}
 \end{equation}
 
-### Cuticular conductances
+### Cuticular conductances {#cuticularconductancesureau}
 
 $g_{leaf,cuti}$ is a function of leaf temperature ($T_{leaf}$), which is based on a single or double Q10 equation depending on whether leaf temperature is above or below the transition phase temperature ($T_{phase}$). If $T_{leaf} \leq T_{phase}$ we have:
 \begin{equation}
@@ -382,27 +382,52 @@ g_{leaf,cuti} = g_{leaf,cuti,20} \cdot Q_{10a}^{\frac{T_{leaf} - 20}{10}} \cdot 
 
 Sunlit and shade leaves will have different $g_{leaf,cuti}$ because of their different temperature. Unlike $g_{leaf,cuti}$, $g_{stem, cuti}$ is assumed non temperature dependent.
 
-### Stomatal conductance
+### Stomatal conductance  {#stomatalconductancesureau}
 
-$g_{stom}$ is the stomatal conductance taking into account the dependence of stomata on light and temperature, as well as water status: 
+$g_{sw}$ is the stomatal conductance taking into account the dependence of stomata on light and temperature, as well as leaf water status, i.e: 
 
 \begin{equation}
-g_{stom} = \lambda(\Psi_{leaf,sym}) · g_{stom, jarvis} 
+g_{stom} = g_{sw} = \lambda(\Psi_{leaf,sym}) · g_{sw, light, temp} 
 \end{equation}
 
-where $g_{stom,jarvis}$ is the stomatal conductance without water stress and is determined as a function of light and temperature following Jarvis (1976). $\lambda$ is a regulation factor that varies between 0 and 1 to represent stomatal closure according to leaf symplasmic water potential ($\Psi_{leaf,sym}$) using sigmoid-type function:
+where $g_{sw, light, temp}$ is the stomatal conductance value without water stress, and $\lambda$ is a regulation factor that varies between 0 and 1 to represent stomatal closure according to leaf symplasmic water potential ($\Psi_{leaf,sym}$) using sigmoid-type function:
 
 \begin{equation}
 \lambda(\Psi_{leaf,sym}) = 1 - \left(1 + e^{(slope_{gs}/25) \cdot (\Psi_{leaf,sym} - \Psi50_{gs}}) \right)^{-1}
 \end{equation}
 
-depending on the potential at 50 % of stomatal closure ($\Psi50_{gs}$) and a shape parameter ($slope_{gs}$) describing the rate of decrease in stomatal conductance per unit of water potential drop.
+depending on the potential at 50 % of stomatal closure ($\Psi50_{gs}$) and a shape parameter ($slope_{gs}$) describing the rate of decrease in stomatal conductance per unit of water potential drop. With the current implementation, $\lambda$ will be the same for sunlit and shade leaves (i.e. there is only one symplasmic water potential for both kind of leaves) but $g_{sw, light, temp}$ will differ because of the different light and temperature conditions.
 
-With the current implementation, $\lambda$ will be the same for sunlit and shade leaves (i.e. there is only one symplasmic water potential for both kind of leaves), but $g_{stom, jarvis}$ will differ because of the different light and temperature conditions.
+Stomatal regulation according to light and temperature can be performed following either a Jarvis [-@jarvis_interpretation_1976] or Baldocchi [-@baldocchi_analytical_1994], as dictated by the control parameter `stomatalSubmodel` (by default set to Baldocchi-type).
+
+**Jarvis-type stomatal regulation**
+
+In the Jarvis-type approach [@jarvis_interpretation_1976], stomatal conductance according to light and temperature ($g_{sw, light, temp}$) is defined as:
+
+\begin{equation}
+g_{sw, light, temp} = g_{sw, night, temp} + (g_{sw, max, temp} - g_{sw,night, temp}) \cdot (1 - e^{-Q_{PAR}^{leaf} \cdot c_{PAR}})
+\end{equation}
+where $g_{sw, max, temp}$ and $g_{sw, night, temp}$ are the maximum stomatal conductance and nocturnal stomatal conductance after accounting for temperature effects, $Q_{PAR}^{leaf}$ is the absorbed PAR photon flux per leaf area (\@ref(eq:leafQequation)) and $c_{PAR}$ is an empirical coefficient. Temperature effects on maximum stomatal conductance are modelled using:
+\begin{equation}
+g_{sw, max, temp} = g_{sw, max} \cdot \left[ 1 + \left(\frac{T_{leaf} - T_{optim}}{T_{gs,sens}}\right)^2 \right]^{-1}
+\end{equation}
+where $T_{leaf}$ is the current leaf temperature, $T_{optim}$ is the optimal temperature and $T_{gs, sens}$ is an empirical coefficient. Temperature effects on nocturnal stomatal conductance are modelled analogously.
+
+**Baldocchi-type stomatal regulation**
+
+Baldocchi [-@baldocchi_analytical_1994] presented an analytical solution of the coupled leaf photosyntesis and stomatal conductance models. Baldocchi's approach uses Farquhar's model to determine photosynthesis, and the stomatal conductance equation is:
+\begin{equation}
+g_{sw, light, temp} = g_{sw, 0} + m_{wue} \cdot \frac{A_n}{C_s}
+\end{equation}
+where $m_{wue}$ is a dimensionless slope representing the water use efficiency, $A_n$ is net photosynthesis as determined by Farquhar's model (which accounts for light and temperature effects), $g_{sw, 0}$ is the zero intercept when $A_{n} = 0$, here taken as $g_{sw,0} = g_{sw, night}$ and $C_{s}$ is the CO2 concentration inside stomata, i.e.:
+\begin{equation}
+C_{s} = C_{atm} - (A_{n}/g_{bound})
+\end{equation}
+where $C_{atm}$ is the atmospheric (inside the canopy) CO2 concentration and  $g_{bound}$ is here the boundary layer conductance for CO2.
 
 ## Cohort-level transpiration and photosynthesis {#scalingtranspirationphotosynthesis}
 
-The amount of transpiration from the plant cohort in a given time step $t$ ($Tr_{i,t}$, in $l \cdot m^{-2}$ of ground area, i.e. in mm) is:
+The amount of transpiration from the plant cohort in a given time step $t$ ($Tr_{i,t}$, in $l \cdot m^{-2}$ of ground area, i.e. mm) is:
 \begin{equation}
 Tr_{i,t} = E_{i,t} \cdot LAI_i^{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step} 
 (\#eq:cohorttranspiration)
