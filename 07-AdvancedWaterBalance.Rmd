@@ -130,15 +130,15 @@ For every day to be simulated, the model performs the following steps:
         ii. Determine stomatal conductance, transpiration and photosynthesis on shade and sunlit leaves of each plant cohort according to Sperry's [-@Sperry2016] profit maximization strategy (section \@ref(stomatalregulation)).
         iii. Update leaf and stem PLC values.
         
-    c. If `transpirationMode = "Sureau"`, for each plant cohort repeat the following in small temporal sub-steps (e.g. 10 min):
-
-       i. Perform energy balance of sunlit and shade leaves (section \@ref(leafenergybalancephoto)), according to the current transpiration flux.
-       ii. Calculate shade-leaf, sunlit-leaf and stem cuticular conductances and cuticular transpiration (\@ref(cuticularconductancesureau)).
-       iii. Determine stomatal regulation and stomatal transpiration for sunlit and shade leaves (\@ref(stomatalconductancesureau)).
-       iv. Determine photosynthesis for sunlit and shade leaves (assuming gas exchange occurs through stomatal and cuticular pathways).
-       v. Update water potentials, water fluxes (including soil extraction) and hydraulic conductances across the plant hydraulic network.
-
-    d. Scale transpiration ($Tr_{woody}$) and net photosynthesis ($A_n$) from sunlit/shade leaves to the plant cohort level (section \@ref(scalingtranspirationphotosynthesis)).
+    c. If `transpirationMode = "Sureau"`, for each plant cohort leaf energy balance, stomatal and cuticular conductances, transpirational flows, photosynthesis and plant hydraulics are computed iteratively in small temporal sub-steps (e.g. 10 min):
+       
+        i. Perform energy balance of sunlit and shade leaves (section \@ref(leafenergybalancephoto)), according to the energy inputs of the current subdaily time step and the transpiration flux of the previous small sub-step.
+        ii. Calculate shade-leaf, sunlit-leaf and stem cuticular conductances and cuticular transpiration according to current temperature (\@ref(cuticularconductancesureau)).
+        iii. Calculate stomatal regulation and stomatal transpiration for sunlit and shade leaves (\@ref(stomatalconductancesureau)).
+        iv. Calculate instantaneous gross and net photosynthesis rates for sunlit and shade leaves.
+        v. Update water potentials, water fluxes (including soil water uptake) and hydraulic conductances across the plant hydraulic network.
+       
+    d. Scale transpiration ($Tr_{woody}$), soil water extraction ($Ex_{woody}$) and photosynthesis to the plant cohort level (section \@ref(scalingtranspirationphotosynthesis)).
     e. Complete energy balance of the canopy and the soil, after translating plant transpiration, evaporation from bare soil, snow melt and interception loss to latent heat and calculating convective heat exchange for both the canopy and the soil. Alternatively, perform energy balance for individual canopy layers, while including turbulent heat exchange and turbulent transport of water vapor and $CO_2$ between layers (chapter \@ref(closecanopysoilenergybalance)).
 8. Determine day-level photosynthesis and transpiration from instantaneous rates and update soil moisture (section \@ref(daylevelphototransp)). Determine drought stress for each woody plant cohort (section \@ref(advanceddroughtstress)).
 9. Determine rainfall infiltration (section \@ref(infiltration)) and vertical water movement within the soil, while considering soil layer source/sinks from infiltration, bare soil evaporation and herbaceous transpiration and woody plant extraction/redistribution (section \@ref(soilflows)). This updates soil moisture and lower boundary condition of water movement corresponds to deep drainage ($Dd$). 
@@ -273,6 +273,7 @@ Other relevant control parameters relevant for the advanced water balance model 
 + `sapFluidityVariation [= TRUE]`: Flag to indicate that temperature affects sap fluidity (see \@ref(sapviscosity)).
 + `windMeasurementHeight [= 200]`: Distance (in cm) above the top of the canopy corresponding to the measurement of wind speed.
 + `boundaryLayerSize [= 2000]`: Size of the canopy boundary layer (in cm). The boundary layer causes the model to define vertical layers above the top of the canopy. The parameter is only relevant when multi-layer canopy energy balance is performed.
++ `gCrown0 [= 0.150]`: Reference canopy conductance (in $mol \cdot s^{-1} \cdot m^{-2}$).
 + `unlimitedSoilWater [=FALSE]`: Boolean flag to indicate the simulation of plant transpiration assuming that soil water is always at field capacity.
 + `interceptionMode [= "Gash1995"]`: Infiltration model, either "Gash1995" or "Liu2001".
 + `infiltrationMode [= "Green-Ampt"]`: Infiltration model, either "Green-Ampt" or "Boughton".
@@ -311,7 +312,6 @@ whereas another set is only relevant for `transpirationMode = "Sureau"`:
 + `gs_NightFrac [= 0.05]`: Stomatal conductance at night as fraction of maximum stomatal conductance ([0-1]).
 + `stomatalSubmodel [= "Baldocchi"]`: Stomatal regulation sub-model, either "Jarvis" or "Baldocchi".
 + `JarvisPAR [= 0.003]`: Parameter regulating the response of stomatal conductance to light (PAR) in the Jarvis model.
-+ `gCrown0 [= 0.150]`: Reference crown conductance (mol·s-1·m-2).
 + `fTRBToLeaf [= 0.8]`: Fraction of surface of bark exposed to air per leaf area.
 
 Finally, a number of control parameters are used to modify how hydraulic parameters are estimated when calling function `spwbInput()`: 

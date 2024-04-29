@@ -4,43 +4,40 @@ In the preceeding chapters we detailed how the model performs canopy and soil en
 
 ## Photosynthesis and transpiration {#daylevelphototransp}
 
-Cohort's transpiration $Tr_{i,t}$ (eq. \@ref(eq:cohorttranspiration)) are added across subdaily steps to yield daily transpiration ($Tr_{i}$, in $mm\,H_2O$):
+Cohort's transpiration $Tr_{t}$ (eq. \@ref(eq:cohorttranspiration)) are added across subdaily steps to yield daily transpiration ($Tr$, in $mm\,H_2O$):
 \begin{equation}
-Tr_{i} = \sum_{t=1}^{n_t} {Tr_{i,t}}
+Tr = \sum_{t=1}^{n_t} {Tr_{t}}
 \end{equation}
-An the same for water extraction $Ex_{i,s,t}$ for each soil layer $s$ (eq.\@ref(eq:cohortextraction)):
+An the same for water extraction $Ex_{s,t}$ for each soil layer $s$ (eq.\@ref(eq:cohortextraction)):
 \begin{equation}
-Ex_{i,s} = \sum_{t=1}^{n_t} {Ex_{i,s,t}}
+Ex_{s} = \sum_{t=1}^{n_t} {Ex_{s,t}}
 \end{equation}
-$Ex_{i,s}$ are substracted from the water content of the corresponding soil layer, closing the soil water balance of the day (eq. \@ref(eq:advancedwaterbalanceequation)). 
+$Ex_{s}$ are substracted from the water content of the corresponding soil layer, closing the soil water balance of the day (eq. \@ref(eq:advancedwaterbalanceequation)). 
 
-Daily values of net carbon assimilation for plant cohorts are obtained similarly. $A_{n, i, t}$ (eq. \@ref(eq:cohortnetphotosynthesis)) are added across subdaily steps to obtain $A_{n,i}$, the daily net assimilation at the cohort level (in $g\,C·m^{-2}$):
-\begin{equation}
-A_{n,i} = \sum_{t=1}^{n_t} {A_{n,i,t}}
-\end{equation}
+Daily values of gross and net carbon assimilation for plant cohorts are obtained similarly. $A_{g, t}$ and $A_{n, t}$ (eq. \@ref(eq:cohortnetphotosynthesis)) are added across subdaily steps to obtain the daily gross and net assimilation values at the cohort level (in $g\,C·m^{-2}$).
 
 ## Plant water potentials and relative water contents
 
-Because the model determines optimum transpiration for every subdaily time step, this leads to a daily sequence of leaf water potential ($\Psi_{leaf,i,t}$), stem water potential ($\Psi_{stem,i,t}$), root crown water potential ($\Psi_{rootcrown,i,t}$) and root surface water potential ($\Psi_{rootcrown,i,s,t}$) values for each plant cohort $i$ (and soil layer $s$ in the last case). The model defines the following daily water potentials for every cohort $i$:
+Because the model determines optimum transpiration for every subdaily time step, this leads to a daily sequence of leaf water potential ($\Psi_{leaf,t}$), stem water potential ($\Psi_{stem,t}$), root crown water potential ($\Psi_{rootcrown,t}$) and root surface water potential ($\Psi_{rootcrown,s,t}$) values (for soil layer $s$ in the last case). The model defines the following daily water potentials:
 
-+ *Pre-dawn leaf water potential* ($\Psi_{pd, i}$): the maximum of $\Psi_{leaf,i,t}$ values.
-+ *Pre-dawn shade leaf water potential* ($\Psi_{pd, i}^{shade}$): the maximum of $\Psi_{leaf,i,t}^{shade}$ values.
-+ *Pre-dawn sunlit leaf water potential* ($\Psi_{pd, i}^{sunlit}$): the maximum of $\Psi_{leaf,i,t}^{sunlit}$ values.
-+ *Mid-day leaf water potential* ($\Psi_{md, i}$): the minimum of $\Psi_{leaf,i,t}$ values.
-+ *Mid-day shade leaf water potential* ($\Psi_{md, i}^{shade}$): the minimum of $\Psi_{leaf,i,t}^{shade}$ values.
-+ *Mid-day sunlit leaf water potential* ($\Psi_{md, i}^{sunlit}$): the minimum of $\Psi_{leaf,i,t}^{sunlit}$ values.
-+ *Stem water potential* ($\Psi_{stem, i}$): the minimum of $\Psi_{stem,i,t}$ values.
-+ *Root-crown water potential* ($\Psi_{rootcrown, i}$): the minimum of $\Psi_{rootcrown,i,t}$ values.
-+ *Root surface water potentials* ($\Psi_{rootsurf, i,s}$): the minimum of $\Psi_{rootsurf,i,s,t}$ values for each soil layer $s$.
++ *Pre-dawn leaf water potential* ($\Psi_{pd}$): the maximum of $\Psi_{leaf,t}$ values.
++ *Pre-dawn shade leaf water potential* ($\Psi_{pd}^{shade}$): the maximum of $\Psi_{leaf,t}^{shade}$ values.
++ *Pre-dawn sunlit leaf water potential* ($\Psi_{pd}^{sunlit}$): the maximum of $\Psi_{leaf,t}^{sunlit}$ values.
++ *Mid-day leaf water potential* ($\Psi_{md}$): the minimum of $\Psi_{leaf,t}$ values.
++ *Mid-day shade leaf water potential* ($\Psi_{md}^{shade}$): the minimum of $\Psi_{leaf,t}^{shade}$ values.
++ *Mid-day sunlit leaf water potential* ($\Psi_{md}^{sunlit}$): the minimum of $\Psi_{leaf,t}^{sunlit}$ values.
++ *Stem water potential* ($\Psi_{stem}$): the minimum of $\Psi_{stem,t}$ values.
++ *Root-crown water potential* ($\Psi_{rootcrown}$): the minimum of $\Psi_{rootcrown,t}$ values.
++ *Root surface water potentials* ($\Psi_{rootsurf, s}$): the minimum of $\Psi_{rootsurf,s,t}$ values for each soil layer $s$.
 
-Analogously, relative water content of stems and leaves is known for every subdaily time step, which results in a daily sequence of leaf relative water content ($RWC_{leaf,i,t}$) and stem relative water content ($RWC_{stem,i,t}$). These are summarized at the daily level for each plant cohort $i$:
+Analogously, relative water content of stems and leaves is known for every subdaily time step, which results in a daily sequence of leaf relative water content ($RWC_{leaf,t}$) and stem relative water content ($RWC_{stem,t}$). These are summarized at the daily level:
 
-+ *Leaf relative water content* ($RWC_{leaf, i}$): the mean $RWC_{leaf,i,t}$ values.
-+ *Stem relative water content* ($RWC_{stem, i}$): the mean of $RWC_{stem,i,t}$ values.
++ *Leaf relative water content* ($RWC_{leaf}$): the mean $RWC_{leaf,t}$ values.
++ *Stem relative water content* ($RWC_{stem}$): the mean of $RWC_{stem,t}$ values.
 
-Finally, the daily sequence of slopes of the supply function ($dE/d\Psi_{i,t}$) is also averaged at the daily level:
+Finally, the daily sequence of slopes of the supply function ($dE/d\Psi_{t}$) is also averaged at the daily level:
 
-+ *Slope of the supply function* ($dE/d\Psi_{i}$): the mean $dE/d\Psi_{i,t}$ values.
++ *Slope of the supply function* ($dE/d\Psi$): the mean $dE/d\Psi_{t}$ values.
 
 
 ## Plant drought stress {#advanceddroughtstress}
@@ -50,10 +47,30 @@ In order to have an estimate of daily drought stress for the plant cohort, the m
 \begin{equation}
 DDS = \phi \cdot \left( 1.0 - \frac{k_{plant}}{k_{\max plant}}\right)
 \end{equation}
-where $\phi_i$ is the leaf phenological status, $k_{plant, i}$ is the current whole-plant hydraulic conductance and $k_{\max plant}$ is the maximum whole-plant conductance. Since $k_{plant}$ varies through the day, average daily values are used for the determination of drought stress. Furthermore, remember than in the Sperry transpiration model we have that the whole-plant conductance is the slope of the vulnerability curve:
+where $\phi$ is the leaf phenological status, $k_{plant}$ is the current whole-plant hydraulic conductance and $k_{\max plant}$ is the maximum whole-plant conductance. Since $k_{plant}$ varies through the day, average daily values are used for the determination of drought stress. Furthermore, remember than in the Sperry transpiration model we have that the whole-plant conductance is the slope of the vulnerability curve:
 \begin{equation}
 k_{plant} = dE/d\Psi
 \end{equation}
 In the Sureau sub-model, $k_{plant}$ is estimated from the resistances across the hydraulic network (see \@ref(conductancessureau)).
 
+## Cavitation and conduit refilling {#cavitationRecovery}
+
+Like with the basic water balance model, the advanced water balance model is normally run assuming that although soil drought may reduce transpiration. Embolized xylem conduits may be automatically refilled when soil moisture recovers if `stemCavitationRecovery = "total"`. Automatic refilling is always assumed for root segments, but not for leaves and stems. There are three other options to deal with leaf and stem xylem cavitation besides automatic refilling. Any of them cause the model to keep track of the proportion of lost conductance in the leaf and stem xylem of the plant cohort ($PLC_{leaf}$ and $PLC_{stem}$) at successive time steps:
+\begin{eqnarray}
+PLC_{leaf, t} &=& \max \{PLC_{leaf, t-1}, 1 - k_{leaf}(\Psi_{leaf})/k_{max,leaf} \} \\
+PLC_{stem, t} &=& \max \{PLC_{stem, t-1}, 1 - k_{stem}(\Psi_{stem})/k_{max,stem} \}
+\end{eqnarray}
+
+In the Sperry sub-model, PLC values are evaluated every subdaily (hourly) time step, whereas in the SurEau sub-model it PLC values are updated more frequently.
+
+For simulations of less than one year one can use `stemCavitationRecovery = "none"` to keep track of the maximum drought stress. However, for simulations of several years, it is normally advisable to allow recovery. If `stemCavitationRecovery = "annual"`, $PLC_{leaf}$ and $PLC_{stem}$ values are set to zero at the beginning of each year, assuming that embolized plants overcome the conductance loss by creating new xylem tissue. Finally, if `stemCavitationRecovery = "rate"` the model simulates stem refilling at daily steps as a function of symplasmic water potential. First, a daily recovery rate ($r_{refill}$; in $cm^2 \cdot m^{-2} \cdot day^{-1}$) is estimated as a function of $\Psi_{symp,stem}$:
+\begin{equation}
+r_{refill}(\Psi_{symp,stem}) = r_{\max,refill} \cdot \max \{0.0, (\Psi_{symp,stem} + 1.5)/1.5\}
+\end{equation}
+Where $r_{\max,refill}$ is the control parameter `cavitationRecoveryMaximumRate` indicating a maximum refill rate. The right part of the equation normalizes the water potential, so that $r_{refill} = r_{refill,\max}$ if $\Psi_{symp,stem} = 0$ and $r_{refill} = 0$ if $\Psi_{symp,stem} <= -1.5MPa$. The proportion of conductance lost in leaves and stem are then updated using:
+\begin{eqnarray}
+PLC_{leaf} &=& \max \{0.0, PLC_{leaf} - (r_{refill}/H_v) \} \\
+PLC_{stem} &=& \max \{0.0, PLC_{stem} - (r_{refill}/H_v) \}
+\end{eqnarray}
+where $H_v$ is the Huber value in units of $cm^2 \cdot m^{-2}$.
 

@@ -190,22 +190,26 @@ Note that the VPD decreasing curves do not start at the same $VPD_{leaf}$ value 
 
 ### Leaf gas exchange
 
-Leaf diffusive conductance to water vapor ($g_{w}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) and to carbon dioxide ($g_{c}$; in $mol\,CO_{2} \cdot s^{-1} \cdot m^{-2}$) are obtained for each value of transpiration flow $E$ (here expressed in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) and $VPD_{leaf}$ using:
+Diffusive conductance to water vapor ($g_{w}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) and to carbon dioxide ($g_{c}$; in $mol\,CO_{2} \cdot s^{-1} \cdot m^{-2}$) are obtained for each value of transpiration flow $E$ (here expressed in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) and $VPD_{leaf}$ using:
 \begin{eqnarray}
 g_{w} &=& E \cdot \frac{P_{atm}}{VPD_{leaf}}\\
 g_{c} &=& g_{w}/1.6
 \end{eqnarray}
-Diffusive conductance to water vapour is assumed to be result of stomatal ($g_{sw}$) and boundary layer ($g_{bw}$) conductances (both in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$). If we estimate $g_{bw}$ using:
+Diffusive conductance to water vapor is assumed to be result of stomatal ($g_{sw}$), leaf boundary layer ($g_{bound}$) and canopy ($g_{canopy}$) conductances (all in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$). If we estimate $g_{bound}$ using:
 \begin{equation}
-g_{bw} = 0.397 \cdot (u_{leaf}/d)^{0.5}
+g_{bound} = 0.397 \cdot (u_{leaf}/d)^{0.5}
 \end{equation}
-then, stomatal conductance is:
+and $g_{canopy}$ as:
 \begin{equation}
-g_{sw}^{-1} = g_{w}^{-1} - g_{bw}^{-1} 
+g_{canopy} = g_{canopy,0} \cdot u_{leaf}^{0.6}
 \end{equation}
-Ensuring here that $g_{w} \leq g_{bw}$ so that $g_{w}^{-1} \geq  g_{bw}^{-1}$. The application of equations for $g_{w}$, $g_{bw}$ and $g_{sw}$ to the $VPD_{leaf}(\Psi_{leaf})$ curves yields the following stomatal conductance $g_{sw}(\Psi_{leaf})$ curves:
+where $g_{canopy,0}$ is the reference canopy conductance given by control parameter `gCrown0`. Since diffusive resistance is the sum of all resistances, stomatal conductance is determined using:
+\begin{equation}
+g_{sw}^{-1} = g_{w}^{-1} - g_{bound}^{-1}  - g_{canopy}^{-1}  
+\end{equation}
+Ensuring here that $g_{sw} \geq 0.0$. The application of equations for $g_{w}$, $g_{bound}$, $g_{canopy}$ and $g_{sw}$ to the $VPD_{leaf}(\Psi_{leaf})$ curves yields the following stomatal conductance $g_{sw}(\Psi_{leaf})$ curves:
 
-(ref:leafGWfunction-cap) Examples of stomatal conductance to water vapour ($g_{sw}$) functions for a hydraulic network, corresponding to fig. \@ref(fig:supplynetwork) and for different soil textures. Left/right panel shows values for uncavitated/cavitated supply functions. Minimum and maximum conductance values ($g_{sw,\min} = 0.0045$ and $g_{sw,\max} = 0.3$) are indicated using dashed lines.
+(ref:leafGWfunction-cap) Examples of stomatal conductance to water vapor ($g_{sw}$) functions for a hydraulic network, corresponding to fig. \@ref(fig:supplynetwork) and for different soil textures. Left/right panel shows values for uncavitated/cavitated supply functions. Minimum and maximum conductance values ($g_{sw,\min} = 0.0045$ and $g_{sw,\max} = 0.3$) are indicated using dashed lines.
 
 ```{r leafGWfunction, echo=FALSE, fig.width=8, fig.height=3.5, fig.align="center", fig.cap='(ref:leafGWfunction-cap)'}
 Gmin = 0.0045;
