@@ -38,32 +38,50 @@ e_{leaf} = e_{sat}(T_{leaf}) \cdot \exp\left\{\frac{2.17 \cdot \Psi_{leaf}}{T_{l
 where $e_{sat}(T)$ is a function giving the saturated vapor pressure for temperature $T$ (see [utility functions](http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils) of the **meteoland** reference manual). If a single-canopy energy balance is considered, the water vapor pressure of the air surrounding the leaf is taken as the average atmospheric water vapor pressure of the day, i.e. $e_{air} = e_{atm}$. This assumes a well-coupled canopy in terms of water vapor. When a multi-layer canopy energy balance is simulated, $e_{air}$ will correspond to the water vapor pressure $e_{air,j}$ of the canopy layer $j$ where the leaf is located.
 
 
-### Gas exchange
+### Leaf gas exchange {#leafgasexchange}
 
 Diffusive conductance to water vapor ($g_{w}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) and to carbon dioxide ($g_{c}$; in $mol\,CO_{2} \cdot s^{-1} \cdot m^{-2}$) between the leaf mesophyll and the air surrounding the leaf are assumed to be related by a single constant:
 \begin{equation}
 g_{c} = g_{w}/1.6
+(\#eq:watertocarbonconductance) 
 \end{equation}
-Either of then is the result of combining leaf stomatal conductance and the conductance of the leaf boundary layer. Taking the conductance to water vapor ($g_{w}$) as example:
+Moreover, if transpiration flow $E$ (here expressed in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) and $VPD_{leaf}$ are known, then we can use Fick's law to estimate the diffusive conductance $g_{w}$:
 \begin{equation}
-g_{w}^{-1} =  g_{sw}^{-1} + g_{bound}^{-1}  
+g_{w} = E \cdot \frac{P_{atm}}{VPD_{leaf}}
+(\#eq:leafficklaw) 
+\end{equation}
+
+Otherwise, $g_{w}$ or $g_{c}$ can be estimated by its components. At this point it is important to distinguish that in the Sperry sub-model leaf water is assumed to flow through stomata only, whereas in SurEau sub-model cuticular transpiration is also possible.
+
+**Gas exchange through stomata**
+
+In the Sperry sub-model, $g_{w}$ is the result of combining leaf stomatal conductance and the conductance of the leaf boundary layer:
+\begin{equation}
+g_{w} =  \left( g_{sw}^{-1} + g_{bound}^{-1} \right)^{-1}  
 (\#eq:leafconductanceequation) 
 \end{equation}
-Where $g_{sw}$ is the stomatal conductance and $g_{bound}$ is the leaf boundary conductance (all in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$). If we estimate $g_{bound}$ using:
+where $g_{sw}$ is the stomatal conductance and $g_{bound}$ is the leaf boundary conductance (all in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$). If we estimate $g_{bound}$ using:
 \begin{equation}
 g_{bound} = 0.397 \cdot (u_{leaf}/d)^{0.5}
 \end{equation}
-then the only unknown to determine $g_{w}$ and $g_{c}$ is stomatal conductance $g_{sw}$. 
-
-If transpiration flow $E$ (here expressed in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) and $VPD_{leaf}$ are known, then we can use Fick's law to estimate the diffusive conductance $g_{w}$:
+then the only unknown to determine $g_{w}$ (or $g_{c}$) is stomatal conductance $g_{sw}$. Sperry's sub-model makes use of eq. \@ref(eq:leafficklaw) to estimate $g_{w}$ from $E$. Then, stomatal conductance is determined using eq. \@ref(eq:leafconductanceequation), i.e.:
 \begin{equation}
-g_{w} = E \cdot \frac{P_{atm}}{VPD_{leaf}}
-\end{equation}
-Then, stomatal conductance is determined using eq. \@ref(eq:leafconductanceequation), i.e.:
-\begin{equation}
-g_{sw}^{-1} = g_{w}^{-1} - g_{bound}^{-1}  
+g_{sw} = \left( g_{w}^{-1} - g_{bound}^{-1} \right)^{-1}
 \end{equation}
 Ensuring here that $g_{sw} \geq 0.0$. If transpiration flow $E$ is not known, one needs to find alternative ways to determine $g_{sw}$, which has lead to the development of algorithms that simultaneously determine $g_{sw}$, $E$ and photosynthesis (see chapter \@ref(transpirationsperrysureau)).
+
+**Gas exchange through the leaf cuticule**
+
+In the SurEau sub-model, the diffusive conductance regulating gas exchange through the cuticule $g_{wc}$ is the result of combining cuticular conductance and the conductance of the leaf boundary layer:
+\begin{equation}
+g_{wc} =  \left(g_{cuti}^{-1} + g_{bound}^{-1}   \right)^{-1}
+\end{equation}
+
+which means that the overall diffusive conductance is, instead of eq. \@ref(eq:leafconductanceequation):
+\begin{equation}
+g_{w} =  \left( (g_{sw} + g_{cuti})^{-1} + g_{bound}^{-1} \right)^{-1}
+(\#eq:leafconductanceequation2) 
+\end{equation}
 
 ### Leaf photosynthesis {#leafphotosynthesis}
 Rubisco-limited photosynthesis rate $A_c$ (in $\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}$) is modelled using [@Collatz1991; @Medlyn2002]:
@@ -91,7 +109,7 @@ where $546$ is the wavelength in $nm$. $J_{max}$ and $J$ are the maximum and act
 \begin{equation}
 A = \frac{(A_c+A_e)-\sqrt{(A_c+A_e)^2-4.0\cdot c'\cdot A_e\cdot A_c}}{2\cdot c'}
 \end{equation}
-where $c'=0.98$ is a curvature factor. The temperature dependence of $J_{max}$ and $V_{max}$ relative to 25ºC (i.e., relative to input parameters $J_{max,298}$ and $V_{max,298}$) is modelled using @Leuning2002 (his eq. 1 with parameters from his Table 2). The internal $CO_2$ concentration, $C_i$, needs to be known to calculate $A$ using the previous equations. @Sperry2016a use a second equation for $A$ which uses $g_{c}$, the diffusive conductance to $CO_2$:
+where $c'=0.98$ is a curvature factor. The temperature dependence of $J_{max}$ and $V_{max}$ relative to 25ºC (i.e., relative to input parameters $J_{max,298}$ and $V_{max,298}$) is modelled using @Leuning2002 (his eq. 1 with parameters from his Table 2). The internal $CO_2$ concentration, $C_i$, needs to be known to calculate $A$ using the previous equations. @Sperry2016a use a second equation for $A$ which uses $g_{c}$, the diffusive conductance to $CO_2$ (see eq. \@ref(eq:watertocarbonconductance)):
 \begin{equation}
 A = g_{c} \cdot (C_{air}-C_i)
 \end{equation}

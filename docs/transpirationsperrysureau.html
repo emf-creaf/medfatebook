@@ -382,7 +382,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="11.1.1" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leaf-temperature"><i class="fa fa-check"></i><b>11.1.1</b> Leaf temperature</a></li>
 <li class="chapter" data-level="11.1.2" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leafVPD"><i class="fa fa-check"></i><b>11.1.2</b> Leaf vapor pressure deficit</a></li>
-<li class="chapter" data-level="11.1.3" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#gas-exchange"><i class="fa fa-check"></i><b>11.1.3</b> Gas exchange</a></li>
+<li class="chapter" data-level="11.1.3" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leafgasexchange"><i class="fa fa-check"></i><b>11.1.3</b> Leaf gas exchange</a></li>
 <li class="chapter" data-level="11.1.4" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leafphotosynthesis"><i class="fa fa-check"></i><b>11.1.4</b> Leaf photosynthesis</a></li>
 </ul></li>
 <li class="chapter" data-level="11.2" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#crownphotosynthesis"><i class="fa fa-check"></i><b>11.2</b> Crown/canopy photosynthesis</a>
@@ -887,7 +887,7 @@ where <span class="math inline">\(LAI^{sunlit}\)</span> and <span class="math in
 <h3><span class="header-section-number">12.2.1</span> Transpiration flows<a href="transpirationsperrysureau.html#transpirationsureau" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>In Sureau-ECOS <span class="citation">(<a href="#ref-ruffault_sureau-ecos_2022">Ruffault <em>et al.</em> 2022</a>)</span>, plants lose water through stomatal transpiration (<span class="math inline">\(E_{stom}\)</span>), cuticular transpiration of the leaf (<span class="math inline">\(E_{leaf,cuti}\)</span>) and cuticular transpiration of the stem (<span class="math inline">\(E_{stem, cuti}\)</span>), see Fig. <a href="planthydraulics.html#fig:hydraulicssureau">10.2</a>. Therefore, the total plant transpiration <span class="math inline">\(E_{plant}\)</span> is decomposed as:
 <span class="math display">\[\begin{equation}
-E_{plant} = E_{stom} + E_{leaf, cuti} + E_{stem, cuti}
+E_{plant} = E_{leaf} + E_{stem, cuti} = E_{stom} + E_{leaf, cuti} + E_{stem, cuti}
 \end{equation}\]</span>
 Since there are sunlit and shade, leaves, both <span class="math inline">\(E_{stom}\)</span> and <span class="math inline">\(E_{leaf, cuti}\)</span> are computed as weighted averages of sunlit and shade leaf values:</p>
 <p><span class="math display">\[\begin{eqnarray}
@@ -899,7 +899,11 @@ E_{leaf,cuti} &amp;=&amp; \frac{E^{sunlit}_{leaf,cuti} \cdot LAI^{sunlit} + E_{l
 E_{leaf, stom } &amp;=&amp;  \left( g_{sw}^{-1} + g_{bound}^{-1} \right)^{-1} \cdot \frac{VPD_{leaf}}{P_{atm}} \\
 E_{leaf, cuti} &amp;=&amp;  \left( g_{leaf, cuti}^{-1} + g_{bound}^{-1} \right)^{-1} \cdot \frac{VPD_{leaf}}{P_{atm}}
 \end{eqnarray}\]</span></p>
-<p>where <span class="math inline">\(VPD_{leaf}\)</span> (in MPa) is the vapor pressure deficit of the leaf (<a href="plantphotosynthesis.html#leafVPD">11.1.2</a>), <span class="math inline">\(P_{atm}\)</span> is the atmospheric pressure, <span class="math inline">\(g_{sw}\)</span> is the stomatal conductance, <span class="math inline">\(g_{leaf,cuti}\)</span> is the cuticular conductance of the leaf and <span class="math inline">\(g_{bound}\)</span> is the conductance of the leaf boundary layer (here all in <span class="math inline">\(mmol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>). In <span class="citation">Ruffault <em>et al.</em> (<a href="#ref-ruffault_sureau-ecos_2022">2022</a>)</span> a crown boundary conductance was also considered, but within the design of <strong>medfate</strong> it is not needed, since <span class="math inline">\(VPD_{leaf}\)</span> represents the gradient in vapor pressure between the leaf mesophyll and the canopy (or canopy layer) air. Additionally, note that sunlit and shade leaves will also differ in <span class="math inline">\(VPD_{leaf}\)</span>, because of their different energy balance, and hence different temperature, values.</p>
+<p>where <span class="math inline">\(VPD_{leaf}\)</span> (in MPa) is the vapor pressure deficit of the leaf (<a href="plantphotosynthesis.html#leafVPD">11.1.2</a>), <span class="math inline">\(P_{atm}\)</span> is the atmospheric pressure, <span class="math inline">\(g_{sw}\)</span> is the stomatal conductance, <span class="math inline">\(g_{leaf,cuti}\)</span> is the cuticular conductance of the leaf and <span class="math inline">\(g_{bound}\)</span> is the conductance of the leaf boundary layer (here all in <span class="math inline">\(mmol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>). The overall transpiration rate of the leaf, <span class="math inline">\(E_{leaf}\)</span> has the following expression in the Fick’s law:</p>
+<p><span class="math display">\[\begin{equation}
+E_{leaf} = g_{w} \cdot \frac{P_{atm}}{VPD_{leaf}} = \left( (g_{sw} + g_{cuti})^{-1} + g_{bound}^{-1} \right)^{-1} \cdot \frac{P_{atm}}{VPD_{leaf}}
+\end{equation}\]</span></p>
+<p>Note that in <span class="citation">Ruffault <em>et al.</em> (<a href="#ref-ruffault_sureau-ecos_2022">2022</a>)</span> a crown boundary conductance was also considered, but within the design of <strong>medfate</strong> it is not needed, since <span class="math inline">\(VPD_{leaf}\)</span> represents the gradient in vapor pressure between the leaf mesophyll and the canopy (or canopy layer) air.</p>
 <p>Finally, <span class="math inline">\(E_{stem, cuti}\)</span> is calculated as follows:
 <span class="math display">\[\begin{equation}
 E_{stem, cuti} =  \left( g_{stem, cuti}^{-1} + g_{bound}^{-1} \right)^{-1} \cdot \frac{VPD_{air}}{P_{atm}}
@@ -938,7 +942,7 @@ g_{sw} = \lambda(\Psi_{leaf,sym}) \cdot g_{sw, light, temp}
 <p><span class="math display">\[\begin{equation}
 g_{sw, light, temp} = g_{sw, night, temp} + (g_{sw, max, temp} - g_{sw,night, temp}) \cdot (1 - e^{-Q_{PAR}^{leaf} \cdot c_{PAR}})
 \end{equation}\]</span>
-where <span class="math inline">\(g_{sw, max, temp}\)</span> and <span class="math inline">\(g_{sw, night, temp}\)</span> are the maximum stomatal conductance and nocturnal stomatal conductance after accounting for temperature effects, <span class="math inline">\(Q_{PAR}^{leaf}\)</span> is the absorbed PAR photon flux per leaf area (<a href="plantphotosynthesis.html#eq:leafQequation">(11.7)</a>) and <span class="math inline">\(c_{PAR}\)</span> is an empirical coefficient. Temperature effects on maximum stomatal conductance are modelled using:
+where <span class="math inline">\(g_{sw, max, temp}\)</span> and <span class="math inline">\(g_{sw, night, temp}\)</span> are the maximum stomatal conductance and nocturnal stomatal conductance after accounting for temperature effects, <span class="math inline">\(Q_{PAR}^{leaf}\)</span> is the absorbed PAR photon flux per leaf area (<a href="plantphotosynthesis.html#eq:leafQequation">(11.10)</a>) and <span class="math inline">\(c_{PAR}\)</span> is an empirical coefficient. Temperature effects on maximum stomatal conductance are modelled using:
 <span class="math display">\[\begin{equation}
 g_{sw, max, temp} = g_{sw, max} \cdot \left[ 1 + \left(\frac{T_{leaf} - T_{optim}}{T_{gs,sens}}\right)^2 \right]^{-1}
 \end{equation}\]</span>
@@ -960,7 +964,7 @@ g_{bc} = g_{bound}/1.6
 </div>
 <div id="photosynthesissureau" class="section level3 hasAnchor" number="12.2.4">
 <h3><span class="header-section-number">12.2.4</span> Photosynthesis<a href="transpirationsperrysureau.html#photosynthesissureau" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Instantaneous gross and net photosynthesis rates for sunlit and shade leaves (i.e., <span class="math inline">\(A_{g}^{shade}\)</span>, <span class="math inline">\(A_{g}^{sunlit}\)</span>, <span class="math inline">\(A_{n}^{shade}\)</span>, <span class="math inline">\(A_{n}^{sunlit}\)</span>) are calculated using Farquhar’s model (<a href="plantphotosynthesis.html#leafphotosynthesis">11.1.4</a>) and assuming that leaf diffusive conductance for <span class="math inline">\(CO_2\)</span> is the composite of stomatal (<span class="math inline">\(g_{sw}\)</span>) and leaf cuticular (<span class="math inline">\(g_{leaf, cuti}\)</span>) conductances. Hence, non-zero gross assimilation can still occur with stomata completely closed.</p>
+<p>Instantaneous gross and net photosynthesis rates for sunlit and shade leaves (i.e., <span class="math inline">\(A_{g}^{shade}\)</span>, <span class="math inline">\(A_{g}^{sunlit}\)</span>, <span class="math inline">\(A_{n}^{shade}\)</span>, <span class="math inline">\(A_{n}^{sunlit}\)</span>) are calculated using Farquhar’s model (<a href="plantphotosynthesis.html#leafphotosynthesis">11.1.4</a>) and assuming that <span class="math inline">\(g_{c}\)</span>, the leaf diffusive conductance for <span class="math inline">\(CO_2\)</span> is influenced by leaf boundary (<span class="math inline">\(g_{bound}\)</span>), stomatal (<span class="math inline">\(g_{sw}\)</span>) and leaf cuticular (<span class="math inline">\(g_{leaf, cuti}\)</span>) conductances, as explained in <a href="plantphotosynthesis.html#leafgasexchange">11.1.3</a>. Hence, non-zero gross assimilation can still occur with stomata completely closed.</p>
 </div>
 </div>
 <div id="scalingtranspirationphotosynthesis" class="section level2 hasAnchor" number="12.3">

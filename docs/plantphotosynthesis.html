@@ -382,7 +382,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="11.1.1" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leaf-temperature"><i class="fa fa-check"></i><b>11.1.1</b> Leaf temperature</a></li>
 <li class="chapter" data-level="11.1.2" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leafVPD"><i class="fa fa-check"></i><b>11.1.2</b> Leaf vapor pressure deficit</a></li>
-<li class="chapter" data-level="11.1.3" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#gas-exchange"><i class="fa fa-check"></i><b>11.1.3</b> Gas exchange</a></li>
+<li class="chapter" data-level="11.1.3" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leafgasexchange"><i class="fa fa-check"></i><b>11.1.3</b> Leaf gas exchange</a></li>
 <li class="chapter" data-level="11.1.4" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#leafphotosynthesis"><i class="fa fa-check"></i><b>11.1.4</b> Leaf photosynthesis</a></li>
 </ul></li>
 <li class="chapter" data-level="11.2" data-path="plantphotosynthesis.html"><a href="plantphotosynthesis.html#crownphotosynthesis"><i class="fa fa-check"></i><b>11.2</b> Crown/canopy photosynthesis</a>
@@ -766,38 +766,51 @@ e_{leaf} = e_{sat}(T_{leaf}) \cdot \exp\left\{\frac{2.17 \cdot \Psi_{leaf}}{T_{l
 \end{equation}\]</span>
 where <span class="math inline">\(e_{sat}(T)\)</span> is a function giving the saturated vapor pressure for temperature <span class="math inline">\(T\)</span> (see <a href="http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils">utility functions</a> of the <strong>meteoland</strong> reference manual). If a single-canopy energy balance is considered, the water vapor pressure of the air surrounding the leaf is taken as the average atmospheric water vapor pressure of the day, i.e. <span class="math inline">\(e_{air} = e_{atm}\)</span>. This assumes a well-coupled canopy in terms of water vapor. When a multi-layer canopy energy balance is simulated, <span class="math inline">\(e_{air}\)</span> will correspond to the water vapor pressure <span class="math inline">\(e_{air,j}\)</span> of the canopy layer <span class="math inline">\(j\)</span> where the leaf is located.</p>
 </div>
-<div id="gas-exchange" class="section level3 hasAnchor" number="11.1.3">
-<h3><span class="header-section-number">11.1.3</span> Gas exchange<a href="plantphotosynthesis.html#gas-exchange" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="leafgasexchange" class="section level3 hasAnchor" number="11.1.3">
+<h3><span class="header-section-number">11.1.3</span> Leaf gas exchange<a href="plantphotosynthesis.html#leafgasexchange" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Diffusive conductance to water vapor (<span class="math inline">\(g_{w}\)</span>; in <span class="math inline">\(mol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>) and to carbon dioxide (<span class="math inline">\(g_{c}\)</span>; in <span class="math inline">\(mol\,CO_{2} \cdot s^{-1} \cdot m^{-2}\)</span>) between the leaf mesophyll and the air surrounding the leaf are assumed to be related by a single constant:
-<span class="math display">\[\begin{equation}
+<span class="math display" id="eq:watertocarbonconductance">\[\begin{equation}
 g_{c} = g_{w}/1.6
-\end{equation}\]</span>
-Either of then is the result of combining leaf stomatal conductance and the conductance of the leaf boundary layer. Taking the conductance to water vapor (<span class="math inline">\(g_{w}\)</span>) as example:
-<span class="math display" id="eq:leafconductanceequation">\[\begin{equation}
-g_{w}^{-1} =  g_{sw}^{-1} + g_{bound}^{-1}  
 \tag{11.5}
 \end{equation}\]</span>
-Where <span class="math inline">\(g_{sw}\)</span> is the stomatal conductance and <span class="math inline">\(g_{bound}\)</span> is the leaf boundary conductance (all in <span class="math inline">\(mol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>). If we estimate <span class="math inline">\(g_{bound}\)</span> using:
+Moreover, if transpiration flow <span class="math inline">\(E\)</span> (here expressed in <span class="math inline">\(mol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>) and <span class="math inline">\(VPD_{leaf}\)</span> are known, then we can use Fick’s law to estimate the diffusive conductance <span class="math inline">\(g_{w}\)</span>:
+<span class="math display" id="eq:leafficklaw">\[\begin{equation}
+g_{w} = E \cdot \frac{P_{atm}}{VPD_{leaf}}
+\tag{11.6}
+\end{equation}\]</span></p>
+<p>Otherwise, <span class="math inline">\(g_{w}\)</span> or <span class="math inline">\(g_{c}\)</span> can be estimated by its components. At this point it is important to distinguish that in the Sperry sub-model leaf water is assumed to flow through stomata only, whereas in SurEau sub-model cuticular transpiration is also possible.</p>
+<p><strong>Gas exchange through stomata</strong></p>
+<p>In the Sperry sub-model, <span class="math inline">\(g_{w}\)</span> is the result of combining leaf stomatal conductance and the conductance of the leaf boundary layer:
+<span class="math display" id="eq:leafconductanceequation">\[\begin{equation}
+g_{w} =  \left( g_{sw}^{-1} + g_{bound}^{-1} \right)^{-1}  
+\tag{11.7}
+\end{equation}\]</span>
+where <span class="math inline">\(g_{sw}\)</span> is the stomatal conductance and <span class="math inline">\(g_{bound}\)</span> is the leaf boundary conductance (all in <span class="math inline">\(mol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>). If we estimate <span class="math inline">\(g_{bound}\)</span> using:
 <span class="math display">\[\begin{equation}
 g_{bound} = 0.397 \cdot (u_{leaf}/d)^{0.5}
 \end{equation}\]</span>
-then the only unknown to determine <span class="math inline">\(g_{w}\)</span> and <span class="math inline">\(g_{c}\)</span> is stomatal conductance <span class="math inline">\(g_{sw}\)</span>.</p>
-<p>If transpiration flow <span class="math inline">\(E\)</span> (here expressed in <span class="math inline">\(mol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>) and <span class="math inline">\(VPD_{leaf}\)</span> are known, then we can use Fick’s law to estimate the diffusive conductance <span class="math inline">\(g_{w}\)</span>:
+then the only unknown to determine <span class="math inline">\(g_{w}\)</span> (or <span class="math inline">\(g_{c}\)</span>) is stomatal conductance <span class="math inline">\(g_{sw}\)</span>. Sperry’s sub-model makes use of eq. <a href="plantphotosynthesis.html#eq:leafficklaw">(11.6)</a> to estimate <span class="math inline">\(g_{w}\)</span> from <span class="math inline">\(E\)</span>. Then, stomatal conductance is determined using eq. <a href="plantphotosynthesis.html#eq:leafconductanceequation">(11.7)</a>, i.e.:
 <span class="math display">\[\begin{equation}
-g_{w} = E \cdot \frac{P_{atm}}{VPD_{leaf}}
-\end{equation}\]</span>
-Then, stomatal conductance is determined using eq. <a href="plantphotosynthesis.html#eq:leafconductanceequation">(11.5)</a>, i.e.:
-<span class="math display">\[\begin{equation}
-g_{sw}^{-1} = g_{w}^{-1} - g_{bound}^{-1}  
+g_{sw} = \left( g_{w}^{-1} - g_{bound}^{-1} \right)^{-1}
 \end{equation}\]</span>
 Ensuring here that <span class="math inline">\(g_{sw} \geq 0.0\)</span>. If transpiration flow <span class="math inline">\(E\)</span> is not known, one needs to find alternative ways to determine <span class="math inline">\(g_{sw}\)</span>, which has lead to the development of algorithms that simultaneously determine <span class="math inline">\(g_{sw}\)</span>, <span class="math inline">\(E\)</span> and photosynthesis (see chapter <a href="transpirationsperrysureau.html#transpirationsperrysureau">12</a>).</p>
+<p><strong>Gas exchange through the leaf cuticule</strong></p>
+<p>In the SurEau sub-model, the diffusive conductance regulating gas exchange through the cuticule <span class="math inline">\(g_{wc}\)</span> is the result of combining cuticular conductance and the conductance of the leaf boundary layer:
+<span class="math display">\[\begin{equation}
+g_{wc} =  \left(g_{cuti}^{-1} + g_{bound}^{-1}   \right)^{-1}
+\end{equation}\]</span></p>
+<p>which means that the overall diffusive conductance is, instead of eq. <a href="plantphotosynthesis.html#eq:leafconductanceequation">(11.7)</a>:
+<span class="math display" id="eq:leafconductanceequation2">\[\begin{equation}
+g_{w} =  \left( (g_{sw} + g_{cuti})^{-1} + g_{bound}^{-1} \right)^{-1}
+\tag{11.8}
+\end{equation}\]</span></p>
 </div>
 <div id="leafphotosynthesis" class="section level3 hasAnchor" number="11.1.4">
 <h3><span class="header-section-number">11.1.4</span> Leaf photosynthesis<a href="plantphotosynthesis.html#leafphotosynthesis" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Rubisco-limited photosynthesis rate <span class="math inline">\(A_c\)</span> (in <span class="math inline">\(\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}\)</span>) is modelled using <span class="citation">(<a href="#ref-Collatz1991">Collatz <em>et al.</em> 1991</a>; <a href="#ref-Medlyn2002">Medlyn <em>et al.</em> 2002</a>)</span>:
 <span class="math display" id="eq:leafAcequation">\[\begin{equation}
 A_c=\frac{V_{max}\cdot (C_i- \Gamma*)}{C_i+K_c \cdot (1+ O_a/K_o)}
-\tag{11.6}
+\tag{11.9}
 \end{equation}\]</span>
 where <span class="math inline">\(V_{max}\)</span> is Rubisco’s maximum carboxylation rate (in <span class="math inline">\(\mu mol\, CO_2 \cdot s^{-1} \cdot m^{-2}\)</span>), <span class="math inline">\(C_i\)</span> is the internal carbon dioxide concentration (in <span class="math inline">\(\mu mol \cdot mol^{-1}\)</span>), <span class="math inline">\(\Gamma*\)</span> is the compensation point (in <span class="math inline">\(\mu mol \cdot mol^{-1}\)</span>), <span class="math inline">\(K_c\)</span> (in <span class="math inline">\(\mu mol \cdot mol^{-1}\)</span>) and <span class="math inline">\(K_o\)</span> (in <span class="math inline">\(mmol \cdot mol^{-1}\)</span>) are Michaelis-Menten constants for carboxylation and oxygenation, respectively, and <span class="math inline">\(O_a\)</span> is the atmospheric oxygen concentration (i.e. 209 <span class="math inline">\(mmol \cdot mol^{-1}\)</span>). <span class="math inline">\(\Gamma*\)</span>, <span class="math inline">\(K_c\)</span> and <span class="math inline">\(K_o\)</span> depend on leaf temperature (<span class="math inline">\(T_{leaf}\)</span>, in <span class="math inline">\(^\circ C\)</span>) <span class="citation">(<a href="#ref-Bernacchi2001">Bernacchi <em>et al.</em> 2001</a>)</span>:
 <span class="math display">\[\begin{eqnarray}
@@ -813,13 +826,13 @@ J &amp;=&amp; \frac{(\alpha\cdot Q^{leaf}_{PAR} + J_{max})-\sqrt{(\alpha\cdot Q^
 where <span class="math inline">\(\alpha = 0.3\,mol \, e \cdot mol\,photon^{-1}\)</span> is the quantum yield of electron transport, <span class="math inline">\(Q^{leaf}_{PAR}\)</span> is the absorbed PAR photon flux density per leaf area (<span class="math inline">\(\mu mol\,photon \cdot m^{-2} \cdot s^{-1}\)</span>), which is calculated from absorbed PAR per leaf area (<span class="math inline">\(\Phi^{leaf}_{PAR}\)</span>; in <span class="math inline">\(W \cdot m^{-2}\)</span>):
 <span class="math display" id="eq:leafQequation">\[\begin{equation}
 Q^{leaf}_{PAR} = \Phi^{leaf}_{PAR}\cdot 546 \cdot 0.836\cdot 10^{-2}
-\tag{11.7}
+\tag{11.10}
 \end{equation}\]</span>
 where <span class="math inline">\(546\)</span> is the wavelength in <span class="math inline">\(nm\)</span>. <span class="math inline">\(J_{max}\)</span> and <span class="math inline">\(J\)</span> are the maximum and actual rate of electron transport (both in <span class="math inline">\(\mu mol\,e \cdot m^{-2} \cdot s^{-1}\)</span>) and <span class="math inline">\(c=0.9\)</span> defines the curvature of the light-response curve. The gross assimilation rate <span class="math inline">\(A\)</span> at a given <span class="math inline">\(C_i\)</span> is the minimum of <span class="math inline">\(A_e\)</span> and <span class="math inline">\(A_c\)</span>. To obtain a smooth <span class="math inline">\(A\)</span>-vs-<span class="math inline">\(C_i\)</span> curve we used <span class="citation">(<a href="#ref-Collatz1991">Collatz <em>et al.</em> 1991</a>)</span>:
 <span class="math display">\[\begin{equation}
 A = \frac{(A_c+A_e)-\sqrt{(A_c+A_e)^2-4.0\cdot c&#39;\cdot A_e\cdot A_c}}{2\cdot c&#39;}
 \end{equation}\]</span>
-where <span class="math inline">\(c&#39;=0.98\)</span> is a curvature factor. The temperature dependence of <span class="math inline">\(J_{max}\)</span> and <span class="math inline">\(V_{max}\)</span> relative to 25ºC (i.e., relative to input parameters <span class="math inline">\(J_{max,298}\)</span> and <span class="math inline">\(V_{max,298}\)</span>) is modelled using <span class="citation">Leuning (<a href="#ref-Leuning2002">2002</a>)</span> (his eq. 1 with parameters from his Table 2). The internal <span class="math inline">\(CO_2\)</span> concentration, <span class="math inline">\(C_i\)</span>, needs to be known to calculate <span class="math inline">\(A\)</span> using the previous equations. <span class="citation">Sperry <em>et al.</em> (<a href="#ref-Sperry2016a">2016</a>)</span> use a second equation for <span class="math inline">\(A\)</span> which uses <span class="math inline">\(g_{c}\)</span>, the diffusive conductance to <span class="math inline">\(CO_2\)</span>:
+where <span class="math inline">\(c&#39;=0.98\)</span> is a curvature factor. The temperature dependence of <span class="math inline">\(J_{max}\)</span> and <span class="math inline">\(V_{max}\)</span> relative to 25ºC (i.e., relative to input parameters <span class="math inline">\(J_{max,298}\)</span> and <span class="math inline">\(V_{max,298}\)</span>) is modelled using <span class="citation">Leuning (<a href="#ref-Leuning2002">2002</a>)</span> (his eq. 1 with parameters from his Table 2). The internal <span class="math inline">\(CO_2\)</span> concentration, <span class="math inline">\(C_i\)</span>, needs to be known to calculate <span class="math inline">\(A\)</span> using the previous equations. <span class="citation">Sperry <em>et al.</em> (<a href="#ref-Sperry2016a">2016</a>)</span> use a second equation for <span class="math inline">\(A\)</span> which uses <span class="math inline">\(g_{c}\)</span>, the diffusive conductance to <span class="math inline">\(CO_2\)</span> (see eq. <a href="plantphotosynthesis.html#eq:watertocarbonconductance">(11.5)</a>):
 <span class="math display">\[\begin{equation}
 A = g_{c} \cdot (C_{air}-C_i)
 \end{equation}\]</span>
@@ -874,7 +887,7 @@ where <span class="math inline">\(K^{sunlit}_{abs,i,j}\)</span> and <span class=
 V^{sunlit}_{max,298,i} &amp;=&amp; \frac{\sum_{j=1}^{l}{V_{max,298,i,j} \cdot LAI^{sunlit}_{i,j}}}{LAI^{sunlit}_{i}} \\
 V^{shade}_{max,298,i} &amp;=&amp; \frac{\sum_{j=1}^{l}{V_{max,298,i,j} \cdot LAI^{shade}_{i,j}}}{LAI^{shade}_{i}}
 \end{eqnarray}\]</span></p></li>
-<li><p>Use <span class="math inline">\(V^{sunlit}_{max,298,i}\)</span> as <span class="math inline">\(V_{max,298}\)</span> in <span class="citation">Leuning (<a href="#ref-Leuning2002">2002</a>)</span> to obtain <span class="math inline">\(V_{max}\)</span> for eq. <a href="plantphotosynthesis.html#eq:leafAcequation">(11.6)</a>; <span class="math inline">\(\Phi^{sunlit}_{SWR,i}\)</span> as <span class="math inline">\(\Phi^{leaf}_{SWR}\)</span> and <span class="math inline">\(L^{sunlit}_{net,i}\)</span> as <span class="math inline">\(L^{leaf}_{net}\)</span> in eq. <a href="plantphotosynthesis.html#eq:leaftemperatureequation">(11.1)</a>; and <span class="math inline">\(\Phi^{sunlit}_{PAR,i}\)</span> as <span class="math inline">\(\Phi_{PAR}^{leaf}\)</span> in eq. <a href="plantphotosynthesis.html#eq:leafQequation">(11.7)</a> to estimate sunlit leaf photosynthesis, which can be up-scaled to the crown level multiplying by <span class="math inline">\(LAI^{sunlit}_{i}\)</span>. The same would be done for shade leaves. In a sun-shade canopy model one then calls the photosynthesis function twice (i.e. once for shade leaves and once for sunlit leaves) for each plant cohort <span class="math inline">\(i\)</span>.</p></li>
+<li><p>Use <span class="math inline">\(V^{sunlit}_{max,298,i}\)</span> as <span class="math inline">\(V_{max,298}\)</span> in <span class="citation">Leuning (<a href="#ref-Leuning2002">2002</a>)</span> to obtain <span class="math inline">\(V_{max}\)</span> for eq. <a href="plantphotosynthesis.html#eq:leafAcequation">(11.9)</a>; <span class="math inline">\(\Phi^{sunlit}_{SWR,i}\)</span> as <span class="math inline">\(\Phi^{leaf}_{SWR}\)</span> and <span class="math inline">\(L^{sunlit}_{net,i}\)</span> as <span class="math inline">\(L^{leaf}_{net}\)</span> in eq. <a href="plantphotosynthesis.html#eq:leaftemperatureequation">(11.1)</a>; and <span class="math inline">\(\Phi^{sunlit}_{PAR,i}\)</span> as <span class="math inline">\(\Phi_{PAR}^{leaf}\)</span> in eq. <a href="plantphotosynthesis.html#eq:leafQequation">(11.10)</a> to estimate sunlit leaf photosynthesis, which can be up-scaled to the crown level multiplying by <span class="math inline">\(LAI^{sunlit}_{i}\)</span>. The same would be done for shade leaves. In a sun-shade canopy model one then calls the photosynthesis function twice (i.e. once for shade leaves and once for sunlit leaves) for each plant cohort <span class="math inline">\(i\)</span>.</p></li>
 </ol>
 <p>In the sun-shade photosynthesis model, the question arises on how to determine layer <span class="math inline">\(j\)</span> for sunlit or shade leaves of a given cohort. The choice is done by calculating the height corresponding to the mass center of sunlit leaves or shade leaves. The canopy layer <span class="math inline">\(j\)</span> where this mass center height is contained is chosen as the layer from which environmental conditions will be taken. For any given plant cohort, sunlit leaves will take their environmental conditions from layers above (or equal to) those corresponding to shade leaves.</p>
 </div>

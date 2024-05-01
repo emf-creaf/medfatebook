@@ -959,7 +959,7 @@ As mentioned in \@ref(advancedwaterbalancescheduling), with SurEau's sub-model, 
 
 In Sureau-ECOS [@ruffault_sureau-ecos_2022], plants lose water through stomatal transpiration ($E_{stom}$), cuticular transpiration of the leaf ($E_{leaf,cuti}$) and cuticular transpiration of the stem ($E_{stem, cuti}$), see Fig. \@ref(fig:hydraulicssureau). Therefore, the total plant transpiration $E_{plant}$ is decomposed as: 
 \begin{equation}
-E_{plant} = E_{stom} + E_{leaf, cuti} + E_{stem, cuti}
+E_{plant} = E_{leaf} + E_{stem, cuti} = E_{stom} + E_{leaf, cuti} + E_{stem, cuti}
 \end{equation}
 Since there are sunlit and shade, leaves, both $E_{stom}$ and $E_{leaf, cuti}$ are computed as weighted averages of sunlit and shade leaf values:
 
@@ -974,7 +974,13 @@ E_{leaf, stom } &=&  \left( g_{sw}^{-1} + g_{bound}^{-1} \right)^{-1} \cdot \fra
 E_{leaf, cuti} &=&  \left( g_{leaf, cuti}^{-1} + g_{bound}^{-1} \right)^{-1} \cdot \frac{VPD_{leaf}}{P_{atm}}
 \end{eqnarray}
 
-where $VPD_{leaf}$ (in MPa) is the vapor pressure deficit of the leaf (\@ref(leafVPD)), $P_{atm}$ is the atmospheric pressure, $g_{sw}$ is the stomatal conductance, $g_{leaf,cuti}$ is the cuticular conductance of the leaf and $g_{bound}$ is the conductance of the leaf boundary layer (here all in $mmol\, H_2O \cdot s^{-1} \cdot m^{-2}$). In @ruffault_sureau-ecos_2022 a crown boundary conductance was also considered, but within the design of **medfate** it is not needed, since $VPD_{leaf}$ represents the gradient in vapor pressure between the leaf mesophyll and the canopy (or canopy layer) air. Additionally, note that sunlit and shade leaves will also differ in $VPD_{leaf}$, because of their different energy balance, and hence different temperature, values. 
+where $VPD_{leaf}$ (in MPa) is the vapor pressure deficit of the leaf (\@ref(leafVPD)), $P_{atm}$ is the atmospheric pressure, $g_{sw}$ is the stomatal conductance, $g_{leaf,cuti}$ is the cuticular conductance of the leaf and $g_{bound}$ is the conductance of the leaf boundary layer (here all in $mmol\, H_2O \cdot s^{-1} \cdot m^{-2}$). The overall transpiration rate of the leaf, $E_{leaf}$ has the following expression in the Fick's law:
+
+\begin{equation}
+E_{leaf} = g_{w} \cdot \frac{P_{atm}}{VPD_{leaf}} = \left( (g_{sw} + g_{cuti})^{-1} + g_{bound}^{-1} \right)^{-1} \cdot \frac{P_{atm}}{VPD_{leaf}}
+\end{equation}
+
+Note that in @ruffault_sureau-ecos_2022 a crown boundary conductance was also considered, but within the design of **medfate** it is not needed, since $VPD_{leaf}$ represents the gradient in vapor pressure between the leaf mesophyll and the canopy (or canopy layer) air. 
 
 Finally, $E_{stem, cuti}$ is calculated as follows:
 \begin{equation}
@@ -1049,7 +1055,7 @@ Note that $A_{n}$ is only calculated here to find the analytical solution to $g_
 
 ### Photosynthesis {#photosynthesissureau}
 
-Instantaneous gross and net photosynthesis rates for sunlit and shade leaves (i.e., $A_{g}^{shade}$, $A_{g}^{sunlit}$, $A_{n}^{shade}$, $A_{n}^{sunlit}$) are calculated using Farquhar's model (\@ref(leafphotosynthesis)) and assuming that leaf diffusive conductance for $CO_2$ is the composite of stomatal ($g_{sw}$) and leaf cuticular ($g_{leaf, cuti}$) conductances. Hence, non-zero gross assimilation can still occur with stomata completely closed.  
+Instantaneous gross and net photosynthesis rates for sunlit and shade leaves (i.e., $A_{g}^{shade}$, $A_{g}^{sunlit}$, $A_{n}^{shade}$, $A_{n}^{sunlit}$) are calculated using Farquhar's model (\@ref(leafphotosynthesis)) and assuming that $g_{c}$, the leaf diffusive conductance for $CO_2$ is influenced by leaf boundary ($g_{bound}$), stomatal ($g_{sw}$) and leaf cuticular ($g_{leaf, cuti}$) conductances, as explained in \@ref(leafgasexchange). Hence, non-zero gross assimilation can still occur with stomata completely closed.  
 
 ## Scaling of transpiration, soil water uptake and photosynthesis rates {#scalingtranspirationphotosynthesis}
 
