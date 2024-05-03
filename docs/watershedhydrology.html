@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-05-01" />
+<meta name="date" content="2024-05-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -55,7 +55,7 @@
 
 <style type="text/css">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -127,6 +127,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
+  margin-bottom: 0em;
 }
 .hanging div.csl-entry {
   margin-left:2em;
@@ -744,7 +745,7 @@ div.csl-indent {
 <li><em>artificial</em>: urban areas.</li>
 <li><em>water</em>: water bodies.</li>
 </ol>
-<p>Watershed water balance simulations extend the simulation of soil water balance to the landscape scale. Hence, the design of most vertical hydrological processes is the same as those of forest water balance. However, additional water compartments and processes are represented in watershed water balance simulations. Each cell in the watershed may include the following: a snow-pack compartment, one or several soil layers (including a rocky layer down to several meters depth), and a groundwater compartment normally beyond the reach of plant roots for most landscape cells. Similar to other models such as TETIS <span class="citation">(<a href="#ref-Frances2007">Francés <em>et al.</em> 2007</a>)</span>, three lateral flows are considered between adjacent cells:</p>
+<p>Watershed water balance simulations extend the simulation of soil water balance to the landscape scale. Hence, the design of most vertical hydrological processes is the same as those of forest water balance. However, cells classified as rock, artificial or water lack any soil and must be treated differently. Additional water compartments and processes are represented in watershed water balance simulations. Each cell in the watershed may include the following: a snow-pack compartment, one or several soil layers (including a rocky layer down to several meters depth), and a groundwater compartment normally beyond the reach of plant roots for most landscape cells. Similar to other models such as TETIS <span class="citation">(<a href="#ref-Frances2007">Francés <em>et al.</em> 2007</a>)</span>, three lateral flows are considered between adjacent cells:</p>
 <ol style="list-style-type: lower-roman">
 <li>Overland surface flows from upper elevation cells.</li>
 <li>Lateral saturated soil flows (i.e. interflow) between adjacent cells.</li>
@@ -828,8 +829,10 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 <li>Calculation of subsurface and groundwater lateral flows between adjacent cells, according to hydraulic gradients (see <a href="watershedhydrology.html#subsurfaceflows">19.6.1</a>).</li>
 <li>Determine the balance of subsurface lateral flows (i.e. determine <span class="math inline">\(\Delta{S_{lat}}\)</span>) for each cell.</li>
 <li>Apply changes in cell aquifer water content due to the balance of groundwater lateral flows (<span class="math inline">\(\Delta{S_{base}}\)</span> in eq. <a href="watershedhydrology.html#eq:cellaquiferwaterbalanceequation">(19.3)</a>).</li>
-<li>Determine vertical cell flows by processing watershed cells (sequentially or in parallel), while accounting for subsurface flows and changes in the groundwater level, which complete eqs. <a href="watershedhydrology.html#eq:cellsnowpackwaterbalanceequation">(19.1)</a> and <a href="watershedhydrology.html#eq:cellsoilwaterbalanceequation">(19.2)</a>. For <em>wildland</em> or <em>agriculture</em> cells, determine snow-pack dynamics, rainfall interception loss, infiltration, saturation excess, capillarity rise, deep drainage and transpiration, soil evaporation processes as described in <a href="basicwaterbalance.html#basicwaterbalancescheduling">3.4</a>. For <em>rock</em> and <em>artificial</em> cells, snow pack dynamics is still processed in these cells, but all rainfall input or snow melt becomes runoff to be passed downhill. In the case of <em>water</em> cells, snow pack dynamics are still processed, but all liquid water (from rain or snow melt) is poured (as deep drainage) down to the aquifer below.</li>
-<li>Distribute overland flows among cells downhill (<a href="watershedhydrology.html#overlandflows">19.6.2</a>). If a cell does not have downhill neighbors (i.e outlet cell) its runoff becomes water exported from the watershed (<a href="watershedhydrology.html#watershedexport">19.6.3</a>).</li>
+<li>Process vertical processes in cells that lack soil (i.e. <em>rock</em>, <em>artificial</em> and <em>water</em>). For <em>rock</em> and <em>artificial</em> cells, snow pack dynamics is still processed in these cells. In <em>artificial</em> cells all rainfall input or snow melt becomes runoff to be passed downhill. In <em>rock</em> cells, water can infiltrate directly to the aquifer, where a maximum rate is confronted with the rainfall/snowmelt input. In the case of <em>water</em> cells, snow pack dynamics are still processed, but all liquid water (from rain or snow melt) is poured (as deep drainage) down to the aquifer below.</li>
+<li>Distribute overland flows from <em>rock</em> or <em>artificial</em> cells donwhill to <em>wildland</em> or <em>agriculture</em> cells, which will receive some runon.</li>
+<li>Determine vertical flows in watershed cells having soil (i.e. <em>wildland</em> or <em>agriculture</em>). Cells are processed sequentially or in parallel, while accounting for subsurface flows, runon from upslope rock or artificial cells, and changes in the groundwater level, which complete eqs. <a href="watershedhydrology.html#eq:cellsnowpackwaterbalanceequation">(19.1)</a> and <a href="watershedhydrology.html#eq:cellsoilwaterbalanceequation">(19.2)</a>. All processes mentioned in <a href="basicwaterbalance.html#basicwaterbalancescheduling">3.4</a> are taken into account.</li>
+<li>Distribute overland flows from cells having soil downhill (<a href="watershedhydrology.html#overlandflows">19.6.2</a>). If a cell does not have downhill neighbors (i.e outlet cell) its runoff becomes water exported from the watershed (<a href="watershedhydrology.html#watershedexport">19.6.3</a>).</li>
 <li>Apply vertical flows between soils and the aquifer below, i.e. deep drainage and capillarity rise, to the water balance of the aquifer, completing eq. <a href="watershedhydrology.html#eq:cellaquiferwaterbalanceequation">(19.3)</a>.</li>
 </ol>
 </div>
@@ -938,13 +941,13 @@ Ro_j = Ro_j + (Ru_i + Exf_i) \cdot q_{ij}
 </div>
 <div id="watershedexport" class="section level3 hasAnchor" number="19.6.3">
 <h3><span class="header-section-number">19.6.3</span> Watershed surface runoff<a href="watershedhydrology.html#watershedexport" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>A special situation arises when processing cells that do not have downhill neighbors defined (i.e. where <span class="math inline">\(q_{ij} = 0\)</span> for all <span class="math inline">\(j\)</span>), either because they are in flat surfaces or at the watershed boundary. In both cases, these cells should correspond to water bodies or streams connecting to the catchment outlet. Hence, these cells are called <em>outlet cells</em> in the model, and the runoff they generate contributes to watershed runoff exported (<span class="math inline">\(Exp\)</span>), which is assumed to reach river channels.</p>
+<p>A special situation arises when processing cells that do not have downhill neighbors defined (i.e. where <span class="math inline">\(q_{ij} = 0\)</span> for all <span class="math inline">\(j\)</span>), either because they are in flat surfaces or at the watershed boundary. In both cases, these cells should correspond to water bodies or streams connecting to the catchment outlet. Hence, these cells are called <em>outlet cells</em> in the model, and the runoff they generate contributes to watershed runoff exported (<span class="math inline">\(Exp\)</span>), which is assumed to reach river channels, dams or other surface water bodies.</p>
 
 </div>
 </div>
 </div>
 <h3>Bibliography<a href="bibliography.html#bibliography" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-Frances2007" class="csl-entry">
 Francés, F., Vélez, J.I. &amp; Vélez, J.J. (2007). <a href="https://doi.org/10.1016/j.jhydrol.2006.06.032">Split-parameter structure for the automatic calibration of distributed hydrological models</a>. <em>Journal of Hydrology</em>, 332, 226–240.
 </div>
