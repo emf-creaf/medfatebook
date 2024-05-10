@@ -56,10 +56,10 @@ Lw = \Delta S_{lat} = S_{lat, in} - S_{lat, out}
 \end{equation}
 3. Variations in the aquifer water content of a cell are summarized by:
 \begin{equation}
-  \Delta{S_{aquifer}} = Dd - Cr - Exf - \Delta{S_{base}}
+  \Delta{S_{aquifer}} = Dd - Cr - Exf - Dal - \Delta{S_{base}}
   (\#eq:cellaquiferwaterbalanceequation)
 \end{equation}
-where $Dd$ is deep drainage from the above-lying soil, $Cr$ is capillary rise into the above-lying soil, $Exf$ is the aquifer exfiltration (ocurring when the water table reaches the soil surface), and $\Delta{S_{base}}$ is the variation in water content of the aquifer derived from the balance between groundwater lateral inputs and outputs.
+where $Dd$ is deep drainage from the above-lying soil, $Cr$ is capillary rise into the above-lying soil, $Exf$ is the aquifer exfiltration (ocurring when the water table reaches the soil surface), $Dal$ is drainage loss to a deeper aquifer (not connected to watershed outlets) and $\Delta{S_{base}}$ is the variation in water content of the aquifer derived from the balance between groundwater lateral inputs and outputs.
 \begin{equation}
 \Delta S_{base} = S_{base, in} - S_{base, out}
 \end{equation}
@@ -78,13 +78,13 @@ where $\hat{Ps}$ and $\hat{Sm}$ are the average snow fall and snow melt over cel
 \Delta{\hat{V}_{soil}} = (\hat{If} + \hat{Cr}) - (\hat{Dd} + \hat{Se} + \hat{Es} +  \hat{Tr}_{woody} + \hat{Tr}_{herb})
 \end{equation}
 where $\hat{If}$, $\hat{Cr}$, $\hat{Dd}$, $\hat{Se}$, $\hat{Es}$, $\hat{Tr}_{woody}$ and $\hat{Tr}_{herb}$ are the average (over cells) of infiltration, capillary rise, soil evaporation, plant transpiration and herb transpiration, respectively. Lateral saturated soil flows are not included as they cancel out at the watershed level.
-3. Changes in the average of cell aquifer water content ($\Delta{\hat{S}_{aquifer}}$) are the result of balancing deep drainage ($Dd$) from soils, capillarity rise to soils ($Cr$) and aquifer exfiltration ($Exf$):
+3. Changes in the average of cell aquifer water content ($\Delta{\hat{S}_{aquifer}}$) are the result of balancing averages for deep drainage ($\hat{Dd}$) from soils, capillarity rise to soils ($\hat{Cr}$), aquifer exfiltration ($\hat{Exf}$) and loss to a deeper aquifer ($\hat{Dal}$):
 \begin{equation}
-  \Delta{\hat{S}_{aquifer}} = \hat{Dd} - \hat{Cr} - \hat{Exf}
+  \Delta{\hat{S}_{aquifer}} = \hat{Dd} - \hat{Cr} - \hat{Exf} - \hat{Dal}
 \end{equation}
 4. If we integrate the three water compartments, water balance at the watershed level is given by:
 \begin{equation}
-  \Delta{S_{watershed}} = \hat{Pr} - (\hat{In} + \hat{Es} + \hat{Tr}_{woody} + \hat{Tr}_{herb}) - \hat{Exp}
+  \Delta{S_{watershed}} = \hat{Pr} - (\hat{In} + \hat{Es} + \hat{Tr}_{woody} + \hat{Tr}_{herb}) - \hat{Exp} - \hat{Dal}
 \end{equation}
 where $\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}+\Delta{\hat{V}_{soil}}+\Delta{\hat{S}_{aquifer}}$ is the change in water content in the watershed and $\hat{Exp}$ is the water exported as runoff from cells without neighbors (i.e. catchment outlet cells).
 
@@ -100,7 +100,8 @@ For every day to be simulated, the model performs the following steps:
  6. Distribute overland flows from *rock* or *artificial* cells donwhill to *wildland* or *agriculture* cells, which will receive some runon.
  7. Determine vertical flows in watershed cells having soil (i.e. *wildland* or *agriculture*). Cells are processed sequentially or in parallel, while accounting for subsurface flows, runon from upslope rock or artificial cells, and changes in the groundwater level, which complete eqs.  \@ref(eq:cellsnowpackwaterbalanceequation) and \@ref(eq:cellsoilwaterbalanceequation). All processes mentioned in \@ref(basicwaterbalancescheduling) are taken into account. 
 8. Distribute overland flows from cells having soil downhill (\@ref(overlandflows)). If a cell does not have downhill neighbors (i.e outlet cell) its runoff becomes water exported from the watershed (\@ref(watershedexport)).
-9. Apply vertical flows between soils and the aquifer below, i.e. deep drainage and capillarity rise, to the water balance of the aquifer, completing eq. \@ref(eq:cellaquiferwaterbalanceequation).
+9. Apply vertical flows between soils and the aquifer below, i.e. deep drainage and capillarity rise, to the water balance of the aquifer.
+10. Apply drainage losses from the aquifer towards a deeper aquifer not connected to watershed outlets (\@ref(deepaquiferloss)), completing eq. \@ref(eq:cellaquiferwaterbalanceequation).
 
 
 ## Inputs and outputs
@@ -192,3 +193,7 @@ Note that a given cell $j$ can receive overland flow from more than one neighbor
 ### Watershed surface runoff {#watershedexport}
 
 A special situation arises when processing cells that do not have downhill neighbors defined (i.e. where $q_{ij} = 0$ for all $j$), either because they are in flat surfaces or at the watershed boundary. In both cases, these cells should correspond to water bodies or streams connecting to the catchment outlet. Hence, these cells are called *outlet cells* in the model, and the runoff they generate contributes to watershed runoff exported ($Exp$), which is assumed to reach river channels, dams or other surface water bodies.
+
+### Losses towards a deeper aquifer {#deepaquiferloss}
+
+Daily losses from the aquifer towards a deeper aquifer not connected to watershed outlets are simulated by means of a daily maximum loss rate (which can be specified either via the watershed control parameter called `deep_aquifer_loss` or using an input `sf` column with the same name) that is compared with the current aquifer content. The minimum of those values is subtracted from the current aquifer content.

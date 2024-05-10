@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-05-03" />
+<meta name="date" content="2024-05-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -578,6 +578,7 @@ div.csl-indent {
 <li class="chapter" data-level="19.6.1" data-path="watershedhydrology.html"><a href="watershedhydrology.html#subsurfaceflows"><i class="fa fa-check"></i><b>19.6.1</b> Subsurface flows</a></li>
 <li class="chapter" data-level="19.6.2" data-path="watershedhydrology.html"><a href="watershedhydrology.html#overlandflows"><i class="fa fa-check"></i><b>19.6.2</b> Overland flows</a></li>
 <li class="chapter" data-level="19.6.3" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedexport"><i class="fa fa-check"></i><b>19.6.3</b> Watershed surface runoff</a></li>
+<li class="chapter" data-level="19.6.4" data-path="watershedhydrology.html"><a href="watershedhydrology.html#deepaquiferloss"><i class="fa fa-check"></i><b>19.6.4</b> Losses towards a deeper aquifer</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="20" data-path="seeddispersal.html"><a href="seeddispersal.html"><i class="fa fa-check"></i><b>20</b> Seed dispersal</a>
@@ -1635,41 +1636,41 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="model-inputs.html#cb15-1" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
 <pre><code>##   [1] &quot;fillMissingRootParams&quot;            &quot;fillMissingSpParams&quot;              &quot;fillMissingWithGenusParams&quot;      
 ##   [4] &quot;verbose&quot;                          &quot;subdailyResults&quot;                  &quot;standResults&quot;                    
-##   [7] &quot;soilResults&quot;                      &quot;plantResults&quot;                     &quot;leafResults&quot;                     
-##  [10] &quot;temperatureResults&quot;               &quot;fireHazardResults&quot;                &quot;fireHazardStandardWind&quot;          
-##  [13] &quot;fireHazardStandardDFMC&quot;           &quot;transpirationMode&quot;                &quot;soilFunctions&quot;                   
-##  [16] &quot;ndailysteps&quot;                      &quot;max_nsubsteps_soil&quot;               &quot;defaultWindSpeed&quot;                
-##  [19] &quot;defaultCO2&quot;                       &quot;defaultRainfallIntensityPerMonth&quot; &quot;snowpack&quot;                        
-##  [22] &quot;leafPhenology&quot;                    &quot;bareSoilEvaporation&quot;              &quot;unlimitedSoilWater&quot;              
-##  [25] &quot;interceptionMode&quot;                 &quot;infiltrationMode&quot;                 &quot;infiltrationCorrection&quot;          
-##  [28] &quot;soilDomains&quot;                      &quot;rhizosphereOverlap&quot;               &quot;unfoldingDD&quot;                     
-##  [31] &quot;verticalLayerSize&quot;                &quot;windMeasurementHeight&quot;            &quot;segmentedXylemVulnerability&quot;     
-##  [34] &quot;stemCavitationRecovery&quot;           &quot;leafCavitationRecovery&quot;           &quot;hydraulicRedistributionFraction&quot; 
-##  [37] &quot;nsubsteps_canopy&quot;                 &quot;taper&quot;                            &quot;multiLayerBalance&quot;               
-##  [40] &quot;sapFluidityVariation&quot;             &quot;TPhase_gmin&quot;                      &quot;Q10_1_gmin&quot;                      
-##  [43] &quot;Q10_2_gmin&quot;                       &quot;rootRadialConductance&quot;            &quot;averageFracRhizosphereResistance&quot;
-##  [46] &quot;thermalCapacityLAI&quot;               &quot;boundaryLayerSize&quot;                &quot;cavitationRecoveryMaximumRate&quot;   
-##  [49] &quot;sunlitShade&quot;                      &quot;numericParams&quot;                    &quot;leafCavitationEffects&quot;           
-##  [52] &quot;stemCavitationEffects&quot;            &quot;stomatalSubmodel&quot;                 &quot;plantCapacitance&quot;                
-##  [55] &quot;cavitationFlux&quot;                   &quot;soilDisconnection&quot;                &quot;leafCuticularTranspiration&quot;      
-##  [58] &quot;stemCuticularTranspiration&quot;       &quot;C_SApoInit&quot;                       &quot;C_LApoInit&quot;                      
-##  [61] &quot;k_SSym&quot;                           &quot;fractionLeafSymplasm&quot;             &quot;gs_NightFrac&quot;                    
-##  [64] &quot;JarvisPAR&quot;                        &quot;fTRBToLeaf&quot;                       &quot;subdailyCarbonBalance&quot;           
-##  [67] &quot;allowDessication&quot;                 &quot;allowStarvation&quot;                  &quot;sinkLimitation&quot;                  
-##  [70] &quot;shrubDynamics&quot;                    &quot;herbDynamics&quot;                     &quot;allocationStrategy&quot;              
-##  [73] &quot;phloemConductanceFactor&quot;          &quot;nonSugarConcentration&quot;            &quot;equilibriumOsmoticConcentration&quot; 
-##  [76] &quot;minimumRelativeStarchForGrowth&quot;   &quot;constructionCosts&quot;                &quot;senescenceRates&quot;                 
-##  [79] &quot;maximumRelativeGrowthRates&quot;       &quot;mortalityMode&quot;                    &quot;mortalityBaselineRate&quot;           
-##  [82] &quot;mortalityRelativeSugarThreshold&quot;  &quot;mortalityRWCThreshold&quot;            &quot;recrTreeDBH&quot;                     
-##  [85] &quot;recrTreeDensity&quot;                  &quot;ingrowthTreeDBH&quot;                  &quot;ingrowthTreeDensity&quot;             
-##  [88] &quot;allowSeedBankDynamics&quot;            &quot;allowRecruitment&quot;                 &quot;allowResprouting&quot;                
-##  [91] &quot;recruitmentMode&quot;                  &quot;removeEmptyCohorts&quot;               &quot;minimumTreeCohortDensity&quot;        
-##  [94] &quot;minimumShrubCohortCover&quot;          &quot;dynamicallyMergeCohorts&quot;          &quot;seedRain&quot;                        
-##  [97] &quot;seedProductionTreeHeight&quot;         &quot;seedProductionShrubHeight&quot;        &quot;probRecr&quot;                        
-## [100] &quot;minTempRecr&quot;                      &quot;minMoistureRecr&quot;                  &quot;minFPARRecr&quot;                     
-## [103] &quot;recrTreeHeight&quot;                   &quot;recrShrubCover&quot;                   &quot;recrShrubHeight&quot;                 
-## [106] &quot;recrTreeZ50&quot;                      &quot;recrShrubZ50&quot;                     &quot;recrTreeZ95&quot;                     
-## [109] &quot;recrShrubZ95&quot;</code></pre>
+##   [7] &quot;soilResults&quot;                      &quot;snowResults&quot;                      &quot;plantResults&quot;                    
+##  [10] &quot;leafResults&quot;                      &quot;temperatureResults&quot;               &quot;fireHazardResults&quot;               
+##  [13] &quot;fireHazardStandardWind&quot;           &quot;fireHazardStandardDFMC&quot;           &quot;transpirationMode&quot;               
+##  [16] &quot;soilFunctions&quot;                    &quot;ndailysteps&quot;                      &quot;max_nsubsteps_soil&quot;              
+##  [19] &quot;defaultWindSpeed&quot;                 &quot;defaultCO2&quot;                       &quot;defaultRainfallIntensityPerMonth&quot;
+##  [22] &quot;snowpack&quot;                         &quot;leafPhenology&quot;                    &quot;bareSoilEvaporation&quot;             
+##  [25] &quot;unlimitedSoilWater&quot;               &quot;interceptionMode&quot;                 &quot;infiltrationMode&quot;                
+##  [28] &quot;infiltrationCorrection&quot;           &quot;soilDomains&quot;                      &quot;rhizosphereOverlap&quot;              
+##  [31] &quot;unfoldingDD&quot;                      &quot;verticalLayerSize&quot;                &quot;windMeasurementHeight&quot;           
+##  [34] &quot;segmentedXylemVulnerability&quot;      &quot;stemCavitationRecovery&quot;           &quot;leafCavitationRecovery&quot;          
+##  [37] &quot;hydraulicRedistributionFraction&quot;  &quot;nsubsteps_canopy&quot;                 &quot;taper&quot;                           
+##  [40] &quot;multiLayerBalance&quot;                &quot;sapFluidityVariation&quot;             &quot;TPhase_gmin&quot;                     
+##  [43] &quot;Q10_1_gmin&quot;                       &quot;Q10_2_gmin&quot;                       &quot;rootRadialConductance&quot;           
+##  [46] &quot;averageFracRhizosphereResistance&quot; &quot;thermalCapacityLAI&quot;               &quot;boundaryLayerSize&quot;               
+##  [49] &quot;cavitationRecoveryMaximumRate&quot;    &quot;sunlitShade&quot;                      &quot;numericParams&quot;                   
+##  [52] &quot;leafCavitationEffects&quot;            &quot;stemCavitationEffects&quot;            &quot;stomatalSubmodel&quot;                
+##  [55] &quot;plantCapacitance&quot;                 &quot;cavitationFlux&quot;                   &quot;soilDisconnection&quot;               
+##  [58] &quot;leafCuticularTranspiration&quot;       &quot;stemCuticularTranspiration&quot;       &quot;C_SApoInit&quot;                      
+##  [61] &quot;C_LApoInit&quot;                       &quot;k_SSym&quot;                           &quot;fractionLeafSymplasm&quot;            
+##  [64] &quot;gs_NightFrac&quot;                     &quot;JarvisPAR&quot;                        &quot;fTRBToLeaf&quot;                      
+##  [67] &quot;subdailyCarbonBalance&quot;            &quot;allowDessication&quot;                 &quot;allowStarvation&quot;                 
+##  [70] &quot;sinkLimitation&quot;                   &quot;shrubDynamics&quot;                    &quot;herbDynamics&quot;                    
+##  [73] &quot;allocationStrategy&quot;               &quot;phloemConductanceFactor&quot;          &quot;nonSugarConcentration&quot;           
+##  [76] &quot;equilibriumOsmoticConcentration&quot;  &quot;minimumRelativeStarchForGrowth&quot;   &quot;constructionCosts&quot;               
+##  [79] &quot;senescenceRates&quot;                  &quot;maximumRelativeGrowthRates&quot;       &quot;mortalityMode&quot;                   
+##  [82] &quot;mortalityBaselineRate&quot;            &quot;mortalityRelativeSugarThreshold&quot;  &quot;mortalityRWCThreshold&quot;           
+##  [85] &quot;recrTreeDBH&quot;                      &quot;recrTreeDensity&quot;                  &quot;ingrowthTreeDBH&quot;                 
+##  [88] &quot;ingrowthTreeDensity&quot;              &quot;allowSeedBankDynamics&quot;            &quot;allowRecruitment&quot;                
+##  [91] &quot;allowResprouting&quot;                 &quot;recruitmentMode&quot;                  &quot;removeEmptyCohorts&quot;              
+##  [94] &quot;minimumTreeCohortDensity&quot;         &quot;minimumShrubCohortCover&quot;          &quot;dynamicallyMergeCohorts&quot;         
+##  [97] &quot;seedRain&quot;                         &quot;seedProductionTreeHeight&quot;         &quot;seedProductionShrubHeight&quot;       
+## [100] &quot;probRecr&quot;                         &quot;minTempRecr&quot;                      &quot;minMoistureRecr&quot;                 
+## [103] &quot;minFPARRecr&quot;                      &quot;recrTreeHeight&quot;                   &quot;recrShrubCover&quot;                  
+## [106] &quot;recrShrubHeight&quot;                  &quot;recrTreeZ50&quot;                      &quot;recrShrubZ50&quot;                    
+## [109] &quot;recrTreeZ95&quot;                      &quot;recrShrubZ95&quot;</code></pre>
 <p>Control parameters are employed when initializing vegetation inputs and state variables using functions <code>forest2spwbInput()</code> and <code>forest2growthInput()</code>, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as <code>spwb()</code> or <code>growth()</code>. Function <code>fordyn()</code> is different than the other simulation functions, because the list control parameters is directly passed to the function (see <a href="model-inputs.html#inputstructuresmedfate">2.1.1</a>).</p>
 <p>Even if the list of control parameters is long, not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), and most of them should not be altered from their default values. However, there are a set of parameters that are worth learning:</p>
 <ul>
