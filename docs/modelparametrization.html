@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-05-10" />
+<meta name="date" content="2024-05-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -570,13 +570,13 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="19.5.1" data-path="watershedhydrology.html"><a href="watershedhydrology.html#gridded-inputs"><i class="fa fa-check"></i><b>19.5.1</b> Gridded inputs</a></li>
 <li class="chapter" data-level="19.5.2" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershed-meteorology-input"><i class="fa fa-check"></i><b>19.5.2</b> Watershed meteorology input</a></li>
-<li class="chapter" data-level="19.5.3" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedbalancecontrol"><i class="fa fa-check"></i><b>19.5.3</b> Watershed hydraulic correction parameters</a></li>
+<li class="chapter" data-level="19.5.3" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedbalancecontrol"><i class="fa fa-check"></i><b>19.5.3</b> Watershed hydraulic control parameters</a></li>
 <li class="chapter" data-level="19.5.4" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedbalanceoutput"><i class="fa fa-check"></i><b>19.5.4</b> Model outputs</a></li>
 </ul></li>
 <li class="chapter" data-level="19.6" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedbalancedetails"><i class="fa fa-check"></i><b>19.6</b> Process details</a>
 <ul>
-<li class="chapter" data-level="19.6.1" data-path="watershedhydrology.html"><a href="watershedhydrology.html#subsurfaceflows"><i class="fa fa-check"></i><b>19.6.1</b> Subsurface flows</a></li>
-<li class="chapter" data-level="19.6.2" data-path="watershedhydrology.html"><a href="watershedhydrology.html#overlandflows"><i class="fa fa-check"></i><b>19.6.2</b> Overland flows</a></li>
+<li class="chapter" data-level="19.6.1" data-path="watershedhydrology.html"><a href="watershedhydrology.html#subsurfaceflows"><i class="fa fa-check"></i><b>19.6.1</b> Soil and groundwater lateral fluxes</a></li>
+<li class="chapter" data-level="19.6.2" data-path="watershedhydrology.html"><a href="watershedhydrology.html#overlandflows"><i class="fa fa-check"></i><b>19.6.2</b> Overland runoff</a></li>
 <li class="chapter" data-level="19.6.3" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedexport"><i class="fa fa-check"></i><b>19.6.3</b> Watershed surface runoff</a></li>
 <li class="chapter" data-level="19.6.4" data-path="watershedhydrology.html"><a href="watershedhydrology.html#deepaquiferloss"><i class="fa fa-check"></i><b>19.6.4</b> Losses towards a deeper aquifer</a></li>
 </ul></li>
@@ -9405,26 +9405,26 @@ The maximum stem conductance with taper (<span class="math inline">\(k_{s, max, 
 <span id="cb72-2"><a href="modelparametrization.html#cb72-2" tabindex="-1"></a>krootmax</span></code></pre></div>
 <pre><code>## [1] 5.579497</code></pre>
 <p>Now, we need to divide total maximum conductance of the root system xylem among soil layers we need weights inversely proportional to the length of transport distances <span class="citation">(<a href="#ref-Sperry2016">Sperry <em>et al.</em> 2017</a>)</span>. Vertical transport lengths can be calculated from soil depths and radial spread can be calculated assuming cylinders with volume proportional to the proportions of fine root biomass. Let’s assume a soil with three layers:</p>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="modelparametrization.html#cb74-1" tabindex="-1"></a>s <span class="ot">=</span> <span class="fu">soil</span>(<span class="fu">defaultSoilParams</span>(<span class="dv">3</span>))</span>
-<span id="cb74-2"><a href="modelparametrization.html#cb74-2" tabindex="-1"></a>d <span class="ot">=</span> s<span class="sc">$</span>dVec</span>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="modelparametrization.html#cb74-1" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">soil</span>(<span class="fu">defaultSoilParams</span>(<span class="dv">3</span>))</span>
+<span id="cb74-2"><a href="modelparametrization.html#cb74-2" tabindex="-1"></a>d <span class="ot">&lt;-</span> s<span class="sc">$</span>widths</span>
 <span id="cb74-3"><a href="modelparametrization.html#cb74-3" tabindex="-1"></a>d</span></code></pre></div>
 <pre><code>## [1]  300  700 1000</code></pre>
 <p>The proportion of fine roots in each layer, assuming a linear dose response model, will be:</p>
-<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="modelparametrization.html#cb76-1" tabindex="-1"></a>Z50 <span class="ot">=</span> <span class="dv">200</span></span>
-<span id="cb76-2"><a href="modelparametrization.html#cb76-2" tabindex="-1"></a>Z95 <span class="ot">=</span> <span class="dv">1500</span></span>
-<span id="cb76-3"><a href="modelparametrization.html#cb76-3" tabindex="-1"></a>v1 <span class="ot">=</span> <span class="fu">root_ldrDistribution</span>(Z50,Z95, d)</span>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="modelparametrization.html#cb76-1" tabindex="-1"></a>Z50 <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb76-2"><a href="modelparametrization.html#cb76-2" tabindex="-1"></a>Z95 <span class="ot">&lt;-</span> <span class="dv">1500</span></span>
+<span id="cb76-3"><a href="modelparametrization.html#cb76-3" tabindex="-1"></a>v1 <span class="ot">&lt;-</span> <span class="fu">root_ldrDistribution</span>(Z50,Z95, d)</span>
 <span id="cb76-4"><a href="modelparametrization.html#cb76-4" tabindex="-1"></a>v1</span></code></pre></div>
 <pre><code>##           [,1]      [,2]       [,3]
 ## [1,] 0.6661036 0.2784153 0.05548106</code></pre>
 <p>Having this information, the calculation of root length (i.e. the sum of vertical and radial lengths) to each layer (<span class="math inline">\(L_j\)</span>) is done using function <code>root_coarseRootLengths()</code>:</p>
-<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="modelparametrization.html#cb78-1" tabindex="-1"></a>rfc <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">20</span>,<span class="dv">50</span>,<span class="dv">70</span>)</span>
-<span id="cb78-2"><a href="modelparametrization.html#cb78-2" tabindex="-1"></a>Vol <span class="ot">=</span> <span class="fu">root_coarseRootSoilVolumeFromConductance</span>(<span class="fl">1.0</span>, <span class="dv">2500</span>,krootmax,</span>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="modelparametrization.html#cb78-1" tabindex="-1"></a>rfc <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">20</span>,<span class="dv">50</span>,<span class="dv">70</span>)</span>
+<span id="cb78-2"><a href="modelparametrization.html#cb78-2" tabindex="-1"></a>Vol <span class="ot">&lt;-</span> <span class="fu">root_coarseRootSoilVolumeFromConductance</span>(<span class="fl">1.0</span>, <span class="dv">2500</span>,krootmax,</span>
 <span id="cb78-3"><a href="modelparametrization.html#cb78-3" tabindex="-1"></a>                                               v1, d, rfc)</span>
-<span id="cb78-4"><a href="modelparametrization.html#cb78-4" tabindex="-1"></a>l <span class="ot">=</span> <span class="fu">root_coarseRootLengthsFromVolume</span>(Vol, v1, d, rfc)</span>
+<span id="cb78-4"><a href="modelparametrization.html#cb78-4" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">root_coarseRootLengthsFromVolume</span>(Vol, v1, d, rfc)</span>
 <span id="cb78-5"><a href="modelparametrization.html#cb78-5" tabindex="-1"></a>l</span></code></pre></div>
 <pre><code>## [1] 4503.445 3250.363 3085.055</code></pre>
 <p>where lengths are in mm. The proportion of total root xylem conductance corresponding to each layer (<span class="math inline">\(w_j\)</span>) is given by <code>root_xylemConductanceProportions()</code>:</p>
-<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="modelparametrization.html#cb80-1" tabindex="-1"></a>w1 <span class="ot">=</span> <span class="fu">hydraulics_rootxylemConductanceProportions</span>(v1, l)</span>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="modelparametrization.html#cb80-1" tabindex="-1"></a>w1 <span class="ot">&lt;-</span> <span class="fu">hydraulics_rootxylemConductanceProportions</span>(v1, l)</span>
 <span id="cb80-2"><a href="modelparametrization.html#cb80-2" tabindex="-1"></a>w1</span></code></pre></div>
 <pre><code>## [1] 0.09131268 0.15767645 0.75101087</code></pre>
 <p>Xylem conductance proportions can be quite different than the fine root biomass proportions. This is because radial lengths are largest for the first top layers and vertical lengths are largest for the bottom layers. The maximum root xylem conductances of each layer will be the product of maximum total conductance of root xylem and weights:</p>

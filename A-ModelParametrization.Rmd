@@ -651,30 +651,30 @@ krootmax
 
 Now, we need to divide total maximum conductance of the root system xylem among soil layers we need weights inversely proportional to the length of transport distances [@Sperry2016]. Vertical transport lengths can be calculated from soil depths and radial spread can be calculated assuming cylinders with volume proportional to the proportions of fine root biomass. Let's assume a soil with three layers:
 ```{r}
-s = soil(defaultSoilParams(3))
-d = s$dVec
+s <- soil(defaultSoilParams(3))
+d <- s$widths
 d
 ```
 The proportion of fine roots in each layer, assuming a linear dose response model, will be:
 ```{r}
-Z50 = 200
-Z95 = 1500
-v1 = root_ldrDistribution(Z50,Z95, d)
+Z50 <- 200
+Z95 <- 1500
+v1 <- root_ldrDistribution(Z50,Z95, d)
 v1
 ```
 
 Having this information, the calculation of root length (i.e. the sum of vertical and radial lengths) to each layer ($L_j$) is done using function `root_coarseRootLengths()`:
 ```{r}
-rfc = c(20,50,70)
-Vol = root_coarseRootSoilVolumeFromConductance(1.0, 2500,krootmax,
+rfc <- c(20,50,70)
+Vol <- root_coarseRootSoilVolumeFromConductance(1.0, 2500,krootmax,
                                                v1, d, rfc)
-l = root_coarseRootLengthsFromVolume(Vol, v1, d, rfc)
+l <- root_coarseRootLengthsFromVolume(Vol, v1, d, rfc)
 l
 ```
 
 where lengths are in mm. The proportion of total root xylem conductance corresponding to each layer ($w_j$) is given by `root_xylemConductanceProportions()`:
 ```{r}
-w1 = hydraulics_rootxylemConductanceProportions(v1, l)
+w1 <- hydraulics_rootxylemConductanceProportions(v1, l)
 w1
 ```
 
