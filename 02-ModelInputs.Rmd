@@ -9,7 +9,7 @@ This chapter describes the inputs required by simulation models of **medfate** a
 
 The last section (\@ref(controlparameters)) describes additional input parameters that are used to specify global options of simulation functions.
 
-Since preparing inputs for simulations can be daunting for most users, package [**medfateutils**](https://github.com/emf-creaf/medfateutils) provides a set of utility functions aimed at facilitating the preparation of vegetation and soil inputs, whereas package [**meteoland**](https://github.com/emf-creaf/meteoland) provides functions to assess daily weather over landscapes.
+Since preparing inputs for simulations can be daunting for most users, package [**medfateland**](https://github.com/emf-creaf/medfateland) provides a set of utility functions aimed at facilitating the preparation of vegetation and soil inputs, whereas package [**meteoland**](https://github.com/emf-creaf/meteoland) provides functions to assess daily weather over landscapes.
 
 
 ## Input structures
@@ -30,7 +30,15 @@ knitr::include_graphics("figures/input_workflow.png")
 
 ### Input structures in medfateland {#medfatelandstructures}
 
-Spatial information for **medfateland** needs to be provided in `sf` objects (i.e. data frames with geometry, see package [**sf**](https://cran.r-project.org/package=sf)), whose actual columns required depend on the simulation function to be used, as described in the following table. 
+Spatial information for **medfateland** needs to be provided in `sf` objects (i.e. data frames with geometry, see package [**sf**](https://cran.r-project.org/package=sf)). For each forest stand to be simulated, these object must include a geometry, topographic features as well as a `forest` object and `soil` object, as illustrated in the figure below:
+
+
+```{r datastructures, out.width='100%', fig.align="center", fig.cap="Relationship between data structures in medfate and medfateland", echo=FALSE}
+knitr::include_graphics("figures/data_structures.png")
+
+```
+
+Non-forest (i.e. croplands or urban areas) patches may be also described, and then `forest` or `soil` objects may not be required. The actual columns required in a `sf` depend on the simulation function to be used, as described in the following table: 
 
 |  Column | Description         | Use                           |
 | ------- | ------------------- | ----------------------------- |
@@ -48,7 +56,6 @@ Spatial information for **medfateland** needs to be provided in `sf` objects (i.
 |  `management_arguments`      |  Management arguments for each stand |  Optional for `fordyn_spatial()` | 
 |  `management_unit`      |  Management unit corresponding to each stand |  Required for `fordyn_scenario()` | 
 |  `represented_area_ha`      |  Area represented by each stand, in hectares |  Required for `fordyn_scenario()` | 
-| `channel` | Logical values indicating whether cells belong to the channel network. | Required for `*_land()` | 
 | `depth_to_bedrock` | Depth to bedrock (mm). | Required for `*_land()` | 
 | `bedrock_conductivity` | Bedrock (saturated) conductivity (in m·day-1). | Required for `*_land()` | 
 | `bedrock_porosity` | Bedrock porosity ([0-1]). | Required for `*_land()` | 
@@ -87,7 +94,7 @@ soildf
 ```
 
 
-Package [**medfateutils**](https://github.com/emf-creaf/medfateutils) includes a function `soilgridsParams()` to fetch soil information from [SoilGrids.org](https://soilgrids.org/), a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.
+Package **medfateland** includes a function `add_soilgrids()` to fetch soil information from [SoilGrids.org](https://soilgrids.org/), a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.
 
 The depth of a given soil layer $s$ ($Z_s$; in mm) is defined as the sum of layer widths from the surface to the target layer:
 \begin{equation}
@@ -264,7 +271,7 @@ data(exampleforest)
 exampleforest
 ```
 
-The most important items of `forest` are the two data frames describing woody vegetation, `treeData` (for trees) and `shrubData` for shrubs, but the herbaceous layer can also be described using `herbCover` and `herbHeight`. With the aim to help users in the task of constructing `forest` objects, package [**medfateutils**](https://github.com/emf-creaf/medfateutils) includes functions to map user data in into tables `treeData` and `shrubData`.
+The most important items of `forest` are the two data frames describing woody vegetation, `treeData` (for trees) and `shrubData` for shrubs, but the herbaceous layer can also be described using `herbCover` and `herbHeight`. With the aim to help users in the task of constructing `forest` objects, package **medfate** includes functions to map user data in into tables `treeData` and `shrubData`.
 
 `forest` objects are a convenient format to start calculations with **medfate**, because there are many static functions that take forest objects as input. For example, a `summary.forest()` function provides the basal area, density, cover and leaf area index of the forest stand, and its different components:
 

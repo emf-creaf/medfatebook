@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-05-23" />
+<meta name="date" content="2024-05-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -743,7 +743,7 @@ div.csl-indent {
 <li><em>Topographic information and geographic location</em>. Topography and latitude are also required, because internal calculations of some physical variables require them.</li>
 </ol>
 <p>The last section (<a href="model-inputs.html#controlparameters">2.6</a>) describes additional input parameters that are used to specify global options of simulation functions.</p>
-<p>Since preparing inputs for simulations can be daunting for most users, package <a href="https://github.com/emf-creaf/medfateutils"><strong>medfateutils</strong></a> provides a set of utility functions aimed at facilitating the preparation of vegetation and soil inputs, whereas package <a href="https://github.com/emf-creaf/meteoland"><strong>meteoland</strong></a> provides functions to assess daily weather over landscapes.</p>
+<p>Since preparing inputs for simulations can be daunting for most users, package <a href="https://github.com/emf-creaf/medfateland"><strong>medfateland</strong></a> provides a set of utility functions aimed at facilitating the preparation of vegetation and soil inputs, whereas package <a href="https://github.com/emf-creaf/meteoland"><strong>meteoland</strong></a> provides functions to assess daily weather over landscapes.</p>
 <div id="input-structures" class="section level2 hasAnchor" number="2.1">
 <h2><span class="header-section-number">2.1</span> Input structures<a href="model-inputs.html#input-structures" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div id="inputstructuresmedfate" class="section level3 hasAnchor" number="2.1.1">
@@ -764,7 +764,14 @@ Figure 2.1: Schematic workflow of input creation for simulation functions in med
 </div>
 <div id="medfatelandstructures" class="section level3 hasAnchor" number="2.1.2">
 <h3><span class="header-section-number">2.1.2</span> Input structures in medfateland<a href="model-inputs.html#medfatelandstructures" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Spatial information for <strong>medfateland</strong> needs to be provided in <code>sf</code> objects (i.e. data frames with geometry, see package <a href="https://cran.r-project.org/package=sf"><strong>sf</strong></a>), whose actual columns required depend on the simulation function to be used, as described in the following table.</p>
+<p>Spatial information for <strong>medfateland</strong> needs to be provided in <code>sf</code> objects (i.e. data frames with geometry, see package <a href="https://cran.r-project.org/package=sf"><strong>sf</strong></a>). For each forest stand to be simulated, these object must include a geometry, topographic features as well as a <code>forest</code> object and <code>soil</code> object, as illustrated in the figure below:</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:datastructures"></span>
+<img src="figures/data_structures.png" alt="Relationship between data structures in medfate and medfateland" width="100%" />
+<p class="caption">
+Figure 2.2: Relationship between data structures in medfate and medfateland
+</p>
+</div>
+<p>Non-forest (i.e. croplands or urban areas) patches may be also described, and then <code>forest</code> or <code>soil</code> objects may not be required. The actual columns required in a <code>sf</code> depend on the simulation function to be used, as described in the following table:</p>
 <table>
 <colgroup>
 <col width="12%" />
@@ -850,31 +857,26 @@ Figure 2.1: Schematic workflow of input creation for simulation functions in med
 <td>Required for <code>fordyn_scenario()</code></td>
 </tr>
 <tr class="odd">
-<td><code>channel</code></td>
-<td>Logical values indicating whether cells belong to the channel network.</td>
-<td>Required for <code>*_land()</code></td>
-</tr>
-<tr class="even">
 <td><code>depth_to_bedrock</code></td>
 <td>Depth to bedrock (mm).</td>
 <td>Required for <code>*_land()</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>bedrock_conductivity</code></td>
 <td>Bedrock (saturated) conductivity (in m·day-1).</td>
 <td>Required for <code>*_land()</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>bedrock_porosity</code></td>
 <td>Bedrock porosity ([0-1]).</td>
 <td>Required for <code>*_land()</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>snowpack</code></td>
 <td>Snow water equivalent content of the snowpack (mm).</td>
 <td>Required for <code>*_land()</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>aquifer</code></td>
 <td>Water content of the aquifer in each cell.</td>
 <td>Required for <code>*_land()</code></td>
@@ -956,7 +958,7 @@ Figure 2.1: Schematic workflow of input creation for simulation functions in med
 ## 2    700   25   25 NA       NA 1.5  45
 ## 3   1000   25   25 NA       NA 1.5  75
 ## 4   2000   25   25 NA       NA 1.5  95</code></pre>
-<p>Package <a href="https://github.com/emf-creaf/medfateutils"><strong>medfateutils</strong></a> includes a function <code>soilgridsParams()</code> to fetch soil information from <a href="https://soilgrids.org/">SoilGrids.org</a>, a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.</p>
+<p>Package <strong>medfateland</strong> includes a function <code>add_soilgrids()</code> to fetch soil information from <a href="https://soilgrids.org/">SoilGrids.org</a>, a global soil database currently providing soil data at 250m scale. This can be helpful to users lacking local soil measurements, but the uncertainty of SoilGrids estimates can be high for some areas and soil properties, especially soil depth and rock fragment content.</p>
 <p>The depth of a given soil layer <span class="math inline">\(s\)</span> (<span class="math inline">\(Z_s\)</span>; in mm) is defined as the sum of layer widths from the surface to the target layer:
 <span class="math display">\[\begin{equation}
 Z_s = \sum_{i=1}^s{d_s}
@@ -966,7 +968,7 @@ And the overall <em>soil depth</em> (<span class="math inline">\(Z_{soil}\)</spa
 <div id="waterretentioncurves" class="section level3 hasAnchor" number="2.3.2">
 <h3><span class="header-section-number">2.3.2</span> Water retention curves<a href="model-inputs.html#waterretentioncurves" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The <strong>water retention curve</strong> of a soil is the relationship between <em>volumetric soil moisture content</em> (<span class="math inline">\(\theta\)</span>, in <span class="math inline">\(m^3 \cdot m^{-3}\)</span> of soil, excluding rock fragments) and the corresponding <em>soil water potential</em> (<span class="math inline">\(\Psi\)</span>, in MPa), i.e. the amount of work that must be done per unit quantity of pure water in order to transport reversibly and isothermally an infinitesimal quantity of water from a reference pool. The shape of the water retention curve (also called the <em>soil moisture characteristic curve</em>) depends on physical properties (mainly texture and bulk density, but also organic matter content). Since soil layers usually differ in their physical properties they also normally have different water retention curves.</p>
-<p>Two water retention curve models are available in <strong>medfate</strong> (fig. <a href="model-inputs.html#fig:retention-curves">2.2</a>):</p>
+<p>Two water retention curve models are available in <strong>medfate</strong> (fig. <a href="model-inputs.html#fig:retention-curves">2.3</a>):</p>
 <ol style="list-style-type: decimal">
 <li><em>Saxton model</em>: In this model, volumetric soil moisture <span class="math inline">\(\theta(\Psi)\)</span> corresponding to a given water potential <span class="math inline">\(\Psi\)</span> (in MPa) below field capacity (i.e., <span class="math inline">\(\Psi &lt; \Psi_{fc}\)</span>) is calculated using:
 <span class="math display">\[\begin{equation}\theta(\Psi) = (\Psi/A)^{(1/B)}\end{equation}\]</span>
@@ -976,14 +978,10 @@ where <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)
 where <span class="math inline">\(\theta(\psi)\)</span> is the water retention, <span class="math inline">\(\theta_{sat}\)</span> is the saturated water content, <span class="math inline">\(\theta_{res}\)</span> is the residual water content, <span class="math inline">\(\alpha\)</span> is related to the inverse of the air entry pressure, and <span class="math inline">\(n\)</span> is a measure of the pore-size distribution.</li>
 </ol>
 
-<pre><code>## Warning: A numeric `legend.position` argument in `theme()` was deprecated in ggplot2 3.5.0.
-## ℹ Please use the `legend.position.inside` argument of `theme()` instead.
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.</code></pre>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:retention-curves"></span>
 <img src="medfatebook_files/figure-html/retention-curves-1.png" alt="Water retention curves under the Saxton and Van Genuchten models, for the same physical attributes (25% sand, 25% clay, 50% silt and bulk density of \(1.5 g \cdot cm^{-3}\)). Parameters of the Van Genuchten curve have been estimated using pedotransfer functions given in Tóth et al. (2015)." width="384" />
 <p class="caption">
-Figure 2.2: Water retention curves under the Saxton and Van Genuchten models, for the same physical attributes (25% sand, 25% clay, 50% silt and bulk density of <span class="math inline">\(1.5 g \cdot cm^{-3}\)</span>). Parameters of the Van Genuchten curve have been estimated using pedotransfer functions given in <span class="citation">Tóth <em>et al.</em> (<a href="#ref-Toth2015">2015</a>)</span>.
+Figure 2.3: Water retention curves under the Saxton and Van Genuchten models, for the same physical attributes (25% sand, 25% clay, 50% silt and bulk density of <span class="math inline">\(1.5 g \cdot cm^{-3}\)</span>). Parameters of the Van Genuchten curve have been estimated using pedotransfer functions given in <span class="citation">Tóth <em>et al.</em> (<a href="#ref-Toth2015">2015</a>)</span>.
 </p>
 </div>
 <p>Hydraulic conductivity governs the rate of water flow for a unit gradient in potential. It decreases sharply as soil becomes dry, and the relationship also depends on soil texture. The Saxton and Van Genuchten models also describe and parameterize the relationship between conductivity and soil water potential.</p>
@@ -1298,8 +1296,8 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 <div id="forestobjects" class="section level3 hasAnchor" number="2.4.4">
 <h3><span class="header-section-number">2.4.4</span> Forest plot objects<a href="model-inputs.html#forestobjects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>While the previous section described the structural forest variables required to run simulations in <strong>medfate</strong>, forest plot data input in the package is easier if one uses a format that follows closely forest inventory plot descriptions. In this format, each forest plot is represented in an object of class <code>forest</code>, a list that contains several elements. Here we use an example forest stand provided with the package:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="model-inputs.html#cb7-1" tabindex="-1"></a><span class="fu">data</span>(exampleforest)</span>
-<span id="cb7-2"><a href="model-inputs.html#cb7-2" tabindex="-1"></a>exampleforest</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="model-inputs.html#cb6-1" tabindex="-1"></a><span class="fu">data</span>(exampleforest)</span>
+<span id="cb6-2"><a href="model-inputs.html#cb6-2" tabindex="-1"></a>exampleforest</span></code></pre></div>
 <pre><code>## $treeData
 ##            Species   N   DBH Height Z50  Z95
 ## 1 Pinus halepensis 168 37.55    800 100  600
@@ -1321,9 +1319,9 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 ## 
 ## attr(,&quot;class&quot;)
 ## [1] &quot;forest&quot; &quot;list&quot;</code></pre>
-<p>The most important items of <code>forest</code> are the two data frames describing woody vegetation, <code>treeData</code> (for trees) and <code>shrubData</code> for shrubs, but the herbaceous layer can also be described using <code>herbCover</code> and <code>herbHeight</code>. With the aim to help users in the task of constructing <code>forest</code> objects, package <a href="https://github.com/emf-creaf/medfateutils"><strong>medfateutils</strong></a> includes functions to map user data in into tables <code>treeData</code> and <code>shrubData</code>.</p>
+<p>The most important items of <code>forest</code> are the two data frames describing woody vegetation, <code>treeData</code> (for trees) and <code>shrubData</code> for shrubs, but the herbaceous layer can also be described using <code>herbCover</code> and <code>herbHeight</code>. With the aim to help users in the task of constructing <code>forest</code> objects, package <strong>medfate</strong> includes functions to map user data in into tables <code>treeData</code> and <code>shrubData</code>.</p>
 <p><code>forest</code> objects are a convenient format to start calculations with <strong>medfate</strong>, because there are many static functions that take forest objects as input. For example, a <code>summary.forest()</code> function provides the basal area, density, cover and leaf area index of the forest stand, and its different components:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="model-inputs.html#cb9-1" tabindex="-1"></a><span class="fu">summary</span>(exampleforest, SpParamsMED)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="model-inputs.html#cb8-1" tabindex="-1"></a><span class="fu">summary</span>(exampleforest, SpParamsMED)</span></code></pre></div>
 <pre><code>## Tree BA (m2/ha): 25.0333016  adult trees: 25.0333016  saplings: 0 
 ## Density (ind/ha) adult trees: 552  saplings: 0  shrubs (estimated): 749.4923076 
 ## Cover (%) adult trees: 100  saplings: 0  shrubs: 3.75  herbs: 10 
@@ -1334,9 +1332,9 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 <div id="single-cohort-forests" class="section level3 hasAnchor" number="2.4.5">
 <h3><span class="header-section-number">2.4.5</span> Single-cohort forests<a href="model-inputs.html#single-cohort-forests" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Although <strong>medfate</strong> has been designed to perform simulations on multi-cohort forests, it can also handle simulations where vegetation is described using a single cohort. Functions <code>tree2forest()</code> and <code>shrub2forest()</code> allow defining single-cohort forests from attributes. For example a holm oak (<em>Quercus ilex</em>) forest of 4-m height and having a leaf area index of <span class="math inline">\(2\, m^2\cdot m^{-2}\)</span> can be defined using:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="model-inputs.html#cb11-1" tabindex="-1"></a>oak_forest <span class="ot">&lt;-</span><span class="fu">tree2forest</span>(<span class="st">&quot;Quercus ilex&quot;</span>, <span class="at">Height=</span> <span class="dv">400</span>, <span class="at">LAI =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="model-inputs.html#cb10-1" tabindex="-1"></a>oak_forest <span class="ot">&lt;-</span><span class="fu">tree2forest</span>(<span class="st">&quot;Quercus ilex&quot;</span>, <span class="at">Height=</span> <span class="dv">400</span>, <span class="at">LAI =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p>The function will return a <code>forest</code> object where most attributes are empty:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="model-inputs.html#cb12-1" tabindex="-1"></a>oak_forest</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="model-inputs.html#cb11-1" tabindex="-1"></a>oak_forest</span></code></pre></div>
 <pre><code>## $treeData
 ##        Species DBH Height  N Z50 Z95 LAI
 ## 1 Quercus ilex  NA    400 NA  NA  NA   2
@@ -1358,7 +1356,7 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 ## attr(,&quot;class&quot;)
 ## [1] &quot;forest&quot; &quot;list&quot;</code></pre>
 <p>Nevertheless, the object is well defined, for example we can summarize it using:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="model-inputs.html#cb14-1" tabindex="-1"></a><span class="fu">summary</span>(oak_forest, SpParamsMED)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="model-inputs.html#cb13-1" tabindex="-1"></a><span class="fu">summary</span>(oak_forest, SpParamsMED)</span></code></pre></div>
 <pre><code>## Tree BA (m2/ha): 0  adult trees: 0  saplings: 0 
 ## Density (ind/ha) adult trees: 0  saplings: 0  shrubs (estimated): 0 
 ## Cover (%) adult trees: 0  saplings: 0  shrubs: 0  herbs: 0 
@@ -1371,11 +1369,11 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 <h3><span class="header-section-number">2.4.6</span> Vertical leaf distribution<a href="model-inputs.html#leafdistribution" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The vegetation input structures allow the package to determine the vertical distribution of leaves in the stand. The leaf area of any woody plant cohort is assumed to be distributed vertically following a <strong>truncated Gaussian function</strong> whose standardized values -1.5 and 1.5 correspond to crown base height (<span class="math inline">\(H_{crown,i}\)</span>; in <span class="math inline">\(cm\)</span>) and total plant height (<span class="math inline">\(H_i\)</span>), respectively. Crown base height is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort (<span class="math inline">\(CR_i\)</span>; a proportion between 0 and 1), which in turn can be estimated as explained in <a href="allometricmodels.html#eq:CrownHeight">(21.6)</a>.</p>
 <p>Simulation models in <strong>medfate</strong> divide the vertical dimension into vertical layers (by default are 100 cm width, but see control parameter <code>verticalLayerSize</code>). Let us define <span class="math inline">\(LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}\)</span> as the leaf area index of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> including both functional leaves and dead leaves standing on branches. The truncated Gaussian distribution defines the <span class="math inline">\(LAI_{i,j}^{\phi}\)</span> and <span class="math inline">\(LAI_{i,j}^{dead}\)</span> for all plant cohorts and vertical layers.</p>
-<p>Dividing the leaf area of a given layer by its width, one obtains the <em>leaf area density</em> (<span class="math inline">\(LAD\)</span> in <span class="math inline">\(m^2 \cdot m^{-3}\)</span>). Figure <a href="model-inputs.html#fig:leafareadensity">2.3</a> illustrates the leaf area density profile (see function <code>vprofile_leafAreaDensity()</code>) corresponding to the forest stand described in the example <code>forest</code> object that we showed above.</p>
+<p>Dividing the leaf area of a given layer by its width, one obtains the <em>leaf area density</em> (<span class="math inline">\(LAD\)</span> in <span class="math inline">\(m^2 \cdot m^{-3}\)</span>). Figure <a href="model-inputs.html#fig:leafareadensity">2.4</a> illustrates the leaf area density profile (see function <code>vprofile_leafAreaDensity()</code>) corresponding to the forest stand described in the example <code>forest</code> object that we showed above.</p>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:leafareadensity"></span>
 <img src="medfatebook_files/figure-html/leafareadensity-1.png" alt="Leaf area density distribution of woody vegetation in a forest stand. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution." width="768" />
 <p class="caption">
-Figure 2.3: Leaf area density distribution of woody vegetation in a forest stand. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution.
+Figure 2.4: Leaf area density distribution of woody vegetation in a forest stand. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution.
 </p>
 </div>
 <p>The leaf area density profile determines the light extinction rates through the forest canopy. The same truncated Gaussian distribution is used to distribute leaf and small branch biomass along the vertical dimension.</p>
@@ -1383,7 +1381,7 @@ Figure 2.3: Leaf area density distribution of woody vegetation in a forest stand
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:leafareadensityherbs"></span>
 <img src="medfatebook_files/figure-html/leafareadensityherbs-1.png" alt="Leaf area density distribution in a forest stand, including the herbaceous layer. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution." width="768" />
 <p class="caption">
-Figure 2.4: Leaf area density distribution in a forest stand, including the herbaceous layer. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution.
+Figure 2.5: Leaf area density distribution in a forest stand, including the herbaceous layer. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution.
 </p>
 </div>
 </div>
@@ -1396,11 +1394,11 @@ FRP_{i,s} &amp;=&amp; Y_i(Z_s) - Y_i(Z_{s-1}) \\
 Y_i(z) &amp;=&amp; \frac{1}{1+(z/Z_{50,i})^{c_i}}
 \end{eqnarray}\]</span>
 where <span class="math inline">\(Y_i(z)\)</span> is the cumulative fraction of fine root mass located between surface and depth <span class="math inline">\(z\)</span>; <span class="math inline">\(Z_{50,i}\)</span> is the depth (in mm) above which 50% of the root mass is located; and <span class="math inline">\(c_i\)</span> is a shape parameter related to <span class="math inline">\(Z_{50,i}\)</span> and <span class="math inline">\(Z_{95,i}\)</span> as <span class="math inline">\(c_i  = 2.94 / \ln(Z_{50,i} / Z_{95,i})\)</span>.</p>
-<p>The linear dose response model is quite flexible with respect to fine root distribution (see function <code>root_ldrDistribution()</code>). The following figure shows the fine root distribution profile of the same cohorts as in fig. <a href="model-inputs.html#fig:leafareadensity">2.3</a> (see <code>vprofile_rootDistribution()</code>):</p>
+<p>The linear dose response model is quite flexible with respect to fine root distribution (see function <code>root_ldrDistribution()</code>). The following figure shows the fine root distribution profile of the same cohorts as in fig. <a href="model-inputs.html#fig:leafareadensity">2.4</a> (see <code>vprofile_rootDistribution()</code>):</p>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:root-distribution"></span>
 <img src="medfatebook_files/figure-html/root-distribution-1.png" alt="Examples of root density profile according to the linear dose response model." width="480" />
 <p class="caption">
-Figure 2.5: Examples of root density profile according to the linear dose response model.
+Figure 2.6: Examples of root density profile according to the linear dose response model.
 </p>
 </div>
 <p>The actual input to simulation functions <code>spwb()</code>, <code>growth()</code> and alike, describes fine root distribution using the matrix of <span class="math inline">\(FRP_{i,s}\)</span> values - not <span class="math inline">\(Z_{50,i}\)</span> and <span class="math inline">\(Z_{95,i}\)</span> -, which means that the proportions of fine roots can be modified manually or be defined by another model. In fact, <strong>medfate</strong> also allows calculating <span class="math inline">\(FRP_{i,s}\)</span> values assuming a conic distribution of fine roots (see <code>root_conicDistribution()</code>).</p>
@@ -1637,7 +1635,7 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <div id="controlparameters" class="section level2 hasAnchor" number="2.6">
 <h2><span class="header-section-number">2.6</span> Simulation control<a href="model-inputs.html#controlparameters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Simulation control parameters are a list of global parameter values, initialized using function <code>defaultControl()</code>, that the user can modify to change the general behavior of simulation functions. Here is the set of global control parameters currently accepted in <strong>medfate</strong>:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="model-inputs.html#cb16-1" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="model-inputs.html#cb15-1" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
 <pre><code>##   [1] &quot;fillMissingRootParams&quot;            &quot;fillMissingSpParams&quot;              &quot;fillMissingWithGenusParams&quot;      
 ##   [4] &quot;verbose&quot;                          &quot;subdailyResults&quot;                  &quot;standResults&quot;                    
 ##   [7] &quot;soilResults&quot;                      &quot;snowResults&quot;                      &quot;plantResults&quot;                    
