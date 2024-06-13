@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-05-29" />
+<meta name="date" content="2024-06-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -357,7 +357,7 @@ div.csl-indent {
 <li class="chapter" data-level="10.3.1" data-path="planthydraulics.html"><a href="planthydraulics.html#pressurevolumecurves"><i class="fa fa-check"></i><b>10.3.1</b> Relative water content of symplasmic tissues</a></li>
 <li class="chapter" data-level="10.3.2" data-path="planthydraulics.html"><a href="planthydraulics.html#relative-water-content-of-apoplastic-tissues"><i class="fa fa-check"></i><b>10.3.2</b> Relative water content of apoplastic tissues</a></li>
 <li class="chapter" data-level="10.3.3" data-path="planthydraulics.html"><a href="planthydraulics.html#averagerelativewatercontent"><i class="fa fa-check"></i><b>10.3.3</b> Average relative water content of a compartment</a></li>
-<li class="chapter" data-level="10.3.4" data-path="planthydraulics.html"><a href="planthydraulics.html#live-fuel-moisture-content"><i class="fa fa-check"></i><b>10.3.4</b> Live fuel moisture content</a></li>
+<li class="chapter" data-level="10.3.4" data-path="planthydraulics.html"><a href="planthydraulics.html#lfmc"><i class="fa fa-check"></i><b>10.3.4</b> Live fuel moisture content</a></li>
 </ul></li>
 <li class="chapter" data-level="10.4" data-path="planthydraulics.html"><a href="planthydraulics.html#supplyfunctions"><i class="fa fa-check"></i><b>10.4</b> Sperry’s sub-model of plant hydraulics</a>
 <ul>
@@ -750,7 +750,6 @@ div.csl-indent {
 <p><strong>Leaf temperature</strong></p>
 <p>By inspecting eq. <a href="plantphotosynthesis.html#eq:leaftemperatureequation">(11.1)</a>, we can conclude that transpiration flow decreases leaf temperature, whereas radiation increases it and wind speed makes it more similar to the temperature of the surrounding air. The following figures illustrate the effect of varying wind speed and flow rate on <span class="math inline">\(T_{leaf}\)</span> for two contrasted leaf widths (see function <code>biophysics_leafTemperature</code>):</p>
 
-<pre><code>## Package &#39;meteoland&#39; [ver. 2.2.1]</code></pre>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:leaftemperaturewind"></span>
 <img src="medfatebook_files/figure-html/leaftemperaturewind-1.png" alt="Values of \(T_{leaf}\) for two leaf widths and varying values of wind speed and flow rate, calculated for 24ºC air temperature and 740 \(W \cdot m^{-2}\) instantaneous absorbed radiation (including SWR and LWR)." width="768" />
 <p class="caption">
@@ -767,10 +766,10 @@ Figure 12.2: Examples of leaf temperature functions for a hydraulic network, cor
 </div>
 <p><strong>Leaf vapor deficit</strong></p>
 <p>Since <span class="math inline">\(e_{leaf}\)</span> decreases when leaf temperature decreases in eq. <a href="plantphotosynthesis.html#eq:leafvpequation">(11.4)</a>, increasing transpiration decreases leaf VPD as a result of decreasing leaf temperature. To illustrate this effect, let us assume the following values of relative humidity, yielding a <span class="math inline">\(e_{air} = e_{atm} =1.91\, kPa\)</span>:</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="transpirationsperrysureau.html#cb59-1" tabindex="-1"></a>RHmin <span class="ot">=</span> <span class="dv">60</span></span>
-<span id="cb59-2"><a href="transpirationsperrysureau.html#cb59-2" tabindex="-1"></a>RHmax <span class="ot">=</span> <span class="dv">75</span></span>
-<span id="cb59-3"><a href="transpirationsperrysureau.html#cb59-3" tabindex="-1"></a>VPatm <span class="ot">=</span> meteoland<span class="sc">::</span><span class="fu">utils_averageDailyVP</span>(Tmin, Tmax, RHmin, RHmax)</span>
-<span id="cb59-4"><a href="transpirationsperrysureau.html#cb59-4" tabindex="-1"></a>VPatm</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="transpirationsperrysureau.html#cb57-1" tabindex="-1"></a>RHmin <span class="ot">=</span> <span class="dv">60</span></span>
+<span id="cb57-2"><a href="transpirationsperrysureau.html#cb57-2" tabindex="-1"></a>RHmax <span class="ot">=</span> <span class="dv">75</span></span>
+<span id="cb57-3"><a href="transpirationsperrysureau.html#cb57-3" tabindex="-1"></a>VPatm <span class="ot">=</span> meteoland<span class="sc">::</span><span class="fu">utils_averageDailyVP</span>(Tmin, Tmax, RHmin, RHmax)</span>
+<span id="cb57-4"><a href="transpirationsperrysureau.html#cb57-4" tabindex="-1"></a>VPatm</span></code></pre></div>
 <pre><code>## [1] 1.912181</code></pre>
 <p>The application of eqs. <a href="plantphotosynthesis.html#eq:leafvpdequation">(11.3)</a> and <a href="plantphotosynthesis.html#eq:leafvpequation">(11.4)</a> to the <span class="math inline">\(T_{leaf}(\Psi_{leaf})\)</span> curves of fig. <a href="transpirationsperrysureau.html#fig:leaftemperaturefunction">12.2</a> yields the following <span class="math inline">\(VPD_{leaf}(\Psi_{leaf})\)</span> curves:</p>
 
@@ -793,10 +792,10 @@ Figure 12.4: Examples of stomatal conductance to water vapor (<span class="math 
 <p>In the previous figure we have indicated the thresholds of <span class="math inline">\(g_{sw,\min}\)</span> and <span class="math inline">\(g_{sw,\max}\)</span>, the species-specific minimum and maximum water vapour conductances (i.e. conductances when stomata are fully closed and fully open, respectively; see parameters <code>Gswmin</code> and <code>Gswmax</code> in <code>SpParamsMED</code>). <span class="math inline">\(g_{sw}\)</span> cannot exceed <span class="math inline">\(g_{sw,\max}\)</span> so that some flow rates may not be possible (see stomatal regulation below). However, <span class="math inline">\(g_{sw,\max}\)</span> should quickly become non-limiting as soil dries (i.e. reducing <span class="math inline">\(E\)</span>) or <span class="math inline">\(VPD_{leaf}\)</span> increases <span class="citation">(<a href="#ref-Sperry2016">Sperry <em>et al.</em> 2017</a>)</span>.</p>
 <p><strong>Leaf photosynthesis</strong></p>
 <p>Thus, after defining PAR photon flux density, canopy air <span class="math inline">\(CO_{2}\)</span> concentration and maximum rate parameters:</p>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="transpirationsperrysureau.html#cb61-1" tabindex="-1"></a>Q <span class="ot">=</span> <span class="dv">2000</span></span>
-<span id="cb61-2"><a href="transpirationsperrysureau.html#cb61-2" tabindex="-1"></a>Cair <span class="ot">=</span> <span class="dv">386</span></span>
-<span id="cb61-3"><a href="transpirationsperrysureau.html#cb61-3" tabindex="-1"></a>Vmax298 <span class="ot">=</span> <span class="dv">100</span></span>
-<span id="cb61-4"><a href="transpirationsperrysureau.html#cb61-4" tabindex="-1"></a>Jmax298 <span class="ot">=</span> <span class="fl">1.67</span><span class="sc">*</span>Vmax298</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="transpirationsperrysureau.html#cb59-1" tabindex="-1"></a>Q <span class="ot">=</span> <span class="dv">2000</span></span>
+<span id="cb59-2"><a href="transpirationsperrysureau.html#cb59-2" tabindex="-1"></a>Cair <span class="ot">=</span> <span class="dv">386</span></span>
+<span id="cb59-3"><a href="transpirationsperrysureau.html#cb59-3" tabindex="-1"></a>Vmax298 <span class="ot">=</span> <span class="dv">100</span></span>
+<span id="cb59-4"><a href="transpirationsperrysureau.html#cb59-4" tabindex="-1"></a>Jmax298 <span class="ot">=</span> <span class="fl">1.67</span><span class="sc">*</span>Vmax298</span></code></pre></div>
 <p>one can obtain the following <span class="math inline">\(A(\Psi_{leaf})\)</span> curves from <span class="math inline">\(T_{leaf}(\Psi_{leaf})\)</span> and <span class="math inline">\(g_{sw}(\Psi_{leaf})\)</span>:</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:leafphotosynthesisfunction"></span>

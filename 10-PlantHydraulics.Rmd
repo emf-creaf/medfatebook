@@ -248,7 +248,7 @@ RWC = RWC_{apo} \cdot f_{apo} + RWC_{sym} \cdot (1 - f_{apo})
 
 Normally the apoplastic fraction is large (~80%) in the stem and small (~15%) in leaves. Hence, the relative water content in stems will be mostly dictated by the level of cavitation, whereas that of leaves will mostly follow leaf symplastic water potential and the symplastic pressure-volume curve.
 
-### Live fuel moisture content
+### Live fuel moisture content {#lfmc}
 
 Given an average relative water content ($RWC$) of a plant organ, its live fuel moisture content ($LFMC$ in $g H_2O \cdot g^{-1}$ of dry tissue) can be calculated using:
 \begin{equation}
@@ -256,11 +256,17 @@ LFMC = RWC \cdot \Theta \cdot \frac{\rho_{H_2O}}{\rho} = RWC \cdot LFMC_{max}
 \end{equation}
 where $\Theta$ is the tissue porosity ($cm^3$ of water per $cm^3$ of tissue), $\rho$ is the density of the tissue and $\rho_{H_2O}$ is the density of water. In practice estimates of maximum fuel moisture content $LFMC_{max}$ are easier to obtain than porosity estimates, so it is more straightforward to estimate $LFMC$ as the product of $RWC$ and $LFMC_{max}$. 
 
-In medfate, $LFMC$ estimates are assumed to correspond to fine fuels (i.e. leaves and twigs of < 6.5 mm) and are estimated from stem and leaf water content:
+In medfate, $LFMC$ estimates are calculated differently depending on the value of the control variable `lfmcComponent`. If `lfmcComponent = "leaf"`, $LFMC$ estimates correspond to the leaf segment, i.e.:
+
 \begin{equation}
-LFMC = (RWC^{leaf} \cdot (1.0/r_{6.35})  + RWC^{stem} \cdot (1.0 - (1.0/r_{6.35}))) \cdot LFMC_{max}
+LFMC_{leaf} = RWC_{leaf} \cdot LFMC_{max}
 \end{equation}
-where $r_{6.35}$ is the ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm; $RWC^{leaf}$ is the relative water content of in leaves and $RWC^{stem}$ is the relative water content of in stem, respectively (already averaging symplasmic and apoplasmic tissues).
+
+where $RWC_{leaf}$ is the relative water content of in leaves (already averaging symplasmic and apoplasmic tissues). In contrast, if `lfmcComponent = "fine"`, $LFMC$ estimates correspond to fine fuels (i.e. leaves and twigs of < 6.5 mm) and are estimated from stem and leaf water content:
+\begin{equation}
+LFMC_{fine} = (RWC_{leaf} \cdot (1.0/r_{6.35})  + RWC_{stem} \cdot (1.0 - (1.0/r_{6.35}))) \cdot LFMC_{max}
+\end{equation}
+where $r_{6.35}$ is the ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm and $RWC_{stem}$ is the relative water content of in stem (already averaging symplasmic and apoplasmic tissues).
 
 
 
