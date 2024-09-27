@@ -25,7 +25,7 @@ f_{met}(T_K) = \frac{T_K \cdot \exp \big\{ \frac{\Delta H_A}{R^n \cdot T_K}\big\
 \end{equation}
 where $R^n$ is the ideal gas constant, $\Delta H_A = 87500$ the enthalpy of activation and $\Delta H_D = 333000$ and $\Delta S_D = 1090$ the enthalpy and entropy difference (respectively) between the catalytically active and inactive states of the enzymatic system). 
 
-Scaling from the cell to the tissue level is conducted by assuming that maximum cell-level expansion rates correspond to maximum tissue-level relative growth rates.
+In **medfate**, we assume a constant value of $\pi_0 = -1$ in meristematic tissues, so that $r_{cell}$ depends on $\Psi$ and $T$ only. Scaling from the cell to the tissue level is conducted by assuming that maximum cell-level expansion rates correspond to maximum tissue-level relative growth rates. Maximum cell-level expansion rates, $r_{cell, max}$, are assumed to occur at $T = 30^\circ C$ and $\Psi = 0$. Other parameters for eq. \@ref(eq:cellexpansion) are set to $\phi_{max} = 0.5$ (which becomes irrelevant), $Y_{P} = 0.05\,MPa$ and $T_{thr} = 5^\circ C$.
 
 ### Leaf growth {#leafgrowth}
 
@@ -46,15 +46,14 @@ Second, $\Delta LA_{source}$ represents the leaf area increment expected given c
 where $ST_{sapwood}$ is the current concentration of sapwood storage carbon (starch), $V_{storage,sapwood}$ is the sapwood storage volume and $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per leaf area unit, see eq. \@ref(eq:leafconstructioncost). 
 
 Finally, $\Delta LA_{sink}$ represents the leaf area increment expected by taking into account the maximum leaf tissue growth rate relative to sapwood area ($RGR_{leaf, max}$; in $m^2 \cdot cm^{-2} \cdot day^{-1}$), the percentage of the crown with active buds ($PCAB$) and the relative cell expansion rate given $T_{day}$, $\Psi_{symp,leaf}$ and $\pi_{0,leaf}$: 
-\begin{eqnarray}
-\Delta LA_{sink} &=& SA \cdot (PCAB/100) \cdot RGR_{leaf, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{symp,leaf}, \pi_{0,leaf})}{r_{cell,max}} \\
-                 &=& SA \cdot (PCAB/100) \cdot RGR_{leaf, max} \cdot \frac{(\Psi_{symp,leaf} - \pi_{0,leaf} - Y_{P}) }{(2 - Y_{P})} \cdot \frac{ f_{met}(T_{day})}{f_{met}(30)}
-\end{eqnarray}
-where cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(30, 0, -2)$ so that $RGR_{leaf, max}$ is attained when sink conditions are optimal. Other parameters for eq. \@ref(eq:cellexpansion) are $\phi_{max} = 0.5$ (which becomes irrelevant), $Y_{P} = 0.05\,MPa$ and $T_{thr} = 5$ºC. Note that the final expression of $\Delta LA_{sink}$ reduces to a product of the maximum leaf area growth times two factors (for turgor and temperature) bounded between 0 and 1.
+\begin{equation}
+\Delta LA_{sink} = SA \cdot (PCAB/100) \cdot RGR_{leaf, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{symp,leaf})}{r_{cell,max}}
+\end{equation}
+where cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max}$, so that $RGR_{leaf, max}$ is attained when sink conditions are optimal. The final expression of $\Delta LA_{sink}$ reduces to a product of the maximum leaf area growth times two factors (for turgor and temperature) bounded between 0 and 1.
 
 ### Sapwood growth {#sapwoodgrowth}
 
-Sapwood area increment $\Delta SA$ can only occur if $LA^{live}>0$. Unlike leaf area or fine root biomass, it is not explicitly constrained by any allocation rule. However, newly assimilated carbon is preferentially allocated to leaves and fine roots whenever storage levels are low. $\Delta SA$ is defined as the minimum of two values expressing source and sink constraints:
+Sapwood area increment $\Delta SA$ can only occur if $LA^{live}>0$. Newly assimilated carbon is preferentially allocated to leaves and fine roots whenever storage levels are low. $\Delta SA$ is defined as the minimum of two values expressing source and sink constraints:
 \begin{equation}
 \Delta SA = \min(\Delta SA_{source}, \Delta SA_{sink})
 \end{equation}
@@ -64,26 +63,19 @@ $\Delta SA_{source}$ represents the sapwood area increment expected given carbon
 \end{equation}
 where $ST_{sapwood}$ is the current starch concentration, $ST_{sapwood,growth}$ is the minimum starch concentration required for sapwood growth, $V_{storage,sapwood}$ is the sapwood storage volume, $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per sapwood area unit, see eq. \@ref(eq:sapwoodconstructioncost). $ST_{sapwood,growth}$ is related to the minimum relative starch concentration for growth ($RSSG$), which is specified via the species-specific parameter `RSSG` or the control parameter `minimumRelativeStarchForGrowth`. This parameter is important because it allows specifying to which extent a given plant species stops growth and saves carbon to ensure survival (e.g. shadow tolerant species), as opposed to a species strongly investing in growth to reach the top of the canopy and have access to high light levels (e.g. light-demanding species).  
 
-Sink limitations to sapwood growth are simulated using a set of $N_c = 10$ cambium cells that undergo division and the new cells are added to a ring (i.e. a vector) of vessels that later suffer enlargement and maturation [@Friend2019]. Assuming that cambium cell volume must double before division, that cell-doubling time is the variable limiting cell division and that each division instantly results in a cell exiting the cambium and initiating differentiation into a vessel, production rate ($PR_{cambium}$) of new vessels cells can be related to the cambial cell expansion rate $r_{cambium}$ such that [@Cabon2020]:
-\begin{equation}
-PR_{cambium} = \frac{N_c}{ln(2)}\cdot r_{cambium}
-\end{equation}
-where $r_{cambium} = r_{cell}(T_{day},\Psi_{symp,stem}, -0.8)$, with other parameters of eq. \@ref(eq:cellexpansion) being $\phi_{max}=0.13$, $Y_{P} = 0.05\,MPa$ and $Y_{thr} = 8$ ºC. The ring growth model is implemented at daily time steps and daily $PR_{cambium}$ values are accumulated (i.e. $P_{cambium, t} = P_{cambium, t-1} + PR_{cambium,t}$). A new vessel is formed and added to the ring every time $P_{cambium}$ advances one integer. All vessel cells in the ring undergo daily enlargement following eq. \@ref(eq:cellexpansion), again with $Y_{P} = 0.05\,MPa$ and $Y_{thr} = 8$ ºC. During cell later stages of enlargement, the cell wall becomes thicker and more rigid as a consequence of cell wall deposition. Consequently, $\phi_{max}=0.13$ for newly formed cells, but then variations in $\phi_{max}$ are modelled as [@Cabon2019]:
-\begin{equation}
-\frac{d\phi_{max}}{\phi_{max}\cdot dt} = s\cdot r_{cell} - h \cdot \frac{f_{met}(T_K)}{f_{met}(288.15)}
-\end{equation}
-where $s = 1.8$ and $h = 0.043\cdot1.8$ are a softening factor and a constant hardening rate, respectively, and the hardening rate is modulated by temperature effects. Cell radial diameter is initially $8.3 \mu m$ and tangential diameter is assumed constant and equal to $20 \mu m$, so that volume increases in ring cells can be translated to daily ring area increases, $\Delta A_{ring}$ (in $\mu m^{2}$). 
-
 Assuming that the maximum relative sapwood growth rate ($RGR_{cambium, max}$ or $RGR_{sapwood, max}$) corresponds to a maximum rate of daily ring area increase, we have that the daily increase in sapwood area according to sink limitations, $\Delta SA_{sink}$, is defined as:
 \begin{equation}
-\Delta SA_{sink} =  \pi \cdot DBH \cdot RGR_{cambium, max} \cdot \frac{\Delta A_{ring}}{\Delta A_{ring,max}}
+\Delta SA_{sink} =  \pi \cdot DBH \cdot (PCAC/100) \cdot RGR_{cambium, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{symp, stem})}{r_{cell,max}}
 \end{equation}
 for trees, and as:
 \begin{equation}
-\Delta SA_{sink} = SA \cdot RGR_{sapwood, max} \cdot \frac{\Delta A_{ring}}{\Delta A_{ring,max}}
+\Delta SA_{sink} = SA \cdot (PCAC/100) \cdot RGR_{sapwood, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{symp, stem})}{r_{cell,max}}
 \end{equation}
-for shrubs. Sapwood growth in trees is proportional to the cambium length (in cm), whereas in trees it is proportional to the current sapwood area (in cm2). Hence, two different maximum relative growth rates are defined for trees ($RGR_{cambium, max}$) and shrubs ($RGR_{sapwood, max}$). In the previous equations, $\Delta A_{ring,max} = N_c \cdot 950\,\mu m^{2} \cdot day^{-1}$, which was obtained by simulating a ring growth under optimum temperature ($T_{day} = 30$ ºC) and water ($\Psi_{symp, stem} = -0.033$ MPa) conditions and observing the steady-state ring area increase.
-
+for shrubs. Sapwood growth in trees is proportional to the cambium length (in $cm$), whereas in trees it is proportional to the current sapwood area (in $cm^2$). Hence, two different maximum relative growth rates are defined for trees ($RGR_{cambium, max}$) and shrubs ($RGR_{sapwood, max}$). In the above equations, $PCAC$ is the percentage of active cambium cells, which is assumed to be controlled by the amount of foliage via the synthesis of growth hormones that then are transported through phloem. In practice, $PCAC$ is estimated as:
+\begin{equation}
+PCAC = 100 \cdot \frac{LAI^{\phi}}{LAI^{NC}}
+\end{equation}
+where $LAI^{\phi}$ is the currently expanded leaf area index and $LAI^{NC}$ is the leaf area index assuming no competition with other plants. Since $LAI^{\phi} = \phi \cdot LAI^{live}$ depends on the phenological status $\phi$, the sapwood growth rate will depend on phenology. Moreover, since $LAI^{live} \leq LAI^{NC}$, maximum growth rates will be achieved by cohorts lacking competition of taller cohorts and low self-competition. Since competition increases with forest development, the inclusion of $PCAC$ ensures that sapwood area growth rates will decrease for forests of larger basal area.
 
 ### Fine root growth {#finerootgrowth}
 
@@ -102,12 +94,11 @@ Second, $\Delta B_{fineroot,source}$ represents the biomass increment expected g
 \end{equation}
 where $ST_{sapwood}$ is the current sapwood concentration of storage carbon,  $V_{storage,sapwood}$ is the sapwood storage volume, $m_{gluc}$ is glucose molar mass and $CC_{fineroot}$ is the construction costs per fine root biomass unit.
 
-Finally, $\Delta B_{fineroot,sink}$ represents the biomass increment expected by taking into account maximum  tissue growth rate ($RGR_{fineroot, max}$; in $g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$) and the relative cell expansion rate given temperature ($T_{day}$), water potential in the rhizosphere ($\Psi_{rhizo,s}$) and the stem osmotic potential at full turgor($\pi_{0,stem}$): 
-\begin{eqnarray}
-\Delta B_{fineroot,sink} &=& B_{fineroot} \cdot RGR_{fineroot, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{rhizo,s}, \pi_{0,stem})}{r_{cell,max}} \\
-                         &=& B_{fineroot} \cdot RGR_{fineroot, max} \cdot \frac{(\Psi_{rhizo,s} - \pi_{0,stem} - Y_{P}) }{(2 - Y_{P})} \cdot \frac{ f_{met}(T_{day})}{f_{met}(30)}
-\end{eqnarray}
-cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max} = r_{cell}(30, 0, -2)$ so that $RGR_{fineroot, max}$ is attained when sink conditions are optimal. Other parameters for eq. \@ref(eq:cellexpansion) are like for leaf growth, $\phi_{max} = 0.5$, $Y_{P} = 0.05\,MPa$ and $T_{thr} = 5$ºC.
+Finally, $\Delta B_{fineroot,sink}$ represents the biomass increment expected by taking into account maximum  tissue growth rate ($RGR_{fineroot, max}$; in $g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$) and the relative cell expansion rate given temperature ($T_{day}$) and water potential in the rhizosphere ($\Psi_{rhizo,s}$): 
+\begin{equation}
+\Delta B_{fineroot,sink} = B_{fineroot} \cdot RGR_{fineroot, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{rhizo,s})}{r_{cell,max}} 
+\end{equation}
+cell relative expansion rate is divided by the maximum relative cell expansion rate so that $RGR_{fineroot, max}$ is attained when sink conditions are optimal. 
 
 
 ## Senescence
