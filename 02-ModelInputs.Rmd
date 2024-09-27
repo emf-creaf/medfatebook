@@ -17,7 +17,7 @@ Since preparing inputs for simulations can be daunting for most users, package [
 
 Package **medfate** deals with simulations at stand level and, hence, the data structures defined in the package are meant to encapsulate information about a target forest stands and the properties of the soil where it grows:
 
-+ S3 class `soil` is a list that is initialized using soil physical properties, but the object includes also soil parameters and state variables. Soil objects are described in subsection \@ref(soilinitialization).
++ S3 class `soil` is a data frame that is initialized using a data frame of soil physical properties, but the table includes also soil parameters and state variables. Soil objects are described in subsection \@ref(soilinitialization).
 + S3 class `forest` is a list of forest inventory data (i.e. mainly tree and shrub measurements, but can include herbaceous vegetation) corresponding to a single forest stand. Forest plot objects are described in subsection \@ref(forestobjects). 
 + S3 classes `spwbInput` and `growthInput` are lists containing all the vegetation parameters and state variables necessary to run water-balance simulations (function `spwb()` and alike) and forest growth simulations (function `growth()` and alike). Objects of classes `spwbInput` and `growthInput` are created using functions whose input includes a `forest` object and a `soil` object. 
 
@@ -212,8 +212,9 @@ A woody plant cohort $i$ is either a *tree cohort* or a *shrub cohort*, and is d
 | $DBH_i$ | $cm$ | `DBH` | Tree diameter at breast height | N | Y |  Y  |
 | $Cover_i$ | % | `Cover` | Shrub percent cover | N | Y |  Y  |
 | $LAI^{live}_i$ | $m^2 \cdot m^{-2}$ | `LAI_live` | (Maximum) leaf area index | Y | Y | N |
-| $LAI^{dead}_i$ | $m^2 \cdot m^{-2}$ | `LAI_dead` | Dead leaf area index | Y | Y |  N  |
+| $LAI^{dead}_i$ | $m^2 \cdot m^{-2}$ | `LAI_dead` | (Standing) dead leaf area index | Y | Y |  N  |
 | $LAI^{\phi}_i$ | $m^2 \cdot m^{-2}$ | `LAI_expanded` | Current expanded leaf area index | Y | Y |  N  |
+| $LAI^{NC}_i$ |$m^2 \cdot m^{-2}$ | `LAI_nocomp` | Leaf area index assuming no competition with other plants | N | Y |  N  |
 | $Z_{50,i}$ | mm | `Z50` | Depth above which 50% of the fine root mass is located | Y | Y | Y |
 | $Z_{95,i}$ | mm | `Z95` | Depth above which 95% of the fine root mass is located | Y | Y | Y |
 
@@ -263,9 +264,9 @@ LAI^{all}_{stand} &=& LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody}+LAI^{d
 \end{eqnarray}
 
 
-### Forest plot objects {#forestobjects}
+### Forest objects {#forestobjects}
 
-While the previous section described the structural forest variables required to run simulations in **medfate**, forest plot data input in the package is easier if one uses a format that follows closely forest inventory plot descriptions. In this format, each forest plot is represented in an object of class `forest`, a list that contains several elements. Here we use an example forest stand provided with the package:
+While the previous section described the structural forest variables required to run simulations in **medfate**, forest data input in the package is easier if one uses a format that follows closely forest inventory plot descriptions. In this format, each forest stand is represented in an object of class `forest`, a list that contains several elements. Here we use an example forest stand provided with the package:
 ```{r}
 data(exampleforest)
 exampleforest
@@ -344,6 +345,18 @@ vprofile_rootDistribution(exampleforest, SpParamsMED)
 
 
 The actual input to simulation functions `spwb()`, `growth()` and alike, describes fine root distribution using the matrix of $FRP_{i,s}$ values - not $Z_{50,i}$ and $Z_{95,i}$ -, which means that the proportions of fine roots can be modified manually or be defined by another model. In fact, **medfate** also allows calculating $FRP_{i,s}$ values assuming a conic distribution of fine roots (see `root_conicDistribution()`). 
+
+### Optional variables in forest objects
+
+The structure presented above for `forest` objects corresponds to the required data elements. A forest object can contain additional information when this is available. In particular, data frames `treeData` and `shrubData` can contain additional columns:
+
++ `LAI`: Leaf area index ($m^2 \cdot m^{-2}$), corresponding to $LAI^{live}$, avoiding the use of allometric relationships for leaf biomass in water balance simulations.
++ `FoliarBiomass`: Standing dry biomass of leaves ($kg \cdot m^{-2}$), which together with $SLA$ will be used to estimate $LAI^{live}$, avoiding the use of allometric relationships for leaf biomass in water balance simulations.
++ `FuelLoading`: Fine fuel loading ($kg \cdot m^{-2}$), to avoid its calculation from allometric relationships.
++ `CrownRatio`: The ratio between crown length and total height (between 0 and 1), avoiding the use of allometric relationships for crown ratio in water balance simulations.
++ `Z100`: Depth (in $mm$) corresponding to 100% of fine roots (to specify a truncated root distribution).
++ `ObsID`: A string identifying plant cohorts at the stage of forest sampling. Used to track the fate of particular plant cohorts through simulations. 
+
 
 ### Water pools and root horizontal distribution {#plantwaterpools}
 

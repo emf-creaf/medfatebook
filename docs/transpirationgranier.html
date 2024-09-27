@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2024-07-26" />
+<meta name="date" content="2024-09-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -65,7 +65,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -212,13 +212,14 @@ div.csl-indent {
 <li class="chapter" data-level="2.4.1" data-path="model-inputs.html"><a href="model-inputs.html#structural-attributes-of-woody-plant-cohorts"><i class="fa fa-check"></i><b>2.4.1</b> Structural attributes of woody plant cohorts</a></li>
 <li class="chapter" data-level="2.4.2" data-path="model-inputs.html"><a href="model-inputs.html#structural-attributes-of-herbaceous-vegetation"><i class="fa fa-check"></i><b>2.4.2</b> Structural attributes of herbaceous vegetation</a></li>
 <li class="chapter" data-level="2.4.3" data-path="model-inputs.html"><a href="model-inputs.html#leaf-area-index-of-the-forest-stand"><i class="fa fa-check"></i><b>2.4.3</b> Leaf area index of the forest stand</a></li>
-<li class="chapter" data-level="2.4.4" data-path="model-inputs.html"><a href="model-inputs.html#forestobjects"><i class="fa fa-check"></i><b>2.4.4</b> Forest plot objects</a></li>
+<li class="chapter" data-level="2.4.4" data-path="model-inputs.html"><a href="model-inputs.html#forestobjects"><i class="fa fa-check"></i><b>2.4.4</b> Forest objects</a></li>
 <li class="chapter" data-level="2.4.5" data-path="model-inputs.html"><a href="model-inputs.html#single-cohort-forests"><i class="fa fa-check"></i><b>2.4.5</b> Single-cohort forests</a></li>
 <li class="chapter" data-level="2.4.6" data-path="model-inputs.html"><a href="model-inputs.html#leafdistribution"><i class="fa fa-check"></i><b>2.4.6</b> Vertical leaf distribution</a></li>
 <li class="chapter" data-level="2.4.7" data-path="model-inputs.html"><a href="model-inputs.html#rootdistribution"><i class="fa fa-check"></i><b>2.4.7</b> Vertical root distribution</a></li>
-<li class="chapter" data-level="2.4.8" data-path="model-inputs.html"><a href="model-inputs.html#plantwaterpools"><i class="fa fa-check"></i><b>2.4.8</b> Water pools and root horizontal distribution</a></li>
-<li class="chapter" data-level="2.4.9" data-path="model-inputs.html"><a href="model-inputs.html#functionaltraits"><i class="fa fa-check"></i><b>2.4.9</b> Functional traits and vegetation initialization</a></li>
-<li class="chapter" data-level="2.4.10" data-path="model-inputs.html"><a href="model-inputs.html#update-of-structural-variables-during-simulations"><i class="fa fa-check"></i><b>2.4.10</b> Update of structural variables during simulations</a></li>
+<li class="chapter" data-level="2.4.8" data-path="model-inputs.html"><a href="model-inputs.html#optional-variables-in-forest-objects"><i class="fa fa-check"></i><b>2.4.8</b> Optional variables in forest objects</a></li>
+<li class="chapter" data-level="2.4.9" data-path="model-inputs.html"><a href="model-inputs.html#plantwaterpools"><i class="fa fa-check"></i><b>2.4.9</b> Water pools and root horizontal distribution</a></li>
+<li class="chapter" data-level="2.4.10" data-path="model-inputs.html"><a href="model-inputs.html#functionaltraits"><i class="fa fa-check"></i><b>2.4.10</b> Functional traits and vegetation initialization</a></li>
+<li class="chapter" data-level="2.4.11" data-path="model-inputs.html"><a href="model-inputs.html#update-of-structural-variables-during-simulations"><i class="fa fa-check"></i><b>2.4.11</b> Update of structural variables during simulations</a></li>
 </ul></li>
 <li class="chapter" data-level="2.5" data-path="model-inputs.html"><a href="model-inputs.html#meteoinput"><i class="fa fa-check"></i><b>2.5</b> Metereological input</a>
 <ul>
@@ -854,7 +855,7 @@ Overall soil moisture is then related to moisture of plant water pools by the fo
 W_{s} = \sum_{j}{f_{pool,j} \cdot W_{j,s}}
 \end{equation}\]</span>
 where <span class="math inline">\(W_{j,s}\)</span> is the soil moisture (relative to field capacity) of layer <span class="math inline">\(s\)</span> in the water pool of cohort <span class="math inline">\(j\)</span>, i.e. under the area of the stand attributed to cohort <span class="math inline">\(j\)</span>.</p>
-<p>When transpiration occurs and water pools are considered, the model assumes that the rhizosphere of each plant cohort occupies its own water pool, but may enter into the water pools under other plant cohorts if the overlap is partial. In other words, the root systems of different cohorts may overlap horizontally. A given plant cohort <span class="math inline">\(i\)</span> will have its roots in layer <span class="math inline">\(s\)</span> partitioned among different water pools. Let us assume that we know <span class="math inline">\(fr_{i,s,j}\)</span>, the (horizontal) proportion of fine roots of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(s\)</span> of the water pool <span class="math inline">\(j\)</span> (see section <a href="model-inputs.html#plantwaterpools">2.4.8</a>). These proportions sum one when summed across water pools:
+<p>When transpiration occurs and water pools are considered, the model assumes that the rhizosphere of each plant cohort occupies its own water pool, but may enter into the water pools under other plant cohorts if the overlap is partial. In other words, the root systems of different cohorts may overlap horizontally. A given plant cohort <span class="math inline">\(i\)</span> will have its roots in layer <span class="math inline">\(s\)</span> partitioned among different water pools. Let us assume that we know <span class="math inline">\(fr_{i,s,j}\)</span>, the (horizontal) proportion of fine roots of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(s\)</span> of the water pool <span class="math inline">\(j\)</span> (see section <a href="model-inputs.html#plantwaterpools">2.4.9</a>). These proportions sum one when summed across water pools:
 <span class="math display">\[\begin{equation}
 \sum_{j}{fr_{i,s,j}} = 1 \,\, \forall i,s
 \end{equation}\]</span>
