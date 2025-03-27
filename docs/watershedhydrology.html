@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2025-01-28" />
+<meta name="date" content="2025-03-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -578,7 +578,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="19.6.1" data-path="watershedhydrology.html"><a href="watershedhydrology.html#subsurfaceflows"><i class="fa fa-check"></i><b>19.6.1</b> Soil and groundwater lateral fluxes</a></li>
 <li class="chapter" data-level="19.6.2" data-path="watershedhydrology.html"><a href="watershedhydrology.html#overlandflows"><i class="fa fa-check"></i><b>19.6.2</b> Overland runoff</a></li>
-<li class="chapter" data-level="19.6.3" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedexport"><i class="fa fa-check"></i><b>19.6.3</b> Watershed surface runoff</a></li>
+<li class="chapter" data-level="19.6.3" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedexport"><i class="fa fa-check"></i><b>19.6.3</b> Channel routing and water exported from the watershed</a></li>
 <li class="chapter" data-level="19.6.4" data-path="watershedhydrology.html"><a href="watershedhydrology.html#deepaquiferloss"><i class="fa fa-check"></i><b>19.6.4</b> Losses towards a deeper aquifer</a></li>
 </ul></li>
 </ul></li>
@@ -747,13 +747,14 @@ div.csl-indent {
 <li><em>artificial</em>: urban areas.</li>
 <li><em>water</em>: water bodies.</li>
 </ol>
-<p>Watershed water balance simulations extend the simulation of soil water balance to the landscape scale. Hence, the design of most vertical hydrological processes is the same as those of forest water balance. However, cells classified as rock, artificial or water lack any soil and must be treated differently. Additional water compartments and processes are represented in watershed water balance simulations. Each cell in the watershed may include the following: a snow-pack compartment, one or several soil layers (including a rocky layer down to several meters depth), and a groundwater compartment normally beyond the reach of plant roots for most landscape cells. Similar to other models such as TETIS <span class="citation">(<a href="#ref-Frances2007">Francés <em>et al.</em> 2007</a>)</span>, three lateral flows are considered between adjacent cells:</p>
+<p>Watershed water balance simulations extend the simulation of soil water balance to the landscape scale. Hence, the design of most vertical hydrological processes is the same as those of forest water balance. However, cells classified as rock, artificial or water lack any soil and must be treated differently. Additional water compartments and processes are represented in watershed water balance simulations. Each cell in the watershed may include the following: a snow-pack compartment, one or several soil layers (including a rocky layer down to several meters depth), and a groundwater compartment normally beyond the reach of plant roots for most landscape cells.</p>
+<p>Similar to other models such as TETIS <span class="citation">(<a href="#ref-Frances2007">Francés <em>et al.</em> 2007</a>)</span>, three lateral flows are considered between adjacent cells:</p>
 <ol style="list-style-type: lower-roman">
 <li>Overland surface flows from upper elevation cells.</li>
 <li>Lateral saturated soil flows (i.e. interflow) between adjacent cells.</li>
 <li>Lateral groundwater flow (i.e. baseflow) between adjacent cells.</li>
 </ol>
-<p>Routing of overland surface flows is modeled following T-HYDRO <span class="citation">Ostendorf &amp; Reynolds (<a href="#ref-Ostendorf1993">1993</a>)</span>. Subsurface flows, including both soil saturated flow and groundwater flow, are modeled following the kinematic wave approximation of DSHVM <span class="citation">Wigmosta <em>et al.</em> (<a href="#ref-Wigmosta1994">1994</a>)</span>.</p>
+<p>Routing of overland surface flows is modeled following T-HYDRO <span class="citation">Ostendorf &amp; Reynolds (<a href="#ref-Ostendorf1993">1993</a>)</span>. In large watersheds not all water entering the river channel will end up reaching the watershed outlet, so it is necessary to perform channel routing. If the user specifies a river network, river channel routing is performed by delaying the day when runoff reaches network outlets. Subsurface flows, including both soil saturated flow and groundwater flow, are modeled following the kinematic wave approximation of DSHVM <span class="citation">Wigmosta <em>et al.</em> (<a href="#ref-Wigmosta1994">1994</a>)</span>.</p>
 <p>Split-parameter parametrization, following <span class="citation">Francés <em>et al.</em> (<a href="#ref-Frances2007">2007</a>)</span>, allows reducing the parameters to be calibrated for practical applications.</p>
 </div>
 <div id="statevariableswatershed" class="section level2 hasAnchor" number="19.2">
@@ -819,7 +820,7 @@ where <span class="math inline">\(\hat{If}\)</span>, <span class="math inline">\
 <span class="math display">\[\begin{equation}
   \Delta{S_{watershed}} = \hat{Pr} - (\hat{In} + \hat{Es} + \hat{Tr}_{woody} + \hat{Tr}_{herb}) - \hat{Exp} - \hat{Dal}
 \end{equation}\]</span>
-where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}+\Delta{\hat{V}_{soil}}+\Delta{\hat{S}_{aquifer}}\)</span> is the change in water content in the watershed and <span class="math inline">\(\hat{Exp}\)</span> is the water exported as runoff from cells without neighbors (i.e. catchment outlet cells).</li>
+where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}+\Delta{\hat{V}_{soil}}+\Delta{\hat{S}_{aquifer}}\)</span> is the change in water content in the watershed and <span class="math inline">\(\hat{Exp}\)</span> is the water exported as runoff to catchment outlet cells (note that the watershed balance equation assumes that all water reaching river channel has reached network outlets).</li>
 </ol>
 </div>
 </div>
@@ -834,7 +835,8 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 <li>Process vertical processes in cells that lack soil (i.e. <em>rock</em>, <em>artificial</em> and <em>water</em>). For <em>rock</em> and <em>artificial</em> cells, snow pack dynamics is still processed in these cells. In <em>artificial</em> cells all rainfall input or snow melt becomes runoff to be passed downhill. In <em>rock</em> cells, water can infiltrate directly to the aquifer, where a maximum rate is confronted with the rainfall/snowmelt input. In the case of <em>water</em> cells, snow pack dynamics are still processed, but all liquid water (from rain or snow melt) is poured (as deep drainage) down to the aquifer below.</li>
 <li>Distribute overland flows from <em>rock</em> or <em>artificial</em> cells donwhill to <em>wildland</em> or <em>agriculture</em> cells, which will receive some runon.</li>
 <li>Determine vertical flows in watershed cells having soil (i.e. <em>wildland</em> or <em>agriculture</em>). Cells are processed sequentially or in parallel, while accounting for subsurface flows, runon from upslope rock or artificial cells, and changes in the groundwater level, which complete eqs. <a href="watershedhydrology.html#eq:cellsnowpackwaterbalanceequation">(19.1)</a> and <a href="watershedhydrology.html#eq:cellsoilwaterbalanceequation">(19.2)</a>. All processes mentioned in <a href="basicwaterbalance.html#basicwaterbalancescheduling">3.4</a> are taken into account.</li>
-<li>Distribute overland flows from cells having soil downhill (<a href="watershedhydrology.html#overlandflows">19.6.2</a>). If a cell does not have downhill neighbors (i.e outlet cell) its runoff becomes water exported from the watershed (<a href="watershedhydrology.html#watershedexport">19.6.3</a>).</li>
+<li>Distribute overland flows from cells having soil downhill (see <a href="watershedhydrology.html#overlandflows">19.6.2</a>). If a cell is part of the channel network, its runoff is added to the backlog of the corresponding watershed outlet (see <a href="watershedhydrology.html#watershedexport">19.6.3</a>). If a cell does not have downhill neighbors (i.e outlet cell) and is not in a channel, its runoff becomes water exported from the watershed (see <a href="watershedhydrology.html#watershedexport">19.6.3</a>).</li>
+<li>If a channel network is defined, advance one day the backlog of network outlets to apply channel routing (see <a href="watershedhydrology.html#watershedexport">19.6.3</a>).</li>
 <li>Apply vertical flows between soils and the aquifer below, i.e. deep drainage and capillarity rise, to the water balance of the aquifer.</li>
 <li>Apply drainage losses from the aquifer towards a deeper aquifer not connected to watershed outlets (<a href="watershedhydrology.html#deepaquiferloss">19.6.4</a>), completing eq. <a href="watershedhydrology.html#eq:cellaquiferwaterbalanceequation">(19.3)</a>.</li>
 </ol>
@@ -912,10 +914,15 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 </tr>
 <tr class="odd">
 <td></td>
-<td><code>rock_max_infiltration</code></td>
-<td>Maximum infiltration rate for rocky cells (mm/day).</td>
+<td><code>channel_flow_speed</code></td>
+<td>Average flow speed in the channel (in m·s-1).</td>
 </tr>
 <tr class="even">
+<td></td>
+<td><code>rock_max_infiltration</code></td>
+<td>Maximum infiltration rate for rocky cells (mm·day-1).</td>
+</tr>
+<tr class="odd">
 <td></td>
 <td><code>deep_aquifer_loss</code></td>
 <td>Maximum daily loss rate from watershed aquifer towards a deeper aquifer not connected to outlets (mm·day-1).</td>
@@ -1006,8 +1013,8 @@ Ro_j = Ro_j + (Ru_i + Exf_i) \cdot q_{ij}
 <p>Note that a given cell <span class="math inline">\(j\)</span> can receive overland flux from more than one neighbor.</p>
 </div>
 <div id="watershedexport" class="section level3 hasAnchor" number="19.6.3">
-<h3><span class="header-section-number">19.6.3</span> Watershed surface runoff<a href="watershedhydrology.html#watershedexport" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>A special situation arises when processing cells that do not have downhill neighbors defined (i.e. where <span class="math inline">\(q_{ij} = 0\)</span> for all <span class="math inline">\(j\)</span>), either because they are in flat surfaces or at the watershed boundary. In both cases, these cells should correspond to water bodies or streams connecting to the catchment outlet. Hence, these cells are called <em>outlet cells</em> in the model, and the runoff they generate contributes to watershed runoff exported (<span class="math inline">\(Exp\)</span>), which is assumed to reach river channels, dams or other surface water bodies.</p>
+<h3><span class="header-section-number">19.6.3</span> Channel routing and water exported from the watershed<a href="watershedhydrology.html#watershedexport" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>A special situation arises in overland runoff processing when processing cells that do not have downhill neighbors defined (i.e. where <span class="math inline">\(q_{ij} = 0\)</span> for all <span class="math inline">\(j\)</span>), either because: (a) they are in a hollow surface (all neighbours have higher elevations); or (b) because they belong to a specified river channel network. In the first case (a), cells are called <em>outlet cells</em> in the model, and the runoff they generate contributes directly to watershed runoff exported (<span class="math inline">\(Exp\)</span>), without any channel routing process. In the second case (b), cells are called <em>channel cells</em>, and channel routing is performed in a very simple way. At the time of initialization, the model determines for each channel cell which is the corresponding outlet cell (this is also a <em>channel</em>, but located in the boundary of the catchment) and how far it is in terms of the number of cells. Additionally, a numeric vector is created to store the backlog of every channel outlet (i.e. to store the water that is a number of days away from the outlet). Then, during overland runoff processing, the runoff of a channel cell is added to the backlog vector of its corresponding outlet cell, at a position determined by its distance and the average channel flow speed (watershed control parameter <code>channel_flow_speed</code>). Once per day, the amount of water at the origin of the backlog vector of each outlet cell becomes watershed runoff exported (<span class="math inline">\(Exp\)</span>), and the rest of values in the backlog vector are shifted one position towards the origin.</p>
 </div>
 <div id="deepaquiferloss" class="section level3 hasAnchor" number="19.6.4">
 <h3><span class="header-section-number">19.6.4</span> Losses towards a deeper aquifer<a href="watershedhydrology.html#deepaquiferloss" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -1054,42 +1061,42 @@ Wigmosta, M., Vail, L. &amp; Lettenmaier, D. (1994). <a href="http://onlinelibra
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
-"sharing": {
-"github": false,
-"facebook": true,
-"twitter": true,
-"linkedin": false,
-"weibo": false,
-"instapaper": false,
-"vk": false,
-"whatsapp": false,
-"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
-},
-"fontsettings": {
-"theme": "white",
-"family": "sans",
-"size": 2
-},
-"edit": {
-"link": null,
-"text": null
-},
-"history": {
-"link": null,
-"text": null
-},
-"view": {
-"link": null,
-"text": null
-},
-"download": ["medfatebook.pdf", "medfatebook.epub"],
-"search": {
-"engine": "fuse",
-"options": null
-},
-"toc": {
-"collapse": "section"
-}
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["medfatebook.pdf", "medfatebook.epub"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "section"
+  }
 });
 });
 </script>

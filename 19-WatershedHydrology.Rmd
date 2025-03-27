@@ -14,13 +14,15 @@ Watersheds are described in raster (i.e. gridded) mode, each cell representing a
   d. *artificial*: urban areas.
   e. *water*: water bodies. 
 
-Watershed water balance simulations extend the simulation of soil water balance to the landscape scale. Hence, the design of most vertical hydrological processes is the same as those of forest water balance. However, cells classified as rock, artificial or water lack any soil and must be treated differently. Additional water compartments and processes are represented in watershed water balance simulations. Each cell in the watershed may include the following: a snow-pack compartment, one or several soil layers (including a rocky layer down to several meters depth), and a groundwater compartment normally beyond the reach of plant roots for most landscape cells. Similar to other models such as TETIS [@Frances2007], three lateral flows are considered between adjacent cells: 
+Watershed water balance simulations extend the simulation of soil water balance to the landscape scale. Hence, the design of most vertical hydrological processes is the same as those of forest water balance. However, cells classified as rock, artificial or water lack any soil and must be treated differently. Additional water compartments and processes are represented in watershed water balance simulations. Each cell in the watershed may include the following: a snow-pack compartment, one or several soil layers (including a rocky layer down to several meters depth), and a groundwater compartment normally beyond the reach of plant roots for most landscape cells. 
+
+Similar to other models such as TETIS [@Frances2007], three lateral flows are considered between adjacent cells: 
 
   (i) Overland surface flows from upper elevation cells.
   (ii) Lateral saturated soil flows (i.e. interflow) between adjacent cells. 
   (iii) Lateral groundwater flow (i.e. baseflow) between adjacent cells.
 
-Routing of overland surface flows is modeled following T-HYDRO @Ostendorf1993. Subsurface flows, including both soil saturated flow and groundwater flow, are modeled following the kinematic wave approximation of DSHVM @Wigmosta1994.
+Routing of overland surface flows is modeled following T-HYDRO @Ostendorf1993. In large watersheds not all water entering the river channel will end up reaching the watershed outlet, so it is necessary to perform channel routing. If the user specifies a river network, river channel routing is performed by delaying the day when runoff reaches network outlets. Subsurface flows, including both soil saturated flow and groundwater flow, are modeled following the kinematic wave approximation of DSHVM @Wigmosta1994.
 
 Split-parameter parametrization, following @Frances2007, allows reducing the parameters to be calibrated for practical applications.
 
@@ -86,7 +88,7 @@ where $\hat{If}$, $\hat{Cr}$, $\hat{Dd}$, $\hat{Se}$, $\hat{Es}$, $\hat{Tr}_{woo
 \begin{equation}
   \Delta{S_{watershed}} = \hat{Pr} - (\hat{In} + \hat{Es} + \hat{Tr}_{woody} + \hat{Tr}_{herb}) - \hat{Exp} - \hat{Dal}
 \end{equation}
-where $\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}+\Delta{\hat{V}_{soil}}+\Delta{\hat{S}_{aquifer}}$ is the change in water content in the watershed and $\hat{Exp}$ is the water exported as runoff from cells without neighbors (i.e. catchment outlet cells).
+where $\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}+\Delta{\hat{V}_{soil}}+\Delta{\hat{S}_{aquifer}}$ is the change in water content in the watershed and $\hat{Exp}$ is the water exported as runoff to catchment outlet cells (note that the watershed balance equation assumes that all water reaching river channel has reached network outlets).
 
 ## Process scheduling {#watershedbalancescheduling}
 
@@ -99,9 +101,10 @@ For every day to be simulated, the model performs the following steps:
  5. Process vertical processes in cells that lack soil (i.e. *rock*, *artificial* and *water*). For *rock* and *artificial* cells, snow pack dynamics is still processed in these cells. In *artificial* cells all rainfall input or snow melt becomes runoff to be passed downhill. In *rock* cells, water can infiltrate directly to the aquifer, where a maximum rate is confronted with the rainfall/snowmelt input. In the case of *water* cells, snow pack dynamics are still processed, but all liquid water (from rain or snow melt) is poured (as deep drainage) down to the aquifer below.
  6. Distribute overland flows from *rock* or *artificial* cells donwhill to *wildland* or *agriculture* cells, which will receive some runon.
  7. Determine vertical flows in watershed cells having soil (i.e. *wildland* or *agriculture*). Cells are processed sequentially or in parallel, while accounting for subsurface flows, runon from upslope rock or artificial cells, and changes in the groundwater level, which complete eqs.  \@ref(eq:cellsnowpackwaterbalanceequation) and \@ref(eq:cellsoilwaterbalanceequation). All processes mentioned in \@ref(basicwaterbalancescheduling) are taken into account. 
-8. Distribute overland flows from cells having soil downhill (\@ref(overlandflows)). If a cell does not have downhill neighbors (i.e outlet cell) its runoff becomes water exported from the watershed (\@ref(watershedexport)).
-9. Apply vertical flows between soils and the aquifer below, i.e. deep drainage and capillarity rise, to the water balance of the aquifer.
-10. Apply drainage losses from the aquifer towards a deeper aquifer not connected to watershed outlets (\@ref(deepaquiferloss)), completing eq. \@ref(eq:cellaquiferwaterbalanceequation).
+8. Distribute overland flows from cells having soil downhill (see \@ref(overlandflows)). If a cell is part of the channel network, its runoff is added to the backlog of the corresponding watershed outlet (see \@ref(watershedexport)). If a cell does not have downhill neighbors (i.e outlet cell) and is not in a channel, its runoff becomes water exported from the watershed (see \@ref(watershedexport)).
+9. If a channel network is defined, advance one day the backlog of network outlets to apply channel routing (see \@ref(watershedexport)).
+10. Apply vertical flows between soils and the aquifer below, i.e. deep drainage and capillarity rise, to the water balance of the aquifer.
+11. Apply drainage losses from the aquifer towards a deeper aquifer not connected to watershed outlets (\@ref(deepaquiferloss)), completing eq. \@ref(eq:cellaquiferwaterbalanceequation).
 
 
 ## Inputs and outputs
@@ -142,7 +145,8 @@ The following table describes the full set of watershed hydraulic control parame
 | $n_{lat}$        | `n_interflow` |  Power exponent regulating the effect of soil saturation level on soil lateral transmissivity (eq. \@ref(eq:interflowtransmissivity)). |
 | $n_{base}$       | `n_baseflow` |  Power exponent regulating the effect of aquifer height on groundwater lateral transmissivity (eq. \@ref(eq:baseflowtransmissivity)). |
 |                  | `num_daily_substeps` | Number of daily sub-steps for interflow calculations. |
-|                  | `rock_max_infiltration` |  Maximum infiltration rate for rocky cells (mm/day).  |
+|                  | `channel_flow_speed` | Average flow speed in the channel (in m·s-1). |
+|                  | `rock_max_infiltration` |  Maximum infiltration rate for rocky cells (mm·day-1).  |
 |                  | `deep_aquifer_loss` | Maximum daily loss rate from watershed aquifer towards a deeper aquifer not connected to outlets (mm·day-1). |
 
 ### Model outputs {#watershedbalanceoutput}
@@ -206,9 +210,9 @@ Ro_j = Ro_j + (Ru_i + Exf_i) \cdot q_{ij}
 
 Note that a given cell $j$ can receive overland flux from more than one neighbor. 
 
-### Watershed surface runoff {#watershedexport}
+### Channel routing and water exported from the watershed {#watershedexport}
 
-A special situation arises when processing cells that do not have downhill neighbors defined (i.e. where $q_{ij} = 0$ for all $j$), either because they are in flat surfaces or at the watershed boundary. In both cases, these cells should correspond to water bodies or streams connecting to the catchment outlet. Hence, these cells are called *outlet cells* in the model, and the runoff they generate contributes to watershed runoff exported ($Exp$), which is assumed to reach river channels, dams or other surface water bodies.
+A special situation arises in overland runoff processing when processing cells that do not have downhill neighbors defined (i.e. where $q_{ij} = 0$ for all $j$), either because: (a) they are in a hollow surface (all neighbours have higher elevations); or (b) because they belong to a specified river channel network. In the first case (a), cells are called *outlet cells* in the model, and the runoff they generate contributes directly to watershed runoff exported ($Exp$), without any channel routing process. In the second case (b), cells are called *channel cells*, and channel routing is performed in a very simple way. At the time of initialization, the model determines for each channel cell which is the corresponding outlet cell (this is also a *channel*, but located in the boundary of the catchment) and how far it is in terms of the number of cells. Additionally, a numeric vector is created to store the backlog of every channel outlet (i.e. to store the water that is a number of days away from the outlet). Then, during overland runoff processing, the runoff of a channel cell is added to the backlog vector of its corresponding outlet cell, at a position determined by its distance and the average channel flow speed (watershed control parameter `channel_flow_speed`). Once per day, the amount of water at the origin of the backlog vector of each outlet cell becomes watershed runoff exported ($Exp$), and the rest of values in the backlog vector are shifted one position towards the origin.
 
 ### Losses towards a deeper aquifer {#deepaquiferloss}
 
