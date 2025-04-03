@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2025-03-27" />
+<meta name="date" content="2025-04-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -826,7 +826,8 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 </div>
 <div id="watershedbalancescheduling" class="section level2 hasAnchor" number="19.4">
 <h2><span class="header-section-number">19.4</span> Process scheduling<a href="watershedhydrology.html#watershedbalancescheduling" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>For every day to be simulated, the model performs the following steps:</p>
+<p>The model can perform water balance simulations on the whole watershed or its subwatersheds, the latter allowing parallelization. If subwatersheds are considered, the results need to be aggregated at the end of water balance simulations.</p>
+<p>For every day to be simulated in a watershed or subwatershed, the model performs the following steps:</p>
 <ol style="list-style-type: decimal">
 <li>Calculation of soil lateral flows between adjacent cells, according to sub-steps if required by the user (see <a href="watershedhydrology.html#subsurfaceflows">19.6.1</a>).</li>
 <li>Determine the balance of soil lateral flows (i.e. determine <span class="math inline">\(\Delta{S_{lat}}\)</span>) for each cell.</li>
@@ -835,11 +836,11 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 <li>Process vertical processes in cells that lack soil (i.e. <em>rock</em>, <em>artificial</em> and <em>water</em>). For <em>rock</em> and <em>artificial</em> cells, snow pack dynamics is still processed in these cells. In <em>artificial</em> cells all rainfall input or snow melt becomes runoff to be passed downhill. In <em>rock</em> cells, water can infiltrate directly to the aquifer, where a maximum rate is confronted with the rainfall/snowmelt input. In the case of <em>water</em> cells, snow pack dynamics are still processed, but all liquid water (from rain or snow melt) is poured (as deep drainage) down to the aquifer below.</li>
 <li>Distribute overland flows from <em>rock</em> or <em>artificial</em> cells donwhill to <em>wildland</em> or <em>agriculture</em> cells, which will receive some runon.</li>
 <li>Determine vertical flows in watershed cells having soil (i.e. <em>wildland</em> or <em>agriculture</em>). Cells are processed sequentially or in parallel, while accounting for subsurface flows, runon from upslope rock or artificial cells, and changes in the groundwater level, which complete eqs. <a href="watershedhydrology.html#eq:cellsnowpackwaterbalanceequation">(19.1)</a> and <a href="watershedhydrology.html#eq:cellsoilwaterbalanceequation">(19.2)</a>. All processes mentioned in <a href="basicwaterbalance.html#basicwaterbalancescheduling">3.4</a> are taken into account.</li>
-<li>Distribute overland flows from cells having soil downhill (see <a href="watershedhydrology.html#overlandflows">19.6.2</a>). If a cell is part of the channel network, its runoff is added to the backlog of the corresponding watershed outlet (see <a href="watershedhydrology.html#watershedexport">19.6.3</a>). If a cell does not have downhill neighbors (i.e outlet cell) and is not in a channel, its runoff becomes water exported from the watershed (see <a href="watershedhydrology.html#watershedexport">19.6.3</a>).</li>
-<li>If a channel network is defined, advance one day the backlog of network outlets to apply channel routing (see <a href="watershedhydrology.html#watershedexport">19.6.3</a>).</li>
+<li>Distribute overland flows from cells having soil downhill (see <a href="watershedhydrology.html#overlandflows">19.6.2</a>). If a cell is part of the channel network, its runoff is stored for latter processing of channel routing (see <a href="watershedhydrology.html#watershedexport">19.6.3</a>). If a cell does not have downhill neighbors (i.e outlet cell) and is not in a channel, its runoff becomes water exported from the watershed (see <a href="watershedhydrology.html#watershedexport">19.6.3</a>).</li>
 <li>Apply vertical flows between soils and the aquifer below, i.e. deep drainage and capillarity rise, to the water balance of the aquifer.</li>
 <li>Apply drainage losses from the aquifer towards a deeper aquifer not connected to watershed outlets (<a href="watershedhydrology.html#deepaquiferloss">19.6.4</a>), completing eq. <a href="watershedhydrology.html#eq:cellaquiferwaterbalanceequation">(19.3)</a>.</li>
 </ol>
+<p>Channel routing is optional, depending on whether a channel network has been supplied. Channel routing is performed after water balance simulations of the watershed (or its subwatersheds) are finished. For each day to be simulated and each channel cell, the model adds the water that reached the channel during water balance simulations to the backlog of the corresponding watershed outlet. After that the model advances one day the backlog of all network outlets to apply channel routing (see details <a href="watershedhydrology.html#watershedexport">19.6.3</a>).</p>
 </div>
 <div id="inputs-and-outputs-3" class="section level2 hasAnchor" number="19.5">
 <h2><span class="header-section-number">19.5</span> Inputs and outputs<a href="watershedhydrology.html#inputs-and-outputs-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -919,6 +920,16 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 </tr>
 <tr class="even">
 <td></td>
+<td><code>subwatersheds</code></td>
+<td>A boolean flag to define watershed subunits (useful for parallelization).</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>max_overlap</code></td>
+<td>Maximum proportion of overlapping cells for subwatersheds to be considered independent. Lower values will normally produce larger subunits.</td>
+</tr>
+<tr class="even">
+<td></td>
 <td><code>rock_max_infiltration</code></td>
 <td>Maximum infiltration rate for rocky cells (mm·day-1).</td>
 </tr>
@@ -959,14 +970,19 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 </tr>
 <tr class="even">
 <td><code>watershed_soil_balance</code></td>
-<td>Data frame with spatially-averaged components of the daily water balance, including only cells that have defined soils (i.e. <em>wildland</em> and <em>agriculture</em> cells).</td>
+<td>Data frame with spatially-averaged components of the daily water balance over cells that have defined soils (i.e. <em>wildland</em> and <em>agriculture</em> cells).</td>
 </tr>
 <tr class="odd">
+<td><code>channel_export_m3s</code></td>
+<td>A matrix with daily values of runoff (in m3/s) reaching each of the channel cells of the landscape.</td>
+</tr>
+<tr class="even">
 <td><code>outlet_export_m3</code></td>
-<td>A matrix with daily runoff (in m3/day) at each of the outlet cells of the landscape.</td>
+<td>A matrix with daily runoff (in m3/day) at each of the outlet cells of the landscape. Each outlet drains its own subset of cells (sometimes including channel routing), so the daily overall watershed export corresponds to the sum of row values.</td>
 </tr>
 </tbody>
 </table>
+<p>Note that while simulations can be performed for sub-watersheds separately, at present the model does not produce results at the sub-watershed level.</p>
 </div>
 </div>
 <div id="watershedbalancedetails" class="section level2 hasAnchor" number="19.6">
@@ -1014,7 +1030,9 @@ Ro_j = Ro_j + (Ru_i + Exf_i) \cdot q_{ij}
 </div>
 <div id="watershedexport" class="section level3 hasAnchor" number="19.6.3">
 <h3><span class="header-section-number">19.6.3</span> Channel routing and water exported from the watershed<a href="watershedhydrology.html#watershedexport" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>A special situation arises in overland runoff processing when processing cells that do not have downhill neighbors defined (i.e. where <span class="math inline">\(q_{ij} = 0\)</span> for all <span class="math inline">\(j\)</span>), either because: (a) they are in a hollow surface (all neighbours have higher elevations); or (b) because they belong to a specified river channel network. In the first case (a), cells are called <em>outlet cells</em> in the model, and the runoff they generate contributes directly to watershed runoff exported (<span class="math inline">\(Exp\)</span>), without any channel routing process. In the second case (b), cells are called <em>channel cells</em>, and channel routing is performed in a very simple way. At the time of initialization, the model determines for each channel cell which is the corresponding outlet cell (this is also a <em>channel</em>, but located in the boundary of the catchment) and how far it is in terms of the number of cells. Additionally, a numeric vector is created to store the backlog of every channel outlet (i.e. to store the water that is a number of days away from the outlet). Then, during overland runoff processing, the runoff of a channel cell is added to the backlog vector of its corresponding outlet cell, at a position determined by its distance and the average channel flow speed (watershed control parameter <code>channel_flow_speed</code>). Once per day, the amount of water at the origin of the backlog vector of each outlet cell becomes watershed runoff exported (<span class="math inline">\(Exp\)</span>), and the rest of values in the backlog vector are shifted one position towards the origin.</p>
+<p>A special situation arises in overland runoff processing when processing cells that do not have downhill neighbors defined (i.e. where <span class="math inline">\(q_{ij} = 0\)</span> for all <span class="math inline">\(j\)</span>), either because: (a) they are in a hollow surface (all neighbors have higher elevations); or (b) because they belong to a specified river channel network. In the first case (a), cells are called <em>outlet cells</em> in the model, and the runoff they generate contributes directly to watershed runoff exported (<span class="math inline">\(Exp\)</span>), without any channel routing process. In the second case (b), cells are called <em>channel cells</em>, and channel routing is performed as explained in the next paragraph.</p>
+<p>At the time of initialization, the model determines for each channel cell which is the corresponding outlet cell (this is also a <em>channel</em>, but located in the boundary of the catchment) and how far it is in terms of the number of cells. Additionally, a numeric vector is created to store the backlog of every channel outlet (i.e. to store the water that is a number of days away from the outlet). Then, during overland runoff processing, the runoff of a channel cell is stored for subsequent processing of channel routing.</p>
+<p>Channel routing is performed after water balance simulations of the watershed (or its subwatersheds) are finished. For each day to be simulated and each channel cell, the model adds the water that reached the channel during water balance simulations to the backlog of the corresponding watershed outlet, at a position determined by its distance and the average channel flow speed (watershed control parameter <code>channel_flow_speed</code>). Once per day, the amount of water at the origin of the backlog vector of each outlet cell becomes watershed runoff exported (<span class="math inline">\(Exp\)</span>), and the rest of values in the backlog vector are shifted one position towards the origin.</p>
 </div>
 <div id="deepaquiferloss" class="section level3 hasAnchor" number="19.6.4">
 <h3><span class="header-section-number">19.6.4</span> Losses towards a deeper aquifer<a href="watershedhydrology.html#deepaquiferloss" class="anchor-section" aria-label="Anchor link to header"></a></h3>
