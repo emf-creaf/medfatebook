@@ -210,7 +210,7 @@ Groundwater lateral flux inputs and outputs for a given cell $i$ are balanced to
 \Delta{S_{base,i}} = S_{base, in} - S_{base, out} = \sum_{j}{q_{base, ji}} - \sum_{j}{q_{base, ij}}
 \end{equation}
 
-Aquifer update due to lateral flows is coupled to the vertical balance due to deep drainage or capillarity rise from/to the overlying soil. If the depth to aquifer becomes negative (i.e. the aquifer reaches the soil surface) then exfiltration occurs.
+Aquifer update due to lateral flows is coupled to the vertical balance due to deep drainage or capillarity rise from/to the overlying soil. If the depth to aquifer becomes negative (i.e. the aquifer reaches the soil surface) for an outlet or channel cell, then exfiltration ($Exf$) occurs.
 
 ### Overland runoff {#overlandflows}
 
@@ -220,10 +220,10 @@ q_{ij} = \frac{\Delta z_{ij}/L_{ij}}{\sum_{j}{\Delta z_{ij}/L_{ij}}}
 \end{equation}
 if $\Delta z_{ij} = z_i - z_j > 0$, that is, if the difference in elevation between the two cells is positive (i.e. if $z_j < z_i$). Otherwise there is no overland transport from $i$ to $j$, i.e. $q_{ij} = 0$. $L_{ij}$ indicates the distance between cell $i$ and $j$ (which depends on cell size and on whether the neighboring cell $j$ is diagonal to cell $i$). The summation of the denominator is done only for neighbors at lower elevation, so that $\sum_{i}{q_{ij}} = 1$. The table of $q_{ij}$ values is calculated when initializing distributed watershed objects.
 
-Every day, cells are processed in order from higher to lower elevation. For a given cell $i$, runoff is defined as the sum of local balance runoff $Ru_i$ (which includes infiltration excess and saturation excess) and aquifer exfiltration ($Exf_i$). This runoff is divided among the neighboring cells at lower elevation. The runon of a neighbor $j$, $Ro_j$ is updated as:
+Every day, cells are processed in order from higher to lower elevation. For a given cell $i$, runoff is ($Ru_i$) includes infiltration excess and saturation excess (aquifer exfiltration is processed separately when dealing with groundwater flows). This runoff is divided among the neighboring cells at lower elevation. The runon of a neighbor $j$, $Ro_j$ is updated as:
 
 \begin{equation}
-Ro_j = Ro_j + (Ru_i + Exf_i) \cdot q_{ij}
+Ro_j = Ro_j + Ru_i \cdot q_{ij}
 \end{equation}
 
 Note that a given cell $j$ can receive overland flux from more than one neighbor. 
