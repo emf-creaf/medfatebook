@@ -14,15 +14,15 @@ Watersheds are described in raster (i.e. gridded) mode, each cell representing a
   d. *artificial*: urban areas.
   e. *water*: water bodies. 
 
-Watershed water balance simulations extend the simulation of soil water balance to the landscape scale. Hence, the design of most vertical hydrological processes is the same as those of forest water balance. However, cells classified as rock, artificial or water lack any soil and must be treated differently. Additional water compartments and processes are represented in watershed water balance simulations. Each cell in the watershed may include the following: a snow-pack compartment, one or several soil layers (including a rocky layer down to several meters depth), and a groundwater compartment normally beyond the reach of plant roots for most landscape cells. 
+Watershed water balance simulations extend the simulation of soil water balance to the landscape scale. Hence, the design of most vertical hydrological processes is the same as those of forest water balance. However, cells classified as rock, artificial or water lack any soil and must be treated differently. Additional water compartments and (spatial transport) processes are represented in watershed water balance simulations. Each cell in the watershed may include the following: a snow-pack compartment, one or several soil layers (including a rocky layer down to several meters depth), and a groundwater compartment normally beyond the reach of plant roots for most landscape cells. 
 
 Similar to other models such as TETIS [@Frances2007], three lateral flows are considered between adjacent cells: 
 
-  (i) Overland surface flows from upper elevation cells.
+  (i) Overland surface flows from upper elevation cells to lower elevation ones.
   (ii) Lateral saturated soil flows (i.e. interflow) between adjacent cells. 
   (iii) Lateral groundwater flow (i.e. baseflow) between adjacent cells.
 
-Routing of overland surface flows is modeled following T-HYDRO @Ostendorf1993. In large watersheds not all water entering the river channel will end up reaching the watershed outlet, so it is necessary to perform channel routing. If the user specifies a river network, river channel routing is performed by calculating an average flow velocity of the whole channel network, according to Manning's equation. Subsurface flows, including both soil saturated flow and groundwater flow, are modeled following the kinematic wave approximation of DSHVM @Wigmosta1994.
+Routing of overland surface flows is modeled following T-HYDRO @Ostendorf1993. In large watersheds not all water entering the river channel will end up reaching the watershed outlet the same day, so it is necessary to perform channel routing. If the user specifies a river network, river channel routing is performed by calculating an average flow velocity of the whole channel network, according to Manning's equation. Subsurface flows, including both soil saturated flow and groundwater flow, are modeled following the kinematic wave approximation of DSHVM @Wigmosta1994.
 
 Split-parameter parametrization, following @Frances2007, allows reducing the parameters to be calibrated for practical applications.
 
@@ -98,16 +98,15 @@ For every day to be simulated in a watershed or subwatershed, the model performs
 
  1. Calculation of soil lateral flows between adjacent cells, according to sub-steps if required by the user (see \@ref(subsurfaceflows)).
  2. Determine the balance of soil lateral flows (i.e. determine $\Delta{S_{lat}}$) for each cell.
- 3. Calculation of groundwater lateral flows between adjacent cells (see \@ref(subsurfaceflows)).
- 4. Apply changes in cell aquifer water content due to the balance of groundwater lateral flows ($\Delta{S_{base}}$ in eq. \@ref(eq:cellaquiferwaterbalanceequation)).
- 5. Process cell vertical processes, including overland runoff-runon dynamics:
+ 3. Process cell vertical processes, including overland runoff-runon dynamics:
     a. In cells that lack soil (i.e. *rock*, *artificial* and *water*). For *rock* and *artificial* cells, subsurface flows are not considered, runon and snow pack dynamics is still processed in these cells. In *artificial* cells all runon, rainfall input or snow melt becomes runoff to be passed downhill. In *rock* cells, water can infiltrate directly to the aquifer, where a maximum rate is confronted with the runon/rainfall/snowmelt input. In the case of *water* cells, snow pack dynamics are also processed, but all liquid water (from rain or snow melt) is poured (as deep drainage) down to the aquifer below.
-    b. In cells having soil (i.e. *wildland* or *agriculture*), cells are processed accounting for subsurface flows, runon from upslope cells, and changes in the groundwater level, which complete eqs.  \@ref(eq:cellsnowpackwaterbalanceequation) and \@ref(eq:cellsoilwaterbalanceequation). All processes mentioned in \@ref(basicwaterbalancescheduling) are taken into account. 
+    b. In cells having soil (i.e. *wildland* or *agriculture*), cells are processed accounting for subsurface flows, runon from upslope cells, and capillarity from the groundwater level, which complete eqs.  \@ref(eq:cellsnowpackwaterbalanceequation) and \@ref(eq:cellsoilwaterbalanceequation). All processes mentioned in \@ref(basicwaterbalancescheduling) are taken into account. In cells that are watershed outlet or belong to channel capillarity from the aquifer is excluded to avoid the confusion (and instability) between local soil saturation excess and aquifer exfiltration.  
     c. In any kind of cell, after vertical flows are considered any surface runoff generated is distributed as overland flow to neighbor downhill cells (see \@ref(overlandflows)). If a cell is part of the channel network, its runoff is instead stored for latter processing of channel routing (see \@ref(watershedexport)). If a cell does not have downhill neighbors (i.e outlet cell) and is not in a channel, its runoff becomes water exported from the watershed (see \@ref(watershedexport)).
-6. Apply vertical flows between soils and the aquifer below, i.e. deep drainage and capillarity rise, to the water balance of the aquifer.
-7. Apply drainage losses from the aquifer towards a deeper aquifer not connected to watershed outlets (\@ref(deepaquiferloss)), completing eq. \@ref(eq:cellaquiferwaterbalanceequation).
+ 4. Calculation of groundwater lateral flows between adjacent cells (see \@ref(subsurfaceflows)).
+ 5. Apply changes in cell aquifer water content due to the balance of groundwater lateral flows ($\Delta{S_{base}}$ in eq. \@ref(eq:cellaquiferwaterbalanceequation)) and vertical flows between soils and the aquifer below, i.e. deep drainage and capillarity rise.
+ 6. Apply drainage losses from the aquifer towards a deeper aquifer not connected to watershed outlets (\@ref(deepaquiferloss)), completing eq. \@ref(eq:cellaquiferwaterbalanceequation).
 
-Channel routing is optional, depending on whether a channel network has been supplied. Channel routing is performed after water balance simulations of the watershed (or its subwatersheds) are finished. For each day to be simulated and each channel cell, the model adds the water that reached the channel during water balance simulations to the volume of water in the network of the corresponding watershed outlet. After that the model applies channel routing (see details \@ref(watershedexport)).
+Channel routing is optional, depending on whether a channel network has been supplied. Channel routing is performed after water balance simulations of the watershed (or its subwatersheds) are finished. For each day to be simulated and each channel cell, the model adds the water that reached the channel during water balance simulations to the volume of water in the network of the corresponding watershed outlet. After that the model applies channel routing, which can result in a channel backlog of water for the next day (see details \@ref(watershedexport)).
 
 ## Inputs and outputs
 
@@ -142,11 +141,14 @@ The following table describes the full set of watershed hydraulic control parame
 | Symbol           | R param       | Description                                |
 |------------------|---------------|--------------------------------------------|
 | $R_{vert}$       | `R_localflow` |  Multiplier of soil vertical conductivity. |
+|                  |  `interflow`  |  Logical flag to include saturated soil flows in simulations. |
 | $R_{lat}$        | `R_interflow` |  Multiplier of soil lateral conductivity (eq. \@ref(eq:interflowtransmissivity)). |
-| $R_{base}$       | `R_baseflow` |  Multiplier of groundwater lateral conductivity (eq. \@ref(eq:baseflowtransmissivity)). |
 | $n_{lat}$        | `n_interflow` |  Power exponent regulating the effect of soil saturation level on soil lateral transmissivity (eq. \@ref(eq:interflowtransmissivity)). |
+|                  | `baseflow`    |  Logical flag to include groundwater lateral flows in simulations. |
+| $R_{base}$       | `R_baseflow` |  Multiplier of groundwater lateral conductivity (eq. \@ref(eq:baseflowtransmissivity)). |
 | $n_{base}$       | `n_baseflow` |  Power exponent regulating the effect of aquifer height on groundwater lateral transmissivity (eq. \@ref(eq:baseflowtransmissivity)). |
 |                  | `n_manning` | Manning's roughness coefficient for channel routing calculations. |
+|                  | `free_drainage_outlets` | A boolean flag to prevent water table effects into local soil water balance of outlet/channel cells (included for numerical stability). |
 |                  | `num_daily_substeps` | Number of daily sub-steps for interflow calculations. |
 |                  | `subwatersheds` | A boolean flag to define watershed subunits (useful for parallelization). |
 |                  | `max_overlap` | Maximum proportion of overlapping cells for subwatersheds to be considered independent. Lower values will normally produce larger subunits. |
@@ -165,15 +167,18 @@ Distributed hydrological models can produce very detailed spatial and temporal o
 | `watershed_balance`| Data frame with spatially-averaged (over all watershed cells) components of the daily water balance (in mm/day). |
 | `watershed_soil_balance`|  Data frame with spatially-averaged components of the daily water balance over cells that have defined soils (i.e. *wildland* and *agriculture* cells) (in mm/day). |
 | `channel_export_m3s` | A matrix with daily values of runoff (in m3/s) reaching each of the channel cells of the landscape (useful for channel processing with an external model). |
-| `outlet_export_m3s` | A matrix with daily runoff (in m3/s) at each of the outlet cells of the landscape. Each outlet drains its own subset of cells (sometimes including channel routing), so the overall watershed outflow corresponds to the sum of row values. |
+| `outlet_export_m3s` | A matrix with daily runoff (in m3/s) at each of the outlet cells of the landscape. Each outlet drains its own subset of cells (sometimes including channel routing), so the overall daily watershed outflow corresponds to the sum of values in the corresponding row. |
 
-Note that while simulations can be performed for sub-watersheds separately, at present the model does not produce results at the sub-watershed level. 
+Note that while simulations can be performed for sub-watersheds separately, at present the model does not produce results at the sub-watershed level. However, the partitioning of sub-watersheds is included in the output, so that users can cross it with `outlet_export_m3s` to get the discharge generated in each sub-watershed.
 
 ## Process details {#watershedbalancedetails}
 
 ### Soil and groundwater lateral fluxes  {#subsurfaceflows}
 
-Both soil saturated and groundwater lateral fluxes follow the saturated subsurface flow model of Wigmosta et al. [-@Wigmosta1994], which is based on a kinematic wave approximation. Each grid cell can exchange water with its eight adjacent neighbors. Local hydraulic gradients are approximated by local ground surface slopes, so that each cell will generally receive water from its upslope neighbors and discharge to its downslope neighbors. The rate of saturated flow from cell $i$ to its downgradient neighbors is equal to [@Wigmosta1999]:
+Both soil saturated and groundwater lateral fluxes follow the saturated subsurface flow model of Wigmosta et al. [-@Wigmosta1994], which is based on a kinematic wave approximation. Each grid cell can exchange water with its eight adjacent neighbors. 
+
+#### Soil saturated lateral flow
+Local hydraulic gradients are approximated by local ground surface slopes, so that each cell will generally receive water from its upslope neighbors and discharge to its downslope neighbors. The rate of saturated flow from cell $i$ to its downgradient neighbors is equal to [@Wigmosta1999]:
 \begin{eqnarray}
 q_{ij} &=& - T_{i}\cdot \tan(\beta_{i,j})\cdot w_j \;\;\; \beta_{i,j} < 0\\
 q_{ij} &=& 0 \;\;\; \beta_{i,j} \geq 0 
@@ -185,21 +190,27 @@ T_{sat,i} = \frac{R_{lat}\cdot K_{sat,i} \cdot Z_{soil,i}}{n_{lat}} \cdot (1 - Z
 \end{equation}
 where $K_{sat,i}$ is the saturated conductivity of the first (top) soil layer in cell $i$, $Z_{soil,i}$ is the soil depth at cell $i$, $Z_{sat,i}$ is the depth of saturated water at cell $i$ (see \@ref(watercontent)) and $n_{lat}$ is a power exponent regulating the responsiveness of transmissivity to the level of saturation. $R_{lat}$ is the correction factor (a watershed parameter) for the fact that $K_{sat,i}$ is assessed from soil samples, whereas the parameter in the model is defined at the scale of a grid cell [@Frances2007], as explained above. 
 
-The transmissivity function for groundwater lateral flux in cell $i$ ($T_{base,i}$) is analogous: 
+Soil saturated lateral flux inputs and outputs for a given cell $i$ are balanced to determine increase or decrease in soil moisture:
+\begin{equation}
+\Delta{S_{lat,i}} = S_{lat, in} - S_{lat, out} = \sum_{j}{q_{lat, ji}} - \sum_{j}{q_{lat, ij}}
+\end{equation}
+Hence, soil layers are not considered separately in the estimation of soil saturated flows and balance. For their source/sink effect on local soil water balance, however, the resulting lateral flow is divided between soil layers according to the water volume present (i.e. layers with larger amounts of water are assumed to exchange water more easily than layers that are drier, regardless of the soil volume they occupy). 
+
+#### Groundwater lateral flow
+
+The transmissivity function for groundwater lateral flux in cell $i$ ($T_{base,i}$) is analogous to the soil saturated lateral flows: 
 \begin{equation}
 T_{base,i} = \frac{R_{base}\cdot K_{bedrock,i} \cdot Z_{bedrock,i}}{n_{base}} \cdot (1 - Z_{aquifer,i}/Z_{bedrock,i})^{n_{base}}
 (\#eq:baseflowtransmissivity)
 \end{equation}
 where $K_{bedrock,i}$ is the bedrock conductivity at cell $i$, $R_{base}$ is the correction factor for base flows, $Z_{bedrock,i}$ is the depth of the unaltered bedrock, $Z_{aquifer,i}$ is the depth of the aquifer water table and $n_{base}$ is again a power exponent regulating the responsiveness of transmissivity to the aquifer level.
 
-Soil saturated lateral flux inputs and outputs for a given cell $i$ are balanced to determine increase or decrease in soil moisture (to be incorporated as source/sink when processing vertical soil flows):
-\begin{equation}
-\Delta{S_{lat,i}} = S_{lat, in} - S_{lat, out} = \sum_{j}{q_{lat, ji}} - \sum_{j}{q_{lat, ij}}
-\end{equation}
-and the same occurs for groundwater lateral fluxes and aquifer balance:
+Groundwater lateral flux inputs and outputs for a given cell $i$ are balanced to determine increase or decrease of the aquifer balance:
 \begin{equation}
 \Delta{S_{base,i}} = S_{base, in} - S_{base, out} = \sum_{j}{q_{base, ji}} - \sum_{j}{q_{base, ij}}
 \end{equation}
+
+Aquifer update due to lateral flows is coupled to the vertical balance due to deep drainage or capillarity rise from/to the overlying soil. If the depth to aquifer becomes negative (i.e. the aquifer reaches the soil surface) then exfiltration occurs.
 
 ### Overland runoff {#overlandflows}
 
