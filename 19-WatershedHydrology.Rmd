@@ -96,15 +96,13 @@ The model can perform water balance simulations on the whole watershed or its su
 
 For every day to be simulated in a watershed or subwatershed, the model performs the following steps:
 
- 1. Calculation of soil lateral flows between adjacent cells, according to sub-steps if required by the user (see \@ref(subsurfaceflows)).
- 2. Determine the balance of soil lateral flows (i.e. determine $\Delta{S_{lat}}$) for each cell.
- 3. Process cell vertical processes, including overland runoff-runon dynamics:
+ 1. Calculation of soil lateral flows between adjacent cells, according to sub-steps if required by the user (see \@ref(soilsaturatedflows)) and determine the balance of soil lateral flows (i.e. determine $\Delta{S_{lat}}$) for each cell.
+ 2. Process cell vertical processes, including overland runoff-runon dynamics:
     a. In cells that lack soil (i.e. *rock*, *artificial* and *water*). For *rock* and *artificial* cells, subsurface flows are not considered, runon and snow pack dynamics is still processed in these cells. In *artificial* cells all runon, rainfall input or snow melt becomes runoff to be passed downhill. In *rock* cells, water can infiltrate directly to the aquifer, where a maximum rate is confronted with the runon/rainfall/snowmelt input. In the case of *water* cells, snow pack dynamics are also processed, but all liquid water (from rain or snow melt) is poured (as deep drainage) down to the aquifer below.
     b. In cells having soil (i.e. *wildland* or *agriculture*), cells are processed accounting for subsurface flows, runon from upslope cells, and capillarity from the groundwater level, which complete eqs.  \@ref(eq:cellsnowpackwaterbalanceequation) and \@ref(eq:cellsoilwaterbalanceequation). All processes mentioned in \@ref(basicwaterbalancescheduling) are taken into account. In cells that are watershed outlet or belong to channel capillarity from the aquifer is excluded to avoid the confusion (and instability) between local soil saturation excess and aquifer exfiltration.  
     c. In any kind of cell, after vertical flows are considered any surface runoff generated is distributed as overland flow to neighbor downhill cells (see \@ref(overlandflows)). If a cell is part of the channel network, its runoff is instead stored for latter processing of channel routing (see \@ref(watershedexport)). If a cell does not have downhill neighbors (i.e outlet cell) and is not in a channel, its runoff becomes water exported from the watershed (see \@ref(watershedexport)).
- 4. Calculation of groundwater lateral flows between adjacent cells (see \@ref(subsurfaceflows)).
- 5. Apply changes in cell aquifer water content due to the balance of groundwater lateral flows ($\Delta{S_{base}}$ in eq. \@ref(eq:cellaquiferwaterbalanceequation)) and vertical flows between soils and the aquifer below, i.e. deep drainage and capillarity rise.
- 6. Apply drainage losses from the aquifer towards a deeper aquifer not connected to watershed outlets (\@ref(deepaquiferloss)), completing eq. \@ref(eq:cellaquiferwaterbalanceequation).
+ 3. Calculation of groundwater lateral flows between adjacent cells (see \@ref(groundwaterflows)) and apply changes in cell aquifer water content due to the balance of groundwater lateral flows ($\Delta{S_{base}}$ in eq. \@ref(eq:cellaquiferwaterbalanceequation)) and vertical flows between soils and the aquifer below, i.e. deep drainage and capillarity rise.
+ 4. Apply drainage losses from the aquifer towards a deeper aquifer not connected to watershed outlets (\@ref(deepaquiferloss)), completing eq. \@ref(eq:cellaquiferwaterbalanceequation).
 
 Channel routing is optional, depending on whether a channel network has been supplied. Channel routing is performed after water balance simulations of the watershed (or its subwatersheds) are finished. For each day to be simulated and each channel cell, the model adds the water that reached the channel during water balance simulations to the volume of water in the network of the corresponding watershed outlet. After that the model applies channel routing, which can result in a channel backlog of water for the next day (see details \@ref(watershedexport)).
 
@@ -173,11 +171,10 @@ Note that while simulations can be performed for sub-watersheds separately, at p
 
 ## Process details {#watershedbalancedetails}
 
-### Soil and groundwater lateral fluxes  {#subsurfaceflows}
+### Soil saturated lateral flow  {#soilsaturatedflows}
 
-Both soil saturated and groundwater lateral fluxes follow the saturated subsurface flow model of Wigmosta et al. [-@Wigmosta1994], which is based on a kinematic wave approximation. Each grid cell can exchange water with its eight adjacent neighbors. 
+Soil saturated lateral flows follow the saturated subsurface flow model of Wigmosta et al. [-@Wigmosta1994], which is based on a kinematic wave approximation. Each grid cell can exchange water with its eight adjacent neighbors. 
 
-#### Soil saturated lateral flow
 Local hydraulic gradients are approximated by local ground surface slopes, so that each cell will generally receive water from its upslope neighbors and discharge to its downslope neighbors. The rate of saturated flow from cell $i$ to its downgradient neighbors is equal to [@Wigmosta1999]:
 \begin{eqnarray}
 q_{ij} &=& - T_{i}\cdot \tan(\beta_{i,j})\cdot w_j \;\;\; \beta_{i,j} < 0\\
@@ -196,9 +193,11 @@ Soil saturated lateral flux inputs and outputs for a given cell $i$ are balanced
 \end{equation}
 Hence, soil layers are not considered separately in the estimation of soil saturated flows and balance. For their source/sink effect on local soil water balance, however, the resulting lateral flow is divided between soil layers according to the water volume present (i.e. layers with larger amounts of water are assumed to exchange water more easily than layers that are drier, regardless of the soil volume they occupy). 
 
-#### Groundwater lateral flow
+### Groundwater lateral flow  {#groundwaterflows}
 
-The transmissivity function for groundwater lateral flux in cell $i$ ($T_{base,i}$) is analogous to the soil saturated lateral flows: 
+Like the preceeding, groundwater lateral flows follow the saturated subsurface flow model of Wigmosta et al. [-@Wigmosta1994], which is based on a kinematic wave approximation. Each grid cell can exchange water with its eight adjacent neighbors. 
+
+The transmissivity function for groundwater lateral flow in cell $i$ ($T_{base,i}$) is analogous to the soil saturated lateral flows: 
 \begin{equation}
 T_{base,i} = \frac{R_{base}\cdot K_{bedrock,i} \cdot Z_{bedrock,i}}{n_{base}} \cdot (1 - Z_{aquifer,i}/Z_{bedrock,i})^{n_{base}}
 (\#eq:baseflowtransmissivity)
