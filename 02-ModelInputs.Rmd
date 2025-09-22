@@ -303,6 +303,18 @@ summary(oak_forest, SpParamsMED)
 
 Since density and diameter have not been provided, simulations in this case will be restricted to function `spwb()/pwb()`. Moreover, note that when defining single-cohort forests all possible interactions with functionally distinct plants are neglected.
 
+### Optional variables in forest objects
+
+The structure presented above for `forest` objects corresponds to the required data elements. A forest object can contain additional information when this is available. In particular, data frames `treeData` and `shrubData` can contain additional columns:
+
++ `LAI`: Leaf area index ($m^2 \cdot m^{-2}$), corresponding to $LAI^{live}$, avoiding the use of allometric relationships for leaf biomass in water balance simulations.
++ `FoliarBiomass`: Standing dry biomass of leaves ($kg \cdot m^{-2}$), which together with $SLA$ will be used to estimate $LAI^{live}$, avoiding the use of allometric relationships for leaf biomass in water balance simulations.
++ `FuelLoading`: Fine fuel loading ($kg \cdot m^{-2}$), to avoid its calculation from allometric relationships.
++ `CrownRatio`: The ratio between crown length and total height (between 0 and 1), avoiding the use of allometric relationships for crown ratio in water balance simulations.
++ `Z100`: Depth (in $mm$) corresponding to 100% of fine roots (to specify a truncated root distribution).
++ `ObsID`: A string identifying plant cohorts at the stage of forest sampling. Used to track the fate of particular plant cohorts through simulations. 
+
+
 ### Vertical leaf distribution {#leafdistribution}
 
 The vegetation input structures allow the package to determine the vertical distribution of leaves in the stand. The leaf area of any woody plant cohort is assumed to be distributed vertically following a **truncated Gaussian function** whose standardized values -1.5 and 1.5 correspond to crown base height ($H_{crown,i}$; in $cm$) and total plant height ($H_i$), respectively. Crown base height is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort ($CR_i$; a proportion between 0 and 1), which in turn can be estimated as explained in \@ref(eq:CrownHeight). 
@@ -345,19 +357,9 @@ The linear dose response model is quite flexible with respect to fine root distr
 vprofile_rootDistribution(exampleforest, SpParamsMED)
 ```
 
+The vertical distribution of fine roots can be effectively truncated to a maximum depth by specifying a value for $Z_{100}$ (or by allowing the model to estimate it using `truncateRootDistribution = TRUE` in control parameters). 
 
 The actual input to simulation functions `spwb()`, `growth()` and alike, describes fine root distribution using the matrix of $FRP_{i,s}$ values - not $Z_{50,i}$ and $Z_{95,i}$ -, which means that the proportions of fine roots can be modified manually or be defined by another model. In fact, **medfate** also allows calculating $FRP_{i,s}$ values assuming a conic distribution of fine roots (see `root_conicDistribution()`). 
-
-### Optional variables in forest objects
-
-The structure presented above for `forest` objects corresponds to the required data elements. A forest object can contain additional information when this is available. In particular, data frames `treeData` and `shrubData` can contain additional columns:
-
-+ `LAI`: Leaf area index ($m^2 \cdot m^{-2}$), corresponding to $LAI^{live}$, avoiding the use of allometric relationships for leaf biomass in water balance simulations.
-+ `FoliarBiomass`: Standing dry biomass of leaves ($kg \cdot m^{-2}$), which together with $SLA$ will be used to estimate $LAI^{live}$, avoiding the use of allometric relationships for leaf biomass in water balance simulations.
-+ `FuelLoading`: Fine fuel loading ($kg \cdot m^{-2}$), to avoid its calculation from allometric relationships.
-+ `CrownRatio`: The ratio between crown length and total height (between 0 and 1), avoiding the use of allometric relationships for crown ratio in water balance simulations.
-+ `Z100`: Depth (in $mm$) corresponding to 100% of fine roots (to specify a truncated root distribution).
-+ `ObsID`: A string identifying plant cohorts at the stage of forest sampling. Used to track the fate of particular plant cohorts through simulations. 
 
 
 ### Water pools and root horizontal distribution {#plantwaterpools}

@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2025-09-13" />
+<meta name="date" content="2025-09-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -215,9 +215,9 @@ div.csl-indent {
 <li class="chapter" data-level="2.4.3" data-path="model-inputs.html"><a href="model-inputs.html#leaf-area-index-of-the-forest-stand"><i class="fa fa-check"></i><b>2.4.3</b> Leaf area index of the forest stand</a></li>
 <li class="chapter" data-level="2.4.4" data-path="model-inputs.html"><a href="model-inputs.html#forestobjects"><i class="fa fa-check"></i><b>2.4.4</b> Forest objects</a></li>
 <li class="chapter" data-level="2.4.5" data-path="model-inputs.html"><a href="model-inputs.html#single-cohort-forests"><i class="fa fa-check"></i><b>2.4.5</b> Single-cohort forests</a></li>
-<li class="chapter" data-level="2.4.6" data-path="model-inputs.html"><a href="model-inputs.html#leafdistribution"><i class="fa fa-check"></i><b>2.4.6</b> Vertical leaf distribution</a></li>
-<li class="chapter" data-level="2.4.7" data-path="model-inputs.html"><a href="model-inputs.html#rootdistribution"><i class="fa fa-check"></i><b>2.4.7</b> Vertical root distribution</a></li>
-<li class="chapter" data-level="2.4.8" data-path="model-inputs.html"><a href="model-inputs.html#optional-variables-in-forest-objects"><i class="fa fa-check"></i><b>2.4.8</b> Optional variables in forest objects</a></li>
+<li class="chapter" data-level="2.4.6" data-path="model-inputs.html"><a href="model-inputs.html#optional-variables-in-forest-objects"><i class="fa fa-check"></i><b>2.4.6</b> Optional variables in forest objects</a></li>
+<li class="chapter" data-level="2.4.7" data-path="model-inputs.html"><a href="model-inputs.html#leafdistribution"><i class="fa fa-check"></i><b>2.4.7</b> Vertical leaf distribution</a></li>
+<li class="chapter" data-level="2.4.8" data-path="model-inputs.html"><a href="model-inputs.html#rootdistribution"><i class="fa fa-check"></i><b>2.4.8</b> Vertical root distribution</a></li>
 <li class="chapter" data-level="2.4.9" data-path="model-inputs.html"><a href="model-inputs.html#plantwaterpools"><i class="fa fa-check"></i><b>2.4.9</b> Water pools and root horizontal distribution</a></li>
 <li class="chapter" data-level="2.4.10" data-path="model-inputs.html"><a href="model-inputs.html#functionaltraits"><i class="fa fa-check"></i><b>2.4.10</b> Functional traits and vegetation initialization</a></li>
 <li class="chapter" data-level="2.4.11" data-path="model-inputs.html"><a href="model-inputs.html#update-of-structural-variables-during-simulations"><i class="fa fa-check"></i><b>2.4.11</b> Update of structural variables during simulations</a></li>
@@ -1392,8 +1392,20 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 ## PAR ground (%): 33.2871084  SWR ground (%): 44.2721305</code></pre>
 <p>Since density and diameter have not been provided, simulations in this case will be restricted to function <code>spwb()/pwb()</code>. Moreover, note that when defining single-cohort forests all possible interactions with functionally distinct plants are neglected.</p>
 </div>
-<div id="leafdistribution" class="section level3 hasAnchor" number="2.4.6">
-<h3><span class="header-section-number">2.4.6</span> Vertical leaf distribution<a href="model-inputs.html#leafdistribution" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="optional-variables-in-forest-objects" class="section level3 hasAnchor" number="2.4.6">
+<h3><span class="header-section-number">2.4.6</span> Optional variables in forest objects<a href="model-inputs.html#optional-variables-in-forest-objects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The structure presented above for <code>forest</code> objects corresponds to the required data elements. A forest object can contain additional information when this is available. In particular, data frames <code>treeData</code> and <code>shrubData</code> can contain additional columns:</p>
+<ul>
+<li><code>LAI</code>: Leaf area index (<span class="math inline">\(m^2 \cdot m^{-2}\)</span>), corresponding to <span class="math inline">\(LAI^{live}\)</span>, avoiding the use of allometric relationships for leaf biomass in water balance simulations.</li>
+<li><code>FoliarBiomass</code>: Standing dry biomass of leaves (<span class="math inline">\(kg \cdot m^{-2}\)</span>), which together with <span class="math inline">\(SLA\)</span> will be used to estimate <span class="math inline">\(LAI^{live}\)</span>, avoiding the use of allometric relationships for leaf biomass in water balance simulations.</li>
+<li><code>FuelLoading</code>: Fine fuel loading (<span class="math inline">\(kg \cdot m^{-2}\)</span>), to avoid its calculation from allometric relationships.</li>
+<li><code>CrownRatio</code>: The ratio between crown length and total height (between 0 and 1), avoiding the use of allometric relationships for crown ratio in water balance simulations.</li>
+<li><code>Z100</code>: Depth (in <span class="math inline">\(mm\)</span>) corresponding to 100% of fine roots (to specify a truncated root distribution).</li>
+<li><code>ObsID</code>: A string identifying plant cohorts at the stage of forest sampling. Used to track the fate of particular plant cohorts through simulations.</li>
+</ul>
+</div>
+<div id="leafdistribution" class="section level3 hasAnchor" number="2.4.7">
+<h3><span class="header-section-number">2.4.7</span> Vertical leaf distribution<a href="model-inputs.html#leafdistribution" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The vegetation input structures allow the package to determine the vertical distribution of leaves in the stand. The leaf area of any woody plant cohort is assumed to be distributed vertically following a <strong>truncated Gaussian function</strong> whose standardized values -1.5 and 1.5 correspond to crown base height (<span class="math inline">\(H_{crown,i}\)</span>; in <span class="math inline">\(cm\)</span>) and total plant height (<span class="math inline">\(H_i\)</span>), respectively. Crown base height is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort (<span class="math inline">\(CR_i\)</span>; a proportion between 0 and 1), which in turn can be estimated as explained in <a href="allometricmodels.html#eq:CrownHeight">(21.6)</a>.</p>
 <p>Simulation models in <strong>medfate</strong> divide the vertical dimension into vertical layers (by default are 100 cm width, but see control parameter <code>verticalLayerSize</code>). Let us define <span class="math inline">\(LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}\)</span> as the leaf area index of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> including both functional leaves and dead leaves standing on branches. The truncated Gaussian distribution defines the <span class="math inline">\(LAI_{i,j}^{\phi}\)</span> and <span class="math inline">\(LAI_{i,j}^{dead}\)</span> for all plant cohorts and vertical layers.</p>
 <p>Dividing the leaf area of a given layer by its width, one obtains the <em>leaf area density</em> (<span class="math inline">\(LAD\)</span> in <span class="math inline">\(m^2 \cdot m^{-3}\)</span>). Figure <a href="model-inputs.html#fig:leafareadensity">2.4</a> illustrates the leaf area density profile (see function <code>vprofile_leafAreaDensity()</code>) corresponding to the forest stand described in the example <code>forest</code> object that we showed above.</p>
@@ -1412,8 +1424,8 @@ Figure 2.5: Leaf area density distribution in a forest stand, including the herb
 </p>
 </div>
 </div>
-<div id="rootdistribution" class="section level3 hasAnchor" number="2.4.7">
-<h3><span class="header-section-number">2.4.7</span> Vertical root distribution<a href="model-inputs.html#rootdistribution" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="rootdistribution" class="section level3 hasAnchor" number="2.4.8">
+<h3><span class="header-section-number">2.4.8</span> Vertical root distribution<a href="model-inputs.html#rootdistribution" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Roots can be distinguished functionally into two different organs: <strong>coarse roots</strong> are responsible for mechanical support and transport of water and nutrients towards the stem, whereas <strong>fine roots</strong> are responsible for absorbing water and nutrients.</p>
 <p>Analogously to the aboveground vegetation parameters, inputs describing depths corresponding to 50% and 95% of fine roots (<span class="math inline">\(Z_{50,i}\)</span> and <span class="math inline">\(Z_{95,i}\)</span>) are used to completely specify the distribution of roots across soil layers. The root system of each plant cohort <span class="math inline">\(i\)</span> is described using <span class="math inline">\(FRP_{i,s}\)</span>, the proportion of fine roots (with respect to the whole plant) in each soil layer <span class="math inline">\(s\)</span>. <span class="math inline">\(FRP_{i,s}\)</span> values are normally defined using the linear dose response model <span class="citation">(<a href="#ref-Schenk2002">Schenk &amp; Jackson 2002</a>; <a href="#ref-Collins2007">Collins &amp; Bras 2007</a>)</span>:
 <span class="math display">\[\begin{eqnarray}
@@ -1428,19 +1440,8 @@ where <span class="math inline">\(Y_i(z)\)</span> is the cumulative fraction of 
 Figure 2.6: Examples of root density profile according to the linear dose response model.
 </p>
 </div>
+<p>The vertical distribution of fine roots can be effectively truncated to a maximum depth by specifying a value for <span class="math inline">\(Z_{100}\)</span> (or by allowing the model to estimate it using <code>truncateRootDistribution = TRUE</code> in control parameters).</p>
 <p>The actual input to simulation functions <code>spwb()</code>, <code>growth()</code> and alike, describes fine root distribution using the matrix of <span class="math inline">\(FRP_{i,s}\)</span> values - not <span class="math inline">\(Z_{50,i}\)</span> and <span class="math inline">\(Z_{95,i}\)</span> -, which means that the proportions of fine roots can be modified manually or be defined by another model. In fact, <strong>medfate</strong> also allows calculating <span class="math inline">\(FRP_{i,s}\)</span> values assuming a conic distribution of fine roots (see <code>root_conicDistribution()</code>).</p>
-</div>
-<div id="optional-variables-in-forest-objects" class="section level3 hasAnchor" number="2.4.8">
-<h3><span class="header-section-number">2.4.8</span> Optional variables in forest objects<a href="model-inputs.html#optional-variables-in-forest-objects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The structure presented above for <code>forest</code> objects corresponds to the required data elements. A forest object can contain additional information when this is available. In particular, data frames <code>treeData</code> and <code>shrubData</code> can contain additional columns:</p>
-<ul>
-<li><code>LAI</code>: Leaf area index (<span class="math inline">\(m^2 \cdot m^{-2}\)</span>), corresponding to <span class="math inline">\(LAI^{live}\)</span>, avoiding the use of allometric relationships for leaf biomass in water balance simulations.</li>
-<li><code>FoliarBiomass</code>: Standing dry biomass of leaves (<span class="math inline">\(kg \cdot m^{-2}\)</span>), which together with <span class="math inline">\(SLA\)</span> will be used to estimate <span class="math inline">\(LAI^{live}\)</span>, avoiding the use of allometric relationships for leaf biomass in water balance simulations.</li>
-<li><code>FuelLoading</code>: Fine fuel loading (<span class="math inline">\(kg \cdot m^{-2}\)</span>), to avoid its calculation from allometric relationships.</li>
-<li><code>CrownRatio</code>: The ratio between crown length and total height (between 0 and 1), avoiding the use of allometric relationships for crown ratio in water balance simulations.</li>
-<li><code>Z100</code>: Depth (in <span class="math inline">\(mm\)</span>) corresponding to 100% of fine roots (to specify a truncated root distribution).</li>
-<li><code>ObsID</code>: A string identifying plant cohorts at the stage of forest sampling. Used to track the fate of particular plant cohorts through simulations.</li>
-</ul>
 </div>
 <div id="plantwaterpools" class="section level3 hasAnchor" number="2.4.9">
 <h3><span class="header-section-number">2.4.9</span> Water pools and root horizontal distribution<a href="model-inputs.html#plantwaterpools" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -1678,11 +1679,11 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <pre><code>##   [1] &quot;fillMissingRootParams&quot;              &quot;fillMissingSpParams&quot;                &quot;fillMissingWithGenusParams&quot;        
 ##   [4] &quot;verbose&quot;                            &quot;subdailyResults&quot;                    &quot;standResults&quot;                      
 ##   [7] &quot;soilResults&quot;                        &quot;soilPoolResults&quot;                    &quot;snowResults&quot;                       
-##  [10] &quot;plantResults&quot;                       &quot;plantWaterBalanceResults&quot;           &quot;labileCarbonBalanceResults&quot;        
-##  [13] &quot;plantStructureResults&quot;              &quot;growthMortalityResults&quot;             &quot;leafResults&quot;                       
-##  [16] &quot;temperatureResults&quot;                 &quot;fireHazardResults&quot;                  &quot;fireHazardStandardWind&quot;            
-##  [19] &quot;fireHazardStandardDFMC&quot;             &quot;transpirationMode&quot;                  &quot;soilDomains&quot;                       
-##  [22] &quot;rhizosphereOverlap&quot;                 &quot;fullRhizosphereOverlapConductivity&quot; &quot;soilFunctions&quot;                     
+##  [10] &quot;plantResults&quot;                       &quot;labileCarbonBalanceResults&quot;         &quot;plantStructureResults&quot;             
+##  [13] &quot;growthMortalityResults&quot;             &quot;leafResults&quot;                        &quot;temperatureResults&quot;                
+##  [16] &quot;fireHazardResults&quot;                  &quot;fireHazardStandardWind&quot;             &quot;fireHazardStandardDFMC&quot;            
+##  [19] &quot;transpirationMode&quot;                  &quot;soilDomains&quot;                        &quot;rhizosphereOverlap&quot;                
+##  [22] &quot;truncateRootDistribution&quot;           &quot;fullRhizosphereOverlapConductivity&quot; &quot;soilFunctions&quot;                     
 ##  [25] &quot;VG_PTF&quot;                             &quot;ndailysteps&quot;                        &quot;max_nsubsteps_soil&quot;                
 ##  [28] &quot;defaultWindSpeed&quot;                   &quot;defaultCO2&quot;                         &quot;defaultRainfallIntensityPerMonth&quot;  
 ##  [31] &quot;leafPhenology&quot;                      &quot;bareSoilEvaporation&quot;                &quot;unlimitedSoilWater&quot;                
