@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 16 Carbon pools and components of the carbon balance | The medfate reference book</title>
+  <title>Chapter 19 Regeneration | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
   <meta name="generator" content="bookdown 0.45 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 16 Carbon pools and components of the carbon balance | The medfate reference book" />
+  <meta property="og:title" content="Chapter 19 Regeneration | The medfate reference book" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="This is a reference book for models implemented in packages medfate and medfateland." />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 16 Carbon pools and components of the carbon balance | The medfate reference book" />
+  <meta name="twitter:title" content="Chapter 19 Regeneration | The medfate reference book" />
   
   <meta name="twitter:description" content="This is a reference book for models implemented in packages medfate and medfateland." />
   
@@ -29,8 +29,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="growthmodelling.html"/>
-<link rel="next" href="growthsenescencemortality.html"/>
+<link rel="prev" href="dynamicsmodelling.html"/>
+<link rel="next" href="watershedhydrology.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -738,183 +738,59 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="carbonpoolsbalance" class="section level1 hasAnchor" number="16">
-<h1><span class="header-section-number">Chapter 16</span> Carbon pools and components of the carbon balance<a href="carbonpoolsbalance.html#carbonpoolsbalance" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<div id="estimationcarbonpools" class="section level2 hasAnchor" number="16.1">
-<h2><span class="header-section-number">16.1</span> Size of carbon pools<a href="carbonpoolsbalance.html#estimationcarbonpools" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Biomass of leaves, sapwood and fine roots is needed in the model to estimate respiratory costs and the size of the C storage pools.</p>
-<div id="leaf-structural-metabolic-and-storage-biomass" class="section level3 hasAnchor" number="16.1.1">
-<h3><span class="header-section-number">16.1.1</span> Leaf structural, metabolic and storage biomass<a href="carbonpoolsbalance.html#leaf-structural-metabolic-and-storage-biomass" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The live leaf area <span class="math inline">\(LA^{live}\)</span> per individual (in <span class="math inline">\(m^2\)</span>) is:
-<span class="math display">\[\begin{equation}
-LA^{live} = 10000 \cdot LAI^{live} / N
-\end{equation}\]</span>
-where <span class="math inline">\(N\)</span> is the density of the cohort and <span class="math inline">\(LAI^{live}\)</span> is the leaf area index. The actual (expanded) leaf area <span class="math inline">\(LA^{\phi}\)</span> is estimated analogously from <span class="math inline">\(LAI^{\phi}\)</span>:
-<span class="math display" id="eq:leafarea">\[\begin{equation}
-LA^{\phi} = 10000 \cdot LAI^{\phi} / N
-\tag{16.1}
-\end{equation}\]</span>
-Structural leaf biomass per individual (<span class="math inline">\(B_{leaf}\)</span>; <span class="math inline">\(g\,dry·ind^{-1}\)</span>) is the result of dividing leaf area by <span class="math inline">\(SLA\)</span> (<span class="math inline">\(m^{2} \cdot kg^{-1}\)</span>), the specific leaf area of the species:
-<span class="math display">\[\begin{equation}
-B_{leaf} = 1000 \cdot LA^{\phi} / SLA
-\end{equation}\]</span>
-where a factor 1000 is used to convert from kg to g. Hence, only expanded leaf area has respiratory cost (i.e. winter resistance buds do not). Leaf storage volume for an individual (<span class="math inline">\(V_{storage,leaf}\)</span>; in <span class="math inline">\(L \cdot ind^{-1}\)</span>) is:
-<span class="math display">\[\begin{equation}
-V_{storage, leaf} = LA^{\phi}  \cdot V_{leaf}
-\end{equation}\]</span>
-where <span class="math inline">\(V_{leaf}\)</span> is the water storage capacity of leaf tissue per leaf area unit (in <span class="math inline">\(L\cdot m^{-2}\)</span>) (see <a href="modelparametrization.html#plantwaterstoragecapacity">A.4.5</a>). Leaf storage volume is necessary to estimate the biomass of metabolic (sugars) or storage (starch) from the concentration of these substances in leaves (<span class="math inline">\(SS_{leaf}\)</span> and <span class="math inline">\(ST_{leaf}\)</span>, which are expressed in <span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span>), and conversely. For example:
-<span class="math display">\[\begin{equation}
-B_{sugar,leaf} = SS_{leaf} \cdot V_{storage, leaf} \cdot m_{gluc}
-\end{equation}\]</span>
-where <span class="math inline">\(m_{gluc}\)</span> is the molar mass of glucose. To estimate leaf starch storage capacity, the model assumes that up to 10% of leaf tissue volume can be occupied with starch, so that the leaf starch storage capacity (<span class="math inline">\(ST^{max}_{leaf}\)</span>; in <span class="math inline">\(mol \cdot ind^{-1}\)</span>) is:
-<span class="math display">\[\begin{equation}
-ST^{max}_{leaf} = 0.1 \cdot 1000 \cdot \frac{V_{storage, leaf} \cdot \rho_{starch}}{m_{starch}}
+<div id="regeneration" class="section level1 hasAnchor" number="19">
+<h1><span class="header-section-number">Chapter 19</span> Regeneration<a href="regeneration.html#regeneration" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="seedbankdynamics" class="section level2 hasAnchor" number="19.1">
+<h2><span class="header-section-number">19.1</span> Seed production and seed bank dynamics<a href="regeneration.html#seedbankdynamics" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The model considers <strong>mortality of seeds</strong> in the seed bank before adding new seeds. Annual seed bank mortality is simulated for each species using an exponential decay function, driven by the species-specific seed longevity (<span class="math inline">\(SL\)</span>):</p>
+<p><span class="math display">\[\begin{equation}
+Seeds_{t+1} = Seeds_{t} \cdot \exp(- 1/SL)
 \end{equation}\]</span></p>
-<p>where <span class="math inline">\(\rho_{starch}\)</span> is the density of starch and <span class="math inline">\(m_{starch}\)</span> is its molar mass.</p>
+<p>To determine seed production, the model determines the <strong>seed rain</strong> in the stand by determining which cohorts have total plant heights above maturity thresholds for trees and shrubs. This is done, for each cohort, by comparing its height with the species-specific parameter seed production height (<span class="math inline">\(H_{seed}\)</span>). Missing values of <span class="math inline">\(H_{seed}\)</span> are given values from control variables <code>seedProductionTreeHeight</code> and <code>seedProductionShrubHeight</code> for trees and shrubs, respectively. In addition to locally produced seeds, the user can use control parameter <code>seedRain</code> to specify a list of species names whose seeds arrive to the stand. Despite the origin, in non-spatial simulations the seed bank relative amount of species with seed rain is set to 100%, assuming that there is enough seed production to allow normal recruitment. However, when simulations are conducted in a spatial context, the species identity and relative amount of seeds is determined via dispersal sub-model (see chapter <a href="seeddispersal.html#seeddispersal">21</a>).</p>
 </div>
-<div id="sapwood-structural-metabolic-and-storage-biomass" class="section level3 hasAnchor" number="16.1.2">
-<h3><span class="header-section-number">16.1.2</span> Sapwood structural, metabolic and storage biomass<a href="carbonpoolsbalance.html#sapwood-structural-metabolic-and-storage-biomass" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Sapwood volume (<span class="math inline">\(V_{sapwood}\)</span>; in <span class="math inline">\(L \cdot ind^{-1}\)</span>) is defined as the product of sapwood area and the sum of aboveground height and belowground coarse root length:
+<div id="recruitment-from-seeds-1" class="section level2 hasAnchor" number="19.2">
+<h2><span class="header-section-number">19.2</span> Recruitment from seeds<a href="regeneration.html#recruitment-from-seeds-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Actual <strong>sapling recruitment</strong> (i.e. recruitment of small trees, typically 1 cm diameter) depends on environmental conditions in the stand. Specifically, the model calculates, for the year that ended, the mean temperature of the coldest month (<span class="math inline">\(TCM\)</span>), the moisture index (<span class="math inline">\(MI\)</span>) and the fraction of photosynthetic active radiation reaching the ground, given the current structure (<span class="math inline">\(FPAR\)</span>). These values are compared to species specific parameter thresholds <span class="math inline">\(TCM_{recr}\)</span>, <span class="math inline">\(MI_{recr}\)</span> and <span class="math inline">\(FPAR_{recr}\)</span>, respectively. More specifically, a given species <span class="math inline">\(j\)</span> can recruit only if <span class="math inline">\(TCM &gt; TCM_{recr, j}\)</span>, <span class="math inline">\(MI &gt; MI_{recr, j}\)</span> and <span class="math inline">\(FPAR &gt; FPAR_{recr, j}\)</span>. These filters do not ensure recruitment, as it is assumed that multiple processes can further determine the death of recruits. A probability of recruitment <span class="math inline">\(P_{recr}\)</span> is used to represent these additional processes. When simulation of recruitment is <em>stochastic</em>, a given species will recruit if (in addition to the bioclimatic limits) a Bernouilli draw falls below <span class="math inline">\(P_{recr}\)</span> and, if so, the initial density or cover will be fixed. If recruitment is deterministic, then the probability of recruitment is used to multiply the recruitment density or cover.</p>
+<p>Tree recruitment density, diameter and height are determined by parameters <span class="math inline">\(N_{tree,recr}\)</span>, <span class="math inline">\(DBH_{tree, recr}\)</span> and <span class="math inline">\(H_{tree, recr}\)</span>, respectively; whereas cover and height of shrub recruitment is determined by parameters <span class="math inline">\(Cover_{recr}\)</span> and <span class="math inline">\(H_{shrub, recr}\)</span>, respectively. Density/cover of recruits is reduced depending on the relative amount of seeds in the seed bank (i.e. maximum density or cover will occur if seed bank levels are 100%). If stochastic simulation of recruitment is requested, then density or cover values are considered mean values of a Poisson distribution. Note that density of tree recruits will decrease during the years after recruitment due to a <strong>self-thinning</strong> process, until <span class="math inline">\(DBH\)</span> reaches <span class="math inline">\(DBH_{tree,ingrowth}\)</span> where <span class="math inline">\(N\)</span> will be <span class="math inline">\(N_{tree,ingrowth}\)</span>, as explained in <a href="growthsenescencemortality.html#selfthinning">17.4.1</a>.</p>
+</div>
+<div id="resprouting-1" class="section level2 hasAnchor" number="19.3">
+<h2><span class="header-section-number">19.3</span> Resprouting<a href="regeneration.html#resprouting-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Currently, resprouting only occurs in the model if plant cohorts have been <strong>cut</strong>, <strong>burned</strong> or they died of <strong>desiccation</strong> (future model versions will include resprouting after fire impacts). In other words, resprouting does not occur for baseline mortality, self-thinning of recruits or due to starvation.</p>
+<p><strong>Resprouting survivorship</strong></p>
+<p>The model first determines <strong>resprouting survivorship</strong>, which depends on the disturbance type and, in the case of fire, on species identity. Unfortunately, we lack information on the mortality caused in resprouting by cutting or drought for the vast majority of species except for holm oak (<em>Quercus ilex</em>). Thus, we suggest applying tentatively to all species the mortality values obtained in different studies for this species: 2.5% after browsing <span class="citation">(<a href="#ref-espelta_response_2006">Espelta <em>et al.</em> 2006</a>)</span>, 4% after cutting <span class="citation">(<a href="#ref-retana_regeneration_1992">Retana <em>et al.</em> 1992</a>)</span>, 5% after drought <span class="citation">(<a href="#ref-lloret_canopy_2004">Lloret <em>et al.</em> 2004</a>)</span>. Larger differences among species have been reported for fire <span class="citation">(<a href="#ref-espelta_post-fire_2012">Espelta <em>et al.</em> 2012</a>)</span>. This pattern may be linked to inter-specific differences in the size of the bud bank, the degree of bud protection or the amount of stored resources in belowground organs (burl, taproot). Accordingly, default values for survivorship are <span class="math inline">\(Resp_{clip} = 0.96\)</span> (for cutting) and <span class="math inline">\(Resp_{dist} = 0.95\)</span> (for dessication), whereas no default value is given for <span class="math inline">\(Resp_{fire}\)</span>. Naturally, the number of surviving trees (stumps) is given by the number of trees affected by the disturbance multiplied by the survivorship rate:
 <span class="math display">\[\begin{equation}
-V_{sapwood} = 1000 \cdot SA\cdot (H + \sum_{s}{FRP_s \cdot L_s})
+N_{surv} = N_{mort, dist} \cdot Resp_{dist}
 \end{equation}\]</span>
-where <span class="math inline">\(SA\)</span> is sapwood area, <span class="math inline">\(H\)</span> is plant height, <span class="math inline">\(FRP_{s}\)</span> is the proportion of fine roots in soil layer <span class="math inline">\(s\)</span> and <span class="math inline">\(L_{s}\)</span> is the coarse root length in layer <span class="math inline">\(s\)</span> (all lengths expressed here in <span class="math inline">\(m\)</span>). Sapwood structural biomass per individual (<span class="math inline">\(B_{sapwood}\)</span>; <span class="math inline">\(g\,dry·ind^{-1}\)</span>) represents the sapwood biomass of sapwood of trunks, branches and coarse roots. It is defined as the product of <span class="math inline">\(V_{sapwood}\)</span> and wood density (<span class="math inline">\(\rho_{wood}\)</span>; <span class="math inline">\(g dry·cm^{-3}\)</span>):
-<span class="math display">\[\begin{equation}
-B_{sapwood} = 1000 \cdot V_{sapwood} \cdot\rho_{wood}
-\end{equation}\]</span>
-While <span class="math inline">\(B_{sapwood}\)</span> represents the structural sapwood biomass, it cannot be used to estimate sapwood respiration, since only xylem axial or radial parenchymatic rays (and not dead cells like tracheids or vessels) contribute to sapwood respiration. In addition, we assume that embolized parts of sapwood do not contribute to sapwood respiration. Hence, sapwood living (respiratory) biomass is estimated using:
-<span class="math display">\[\begin{equation}
-B_{living, sapwood} = 1000 \cdot (1 - PLC_{stem}) \cdot V_{sapwood} \cdot\rho_{wood} \cdot (1 - f_{conduits})
-\end{equation}\]</span>
-where <span class="math inline">\(PLC_{stem}\)</span> is the current proportion of stem conductance lost and <span class="math inline">\(f_{conduits}\)</span> is the fraction of sapwood volume that corresponds to dead conducts, being the complement of the fraction of parenchymatic tissue. The volume available for metabolic or storage carbon within sapwood is limited by both the sapwood fraction that corresponds to parenchyma and wood porosity (i.e. <span class="math inline">\((1 - (\rho_{wood}/1.54))\)</span>). Sapwood storage volume (<span class="math inline">\(V_{storage, sapwood}\)</span>; in <span class="math inline">\(L \cdot ind^{-1}\)</span>) is:
-<span class="math display">\[\begin{equation}
-V_{storage, sapwood} = V_{sapwood} \cdot (1 - (\rho_{wood}/1.54)) \cdot (1 - f_{conduits})
-\end{equation}\]</span>
-Analogously to leaf carbon, <span class="math inline">\(V_{storage, sapwood}\)</span> is used to estimate the biomass of metabolic (sugars) or storage (starch) from the concentration of these substances in sapwood (<span class="math inline">\(SS_{sapwood}\)</span> and <span class="math inline">\(ST_{sapwood}\)</span>, which are expressed in <span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span>), and conversely. For example:
-<span class="math display">\[\begin{equation}
-B_{sugar,sapwood} = SS_{sapwood} \cdot V_{storage, sapwood} \cdot m_{gluc}
-\end{equation}\]</span>
-where <span class="math inline">\(m_{gluc}\)</span> is the molar mass of glucose. To estimate sapwood storage capacity, the model assumes that up to 50% of volume of parenchymatic cells can be occupied with starch, so that the sapwood starch storage capacity (<span class="math inline">\(ST^{max}_{sapwood}\)</span>; in <span class="math inline">\(mol \cdot ind^{-1}\)</span>) is:
-<span class="math display">\[\begin{equation}
-ST^{max}_{sapwood} = 0.5 \cdot 1000 \cdot \frac{V_{storage,sapwood} \cdot \rho_{starch}}{m_{starch}}
+for a generic disturbance, but the same equation would apply for cutting, dessication or fire.</p>
+<p><strong>Resprouting vigor</strong></p>
+<p>For those individuals that survive the disturbance event and are able to resprout, the number of resprouts present in a given moment is a matter of the stump area and age. According to different literature sources, the number of resprouts initially produced is approximately 1.82 per 1 cm2 of stump area, but owing to the intra- and inter-individual competition (self-thinning), the number of resprouts will decrease with time following an exponential equation (Retana et al. 1999. Espelta et al. 1999, 2013):</p>
+<p><span class="math display">\[\begin{equation}
+N_{resp} = N_{surv} \cdot \pi \cdot (DBH/2)^2 \cdot 1.82 \cdot 10^{-0.053\cdot x}
 \end{equation}\]</span></p>
-</div>
-<div id="fine-root-area-and-biomass" class="section level3 hasAnchor" number="16.1.3">
-<h3><span class="header-section-number">16.1.3</span> Fine root area and biomass<a href="carbonpoolsbalance.html#fine-root-area-and-biomass" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The fine root compartment does not have labile carbon (i.e. the model supplies labile carbon for fine roots from sapwood compartment), so that only the structural biomass of fine roots needs to be estimated. If growth is simulated using the <em>basic</em> water balance model, the initial area of fine roots (<span class="math inline">\(FRA\)</span>, <span class="math inline">\(m^2\)</span>) for layer <span class="math inline">\(s\)</span> is estimated from leaf area using:
-<span class="math display">\[\begin{equation}
-FRA = FRP_{s} \cdot LA^{\phi} \cdot RLR
-\end{equation}\]</span>
-where <span class="math inline">\(FRP_s\)</span> is the proportion of fine roots in layer <span class="math inline">\(s\)</span> and <span class="math inline">\(RLR\)</span> is the species-specific root area to leaf area ratio. Biomass of fine roots per individual for a given layer <span class="math inline">\(s\)</span> (<span class="math inline">\(B_{fineroot,s}\)</span>; <span class="math inline">\(g\,dry·ind^{-1}\)</span>) is then estimated from <span class="math inline">\(FRA_s\)</span> using:
-<span class="math display">\[\begin{equation}
-B_{fineroot,s} =  \frac{10^{4}\cdot FRA_s}{2.0 \cdot \sqrt{\frac{\pi \cdot SRL}{\rho_{fineroot}}}}
-\end{equation}\]</span>
-where <span class="math inline">\(\rho_{fineroot}\)</span> is fine root tissue density (<span class="math inline">\(g\,dry \cdot cm^{-3}\)</span>) and <span class="math inline">\(SRL\)</span> (<span class="math inline">\(cm \cdot g\,dry^{-1}\)</span>) is the specific root length. Fine root biomass per individual (<span class="math inline">\(g\,dry\cdot ind^{-1}\)</span>) is simply the sum across layers:
-<span class="math display">\[\begin{equation}
-B_{fineroot} = \sum_{s}{B_{fineroot,s}}
-\end{equation}\]</span>
-If growth is simulated using the <em>advanced</em> water balance model, the initial fine root length per area in each soil layer (<span class="math inline">\(FLA_s\)</span>; <span class="math inline">\(m \cdot m^{-2}\)</span>) is estimated from rhizosphere conductance, assuming a cylindrical flow geometry in the rhizosphere. The initial fine root biomass for a given layer <span class="math inline">\(s\)</span> (<span class="math inline">\(g\,dry\cdot ind^{-1}\)</span>) is then calculated using:
-<span class="math display">\[\begin{equation}
-B_{fineroot,s} = \frac{10000\cdot FLA_s}{N\cdot 0.01 \cdot SRL}
-\end{equation}\]</span>
-where <span class="math inline">\(N\)</span> is the density of individuals. Finally, initial fine root area in each soil layer (<span class="math inline">\(FRA_s\)</span>) is then calculated from <span class="math inline">\(B_{fineroot}\)</span> by inverting the equation presented above:
-<span class="math display">\[\begin{equation}
-FRA_{s} = 10^{-4}\cdot B_{fineroot,s} \cdot 2.0 \cdot \sqrt{\frac{\pi \cdot SRL}{\rho_{fineroot}}}
-\end{equation}\]</span></p>
-</div>
-<div id="total-living-biomass" class="section level3 hasAnchor" number="16.1.4">
-<h3><span class="header-section-number">16.1.4</span> Total living biomass<a href="carbonpoolsbalance.html#total-living-biomass" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Total living biomass per individual (i.e. not accounting for heartwood or xylem conduits) is:
-<span class="math display">\[\begin{align*}
-B_{total} &amp;= B_{leaf} + B_{living, sapwood} + B_{fineroot} + \\
-          &amp;+ B_{sugar,leaf} + B_{starch,leaf}+ B_{sugar,sapwood} + B_{starch,sapwood}
-\end{align*}\]</span>
-<span class="math inline">\(B_{total}\)</span> is used to express carbon balance components per dry weight of living biomass in the model output, which allows a better comparison across plant cohorts of different size and species.</p>
-</div>
-</div>
-<div id="carbonbalancecomponents" class="section level2 hasAnchor" number="16.2">
-<h2><span class="header-section-number">16.2</span> Components of labile carbon balance<a href="carbonpoolsbalance.html#carbonbalancecomponents" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Here we provide the details of labile carbon balance calculations, i.e. how the components of eqs. <a href="growthmodelling.html#eq:leafcarbonbalanceequations">(15.1)</a> and <a href="growthmodelling.html#eq:sapwoodcarbonbalanceequations">(15.2)</a> are determined.</p>
-<div id="gross-photosynthesis" class="section level3 hasAnchor" number="16.2.1">
-<h3><span class="header-section-number">16.2.1</span> Gross photosynthesis<a href="carbonpoolsbalance.html#gross-photosynthesis" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The soil water balance submodel provides values of photosynthesis calculated at the plant cohort level, but note that the user output of function <code>spwb()</code> refers to net photosynthesis (<span class="math inline">\(A_n\)</span>) after accounting for an estimate of leaf respiration. In the basic water balance model there is no way to make the distinction between gross and net photosynthesis, so we will assume here that <span class="math inline">\(A_g = A_n\)</span> (in <span class="math inline">\(g\,C \cdot m^{-2}\)</span>) as calculated in section <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>. In the advance water balance model the output is also net photosynthesis, but the distinction is possible (see section <a href="plantphotosynthesis.html#leafenergybalancephoto">11.1</a>). In any case, here we start with a <span class="math inline">\(A_g\)</span> value in units of carbon per ground area unit, i.e. <span class="math inline">\(g\,C \cdot m^{-2}\)</span>, and to enter the carbon balance we need scale photosynthesis to units of glucose per individual (<span class="math inline">\(A\)</span>; in <span class="math inline">\(g\,gluc \cdot ind^{-1}\)</span>). This is done using:
-<span class="math display">\[\begin{equation}
-A = \frac{10000 \cdot A_g}{N} \cdot \frac{m_{gluc}}{m_{carbon} \cdot 6}
-\end{equation}\]</span>
-where <span class="math inline">\(N\)</span> is the density of individuals per hectare, <span class="math inline">\(m_{gluc}\)</span> is the glucose molar mass and <span class="math inline">\(m_{carbon}\)</span> is the carbon molar mass.</p>
-</div>
-<div id="maintenance-respiration" class="section level3 hasAnchor" number="16.2.2">
-<h3><span class="header-section-number">16.2.2</span> Maintenance respiration<a href="carbonpoolsbalance.html#maintenance-respiration" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Maintenance respiration (in <span class="math inline">\(g\,gluc·ind^{-1}\)</span>) is calculated for each of the three compartments (leaves, sapwood, and fine roots) individually <span class="citation">(<a href="#ref-Mouillot2001">Mouillot <em>et al.</em> 2001</a>)</span>, and differs slightly depending on the complexity of the transpiration submodel.</p>
-<p>When simulating growth with the basic water balance, the model uses a <span class="math inline">\(Q_{10}\)</span> relationship of baseline respiration with temperature, which means that for every 10 ºC change in temperature there is a <span class="math inline">\(Q_{10}\)</span> factor change in respiration:
-<span class="math display">\[\begin{eqnarray}
-M_{leaf} &amp;=&amp; (B_{leaf} + B_{sugar,leaf}) \cdot MR_{leaf} \cdot Q_{10}^{(T_{mean}-20)/10} \cdot (L^{PAR})^{WUE_{decay}} \\
-M_{sapwood} &amp;=&amp; (B_{living,sapwood} + B_{sugar,sapwood}) \cdot MR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
-M_{fineroot} &amp;=&amp; B_{fineroot} \cdot MR_{fineroot} \cdot Q_{10}^{(T_{mean}-20)/10} \cdot ( LA_{i}/LA^{live}_i)
-\end{eqnarray}\]</span>
-where <span class="math inline">\(T_{mean}\)</span> is the average daily temperature (in ºC). Baseline maintenance respiration rates per dry biomass (<span class="math inline">\(MR_{leaf}\)</span>, <span class="math inline">\(MR_{sapwood}\)</span> and <span class="math inline">\(MR_{fineroot}\)</span> for leaves, parenchymatic sapwood and fine roots, respectively; in <span class="math inline">\(g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}\)</span>) are can be supplied via species-specific parameters and should refer to 20 ºC. Leaf and fine root rates can also be estimated from nitrogen concentration, following <span class="citation">Reich <em>et al.</em> (<a href="#ref-Reich2008">2008</a>)</span> (see section <a href="modelparametrization.html#imputationRER">A.3.18</a>). Factor <span class="math inline">\(Q_{10}\)</span> has been found to decrease with temperature <span class="citation">(<a href="#ref-Tjoelker2001">Tjoelker <em>et al.</em> 2001</a>)</span>. For example, a 10 °C increase in measurement temperature at low measurement temperatures from 5 to 15 °C results in an approximate 2.8 fold increase in respiration rate, whereas an increase in temperature from 25 to 35 °C results in a less than two-fold (1.8) increase in rate. The general temperature relationship proposed by <span class="citation">Tjoelker <em>et al.</em> (<a href="#ref-Tjoelker2001">2001</a>)</span> is used here:
-<span class="math display">\[\begin{equation}
-Q_{10} = 3.22 - 0.046 \cdot T_{mean}
-\end{equation}\]</span>
-Factor <span class="math inline">\((L^{PAR})^{WUE_{decay}}\)</span> is added to reduce respiration rates in leaves under shade, analogously to the reduction of water use efficiency explained in <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>. Thus, it is assumed that the carbon use efficiency of the leaves is more or less constant. Factor <span class="math inline">\(LA_{i}/LA^{live}_i\)</span> is added to the maintenance respiration of fine roots to reduce respiration rates during winter in winter-deciduous species, assuming a decrease in respiration rates of fine roots parallel to that of leaves.</p>
-<p>When simulating growth with the advanced model, sub-daily leaf maintenance respiration rates are estimated as the difference between gross and net photosynthesis (see <a href="plantphotosynthesis.html#leafphotosynthesis">11.1.4</a>). Sapwood and fine root respiration rates are also estimated at sub-daily steps and, hence, sub-daily canopy temperature variation is taken into account (i.e. sub-daily canopy <span class="math inline">\(T_{can}\)</span> values are used instead of the daily temperature mean, <span class="math inline">\(T_{mean}\)</span>).</p>
-</div>
-<div id="growth-respiration" class="section level3 hasAnchor" number="16.2.3">
-<h3><span class="header-section-number">16.2.3</span> Growth respiration<a href="carbonpoolsbalance.html#growth-respiration" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Construction costs per unit dry weight of new tissue (<span class="math inline">\(CC_{leaf}\)</span>, <span class="math inline">\(CC_{sapwood}\)</span> and <span class="math inline">\(CC_{fineroot}\)</span> for leaves, sapwood and fine roots; in <span class="math inline">\(g\,gluc \cdot g\,dry^{-1}\)</span>) are specified as control parameters (i.e. they are not species-specific). These unitary costs include both the carbon used in respiration during growth and structural carbon. Given an increase in leaf area <span class="math inline">\(\Delta LA\)</span>, leaf growth respiration is:
-<span class="math display" id="eq:leafconstructioncost">\[\begin{equation}
-G_{leaf} = \Delta LA \cdot CC_{leaf} \cdot 1000 / SLA
-\tag{16.2}
-\end{equation}\]</span>
-Analogously, given an increase in sapwood area <span class="math inline">\(\Delta LA\)</span>, sapwood growth respiration is:
-<span class="math display" id="eq:sapwoodconstructioncost">\[\begin{equation}
-G_{sapwood} = \Delta SA \cdot CC_{sapwood} \cdot (H + \sum_{s}{FRP_s \cdot L_s}) \cdot \rho_{wood}
-\tag{16.3}
-\end{equation}\]</span>
-Finally, and given an increase in fine root biomass <span class="math inline">\(\Delta B_{fineroot}\)</span>:
-<span class="math display">\[\begin{equation}
-G_{fineroot} = \Delta B_{fineroot} \cdot CC_{fineroot}
-\end{equation}\]</span></p>
-</div>
-<div id="phloemtransport" class="section level3 hasAnchor" number="16.2.4">
-<h3><span class="header-section-number">16.2.4</span> Phloem transport<a href="carbonpoolsbalance.html#phloemtransport" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>When growth is simulated using the basic water balance model, phloem transport between leaf and sapwood (<span class="math inline">\(F_{phloem}\)</span>) is simply modelled as the flow needed to make the concentration of metabolic carbon equal in both compartments. When the advanced water balance submodel is used, <span class="math inline">\(F_{phloem}\)</span> is modelled following <span class="citation">Hölttä <em>et al.</em> (<a href="#ref-Holtta2017">2017</a>)</span>. Specifically, the instantaneous phloem flow per leaf area basis (<span class="math inline">\(mol\,gluc\cdot m^{-2} \cdot s^{-1}\)</span>) depends on <span class="math inline">\(k_{phloem}\)</span>, i.e. the phloem conductance per leaf area basis (<span class="math inline">\(L\cdot m^{-2} \cdot MPa^{-1} \cdot s^{-1}\)</span>), sap viscosity relative to water and the difference in turgor between the sieve cells of leaf and sapwood compartments. <span class="math inline">\(k_{phloem}\)</span> is estimated as linear function of stem maximum conductance, <span class="math inline">\(k_{stem,max}\)</span>:
-<span class="math display">\[\begin{equation}
-k_{phloem} = f_{phloem} \cdot k_{stem,\max}
-\end{equation}\]</span>
-where factor <span class="math inline">\(f_{phloem}\)</span> is specified by the control parameter <code>phloemConductanceFactor</code>. Sap viscosity is calculated following <span class="citation">Först <em>et al.</em> (<a href="#ref-Forst2002">2002</a>)</span>, which takes into account temperature and the average sugar concentration between the two compartments (no phloem flow can occur if temperature is below zero). Turgor in sieve cells of each compartment depends on symplastic water potential and osmotic water potential, with Van’t Hoff’s equation being used to calculate the osmotic water potential, based on temperature, sugar concentration and the concentration of other solutes (control parameter <code>nonSugarConcentration</code>). Note that here leaf or sapwood sugar concentration is modulated to account for the effect of the relative water content of the compartment on osmotic water potential.</p>
-</div>
-<div id="sugarstarchdynamics" class="section level3 hasAnchor" number="16.2.5">
-<h3><span class="header-section-number">16.2.5</span> Sugar-starch dynamics<a href="carbonpoolsbalance.html#sugarstarchdynamics" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>When growth is simulated using the <em>basic</em> water balance submodel, sugar-starch dynamics (<span class="math inline">\(SC_{leaf}\)</span> and <span class="math inline">\(SC_{sapwood}\)</span>) are simply defined as the conversion between metabolic and storage carbon needed to keep the sugar concentration equal to an equilibrium required for metabolic functioning, which is specified by control parameters <code>equilibriumOsmoticConcentration</code> (including two values, for leaves and sapwood respectively) and <code>nonSugarConcentration</code>. For example, if leaf osmotic equilibrium concentration is 0.8 <span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span> and non-sugar concentration is 0.3 <span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span>, the model will simulate sugar-starch dynamics to stabilize sugar concentration in leaves to 0.5 <span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span>. A lower equilibrium osmotic concentration is required for sapwood, by default 0.6 <span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span>, so that sugar equilibrium concentration is 0.1 <span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span>. That lower equilibrium concentrations are required for sapwood than for leaves is necessary to sustain the phloem transport of sugars from leaves towards sapwood.</p>
-<p>When growth is simulated using the <em>advanced</em> water balance submodel, sugar-starch dynamics are similar to the previous case, in the sense that equilibrium sugar concentrations are sought for leaves and sapwood. However, instantaneous conversion rates are calculated depending on equations regulating starch synthesis (occurring when sugar concentration is higher than the equilibrium concentration) and starch hydrolysis (occurring when sugar concentration is lower than the equilibrium concentration). Synthesis is modelled as a Michaelis-Menten function, whereas hydrolysis rate is simply a linear function of starch concentration. Maximum synthesis rates and hydrolysis linear factors are larger (i.e. faster sugar-starch dynamics) in leaves than sapwood.</p>
-</div>
-<div id="root-exudation" class="section level3 hasAnchor" number="16.2.6">
-<h3><span class="header-section-number">16.2.6</span> Root exudation<a href="carbonpoolsbalance.html#root-exudation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Whereas surplus in leaf storage capacity is relocated into sapwood storage, surplus in sapwood storage carbon is diverted towards root exudation (<span class="math inline">\(RE_{sapwood}\)</span>). Hence, root exudation is not a process competing for metabolic carbon, but only a consequence of plant C storage capacity being surpassed <span class="citation">(<a href="#ref-Prescott2020">Prescott <em>et al.</em> 2020</a>)</span>. Root exudation may happen in the model when growth is restricted due to sink limitations but photosynthesis continues and storage carbon levels have attained the storage capacity in the sapwood compartment (<span class="math inline">\(ST_{sapwood} &gt; ST^{max}_{sapwood}\)</span>).</p>
+<p>where <span class="math inline">\(DBH\)</span> is diameter at breast height of the <em>parent</em> tree cohort, in cm, <span class="math inline">\(x = 5\)</span> is time in years, <span class="math inline">\(N_{resp}\)</span> is the number of resprouts, <span class="math inline">\(N_{surv}\)</span> is the number of parent trees that survived.</p>
+<p><strong>Initial characteristics and self-thinning</strong></p>
+<p>Tree resprouts have all a starting diameter <span class="math inline">\(DBH_{tree, recr}\)</span> and a height <span class="math inline">\(H_{tree, recr}\)</span>, but the root system is the same of the <em>parent</em> tree cohort. Analogously to recruitment from seeds, the initial density of tree resprout will decrease during the years after the initial resprouting due to a <strong>self-thinning</strong> process, until <span class="math inline">\(DBH\)</span> reaches <span class="math inline">\(DBH_{tree,ingrowth}\)</span> where <span class="math inline">\(N\)</span> will be <span class="math inline">\(N_{tree,ingrowth}\)</span>, as explained in <a href="growthsenescencemortality.html#selfthinning">17.4.1</a>.</p>
+<p><strong>Resprouting in shrubs</strong></p>
+<p>In the case of shrub species, the same operations are done, but on cover values instead of density values. Shrub height of resprouts is assumed to be <span class="math inline">\(H_{shrub, recr}\)</span>.</p>
 
 </div>
 </div>
-</div>
+
+
+
 <h3>Bibliography<a href="bibliography.html#bibliography" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-Forst2002" class="csl-entry">
-Först, P., Werner, F. &amp; Delgado, A. (2002). <a href="https://doi.org/10.1007/s00397-002-0238-y">On the pressure dependence of the viscosity of aqueous sugar solutions</a>. <em>Rheologica Acta</em>, 41, 369–374.
+<div id="ref-espelta_post-fire_2012" class="csl-entry">
+Espelta, J.M., Barbati, A., Quevedo, L., Tárrega, R., Navascués, P., Bonfil, C., <em>et al.</em> (2012). <a href="https://doi.org/10.1007/978-94-007-2208-8_8">Post-<span>Fire</span> <span>Management</span> of <span>Mediterranean</span> <span>Broadleaved</span> <span>Forests</span></a>. In: <em>Post-<span>Fire</span> <span>Management</span> and <span>Restoration</span> of <span>Southern</span> <span>European</span> <span>Forests</span></em>, Managing <span>Forest</span> <span>Ecosystems</span> (eds. Moreira, F., Arianoutsou, M., Corona, P. &amp; De las Heras, J.). Springer Netherlands, Dordrecht, pp. 171–194.
 </div>
-<div id="ref-Holtta2017" class="csl-entry">
-Hölttä, T., Lintunen, A., Chan, T., Mäkelä, A. &amp; Nikinmaa, E. (2017). <a href="https://doi.org/10.1093/treephys/tpx011">A steady-state stomatal model of balanced leaf gas exchange, hydraulics and maximal source-sink flux</a>. <em>Tree physiology</em>, 37, 851–868.
+<div id="ref-espelta_response_2006" class="csl-entry">
+Espelta, J.M., Habrouk, A. &amp; Retana, J. (2006). <a href="https://doi.org/10.1051/forest:2006024">Response to natural and simulated browsing of two <span>Mediterranean</span> oaks with contrasting leaf habit after a wildfire</a>. <em>Annals of Forest Science</em>, 63, 441–447.
 </div>
-<div id="ref-Mouillot2001" class="csl-entry">
-Mouillot, F., Rambal, S. &amp; Lavorel, S. (2001). <a href="https://doi.org/10.1016/S0378-1127(00)00432-1">A generic process-based <span>SImulator</span> for <span class="nocase">meditERRanean</span> <span class="nocase">landscApes</span> (<span>SIERRA</span>): Design and validation exercises</a>. <em>Forest Ecology and Management</em>, 147, 75–97.
+<div id="ref-lloret_canopy_2004" class="csl-entry">
+Lloret, F., Siscart, D. &amp; Dalmases, C. (2004). <a href="https://doi.org/10.1111/j.1365-2486.2004.00870.x">Canopy recovery after drought dieback in holm-oak <span>Mediterranean</span> forests of <span>Catalonia</span> (<span>NE</span> <span>Spain</span>)</a>. <em>Global Change Biology</em>, 10, 2092–2099.
 </div>
-<div id="ref-Prescott2020" class="csl-entry">
-Prescott, C.E., Grayston, S.J., Helmisaari, H.-S., Kaštovská, E., Körner, C., Lambers, H., <em>et al.</em> (2020). <a href="https://doi.org/10.1016/j.tree.2020.08.007">Surplus <span>Carbon</span> <span>Drives</span> <span>Allocation</span> and <span>Plant</span>–<span>Soil</span> <span>Interactions</span></a>. <em>Trends in Ecology &amp; Evolution</em>, 35, 1110–1118.
-</div>
-<div id="ref-Reich2008" class="csl-entry">
-Reich, P.B., Tjoelker, M.G., Pregitzer, K.S., Wright, I.J., Oleksyn, J. &amp; Machado, J.L. (2008). <a href="https://doi.org/10.1111/j.1461-0248.2008.01185.x">Scaling of respiration to nitrogen in leaves, stems and roots of higher land plants</a>. <em>Ecology Letters</em>, 11, 793–801.
-</div>
-<div id="ref-Tjoelker2001" class="csl-entry">
-Tjoelker, M.G., Oleksyn, J. &amp; Reich, P.B. (2001). <a href="https://doi.org/10.1046/j.1365-2486.2001.00397.x">Modelling respiration of vegetation: <span>Evidence</span> for a general temperature-dependent <span>Q10</span></a>. <em>Global Change Biology</em>, 7, 223–230.
+<div id="ref-retana_regeneration_1992" class="csl-entry">
+Retana, J., Riba, M., Castell, C. &amp; Espelta, J.M. (1992). <a href="https://doi.org/10.1007/BF00118242">Regeneration by sprouting of holm-oak (<span>Quercus</span> ilex) stands exploited by selection thinning</a>. <em>Vegetatio</em>, 99, 355–364.
 </div>
 </div>
             </section>
@@ -922,8 +798,8 @@ Tjoelker, M.G., Oleksyn, J. &amp; Reich, P.B. (2001). <a href="https://doi.org/1
           </div>
         </div>
       </div>
-<a href="growthmodelling.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="growthsenescencemortality.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="dynamicsmodelling.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="watershedhydrology.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

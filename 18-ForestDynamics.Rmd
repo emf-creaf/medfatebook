@@ -6,17 +6,17 @@ This chapter provides an overview of a forest dynamics model, which builds on th
 
 ## Design principles
 
-The design of the forest dynamics model is to a large degree inherited from the water balance and growth models it builds on. Readers should refer to former sections to learn the design of the basic water balance (see \@ref(basicdesign)), advanced water/energy balance (see \@ref(advanceddesign)) or growth/mortality processes (see \@ref(growthdesign)). Regeneration, from either seed germination and establishment or via resprouting, and forest management are explicitly simulated at the level of `fordyn()` and hence will be the focus of this chapter. 
+The design of the forest dynamics model is, to a large degree, inherited from the energy/water balance and growth models it builds on. Readers should refer to former sections to learn the design of the basic water balance (see \@ref(basicdesign)), advanced water/energy balance (see \@ref(advanceddesign)) or growth/mortality processes (see \@ref(growthdesign)). Regeneration, from either seed germination and establishment or via resprouting, and forest management are explicitly simulated at the level of `fordyn()` and hence their design will be the focus of this chapter, with implementation details described in chapter \@ref(regeneration). 
 
 ### Recruitment from seeds
 
-Recruitment of saplings involves a number of processes (flowering and pollination, fruit/seed production, dispersal, storage, seed predation, germination, seedling establishment and survival until the sapling stage). All these processes have their own biotic and abiotic drivers [@Price2001], so that modelling becomes a challenging task. Processes leading to sapling recruitment are frequently extremely simplified or their mechanisms ignored in many forest models [@Price2001]. The design of the forest dynamics model with respect to recruitment follows that of many gap models. Local seed production is considered in a binary way, where plants are considered fertile and able to produce viable seeds if they reach a given height (different for shrubs and trees). Alternatively, the user can specify a set of species whose seeds arrive to the target stand via simulation control parameters or dispersal processes (see chapter \@ref(seeddispersal)). A seed bank exists in the forest stand, where seed levels are relative (up to 100%) and result from the interplay between seed rain and seed mortality. Actual recruitment from seeds depends on a set of regeneration *thresholds* are used to determine whether recruitment of new saplings (i.e. ingrowth into a given diameter class for trees or size for shrubs) is possible. Typically, regeneration thresholds concern environmental conditions, although some models also consider ungulate browsing [@Wehrli2007]. In our case we focus on three environmental drivers limiting the transition from seedlings to saplings: 
+Recruitment of saplings involves a number of processes (flowering and pollination, fruit/seed production, dispersal, storage, seed predation, germination, seedling establishment and survival until the sapling stage). All these processes have their own biotic and abiotic drivers [@Price2001], so that modelling becomes a challenging task. Processes leading to sapling recruitment are frequently extremely simplified or their mechanisms ignored in many forest models [@Price2001]. The design of the forest dynamics model with respect to recruitment follows that of many gap models. Local seed production is considered in a binary way, where plants are considered fertile and able to produce viable seeds if they reach a given height (different for shrubs and trees). Alternatively, the user can specify a set of species whose seeds arrive to the target stand via simulation control parameters or dispersal processes (see chapter \@ref(seeddispersal)). A seed bank exists in the forest stand, where seed levels are relative (up to 100%) and result from the interplay between seed rain and seed mortality. Germination is scheduled once a year (assumed to be in winter), and results in age cohorts entering a seedling bank. A constant probability of germination determines is used as a statistical surrogate of processes affecting germination success. During the years between germination and recruitment (i.e. ingrowth into a given diameter class for trees or size for shrubs) the amount of seedlings decreases due to environmental filtering, depending on a set of regeneration *thresholds*. Typically, regeneration thresholds concern environmental conditions, although some models also consider ungulate browsing [@Wehrli2007]. In our case we focus on three environmental drivers limiting the transition from seedlings to saplings: 
 
   1. Tolerance to low temperatures, indicated by the mean temperature of the coldest month.
-  2. Drought tolerance, indicated by the annual moisture index (annual precipitation divided by annual evapotranspiration).
+  2. Drought tolerance, indicated by the annual moisture index or the daily water potential experienced by seedlings/saplings.
   3. Shade tolerance, indicated by the percentage of photosynthetic active radiation reaching the ground.
 
-A target species can recruit on a given year if current conditions for all three environmental indicators are above the species tolerance thresholds. A constant probability of recruitment determines actual recruitment within these bioclimatic limits. Recruitment densities and plant size of recruited individuals are specified via species parameters. Trees recruited from seed are subject to self-thinning processes before attaining the diameter of ingrowth (see \@ref(selfthinning)).
+Maximum recruitment densities and plant size of recruited individuals are specified via species parameters. Importantly, trees recruited from seed are subject to self-thinning processes before attaining the diameter of adult ingrowth (typically $7.5\,cm$ diameter; see \@ref(selfthinning)).
 
 ### Resprouting
 
@@ -50,7 +50,7 @@ The `fordyn()` model divides the period to be simulated in years, which is the t
 
  1. Calls function `growth()` to simulate daily water/carbon balance, growth and mortality processes (sub-daily processes may also be involved in `transpirationMode = "Sperry"` or `transpirationMode = "Sureau"`). See section \@ref(growthscheduling) for details of growth scheduling.
  2. If a management function is supplied, calls this function and apply the resulting reductions in tree density and shrub cover.
- 3. If required, simulates seed production, seed bank mortality, seed rain, recruitment from seeds and/or resprouting. In a spatial context, seed rain will include seeds dispersed from other forest stands \@ref(seeddispersal). 
+ 3. If required, simulates seed production, seed bank mortality, seed rain, recruitment from seeds and/or resprouting (see chapter \@ref(regeneration)). In a spatial context, seed rain will include seeds dispersed from other forest stands \@ref(seeddispersal). 
  4. Removes tree (or shrub) cohorts whose remaining density (resp. cover) is lower than a specified threshold.
  5. Merges surviving cohorts with recruitment in the `forest` object and prepares the input of function `growth()` for the next annual time step.
  6. Store current status of the `forest` object and update output tables/summaries.
@@ -161,56 +161,4 @@ Finally, there are a set of parameters specifying default values for recruited c
 | `ManagementArgs`| If management is considered, a list of management arguments to be used in another call to `fordyn()`. |
 | `NextInputObject` | An object of class `growthInput` to be used in a subsequent simulation.|
 | `NextForestObject` | An object of class `forest` to be used in a subsequent simulation.|
-
-## Process details
-
-### Seed production and seed bank dynamics {#seedbankdynamics}
-
-
-The model considers **mortality of seeds** in the seed bank before adding new seeds. Annual seed bank mortality is simulated for each species using an exponential decay function, driven by the species-specific seed longevity ($SL$):
-
-\begin{equation}
-Seeds_{t+1} = Seeds_{t} \cdot \exp(- 1/SL)
-\end{equation}
-
-To determine seed production, the model determines the **seed rain** in the stand by determining which cohorts have total plant heights above maturity thresholds for trees and shrubs. This is done, for each cohort, by comparing its height with the species-specific parameter seed production height ($H_{seed}$). Missing values of $H_{seed}$ are given values from control variables `seedProductionTreeHeight` and `seedProductionShrubHeight` for trees and shrubs, respectively. In addition to locally produced seeds, the user can use control parameter `seedRain` to specify a list of species names whose seeds arrive to the stand. Despite the origin, in non-spatial simulations the seed bank relative amount of species with seed rain is set to 100%, assuming that there is enough seed production to allow normal recruitment. However, when simulations are conducted in a spatial context, the species identity and relative amount of seeds is determined via dispersal sub-model (see chapter \@ref(seeddispersal)). 
-
-
-### Recruitment from seeds
-
-Actual **sapling recruitment** (i.e. recruitment of small trees, typically 1 cm diameter) depends on environmental conditions in the stand. Specifically, the model calculates, for the year that ended, the mean temperature of the coldest month ($TCM$), the moisture index ($MI$) and the fraction of photosynthetic active radiation reaching the ground, given the current structure ($FPAR$). These values are compared to species specific parameter thresholds $TCM_{recr}$, $MI_{recr}$ and $FPAR_{recr}$, respectively. More specifically, a given species $j$ can recruit only if $TCM > TCM_{recr, j}$, $MI > MI_{recr, j}$ and $FPAR > FPAR_{recr, j}$. These filters do not ensure recruitment, as it is assumed that multiple processes can further determine the death of recruits. A probability of recruitment $P_{recr}$ is used to represent these additional processes. When simulation of recruitment is *stochastic*, a given species will recruit if (in addition to the bioclimatic limits) a Bernouilli draw falls below $P_{recr}$ and, if so, the initial density or cover will be fixed. If recruitment is deterministic, then the probability of recruitment is used to multiply the recruitment density or cover. 
-
-Tree recruitment density, diameter and height are determined by parameters $N_{tree,recr}$, $DBH_{tree, recr}$  and $H_{tree, recr}$, respectively; whereas cover and height of shrub recruitment is determined by parameters $Cover_{recr}$  and $H_{shrub, recr}$, respectively. Density/cover of recruits is reduced depending on the relative amount of seeds in the seed bank (i.e. maximum density or cover will occur if seed bank levels are 100%). If stochastic simulation of recruitment is requested, then density or cover values are considered mean values of a Poisson distribution. Note that density of tree recruits will decrease during the years after recruitment due to a **self-thinning** process, until $DBH$ reaches $DBH_{tree,ingrowth}$ where $N$ will be $N_{tree,ingrowth}$, as explained in \@ref(selfthinning).
-
-### Resprouting
-
-Currently, resprouting only occurs in the model if plant cohorts have been **cut**, **burned** or they died of **desiccation** (future model versions will include resprouting after fire impacts). In other words, resprouting does not occur for baseline mortality, self-thinning of recruits or due to starvation.
-
-**Resprouting survivorship**
-
-The model first determines **resprouting survivorship**, which depends on the disturbance type and, in the case of fire, on species identity. Unfortunately, we lack information on the mortality caused in resprouting by cutting or drought for the vast majority of species except for holm oak (*Quercus ilex*). Thus, we suggest applying tentatively to all species the mortality values obtained in different studies for this species: 2.5% after browsing [@espelta_response_2006], 4% after cutting [@retana_regeneration_1992], 5% after drought [@lloret_canopy_2004]. Larger differences among species have been reported for fire [@espelta_post-fire_2012]. This pattern may be linked to inter-specific differences in the size of the bud bank, the degree of bud protection or the amount of stored resources in belowground organs (burl, taproot). Accordingly, default values for survivorship are $Resp_{clip} = 0.96$ (for cutting) and $Resp_{dist} = 0.95$ (for dessication), whereas no default value is given for $Resp_{fire}$. Naturally, the number of surviving trees (stumps) is given by the number of trees affected by the disturbance multiplied by the survivorship rate:
-\begin{equation}
-N_{surv} = N_{mort, dist} \cdot Resp_{dist}
-\end{equation}
-for a generic disturbance, but the same equation would apply for cutting, dessication or fire.
-
-
-**Resprouting vigor**
-
-For those individuals that survive the disturbance event and are able to resprout, the number of resprouts present in a given moment is a matter of the stump area and age. According to different literature sources, the number of resprouts initially produced is approximately 1.82 per 1 cm2 of stump area, but owing to the intra- and inter-individual competition (self-thinning), the number of resprouts will decrease with time following an exponential equation (Retana et al. 1999. Espelta et al. 1999, 2013):
-
-\begin{equation}
-N_{resp} = N_{surv} \cdot \pi \cdot (DBH/2)^2 \cdot 1.82 \cdot 10^{-0.053\cdot x}
-\end{equation}
-
-where $DBH$ is diameter at breast height of the *parent* tree cohort, in cm, $x = 5$ is time in years, $N_{resp}$ is the number of resprouts, $N_{surv}$ is the number of parent trees that survived. 
-
-
-**Initial characteristics and self-thinning**
-
-Tree resprouts have all a starting diameter $DBH_{tree, recr}$ and a height $H_{tree, recr}$, but the root system is the same of the *parent* tree cohort. Analogously to recruitment from seeds, the initial density of tree resprout will decrease during the years after the initial resprouting due to a **self-thinning** process, until $DBH$ reaches $DBH_{tree,ingrowth}$ where $N$ will be $N_{tree,ingrowth}$, as explained in \@ref(selfthinning). 
-
-**Resprouting in shrubs**
-
-In the case of shrub species, the same operations are done, but on cover values instead of density values. Shrub height of resprouts is assumed to be $H_{shrub, recr}$. 
 

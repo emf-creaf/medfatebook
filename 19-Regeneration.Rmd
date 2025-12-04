@@ -1,0 +1,53 @@
+
+# Regeneration {#regeneration}
+
+## Seed production and seed bank dynamics {#seedbankdynamics}
+
+
+The model considers **mortality of seeds** in the seed bank before adding new seeds. Annual seed bank mortality is simulated for each species using an exponential decay function, driven by the species-specific seed longevity ($SL$):
+
+\begin{equation}
+Seeds_{t+1} = Seeds_{t} \cdot \exp(- 1/SL)
+\end{equation}
+
+To determine seed production, the model determines the **seed rain** in the stand by determining which cohorts have total plant heights above maturity thresholds for trees and shrubs. This is done, for each cohort, by comparing its height with the species-specific parameter seed production height ($H_{seed}$). Missing values of $H_{seed}$ are given values from control variables `seedProductionTreeHeight` and `seedProductionShrubHeight` for trees and shrubs, respectively. In addition to locally produced seeds, the user can use control parameter `seedRain` to specify a list of species names whose seeds arrive to the stand. Despite the origin, in non-spatial simulations the seed bank relative amount of species with seed rain is set to 100%, assuming that there is enough seed production to allow normal recruitment. However, when simulations are conducted in a spatial context, the species identity and relative amount of seeds is determined via dispersal sub-model (see chapter \@ref(seeddispersal)). 
+
+
+## Recruitment from seeds
+
+Actual **sapling recruitment** (i.e. recruitment of small trees, typically 1 cm diameter) depends on environmental conditions in the stand. Specifically, the model calculates, for the year that ended, the mean temperature of the coldest month ($TCM$), the moisture index ($MI$) and the fraction of photosynthetic active radiation reaching the ground, given the current structure ($FPAR$). These values are compared to species specific parameter thresholds $TCM_{recr}$, $MI_{recr}$ and $FPAR_{recr}$, respectively. More specifically, a given species $j$ can recruit only if $TCM > TCM_{recr, j}$, $MI > MI_{recr, j}$ and $FPAR > FPAR_{recr, j}$. These filters do not ensure recruitment, as it is assumed that multiple processes can further determine the death of recruits. A probability of recruitment $P_{recr}$ is used to represent these additional processes. When simulation of recruitment is *stochastic*, a given species will recruit if (in addition to the bioclimatic limits) a Bernouilli draw falls below $P_{recr}$ and, if so, the initial density or cover will be fixed. If recruitment is deterministic, then the probability of recruitment is used to multiply the recruitment density or cover. 
+
+Tree recruitment density, diameter and height are determined by parameters $N_{tree,recr}$, $DBH_{tree, recr}$  and $H_{tree, recr}$, respectively; whereas cover and height of shrub recruitment is determined by parameters $Cover_{recr}$  and $H_{shrub, recr}$, respectively. Density/cover of recruits is reduced depending on the relative amount of seeds in the seed bank (i.e. maximum density or cover will occur if seed bank levels are 100%). If stochastic simulation of recruitment is requested, then density or cover values are considered mean values of a Poisson distribution. Note that density of tree recruits will decrease during the years after recruitment due to a **self-thinning** process, until $DBH$ reaches $DBH_{tree,ingrowth}$ where $N$ will be $N_{tree,ingrowth}$, as explained in \@ref(selfthinning).
+
+## Resprouting
+
+Currently, resprouting only occurs in the model if plant cohorts have been **cut**, **burned** or they died of **desiccation** (future model versions will include resprouting after fire impacts). In other words, resprouting does not occur for baseline mortality, self-thinning of recruits or due to starvation.
+
+**Resprouting survivorship**
+
+The model first determines **resprouting survivorship**, which depends on the disturbance type and, in the case of fire, on species identity. Unfortunately, we lack information on the mortality caused in resprouting by cutting or drought for the vast majority of species except for holm oak (*Quercus ilex*). Thus, we suggest applying tentatively to all species the mortality values obtained in different studies for this species: 2.5% after browsing [@espelta_response_2006], 4% after cutting [@retana_regeneration_1992], 5% after drought [@lloret_canopy_2004]. Larger differences among species have been reported for fire [@espelta_post-fire_2012]. This pattern may be linked to inter-specific differences in the size of the bud bank, the degree of bud protection or the amount of stored resources in belowground organs (burl, taproot). Accordingly, default values for survivorship are $Resp_{clip} = 0.96$ (for cutting) and $Resp_{dist} = 0.95$ (for dessication), whereas no default value is given for $Resp_{fire}$. Naturally, the number of surviving trees (stumps) is given by the number of trees affected by the disturbance multiplied by the survivorship rate:
+\begin{equation}
+N_{surv} = N_{mort, dist} \cdot Resp_{dist}
+\end{equation}
+for a generic disturbance, but the same equation would apply for cutting, dessication or fire.
+
+
+**Resprouting vigor**
+
+For those individuals that survive the disturbance event and are able to resprout, the number of resprouts present in a given moment is a matter of the stump area and age. According to different literature sources, the number of resprouts initially produced is approximately 1.82 per 1 cm2 of stump area, but owing to the intra- and inter-individual competition (self-thinning), the number of resprouts will decrease with time following an exponential equation (Retana et al. 1999. Espelta et al. 1999, 2013):
+
+\begin{equation}
+N_{resp} = N_{surv} \cdot \pi \cdot (DBH/2)^2 \cdot 1.82 \cdot 10^{-0.053\cdot x}
+\end{equation}
+
+where $DBH$ is diameter at breast height of the *parent* tree cohort, in cm, $x = 5$ is time in years, $N_{resp}$ is the number of resprouts, $N_{surv}$ is the number of parent trees that survived. 
+
+
+**Initial characteristics and self-thinning**
+
+Tree resprouts have all a starting diameter $DBH_{tree, recr}$ and a height $H_{tree, recr}$, but the root system is the same of the *parent* tree cohort. Analogously to recruitment from seeds, the initial density of tree resprout will decrease during the years after the initial resprouting due to a **self-thinning** process, until $DBH$ reaches $DBH_{tree,ingrowth}$ where $N$ will be $N_{tree,ingrowth}$, as explained in \@ref(selfthinning). 
+
+**Resprouting in shrubs**
+
+In the case of shrub species, the same operations are done, but on cover values instead of density values. Shrub height of resprouts is assumed to be $H_{shrub, recr}$. 
+
