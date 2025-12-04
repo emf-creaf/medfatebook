@@ -3,7 +3,7 @@
 This chapter describes the inputs required by simulation models of **medfate** and **medfateland** packages. First, we describe the R structures required for the two packages. Then, we provide the details for four different kinds of inputs:
 
   (1) *Vegetation existing in the forest stand*. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in `spwb()` calls, but becomes dynamic in calls to `growth()` or `fordyn()`. Hence, in these functions the input vegetation describes the starting point. 
-  (2) *Information on the physical structure of soil*. Soil information is also required but, unlike vegetation, the soil physical structure is considered static. 
+  (2) *Information on the physical structure of soil*. Soil information is also required but, unlike vegetation, the soil physical structure and its hydraulic properties are considered static. 
   (3) *Climatic forcing*. Daily weather series are always required, defining the temporal extent of the simulation and the temporal variation of environmental conditions in which physical and biological processes occur. 
   (4) *Topographic information and geographic location*. Topography and latitude are also required, because internal calculations of some physical variables require them. 
 
@@ -17,8 +17,8 @@ Since preparing inputs for simulations can be daunting for most users, package [
 
 Package **medfate** deals with simulations at stand level and, hence, the data structures defined in the package are meant to encapsulate information about a target forest stands and the properties of the soil where it grows:
 
-+ S3 class `soil` is a data frame that is initialized using a data frame of soil physical properties, but the table includes also soil parameters and state variables. Soil objects are described in subsection \@ref(soilinitialization).
-+ S3 class `forest` is a list of forest inventory data (i.e. mainly tree and shrub measurements, but can include herbaceous vegetation) corresponding to a single forest stand. Forest plot objects are described in subsection \@ref(forestobjects). 
++ S3 class `soil` is a *data frame* that is initialized using a data frame of soil physical properties, but the table includes also soil parameters and state variables. Soil objects are described in subsection \@ref(soilinitialization).
++ S3 class `forest` is a *list* of forest inventory data (i.e. mainly tree and shrub measurements, but can include herbaceous vegetation, seedling bank and seed bank) corresponding to a single forest stand. Forest plot objects are described in subsection \@ref(forestobjects). 
 + S3 classes `spwbInput` and `growthInput` are lists containing all the vegetation parameters and state variables necessary to run water-balance simulations (function `spwb()` and alike) and forest growth simulations (function `growth()` and alike). Objects of classes `spwbInput` and `growthInput` are created using functions whose input includes a `forest` object and a `soil` object. 
 
 The figure below (Fig. \@ref(fig:inputworkflow)) can be used to illustrate the workflow of soil/forest input creation for the main simulation functions in **medfate**. Note the different inputs in the case of `fordyn()`.
@@ -67,15 +67,15 @@ Non-forest (i.e. croplands or urban areas) patches may be also described, and th
 
 ## Latitude and topography {#topoinput}
 
-Topography has a relatively small direct influence in **medfate** simulations, because most topographic effects are assumed to be taken into account in the estimation of weather inputs. Nonetheless, *elevation* in meters is needed to estimate atmospheric pressure and air density (see \@ref(meteoinput)), whereas *aspect* (in degrees from North) and *slope* (also in degrees) are needed in addition to *latitude* (also in degrees North) to estimate sunrise/sunset hours and potential radiation. Topographic variables should be readily accessible for users having access to a digital elevation model of the target area.
+Topography has a relatively small direct influence in **medfate** simulations, because most topographic effects are assumed to be taken into account in the estimation of weather inputs. Nonetheless, *elevation* (in meters) is needed to estimate atmospheric pressure and air density (see \@ref(meteoinput)), whereas *aspect* (in degrees from North) and *slope* (also in degrees) are needed in addition to *latitude* (also in degrees North) to estimate sunrise/sunset hours and potential radiation. Topographic variables should be readily accessible for users having access to a digital elevation model of the target area.
 
 ## Soil description  {#soilinput}
 
-Soils are described in **medfate** using $S > 1$ different soil layers ($s \in \{1, 2, ..., S\}$). Here the word *soil* refers to depths that plant rooting systems can reach (i.e., the critical zone), including cracks within the bedrock. The number and size of soil layers may correspond to changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties and are considered **static soil parameters** in simulations. In contrast, soil moisture content, other variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered, are all **soil state variables**.
+Soils are described in **medfate** using $S > 1$ discrete soil layers ($s \in \{1, 2, ..., S\}$). Here the word *soil* refers to the volume comprised between between forest floor and the depth that plant rooting systems can reach (i.e., the critical zone), including cracks within the bedrock. The number and size of soil layers may correspond to changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties and are considered **static soil parameters** in simulations. In contrast, soil moisture content, other variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered, are all **soil state variables**.
 
 ### Soil physical properties
 
-Soil physical properties, such as *texture* (i.e. volume percent of sand, silt and clay), *organic matter content*, *bulk density* or *rock fragment content*, can differ between soil layers, and this has important consequences for soil water retention capacity and soil hydraulics. Specifying layers with an elevated rock fragment content (e.g. layers of weathered rock where soil particles are scarce) may be important in  seasonally-arid climates like the Mediterranean, because plants often extend their roots into cracks existing in the parent rock to access water during summer [@Ruffault2013]. 
+Soil physical properties, such as *texture* (i.e. volume percent of sand, silt and clay), *organic matter content*, *bulk density* or *rock fragment content*, can differ between soil layers, and this has important consequences for soil water retention capacity and soil hydraulics. Specifying layers with an elevated rock fragment content (e.g. layers of weathered rock where soil particles are scarce) may be important in arid or seasonally-dry climates like the Mediterranean, because plants often extend their roots into cracks existing in the parent rock to access water during summer [@Ruffault2013]. 
 
 For each soil layer $s$, the following physical parameters are needed:
 
@@ -425,20 +425,22 @@ Dates are needed in **medfate** to estimate parameters like solar declination or
 
 ### Required weather variables
 
-Some weather variables must be present always in the input data frame, whereas others are optional, meaning that the package can estimate them if missing. The following table indicates the symbols, units, definitions and the variable name in R of input weather variables that are always **required**: 
+The following table indicates the symbols, units, definitions and the variable name in R of input weather variables that are always **required** in the input data frame: 
 
-| Symbol | Units | R param | Description                        | Optional |
-|--------|-------|---------|------------------------------------|----------|
-| $T_{min}$ | $^{\circ} \mathrm{C}$ | `MinTemperature` | Minimum temperature | No |
-| $T_{max}$ | $^{\circ} \mathrm{C}$ | `MaxTemperature` | Maximum temperature | No |
-| $RH_{min}$ | % | `MinRelativeHumidity` | Minimum relative humidity | No |
-| $RH_{max}$ | % | `MaxRelativeHumidity` | Maximum relative humidity | No |
-| $P$ | $L \cdot m^{-2} = mm$ | `Precipitation` | Precipitation (either rainfall or snow). | No |
-| $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds | No |
+| Symbol | Units | R param | Description                        | Optional | Missing allowed |
+|--------|-------|---------|------------------------------------|----------|----------|
+| $T_{min}$ | $^{\circ} \mathrm{C}$ | `MinTemperature` | Minimum temperature | No | No |
+| $T_{max}$ | $^{\circ} \mathrm{C}$ | `MaxTemperature` | Maximum temperature | No | No |
+| $RH_{min}$ | % | `MinRelativeHumidity` | Minimum relative humidity | No | Yes |
+| $RH_{max}$ | % | `MaxRelativeHumidity` | Maximum relative humidity | No | Yes |
+| $P$ | $L \cdot m^{-2} = mm$ | `Precipitation` | Precipitation (either rainfall or snow). | No | No |
+| $Rad$ | $MJ \cdot m^{-2}$ | `Radiation` | Solar radiation after accounting for clouds | No | Yes |
+
+Some weather variables (temperature, precipitation) cannot contain missing values, whereas for others (radiation, relative humidity) the package can impute values when missing, thanks to its dependency with package **meteoland**.
 
 ### Optional weather variables
 
-The following table lists the same attributes for input weather variables that are **optional**: 
+The following table lists the same attributes for input weather variables that are **optional**:
 
 | Symbol | Units | R param | Description                        | Optional |
 |--------|-------|---------|------------------------------------|----------|
