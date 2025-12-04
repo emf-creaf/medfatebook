@@ -17,7 +17,7 @@ Since preparing inputs for simulations can be daunting for most users, package [
 
 Package **medfate** deals with simulations at stand level and, hence, the data structures defined in the package are meant to encapsulate information about a target forest stands and the properties of the soil where it grows:
 
-+ S3 class `soil` is a *data frame* that is initialized using a data frame of soil physical properties, but the table includes also soil parameters and state variables. Soil objects are described in subsection \@ref(soilinitialization).
++ S3 class `soil` is a *data frame* that is initialized using a data frame of soil physical properties, but the table includes also soil hydraulic parameters and state variables. Soil objects are described in subsection \@ref(soilinitialization).
 + S3 class `forest` is a *list* of forest inventory data (i.e. mainly tree and shrub measurements, but can include herbaceous vegetation, seedling bank and seed bank) corresponding to a single forest stand. Forest plot objects are described in subsection \@ref(forestobjects). 
 + S3 classes `spwbInput` and `growthInput` are lists containing all the vegetation parameters and state variables necessary to run water-balance simulations (function `spwb()` and alike) and forest growth simulations (function `growth()` and alike). Objects of classes `spwbInput` and `growthInput` are created using functions whose input includes a `forest` object and a `soil` object. 
 
@@ -127,19 +127,18 @@ soil_retentionCurvePlot(soil(soildf), model="both")+
 Hydraulic conductivity governs the rate of water flow for a unit gradient in potential. It decreases sharply as soil becomes dry, and the relationship also depends on soil texture. The Saxton and Van Genuchten models also describe and parameterize the relationship between conductivity and soil water potential.
 
 ### Soil initialization  {#soilinitialization}
-Soil initialization is needed to estimate hydrological parameters for each soil layer $s$ from its physical attributes. Soil initialization is done using function `soil()`, which returns an object of a S3 class with the same name (see \@ref(inputstructuresmedfate)). Simulation functions in **medfate** need an object of class `soil` to be run. 
+Soil initialization is needed to estimate hydraulic parameters for each soil layer $s$ from its physical attributes. Soil initialization can be done using function `soil()`, which returns a data frame of a S3 class with the same name (see \@ref(inputstructuresmedfate)), but most often is performed implicitly when calling functions `spwbInput()` or `growthInput()` with a data frame of physical properties. 
 
-Function `soil()` adds the following information to the physical soil description: 
+Soil initialization adds the following information to the physical soil description: 
 
 | Symbol | Units | R  | Description                               | 
 |--------|-------|----| ------------------------------------------|
 | $P_{macro}$ | % | `macro` | Percentage of macroporosity corresponding to each soil layers | 
-| $\gamma_{soil}$ | $mm \cdot day^{-1}$ | `Gsoil` | The maximum daily evaporation rate from soil (see \@ref(soilevaporation)) |
+| $K_{sat}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | `Ksat` | Saturated soil conductivity for each soil layer |
+| $\alpha$ | $MPa^{-1}$ | `VG_alpha`| Parameter $\alpha$ of the Van Genuchten [-@Genuchten1980] model for each soil layer |
+| $n$ | | `VG_n` | Parameter $n$ of the Van Genuchten [-@Genuchten1980] model for each soil layer|
 | $\theta_{sat}$ |$m^3 \cdot m^{-3}$ | `VG_theta_sat`| Volumetric soil moisture at saturation for each soil layer |
 | $\theta_{res}$ |$m^3 \cdot m^{-3}$ | `VG_theta_res` | Residual volumetric soil moisture for each soil layer |
-| $n$ | | `VG_n` | Parameter $n$ of the Van Genuchten [-@Genuchten1980] model for each soil layer|
-| $\alpha$ | $MPa^{-1}$ | `VG_alpha`| Parameter $\alpha$ of the Van Genuchten [-@Genuchten1980] model for each soil layer |
-| $K_{sat}$ | $mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}$ | `Ksat` | Saturated soil conductivity for each soil layer |
 
 Macroporosity values are calculated using the equations given in @Stolf2011, while $\gamma_{soil}$ is derived from texture. Parameters of the van Genuchten model for each layer are estimated from the physical description of the layer using one of two pedotransfer functions (see help for `soil()`): 
 
@@ -158,14 +157,21 @@ which can also be applied to water potential units. Soil layer saturated conduct
 1\, cm\cdot day^{-1} = 655.2934\,\,mmol \cdot s^{-1} \cdot m^{-2} \cdot MPa^{-1}
 \end{equation}
 
-Besides defining soil parameters, function `soil()` also initializes *soil state variables*: soil moisture content, soil temperature (although set to a missing value) and water table depth.  Users can edit the `soil` object manually (it is actually a `list`), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements. 
-
 Saturated conductivity ($K_{sat}$) is corrected for bulk density ($BD$) of the soil layer, because compact soils have lower conductivity [@rahimi_evaluation_2011]:
 
 \begin{equation}
 K_{sat} = K_{sat,ref} \cdot \left( \frac{\rho_{s} - BD}{\rho_{s} - BD_{ref}} \right)^3
 \end{equation}
 where $K_{sat,ref}$ is the reference conductivity according to soil texture, $\rho_{s} = 2.73 \,g\cdot cm^{-3}$ is density of soil particles, $BD_{ref} = 1.2\,g\cdot cm^{-3}$ is the reference bulk density.
+
+Below is an example of soil initialization:
+
+```{r}
+soilinit <- soil(soildf)
+soilinit
+```
+
+Besides defining soil parameters, function `soil()` also initializes *soil state variables*: soil moisture content with respect to field capacity (i.e. $\theta(\Psi)/\theta(\Psi_{fc})$; noted using `W`) and soil temperature (in Celsius, noted using `Temp`; set to a missing value).  Users can edit the `soil` object manually (it is actually a `list`), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements. 
 
 ### Water content and depth to saturation {#watercontent}
 
@@ -186,13 +192,19 @@ V_{fc,s} = V_{s}(-0.033) = d_s\cdot ((100-P_{rocks,s})/100)\cdot\theta_{fc,s}
 \end{equation}
 where $\theta_{fc,s} = \theta_s(-0.033)$ is the corresponding moisture at field capacity. 
   + *Water content at saturation* ($V_{sat, s}$, in mm) is calculated anagolously, but replacing $\theta_{fc,s}$ by $\theta_{sat, s} = \theta_s(0)$, the moisture at *saturation*, the amount of soil moisture when all easily drained spaces between soil particles (i.e. macropores) are also filled with water. 
-  + *Water content at wilting point* ($V_{wp, s}$, in mm) is calculated replacing $\theta_{fc,s}$ by $\theta_{wp,s} = \theta_s(-1.5)$, the moisture at *wilting point*, i.e. at $\Psi_{fc} = -1.5$ MPa, a conventional amount of soil moisture beyond which plants are assumed have problems extracting water and start to wilt. However, plants can often extract water from much drier soils.
+  + *Water content at wilting point* ($V_{wp, s}$, in mm) is calculated replacing $\theta_{fc,s}$ by $\theta_{wp,s} = \theta_s(-1.5)$, the moisture at *wilting point*, i.e. at $\Psi_{wp} = -1.5$ MPa, a conventional amount of soil moisture beyond which plants are assumed have problems extracting water and start to wilt. However, plants can often extract water from much drier soils.
   + The *amount of extractable water* (in mm) is the difference between water content at field capacity and the water content at a conventional minimum water potential, which can be set at wilting point or lower values (by default at -5 MPa in **medfate**).
 
 The *saturated water depth* ($Z_{sat}$, in mm) is not defined (i.e. missing) when all soil layers are below field capacity. When some layers are between field capacity and saturation, depth of the saturated water is calculated as:
 \begin{equation}
 Z_{sat} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\theta_{sat,s}-\theta_{fc,s})\right]}
 \end{equation}
+
+Function `summary.soil()` can be used to describe the properties and water content of the different soil layers, after initialization:
+
+```{r}
+summary(soilinit)
+```
 
 
 ## Vegetation description {#vegetationinput}
@@ -274,7 +286,7 @@ data(exampleforest)
 exampleforest
 ```
 
-The most important items of `forest` are the two data frames describing woody vegetation, `treeData` (for trees) and `shrubData` for shrubs, but the herbaceous layer can also be described using `herbCover` and `herbHeight`. With the aim to help users in the task of constructing `forest` objects, package **medfate** includes functions to map user data in into tables `treeData` and `shrubData`.
+The most important items of `forest` are the two data frames describing woody vegetation, `treeData` (for trees) and `shrubData` for shrubs, but other items can be used to describe the herbaceous layer, seedling bank or seed bank. With the aim to help users in the task of constructing `forest` objects, package **medfate** includes functions to map user data in into tables `treeData` and `shrubData`.
 
 `forest` objects are a convenient format to start calculations with **medfate**, because there are many static functions that take forest objects as input. For example, a `summary.forest()` function provides the basal area, density, cover and leaf area index of the forest stand, and its different components:
 
@@ -322,25 +334,19 @@ The vegetation input structures allow the package to determine the vertical dist
 
 Simulation models in **medfate** divide the vertical dimension into vertical layers (by default are 100 cm width, but see control parameter `verticalLayerSize`). Let us define $LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}$ as the leaf area index of cohort $i$ in layer $j$ including both functional leaves and dead leaves standing on branches. The truncated Gaussian distribution defines the $LAI_{i,j}^{\phi}$ and $LAI_{i,j}^{dead}$ for all plant cohorts and vertical layers.
 
-Dividing the leaf area of a given layer by its width, one obtains the *leaf area density* ($LAD$ in $m^2 \cdot m^{-3}$). Figure \@ref(fig:leafareadensity) illustrates the leaf area density profile (see function `vprofile_leafAreaDensity()`) corresponding to the forest stand described in the example `forest` object that we showed above. 
+Dividing the leaf area of a given layer by its width, one obtains the *leaf area density* ($LAD$ in $m^2 \cdot m^{-3}$). Figure \@ref(fig:leafareadensity) illustrates the leaf area density profile (see function `plot.forest()`) corresponding to the forest stand described in the example `forest` object that we showed above. 
 
 ```{r leafareadensity, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap="Leaf area density distribution of woody vegetation in a forest stand. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution."}
-g1<-vprofile_leafAreaDensity(exampleforest, SpParamsMED, z = seq(0,1000, by=1), byCohorts = T)
+g1<-plot(exampleforest, SpParamsMED, type = "LeafAreaDensity", byCohorts = TRUE, 
+         z = seq(0,1000, by=1))
 g1 <- g1 + theme(legend.background = element_blank(), legend.position = c(0.8,0.8))
-g2<-vprofile_leafAreaDensity(exampleforest, SpParamsMED, z = seq(0,1000, by=1))
+g2<-plot(exampleforest, SpParamsMED, type = "LeafAreaDensity", z = seq(0,1000, by=1))
 plot_grid(g1, g2, nrow=1, ncol=2)
 ```
 
 The leaf area density profile determines the light extinction rates through the forest canopy. The same truncated Gaussian distribution is used to distribute leaf and small branch biomass along the vertical dimension.
 
-When present, we can include herbaceous vegetation (i.e. $LAI_{herb}$) in the leaf area density profile. Its vertical distribution is also assumed to follow a truncated Gaussian function:
-
-```{r leafareadensityherbs, fig.width=8, fig.height=4, fig.align='center', echo=FALSE, fig.cap="Leaf area density distribution in a forest stand, including the herbaceous layer. The left panel shows the distribution for each plant cohort separately, whereas the right panel shows the overall density distribution."}
-g1<-vprofile_leafAreaDensity(exampleforest, SpParamsMED, z = seq(0,1000, by=1), byCohorts = T, includeHerbs = TRUE)
-g1 <- g1 + theme(legend.background = element_blank(), legend.position = c(0.8,0.8))
-g2<-vprofile_leafAreaDensity(exampleforest, SpParamsMED, z = seq(0,1000, by=1), includeHerbs = TRUE)
-plot_grid(g1, g2, nrow=1, ncol=2)
-```
+When present, we can include herbaceous vegetation (i.e. $LAI_{herb}$) in the leaf area density profile. Its vertical distribution is also assumed to follow a truncated Gaussian function.
 
 ### Vertical root distribution {#rootdistribution}
 Roots can be distinguished functionally into two different organs: **coarse roots** are responsible for mechanical support and transport of water and nutrients towards the stem, whereas **fine roots** are responsible for absorbing water and nutrients. 
@@ -352,15 +358,15 @@ Y_i(z) &=& \frac{1}{1+(z/Z_{50,i})^{c_i}}
 \end{eqnarray}
 where $Y_i(z)$ is the cumulative fraction of fine root mass located between surface and depth $z$; $Z_{50,i}$ is the depth (in mm) above which 50\% of the root mass is located; and $c_i$ is a shape parameter related to $Z_{50,i}$ and $Z_{95,i}$ as $c_i  = 2.94 / \ln(Z_{50,i} / Z_{95,i})$. 
 
-The linear dose response model is quite flexible with respect to fine root distribution (see function `root_ldrDistribution()`). The following figure shows the fine root distribution profile of the same cohorts as in fig. \@ref(fig:leafareadensity) (see `vprofile_rootDistribution()`):
+The linear dose response model is quite flexible with respect to fine root distribution (see internal function `root_ldrDistribution()`). The following figure shows the fine root distribution profile of the same cohorts as in fig. \@ref(fig:leafareadensity) (see function `plot.forest()`):
 
 ```{r root-distribution, echo = FALSE, fig.width=5, fig.height=4, fig.align = 'center', fig.cap = "Examples of root density profile according to the linear dose response model."}
-vprofile_rootDistribution(exampleforest, SpParamsMED)
+plot(exampleforest, SpParamsMED, type = "RootDistribution")
 ```
 
 The vertical distribution of fine roots can be effectively truncated to a maximum depth by specifying a value for $Z_{100}$ (or by allowing the model to estimate it using `truncateRootDistribution = TRUE` in control parameters). 
 
-The actual input to simulation functions `spwb()`, `growth()` and alike, describes fine root distribution using the matrix of $FRP_{i,s}$ values - not $Z_{50,i}$ and $Z_{95,i}$ -, which means that the proportions of fine roots can be modified manually or be defined by another model. In fact, **medfate** also allows calculating $FRP_{i,s}$ values assuming a conic distribution of fine roots (see `root_conicDistribution()`). 
+The actual input to simulation functions `spwb()`, `growth()` and alike, describes fine root distribution using the matrix of $FRP_{i,s}$ values - not $Z_{50,i}$ and $Z_{95,i}$ -, which means that the proportions of fine roots can be modified manually or be defined by another model. In fact, **medfate** also allows calculating $FRP_{i,s}$ values assuming a conic distribution of fine roots (see internal function `root_conicDistribution()`). 
 
 
 ### Water pools and root horizontal distribution {#plantwaterpools}
@@ -384,7 +390,7 @@ In **medfate**, coarse roots are represented by *axial* and *radial* components.
 \begin{equation}
 Vol_{i,s} = \pi \cdot L_{radial,i,s}^2 \cdot L_{axial, i, s}
 \end{equation}
-and substituting the soil volume $Vol_{i,s}$ in the equation above we can isolate $L_{radial,i,s}$ (see function `root_coarseRootLengthsFromVolume()`). Once we have the radial component we can estimate the area ($m^2$) covered by coarse roots of an individual of the cohort in a given layer $s$:
+and substituting the soil volume $Vol_{i,s}$ in the equation above we can isolate $L_{radial,i,s}$ (see internal function `root_coarseRootLengthsFromVolume()`). Once we have the radial component we can estimate the area ($m^2$) covered by coarse roots of an individual of the cohort in a given layer $s$:
 \begin{equation}
 Area_{i,s} = \pi \cdot L_{radial,i,s}^2
 \end{equation}
@@ -393,7 +399,7 @@ We can then compare $Area_{i,s}$ to the area of the water pool for an individual
 AreaPool_{i} = 10000 \cdot f_{pool,i}/N_{i}
 \end{equation}
 If $Area_{i,s} \leq AreaPool_{i}$, then the roots of the individual do not exceed the area of the pool, in other words $fr_{i,s,i} = 1$ and $fr_{i,s,j} = 0$ for all $j \neq i$. If
-$Area_{i,s} > AreaPool_{i}$ then the excess should be counted as overlap with the other pools. Assuming that plants are randomly distributed (i.e. no clumping) the probability of finding the pool of a cohort is equal to the proportion of its water pool (see function `root_horizontalProportions()`). All these calculations were done assuming $Vol_{i}$ were known. Estimation of $Vol_{i}$ depends on the complexity of the water balance model and is explained in \@ref(horizontalrootoverlap).
+$Area_{i,s} > AreaPool_{i}$ then the excess should be counted as overlap with the other pools. Assuming that plants are randomly distributed (i.e. no clumping) the probability of finding the pool of a cohort is equal to the proportion of its water pool (see internal function `root_horizontalProportions()`). All these calculations were done assuming $Vol_{i}$ were known. Estimation of $Vol_{i}$ depends on the complexity of the water balance model and is explained in \@ref(horizontalrootoverlap).
 
 
 ### Functional traits and vegetation initialization {#functionaltraits}
