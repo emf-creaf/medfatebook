@@ -10,13 +10,13 @@ The design of the forest dynamics model is, to a large degree, inherited from th
 
 ### Recruitment from seeds
 
-Recruitment of saplings involves a number of processes (flowering and pollination, fruit/seed production, dispersal, storage, seed predation, germination, seedling establishment and survival until the sapling stage). All these processes have their own biotic and abiotic drivers [@Price2001], so that modelling becomes a challenging task. Processes leading to sapling recruitment are frequently extremely simplified or their mechanisms ignored in many forest models [@Price2001]. The design of the forest dynamics model with respect to recruitment follows that of many gap models. Local seed production is considered in a binary way, where plants are considered fertile and able to produce viable seeds if they reach a given height (different for shrubs and trees). Alternatively, the user can specify a set of species whose seeds arrive to the target stand via simulation control parameters or dispersal processes (see chapter \@ref(seeddispersal)). A seed bank exists in the forest stand, where seed levels are relative (up to 100%) and result from the interplay between seed rain and seed mortality. Germination is scheduled once a year (assumed to be in winter), and results in age cohorts entering a seedling bank. A constant probability of germination determines is used as a statistical surrogate of processes affecting germination success. During the years between germination and recruitment (i.e. ingrowth into a given diameter class for trees or size for shrubs) the amount of seedlings decreases due to environmental filtering, depending on a set of regeneration *thresholds*. Typically, regeneration thresholds concern environmental conditions, although some models also consider ungulate browsing [@Wehrli2007]. In our case we focus on three environmental drivers limiting the transition from seedlings to saplings: 
+Recruitment of saplings involves a number of processes (flowering and pollination, fruit/seed production, dispersal, storage, seed predation, germination, seedling establishment and survival until the sapling stage). All these processes have their own biotic and abiotic drivers [@Price2001], so that modelling becomes a challenging task. Processes leading to sapling recruitment are frequently extremely simplified or their mechanisms ignored in many forest models [@Price2001]. The design of the forest dynamics model with respect to recruitment follows that of many gap models. Local seed production is considered in a binary way, where plants are considered fertile and able to produce viable seeds if they reach a given height (different for shrubs and trees). Alternatively, the user can specify a set of species whose seeds arrive to the target stand via simulation control parameters or dispersal processes (see chapter \@ref(seeddispersal)). A seed bank exists in the forest stand, where seed levels are relative (up to 100%) and result from the interplay between seed rain and seed mortality. Germination is scheduled once a year (assumed to be in winter), and results in age cohorts entering a seedling bank. A constant probability of germination determines is used as a statistical surrogate of processes affecting germination success. During the years between germination and recruitment the amount of seedlings decreases due to environmental filtering, depending on a set of regeneration *thresholds*. Typically, regeneration thresholds concern environmental conditions, although some models also consider ungulate browsing [@Wehrli2007]. In our case we focus on three environmental drivers limiting the transition from seedlings to saplings: 
 
   1. Tolerance to low temperatures, indicated by the mean temperature of the coldest month.
-  2. Drought tolerance, indicated by the annual moisture index or the daily water potential experienced by seedlings/saplings.
-  3. Shade tolerance, indicated by the percentage of photosynthetic active radiation reaching the ground.
+  2. Drought tolerance, indicated by the annual moisture index or the daily water potential experienced by seedlings/saplings [@maranon_regeneration_2004; @lloret_plant_2009].
+  3. Shade tolerance, indicated by the percentage of photosynthetic active radiation reaching the ground [@maranon_regeneration_2004].
 
-Maximum recruitment densities and plant size of recruited individuals are specified via species parameters. Importantly, trees recruited from seed are subject to self-thinning processes before attaining the diameter of adult ingrowth (typically $7.5\,cm$ diameter; see \@ref(selfthinning)).
+While aging, seedling cohorts progressively increase their rooting depth, which influences their chances of survival in front of drought [@padilla_rooting_2007]. Aboveground growth is not explicitly modelled for cohorts in the seedling bank. When they reach a pre-specified age, seedling/saplings leave the seedling bank and recruitment as functional cohorts occurs. This entails ingrowth into a given diameter for trees, typically $1\,cm$, or into a given height for shrubs. Maximum recruitment densities and plant size of recruited individuals are specified via species parameters. Importantly, trees recruited are subject to self-thinning processes before attaining the diameter of *adult* ingrowth (typically $7.5\,cm$ diameter; see \@ref(selfthinning)).
 
 ### Resprouting
 
@@ -98,8 +98,6 @@ All of them concern the simulation of recruitment and are specified in the speci
 | $H_{tree, recr}$  | $cm$  | `RecrTreeHeight` | Height for tree recruits from seeds or resprouting |
 | $Cover_{shrub, recr}$  | %  | `RecrShrubCover` | Recruitment cover for shrubs |
 | $H_{shrub, recr}$  | $cm$  | `RecrShrubHeight` | Recruitment height for shrubs |
-| $Z50_{recr}$  | mm  | `RecrZ50` | Soil depth corresponding to 50% of fine roots for recruitment |
-| $Z95_{recr}$  | mm  | `RecrZ95` | Soil depth corresponding to 95% of fine roots for recruitment |
 | $Resp_{fire}$  |   | `RespFire` | Number of resprouts per stem after fire disturbance |
 | $Resp_{dist}$  |   | `RespDist` | Number of resprouts per stem after undefined disturbance (typically desiccation) |
 | $Resp_{clip}$  |   | `RespClip` | Number of resprouts per stem after clipping |
@@ -111,11 +109,12 @@ Control parameters modulate the overall behavior of `fordyn` simulations, which 
 + `applySeedBankDynamics [= TRUE]`: Boolean flag to indicate that seed bank dynamics (seed production, seed bank mortality and seed rain) need to be simulated.
 + `applyRecruitment [= TRUE]`: Boolean flag to indicate that recruitment from seeds is allowed.
 + `applyResprouting [= TRUE]`: Boolean flag to indicate that resprouting is allowed.
-+ `recruitmentMode [= "stochastic"]`: String describing how recruitment from seeds is applied. Current accepted values are "deterministic" or "stochastic".
++ `recruitmentMode [= "annual/stochastic"]`: String describing how recruitment from seeds is applied. Current accepted values are "annual/deterministic", "annual/stochastic", "daily/deterministic" or "daily/stochastic".
 + `removeEmptyCohorts [= FALSE]`: Boolean flag to indicate the removal of cohorts whose density is too low.
 + `minimumTreeCohortDensity [= 1]`: Threshold of tree density resulting in cohort removal.
 + `minimumShrubCohortCover [= 0.01]`: Threshold of shrub cover resulting in cohort removal.
 + `dynamicallyMergeCohorts [= TRUE]`: Boolean flag to indicate that cohorts should be merged when possible. This option speeds up calculations but results in a loss of cohort identity and reinitialization of many state variables.
++ `keepCohortsWithID [= TRUE]`: Boolean flag to indicate that cohorts having a non-missing value in a column `ObsID` (if present) should not be merged or removed.
 
 Next, a few parameters control the production/arrival of seeds:
 
@@ -125,7 +124,7 @@ Next, a few parameters control the production/arrival of seeds:
 
 Then we have default parameters determining whether recruitment occurs:
 
-+ `probRecr [= 0.05]`: Default annual probability of recruitment (when species parameter `ProbRecr` is missing).
++ `probRecr [= 0.05]`: Default annual probability of germination (when species parameter `ProbRecr` is missing).
 + `minTempRecr [= 0]`: Default threshold of minimum average temperature of the coldest month necessary for recruiting (when species parameter `MinTempRecr` is missing).
 + `minMoistureRecr [= 0.3]`: Default threshold of minimum moisture index (annual precipitation over annual ETP) necessary for recruiting (when species parameter `MinMoistureRecr` is missing).
 + `minFPARRecr [= 10]`: Default threshold of minimum fraction of PAR (in %) reaching the ground necessary for recruiting (when species parameter `MinFPARRecr` is missing).
@@ -133,14 +132,11 @@ Then we have default parameters determining whether recruitment occurs:
 Finally, there are a set of parameters specifying default values for recruited cohort attributes:
 
 + `recrTreeDBH [= 1]`: Default DBH (cm) for recruited trees (when species parameter `RecrTreeDBH` is missing).
-+ `recrTreeDensity [= 100]`: Default density (ind·ha-1) for recruited trees (when species parameter `RecrTreeDensity` is missing).
++ `recrTreeDensity [= 100]`: Default maximum density (ind·ha-1) for recruited trees (when species parameter `RecrTreeDensity` is missing).
 + `recrTreeHeight [= 100]`: Default height (cm) for recruited trees (when species parameter `RecrTreeHeight` is missing).
-+ `recrShrubCover [= 1]`: Default cover (%) for recruited shrubs (when species parameter `RecrShrubCover` is missing).
++ `recrShrubCover [= 1]`: Default maximum cover (%) for recruited shrubs (when species parameter `RecrShrubCover` is missing).
 + `recrShrubHeight [= 100]`: Default height (cm) for recruited shrubs (when species parameter `RecrShrubHeight` is missing).
-+ `recrTreeZ50 [= 100]`: Default value for Z50 (mm) in recruited trees (when species parameter `RecrZ50` is missing).
-+ `recrShrubZ50 [= 50]`: Default value for Z50 (mm) in recruited shrubs (when species parameter `RecrZ50` is missing).
-+ `recrTreeZ95 [= 1000]`: Default value for Z95 (mm) in recruited trees (when species parameter `RecrZ50` is missing).
-+ `recrShrubZ50 [= 500]`: Default value for Z95 (mm) in recruited shrubs (when species parameter `RecrZ50` is missing).
+
 
 ### Model output {#forestdynamicsoutput}
 
@@ -161,4 +157,7 @@ Finally, there are a set of parameters specifying default values for recruited c
 | `ManagementArgs`| If management is considered, a list of management arguments to be used in another call to `fordyn()`. |
 | `NextInputObject` | An object of class `growthInput` to be used in a subsequent simulation.|
 | `NextForestObject` | An object of class `forest` to be used in a subsequent simulation.|
+
+## Applications
+
 
