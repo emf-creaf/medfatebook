@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2025-12-04" />
+<meta name="date" content="2025-12-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -210,8 +210,8 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="model-inputs.html"><a href="model-inputs.html#vegetationinput"><i class="fa fa-check"></i><b>2.4</b> Vegetation description</a>
 <ul>
-<li class="chapter" data-level="2.4.1" data-path="model-inputs.html"><a href="model-inputs.html#structural-attributes-of-woody-plant-cohorts"><i class="fa fa-check"></i><b>2.4.1</b> Structural attributes of woody plant cohorts</a></li>
-<li class="chapter" data-level="2.4.2" data-path="model-inputs.html"><a href="model-inputs.html#structural-attributes-of-herbaceous-vegetation"><i class="fa fa-check"></i><b>2.4.2</b> Structural attributes of herbaceous vegetation</a></li>
+<li class="chapter" data-level="2.4.1" data-path="model-inputs.html"><a href="model-inputs.html#structural-attributes-of-plant-cohorts"><i class="fa fa-check"></i><b>2.4.1</b> Structural attributes of plant cohorts</a></li>
+<li class="chapter" data-level="2.4.2" data-path="model-inputs.html"><a href="model-inputs.html#structural-attributes-of-collective-herbaceous-layer"><i class="fa fa-check"></i><b>2.4.2</b> Structural attributes of collective herbaceous layer</a></li>
 <li class="chapter" data-level="2.4.3" data-path="model-inputs.html"><a href="model-inputs.html#leaf-area-index-of-the-forest-stand"><i class="fa fa-check"></i><b>2.4.3</b> Leaf area index of the forest stand</a></li>
 <li class="chapter" data-level="2.4.4" data-path="model-inputs.html"><a href="model-inputs.html#forestobjects"><i class="fa fa-check"></i><b>2.4.4</b> Forest objects</a></li>
 <li class="chapter" data-level="2.4.5" data-path="model-inputs.html"><a href="model-inputs.html#single-cohort-forests"><i class="fa fa-check"></i><b>2.4.5</b> Single-cohort forests</a></li>
@@ -743,7 +743,7 @@ div.csl-indent {
 <h1><span class="header-section-number">Chapter 2</span> Model inputs<a href="model-inputs.html#model-inputs" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>This chapter describes the inputs required by simulation models of <strong>medfate</strong> and <strong>medfateland</strong> packages. First, we describe the R structures required for the two packages. Then, we provide the details for four different kinds of inputs:</p>
 <ol style="list-style-type: decimal">
-<li><em>Vegetation existing in the forest stand</em>. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of woody plants. Vegetation structure is considered static in <code>spwb()</code> calls, but becomes dynamic in calls to <code>growth()</code> or <code>fordyn()</code>. Hence, in these functions the input vegetation describes the starting point.</li>
+<li><em>Vegetation existing in the forest stand</em>. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of a set of plant cohorts. Vegetation structure is considered static in <code>spwb()</code> calls, but becomes dynamic in calls to <code>growth()</code> or <code>fordyn()</code>. Hence, in these functions the input vegetation describes the starting point.</li>
 <li><em>Information on the physical structure of soil</em>. Soil information is also required but, unlike vegetation, the soil physical structure and its hydraulic properties are considered static.</li>
 <li><em>Climatic forcing</em>. Daily weather series are always required, defining the temporal extent of the simulation and the temporal variation of environmental conditions in which physical and biological processes occur.</li>
 <li><em>Topographic information and geographic location</em>. Topography and latitude are also required, because internal calculations of some physical variables require them.</li>
@@ -1159,11 +1159,11 @@ Z_{sat} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\the
 </div>
 <div id="vegetationinput" class="section level2 hasAnchor" number="2.4">
 <h2><span class="header-section-number">2.4</span> Vegetation description<a href="model-inputs.html#vegetationinput" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The representation of vegetation within a target forest stand is done in <strong>medfate</strong> primarily by means of <strong>cohorts of woody plants</strong> (i.e. trees and shrubs). A woody plant cohort represents a set of woody plants that belong to the same species (or functional group) and are more or less of the same <em>size</em>. For example, trees in a stand may be grouped by species and diameter class, whereas shrubs may be grouped by species and height. In practice however, plant cohorts are entities that are treated separately when modeling the forest stand. This representation in plant cohorts was chosen so that package functions can be easily applied to <strong>forest inventory data</strong>, for example from national forest surveys. The description of woody plant cohorts includes a measure of <em>abundance</em> of the cohort in the stand, which in the case of trees is <em>density</em> as stems per hectare and for shrubs is <em>percent cover</em> (shrubs are often multi-stemmed). The difference in measurement units for abundance is the main motivation for distinguishing between tree cohorts and shrub cohorts, rather than their size or growth form. Additionally, the description of vegetation in the forest stand may include the cover and mean height of a <strong>herbaceous layer</strong>. The presence or abundance of herbs is not always recorded in forest inventory surveys, but may be relevant vegetation component in open habitats like shrublands.</p>
+<p>The representation of vegetation within a target forest stand is done in <strong>medfate</strong> primarily by means of <strong>cohorts of plants</strong> (i.e. trees, shrubs or herbs). A plant cohort represents a set of plants that belong to the same species (or functional group) and are more or less of the same <em>size</em>. For example, trees in a stand may be grouped by species and diameter class, whereas shrubs or herbs may be grouped by species and height. In practice, however, plant cohorts are entities that are treated separately when modeling the forest stand. This representation in plant cohorts was chosen so that package functions can be easily applied to <strong>forest inventory data</strong>, for example from national forest surveys. The description of plant cohorts includes a measure of <em>abundance</em> of the cohort in the stand, which in the case of trees is <em>density</em> as stems per hectare and for shrubs or herbs is <em>percent cover</em>. The difference in the kind of measurements made for abundance is the main motivation for distinguishing between tree cohorts and shrub/herbs cohorts, rather than their size or growth form. Herbaceous cohorts are different from shrub cohorts for functional reasons. While shrubs are woody (often multi-stemmed) plants with secondary growth, herbs are non-woody, lacking secondary growth and with crowns starting at the ground level. Although herbs can be described as plant cohorts, similar to shrubs, the description of vegetation in the forest stand may include the cover and mean height of a <em>herbaceous layer</em> defined collectively, for practical reasons.</p>
 <p>Note that one limitation of the representation of vegetation in <strong>medfate</strong> is that it is not spatially-explicit (i.e. plants cannot have explicit coordinates within forest stands) and hence spatial (horizontal) interactions between plant cannot be taken into account explicitly (but see <a href="model-inputs.html#plantwaterpools">2.4.9</a>).</p>
-<div id="structural-attributes-of-woody-plant-cohorts" class="section level3 hasAnchor" number="2.4.1">
-<h3><span class="header-section-number">2.4.1</span> Structural attributes of woody plant cohorts<a href="model-inputs.html#structural-attributes-of-woody-plant-cohorts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>A woody plant cohort <span class="math inline">\(i\)</span> is either a <em>tree cohort</em> or a <em>shrub cohort</em>, and is defined using a set of structural attributes shown in the following table, where columns <strong>spwb</strong>, <strong>growth</strong> and <strong>fordyn</strong> indicate whether attributes are required by simulation functions <code>spwb()</code>, <code>growth()</code> and <code>fordyn()</code>, respectively:</p>
+<div id="structural-attributes-of-plant-cohorts" class="section level3 hasAnchor" number="2.4.1">
+<h3><span class="header-section-number">2.4.1</span> Structural attributes of plant cohorts<a href="model-inputs.html#structural-attributes-of-plant-cohorts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>A plant cohort <span class="math inline">\(i\)</span> is either a <em>tree cohort</em>, a <em>shrub cohort</em> or a <em>herb cohort</em>; and is defined using a set of structural attributes shown in the following table, where columns <strong>spwb</strong>, <strong>growth</strong> and <strong>fordyn</strong> indicate whether attributes are required by simulation functions <code>spwb()</code>, <code>growth()</code> and <code>fordyn()</code>, respectively:</p>
 <table style="width:100%;">
 <colgroup>
 <col width="11%" />
@@ -1199,7 +1199,7 @@ Z_{sat} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\the
 <td><span class="math inline">\(H_i\)</span></td>
 <td><span class="math inline">\(cm\)</span></td>
 <td><code>Height</code></td>
-<td>Average tree or shrub height</td>
+<td>Average plant height</td>
 <td>Y</td>
 <td>Y</td>
 <td>Y</td>
@@ -1217,7 +1217,7 @@ Z_{sat} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\the
 <td><span class="math inline">\(N_i\)</span></td>
 <td><span class="math inline">\(ind · ha^{-1}\)</span></td>
 <td><code>N</code></td>
-<td>Density of tree individuals</td>
+<td>Density of individuals</td>
 <td>N</td>
 <td>Y</td>
 <td>Y</td>
@@ -1235,7 +1235,7 @@ Z_{sat} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\the
 <td><span class="math inline">\(Cover_i\)</span></td>
 <td>%</td>
 <td><code>Cover</code></td>
-<td>Shrub percent cover</td>
+<td>Projected percent cover</td>
 <td>N</td>
 <td>Y</td>
 <td>Y</td>
@@ -1296,17 +1296,17 @@ Z_{sat} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\the
 </tr>
 </tbody>
 </table>
-<p>Height (<span class="math inline">\(H\)</span>) values refer to average height of individuals included in the cohort, and the same for crown ratio (<span class="math inline">\(CR\)</span>) and diameter at breast height (<span class="math inline">\(DBH\)</span>). While plant size (i.e. height or diameter) is relatively easy to tally, other measurements are not usually made in the field. Package <strong>medfate</strong> includes utility functions that provide estimates <span class="math inline">\(CR\)</span> and <span class="math inline">\(LAI\)</span> from forest inventory data (e.g. heights, DBH and density for measured trees), using allometric relationships calibrated for Catalonia, Spain (see chapter <a href="allometricmodels.html#allometricmodels">22</a>).</p>
+<p>Height (<span class="math inline">\(H\)</span>) values refer to average height of individuals included in the cohort, and the same for crown ratio (<span class="math inline">\(CR\)</span>) and diameter at breast height (<span class="math inline">\(DBH\)</span>). While plant size (i.e. height or diameter) is relatively easy to tally, other measurements are not usually made in the field. Package <strong>medfate</strong> includes utility functions that provide estimates <span class="math inline">\(CR\)</span> and <span class="math inline">\(LAI\)</span> from forest inventory data (e.g. heights, DBH and density for measured trees), using allometric relationships calibrated for Catalonia, Spain (see chapter <a href="allometricmodels.html#allometricmodels">22</a>). As mentioned above, herbaceous cohorts are assumed to have <span class="math inline">\(CR = 1\)</span>.</p>
 <p><strong>Leaf area index</strong></p>
-<p><span class="math inline">\(LAI\)</span> variables refer to <em>one-sided leaf area</em> of plants per surface area of the stand. Leaves standing on branches of woody plants can be alive or dead. We will call <em>total leaf area index</em> of a woody plant cohort <span class="math inline">\(i\)</span> (<span class="math inline">\(LAI^{all}_{i}\)</span>) to the sum of its dead and live (and unfolded) leaf area:
+<p><span class="math inline">\(LAI\)</span> variables refer to <em>one-sided leaf area</em> of plants per surface area of the stand. Leaves standing on branches of plants can be alive or dead. We will call <em>total leaf area index</em> of a plant cohort <span class="math inline">\(i\)</span> (<span class="math inline">\(LAI^{all}_{i}\)</span>) to the sum of its dead and live (and unfolded) leaf area:
 <span class="math display">\[\begin{equation}
 LAI^{all}_{i} = LAI^{\phi}_{i}+LAI^{dead}_{i}
 \end{equation}\]</span></p>
 <p>For simulations not involving growth, winter-deciduous phenology is a prognosed variable, and the current level of leaves unfolded may be lower than the maximum (live) amount of leaves. In simulations involving growth, both <span class="math inline">\(LAI^{\phi}\)</span> and <span class="math inline">\(LAI^{live}\)</span> can change, the former due to leaf phenology (unfolding is simulated explicitly and has carbon costs) and the latter due to leaf allocation limits during plant development.</p>
 </div>
-<div id="structural-attributes-of-herbaceous-vegetation" class="section level3 hasAnchor" number="2.4.2">
-<h3><span class="header-section-number">2.4.2</span> Structural attributes of herbaceous vegetation<a href="model-inputs.html#structural-attributes-of-herbaceous-vegetation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The herbaceous layer of the stand is described collectively, without distinguishing among plant cohorts. Two attributes, cover and height, are required:</p>
+<div id="structural-attributes-of-collective-herbaceous-layer" class="section level3 hasAnchor" number="2.4.2">
+<h3><span class="header-section-number">2.4.2</span> Structural attributes of collective herbaceous layer<a href="model-inputs.html#structural-attributes-of-collective-herbaceous-layer" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>As stated above, the herbaceous layer of the stand can be described collectively, without distinguishing among plant cohorts. Two attributes, cover and height, are required in this case:</p>
 <table>
 <colgroup>
 <col width="14%" />
@@ -1347,19 +1347,19 @@ LAI^{all}_{i} = LAI^{\phi}_{i}+LAI^{dead}_{i}
 </div>
 <div id="leaf-area-index-of-the-forest-stand" class="section level3 hasAnchor" number="2.4.3">
 <h3><span class="header-section-number">2.4.3</span> Leaf area index of the forest stand<a href="model-inputs.html#leaf-area-index-of-the-forest-stand" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>If there are <span class="math inline">\(c\)</span> woody plant cohorts, the leaf area index corresponding to living leaves, unfolded leaves and dead leaves can be aggregated across cohorts using:</p>
+<p>If there are <span class="math inline">\(c\)</span> plant cohorts, the leaf area index corresponding to living leaves, unfolded leaves and dead leaves can be aggregated across cohorts using:</p>
 <p><span class="math display">\[\begin{eqnarray}
-LAI^{live}_{woody} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{live}} \\
-LAI^{\phi}_{woody} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{\phi}} \\
-LAI^{dead}_{woody} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{dead}}
+LAI^{live} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{live}} \\
+LAI^{\phi} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{\phi}} \\
+LAI^{dead} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{dead}}
 \end{eqnarray}\]</span></p>
-<p>We can also estimate the overall leaf area index of woody plant cohorts (<span class="math inline">\(LAI^{all}_{woody}\)</span>):</p>
+<p>We can also estimate the overall leaf area index of plant cohorts (<span class="math inline">\(LAI^{all}\)</span>), including dead leaves:</p>
 <p><span class="math display">\[\begin{eqnarray}
-LAI^{all}_{woody} &amp;=&amp; \sum_{i=1}^c{LAI_{i}^{woody}}= LAI^{\phi}_{woody}+LAI^{dead}_{woody}
+LAI^{all} &amp;=&amp; \sum_{i=1}^{c}{\left[LAI^{\phi}_{i}+LAI^{dead}_{i}\right]} = LAI^{\phi}+LAI^{dead}
 \end{eqnarray}\]</span></p>
-<p>Finally, we can also estimate the overall leaf area index of the whole stand (<span class="math inline">\(LAI^{all}_{stand}\)</span>), which also takes into account the herbaceous layer (<span class="math inline">\(LAI_{herb}\)</span>):</p>
+<p>Finally, we can also estimate the overall leaf area index of the whole stand (<span class="math inline">\(LAI^{all}_{stand}\)</span>), which also takes into account the collective herbaceous layer (<span class="math inline">\(LAI_{herb}\)</span>), if defined:</p>
 <p><span class="math display">\[\begin{eqnarray}
-LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody}+LAI^{dead}_{woody} + LAI_{herb}
+LAI^{all}_{stand} &amp;=&amp; LAI^{all} + LAI_{herb} = LAI^{\phi}+LAI^{dead} + LAI_{herb}
 \end{eqnarray}\]</span></p>
 </div>
 <div id="forestobjects" class="section level3 hasAnchor" number="2.4.4">
@@ -1378,7 +1378,7 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 ## 
 ## attr(,&quot;class&quot;)
 ## [1] &quot;forest&quot; &quot;list&quot;</code></pre>
-<p>The most important items of <code>forest</code> are the two data frames describing woody vegetation, <code>treeData</code> (for trees) and <code>shrubData</code> for shrubs, but other items can be used to describe the herbaceous layer, seedling bank or seed bank. With the aim to help users in the task of constructing <code>forest</code> objects, package <strong>medfate</strong> includes functions to map user data in into tables <code>treeData</code> and <code>shrubData</code>.</p>
+<p>The most important items of <code>forest</code> are the two data frames describing woody plants: <code>treeData</code> (for trees) and <code>shrubData</code> for shrubs. While not required, an additional <code>herbData</code> item can be used to describe the herbs, with the same structure as for shrubs. Other items can be used to describe the seedling bank, the seed bank or the herbaceous layer collectively (see details using <code>?forest</code>). With the aim to help users in the task of constructing <code>forest</code> objects, package <strong>medfate</strong> includes functions to map user data in into tables <code>treeData</code> and <code>shrubData</code>.</p>
 <p><code>forest</code> objects are a convenient format to start calculations with <strong>medfate</strong>, because there are many static functions that take forest objects as input. For example, a <code>summary.forest()</code> function provides the basal area, density, cover and leaf area index of the forest stand, and its different components:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="model-inputs.html#cb13-1" tabindex="-1"></a><span class="fu">summary</span>(exampleforest, SpParamsMED)</span></code></pre></div>
 <pre><code>## Tree BA (m2/ha): 25.0333016  adult trees: 25.0333016  saplings: 0 
@@ -1416,7 +1416,7 @@ LAI^{all}_{stand} &amp;=&amp; LAI^{all}_{woody} + LAI_{herb} = LAI^{\phi}_{woody
 </div>
 <div id="optional-variables-in-forest-objects" class="section level3 hasAnchor" number="2.4.6">
 <h3><span class="header-section-number">2.4.6</span> Optional variables in forest objects<a href="model-inputs.html#optional-variables-in-forest-objects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The structure presented above for <code>forest</code> objects corresponds to the required data elements. A forest object can contain additional information when this is available. In particular, data frames <code>treeData</code> and <code>shrubData</code> can contain additional columns:</p>
+<p>The structure presented above for <code>forest</code> objects corresponds to the required data elements. A forest object can contain additional information when this is available. In particular, data frames <code>treeData</code>, <code>shrubData</code> and <code>herbData</code> can contain additional columns:</p>
 <ul>
 <li><code>LAI</code>: Leaf area index (<span class="math inline">\(m^2 \cdot m^{-2}\)</span>), corresponding to <span class="math inline">\(LAI^{live}\)</span>, avoiding the use of allometric relationships for leaf biomass in water balance simulations.</li>
 <li><code>FoliarBiomass</code>: Standing dry biomass of leaves (<span class="math inline">\(kg \cdot m^{-2}\)</span>), which together with <span class="math inline">\(SLA\)</span> will be used to estimate <span class="math inline">\(LAI^{live}\)</span>, avoiding the use of allometric relationships for leaf biomass in water balance simulations.</li>
@@ -1439,7 +1439,6 @@ Figure 2.4: Leaf area density distribution of woody vegetation in a forest stand
 </p>
 </div>
 <p>The leaf area density profile determines the light extinction rates through the forest canopy. The same truncated Gaussian distribution is used to distribute leaf and small branch biomass along the vertical dimension.</p>
-<p>When present, we can include herbaceous vegetation (i.e. <span class="math inline">\(LAI_{herb}\)</span>) in the leaf area density profile. Its vertical distribution is also assumed to follow a truncated Gaussian function.</p>
 </div>
 <div id="rootdistribution" class="section level3 hasAnchor" number="2.4.8">
 <h3><span class="header-section-number">2.4.8</span> Vertical root distribution<a href="model-inputs.html#rootdistribution" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -1493,13 +1492,13 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <div id="functionaltraits" class="section level3 hasAnchor" number="2.4.10">
 <h3><span class="header-section-number">2.4.10</span> Functional traits and vegetation initialization<a href="model-inputs.html#functionaltraits" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Besides the physical representation of vegetation, forest ecosystem models require information regarding plant functional traits, because this influences the outcome of physical, physiological and hydrological processes. In the following chapters, we will indicate for each simulated process its required plant functional parameters. A description of all parameters is provided in data frame <code>SpParamsDefinition</code> included in the package.</p>
-<p>Normally, functional traits are described at the species level because infra-specific parameters are hard to get. Even at the species level, many functional (e.g. physiological) traits are hard to obtain, so in <strong>medfate</strong> we provide a default species parameter table for woody species found in Spain, with many of them occurring elsewhere in the Mediterranean Basin (<code>SpParamsMED</code>). User can modify this data frame to account for intra-specific trait variation (see function <code>modifySpParams()</code>).</p>
-<p>The package provides functions <code>spwbInput()</code> and <code>growthInput()</code> that prepare the <code>forest</code> vegetation input for simulation functions <code>spwb()</code> and <code>growth()</code>, respectively (see <a href="model-inputs.html#inputstructuresmedfate">2.1.1</a>). This initialization mostly consists in compiling the necessary functional traits from the species parameter table, following the <span class="math inline">\(SP_i\)</span> attribute of woody plant cohorts. Some new model parameters are estimated from the initial ones, while taking into account the structural attributes of cohorts (an example of these derived quantities is stem conductance, which estimated from stem xylem conductivity, Huber value and plant height). Users can take the output of these initialization functions and replace parameter values for specific plant cohorts (see function <code>modifyCohortParams()</code>).</p>
+<p>Normally, functional traits are described at the species level because infra-specific parameters are hard to get. Even at the species level, many functional (e.g. physiological) traits are hard to obtain, so in <strong>medfate</strong> we provide a default species parameter table for tree/shrub species found in Spain, with many of them occurring elsewhere in the Mediterranean Basin (<code>SpParamsMED</code>). User can modify this data frame to account for intra-specific trait variation (see function <code>modifySpParams()</code>).</p>
+<p>The package provides functions <code>spwbInput()</code> and <code>growthInput()</code> that prepare the <code>forest</code> vegetation input for simulation functions <code>spwb()</code> and <code>growth()</code>, respectively (see <a href="model-inputs.html#inputstructuresmedfate">2.1.1</a>). This initialization mostly consists in compiling the necessary functional traits from the species parameter table, following the <span class="math inline">\(SP_i\)</span> attribute of plant cohorts. Some new model parameters are estimated from the initial ones, while taking into account the structural attributes of cohorts (an example of these derived quantities is stem conductance, which estimated from stem xylem conductivity, Huber value and plant height). Users can take the output of these initialization functions and replace parameter values for specific plant cohorts (see function <code>modifyCohortParams()</code>).</p>
 </div>
 <div id="update-of-structural-variables-during-simulations" class="section level3 hasAnchor" number="2.4.11">
 <h3><span class="header-section-number">2.4.11</span> Update of structural variables during simulations<a href="model-inputs.html#update-of-structural-variables-during-simulations" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Vegetation characteristics stay constant during simulations using functions <code>spwb()</code>, although the actual (unfolded) leaf area and dead leaf area may vary depending on leaf phenology.</p>
-<p>In contrast, growth simulation requires updating the structure of vegetation, i.e. plant heights, tree diameters, tree density and shrub cover. Function <code>growth()</code> can modify any of the vegetation attributes. Finally, function <code>fordyn()</code> modifies not only structural variables of the initial cohorts but also involves the removal of dead (or cut) woody cohorts and recruitment of new woody cohorts during simulations.</p>
+<p>In contrast, growth simulation requires updating the structure of vegetation, i.e. plant heights, tree diameters, tree density and shrub cover. Function <code>growth()</code> can modify any of the vegetation attributes. Finally, function <code>fordyn()</code> modifies not only structural variables of the initial cohorts but also involves the removal of dead (or cut) cohorts and recruitment of new cohorts during simulations.</p>
 </div>
 </div>
 <div id="meteoinput" class="section level2 hasAnchor" number="2.5">

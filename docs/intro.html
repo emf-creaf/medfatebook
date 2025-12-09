@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2025-12-04" />
+<meta name="date" content="2025-12-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -210,8 +210,8 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="model-inputs.html"><a href="model-inputs.html#vegetationinput"><i class="fa fa-check"></i><b>2.4</b> Vegetation description</a>
 <ul>
-<li class="chapter" data-level="2.4.1" data-path="model-inputs.html"><a href="model-inputs.html#structural-attributes-of-woody-plant-cohorts"><i class="fa fa-check"></i><b>2.4.1</b> Structural attributes of woody plant cohorts</a></li>
-<li class="chapter" data-level="2.4.2" data-path="model-inputs.html"><a href="model-inputs.html#structural-attributes-of-herbaceous-vegetation"><i class="fa fa-check"></i><b>2.4.2</b> Structural attributes of herbaceous vegetation</a></li>
+<li class="chapter" data-level="2.4.1" data-path="model-inputs.html"><a href="model-inputs.html#structural-attributes-of-plant-cohorts"><i class="fa fa-check"></i><b>2.4.1</b> Structural attributes of plant cohorts</a></li>
+<li class="chapter" data-level="2.4.2" data-path="model-inputs.html"><a href="model-inputs.html#structural-attributes-of-collective-herbaceous-layer"><i class="fa fa-check"></i><b>2.4.2</b> Structural attributes of collective herbaceous layer</a></li>
 <li class="chapter" data-level="2.4.3" data-path="model-inputs.html"><a href="model-inputs.html#leaf-area-index-of-the-forest-stand"><i class="fa fa-check"></i><b>2.4.3</b> Leaf area index of the forest stand</a></li>
 <li class="chapter" data-level="2.4.4" data-path="model-inputs.html"><a href="model-inputs.html#forestobjects"><i class="fa fa-check"></i><b>2.4.4</b> Forest objects</a></li>
 <li class="chapter" data-level="2.4.5" data-path="model-inputs.html"><a href="model-inputs.html#single-cohort-forests"><i class="fa fa-check"></i><b>2.4.5</b> Single-cohort forests</a></li>
@@ -747,7 +747,7 @@ div.csl-indent {
 <p>Being able to anticipate the impact of global change on forest function and dynamics is one of the major environmental challenges in contemporary societies. However, uncertainties in the mechanisms underpinning forest function and practical constraints in how to integrate available information still hinder the availability of robust and reliable predictive models. Despite the amount of knowledge accumulated about the function and dynamics of forest ecosystems and the plethora of observations and modelling tools already available, further efforts are necessary to achieve the challenge of integrating different global change drivers into simulation frameworks useful for research and applications.</p>
 <div id="package-medfate" class="section level3 hasAnchor" number="1.1.1">
 <h3><span class="header-section-number">1.1.1</span> Package medfate<a href="intro.html#package-medfate" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The R package <strong>medfate</strong> has been designed as a platform to simulate the function and dynamics of individual forest stands at temporal scales from days to years. Climate is the main environmental driver forcing model predictions, and the ecological, biophysical, hydrological and physiological processes surrounding these are fundamental for the simulation models included in the package. In particular, the package allows the simulation of daily energy, water and carbon balances within forest stands. It also allows simulating the growth, mortality and regeneration processes of a set of woody plant cohorts competing for light and water within a forest stand. Finally, additional package functions allow relating the amount of plant biomass and the water status of plant live and dead tissues to fuel characteristics and, hence, fire hazard.</p>
+<p>The R package <strong>medfate</strong> has been designed as a platform to simulate the function and dynamics of individual forest stands at temporal scales from days to years. Climate is the main environmental driver forcing model predictions, and the ecological, biophysical, hydrological and physiological processes surrounding these are fundamental for the simulation models included in the package. In particular, the package allows the simulation of daily energy, water and carbon balances within forest stands. It also allows simulating the growth, mortality and regeneration processes of a set of plant cohorts competing for light and water within a forest stand. Finally, additional package functions allow relating the amount of plant biomass and the water status of plant live and dead tissues to fuel characteristics and, hence, fire hazard.</p>
 <p>The version of the reference manual that you are reading is intended to reflect <strong>version 4.9.0</strong> of the package.</p>
 </div>
 <div id="package-medfateland" class="section level3 hasAnchor" number="1.1.2">
@@ -891,13 +891,12 @@ Figure 1.2: Nested relationships between medfate simulation functions and proces
 </div>
 <div id="static-functions" class="section level3 hasAnchor" number="1.3.3">
 <h3><span class="header-section-number">1.3.3</span> Static functions<a href="intro.html#static-functions" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Package <strong>medfate</strong> includes a number of functions to examine static properties of plants conforming forest stands, summary functions at the stand level or vertical profiles of several physical properties:</p>
+<p>Package <strong>medfate</strong> includes a number of functions to examine static properties of plants conforming forest stands, summary functions at the species- and stand- levels:</p>
 <ul>
-<li><code>plant_*</code>: Cohort-level information (species name, id, leaf area, height…).</li>
-<li><code>species_*</code>: Cohort-level attributes aggregated by species (e.g. basal area).</li>
-<li><code>herb_*</code>: Attributes of the herbaceous layer (e.g. fuel density or leaf area index).</li>
-<li><code>stand_*</code>: Stand-level attributes (e.g. basal area).</li>
-<li><code>vprofile_*</code>: Vertical profiles (light, wind, fuel density, leaf area density).</li>
+<li><code>plant_*</code>: Cohort-level information (species name, id, leaf area, height, etc.).</li>
+<li><code>species_*</code>: Cohort-level attributes aggregated by species (e.g. basal area, cover, density, etc.).</li>
+<li><code>herb_*</code>: Attributes of the (aggregated) herbaceous layer (e.g. fuel density or leaf area index).</li>
+<li><code>stand_*</code>: Stand-level attributes (e.g. stand basal area, fuel loading, etc.).</li>
 </ul>
 <p>Vegetation functioning and dynamics have strong, but complex, effects on fire hazard. On one hand, growth and death of organs and individuals changes the amount of standing live and dead fuels, as well as downed dead fuels. On the other, day-to-day changes in soil and plant water content changes the physical properties of fuel, notably moisture content of live and dead fuels. Package <strong>medfate</strong> provides functions to estimate fuel properties and potential fire behaviour in forest stands. Specifically, <code>fuel_FCCS()</code> calculates fuel characteristics for a set of fuel strata; and a fire behaviour model is implemented in function <code>fire_FCCS()</code> to calculate the intensity of surface fire reaction and the rate of fire spread of surface fires assuming a steady-state fire. Fuel and fire behavior functions allow obtaining the following:</p>
 <ol style="list-style-type: decimal">
