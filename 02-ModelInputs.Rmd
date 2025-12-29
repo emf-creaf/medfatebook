@@ -2,8 +2,8 @@
 
 This chapter describes the inputs required by simulation models of **medfate** and **medfateland** packages. First, we describe the R structures required for the two packages. Then, we provide the details for four different kinds of inputs:
 
-  (1) *Vegetation existing in the forest stand*. This information should be available at a level of detail appropriate for the model design, which in our case includes not only species composition and/or structure, but also functional parameters of a set of plant cohorts. Vegetation structure is considered static in `spwb()` calls, but becomes dynamic in calls to `growth()` or `fordyn()`. Hence, in these functions the input vegetation describes the starting point. 
-  (2) *Information on the physical structure of soil*. Soil information is also required but, unlike vegetation, the soil physical structure and its hydraulic properties are considered static. 
+  (1) *Vegetation existing in the forest stand*. Information of the living plants includes not only species composition and/or structure, but also functional parameters of a set of plant cohorts. Vegetation can include information about dead plant elements (e.g. snags, leaf litter, large wood) or soil carbon pools. Vegetation is considered static in `spwb()` calls, except for leaf area variation, but becomes dynamic in calls to `growth()` or `fordyn()`. Hence, in these functions the input vegetation describes the starting point. 
+  (2) *Information on the physical structure of soil*. Soil information is also required but, unlike vegetation, the soil physical structure and its hydraulic properties are considered static in the current version. 
   (3) *Climatic forcing*. Daily weather series are always required, defining the temporal extent of the simulation and the temporal variation of environmental conditions in which physical and biological processes occur. 
   (4) *Topographic information and geographic location*. Topography and latitude are also required, because internal calculations of some physical variables require them. 
 
@@ -18,7 +18,7 @@ Since preparing inputs for simulations can be daunting for most users, package [
 Package **medfate** deals with simulations at stand level and, hence, the data structures defined in the package are meant to encapsulate information about a target forest stands and the properties of the soil where it grows:
 
 + S3 class `soil` is a *data frame* that is initialized using a data frame of soil physical properties, but the table includes also soil hydraulic parameters and state variables. Soil objects are described in subsection \@ref(soilinitialization).
-+ S3 class `forest` is a *list* of forest inventory data (i.e. mainly tree and shrub measurements, but can include herbaceous vegetation, seedling bank and seed bank) corresponding to a single forest stand. Forest plot objects are described in subsection \@ref(forestobjects). 
++ S3 class `forest` is a *list* of forest inventory data corresponding to a single forest stand. It mainly refers to tree and shrub measurements, but can include many other information such as herbaceous vegetation, seedling bank, seed bank, tree snags or litter. Forest plot objects are described in subsection \@ref(forestobjects). 
 + S3 classes `spwbInput` and `growthInput` are lists containing all the vegetation parameters and state variables necessary to run water-balance simulations (function `spwb()` and alike) and forest growth simulations (function `growth()` and alike). Objects of classes `spwbInput` and `growthInput` are created using functions whose input includes a `forest` object and a `soil` object. 
 
 The figure below (Fig. \@ref(fig:inputworkflow)) can be used to illustrate the workflow of soil/forest input creation for the main simulation functions in **medfate**. Note the different inputs in the case of `fordyn()`.
@@ -73,22 +73,24 @@ Topography has a relatively small direct influence in **medfate** simulations, b
 
 Soils are described in **medfate** using $S > 1$ discrete soil layers ($s \in \{1, 2, ..., S\}$). Here the word *soil* refers to the volume comprised between between forest floor and the depth that plant rooting systems can reach (i.e., the critical zone), including cracks within the bedrock. The number and size of soil layers may correspond to changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties and are considered **static soil parameters** in simulations. In contrast, soil moisture content, other variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered, are all **soil state variables**.
 
-### Soil physical properties
+### Soil physico-chemical properties
 
-Soil physical properties, such as *texture* (i.e. volume percent of sand, silt and clay), *organic matter content*, *bulk density* or *rock fragment content*, can differ between soil layers, and this has important consequences for soil water retention capacity and soil hydraulics. Specifying layers with an elevated rock fragment content (e.g. layers of weathered rock where soil particles are scarce) may be important in arid or seasonally-dry climates like the Mediterranean, because plants often extend their roots into cracks existing in the parent rock to access water during summer [@Ruffault2013]. 
+Soil physico-chemical properties, such as *texture* (i.e. volume percent of sand, silt and clay), *organic matter content*, *bulk density* or *rock fragment content*, can differ between soil layers, and this has important consequences for soil water retention capacity and soil hydraulics. Specifying layers with an elevated rock fragment content (e.g. layers of weathered rock where soil particles are scarce) may be important in arid or seasonally-dry climates like the Mediterranean, because plants often extend their roots into cracks existing in the parent rock to access water during summer [@Ruffault2013]. 
 
-For each soil layer $s$, the following physical parameters are needed:
+For each soil layer $s$, the following physico-chemical parameters are accepted (some of them are only optional):
 
-| Symbol | Units | R  | Description                         | 
-|--------|-------|----| ------------------------------------|
-| $d_{s}$ | mm | `widths` | Width of soil layer $s$ |
-| $P_{clay,s}$ | % | `clay` | Percent volume of clay (within soil particles fraction) in layer $s$  |
-| $P_{sand,s}$ | % | `sand` | Percent volume of sand (within soil particles fraction) in layer $s$ |
-| $OM_s$ | % | `om` | Percentage of organic mater per dry weight (can be missing) in layer $s$ |
-| $BD_{s}$ | $g \cdot cm^{-3}$ |`bd` | Bulk density in layer $s$|
-| $P_{rocks,s}$ | % | `rfc` | Rock fragment content as percent volume (within whole soil) in layer $s$ |
+| Symbol | Units | R  | Description                         | Required |
+|--------|-------|----| ------------------------------------|----------|
+| $d_{s}$ | mm | `widths` | Width of soil layer $s$ | Yes |
+| $P_{clay,s}$ | % | `clay` | Percent volume of clay (within soil particles fraction) in layer $s$  | Yes |
+| $P_{sand,s}$ | % | `sand` | Percent volume of sand (within soil particles fraction) in layer $s$ | Yes |
+| $OM_s$ | % | `om` | Percentage of organic mater per dry weight (can be missing) in layer $s$ | No |
+| $N_s$ | $g/kg$  | `nitrogen` | Sum of total nitrogen (ammonia, organic and reduced nitrogen) in layer $s$ | No |
+| $pH_s$ | [0-14] | `ph` | pH in water of layer $s$ | No |
+| $BD_{s}$ | $g \cdot cm^{-3}$ |`bd` | Bulk density in layer $s$| Yes |
+| $P_{rocks,s}$ | % | `rfc` | Rock fragment content as percent volume (within whole soil) in layer $s$ | Yes |
 
-The percent volume of silt is 100\% minus the percent volume of clay and sand. Whenever possible, soil physical properties should be measured in soil profiles conducted at the target forest plot (although soil profiles rarely reach rooting depths of deeply-rooted plants). Soil input data should be arranged in a `data.frame` with soil layers in rows and physical variables in columns (see function `defaultSoilParams()`). The following is an example with four soil layers:
+The percent volume of silt is 100\% minus the percent volume of clay and sand. Whenever possible, soil physico-chemical properties should be measured in soil profiles conducted at the target forest plot (although soil profiles rarely reach rooting depths of deeply-rooted plants). Soil input data should be arranged in a `data.frame` with soil layers in rows and physico-chemicl variables in columns (see function `defaultSoilParams()`). The following is an example with four soil layers:
 
 ```{r}
 soildf <- defaultSoilParams()
@@ -127,9 +129,9 @@ soil_retentionCurvePlot(soil(soildf), model="both")+
 Hydraulic conductivity governs the rate of water flow for a unit gradient in potential. It decreases sharply as soil becomes dry, and the relationship also depends on soil texture. The Saxton and Van Genuchten models also describe and parameterize the relationship between conductivity and soil water potential.
 
 ### Soil initialization  {#soilinitialization}
-Soil initialization is needed to estimate hydraulic parameters for each soil layer $s$ from its physical attributes. Soil initialization can be done using function `soil()`, which returns a data frame of a S3 class with the same name (see \@ref(inputstructuresmedfate)), but most often is performed implicitly when calling functions `spwbInput()` or `growthInput()` with a data frame of physical properties. 
+Soil initialization is needed to estimate hydraulic parameters for each soil layer $s$ from its physico-chemical attributes. Soil initialization can be done using function `soil()`, which returns a data frame of a S3 class with the same name (see \@ref(inputstructuresmedfate)), but most often is performed implicitly when calling functions `spwbInput()` or `growthInput()` with a data frame of physical properties. 
 
-Soil initialization adds the following information to the physical soil description: 
+Soil initialization adds the following information to the physico-chemical soil description: 
 
 | Symbol | Units | R  | Description                               | 
 |--------|-------|----| ------------------------------------------|
@@ -213,7 +215,7 @@ The representation of vegetation within a target forest stand is done in **medfa
 
 Note that one limitation of the representation of vegetation in **medfate** is that it is not spatially-explicit (i.e. plants cannot have explicit coordinates within forest stands) and hence spatial (horizontal) interactions between plant cannot be taken into account explicitly (but see \@ref(plantwaterpools)).  
 
-### Structural attributes of plant cohorts
+### Structural attributes of living plant cohorts
 
 A plant cohort $i$ is either a *tree cohort*, a *shrub cohort* or a *herb cohort*; and is defined using a set of structural attributes shown in the following table, where columns **spwb**, **growth** and **fordyn** indicate whether attributes are required by simulation functions `spwb()`, `growth()` and `fordyn()`, respectively:
 
@@ -315,7 +317,7 @@ summary(oak_forest, SpParamsMED)
 
 Since density and diameter have not been provided, simulations in this case will be restricted to function `spwb()`. Moreover, note that when defining single-cohort forests all possible interactions with functionally distinct plants are neglected.
 
-### Optional variables in forest objects
+### Optional variables for living plant cohorts in forest objects
 
 The structure presented above for `forest` objects corresponds to the required data elements. A forest object can contain additional information when this is available. In particular, data frames `treeData`, `shrubData` and `herbData` can contain additional columns:
 
