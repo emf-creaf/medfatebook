@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2025-12-29" />
+<meta name="date" content="2025-12-30" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -220,7 +220,9 @@ div.csl-indent {
 <li class="chapter" data-level="2.4.8" data-path="model-inputs.html"><a href="model-inputs.html#rootdistribution"><i class="fa fa-check"></i><b>2.4.8</b> Vertical root distribution</a></li>
 <li class="chapter" data-level="2.4.9" data-path="model-inputs.html"><a href="model-inputs.html#plantwaterpools"><i class="fa fa-check"></i><b>2.4.9</b> Water pools and root horizontal distribution</a></li>
 <li class="chapter" data-level="2.4.10" data-path="model-inputs.html"><a href="model-inputs.html#functionaltraits"><i class="fa fa-check"></i><b>2.4.10</b> Functional traits and vegetation initialization</a></li>
-<li class="chapter" data-level="2.4.11" data-path="model-inputs.html"><a href="model-inputs.html#update-of-structural-variables-during-simulations"><i class="fa fa-check"></i><b>2.4.11</b> Update of structural variables during simulations</a></li>
+<li class="chapter" data-level="2.4.11" data-path="model-inputs.html"><a href="model-inputs.html#deadplantelements"><i class="fa fa-check"></i><b>2.4.11</b> Dead plant elements</a></li>
+<li class="chapter" data-level="2.4.12" data-path="model-inputs.html"><a href="model-inputs.html#seedlingseedbanks"><i class="fa fa-check"></i><b>2.4.12</b> Seedling and seed banks</a></li>
+<li class="chapter" data-level="2.4.13" data-path="model-inputs.html"><a href="model-inputs.html#update-of-vegetation-during-simulations"><i class="fa fa-check"></i><b>2.4.13</b> Update of vegetation during simulations</a></li>
 </ul></li>
 <li class="chapter" data-level="2.5" data-path="model-inputs.html"><a href="model-inputs.html#meteoinput"><i class="fa fa-check"></i><b>2.5</b> Metereological input</a>
 <ul>
@@ -1118,7 +1120,42 @@ where <span class="math inline">\(K_{sat,ref}\)</span> is the reference conducti
 ## 2     0.423715 1   NA
 ## 3     0.423715 1   NA
 ## 4     0.423715 1   NA</code></pre>
-<p>Besides defining soil parameters, function <code>soil()</code> also initializes <em>soil state variables</em>: soil moisture content with respect to field capacity (i.e. <span class="math inline">\(\theta(\Psi)/\theta(\Psi_{fc})\)</span>; noted using <code>W</code>) and soil temperature (in Celsius, noted using <code>Temp</code>; set to a missing value). Users can edit the <code>soil</code> object manually (it is actually a <code>list</code>), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements.</p>
+<p>Besides defining soil parameters, function <code>soil()</code> also initializes <em>soil state variables</em> for each soil layer:</p>
+<table>
+<colgroup>
+<col width="11%" />
+<col width="10%" />
+<col width="5%" />
+<col width="60%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Units</th>
+<th>R</th>
+<th>Description</th>
+<th>Initial value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\theta(\Psi_s)/\theta(\Psi_{fc,s})\)</span></td>
+<td></td>
+<td><code>W</code></td>
+<td>Soil moisture content with respect to field capacity for layer <span class="math inline">\(s\)</span></td>
+<td><code>1</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(T_{soil,s}\)</span></td>
+<td>Celsius</td>
+<td><code>Temp</code></td>
+<td>Soil temperature for layer <span class="math inline">\(s\)</span></td>
+<td><code>NA</code></td>
+</tr>
+</tbody>
+</table>
+<p>Users can edit the <code>soil</code> object manually (it is actually a <code>list</code>) before simulations, for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements or to modify the initial values of state variables.</p>
 </div>
 <div id="watercontent" class="section level3 hasAnchor" number="2.3.4">
 <h3><span class="header-section-number">2.3.4</span> Water content and depth to saturation<a href="model-inputs.html#watercontent" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -1190,8 +1227,9 @@ Z_{sat} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\the
 </div>
 <div id="vegetationinput" class="section level2 hasAnchor" number="2.4">
 <h2><span class="header-section-number">2.4</span> Vegetation description<a href="model-inputs.html#vegetationinput" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The representation of vegetation within a target forest stand is done in <strong>medfate</strong> primarily by means of <strong>cohorts of plants</strong> (i.e. trees, shrubs or herbs). A plant cohort represents a set of plants that belong to the same species (or functional group) and are more or less of the same <em>size</em>. For example, trees in a stand may be grouped by species and diameter class, whereas shrubs or herbs may be grouped by species and height. In practice, however, plant cohorts are entities that are treated separately when modeling the forest stand. This representation in plant cohorts was chosen so that package functions can be easily applied to <strong>forest inventory data</strong>, for example from national forest surveys. The description of plant cohorts includes a measure of <em>abundance</em> of the cohort in the stand, which in the case of trees is <em>density</em> as stems per hectare and for shrubs or herbs is <em>percent cover</em>. The difference in the kind of measurements made for abundance is the main motivation for distinguishing between tree cohorts and shrub/herbs cohorts, rather than their size or growth form. Herbaceous cohorts are different from shrub cohorts for functional reasons. While shrubs are woody (often multi-stemmed) plants with secondary growth, herbs are non-woody, lacking secondary growth and with crowns starting at the ground level. Although herbs can be described as plant cohorts, similar to shrubs, the description of vegetation in the forest stand may include the cover and mean height of a <em>herbaceous layer</em> defined collectively, for practical reasons.</p>
+<p>The representation of vegetation in a target forest stand is done primarily by means of <strong>cohorts of living plants</strong> (i.e. trees, shrubs or herbs). A living plant cohort represents a set of plants that belong to the same species (or functional group) and are more or less of the same <em>size</em>. For example, trees in a stand may be grouped by species and diameter class, whereas shrubs or herbs may be grouped by species and height. In practice, however, plant cohorts are entities that are treated separately when modeling the forest stand. This representation in plant cohorts was chosen so that package functions can be easily applied to <strong>forest inventory data</strong>, for example from national forest surveys. The description of plant cohorts includes a measure of <em>abundance</em> of the cohort in the stand, which in the case of trees is <em>density</em> as stems per hectare and for shrubs or herbs is <em>percent cover</em>. The difference in the kind of measurements made for abundance is the main motivation for distinguishing between tree cohorts and shrub/herbs cohorts, rather than their size or growth form. Herbaceous cohorts are different from shrub cohorts for functional reasons. While shrubs are woody (often multi-stemmed) plants with secondary growth, herbs are non-woody, lacking secondary growth and with crowns starting at the ground level. Although herbs can be described as plant cohorts, similar to shrubs, the description of vegetation in the forest stand may include the cover and mean height of a <em>herbaceous layer</em> defined collectively, for practical reasons.</p>
 <p>Note that one limitation of the representation of vegetation in <strong>medfate</strong> is that it is not spatially-explicit (i.e. plants cannot have explicit coordinates within forest stands) and hence spatial (horizontal) interactions between plant cannot be taken into account explicitly (but see <a href="model-inputs.html#plantwaterpools">2.4.9</a>).</p>
+<p>Apart from its living plants, vegetation description can also include other elements, such as <strong>cohorts of standing dead wood</strong> (i.e. snags), or <strong>leaf/branch/root litter</strong> lying on the ground or found below the surface, or even the <strong>seedling and seed banks</strong>. These additional vegetation elements are described in sub-sections <a href="model-inputs.html#deadplantelements">2.4.11</a> and <a href="model-inputs.html#seedlingseedbanks">2.4.12</a> after the description of living plant cohorts.</p>
 <div id="structural-attributes-of-living-plant-cohorts" class="section level3 hasAnchor" number="2.4.1">
 <h3><span class="header-section-number">2.4.1</span> Structural attributes of living plant cohorts<a href="model-inputs.html#structural-attributes-of-living-plant-cohorts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>A plant cohort <span class="math inline">\(i\)</span> is either a <em>tree cohort</em>, a <em>shrub cohort</em> or a <em>herb cohort</em>; and is defined using a set of structural attributes shown in the following table, where columns <strong>spwb</strong>, <strong>growth</strong> and <strong>fordyn</strong> indicate whether attributes are required by simulation functions <code>spwb()</code>, <code>growth()</code> and <code>fordyn()</code>, respectively:</p>
@@ -1526,8 +1564,14 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <p>Normally, functional traits are described at the species level because infra-specific parameters are hard to get. Even at the species level, many functional (e.g. physiological) traits are hard to obtain, so in <strong>medfate</strong> we provide a default species parameter table for tree/shrub species found in Spain, with many of them occurring elsewhere in the Mediterranean Basin (<code>SpParamsMED</code>). User can modify this data frame to account for intra-specific trait variation (see function <code>modifySpParams()</code>).</p>
 <p>The package provides functions <code>spwbInput()</code> and <code>growthInput()</code> that prepare the <code>forest</code> vegetation input for simulation functions <code>spwb()</code> and <code>growth()</code>, respectively (see <a href="model-inputs.html#inputstructuresmedfate">2.1.1</a>). This initialization mostly consists in compiling the necessary functional traits from the species parameter table, following the <span class="math inline">\(SP_i\)</span> attribute of plant cohorts. Some new model parameters are estimated from the initial ones, while taking into account the structural attributes of cohorts (an example of these derived quantities is stem conductance, which estimated from stem xylem conductivity, Huber value and plant height). Users can take the output of these initialization functions and replace parameter values for specific plant cohorts (see function <code>modifyCohortParams()</code>).</p>
 </div>
-<div id="update-of-structural-variables-during-simulations" class="section level3 hasAnchor" number="2.4.11">
-<h3><span class="header-section-number">2.4.11</span> Update of structural variables during simulations<a href="model-inputs.html#update-of-structural-variables-during-simulations" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="deadplantelements" class="section level3 hasAnchor" number="2.4.11">
+<h3><span class="header-section-number">2.4.11</span> Dead plant elements<a href="model-inputs.html#deadplantelements" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+</div>
+<div id="seedlingseedbanks" class="section level3 hasAnchor" number="2.4.12">
+<h3><span class="header-section-number">2.4.12</span> Seedling and seed banks<a href="model-inputs.html#seedlingseedbanks" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+</div>
+<div id="update-of-vegetation-during-simulations" class="section level3 hasAnchor" number="2.4.13">
+<h3><span class="header-section-number">2.4.13</span> Update of vegetation during simulations<a href="model-inputs.html#update-of-vegetation-during-simulations" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Vegetation characteristics stay constant during simulations using functions <code>spwb()</code>, although the actual (unfolded) leaf area and dead leaf area may vary depending on leaf phenology.</p>
 <p>In contrast, growth simulation requires updating the structure of vegetation, i.e. plant heights, tree diameters, tree density and shrub cover. Function <code>growth()</code> can modify any of the vegetation attributes. Finally, function <code>fordyn()</code> modifies not only structural variables of the initial cohorts but also involves the removal of dead (or cut) cohorts and recruitment of new cohorts during simulations.</p>
 </div>

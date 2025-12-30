@@ -173,7 +173,14 @@ soilinit <- soil(soildf)
 soilinit
 ```
 
-Besides defining soil parameters, function `soil()` also initializes *soil state variables*: soil moisture content with respect to field capacity (i.e. $\theta(\Psi)/\theta(\Psi_{fc})$; noted using `W`) and soil temperature (in Celsius, noted using `Temp`; set to a missing value).  Users can edit the `soil` object manually (it is actually a `list`), for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements. 
+Besides defining soil parameters, function `soil()` also initializes *soil state variables* for each soil layer: 
+
+| Symbol | Units | R  | Description                               | Initial value |
+|--------|-------|----| ------------------------------------------|--------|
+| $\theta(\Psi_s)/\theta(\Psi_{fc,s})$ |  | `W` | Soil moisture content with respect to field capacity for layer $s$ | `1` |
+| $T_{soil,s}$ | Celsius | `Temp` | Soil temperature for layer $s$ | `NA` |
+
+Users can edit the `soil` object manually (it is actually a `list`) before simulations, for example to provide specific parameters of the Van Genuchten retention curve calibrated from soil measurements or to modify the initial values of state variables. 
 
 ### Water content and depth to saturation {#watercontent}
 
@@ -211,9 +218,11 @@ summary(soilinit)
 
 ## Vegetation description {#vegetationinput}
 
-The representation of vegetation within a target forest stand is done in **medfate** primarily by means of **cohorts of plants** (i.e. trees, shrubs or herbs). A plant cohort represents a set of plants that belong to the same species (or functional group) and are more or less of the same *size*. For example, trees in a stand may be grouped by species and diameter class, whereas shrubs or herbs may be grouped by species and height. In practice, however, plant cohorts are entities that are treated separately when modeling the forest stand. This representation in plant cohorts was chosen so that package functions can be easily applied to **forest inventory data**, for example from national forest surveys. The description of plant cohorts includes a measure of *abundance* of the cohort in the stand, which in the case of trees is *density* as stems per hectare and for shrubs or herbs is *percent cover*. The difference in the kind of measurements made for abundance is the main motivation for distinguishing between tree cohorts and shrub/herbs cohorts, rather than their size or growth form. Herbaceous cohorts are different from shrub cohorts for functional reasons. While shrubs are woody (often multi-stemmed) plants with secondary growth, herbs are non-woody, lacking secondary growth and with crowns starting at the ground level. Although herbs can be described as plant cohorts, similar to shrubs, the description of vegetation in the forest stand may include the cover and mean height of a *herbaceous layer* defined collectively, for practical reasons. 
+The representation of vegetation in a target forest stand is done primarily by means of **cohorts of living plants** (i.e. trees, shrubs or herbs). A living plant cohort represents a set of plants that belong to the same species (or functional group) and are more or less of the same *size*. For example, trees in a stand may be grouped by species and diameter class, whereas shrubs or herbs may be grouped by species and height. In practice, however, plant cohorts are entities that are treated separately when modeling the forest stand. This representation in plant cohorts was chosen so that package functions can be easily applied to **forest inventory data**, for example from national forest surveys. The description of plant cohorts includes a measure of *abundance* of the cohort in the stand, which in the case of trees is *density* as stems per hectare and for shrubs or herbs is *percent cover*. The difference in the kind of measurements made for abundance is the main motivation for distinguishing between tree cohorts and shrub/herbs cohorts, rather than their size or growth form. Herbaceous cohorts are different from shrub cohorts for functional reasons. While shrubs are woody (often multi-stemmed) plants with secondary growth, herbs are non-woody, lacking secondary growth and with crowns starting at the ground level. Although herbs can be described as plant cohorts, similar to shrubs, the description of vegetation in the forest stand may include the cover and mean height of a *herbaceous layer* defined collectively, for practical reasons. 
 
 Note that one limitation of the representation of vegetation in **medfate** is that it is not spatially-explicit (i.e. plants cannot have explicit coordinates within forest stands) and hence spatial (horizontal) interactions between plant cannot be taken into account explicitly (but see \@ref(plantwaterpools)).  
+
+Apart from its living plants, vegetation description can also include other elements, such as **cohorts of standing dead wood** (i.e. snags), or **leaf/branch/root litter** lying on the ground or found below the surface, or even the **seedling and seed banks**. These additional vegetation elements are described in sub-sections \@ref(deadplantelements) and \@ref(seedlingseedbanks) after the description of living plant cohorts.
 
 ### Structural attributes of living plant cohorts
 
@@ -410,7 +419,11 @@ Normally, functional traits are described at the species level because infra-spe
 
 The package provides functions `spwbInput()` and `growthInput()` that prepare the `forest` vegetation input for simulation functions `spwb()` and `growth()`, respectively (see \@ref(inputstructuresmedfate)). This initialization mostly consists in compiling the necessary functional traits from the species parameter table, following the $SP_i$ attribute of plant cohorts. Some new model parameters are estimated from the initial ones, while taking into account the structural attributes of cohorts (an example of these derived quantities is stem conductance, which estimated from stem xylem conductivity, Huber value and plant height). Users can take the output of these initialization functions and replace parameter values for specific plant cohorts (see function `modifyCohortParams()`). 
 
-### Update of structural variables during simulations
+### Dead plant elements  {#deadplantelements}
+
+### Seedling and seed banks {#seedlingseedbanks}
+
+### Update of vegetation during simulations
 
 Vegetation characteristics stay constant during simulations using functions `spwb()`, although the actual (unfolded) leaf area and dead leaf area may vary depending on leaf phenology.
 
