@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 8 Sub-daily atmospheric temperature and radiation variation | The medfate reference book</title>
+  <title>Chapter 18 Decomposition and soil biogeochemistry | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
   <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 8 Sub-daily atmospheric temperature and radiation variation | The medfate reference book" />
+  <meta property="og:title" content="Chapter 18 Decomposition and soil biogeochemistry | The medfate reference book" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="This is a reference book for models implemented in packages medfate and medfateland." />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 8 Sub-daily atmospheric temperature and radiation variation | The medfate reference book" />
+  <meta name="twitter:title" content="Chapter 18 Decomposition and soil biogeochemistry | The medfate reference book" />
   
   <meta name="twitter:description" content="This is a reference book for models implemented in packages medfate and medfateland." />
   
@@ -29,8 +29,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="advancedwaterbalance.html"/>
-<link rel="next" href="radiationbalance.html"/>
+<link rel="prev" href="growthsenescencemortality.html"/>
+<link rel="next" href="dynamicsmodelling.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -734,51 +734,20 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="subdailytemplight" class="section level1 hasAnchor" number="8">
-<h1><span class="header-section-number">Chapter 8</span> Sub-daily atmospheric temperature and radiation variation<a href="subdailytemplight.html#subdailytemplight" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>After estimating leaf phenology (chapter <a href="leafphenologylight.html#leafphenologylight">4</a>) and simulating the main hydrological processes (chapter <a href="hydrology.html#hydrology">5</a>), the advanced water balance model (chapter <a href="advancedwaterbalance.html#advancedwaterbalance">7</a>) starts simulating <em>subdaily</em> processes, which include energy balances and photosynthesis/transpiration. In order to properly simulate these processes it is important to consider sub-daily variations in temperature and radiation. Here we detail how sub-daily estimates of above-canopy air temperature and atmospheric incoming radiation are derived from daily input values.</p>
-<div id="above-canopy-air-temperature" class="section level2 hasAnchor" number="8.1">
-<h2><span class="header-section-number">8.1</span> Above-canopy air temperature<a href="subdailytemplight.html#above-canopy-air-temperature" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Above-canopy air temperature (<span class="math inline">\(T_{atm}\)</span>, in <span class="math inline">\(^\circ C\)</span>) diurnal variations are modeled assuming a <em>sinusoidal pattern</em> with <span class="math inline">\(T_{atm} = T_{\min}\)</span> at sunrise and <span class="math inline">\(T_{atm} = (T_{\min}+T_{\max})/2\)</span> at sunset. Air temperature varies linearly between sunset and sunrise <span class="citation">(<a href="#ref-McMurtrie1990">McMurtrie <em>et al.</em> 1990</a>)</span>. Sunrise and sunset hours are determined from latitude and sun declination (see <a href="http://emf-creaf.github.io/meteolandbook/solarradiation.html#day-length">section 4.2 of the reference manual</a> for package <strong>meteoland</strong>).</p>
-</div>
-<div id="directdiffuseSWR" class="section level2 hasAnchor" number="8.2">
-<h2><span class="header-section-number">8.2</span> Incoming diffuse and direct short-wave radiation<a href="subdailytemplight.html#directdiffuseSWR" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Daily global radiation (<span class="math inline">\(Rad\)</span>, in <span class="math inline">\(MJ \cdot m^{-2} \cdot d^{-1}\)</span>) is assumed to include both direct and diffuse short-wave radiation (SWR). Using latitude information and whether is a rainy day, this quantity is partitioned into instantaneous direct and diffuse SWR and PAR for different daily substeps. Values of instantaneous direct and diffuse SWR and PAR above the canopy (<span class="math inline">\(I_{beam}\)</span> and <span class="math inline">\(I_{dif}\)</span>, in <span class="math inline">\(W \cdot m^{-2}\)</span>) are calculated using the methods described in <span class="citation">Spitters <em>et al.</em> (<a href="#ref-Spitters1986">1986</a>)</span>, which involve comparing daily global radiation with daily potential radiation. All these calculations are performed using routines in package <strong>meteoland</strong> (see details in section <a href="http://emf-creaf.github.io/meteolandbook/solarradiation.html#diurnal-trends-in-diffuse-and-direct-radiation">4.6 of the reference manual</a> for this package).</p>
-</div>
-<div id="longwaveatmradiation" class="section level2 hasAnchor" number="8.3">
-<h2><span class="header-section-number">8.3</span> Incoming long-wave radiation<a href="subdailytemplight.html#longwaveatmradiation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Once the above-canopy air temperature for a given time step is known, instantaneous long-wave radiation (LWR) coming from the atmosphere (<span class="math inline">\(L_{atm}\)</span>, in <span class="math inline">\(W \cdot m^{-2}\)</span>) can be calculated following <span class="citation">Campbell &amp; Norman (<a href="#ref-Campbell1998">1998</a>)</span>:
-<span class="math display">\[\begin{equation}
-L_{atm} = \epsilon_{a} \cdot \sigma \cdot (T_{atm} + 273.16)^{4.0}
-\end{equation}\]</span>
-where <span class="math inline">\(T_{atm}\)</span> is air temperature, <span class="math inline">\(\sigma = 5.67 \cdot 10^{-8.0}\,W \cdot K^{-4} \cdot m^{-2}\)</span> is the Stephan-Boltzmann constant and <span class="math inline">\(\epsilon_{a}\)</span> is the emmissivity of the atmosphere, calculated using:
-<span class="math display">\[\begin{eqnarray}
-\epsilon_{a} &amp;=&amp; (1 - 0.84 \cdot c) \cdot \epsilon_{ac} + 0.84 \cdot c \\
-\epsilon_{ac} &amp;=&amp; 1.72 \cdot \left(\frac{e_{atm}}{T_{atm} + 273.16} \right)^{1/7}
-\end{eqnarray}\]</span>
-where <span class="math inline">\(e_{atm}\)</span> is the average daily water vapor pressure (in kPa; see <a href="model-inputs.html#meteoinput">2.5</a>) and <span class="math inline">\(c\)</span> is the proportion of clouds (<span class="math inline">\(c=1\)</span> in rainy days and <span class="math inline">\(c=0\)</span> otherwise).</p>
+<div id="decomposition" class="section level1 hasAnchor" number="18">
+<h1><span class="header-section-number">Chapter 18</span> Decomposition and soil biogeochemistry<a href="decomposition.html#decomposition" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 
 </div>
-</div>
-<h3>Bibliography<a href="bibliography.html#bibliography" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-Campbell1998" class="csl-entry">
-Campbell, G.S. &amp; Norman, J.M. (1998). <em><a href="http://books.google.com/books?id=v6UpE6lThCwC">An introduction to environmental biophysics</a></em>. Springer-Verlag, New York.
-</div>
-<div id="ref-McMurtrie1990" class="csl-entry">
-McMurtrie, R.E., Rook, D.A. &amp; Kelliher, F.M. (1990). <a href="https://doi.org/10.1016/0378-1127(90)90150-A">Modelling the yield of <span>Pinus</span> radiata on a site limited by water and nitrogen</a>. <em>Forest Ecology and Management</em>, 30, 381–413.
-</div>
-<div id="ref-Spitters1986" class="csl-entry">
-Spitters, C.J.T., Toussaint, H.A.J.M. &amp; Goudriaan, J. (1986). <a href="https://doi.org/10.1016/0168-1923(86)90060-2">Separating the diffuse and direct components of global radiation and its implications for modeling canopy photosynthesis. <span>I</span>. <span>Components</span> of incoming radiation</a>. <em>Agricultural and Forest Meteorology</em>, 38, 231–242.
-</div>
-</div>
+
+
+
             </section>
 
           </div>
         </div>
       </div>
-<a href="advancedwaterbalance.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="radiationbalance.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="growthsenescencemortality.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="dynamicsmodelling.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
