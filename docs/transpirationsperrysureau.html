@@ -278,7 +278,7 @@ div.csl-indent {
 <li class="chapter" data-level="5.7.6" data-path="hydrology.html"><a href="hydrology.html#finite-approximation-to-flows-in-the-macropore-domain"><i class="fa fa-check"></i><b>5.7.6</b> Finite approximation to flows in the macropore domain</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Woody plant transpiration, photosynthesis and water status</a>
+<li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Plant cohort transpiration, photosynthesis and water status</a>
 <ul>
 <li class="chapter" data-level="6.1" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-transpiration-and-photosynthesis"><i class="fa fa-check"></i><b>6.1</b> Plant transpiration and photosynthesis</a>
 <ul>
@@ -972,9 +972,9 @@ g_{bc} = g_{bound}/1.6
 </div>
 <div id="scalingtranspirationphotosynthesis" class="section level2 hasAnchor" number="12.3">
 <h2><span class="header-section-number">12.3</span> Scaling of transpiration, soil water uptake and photosynthesis rates<a href="transpirationsperrysureau.html#scalingtranspirationphotosynthesis" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The amount of transpiration of a woody plant cohort in a given time step <span class="math inline">\(t\)</span> (<span class="math inline">\(Tr_{woody, t}\)</span>, in <span class="math inline">\(l \cdot m^{-2}\)</span> of ground area, i.e. mm) is:
+<p>The amount of transpiration of a plant cohort in a given time step <span class="math inline">\(t\)</span> (<span class="math inline">\(Tr_{cohorts, t}\)</span>, in <span class="math inline">\(l \cdot m^{-2}\)</span> of ground area, i.e. mm) is:
 <span class="math display" id="eq:cohorttranspiration">\[\begin{equation}
-Tr_{woody,t} = E_{plant} \cdot LAI^{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
+Tr_{cohorts,t} = E_{plant} \cdot LAI^{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
 \tag{12.1}
 \end{equation}\]</span>
 where <span class="math inline">\(E_{plant}\)</span> is the instantaneous cohort-level transpiration rate (<span class="math inline">\(mmol\,H_2O \cdot s^{-1} \cdot m^{-2}\)</span> of leaf area), <span class="math inline">\(0.01802\)</span> is the molar weight (in <span class="math inline">\(kg = l\)</span>) of water and <span class="math inline">\(\Delta t_{step} = 86400/n_t\)</span> the size of the time step in seconds, being <span class="math inline">\(n_t\)</span> the number of time steps. <span class="math inline">\(f_{dry}\)</span> is the fraction of the canopy that is assumed dry, which is necessary to avoid overestimating total evapo-transpiration. In non-rainy days <span class="math inline">\(f_{dry} = 1\)</span> whereas in rainy days it is derived from comparing the daily evaporation due to rainfall interception (<span class="math inline">\(In\)</span>; in <span class="math inline">\(mm\)</span>) with Penman’s potential evapo-transpiration (<span class="math inline">\(PET\)</span>; in <span class="math inline">\(mm\)</span>):</p>
@@ -983,12 +983,12 @@ f_{dry} = 1.0 - \frac{In}{PET}
 \end{equation}\]</span></p>
 <p>Instantaneous water uptake rates from a given soil layer <span class="math inline">\(s\)</span> (<span class="math inline">\(U_{s}\)</span>; in <span class="math inline">\(mmol\,H_2O \cdot s^{-1} \cdot m^{-2}\)</span> of leaf area) are scaled to the time step as done for transpiration:
 <span class="math display" id="eq:cohortextraction">\[\begin{equation}
-Ex_{woody,s,t} = U_{s} \cdot LAI^{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
+Ex_{cohorts,s,t} = U_{s} \cdot LAI^{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
 \tag{12.2}
 \end{equation}\]</span></p>
 <p>Under the Sperry model, the sum of soil extraction equals transpiration, i.e.:
 <span class="math display">\[\begin{equation}
-Tr_{woody,t} = Ex_{woody,t} = \sum_s {Ex_{woody,s,t}}
+Tr_{cohorts,t} = Ex_{cohorts,t} = \sum_s {Ex_{cohorts,s,t}}
 \end{equation}\]</span>
 In contrast, under the SurEau model, soil extraction may not be equal to transpiration, leading to a change in plant water content (see <a href="advancedwaterbalance.html#eq:plantwaterbalance">(7.2)</a>).</p>
 <p>Instantaneous net photosynthesis per leaf area of sunlit and shade leaves in a given time step <span class="math inline">\(t\)</span> (i.e. <span class="math inline">\(A_{n,t}^{sunlit}\)</span> and <span class="math inline">\(A_{n,t}^{shade}\)</span>) are also aggregated into <span class="math inline">\(A_{n,t}\)</span>, the net photosynthesis of the plant cohort for the time step <span class="math inline">\(t\)</span>, in <span class="math inline">\(g\,C \cdot m^{-2}\)</span> of ground area:

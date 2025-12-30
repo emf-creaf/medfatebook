@@ -1,6 +1,6 @@
 # Forest hydrology {#hydrology}
 
-Forest hydrological processes are key for soil and plant water balances. This chapter details the design and implementation of most of the vertical hydrological processes included in package **medfate**. These processes determine the value of the water flows mentioned in eq. \@ref(eq:basicwaterbalanceequation). The only process that is not described here is woody plant transpiration ($Tr_w$), as it will be covered in detail in chapter \@ref(transpirationgranier).
+Forest hydrological processes are key for soil and plant water balances. This chapter details the design and implementation of most of the vertical hydrological processes included in package **medfate**. These processes determine the value of the water flows mentioned in eq. \@ref(eq:basicwaterbalanceequation). The only process that is not described here is plant cohort transpiration, as it will be covered in detail in chapter \@ref(transpirationgranier).
 
 Although each process can be simulated in specific sub-model functions, function `hydrology_verticalInputs()` allows simulating soil water input processes altogether, including canopy water interception, snow accumulation/melt, soil infiltration and percolation.
 
@@ -244,11 +244,11 @@ legend("topleft", lty=1:3, legend=c("Gsoil = 1",
 
 ## Transpiration of the herbaceous layer {#herbaceoustranspiration}
 
-Transpiration of herbaceous layer is modelled analogously to the transpiration of woody plants. First, potential evapotranspiration from the herbaceous layer ($PET_{herb}$; in $mm \cdot day^{-1}$) is defined as the product between $PET$ and $L^{SWR}_{herb}$, the proportion of SWR reaching the herbaceous layer:
+Transpiration of herbaceous layer is modelled analogously to the transpiration of plant cohorts. First, potential evapotranspiration from the herbaceous layer ($PET_{herb}$; in $mm \cdot day^{-1}$) is defined as the product between $PET$ and $L^{SWR}_{herb}$, the proportion of SWR reaching the herbaceous layer:
 \begin{equation}
 PET_{herb} =  PET \cdot L^{SWR}_{herb}
 \end{equation}
-Thus, the more dense the woody plant canopy, the lower herbaceous transpiration will be. Maximum herbaceous transpiration $Tr_{herb, \max}$ depends on both $PET_{herb}$ and the amount of transpiring surface, i.e. $LAI_{herb}$. To estimate $Tr_{\max}$ the model uses the empirical equation of @Granier1999, as in section \@ref(maximumtranspiration):
+Thus, the more dense the canopy of plant cohorts, the lower herbaceous layer transpiration will be. Maximum herbaceous transpiration $Tr_{herb, \max}$ depends on both $PET_{herb}$ and the amount of transpiring surface, i.e. $LAI_{herb}$. To estimate $Tr_{\max}$ the model uses the empirical equation of @Granier1999, as in section \@ref(maximumtranspiration):
 \begin{equation}
 \frac{Tr_{herb,\max}}{PET}= -0.006\cdot (LAI_{herb})^2+0.134\cdot LAI_{herb}
 \end{equation}
@@ -435,13 +435,13 @@ knitr::include_graphics("figures/soil_flow_design.png")
 
 Function `hydrology_soilWaterBalance()` performs infiltration and vertical water movement flows, given a soil, net rainfall, snowmelt and source/sink vector for each layer. Source/sink terms are defined as follows for the first layer ($i=1$):
 \begin{equation}
-S_1 = - Es - Tr_{herb,1} - Ex_{woody,1}
+S_1 = - Es - Tr_{herb,1} - Ex_{cohorts,1}
 \end{equation}
 and for $1 < i \leq N$:
 \begin{equation}
-S_i = - Tr_{herb,i} - Ex_{woody,i}
+S_i = - Tr_{herb,i} - Ex_{cohorts,i}
 \end{equation}
-where $Es$ is bare soil evaporation, $Tr_{herb, i}$ is herbaceous uptake from layer $i$ and $Ex_{woody}$ is woody plant uptake/redistribution from/to layer $i$. In the single-domain and dual-permeability models, all right-hand terms are converted from $mm/day$ to instantaneous rates ($m/s$) for proper units in $S$. By default, **24 time steps** of 1 hour are used for vertical water simulation of each day, but the time step is modified if required to close the water balance of the matrix or macropore domains. Function `hydrology_soilWaterBalance()`  updates soil moisture and returns daily fluxes corresponding to infiltration, runoff and deep drainage.
+where $Es$ is bare soil evaporation, $Tr_{herb, i}$ is herbaceous uptake from layer $i$ and $Ex_{cohorts}$ is plant cohort uptake/redistribution from/to layer $i$. In the single-domain and dual-permeability models, all right-hand terms are converted from $mm/day$ to instantaneous rates ($m/s$) for proper units in $S$. By default, **24 time steps** of 1 hour are used for vertical water simulation of each day, but the time step is modified if required to close the water balance of the matrix or macropore domains. Function `hydrology_soilWaterBalance()`  updates soil moisture and returns daily fluxes corresponding to infiltration, runoff and deep drainage.
 
 The following sections detail the formulation and numerical solving of soil flows, both under the single-domain and the dual-permeability models.
 
@@ -576,7 +576,7 @@ knitr::include_graphics("figures/soilmatrix_flows.png")
 
 For reasons of numerical stability, Richards equation is solved using an implicit time discretization win which the spatial derivatives $\delta K / \delta z$, $\delta \Psi / \delta z$ and  $\delta^2 \Psi / \delta ^2 z$ are written numerically using a central difference approximation at time $n+1$, and the time derivative uses a backward difference approximation at $n+1$. 
 
-Soil layer $i$ has a thickness $\Delta z_i$. Water content $\theta_i$, matric potential $\Psi_i$ and hydraulic conductivity $K_i$ are defined at the center of the layer at depth $z_i$ and are uniform over the layer. Here $K_i$ values have been corrected by $\lambda_i$, to account for the fact that the amount of stones in the soil reduce the conductivity, which is expressed per soil area unit (so, in fact, all terms in the mass balance equations are multiplied by $\lambda_i$, except the source/sinks). Water inputs/outputs from other processes (i.e. infiltration, snow melt, bare soil evaporation, herbaceous transpiration and woody plant uptake/redistribution) are represented as a source/sink term $S_i$ for each node $i$. If simulations are done in the dual-permeability model, $S_i$ can include positive or negative terms due to saturation excess flow into the macropore domain or capillary imbibition from the macropore domain. 
+Soil layer $i$ has a thickness $\Delta z_i$. Water content $\theta_i$, matric potential $\Psi_i$ and hydraulic conductivity $K_i$ are defined at the center of the layer at depth $z_i$ and are uniform over the layer. Here $K_i$ values have been corrected by $\lambda_i$, to account for the fact that the amount of stones in the soil reduce the conductivity, which is expressed per soil area unit (so, in fact, all terms in the mass balance equations are multiplied by $\lambda_i$, except the source/sinks). Water inputs/outputs from other processes (i.e. infiltration, snow melt, bare soil evaporation, herbaceous layer transpiration and plant uptake/redistribution) are represented as a source/sink term $S_i$ for each node $i$. If simulations are done in the dual-permeability model, $S_i$ can include positive or negative terms due to saturation excess flow into the macropore domain or capillary imbibition from the macropore domain. 
 
 For a given intermediate layer $1 < i < N$, the outward flux $Q_i$ between layers $i$ and $i+1$ is defined using:
 

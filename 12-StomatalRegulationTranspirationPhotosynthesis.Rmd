@@ -1059,9 +1059,9 @@ Instantaneous gross and net photosynthesis rates for sunlit and shade leaves (i.
 
 ## Scaling of transpiration, soil water uptake and photosynthesis rates {#scalingtranspirationphotosynthesis}
 
-The amount of transpiration of a woody plant cohort in a given time step $t$ ($Tr_{woody, t}$, in $l \cdot m^{-2}$ of ground area, i.e. mm) is:
+The amount of transpiration of a plant cohort in a given time step $t$ ($Tr_{cohorts, t}$, in $l \cdot m^{-2}$ of ground area, i.e. mm) is:
 \begin{equation}
-Tr_{woody,t} = E_{plant} \cdot LAI^{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step} 
+Tr_{cohorts,t} = E_{plant} \cdot LAI^{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step} 
 (\#eq:cohorttranspiration)
 \end{equation}
 where $E_{plant}$ is the instantaneous cohort-level transpiration rate ($mmol\,H_2O \cdot s^{-1} \cdot m^{-2}$ of leaf area), $0.01802$ is the molar weight (in $kg = l$) of water and $\Delta t_{step} = 86400/n_t$ the size of the time step in seconds, being $n_t$ the number of time steps. $f_{dry}$ is the fraction of the canopy that is assumed dry, which is necessary to avoid overestimating total evapo-transpiration. In non-rainy days $f_{dry} = 1$ whereas in rainy days it is derived from comparing the daily evaporation due to rainfall interception ($In$; in $mm$) with Penman's potential evapo-transpiration ($PET$; in $mm$):
@@ -1072,13 +1072,13 @@ f_{dry} = 1.0 - \frac{In}{PET}
 
 Instantaneous water uptake rates from a given soil layer $s$ ($U_{s}$; in $mmol\,H_2O \cdot s^{-1} \cdot m^{-2}$ of leaf area) are scaled to the time step as done for transpiration:
 \begin{equation}
-Ex_{woody,s,t} = U_{s} \cdot LAI^{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
+Ex_{cohorts,s,t} = U_{s} \cdot LAI^{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
 (\#eq:cohortextraction)
 \end{equation}
 
 Under the Sperry model, the sum of soil extraction equals transpiration, i.e.:
 \begin{equation}
-Tr_{woody,t} = Ex_{woody,t} = \sum_s {Ex_{woody,s,t}}
+Tr_{cohorts,t} = Ex_{cohorts,t} = \sum_s {Ex_{cohorts,s,t}}
 \end{equation}
 In contrast, under the SurEau model, soil extraction may not be equal to transpiration, leading to a change in plant water content (see \@ref(eq:plantwaterbalance)).
 
