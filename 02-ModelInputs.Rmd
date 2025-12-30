@@ -421,6 +421,35 @@ The package provides functions `spwbInput()` and `growthInput()` that prepare th
 
 ### Dead plant elements  {#deadplantelements}
 
+Forest objects can be used to describe dead vegetation elements of forest stands. Dead elements can be either *standing* (e.g. tree snags), *downed litter* (e.g. branches, logs or leaf litter) or *belowground litter* (i.e. fine roots or coarse roots).
+
+The optional data frame `snagData` contains information for dead plant cohorts, with the following columns:
+
+| R column  | Description                        | 
+|--------|------------------------------------|
+| `Species` | String with species (taxon) name |
+| `DBH` | Diameter at breast height (in cm) of the original living cohort, for tree snags only |
+| `Height` | Height of the original living cohort (tree or shrub) (in cm) |
+| `DeathAge` |  Years passed since plant death (in yrs) |
+| `SmallBranches` | Necromass of (standing) small dead branches (in g C/m2) |
+| `LargeWood` | Necromass of (standing) large dead wood (in g C/m2). |
+
+Dead plant cohorts are characterized by species, diameter (for trees), height and age since death. Note that the description of dead cohorts quantifies the abundance of branches and large wood (i.e. stems), but not leaves (or twigs), which are assumed to fall before or soon after plant death. When dead plant cohorts are included, they can be used to simulate decomposition of standing dead elements and snag fall.
+
+Downed and belowground litter can be described in an additional data frame `litterData`, containing the following columns:
+
+| R column  | Description                        | 
+|--------|------------------------------------|
+| `Species` | String with species (taxon) name. |
+| `Leaves` | Necromass of leaf litter (in g C/m2). |
+| `Twigs` | Necromass of twig litter (in g C/m2). |
+| `SmallBranches` | Necromass of (downed) small dead branches (in g C/m2). |
+| `LargeWood` | Necromass of (downed) large dead wood (in g C/m2). |
+| `CoarseRoots` | Necromass of dead coarse roots (in g C/m2). |
+| `FineRoots` | Necromass of fine root litter (in g C/m2). |
+
+Note that litter elements are characterized by species, so that the model can decompose litter elements at different speeds depending on species identity.
+
 ### Seedling and seed banks {#seedlingseedbanks}
 
 ### Update of vegetation during simulations
