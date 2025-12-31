@@ -12,7 +12,13 @@ The information provided in the current chapter should be enough to understand w
 
 ### Overview
 
-Like in the preceding models, the physical structure of the stand is represented in one (vertical) dimension (i.e. the horizontal coordinates of plants are not explicit). The model is *cohort-based*, meaning that similar plant individuals are represented using a single entity with average characteristics (e.g. tree height and diameter at breast height) and a density variable is used to scale from individual level to the cohort level. Processes are modelled either at the cohort level (water balance, photosynthesis, or plant mortality) or at the "average" individual level (carbon balance, tissue growth and senescence). Water fluxes, soil water balance and plant photosynthesis processes follow the design of the soil water balance model and will not be repeated here (see chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). The growth model tries to reproduce the physical and physiological processes that modulate leaf area changes, sapwood area changes and fine root area changes (the latter only under the advanced water balance submodel), while accounting for both source and sink limitations to tissue growth. Formation of new sapwood leads to diameter and height increases, so that physiological processes involve structural changes. Since the model does not implement all processes and drivers (such as nutrient availability) potentially affecting growth, user input parameters are used to empirically constrain growth rates and plant size, i.e. maximum relative sapwood area growth rates, maximum plant height and diameter-height ratios. The forest growth model also implements tree mortality, which reduces cohort density, arising from different processes. A baseline mortality rate is incremented either because of exhaustion of carbon reserves (i.e. plant starvation) or dehydration of plant tissues (i.e. plant desiccation). Additionally, fire behavior and effects (i.e. fire severity) can be simulated. Fires can partially or totally burn crown leaves and buds. Fire heat can also induce necrosis in the cambium, leading to full above-ground mortality.
+Like in the preceding models, the physical structure of the stand is represented in one (vertical) dimension (i.e. the horizontal coordinates of plants are not explicit). The model is *cohort-based*, meaning that similar plant individuals are represented using a single entity with average characteristics (e.g. tree height and diameter at breast height) and a density variable is used to scale from **individual level** to the **cohort level**. Processes are modeled either at the cohort level (water balance, photosynthesis, or plant mortality) or at the individual level (carbon balance, tissue growth and senescence). Energy balance, water balance and plant photosynthesis processes follow the design of the previous models and will not be repeated here (see chapters \@ref(basicwaterbalance) and \@ref(advancedwaterbalance)). 
+
+At the *individual level*, the growth model tries to reproduce the physical and physiological processes that modulate leaf area changes, sapwood area changes and fine root area changes (the latter only under the advanced water balance submodel), while accounting for both source and sink limitations to tissue growth. Formation of new sapwood leads to diameter and height increases, so that physiological processes involve **structural changes**. Since the model does not implement all processes and drivers (such as nutrient availability) potentially affecting growth, user input parameters are used to empirically constrain growth rates and plant size, i.e. maximum relative sapwood area growth rates, maximum plant height and diameter-height ratios. 
+
+At the *cohort level*, the forest growth model implements **plant mortality** for woody cohorts, which reduces cohort density, arising from different processes. A baseline mortality rate is incremented either because of exhaustion of carbon reserves (i.e. plant starvation) or dehydration of plant tissues (i.e. plant desiccation). Additionally, fire behavior and effects (i.e. fire severity) can be simulated. Fires can partially or totally burn crown leaves and buds. Fire heat can also induce necrosis in the cambium, leading to full above-ground mortality.
+
+Finally, the model also simulates the **decomposition** of organic matter produced by previous processes (root exudation, tissue senescence and plant mortality). Plant litter (i.e. fine roots, leaves, branches, etc.) is allocated into different structural carbon pools  depending on the species that produced it. Decomposition of organic matter in those structural pools leads to fluxes towards surface and soil carbon pools for further decomposition. Decomposition processes involve heterotrophic respiration, which releases CO2 back to the atmosphere. 
 
 ### Carbon compartments, transport and carbon balance
 
@@ -83,7 +89,11 @@ The growth model allows coordinating several aspects of carbon and water balance
 knitr::include_graphics("figures/hydraulics_carbon_relations.png")
 ```
 
+### Tree diameter, tree height and shrub cover updates
 
+Tree diameter increment follows the creation of sapwood area, whereas sapwood area decreases do not affect diameter, as they imply conversion to heartwood. Tree height increments are estimated from diameter increments following diameter-height ratios that are modulated by the proportion of light available to the plant cohort, as frequently done in forest gap models [@Lindner1997]. Tree crown ratios are updated using static allometric relationships, whereas shrub height and cover are estimated from new leaf area values by inverting static leaf biomass allometries. 
+
+Further details and formulation of structural update are given in chapter \@ref(structuralupdate).
 
 ### Plant mortality {#mortalitydesign}
 
@@ -118,9 +128,9 @@ The critical threshold for dessication is specified in the control variable `mor
 
 Details of the implementation of plant mortality are given in section \@ref(plantmortality).
 
-### Fire occurrence and severity {#fireseveritydesign}
+### Fire occurrence, severity and emissions {#fireseveritydesign}
 
-The occurrence of fires is represented in the growth model in a forcing variable that describes the daily probability that a wildfire strikes the stand. Whenever a fire occurs, the model first simulates fire behavior according to the conditions of the stand (see chapter \@ref(fuelandfirebehavior)) and then fire severity is evaluated. 
+The occurrence of fires is represented in the growth model in a forcing variable that describes the daily probability that a wildfire strikes the stand. Whenever a fire occurs, the model first simulates fire behavior according to the conditions of the stand (see chapter \@ref(fuelandfirebehavior)) and then fire severity and carbon emissions are evaluated. 
 
 The degree to which vegetation is impacted by fire depends on the heat fluxes incident on plant tissues and organs, which is an outcome of various fire behavior variables (such as fireline intensity and residence time) and the position of plant organs in the stand, and the physiological responses triggered thereafter. Fire effects on plants can be classified as two types: first- and second-order effects [@bar_fire_2019; @hood_fire_2018]. First-order effects comprise the immediate impacts of heat transfer on plant tissues. Nonlethal first-order heat injuries can trigger second-order effects, such as physiological limitations in carbon and water relations or increased susceptibility to insect attacks and pathogenic infections. The growth model currently deals with first-order effects only. Moreover, the model focuses on effects in above-ground tissues (leaves, buds and cambium), disregarding fire effects on below-ground structures such as seed banks, or below-ground meristems, which are also important for the resilience of ecosystems [@stephan_first-order_2010].
 
@@ -139,28 +149,28 @@ While the severity sub-model described above is based on heat transfer and accum
 
 Details of the implementation of fire severity are given in section \@ref(fireseverity).
 
-### Tree diameter, tree height and shrub cover updates
-
-Tree diameter increment follows the creation of sapwood area, whereas sapwood area decreases do not affect diameter, as they imply conversion to heartwood. Tree height increments are estimated from diameter increments following diameter-height ratios that are modulated by the proportion of light available to the plant cohort, as frequently done in forest gap models [@Lindner1997]. Tree crown ratios are updated using static allometric relationships, whereas shrub height and cover are estimated from new leaf area values by inverting static leaf biomass allometries. 
-
-Further details and formulation of structural update are given in chapter \@ref(structuralupdate).
+### Dead carbon pools and decomposition
 
 
 ## State variables
 
-Many state variables are inherited by the corresponding water balance model and depend on its level of complexity (see  \@ref(statevariablesbasic) and \@ref(statevariablesadvanced)). Several *cohort-level state variables* were treated as fixed parameters in the water balance models. For each plant cohort:
+
+### Living plants
+
+**True state variables**
+
+Many *cohort-level state variables* are inherited by the corresponding water balance model and depend on its level of complexity (see  \@ref(statevariablesbasic) and \@ref(statevariablesadvanced)). Several variables were treated as fixed parameters in the water balance models and become variable here:
 
  + Leaf area index of live leaves, $LAI^{live}$, and the actual expanded leaf area, $LAI^{\phi}$.
- + Diameter at breast height for trees, $DBH$ (cohort average).
  + Percent cover of shrubs, $Cover$.
  + Density of individuals in the plant cohort, $N$.
- + Plant height, $H$ (cohort average).
- + Crown ratio, $CR$.
  + The proportion of fine roots, $FRP_{s}$, in each soil layer $s$.
- + The radial length of coarse roots $L_{radial, s}$ in each soil layer $s$.
  
-Additional *individual-level state variables* are needed in growth model simulations:
+*Individual-level state variables* are needed in growth simulations:
  
+ + Plant height, $H$ ($cm$).
+ + Diameter at breast height for trees, $DBH$ ($cm$).
+ + Crown ratio, $CR$.
  + Leaf area, $LA$ ($m^2$), and target leaf area, $LA_{target}$ ($m^2$).
  + Sapwood area, $SA$ ($cm^2$), and target sapwood area, $SA_{target}$ ($cm^2$).
  + The percentage of the crown with active buds ($PCAB$).
@@ -172,16 +182,27 @@ Additional *individual-level state variables* are needed in growth model simulat
  
 Note that $LA$ is the same state variable as $LAI^{\phi}$, but expressed at the individual level, and the same occurs between $LA_{target}$ and $LAI^{live}$. These pairs of state variables are related by cohort density ($N$).
 
+**Derived variables**
+
 Other functional variables can be derived from the true state variables and, hence, hence do not need to be treated as state variables themselves but are often used in equations instead of the true state variables:
 
- + Leaf biomass ($B_{leaf}$;in $g\,dry$) from $LA$.
- + Sapwood biomass ($B_{sapwood}$; in $g\,dry$) from $SA$, $H$ and $FRP_{s}$ and $L_{radial,s}$.
+ + Leaf biomass ($B_{leaf}$;in $g\,dry$), from $LA$.
+ + Twig biomass ($B_{twig}$;in $g\,dry$), from $LA$.
+ + The radial length of coarse roots in each soil layer $s$ ($L_{radial, s}$; in $mm$), from $FRP_{s}$.
+ + Sapwood biomass ($B_{sapwood}$; in $g\,dry$), from $SA$, $H$ and $FRP_{s}$ and $L_{radial,s}$.
+ + Heartwood biomass for trees ($B_{heartwood}$; in $g\,dry$), from $SA$, $DBH$, $H$ and $FRP_{s}$ and $L_{radial,s}$.
  + Leaf storage volume ($V_{storage, leaf}$; in $L$) from $B_{leaf}$.
  + Sapwood storage volume ($V_{storage, sapwood}$; in $L$) from $SA$, $H$ and $FRP_{s}$ and $L_{radial,s}$.
  + Fine root area ($FRA_{s}$; in $m^2$) in each soil layer $s$, from $B_{fineroot,s}$.
 
 Some belowground variables (such as the radial length of coarse roots) are only considered dynamic when simulating growth with advance water balance.
- 
+
+
+### Dead standing plant organs and litter pools
+
+### Soil carbon pools
+
+
 ## Mass and energy balances
 
 ### Water and energy balance 
@@ -221,7 +242,7 @@ then labile carbon balance at the plant level reduces to:
 \end{equation}
 where $M = M_{leaf} + M_{sapwood} + M_{fineroot}$ is plant-level maintenance respiration,  $G = G_{leaf} + G_{sapwood} + G_{fineroot}$ is plant-level growth costs and $RE = RE_{sapwood}$ is plant-level root exudation.
 
-### Biomass balance
+### Live biomass balance
 
 In addition to changes in labile carbon pools, the model also implements changes in the size of carbon compartments (leaves, sapwood and fine roots), as a result of the interplay between growth and senescence processes. Hence, we can define the following structural equations:
 \begin{eqnarray}
@@ -237,7 +258,10 @@ The biomass balance at the **individual level** is completed if we add the labil
 \begin{equation}
 \Delta{B_{plant}} = \Delta{B_{structure}} + \Delta{S_{labile}} 
 \end{equation}
-At the **cohort level**, however, we need to take into account that some individuals will die, so that the biomass balance needs to incorporate mortality losses:
+
+**Cohort-level biomass balance**
+
+At the cohort level, we need to take into account that some individuals will die, so that the biomass balance needs to incorporate mortality losses:
 \begin{equation}
 \Delta{B_{cohort}} = \Delta{B_{plant}} \cdot N_{cohort} - B_{mortality} 
 \end{equation}
@@ -247,14 +271,23 @@ where $N_{cohort}$ is the initial cohort density (before mortality occurred) and
 \end{equation}
 where $N_{dead}$ is the density of dead individuals and $B_{plant}$ is the initial plant biomass.
 
+### Mass balance of dead elements
+
 ### Stand-level carbon balance
 
-With the aim to produce outputs to be compared with Eddy-covariance flux data, the model produces aggregates of gross photosynthesis and respiration at the stand level, all expressed using units of $g\,C\cdot m^{-2}$.
+The model estimates several carbon fluxes at the stand level, all expressed in units of $g\,C\cdot m^{-2}$:
 
-  + *Gross primary production* ($GPP$) is the sum of gross photosynthesis across plant cohorts.
-  + *Maintenance respiration* is the sum across cohorts of the carbon emitted to the atmosphere as a result of maintenance respiration, i.e. $M$.
-  + *Synthesis respiration* is the sum across cohorts of the carbon returned to the atmosphere as a result of the process of synthesizing new structures. Note that this is less than $G$, as it does not include the carbon allocated to the new structures.
-  + *Net primary production* ($NPP$) is $GPP$ minus the maintenance and synthesis respiration terms.
+  + **Gross primary production** ($GPP$) is the sum of gross photosynthesis across plant cohorts.
+  + **Maintenance respiration** ($MR$) is the sum across plant cohorts of the carbon emitted to the atmosphere as a result of respiration required for the maintenance of living tissues (leaves, fine roots and sapwood parenchyma).
+  + **Synthesis respiration** ($SR$) is the sum across plant cohorts of the carbon returned to the atmosphere as a result of the process of synthesizing new structures. Note that this is less than the total carbon used for growth, as it does not include the carbon allocated to the new structures.
+  + **Net primary production** ($NPP$) is gross primary production minus the maintenance respiration and synthesis respiration terms. Net primary production should thus be equal to the increase in carbon allocated to new structures.
+  + **Heterotrophic respiration** ($HR$) is the sum of carbon returned to the atmosphere as a result of respiration occurred during decomposition processes.
+  + **Fire combustion** ($FC$) is the sum of carbon returned to the atmosphere as a result of combustion of plant tissues.
+  
+The overall carbon balance of the forest stand is the following:
+\begin{equation}
+\Delta{C}_{stand} = GPP - MR - SR - HR - FC = NPP - HR - FC 
+\end{equation}
 
 ## Process scheduling {#growthscheduling}
 
