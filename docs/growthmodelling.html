@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2025-12-31" />
+<meta name="date" content="2026-01-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -869,6 +869,15 @@ Figure 15.4: Schematic representation of the design of fire effects on foliage, 
 </div>
 <div id="dead-carbon-pools-and-decomposition" class="section level3 hasAnchor" number="15.1.8">
 <h3><span class="header-section-number">15.1.8</span> Dead carbon pools and decomposition<a href="growthmodelling.html#dead-carbon-pools-and-decomposition" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The design of dead carbon pools and carbon decomposition processes is a modification of the CENTURY model, and its daily variant DAYCENT <span class="citation">(<a href="#ref-parton_dynamics_1988">Parton <em>et al.</em> 1988</a>, <a href="#ref-parton_observations_1993">1993</a>; <a href="#ref-parton_daycent_1998">Parton <em>et al.</em> 1998</a>)</span>, as described in Bonan et al. <span class="citation">(<a href="#ref-bonan_climate_2019">2019</a>)</span>. It is summarized in fig. <a href="growthmodelling.html#fig:decompositionpools">15.5</a> below.</p>
+<p>The decomposition model simulates a number of chemically distinct organic matter pools with varying decay rates. The CENTURY/DAYCENT models partition plant litter into metabolic material that readily decomposes and structural material that is more resistant to decomposition. Leaf litter enters the surface pools, and root litter enters the belowground pools. The model additionally represents twig, small-branch and large wood debris (on the surface) as well as coarse root debris (belowground). Only leaf litter fall and fineroot litter fall generate metabolic material, whereas the other types of litter (large wood, small branches, twigs and coarse roots) generate only structural material. Litter pools include two important differences with respect to the description of DAYCENT provided in Bonan et al. <span class="citation">(<a href="#ref-bonan_climate_2019">2019</a>)</span>. First, structural litter pools are species-specific (yellow boxes in fig. <a href="growthmodelling.html#fig:decompositionpools">15.5</a>), which allows decomposition rates to be dependent on the species identity of the plant that generated the litter, thus accounting for potential differences in lignin content. Second, the model also considers aboveground standing dead wood (i.e. snags), which originate from plant mortality (or aboveground dead structures in resprouting cohorts) and will normally decompose at slower rates than downed deadwood (magenta gray boxes in fig. <a href="growthmodelling.html#fig:decompositionpools">15.5</a>). While the growth model deals with decomposition of these pools, dead branch fall and snag fall processes, which lead to transfer of carbon from standing pools to downed litter pools, are dealt with in the forest dynamics (i.e. <code>fordyn()</code>) model.</p>
+<p>In CENTURY/DAYCENT, soil organic matter is represented by <em>active</em>, <em>slow</em> and <em>passive</em> carbon pools, that represent material with increasingly longer turnover time. These pools have a surface and belowground component, except the passive pool, which only occurs belowground (light gray boxes in fig. <a href="growthmodelling.html#fig:decompositionpools">15.5</a>). Decomposition process in a given pool transfers carbon to other pools, while releasing carbon to the atmosphere due to heterotrophic respiration.This conceptualization results in a system of first-order linear differential equations. Each pool has a specific base decomposition rate, which is modified for abiotic factors. Abiotic factors (temperature, pH and moisture) in the surface and soil carbon pools are those corresponding to the first soil layer, whereas abiotic factors for standing dead pools correspond to air temperature and relative humidity. Processes of the nitrogen cycle (i.e. immobilization, mineralization and plant uptake) are not simulated at present.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:decompositionpools"></span>
+<img src="figures/Decomposition.drawio.png" alt="Schematic representation of the design of dead carboon pools and decomposition. Boxes are carbon pools (some of them being cohort-specific or species-specific). Dashed arrows indicate processes originating surface or belowground litter. Continuous arrows indicate carbon transfer from one pool to another, and most of them include release of carbon to the atmosphere via heterotrophic respiration." width="100%" />
+<p class="caption">
+Figure 15.5: Schematic representation of the design of dead carboon pools and decomposition. Boxes are carbon pools (some of them being cohort-specific or species-specific). Dashed arrows indicate processes originating surface or belowground litter. Continuous arrows indicate carbon transfer from one pool to another, and most of them include release of carbon to the atmosphere via heterotrophic respiration.
+</p>
+</div>
 </div>
 </div>
 <div id="state-variables" class="section level2 hasAnchor" number="15.2">
@@ -1834,6 +1843,9 @@ Bär, A., Michaletz, S.T. &amp; Mayr, S. (2019). <a href="https://doi.org/10.111
 <div id="ref-Blackman2016" class="csl-entry">
 Blackman, C.J., Pfautsch, S., Choat, B., Delzon, S., Gleason, S.M. &amp; Duursma, R.A. (2016). <a href="https://doi.org/10.1111/pce.12758">Toward an index of desiccation time to tree mortality under drought</a>. <em>Plant Cell and Environment</em>, 39, 2342–2345.
 </div>
+<div id="ref-bonan_climate_2019" class="csl-entry">
+Bonan, G. (2019). <em><a href="https://doi.org/10.1017/9781107339217">Climate change and terrestrial ecosystem modeling</a></em>. Cambridge University Press, Cambridge, UK.
+</div>
 <div id="ref-Bugmann2019" class="csl-entry">
 Bugmann, H., Seidl, R., Hartig, F., Bohn, F., Brůna, J., Cailleret, M., <em>et al.</em> (2019). <a href="https://doi.org/10.1002/ecs2.2616">Tree mortality submodels drive simulated long-term forest dynamics: Assessing 15 models from the stand to global scale</a>. <em>Ecosphere</em>, 10, e02616.
 </div>
@@ -1923,6 +1935,15 @@ Mencuccini, M. &amp; Grace, J. (1995). <a href="https://doi.org/10.1093/treephys
 </div>
 <div id="ref-michaletz_biophysical_2008" class="csl-entry">
 Michaletz, S.T. &amp; Johnson, E.A. (2008). <a href="https://doi.org/10.1139/X08-024">A biophysical process model of tree mortality in surface fires</a>. <em>Canadian Journal of Forest Research</em>, 38, 2013–2029.
+</div>
+<div id="ref-parton_daycent_1998" class="csl-entry">
+Parton, W.J., Hartman, M., Ojima, D. &amp; Schimel, D. (1998). <a href="https://doi.org/10.1016/S0921-8181(98)00040-X"><span>DAYCENT</span> and its land surface submodel: Description and testing</a>. <em>Global and Planetary Change</em>, 19, 35–48.
+</div>
+<div id="ref-parton_observations_1993" class="csl-entry">
+Parton, W.J., Scurlock, J.M.O., Ojima, D.S., Gilmanov, T.G., Scholes, R.J., Schimel, D.S., <em>et al.</em> (1993). <a href="https://doi.org/10.1029/93GB02042">Observations and modeling of biomass and soil organic matter dynamics for the grassland biome worldwide</a>. <em>Global Biogeochemical Cycles</em>, 7, 785–809.
+</div>
+<div id="ref-parton_dynamics_1988" class="csl-entry">
+Parton, W.J., Stewart, J.W.B. &amp; Cole, C.V. (1988). <a href="https://doi.org/10.1007/BF02180320">Dynamics of <span>C</span>, <span>N</span>, <span>P</span> and <span>S</span> in grassland soils: A model</a>. <em>Biogeochemistry</em>, 5, 109–131.
 </div>
 <div id="ref-Plavcova2015" class="csl-entry">
 Plavcová, L. &amp; Jansen, S. (2015). <a href="https://doi.org/10.1007/978-3-319-15783-2_8">The <span>Role</span> of <span>Xylem</span> <span>Parenchyma</span> in the <span>Storage</span> and <span>Utilization</span> of <span>Nonstructural</span> <span>Carbohydrates</span></a>. In: <em>Functional and <span>Ecological</span> <span>Xylem</span> <span>Anatomy</span></em>. Springer International Publishing, Cham, pp. 209–234.
