@@ -49,7 +49,7 @@ Further design details and formulation regarding the estimation of carbon pool s
 
 The forest growth model allows simulating the variation of leaf area, sapwood area and fine root area via the following processes (see fig. \@ref(fig:allocationdiagram)):
 
- i. **Leaf growth**: Whereas in the water balance models expanded leaf area corresponded to the portion of live leaf area that was unfolded according to the phenological status (see \@ref(leafphenology)), in the growth model expanded leaf area results from explicit simulation of growth. However, leaf phenology submodel still controls the duration of phenophases corresponding budburst, leaf development and senescence. Leaf area growth occurs during *leaf unfolding* periods only, whereas *bud formation* periods are required to update the target leaf area (in accordance to an allocation strategy, see below). Storage carbon levels need to be at more than 10\% of their capacity to allow leaf growth. Moreover, leaf area target is constrained by stand structure (i.e. competition) via allometric equations. Leaf growth includes a corresponding carbon cost in **twig growth**, according to the biomass ratio between both.
+ i. **Leaf/twig growth**: Whereas in the water balance models expanded leaf area corresponded to the portion of live leaf area that was unfolded according to the phenological status (see \@ref(leafphenology)), in the growth model expanded leaf area results from explicit simulation of growth. However, leaf phenology submodel still controls the duration of phenophases corresponding budburst, leaf development and senescence. Leaf area growth occurs during *leaf unfolding* periods only, whereas *bud formation* periods are required to update the target leaf area (in accordance to an allocation strategy, see below). Storage carbon levels need to be at more than 10\% of their capacity to allow leaf growth. Moreover, leaf area target is constrained by stand structure (i.e. competition) via allometric equations. Leaf growth includes a corresponding carbon cost in **twig growth**, according to the biomass ratio between both.
  ii. **Leaf/twig senescence and leaf fall**: Leaf/twig senescence (and the corresponding increases in dead leaf area) can occur in the model due to *leaf aging* in evergreen species, due to *programmed leaf senescence* in deciduous species, or due to *leaf dessication* (as a result of xylem cavitation and/or low leaf relative water content). Leaf senescence increases the leaf area index corresponding to dead leaves. *Leaf fall* is the process that transforms dead leaf area into leaf and twig litter, initiating decomposition processes (see fig. \@ref(fig:carbonpools)). In addition, fires can induce *foliage burning*, which also leads to a decrease in leaf area (but where non-structural carbon reallocation is not possible and dead leaf area does not increase) and produces atmospheric carbon emission.
  iii. **Sapwood growth**: The model assumes that the hormonal signals controlling cambium division have been mainly synthesized in leaves. Auxins are known to be primarily generated in the plant's apical meristems, young leaves, and flower buds; from where they are transported throughout the plant via the phloem [@bajguz_biosynthetic_2023]. More specifically, we assume that the levels of secondary growth hormones (auxines) depend linearly on the *current amount of foliage relative to the expected maximum foliage of the same plant without competition*. This entails that: (a) leaf phenological status of deciduous species will affect sapwood growth rates; (b) for a given plant size (i.e. cambium surface) the amount of foliage will be higher or lower depending on the shading created by taller plants and, hence, understory plants or densely-crowded plants will have lower sapwood growth rates than plants that are isolated or overtop the other plants; (c) defoliation events (e.g. from drought impacts) will have an effect on sapwood growth rates, as observed empirically [@javoy_impact_2025]. Sapwood formation corresponds mostly to secondary growth (but primary growth occurs at the same time due to diameter-height relationships), and is only allowed if storage carbon levels are above a given species-specific threshold (e.g. 50\%). These levels are much higher than required for leaf or fine root growth. Thus, when carbon levels are low, sapwood growth rates fall to zero, whereas replacement of leaves and fine roots continues to sustain metabolism. This design was chosen to stop sapwood growth much before emptying storage carbon reserves, so that maintenance respiration can be sustained longer whenever photosynthesis is low, as in shadow-tolerant species. 
  iv. **Sapwood senescence**:  Losses in sapwood area (i.e. conversion to heartwood) occur via tissue *aging* (i.e. assuming a daily rate of conversion). Since xylem tracheids and vessels are already dead cells, sapwood senescence refers to the death of parenchymatic tissue. Similarly to 3-PG [@Landsberg1997] we assume that the relative turnover rate of sapwood is smallest for young plants, and it increases up to a maximum value. However, recent reviews indicate that heartwood formation should be viewed as an active developmental program during which a conductive but vulnerable sapwood is transformed in a non-conductive but durable heartwood [@Spicer2005]. Sapwood senescence also occurs whenever the sapwood area exceeds the amount required to sustain the current leaf area target. Note that stem *cavitation* reduces the area of sapwood that is effectively functional for water transport, but does not lead to sapwood senescence *per se*, unless mortality occurs. Sapwood senescence produces heartwood biomass in trees, which does not decompose as long as the trees are alive. In contrast, sapwood senescence leads to increase the mass of standing dead branches in shrubs (see fig. \@ref(fig:carbonpools)).
@@ -158,52 +158,91 @@ knitr::include_graphics("figures/Decomposition.drawio.png")
 ## State variables
 
 
-### Living plants
+### State variables related to live plant cohorts
 
 **True state variables**
 
 Many *cohort-level state variables* are inherited by the corresponding water balance model and depend on its level of complexity (see  \@ref(statevariablesbasic) and \@ref(statevariablesadvanced)). Several variables were treated as fixed parameters in the water balance models and become variable here:
 
- + Leaf area index of live leaves, $LAI^{live}$, and the actual expanded leaf area, $LAI^{\phi}$.
- + Percent cover of shrubs, $Cover$.
- + Density of individuals in the plant cohort, $N$.
- + The proportion of fine roots, $FRP_{s}$, in each soil layer $s$.
- 
+ + Leaf area index of live leaves, $LAI^{live}$  ($m^2·m^{-2}$).
+ + Actual expanded leaf area, $LAI^{\phi}$ ($m^2·m^{-2}$).
+ + Dead leaf area, $LAI^{dead}$ ($m^2·m^{-2}$).
+ + Percent cover of shrubs, $Cover$ (%).
+ + Density of living individuals in the plant cohort, $N$ ($ind·ha^{-1}$).
+ + Density of dead individuals in the plant cohort, $N^{dead}$ ($ind·ha^{-1}$).
+ + The proportion of fine roots, $FRP_{s}$, in each soil layer $s$  ([0-1]).
+ + Cumulative mass of small dead branches corresponding to cohort dead individuals $D_{smallbranches}$ ($g\,C·m^{-2}$).
+ + Cumulative mass of large dead wood corresponding to cohort dead individuals $D_{largewood}$ ($g\,C·m^{-2}$).
+
+Variables $D_{smallbranches}$ and $D_{largewood}$ are not to be confounded with state variables corresponding to decomposing snags (see below). In growth simulations $D_{smallbranches}$ and $D_{largewood}$ are used to track mass of dead wood only. In forest dynamic simulations, the values of $D_{smallbranches}$ and $D_{largewood}$ at the end of the simulated year are used by function `fordyn()` to create new snag cohorts to start the decomposition process the year after.
+
 *Individual-level state variables* are needed in growth simulations:
  
  + Plant height, $H$ ($cm$).
  + Diameter at breast height for trees, $DBH$ ($cm$).
- + Crown ratio, $CR$.
- + Leaf area, $LA$ ($m^2$), and target leaf area, $LA_{target}$ ($m^2$).
- + Sapwood area, $SA$ ($cm^2$), and target sapwood area, $SA_{target}$ ($cm^2$).
- + The percentage of the crown with active buds ($PCAB$).
+ + Crown ratio, $CR$ ([0-1]).
+ + Leaf area, $LA$ ($m^2$).
+ + Target leaf area, $LA_{target}$ ($m^2$).
+ + Dead leaf area $LA^{dead}$ ($m^2$).
+ + Sapwood area, $SA$ ($cm^2$).
+ + Target sapwood area, $SA_{target}$ ($cm^2$).
+ + The percentage of the crown with active buds, $PCAB$ (%).
  + Fine root biomass, $B_{fineroot, s}$ ($g\,dry$), and the target fine root biomass, $B_{fineroot, target, s}$ ($g\,dry$), in each soil layer $s$.
  + Sugar concentration in leaves, $SS_{leaf}$ ($mol\,gluc \cdot L^{-1}$).
  + Starch concentration in leaves, $ST_{leaf}$ ($mol\,gluc \cdot L^{-1}$).
  + Sugar concentration in sapwood (stem, branches and coarse roots), $SS_{sapwood}$ ($mol\,gluc \cdot L^{-1}$).
  + Starch concentration in sapwood (stem, branches and coarse roots), $ST_{sapwood}$ ($mol\,gluc \cdot L^{-1}$).
  
-Note that $LA$ is the same state variable as $LAI^{\phi}$, but expressed at the individual level, and the same occurs between $LA_{target}$ and $LAI^{live}$. These pairs of state variables are related by cohort density ($N$).
+Note that $LA$ is the same state variable as $LAI^{\phi}$, but expressed at the individual level. The same happens between $LA_{target}$ and $LAI^{live}$; and between $LA^{dead}$ and $LAI^{dead}$. These pairs of state variables are related by cohort density ($N$).
 
 **Derived variables**
 
 Other functional variables can be derived from the true state variables and, hence, hence do not need to be treated as state variables themselves but are often used in equations instead of the true state variables:
 
- + Leaf biomass ($B_{leaf}$;in $g\,dry$), from $LA$.
- + Twig biomass ($B_{twig}$;in $g\,dry$), from $LA$.
- + The radial length of coarse roots in each soil layer $s$ ($L_{radial, s}$; in $mm$), from $FRP_{s}$.
- + Sapwood biomass ($B_{sapwood}$; in $g\,dry$), from $SA$, $H$ and $FRP_{s}$ and $L_{radial,s}$.
- + Heartwood biomass for trees ($B_{heartwood}$; in $g\,dry$), from $SA$, $DBH$, $H$ and $FRP_{s}$ and $L_{radial,s}$.
+ + Leaf biomass, $B_{leaf}$ ($g\,dry$), from $LA$.
+ + Twig biomass, $B_{twig}$ ($g\,dry$), from $LA$.
+ + Dead leaf mass, $D_{leaf}$ ($g\,dry$), from $LA^{dead}$.
+ + Dead twig mass, $D_{twig}$ ($g\,dry$), from $LA^{dead}$.
+ + The radial length of coarse roots in each soil layer $s$, $L_{radial, s}$ ($mm$), from $FRP_{s}$.
+ + Sapwood biomass, $B_{sapwood}$ ($g\,dry$), from $SA$, $H$ and $FRP_{s}$ and $L_{radial,s}$.
+ + Heartwood mass, for trees, $D_{heartwood}$ ($g\,dry$), from $SA$, $DBH$, $H$ and $FRP_{s}$ and $L_{radial,s}$.
  + Leaf storage volume ($V_{storage, leaf}$; in $L$) from $B_{leaf}$.
  + Sapwood storage volume ($V_{storage, sapwood}$; in $L$) from $SA$, $H$ and $FRP_{s}$ and $L_{radial,s}$.
  + Fine root area ($FRA_{s}$; in $m^2$) in each soil layer $s$, from $B_{fineroot,s}$.
 
 Some belowground variables (such as the radial length of coarse roots) are only considered dynamic when simulating growth with advance water balance.
 
+### State variables related to carbon decomposition
 
-### Dead standing plant organs and litter pools
+**Dead standing wood cohorts**
 
-### Soil carbon pools
+Cohorts of dead standing wood (i.e. snag cohorts) are identified by combinations of species, DBH of the original tree, height and dead age (i.e. the years passed since mortality occurred). Those properties are modified by the model of forest dynamics, whereas the growth model deals with the daily decomposition process. In the growth model, the following state variables are tracked for cohorts of dead standing wood:
+
+ + Mass of small dead branches, with diameters < 7.5 cm, $SN_{smallbranches}$ ($g\,C ·m^{-2}$).
+ + Mass of large dead wood, with diameters > 7.5 cm, $SN_{deadwood}$ ($g\,C ·m^{-2}$).
+
+**Structural litter pools**
+
+Structural litter pools are **species-specific**. For each species, the following pools are tracked:
+
+ + Leaf structural litter, $LI_{leaves}$ ($g\,C ·m^{-2}$).
+ + Twig structural litter, $LI_{twigs}$ ($g\,C ·m^{-2}$).
+ + Small branches structural litter, $LI_{smallbranches}$ ($g\,C ·m^{-2}$).
+ + Large wood structural litter, $LI_{largewood}$ ($g\,C ·m^{-2}$).
+ + Coarse roots structural litter, $LI_{coarseroots}$ ($g\,C ·m^{-2}$).
+ + Fine roots structural litter, $LI_{fineroots}$ ($g\,C ·m^{-2}$).
+
+**Soil carbon pools**
+
+The decomposition model keeps track of the carbon amount in different organic matter pools:
+
+ + Surface metabolic litter, $LI_{surface,metabolic}$ ($g\,C ·m^{-2}$).
+ + Surface active decomposition pool, $SOC_{surface, active}$ ($g\,C ·m^{-2}$).
+ + Surface slow decomposition pool, $SOC_{surface, slow}$ ($g\,C ·m^{-2}$).
+ + Soil metabolic litter, $LI_{soil,metabolic}$ ($g\,C ·m^{-2}$).
+ + Soil active decomposition pool, $SOC_{surface, active}$ ($g\,C ·m^{-2}$).
+ + Soil slow decomposition pool, $SOC_{surface, slow}$ ($g\,C ·m^{-2}$).
+ + Soil passive decomposition pool, $SOC_{surface, passive}$ ($g\,C ·m^{-2}$).
 
 
 ## Mass and energy balances
@@ -290,6 +329,7 @@ The model estimates several carbon fluxes at the stand level, all expressed in u
 The overall carbon balance of the forest stand is the following:
 \begin{equation}
 \Delta{C}_{stand} = GPP - MR - SR - HR - FC = NPP - HR - FC 
+(\#eq:standcarbonbalanceequation)
 \end{equation}
 
 ## Process scheduling {#growthscheduling}
@@ -475,7 +515,7 @@ Functions `growth()` returns a list of a class with the same name. The first fou
 |---------|------------------------------------------------------------|
 | `WaterBalance`| Climatic input and water balance flows (i.e. net precipitation, infiltration, runoff, transpiration...). All of them in $mm = L \cdot m^{-2}$. |
 | `EnergyBalance` | Energy balance components (instantaneous values) for the soil and the canopy |
-| `CarbonBalance` | Stand-level carbon balance components (gross primary production, maintenance respiration, synthesis respiration and net primary production). All of them in $g\,C \cdot m^{-2}$. |
+| `CarbonBalance` | Stand-level carbon balance components (see \@ref(eq:standcarbonbalanceequation)), all of them in $g\,C \cdot m^{-2}$. |
 | `BiomassBalance` | Stand-level biomass balance components. All of them in $g\,dry \cdot m^{-2}$. |
 | `Temperature` | Minimum and maximum temperature values for topsoil, canopy and atmosphere (if `transpirationMode = "Sperry"`) |
 | `Soil`| Soil variables for each soil layer: Moisture relative to field capacity ($W_s$), water potential ($\Psi_s$) and volumetric water content ($V_s$). |

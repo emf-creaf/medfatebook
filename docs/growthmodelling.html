@@ -449,9 +449,8 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="15.2" data-path="growthmodelling.html"><a href="growthmodelling.html#state-variables"><i class="fa fa-check"></i><b>15.2</b> State variables</a>
 <ul>
-<li class="chapter" data-level="15.2.1" data-path="growthmodelling.html"><a href="growthmodelling.html#living-plants"><i class="fa fa-check"></i><b>15.2.1</b> Living plants</a></li>
-<li class="chapter" data-level="15.2.2" data-path="growthmodelling.html"><a href="growthmodelling.html#dead-standing-plant-organs-and-litter-pools"><i class="fa fa-check"></i><b>15.2.2</b> Dead standing plant organs and litter pools</a></li>
-<li class="chapter" data-level="15.2.3" data-path="growthmodelling.html"><a href="growthmodelling.html#soil-carbon-pools"><i class="fa fa-check"></i><b>15.2.3</b> Soil carbon pools</a></li>
+<li class="chapter" data-level="15.2.1" data-path="growthmodelling.html"><a href="growthmodelling.html#state-variables-related-to-live-plant-cohorts"><i class="fa fa-check"></i><b>15.2.1</b> State variables related to live plant cohorts</a></li>
+<li class="chapter" data-level="15.2.2" data-path="growthmodelling.html"><a href="growthmodelling.html#state-variables-related-to-carbon-decomposition"><i class="fa fa-check"></i><b>15.2.2</b> State variables related to carbon decomposition</a></li>
 </ul></li>
 <li class="chapter" data-level="15.3" data-path="growthmodelling.html"><a href="growthmodelling.html#mass-and-energy-balances"><i class="fa fa-check"></i><b>15.3</b> Mass and energy balances</a>
 <ul>
@@ -785,7 +784,7 @@ Figure 15.1: Plant live and dead plant carbon pools and processes determining ca
 <h3><span class="header-section-number">15.1.3</span> Tissue growth, senescence and allocation<a href="growthmodelling.html#tissue-growth-senescence-and-allocation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The forest growth model allows simulating the variation of leaf area, sapwood area and fine root area via the following processes (see fig. <a href="growthmodelling.html#fig:allocationdiagram">15.2</a>):</p>
 <ol style="list-style-type: lower-roman">
-<li><strong>Leaf growth</strong>: Whereas in the water balance models expanded leaf area corresponded to the portion of live leaf area that was unfolded according to the phenological status (see <a href="leafphenologylight.html#leafphenology">4.1</a>), in the growth model expanded leaf area results from explicit simulation of growth. However, leaf phenology submodel still controls the duration of phenophases corresponding budburst, leaf development and senescence. Leaf area growth occurs during <em>leaf unfolding</em> periods only, whereas <em>bud formation</em> periods are required to update the target leaf area (in accordance to an allocation strategy, see below). Storage carbon levels need to be at more than 10% of their capacity to allow leaf growth. Moreover, leaf area target is constrained by stand structure (i.e. competition) via allometric equations. Leaf growth includes a corresponding carbon cost in <strong>twig growth</strong>, according to the biomass ratio between both.</li>
+<li><strong>Leaf/twig growth</strong>: Whereas in the water balance models expanded leaf area corresponded to the portion of live leaf area that was unfolded according to the phenological status (see <a href="leafphenologylight.html#leafphenology">4.1</a>), in the growth model expanded leaf area results from explicit simulation of growth. However, leaf phenology submodel still controls the duration of phenophases corresponding budburst, leaf development and senescence. Leaf area growth occurs during <em>leaf unfolding</em> periods only, whereas <em>bud formation</em> periods are required to update the target leaf area (in accordance to an allocation strategy, see below). Storage carbon levels need to be at more than 10% of their capacity to allow leaf growth. Moreover, leaf area target is constrained by stand structure (i.e. competition) via allometric equations. Leaf growth includes a corresponding carbon cost in <strong>twig growth</strong>, according to the biomass ratio between both.</li>
 <li><strong>Leaf/twig senescence and leaf fall</strong>: Leaf/twig senescence (and the corresponding increases in dead leaf area) can occur in the model due to <em>leaf aging</em> in evergreen species, due to <em>programmed leaf senescence</em> in deciduous species, or due to <em>leaf dessication</em> (as a result of xylem cavitation and/or low leaf relative water content). Leaf senescence increases the leaf area index corresponding to dead leaves. <em>Leaf fall</em> is the process that transforms dead leaf area into leaf and twig litter, initiating decomposition processes (see fig. <a href="growthmodelling.html#fig:carbonpools">15.1</a>). In addition, fires can induce <em>foliage burning</em>, which also leads to a decrease in leaf area (but where non-structural carbon reallocation is not possible and dead leaf area does not increase) and produces atmospheric carbon emission.</li>
 <li><strong>Sapwood growth</strong>: The model assumes that the hormonal signals controlling cambium division have been mainly synthesized in leaves. Auxins are known to be primarily generated in the plant’s apical meristems, young leaves, and flower buds; from where they are transported throughout the plant via the phloem <span class="citation">(<a href="#ref-bajguz_biosynthetic_2023">Bajguz &amp; Piotrowska-Niczyporuk 2023</a>)</span>. More specifically, we assume that the levels of secondary growth hormones (auxines) depend linearly on the <em>current amount of foliage relative to the expected maximum foliage of the same plant without competition</em>. This entails that: (a) leaf phenological status of deciduous species will affect sapwood growth rates; (b) for a given plant size (i.e. cambium surface) the amount of foliage will be higher or lower depending on the shading created by taller plants and, hence, understory plants or densely-crowded plants will have lower sapwood growth rates than plants that are isolated or overtop the other plants; (c) defoliation events (e.g. from drought impacts) will have an effect on sapwood growth rates, as observed empirically <span class="citation">(<a href="#ref-javoy_impact_2025">Javoy <em>et al.</em> 2025</a>)</span>. Sapwood formation corresponds mostly to secondary growth (but primary growth occurs at the same time due to diameter-height relationships), and is only allowed if storage carbon levels are above a given species-specific threshold (e.g. 50%). These levels are much higher than required for leaf or fine root growth. Thus, when carbon levels are low, sapwood growth rates fall to zero, whereas replacement of leaves and fine roots continues to sustain metabolism. This design was chosen to stop sapwood growth much before emptying storage carbon reserves, so that maintenance respiration can be sustained longer whenever photosynthesis is low, as in shadow-tolerant species.</li>
 <li><strong>Sapwood senescence</strong>: Losses in sapwood area (i.e. conversion to heartwood) occur via tissue <em>aging</em> (i.e. assuming a daily rate of conversion). Since xylem tracheids and vessels are already dead cells, sapwood senescence refers to the death of parenchymatic tissue. Similarly to 3-PG <span class="citation">(<a href="#ref-Landsberg1997">Landsberg &amp; Waring 1997</a>)</span> we assume that the relative turnover rate of sapwood is smallest for young plants, and it increases up to a maximum value. However, recent reviews indicate that heartwood formation should be viewed as an active developmental program during which a conductive but vulnerable sapwood is transformed in a non-conductive but durable heartwood <span class="citation">(<a href="#ref-Spicer2005">Spicer 2005</a>)</span>. Sapwood senescence also occurs whenever the sapwood area exceeds the amount required to sustain the current leaf area target. Note that stem <em>cavitation</em> reduces the area of sapwood that is effectively functional for water transport, but does not lead to sapwood senescence <em>per se</em>, unless mortality occurs. Sapwood senescence produces heartwood biomass in trees, which does not decompose as long as the trees are alive. In contrast, sapwood senescence leads to increase the mass of standing dead branches in shrubs (see fig. <a href="growthmodelling.html#fig:carbonpools">15.1</a>).</li>
@@ -868,50 +867,85 @@ Figure 15.4: Design of dead carbon pools and decomposition processes. Boxes are 
 </div>
 <div id="state-variables" class="section level2 hasAnchor" number="15.2">
 <h2><span class="header-section-number">15.2</span> State variables<a href="growthmodelling.html#state-variables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="living-plants" class="section level3 hasAnchor" number="15.2.1">
-<h3><span class="header-section-number">15.2.1</span> Living plants<a href="growthmodelling.html#living-plants" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="state-variables-related-to-live-plant-cohorts" class="section level3 hasAnchor" number="15.2.1">
+<h3><span class="header-section-number">15.2.1</span> State variables related to live plant cohorts<a href="growthmodelling.html#state-variables-related-to-live-plant-cohorts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p><strong>True state variables</strong></p>
 <p>Many <em>cohort-level state variables</em> are inherited by the corresponding water balance model and depend on its level of complexity (see <a href="basicwaterbalance.html#statevariablesbasic">3.2</a> and <a href="advancedwaterbalance.html#statevariablesadvanced">7.3</a>). Several variables were treated as fixed parameters in the water balance models and become variable here:</p>
 <ul>
-<li>Leaf area index of live leaves, <span class="math inline">\(LAI^{live}\)</span>, and the actual expanded leaf area, <span class="math inline">\(LAI^{\phi}\)</span>.</li>
-<li>Percent cover of shrubs, <span class="math inline">\(Cover\)</span>.</li>
-<li>Density of individuals in the plant cohort, <span class="math inline">\(N\)</span>.</li>
-<li>The proportion of fine roots, <span class="math inline">\(FRP_{s}\)</span>, in each soil layer <span class="math inline">\(s\)</span>.</li>
+<li>Leaf area index of live leaves, <span class="math inline">\(LAI^{live}\)</span> (<span class="math inline">\(m^2·m^{-2}\)</span>).</li>
+<li>Actual expanded leaf area, <span class="math inline">\(LAI^{\phi}\)</span> (<span class="math inline">\(m^2·m^{-2}\)</span>).</li>
+<li>Dead leaf area, <span class="math inline">\(LAI^{dead}\)</span> (<span class="math inline">\(m^2·m^{-2}\)</span>).</li>
+<li>Percent cover of shrubs, <span class="math inline">\(Cover\)</span> (%).</li>
+<li>Density of living individuals in the plant cohort, <span class="math inline">\(N\)</span> (<span class="math inline">\(ind·ha^{-1}\)</span>).</li>
+<li>Density of dead individuals in the plant cohort, <span class="math inline">\(N^{dead}\)</span> (<span class="math inline">\(ind·ha^{-1}\)</span>).</li>
+<li>The proportion of fine roots, <span class="math inline">\(FRP_{s}\)</span>, in each soil layer <span class="math inline">\(s\)</span> ([0-1]).</li>
+<li>Cumulative mass of small dead branches corresponding to cohort dead individuals <span class="math inline">\(D_{smallbranches}\)</span> (<span class="math inline">\(g\,C·m^{-2}\)</span>).</li>
+<li>Cumulative mass of large dead wood corresponding to cohort dead individuals <span class="math inline">\(D_{largewood}\)</span> (<span class="math inline">\(g\,C·m^{-2}\)</span>).</li>
 </ul>
+<p>Variables <span class="math inline">\(D_{smallbranches}\)</span> and <span class="math inline">\(D_{largewood}\)</span> are not to be confounded with state variables corresponding to decomposing snags (see below). In growth simulations <span class="math inline">\(D_{smallbranches}\)</span> and <span class="math inline">\(D_{largewood}\)</span> are used to track mass of dead wood only. In forest dynamic simulations, the values of <span class="math inline">\(D_{smallbranches}\)</span> and <span class="math inline">\(D_{largewood}\)</span> at the end of the simulated year are used by function <code>fordyn()</code> to create new snag cohorts to start the decomposition process the year after.</p>
 <p><em>Individual-level state variables</em> are needed in growth simulations:</p>
 <ul>
 <li>Plant height, <span class="math inline">\(H\)</span> (<span class="math inline">\(cm\)</span>).</li>
 <li>Diameter at breast height for trees, <span class="math inline">\(DBH\)</span> (<span class="math inline">\(cm\)</span>).</li>
-<li>Crown ratio, <span class="math inline">\(CR\)</span>.</li>
-<li>Leaf area, <span class="math inline">\(LA\)</span> (<span class="math inline">\(m^2\)</span>), and target leaf area, <span class="math inline">\(LA_{target}\)</span> (<span class="math inline">\(m^2\)</span>).</li>
-<li>Sapwood area, <span class="math inline">\(SA\)</span> (<span class="math inline">\(cm^2\)</span>), and target sapwood area, <span class="math inline">\(SA_{target}\)</span> (<span class="math inline">\(cm^2\)</span>).</li>
-<li>The percentage of the crown with active buds (<span class="math inline">\(PCAB\)</span>).</li>
+<li>Crown ratio, <span class="math inline">\(CR\)</span> ([0-1]).</li>
+<li>Leaf area, <span class="math inline">\(LA\)</span> (<span class="math inline">\(m^2\)</span>).</li>
+<li>Target leaf area, <span class="math inline">\(LA_{target}\)</span> (<span class="math inline">\(m^2\)</span>).</li>
+<li>Dead leaf area <span class="math inline">\(LA^{dead}\)</span> (<span class="math inline">\(m^2\)</span>).</li>
+<li>Sapwood area, <span class="math inline">\(SA\)</span> (<span class="math inline">\(cm^2\)</span>).</li>
+<li>Target sapwood area, <span class="math inline">\(SA_{target}\)</span> (<span class="math inline">\(cm^2\)</span>).</li>
+<li>The percentage of the crown with active buds, <span class="math inline">\(PCAB\)</span> (%).</li>
 <li>Fine root biomass, <span class="math inline">\(B_{fineroot, s}\)</span> (<span class="math inline">\(g\,dry\)</span>), and the target fine root biomass, <span class="math inline">\(B_{fineroot, target, s}\)</span> (<span class="math inline">\(g\,dry\)</span>), in each soil layer <span class="math inline">\(s\)</span>.</li>
 <li>Sugar concentration in leaves, <span class="math inline">\(SS_{leaf}\)</span> (<span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span>).</li>
 <li>Starch concentration in leaves, <span class="math inline">\(ST_{leaf}\)</span> (<span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span>).</li>
 <li>Sugar concentration in sapwood (stem, branches and coarse roots), <span class="math inline">\(SS_{sapwood}\)</span> (<span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span>).</li>
 <li>Starch concentration in sapwood (stem, branches and coarse roots), <span class="math inline">\(ST_{sapwood}\)</span> (<span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span>).</li>
 </ul>
-<p>Note that <span class="math inline">\(LA\)</span> is the same state variable as <span class="math inline">\(LAI^{\phi}\)</span>, but expressed at the individual level, and the same occurs between <span class="math inline">\(LA_{target}\)</span> and <span class="math inline">\(LAI^{live}\)</span>. These pairs of state variables are related by cohort density (<span class="math inline">\(N\)</span>).</p>
+<p>Note that <span class="math inline">\(LA\)</span> is the same state variable as <span class="math inline">\(LAI^{\phi}\)</span>, but expressed at the individual level. The same happens between <span class="math inline">\(LA_{target}\)</span> and <span class="math inline">\(LAI^{live}\)</span>; and between <span class="math inline">\(LA^{dead}\)</span> and <span class="math inline">\(LAI^{dead}\)</span>. These pairs of state variables are related by cohort density (<span class="math inline">\(N\)</span>).</p>
 <p><strong>Derived variables</strong></p>
 <p>Other functional variables can be derived from the true state variables and, hence, hence do not need to be treated as state variables themselves but are often used in equations instead of the true state variables:</p>
 <ul>
-<li>Leaf biomass (<span class="math inline">\(B_{leaf}\)</span>;in <span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA\)</span>.</li>
-<li>Twig biomass (<span class="math inline">\(B_{twig}\)</span>;in <span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA\)</span>.</li>
-<li>The radial length of coarse roots in each soil layer <span class="math inline">\(s\)</span> (<span class="math inline">\(L_{radial, s}\)</span>; in <span class="math inline">\(mm\)</span>), from <span class="math inline">\(FRP_{s}\)</span>.</li>
-<li>Sapwood biomass (<span class="math inline">\(B_{sapwood}\)</span>; in <span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(SA\)</span>, <span class="math inline">\(H\)</span> and <span class="math inline">\(FRP_{s}\)</span> and <span class="math inline">\(L_{radial,s}\)</span>.</li>
-<li>Heartwood biomass for trees (<span class="math inline">\(B_{heartwood}\)</span>; in <span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(SA\)</span>, <span class="math inline">\(DBH\)</span>, <span class="math inline">\(H\)</span> and <span class="math inline">\(FRP_{s}\)</span> and <span class="math inline">\(L_{radial,s}\)</span>.</li>
+<li>Leaf biomass, <span class="math inline">\(B_{leaf}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA\)</span>.</li>
+<li>Twig biomass, <span class="math inline">\(B_{twig}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA\)</span>.</li>
+<li>Dead leaf mass, <span class="math inline">\(D_{leaf}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA^{dead}\)</span>.</li>
+<li>Dead twig mass, <span class="math inline">\(D_{twig}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA^{dead}\)</span>.</li>
+<li>The radial length of coarse roots in each soil layer <span class="math inline">\(s\)</span>, <span class="math inline">\(L_{radial, s}\)</span> (<span class="math inline">\(mm\)</span>), from <span class="math inline">\(FRP_{s}\)</span>.</li>
+<li>Sapwood biomass, <span class="math inline">\(B_{sapwood}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(SA\)</span>, <span class="math inline">\(H\)</span> and <span class="math inline">\(FRP_{s}\)</span> and <span class="math inline">\(L_{radial,s}\)</span>.</li>
+<li>Heartwood mass, for trees, <span class="math inline">\(D_{heartwood}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(SA\)</span>, <span class="math inline">\(DBH\)</span>, <span class="math inline">\(H\)</span> and <span class="math inline">\(FRP_{s}\)</span> and <span class="math inline">\(L_{radial,s}\)</span>.</li>
 <li>Leaf storage volume (<span class="math inline">\(V_{storage, leaf}\)</span>; in <span class="math inline">\(L\)</span>) from <span class="math inline">\(B_{leaf}\)</span>.</li>
 <li>Sapwood storage volume (<span class="math inline">\(V_{storage, sapwood}\)</span>; in <span class="math inline">\(L\)</span>) from <span class="math inline">\(SA\)</span>, <span class="math inline">\(H\)</span> and <span class="math inline">\(FRP_{s}\)</span> and <span class="math inline">\(L_{radial,s}\)</span>.</li>
 <li>Fine root area (<span class="math inline">\(FRA_{s}\)</span>; in <span class="math inline">\(m^2\)</span>) in each soil layer <span class="math inline">\(s\)</span>, from <span class="math inline">\(B_{fineroot,s}\)</span>.</li>
 </ul>
 <p>Some belowground variables (such as the radial length of coarse roots) are only considered dynamic when simulating growth with advance water balance.</p>
 </div>
-<div id="dead-standing-plant-organs-and-litter-pools" class="section level3 hasAnchor" number="15.2.2">
-<h3><span class="header-section-number">15.2.2</span> Dead standing plant organs and litter pools<a href="growthmodelling.html#dead-standing-plant-organs-and-litter-pools" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-</div>
-<div id="soil-carbon-pools" class="section level3 hasAnchor" number="15.2.3">
-<h3><span class="header-section-number">15.2.3</span> Soil carbon pools<a href="growthmodelling.html#soil-carbon-pools" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="state-variables-related-to-carbon-decomposition" class="section level3 hasAnchor" number="15.2.2">
+<h3><span class="header-section-number">15.2.2</span> State variables related to carbon decomposition<a href="growthmodelling.html#state-variables-related-to-carbon-decomposition" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><strong>Dead standing wood cohorts</strong></p>
+<p>Cohorts of dead standing wood (i.e. snag cohorts) are identified by combinations of species, DBH of the original tree, height and dead age (i.e. the years passed since mortality occurred). Those properties are modified by the model of forest dynamics, whereas the growth model deals with the daily decomposition process. In the growth model, the following state variables are tracked for cohorts of dead standing wood:</p>
+<ul>
+<li>Mass of small dead branches, with diameters &lt; 7.5 cm, <span class="math inline">\(SN_{smallbranches}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Mass of large dead wood, with diameters &gt; 7.5 cm, <span class="math inline">\(SN_{deadwood}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+</ul>
+<p><strong>Structural litter pools</strong></p>
+<p>Structural litter pools are <strong>species-specific</strong>. For each species, the following pools are tracked:</p>
+<ul>
+<li>Leaf structural litter, <span class="math inline">\(LI_{leaves}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Twig structural litter, <span class="math inline">\(LI_{twigs}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Small branches structural litter, <span class="math inline">\(LI_{smallbranches}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Large wood structural litter, <span class="math inline">\(LI_{largewood}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Coarse roots structural litter, <span class="math inline">\(LI_{coarseroots}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Fine roots structural litter, <span class="math inline">\(LI_{fineroots}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+</ul>
+<p><strong>Soil carbon pools</strong></p>
+<p>The decomposition model keeps track of the carbon amount in different organic matter pools:</p>
+<ul>
+<li>Surface metabolic litter, <span class="math inline">\(LI_{surface,metabolic}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Surface active decomposition pool, <span class="math inline">\(SOC_{surface, active}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Surface slow decomposition pool, <span class="math inline">\(SOC_{surface, slow}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Soil metabolic litter, <span class="math inline">\(LI_{soil,metabolic}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Soil active decomposition pool, <span class="math inline">\(SOC_{surface, active}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Soil slow decomposition pool, <span class="math inline">\(SOC_{surface, slow}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Soil passive decomposition pool, <span class="math inline">\(SOC_{surface, passive}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+</ul>
 </div>
 </div>
 <div id="mass-and-energy-balances" class="section level2 hasAnchor" number="15.3">
@@ -991,8 +1025,9 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 <li><strong>Fire combustion</strong> (<span class="math inline">\(FC\)</span>) is the sum of carbon returned to the atmosphere as a result of combustion of plant tissues.</li>
 </ul>
 <p>The overall carbon balance of the forest stand is the following:
-<span class="math display">\[\begin{equation}
+<span class="math display" id="eq:standcarbonbalanceequation">\[\begin{equation}
 \Delta{C}_{stand} = GPP - MR - SR - HR - FC = NPP - HR - FC
+\tag{15.4}
 \end{equation}\]</span></p>
 </div>
 </div>
@@ -1492,7 +1527,7 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 </tr>
 <tr class="odd">
 <td><code>CarbonBalance</code></td>
-<td>Stand-level carbon balance components (gross primary production, maintenance respiration, synthesis respiration and net primary production). All of them in <span class="math inline">\(g\,C \cdot m^{-2}\)</span>.</td>
+<td>Stand-level carbon balance components (see <a href="growthmodelling.html#eq:standcarbonbalanceequation">(15.4)</a>), all of them in <span class="math inline">\(g\,C \cdot m^{-2}\)</span>.</td>
 </tr>
 <tr class="even">
 <td><code>BiomassBalance</code></td>
