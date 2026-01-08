@@ -105,7 +105,7 @@ Soil input requirements are fully described in section \@ref(soilinput).
 
 **Vegetation**
 
-Vegetation input requirements are fully described in section \@ref(vegetationinput). Tree, shrub and herb cohorts do not need to be characterized with different variables in soil water balance calculations, since all living plant cohorts have a $LAI$ value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. $LAI^{live}$, because normally at the starting point all leaves are expanded (i.e. $LAI^{\phi} = LAI^{live}$) and one can assume no dead leaves in the canopy (i.e., $LAI^{dead} = 0$). Vegetation characteristics stay constant during simulations using function `spwb()`, although the actual expanded leaf area ($LAI^{\phi}$) and dead leaf area ($LAI^{dead}$) may vary is the species is winter deciduous.
+Vegetation input requirements are fully described in section \@ref(vegetationinput). Tree, shrub and herb cohorts do not need to be characterized with different variables in soil water balance calculations, since all living plant cohorts have a $LAI$ value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. $LAI_{live}$, because normally at the starting point all leaves are expanded (i.e. $LAI_{\phi} = LAI_{live}$) and one can assume no dead leaves in the canopy (i.e., $LAI_{dead} = 0$). Vegetation characteristics stay constant during simulations using function `spwb()`, although the actual expanded leaf area ($LAI_{\phi}$) and dead leaf area ($LAI_{dead}$) may vary is the species is winter deciduous.
 
 **Meteorology**
 
@@ -229,16 +229,16 @@ Function `spwb()` returns a list of a class with the same name. The first four e
 |---------|------------------------------------------------------------|
 | `WaterBalance`| Climatic input and water balance flows of eq.\@ref(eq:basicwaterbalanceequation) (i.e. net precipitation, infiltration, runoff, transpiration...). All of them in $mm = l \cdot m^{-2}$. |
 | `Soil`| Soil variables for each soil layer: Moisture relative to field capacity ($W_s$), water potential ($\Psi_s$) and volumetric water content ($V_s$). Only returned if `soilResults = TRUE`. |
-| `Stand`| Stand-level variables, such as $LAI^{\phi}_{stand}$, $LAI^{dead}_{stand}$, the water retention capacity of the canopy ($S_{canopy}$) or the fraction of light reaching the ground ($L^{PAR}_{ground}$ and $L^{SWR}_{ground}$). Only returned if `standResults = TRUE`.|
-| `Plants`| Variables defined at the level of plant cohort, such as expanded leaf area ($LAI^{phi}_i$), transpiration, photosynthesis, water potential, etc. Only returned if `plantResults = TRUE`. |
+| `Stand`| Stand-level variables, such as $LAI_{\phi}$, $LAI_{dead}$, the water retention capacity of the canopy ($S_{canopy}$) or the fraction of light reaching the ground ($L^{PAR}_{ground}$ and $L^{SWR}_{ground}$). Only returned if `standResults = TRUE`.|
+| `Plants`| Variables defined at the level of plant cohort, such as expanded leaf area ($LAI_{\phi,i}$), transpiration, photosynthesis, water potential, etc. Only returned if `plantResults = TRUE`. |
 | `FireHazard`| Fire hazard variables (fuel moisture, rate of spread, fire potentials, etc). Only returned if `fireHazardResults = TRUE`. |
 
 Elements `WaterBalance`, `Soil`, `Stand` and `FireHazard` are data frames with dates in rows and variables in columns, whereas `Plants` is itself a list with several data frames, with dates in rows and plant cohorts in columns:
 
 | Element | Symbol | Units | Description                               |
 |---------|--------|-------|-------------------------------------------|
-|`LAI`| $LAI^{\phi}$ | $m^2 \cdot m^{-2}$ | Leaf area index (expanded).|
-|`LAIlive`| $LAI^{live}$ | $m^2 \cdot m^{-2}$ | Leaf area index (live).|
+|`LAI`| $LAI_{\phi}$ | $m^2 \cdot m^{-2}$ | Leaf area index (expanded).|
+|`LAIlive`| $LAI_{live}$ | $m^2 \cdot m^{-2}$ | Leaf area index (live).|
 |`AbsorbedSWRFraction` | $f_i$ | [0-1] | Fraction of shortwave radiation absorbed.|
 |`Transpiration`| $Tr$ | mm | Transpiration per unit ground area.|
 |`GrossPhotosynthesis`| $A_{g}$ | $g\,C \cdot m^{-2}$ | Gross photosynthesis per unit ground area.|

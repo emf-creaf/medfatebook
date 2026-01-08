@@ -12,12 +12,12 @@ Plant species can have either *progressive evergreen*, *one-flush evergreen*, *w
 knitr::include_graphics("figures/leaf_phenology.png")
 ```
 
-Evergreen plants thus maintain constant leaf area over the year, whereas in deciduous plants leaf-expanded status is updated daily, represented by $\phi_i$, the fraction of maximum leaf area:
+Evergreen plants thus maintain constant leaf area over the year, whereas in deciduous plants leaf-expanded status is updated daily, represented by $\phi_i$, the fraction of maximum leaf area for cohort $i$:
 
 \begin{equation}
-LAI_{i}^{\phi}=LAI^{live}_i\,\cdot\phi_i
+LAI_{\phi,i}=LAI_{live,i}\,\cdot\phi_i
 \end{equation}
-whereas for evergreen species $LAI_{i}^{\phi}=LAI^{live}_i$ (or equivalently $\phi_i = 1$ at all times).
+whereas for evergreen species $LAI_{\phi,i}=LAI_{live,i}$ (or equivalently $\phi_i = 1$ at all times).
 
 The general structure of process based phenological models explained in @Chuine2013. These models aim determine, for a given phenological phase $n$ (endodormancy, ecodormancy, maturation, etc), the day of its finalisation $d_n$, such that the following equation holds:
 \begin{equation} 
@@ -61,20 +61,19 @@ S_{sen,d} = \sum R_{sen,d}
 \end{equation}
 and when $S_{sen,d}  \geq  S_{sen}^*$ then expanded leaves are assumed to suddenly die. This model is implemented in function `pheno_leafSenescenceStatus()` and returns $\phi_{i,d}=1$ for all days until $S_{sen,d}  \geq  S_{sen}^*$ when it returns $\phi_{i,d}=0$. Parameters $T_{sen}$, $Ph_{sen}$ and $S_{sen}^*$ are plant-specific parameters in `spwbInput`.  
 
-### Leaf abscission
+### Leaf abscission {#leafabscission}
 The drop of $\phi_i$ causes live expanded leaves to become dead leaves. To avoid a sudden decrease of leaf area, dead leaves are kept in the canopy and they are reduced daily using a negative exponential function of wind speed:
 \begin{equation}
-LAI^{dead}_i=LAI^{dead}_i\,\cdot e^{- u/10}
+LAI_{dead,i, d}=LAI_{dead,i,d-1}\,\cdot e^{- u/10}
 \end{equation}
-where $u$ is wind speed in ($m \cdot s^{-1}$).
-
+where $u$ is wind speed in ($m \cdot s^{-1}$), $LAI_{dead,i,d-1}$ is the dead leaf area index of the previous day and $LAI_{dead,i,d}$ is the dead leaf area index of the current day.
 
 
 ## Radiation extinction {#basiclightextinction}
 The proportion of photosynthetically active radiation (PAR) and short-wave radiation (SWR; 400-3000 nm) decreases through the canopy following the Beer-Lambert’s light extinction equation. 
 $L^{PAR}_{herb}$, the proportion of PAR that reaches the herbaceous layer, is calculated as:
 \begin{equation}
-L^{PAR}_{herb}=e^{-\sum_{i=1}^{c}{k_{PAR,i} \cdot LAI_{i}^{all}}}
+L^{PAR}_{herb}=e^{-\sum_{i=1}^{c}{k_{PAR,i} \cdot LAI_{all,i}}}
 \end{equation}
 where $k_{PAR,i}$ is the PAR extinction coefficient of plant cohort $i$. If we add the extinction caused by the herbaceous layer, we have that $L^{PAR}_{ground}$, the proportion of PAR that reaches the ground, is calculated as:
 \begin{equation}
@@ -82,7 +81,7 @@ L^{PAR}_{ground}=L^{PAR}_{herb}e^{-0.5 \cdot LAI_{herb}}
 \end{equation}
 Where herbaceous vegetation is assumed to have a fixed extinction coefficient. 
 
-We can also define $L^{PAR}_i$ as the proportion of PAR available for a given plant cohort $i$, which we associate to the PAR available at a height corresponding to half of the cohort's crown. This height will include some self-shading of the target cohort.
+We can also define $L^{PAR}$ as the proportion of PAR available for a given plant cohort, which we associate to the PAR available at a height corresponding to half of the cohort's crown. This height will include some self-shading of the target cohort.
 
 The proportion of short-wave radiation (SWR) energy absorbed by each plant cohort needs to be calculated to divide the transpiration of the stand among cohorts (chapter \@ref(transpirationgranier)), and the radiation absorbed by the soil is needed to calculate soil evaporation (section \@ref(soilevaporation)). Foliage absorbs a higher proportion of PAR than SWR; thus, the extinction coefficient is higher for PAR than for SWR. However, values for the ratio of extinction coefficients are rather constant. Following Friend et al. [-@Friend1997] it is assumed that the extinction coefficient for PAR is 1.35 times larger than that for SWR (i.e.
 $k_{SWR,i} = k_{PAR,i}/1.35$). Figure \@ref(fig:lightextinction) shows the PAR and SWR extinction profiles (see functions `vprofile_PARExtinction()` and `vprofile_SWRExtinction()`) corresponding to the leaf area density distribution of Fig. \@ref(fig:leafareadensity). 
@@ -95,12 +94,12 @@ plot_grid(g1, g2, nrow=1, ncol=2)
 
 To calculate radiation absorption, where the vertical dimension of the plot is divided into layers (as explained in \@ref(leafdistribution)), and the SWR absorbed is calculated for each plant cohort in each layer. Let $l$ be the number of vertical layers. The fraction of radiation incident on layer $j$ that is absorbed in the same layer is:
 \begin{equation}
-f_j=1 - e^{-\sum_{i=1}^{c}{k_{SWR,i} \cdot LAI_{i,j}^{all}}}
+f_j=1 - e^{-\sum_{i=1}^{c}{k_{SWR,i} \cdot LAI_{all, i,j}}}
 \end{equation}
 where $LAI_{i,j}^{all}$ is the leaf area index of cohort $i$ in layer $j$. Hence, the fraction transmitted is $(1-f_j)$. The fraction of radiation incident on layer $j$ that is absorbed by expanded leaves of plant cohort $i$ in that layer ($f_{ij}$) is calculated from the relative
 contribution of these leaves to the total absorption in the layer:
 \begin{equation}
-f_{ij} = f_j \cdot \frac{k_{SWR,i}\cdot LAI_{i,j}^{\phi}}{\sum_{h=1}^{c}{k_{SWR,h} \cdot LAI_{h,j}^{all}}}
+f_{ij} = f_j \cdot \frac{k_{SWR,i}\cdot LAI_{\phi, i,j}}{\sum_{h=1}^{c}{k_{SWR,h} \cdot LAI_{all, h,j}}}
 \end{equation}
 The fraction of canopy radiation absorbed by a plant cohort $i$ across all layers is found by adding the fraction absorbed in each layer:
 \begin{equation}

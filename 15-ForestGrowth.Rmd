@@ -22,17 +22,17 @@ Finally, the model also simulates the **decomposition** of organic matter produc
 
 ### Plant carbon pools and carbon flows
 
-Different *plant carbon compartments* are considered separately: **leaves/twigs**, **sapwood** (including stem, branches and coarse roots) and **fine roots**. Each compartments has one or more *carbon pools* where carbon is in different form. Carbon pools are differentiated between **structural** and **labile**. In turn, labile carbon involves **metabolic** and **storage** [@Richardson2013; @Dietze2014], with a conversion rate regulated by the need to maintain, as much as possible, an equilibrium in the amount of metabolic carbon to sustain cell metabolism and for osmotic purposes. Similar designs of two non-structural carbon compartments have been implemented in other forest ecosystem models [@cho_modeling_2022].
+Different *plant carbon compartments (organs)* are considered separately: **leaves**, **twigs** (branchlets), **sapwood** (including stem, branches and coarse roots) and **fine roots**. Twigs are kept separated from the rest of woody organs because their biomass dynamics is assumed to be coupled with leaf biomass. Each compartment has one or more *carbon pools* where carbon is in different form. Carbon pools are differentiated between **structural** (live organs), **dead** (dead organs) and **labile**. In turn, labile carbon involves **metabolic** and **storage** [@Richardson2013; @Dietze2014], with a conversion rate regulated by the need to maintain, as much as possible, an equilibrium in the amount of metabolic carbon to sustain cell metabolism and for osmotic purposes. Similar designs of two non-structural carbon compartments have been implemented in other forest ecosystem models [@cho_modeling_2022].
 
 Details of the carbon pools in different compartments are as follows (Fig. \@ref(fig:carbonpools)):
 
- + **Structural carbon** corresponds to the carbon forming cell membranes, cell walls and the cytosolic machinery (in the case of living cells). The amount of structural carbon in a given compartment is used to determine *maintenance respiration* costs (together with labile carbon), and the structural carbon per tissue unit determines *growth respiration* costs. Structural carbon occurs in *leaves*, *twigs*, *sapwood* and *fine roots*, which however have different maintenance and growth costs. Sapwood carbon includes branches, stem and coarse roots. Only live (parenchymatic) sapwood cells, accounting for between 5 and 40% of sapwood volume [@Plavcova2015], contribute to estimate sapwood maintenance respiration costs. The fraction of embolized sapwood is also discounted from sapwood respiratory biomass. Structural carbon is lost via tissue senescence (in the case of sapwood due to conversion to heartwood).
- + **Dead carbon** corresponds to dead plant organs that are still standing (as opposed to being litter). This includes the mass of *dead leaves* and *dead twigs* corresponding to dead leaf area that has not yet fallen, as well as the mass of *heartwood*, in the case of tree cohorts.
+ + **Structural carbon** corresponds to the carbon forming cell membranes, cell walls and the cytosolic machinery of *living plant organs*. The amount of structural carbon in a given compartment is used to determine *maintenance respiration* costs (together with labile carbon), and the structural carbon per tissue unit determines *growth respiration* costs. Structural carbon occurs in *leaves*, *twigs*, *sapwood* and *fine roots* compartments, which have different maintenance respiration costs per dry biomass. Additionally, only live (parenchymatic) sapwood/twig cells, accounting for between 5 and 40% of volume [@Plavcova2015], contribute to estimate sapwood/twig maintenance respiration costs. The fraction of embolized conduits is also discounted from sapwood/twig respiratory biomass. Structural carbon is transformed into dead carbon or exported to litter via tissue senescence.
+ + **Dead carbon** corresponds to dead organs that are still standing as part of living plants (as opposed to being litter or snags). This includes the mass of *dead leaves* and *dead twigs* corresponding to dead leaf area that has not yet fallen to become litter, as well as the mass of *heartwood*, in the case of tree cohorts.
  + **Metabolic carbon** is a labile carbon form assumed to correspond to **sugars** (e.g., glucose or fructose) used to sustain cell functioning (i.e. provide carbon for maintenance respiration). Moreover, changes in metabolic carbon are coupled to variations in osmotic potential. Metabolic carbon occurs in leaves and sapwood compartments only. *Leaf metabolic carbon* is generated from photosynthesis or leaf starch degradation and used in different functions, including leaf maintenance respiration and export to sapwood via phloem transport. An excess of leaf metabolic carbon can inhibit photosynthesis. Sugar concentration in the phloem is assumed to be (passively) in equilibrium with leaf metabolic sugar concentration. *Sapwood metabolic carbon* comes from phloem transport, or sapwood starch degradation, and is used to directly sustain maintenance respiration of sapwood and fine roots. 
-+ **Storage carbon** is a labile carbon form assumed to loosely correspond to **starch**. *Leaf storage carbon* is intended to represent short-term storage (mainly starch within chloroplasts) and its inclusion in the model follows the need to buffer daily variations in leaf metabolic carbon as well as in the corresponding leaf osmotic potential. *Sapwood storage carbon* in parenchymatic tissues of branches, stems and coarse roots conforms a much larger carbon pool and is intended to serve as carbon source for growth and long-term (seasonal and inter-annual) storage [@Plavcova2015].
++ **Storage carbon** is a labile carbon form assumed to loosely correspond to **starch**. Like metabolic carbon, storage carbon occurs in leaves and sapwood compartments only. *Leaf storage carbon* is intended to represent short-term storage (mainly starch within chloroplasts) and its inclusion in the model follows the need to buffer daily variations in leaf metabolic carbon as well as in the corresponding leaf osmotic potential. *Sapwood storage carbon* in parenchymatic tissues of branches, stems and coarse roots conforms a much larger carbon pool and is intended to serve as carbon source for growth and long-term (seasonal and inter-annual) storage [@Plavcova2015].
 
 
-```{r carbonpools, out.width='100%', fig.align="center", fig.cap="Plant live and dead plant carbon pools and processes determining carbon flows between them. Decomposition pools are indicated in gray. Flows between plant carbon pools are indicated using continuous arrows. Flows towards the atmosphere or dead carbon pools are indicated using dashed arrows. Translocation of reserves during senescence is not represented.", echo=FALSE}
+```{r carbonpools, out.width='100%', fig.align="center", fig.cap="Plant labile (metabolic and storage), structural and dead carbon pools and processes determining carbon flows between them (indicated using continuous arrows). Decomposition pools are indicated in gray, and flows towards the atmosphere or decomposition pools are indicated using dashed arrows. Translocation of reserves during senescence is not represented.", echo=FALSE}
 knitr::include_graphics("figures/Carbon_pools.png")
 
 ```
@@ -40,7 +40,7 @@ knitr::include_graphics("figures/Carbon_pools.png")
 Different processes contribute to the carbon balance of plant's structural and labile compartments:
 
  + Carbon balance of **labile carbon pools** is performed by considering **photosynthesis**, **maintenance respiration** , **growth costs**, **sugar-starch conversion**, **root exudation** and  **phloem transport**. Photosynthesis estimates come from the water balance submodel. Respiration is modelled following the *growth-maintenance* paradigm, but we acknowledge that such approach has limitations and that others have been proposed such as assuming a constant *carbon use efficiency* or the *process/residual approach*  [@Cannell2000; @Gifford2003]. Maintenance respiration demand of leaves and sapwood depends on both structural and metabolic carbon, whereas only structural carbon counts for fine root maintenance respiration because they lack labile carbon pools. Maintenance respiration of leaves and fine roots can be species-specific rates, but can also be estimated from species-specific values of nitrogen concentration [@Reich2008]. In contrast, the species-specific maintenance respiration per sapwood unit mass (in fact, only parenchymatic tissues contribute to sapwood respiration) is not estimated from nitrogen concentration and should be calibrated. In all three cases, however, temperature dependencies are included in the actual respiration rates[@Tjoelker2001]. Growth costs include the carbon cost of building new structures as well as the respiration expenses of growth. Sugar-starch conversion is designed to maintain an equilibrium in the concentration of metabolic sugar. Any surplus in sapwood storage carbon over storage capacity is assumed to be diverted towards root exudation. Hence, root exudation is not modeled as a process actively competing for metabolic carbon, but as a consequence of plant C storage capacity being surpassed [@Prescott2020]. 
-  + Biomass balance in **structural pools** comes from the interplay between **growth**  (i.e. new tissue formation) and **senescence** (see below). Structural growth rates are lower than growth costs for labile pools, since growth costs also include growth respiration expenses. During leaf/twig senescence it is assumed that non-structural carbon sources (i.e. labile carbon pools) are recycled and relocated to sapwood storage. Analogously, when sapwood is converted into heartwood, labile carbon in the protoplasm of parenchyma cells is assumed to be re-absorbed by neighboring living cells as storage [@Spicer2005].
+  + Biomass balance in **structural pools** and **dead pools** comes from the interplay between **growth**  (i.e. new tissue formation) and **senescence** (see below). Structural growth rates are lower than growth costs for labile pools, since growth costs also include growth respiration expenses. During leaf senescence it is assumed that non-structural carbon sources (i.e. leaf labile carbon pools) are recycled and relocated to sapwood storage. Analogously, when sapwood is converted into heartwood, labile carbon in the protoplasm of parenchyma cells is assumed to be re-absorbed by neighboring living cells as storage [@Spicer2005].
 
 Further design details and formulation regarding the estimation of carbon pool sizes and carbon balance components are given in chapter \@ref(carbonpoolsbalance). 
 
@@ -49,8 +49,8 @@ Further design details and formulation regarding the estimation of carbon pool s
 
 The forest growth model allows simulating the variation of leaf area, sapwood area and fine root area via the following processes (see fig. \@ref(fig:allocationdiagram)):
 
- i. **Leaf/twig growth**: Whereas in the water balance models expanded leaf area corresponded to the portion of live leaf area that was unfolded according to the phenological status (see \@ref(leafphenology)), in the growth model expanded leaf area results from explicit simulation of growth. However, leaf phenology submodel still controls the duration of phenophases corresponding budburst, leaf development and senescence. Leaf area growth occurs during *leaf unfolding* periods only, whereas *bud formation* periods are required to update the target leaf area (in accordance to an allocation strategy, see below). Storage carbon levels need to be at more than 10\% of their capacity to allow leaf growth. Moreover, leaf area target is constrained by stand structure (i.e. competition) via allometric equations. Leaf growth includes a corresponding carbon cost in **twig growth**, according to the biomass ratio between both.
- ii. **Leaf/twig senescence and leaf fall**: Leaf/twig senescence (and the corresponding increases in dead leaf area) can occur in the model due to *leaf aging* in evergreen species, due to *programmed leaf senescence* in deciduous species, or due to *leaf dessication* (as a result of xylem cavitation and/or low leaf relative water content). Leaf senescence increases the leaf area index corresponding to dead leaves. *Leaf fall* is the process that transforms dead leaf area into leaf and twig litter, initiating decomposition processes (see fig. \@ref(fig:carbonpools)). In addition, fires can induce *foliage burning*, which also leads to a decrease in leaf area (but where non-structural carbon reallocation is not possible and dead leaf area does not increase) and produces atmospheric carbon emission.
+ i. **Leaf/twig growth**: Whereas in the water balance models expanded leaf area corresponded to the portion of live leaf area that was unfolded according to the phenological status (see \@ref(leafphenology)), in the growth model expanded leaf area results from explicit simulation of growth. However, leaf phenology submodel still controls the duration of phenophases corresponding budburst, leaf development and senescence. Leaf area growth occurs during *leaf unfolding* periods only, whereas *bud formation* periods are required to update the target leaf area (in accordance to an allocation strategy, see below). Storage carbon levels need to be at more than 10\% of their capacity to allow leaf growth. Moreover, leaf area target is constrained by stand structure (i.e. competition) via allometric equations. Leaf growth includes a corresponding carbon cost in *twig growth*, according to the biomass ratio between both.
+ ii. **Leaf/twig senescence and leaf fall**: Leaf/twig senescence (and the corresponding increases in dead leaf area) can occur in the model due to *leaf aging* in evergreen species, due to *programmed leaf senescence* in deciduous species, or due to *leaf dessication* (as a result of xylem cavitation and/or low leaf relative water content). Leaf senescence increases the leaf area index corresponding to dead leaves, thereby increasing the leaf and twig dead carbon pools. *Leaf fall* is the process that transforms dead leaf area into leaf and twig litter, which triggers decomposition processes (see fig. \@ref(fig:carbonpools)). In addition, fires can induce *foliage burning*, which also leads to a decrease in dead and live leaf area (but where non-structural carbon reallocation is not possible) and produces carbon emissions due to leaf and twig combustion.
  iii. **Sapwood growth**: The model assumes that the hormonal signals controlling cambium division have been mainly synthesized in leaves. Auxins are known to be primarily generated in the plant's apical meristems, young leaves, and flower buds; from where they are transported throughout the plant via the phloem [@bajguz_biosynthetic_2023]. More specifically, we assume that the levels of secondary growth hormones (auxines) depend linearly on the *current amount of foliage relative to the expected maximum foliage of the same plant without competition*. This entails that: (a) leaf phenological status of deciduous species will affect sapwood growth rates; (b) for a given plant size (i.e. cambium surface) the amount of foliage will be higher or lower depending on the shading created by taller plants and, hence, understory plants or densely-crowded plants will have lower sapwood growth rates than plants that are isolated or overtop the other plants; (c) defoliation events (e.g. from drought impacts) will have an effect on sapwood growth rates, as observed empirically [@javoy_impact_2025]. Sapwood formation corresponds mostly to secondary growth (but primary growth occurs at the same time due to diameter-height relationships), and is only allowed if storage carbon levels are above a given species-specific threshold (e.g. 50\%). These levels are much higher than required for leaf or fine root growth. Thus, when carbon levels are low, sapwood growth rates fall to zero, whereas replacement of leaves and fine roots continues to sustain metabolism. This design was chosen to stop sapwood growth much before emptying storage carbon reserves, so that maintenance respiration can be sustained longer whenever photosynthesis is low, as in shadow-tolerant species. 
  iv. **Sapwood senescence**:  Losses in sapwood area (i.e. conversion to heartwood) occur via tissue *aging* (i.e. assuming a daily rate of conversion). Since xylem tracheids and vessels are already dead cells, sapwood senescence refers to the death of parenchymatic tissue. Similarly to 3-PG [@Landsberg1997] we assume that the relative turnover rate of sapwood is smallest for young plants, and it increases up to a maximum value. However, recent reviews indicate that heartwood formation should be viewed as an active developmental program during which a conductive but vulnerable sapwood is transformed in a non-conductive but durable heartwood [@Spicer2005]. Sapwood senescence also occurs whenever the sapwood area exceeds the amount required to sustain the current leaf area target. Note that stem *cavitation* reduces the area of sapwood that is effectively functional for water transport, but does not lead to sapwood senescence *per se*, unless mortality occurs. Sapwood senescence produces heartwood biomass in trees, which does not decompose as long as the trees are alive. In contrast, sapwood senescence leads to increase the mass of standing dead branches in shrubs (see fig. \@ref(fig:carbonpools)).
  v. **Fine root growth**: Fine root growth can in principle occur any time of the year (i.e. the model does not explicitly consider root phenology), but since fine root biomass targets depend on leaf area, seasonal fine root area patterns may follow phenological changes in leaf area. Like in leaf growth, storage carbon levels need to be at more than 10\% of their capacity to allow fine root growth.
@@ -111,6 +111,9 @@ Using stem relative water content as indicator of dessication has the inconvenie
 
 The critical threshold for dessication is specified in the control variable `mortalityRWCThreshold`, set to 40\% by default. Note that most studies focus on leaf RWC, for which @Kursar2009 indicate ranges between 16\% and 61\%, and @Korner2019 advocates for values around 50\%. 
 
+**Mortality effects**
+
+Mortality processes lead to the estimation of the number of dead individuals during the current day ($N_{dead}$). The model then determines what fraction of these individuals will resprout from the root collar (although resprouts are actually created by `fordyn()` at the end of the year). The fine root and coarse root biomass of non-resprouting individuals are added to the corresponding litter pools. Leave area of all dead trees is added to dead leaf area (which effectively transfers leaf biomass and twig biomass to dead carbon pools). The aboveground wood biomass (i.e heartwood and sapwood) of all dead trees is stored in cumulative variables ($D_{smallbranches}$ and $D_{largewood}$) for future snag creation. 
 
 Details of the implementation of plant mortality are given in section \@ref(plantmortality).
 
@@ -142,9 +145,9 @@ Whenever foliage burning occurs, the corresponding dry biomass of leaves and twi
 
 Details of the implementation of fire severity and emissions are given in section \@ref(fireseverity).
 
-### Dead carbon pools and decomposition
+### Organic matter decomposition
 
-The design of dead carbon pools and carbon decomposition processes is a modification of the CENTURY model, and its daily variant DAYCENT [@parton_dynamics_1988; @parton_observations_1993; @parton_daycent_1998], as described in Bonan et al. -@bonan_climate_2019. It is summarized in fig. \@ref(fig:decompositionpools) below.
+The design of carbon decomposition processes is a modification of the CENTURY model, and its daily variant DAYCENT [@parton_dynamics_1988; @parton_observations_1993; @parton_daycent_1998], as described in Bonan et al. -@bonan_climate_2019. It is summarized in fig. \@ref(fig:decompositionpools) below.
 
 The decomposition model simulates a number of chemically distinct organic matter pools with varying decay rates. The CENTURY/DAYCENT models partition plant litter into metabolic material that readily decomposes and structural material that is more resistant to decomposition. Leaf litter enters the surface pools, and root litter enters the belowground pools. The model additionally represents twig, small-branch and large wood debris (on the surface) as well as coarse root debris (belowground). Only leaf litter fall and fineroot litter fall generate metabolic material, whereas the other types of litter (large wood, small branches, twigs and coarse roots) generate only structural material. Litter pools include two important differences with respect to the description of DAYCENT provided in Bonan et al. -@bonan_climate_2019. First, structural litter pools are species-specific (yellow boxes in fig. \@ref(fig:decompositionpools)), which allows decomposition rates to be dependent on the species identity of the plant that generated the litter, thus accounting for potential differences in lignin content. Second, the model also considers aboveground standing dead wood (i.e. snags), which originate from plant mortality (or aboveground dead structures in resprouting cohorts) and will normally decompose at slower rates than downed deadwood (magenta gray boxes in fig. \@ref(fig:decompositionpools)). While the growth model deals with decomposition of these pools, dead branch fall and snag fall processes, which lead to transfer of carbon from standing pools to downed litter pools, are dealt with in the forest dynamics (i.e. `fordyn()`) model.
 
@@ -164,12 +167,12 @@ knitr::include_graphics("figures/Decomposition.drawio.png")
 
 Many *cohort-level state variables* are inherited by the corresponding water balance model and depend on its level of complexity (see  \@ref(statevariablesbasic) and \@ref(statevariablesadvanced)). Several variables were treated as fixed parameters in the water balance models and become variable here:
 
- + Leaf area index of live leaves, $LAI^{live}$  ($m^2·m^{-2}$).
- + Actual expanded leaf area, $LAI^{\phi}$ ($m^2·m^{-2}$).
- + Dead leaf area, $LAI^{dead}$ ($m^2·m^{-2}$).
+ + Leaf area index of live leaves, $LAI_{live}$  ($m^2·m^{-2}$).
+ + Actual expanded leaf area, $LAI_{\phi}$ ($m^2·m^{-2}$).
+ + Dead leaf area, $LAI_{dead}$ ($m^2·m^{-2}$).
  + Percent cover of shrubs, $Cover$ (%).
  + Density of living individuals in the plant cohort, $N$ ($ind·ha^{-1}$).
- + Density of dead individuals in the plant cohort, $N^{dead}$ ($ind·ha^{-1}$).
+ + Density of dead individuals in the plant cohort, $N_{dead}$ ($ind·ha^{-1}$).
  + The proportion of fine roots, $FRP_{s}$, in each soil layer $s$  ([0-1]).
  + Cumulative mass of small dead branches (diameter between 0.635 cm an 7.5 cm; 10h and 100h fuels) corresponding to cohort dead individuals $D_{smallbranches}$ ($g\,C·m^{-2}$).
  + Cumulative mass of large dead wood (diameters > 7.5 cm; 1000h and 10000h fuels) corresponding to cohort dead individuals $D_{largewood}$ ($g\,C·m^{-2}$).
@@ -183,7 +186,7 @@ Variables $D_{smallbranches}$ and $D_{largewood}$ are not to be confounded with 
  + Crown ratio, $CR$ ([0-1]).
  + Leaf area, $LA$ ($m^2$).
  + Target leaf area, $LA_{target}$ ($m^2$).
- + Dead leaf area $LA^{dead}$ ($m^2$).
+ + Dead leaf area $LA_{dead}$ ($m^2$).
  + Sapwood area, $SA$ ($cm^2$).
  + Target sapwood area, $SA_{target}$ ($cm^2$).
  + The percentage of the crown with active buds, $PCAB$ (%).
@@ -193,16 +196,16 @@ Variables $D_{smallbranches}$ and $D_{largewood}$ are not to be confounded with 
  + Sugar concentration in sapwood (stem, branches and coarse roots), $SS_{sapwood}$ ($mol\,gluc \cdot L^{-1}$).
  + Starch concentration in sapwood (stem, branches and coarse roots), $ST_{sapwood}$ ($mol\,gluc \cdot L^{-1}$).
  
-Note that $LA$ is the same state variable as $LAI^{\phi}$, but expressed at the individual level. The same happens between $LA_{target}$ and $LAI^{live}$; and between $LA^{dead}$ and $LAI^{dead}$. These pairs of state variables are related by cohort density ($N$).
+Note that $LA$ is the same state variable as $LAI_{\phi}$, but expressed at the individual level. The same happens between $LA_{target}$ and $LAI_{live}$; and between $LA_{dead}$ and $LAI_{dead}$. These pairs of state variables are related by cohort density ($N$).
 
 **Derived variables**
 
-Other functional variables can be derived from the true state variables and, hence, hence do not need to be treated as state variables themselves but are often used in equations instead of the true state variables:
+Other individual-level variables can be derived from the true state variables and, hence, hence do not need to be treated as state variables themselves but are often used in equations instead of the true state variables:
 
  + Leaf biomass, $B_{leaf}$ ($g\,dry$), from $LA$.
  + Twig biomass, $B_{twig}$ ($g\,dry$), from $LA$.
- + Dead leaf mass, $D_{leaf}$ ($g\,dry$), from $LA^{dead}$.
- + Dead twig (diameter < 0.635 cm) mass, $D_{twig}$ ($g\,dry$), from $LA^{dead}$.
+ + Dead leaf mass, $D_{leaf}$ ($g\,dry$), from $LA_{dead}$.
+ + Dead twig (diameter < 0.635 cm) mass, $D_{twig}$ ($g\,dry$), from $LA_{dead}$.
  + The radial length of coarse roots in each soil layer $s$, $L_{radial, s}$ ($mm$), from $FRP_{s}$.
  + Sapwood biomass, $B_{sapwood}$ ($g\,dry$), from $SA$, $H$ and $FRP_{s}$ and $L_{radial,s}$.
  + Heartwood mass, for trees, $D_{heartwood}$ ($g\,dry$), from $SA$, $DBH$, $H$ and $FRP_{s}$ and $L_{radial,s}$.
@@ -253,14 +256,14 @@ Since the growth model builds on soil and plant water balance models, the water 
 
 ### Labile carbon balance 
 
-The model performs daily carbon balance of *labile carbon* in leaves and sapwood (stem, branches and coarse roots) for each plant cohort. In each of these two compartments carbon balance is performed for the two labile carbon forms, dissolved sugars (i.e. *metabolic carbon*) and starch (i.e. *storage carbon*). In the following all carbon flows (i.e. the components of right hand side of equations) are assumed to be in units of $g\,gluc \cdot day^{-1}$. At the leaf level, the carbon balance equations for dissolved sugars and starch are ($i$ subscripts omitted):
+The model performs daily carbon balance of *labile carbon* in leaves and sapwood (stem, branches and coarse roots) for each plant cohort. In each of these two compartments carbon balance is performed for the two labile carbon forms, dissolved sugars (i.e. *metabolic carbon*) and starch (i.e. *storage carbon*). In the following all carbon flows (i.e. the components of right hand side of equations) are assumed to be in units of $g\,gluc$. At the leaf level, the carbon balance equations for dissolved sugars and starch are:
 
 \begin{eqnarray}
 \Delta{SS_{leaf}} \cdot V_{storage,leaf} &=& A - M_{leaf} - F_{phloem} - SC_{leaf} - TS_{leaf}\\
 \Delta{ST_{leaf}} \cdot V_{storage,leaf} &=& SC_{leaf} - TT_{leaf}
 (\#eq:leafcarbonbalanceequations)
 \end{eqnarray}
-where $A$ is (gross) photosynthesis, $M_{leaf}$ is leaf maintenance respiration, $F_{phloem}$ is the sugar flow via phloem towards the stem and roots,  $SC_{leaf}$ is the conversion from leaf sugar to leaf starch, $TS_{leaf}$ and $TT_{leaf}$ are the translocation of leaf sugars and starch into sapwood storage, respectively, during leaf senescence (see \@ref(eq:sapwoodcarbonbalanceequations) below) or if leaf storage capacity is surpassed. 
+where $A$ is (gross) photosynthesis, $M_{leaf}$ is leaf maintenance respiration, $F_{phloem}$ is the sugar flow via phloem towards the stem and roots,  $SC_{leaf}$ is the conversion from leaf sugar to leaf starch, $TS_{leaf}$ and $TT_{leaf}$ are the translocation of leaf sugars and starch into sapwood storage, respectively, during leaf senescence (see eq. \@ref(eq:sapwoodcarbonbalanceequations) below) or if leaf storage capacity is surpassed. 
 
 The corresponding carbon balance equations for sapwood dissolved sugars and starch are:
 \begin{eqnarray}
@@ -273,9 +276,10 @@ The corresponding carbon balance equations for sapwood dissolved sugars and star
 where $F_{phloem}$ is the sugar inflow via phloem transport, $M_{sapwood}$ is the sum of maintenance respiration of branches, stem and coarse roots, $M_{fineroot}$ is the maintenance respiration of fine roots, $G_{leaf}$, $G_{sapwood}$ and $G_{fineroot}$ are the carbon costs of forming new leaves, sapwood or fine roots (respectively), $SC_{sapwood}$ is the conversion of sapwood sugar to sapwood starch, $TS_{sapwood}$ is the translocation of sapwood sugars into starch during leaf senescence and $RE_{sapwood}$ is the root exudation of sapwood carbon. 
 
 
-If we define $S_{labile}$ as the total amount of labile carbon in the plant (in $g\,gluc$):
+If we define $S_{labile}$ as the total amount of labile carbon for an individual plant (in $g\,gluc$):
 \begin{equation}
 S_{labile} = (SS_{leaf} + ST_{leaf}) \cdot V_{storage,leaf} + (SS_{sapwood} + ST_{sapwood}) \cdot V_{storage,sapwood}
+(\#eq:totallabileplantequation)
 \end{equation}
 then labile carbon balance at the plant level reduces to:
 \begin{equation}
@@ -284,32 +288,66 @@ then labile carbon balance at the plant level reduces to:
 \end{equation}
 where $M = M_{leaf} + M_{sapwood} + M_{fineroot}$ is plant-level maintenance respiration,  $G = G_{leaf} + G_{sapwood} + G_{fineroot}$ is plant-level growth costs and $RE = RE_{sapwood}$ is plant-level root exudation.
 
-### Live biomass balance
+### Plant biomass balance
 
-In addition to changes in labile carbon pools, the model also implements changes in the size of carbon compartments (leaves, sapwood and fine roots), as a result of the interplay between growth and senescence processes. Hence, we can define the following structural equations:
+**Live biomass balance**
+
+In addition to changes in labile carbon pools, the model also implements changes in the size of carbon compartments (leaves, twigs, sapwood and fine roots), as a result of the interplay between growth and senescence processes. Hence, we can define the following structural equations:
 \begin{eqnarray}
 \Delta{B_{leaves}} &=& B_{leaves, growth} - B_{leaves, senescence}\\
+\Delta{B_{twigs}} &=& B_{twigs, growth} - B_{twigs, senescence}\\
 \Delta{B_{sapwood}} &=& B_{sapwood, growth} - B_{sapwood, senescence}\\
 \Delta{B_{fineroot}} &=& B_{fineroot, growth} -  B_{fineroot, senescence}
+(\#eq:livestructurecarbonbalanceequations)
 \end{eqnarray}
-where all variables would be in units of $g\,dry \cdot day^{-1}$. And the following equation defines the structural biomass balance at the plant level:
+where all variables would be in units of $g\,dry$. 
+
+The following equation defines the biomass balance for (live) structural pools:
+
 \begin{equation}
-\Delta{B_{structure}} = \Delta{B_{leaves}} + \Delta{B_{sapwood}} +  \Delta{B_{fineroot}}
+\Delta{B_{structure}} = \Delta{B_{leaves}} + \Delta{B_{twigs}} + \Delta{B_{sapwood}} + \Delta{B_{fineroot}}
+(\#eq:plantlivestructurecarbonbalanceequation)
 \end{equation}
-The biomass balance at the **individual level** is completed if we add the labile biomass balance to the structural biomass balance:
+
+**Dead mass balance**
+
+Senescence processes create carbon for dead pools. Hence, we can define the following structural equations:
+\begin{eqnarray}
+\Delta{D_{leaves}} &=& B_{leaves, senescence} - D_{leaves, fall}\\
+\Delta{D_{twigs}} &=& B_{twigs, senescence} - D_{twigs, fall}\\
+\Delta{D_{heartwood}} &=& B_{sapwood, senescence}\\
+(\#eq:deadstructurecarbonbalanceequations)
+\end{eqnarray}
+
+Where $D_{leaves, fall}$ and $D_{twigs, fall}$ are the mass of leaves and twigs, respectively. that falls and goes to litter pools. For trees, sapwood senescence ($B_{sapwood, senescence}$) results in a corresponding increase in heartwood ($D_{heartwood}$). In contrast, for shrubs heartwood is not considered and sapwood senescence ($B_{sapwood, senescence}$) results in dead standing branch (snag) creation. 
+
+The following equation defines the plant mass balance for dead pools:
+
 \begin{equation}
-\Delta{B_{plant}} = \Delta{B_{structure}} + \Delta{S_{labile}} 
+\Delta{D_{dead}} = \Delta{D_{leaves}} + \Delta{D_{twigs}} + \Delta{D_{heartwood}}
+(\#eq:plantdeadstructurecarbonbalanceequation)
+\end{equation}
+
+
+**Total plant mass balance**
+
+The overall mass balance at the **individual level** is completed if we add the labile biomass balance to the structural and dead mass balances:
+\begin{equation}
+\Delta{B_{plant}} = \Delta{B_{structure}} + \Delta{D_{dead}} + \Delta{S_{labile}} 
+(\#eq:planttotalcarbonbalanceequation)
 \end{equation}
 
 **Cohort-level biomass balance**
 
 At the cohort level, we need to take into account that some individuals will die, so that the biomass balance needs to incorporate mortality losses:
 \begin{equation}
-\Delta{B_{cohort}} = \Delta{B_{plant}} \cdot N_{cohort} - B_{mortality} 
+\Delta{B_{cohort}} = \Delta{B_{plant}} \cdot N_{cohort} - D_{mortality} 
+(\#eq:cohorttotalcarbonbalanceequation)
 \end{equation}
-where $N_{cohort}$ is the initial cohort density (before mortality occurred) and $B_{mortality}$ is the biomass loss due to mortality of individuals, which in order to close the balance has to be defined as:
+where $N_{cohort}$ is the initial cohort density (before mortality occurred) and $D_{mortality}$ is the biomass loss due to mortality of individuals, which in order to close the balance has to be defined as:
 \begin{equation}
- B_{mortality} = (B_{plant} + \Delta{B_{plant}}) \cdot N_{dead} 
+ D_{mortality} = (B_{plant} + \Delta{B_{plant}}) \cdot N_{dead} 
+(\#eq:mortalitycarbonlossequation)
 \end{equation}
 where $N_{dead}$ is the density of dead individuals and $B_{plant}$ is the initial plant biomass.
 
@@ -388,7 +426,7 @@ Soil input requirements are the same as for the basic water balance model and we
 
 **Vegetation**
 
-Vegetation input requirements were fully described in section \@ref(vegetationinput). Trees and shrubs do not need to be characterized with different variables in soil water balance calculations, since both kinds of cohort have a $LAI$ value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. $LAI^{live}$, because one can assume no dead leaves in the canopy (i.e., $LAI^{dead} = 0$). Note that vegetation characteristics are modified by simulations in this model.
+Vegetation input requirements were fully described in section \@ref(vegetationinput). Trees and shrubs do not need to be characterized with different variables in soil water balance calculations, since both kinds of cohort have a $LAI$ value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. $LAI_{live}$, because one can assume no dead leaves in the canopy (i.e., $LAI_{dead} = 0$). Note that vegetation characteristics are modified by simulations in this model.
 
 **Metereological input**
 

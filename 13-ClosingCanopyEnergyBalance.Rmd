@@ -48,10 +48,10 @@ After evaluating the canopy energy balance equation \@ref(eq:canopyenergybalance
 \end{equation}
 where $TC_{can}$ is the canopy thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$) and $\Delta t_{step} = 86400/n_t$ is the size of the time step in seconds. Canopy thermal capacitance depends on the leaf area index of the stand:
 \begin{equation}
-TC_{can} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{stand} + 1.2 \cdot (LAI_{stand}^{phi} + \cdot LAI_{stand}^{dead})}{2}
+TC_{can} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{live} + 1.2 \cdot (LAI_{\phi} + \cdot LAI_{dead})}{2}
 (\#eq:canopythermalcapacitance)
 \end{equation}
-where $TC_{LAI}$ is the thermal capacitance per LAI unit, which is specified by the control parameter `thermalCapacityLAI`. By using both the maximum leaf area of the stand, $LAI_{stand}$, and its current live/dead leaf area ($LAI_{stand}^{phi}+LAI_{stand}^{dead}$) it is assumed that part of thermal capacitance corresponds to stems and branches, so that capacitance does not drop to zero for deciduous canopies.
+where $TC_{LAI}$ is the thermal capacitance per LAI unit, which is specified by the control parameter `thermalCapacityLAI`. By using both the maximum leaf area of the stand, $LAI_{live}$, and its current live/dead leaf area ($LAI_{\phi}+LAI_{dead}$) it is assumed that part of thermal capacitance corresponds to stems and branches, so that capacitance does not drop to zero for deciduous canopies.
 
 ### Soil temperature changes
 Analogously to the canopy, the change in temperature for a given soil layer $s$ in the current time step is given by rearranging eq. \@ref(eq:deepsoilenergybalance):
@@ -86,28 +86,28 @@ LE_{vap, j} = \lambda_v(T_{air,j}) \cdot \left(\frac{In_{j,t}}{\Delta t_{step}} 
 \end{equation}
 where $\lambda_v(T_{air,j})$ is the latent heat of vaporization at temperature $T_{air,j}$ (in $J·kg^{-1}$), $In_{j,t}$ is the intercepted water that is evaporated from the canopy layer, determined by dividing $In_{t}$ among canopy layers according to the fraction of total LAI in each one:
 \begin{equation}
-In_{j,t} = In_{t} \cdot \frac{\sum_{i=1}{LAI_{i,j}^{\phi}}}{LAI^{\phi}_{stand}}
+In_{j,t} = In_{t} \cdot \frac{\sum_{i=1}{LAI_{\phi,i,j}}}{LAI_{\phi}}
 \end{equation}
 and $E_{j,t}$ is the instantaneous transpiration rate in layer $j$ (in $kg\,H_2O\cdot m^{-2}\cdot s^{-1}$), given by:
 \begin{equation}
-E_{j,t} = 10^{-3} \cdot 0.01802\cdot \sum_{i=1}^{c}{E_{i,t}^{sunlit}\cdot LAI_{i,j}^{sunlit} + E_{i,t}^{shade}\cdot LAI_{i,j}^{shade}} 
+E_{j,t} = 10^{-3} \cdot 0.01802\cdot \sum_{i=1}^{c}{E_{sunlit,i,t}\cdot LAI_{sunlit,i,j} + E_{shade,i,t}\cdot LAI_{shade,i,j}} 
 (\#eq:cohortlayertranspiration)
 \end{equation}
-where $E_{i,t}^{sunlit}$ and $E_{i,t}^{shade}$ are the instantaneous transpiration rates (in $mmol\,H_2O\cdot m^{-2}\cdot s^{-1}$) of sunlit and shade leaves, respectively, of cohort $i$ during time step $t$; and $LAI_{i,j}^{sunlit}$ and $LAI_{i,j}^{shade}$ are the leaf area index of sunlit and shade leaves, respectively, of cohort $i$ in layer $j$ \@ref(eq:sunlitshadelai).
+where $E_{sunlit, i,t}$ and $E_{sunlit,i,t}$ are the instantaneous transpiration rates (in $mmol\,H_2O\cdot m^{-2}\cdot s^{-1}$) of sunlit and shade leaves, respectively, of cohort $i$ during time step $t$; and $LAI_{sunlit,i,j}$ and $LAI_{shade,i,j}$ are the leaf area index of sunlit and shade leaves, respectively, of cohort $i$ in layer $j$ \@ref(eq:sunlitshadelai).
 
 Latent heat derived from soil water evaporation and snow melting ($LE_{vap, soil}$ and $LE_{fus, snow}$; in $W\cdot m^{-2}$) are estimated as in the single-canopy case, using eqs. \@ref(eq:soillatentheat) and \@ref(eq:snowlatentheat).
 
 ### Sensible heat between leaves and the canopy air space
 The sensible heat exchanged between the air of canopy layer $j$ and the leaves within it ($H_{leaf,j}$; $W\cdot m^{-2}$) is obtained using:
 \begin{equation}
-H_{leaf,j} = \sum_{i=1}^c { LAI^{sunlit}_{i,j} \cdot H^{sunlit}_{i,j}  + LAI^{shade}_{i,j} \cdot H^{shade}_{i,j}}
+H_{leaf,j} = \sum_{i=1}^c { LAI_{sunlit,i,j} \cdot H_{sunlit,i,j}  + LAI_{shade,i,j} \cdot H_{shade,i,j}}
 \end{equation}
-where $LAI^{sunlit}_{i,j}$ and $LAI^{shade}_{i,j}$ are the leaf area index of sunlit and shade leaves of plant cohort $i$ in layer $j$, respectively (see eq. \@ref(eq:sunlitshadelai)). $H^{sunlit}_{i,j}$ and $H^{shade}_{i,j}$ are the sensible heat exchange between layer $j$ and sunlit or shade leaves of cohort $i$ [@Ma2019]:
+where $LAI_{sunlit,i,j}$ and $LAI_{shade,i,j}$ are the leaf area index of sunlit and shade leaves of plant cohort $i$ in layer $j$, respectively (see eq. \@ref(eq:sunlitshadelai)). $H_{sunlit,i,j}$ and $H_{shade,i,j}$ are the sensible heat exchange between layer $j$ and sunlit or shade leaves of cohort $i$ [@Ma2019]:
 \begin{eqnarray}
-H^{sunlit}_{i,j} &=& -2 \cdot C_p \cdot (T^{sunlit}_{leaf,i} - T_{air,j})\cdot g_{Ha,i,j}\\
-H^{shade}_{i,j} &=& -2\cdot C_p \cdot (T^{shade}_{leaf,i} - T_{air,j})\cdot g_{Ha,i,j}
+H_{sunlit,i,j} &=& -2 \cdot C_p \cdot (T_{leaf,sunlit,i} - T_{air,j})\cdot g_{Ha,i,j}\\
+H_{shade,i,j} &=& -2\cdot C_p \cdot (T_{leaf,shade,i} - T_{air,j})\cdot g_{Ha,i,j}
 \end{eqnarray}
-where $T^{sunlit}_{leaf,i}$ and $T^{shade}_{leaf,i}$ are, respectively, the sunlit and shade leaf temperatures for cohort $i$ (determined using eq. \@ref(eq:leaftemperatureequation)); $T_{air,j}$ is the current air temperature in canopy layer $j$, $C_p = 29.37152\,J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure; and $g_{Ha,i,j}$ is the leaf boundary layer conductance for heat ($mol \cdot m^{-2} \cdot s^{-1}$) for leaves of cohort $i$ and wind speed in layer $j$ (see eq. \@ref(eq:leafboundaryconductances)).
+where $T_{leaf,sunlit,i}$ and $T_{leaf,shade,i}$ are, respectively, the sunlit and shade leaf temperatures for cohort $i$ (determined using eq. \@ref(eq:leaftemperatureequation)); $T_{air,j}$ is the current air temperature in canopy layer $j$, $C_p = 29.37152\,J \cdot mol^{-1} \cdot ºC^{-1}$ is the specific heat capacity of dry air at constant pressure; and $g_{Ha,i,j}$ is the leaf boundary layer conductance for heat ($mol \cdot m^{-2} \cdot s^{-1}$) for leaves of cohort $i$ and wind speed in layer $j$ (see eq. \@ref(eq:leafboundaryconductances)).
 
 ### Turbulent heat exchange
 
@@ -137,7 +137,7 @@ Evaluation of the canopy layer energy balance equation \@ref(eq:canopylayerenerg
 \end{equation}
 where $TC_{j}$ is the  thermal capacitance of canopy layer $j$ (in $J \cdot m^{-2} \cdot K^{-1}$), found analogously to $TC_{can}$ (eq. \@ref(eq:canopythermalcapacitance)):
 \begin{equation}
-TC_{j} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{j} + 1.2 \cdot (LAI_{j}^{phi} + \cdot LAI_{j}^{dead})}{2}
+TC_{j} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{live,j} + 1.2 \cdot (LAI_{\phi,j} + \cdot LAI_{dead,j})}{2}
 \end{equation}
 $\Delta t_{substep}$ is the time step for closing the energy balance, which has to be smaller than $\Delta t_{step}$ to avoid numerical instabilities due to turbulent flow.
 
@@ -170,9 +170,9 @@ S_{[CO_2],j} &=& - \frac{A_{n, j,t}}{\Delta z}
 \end{eqnarray}
 where $E_{j,t}$ and $A_{n,j,t}$ are the instantaneous transpiration and photosynthesis rates in layer $j$. The former was already defined in eq. \@ref(eq:cohortlayertranspiration), whereas the latter ($A_{n, j,t}$; in $mg\,CO_2\cdot m^{-2} \cdot s^{-1}$) is defined analogously:
 \begin{equation}
-A_{n, j,t} = 10^{-3} \cdot 44.01 \cdot \sum_{i=1}^{c}{A_{n,i,t}^{sunlit}\cdot LAI_{i,j}^{sunlit} + A_{n,i,t}^{shade}\cdot LAI_{i,j}^{shade}}
+A_{n, j,t} = 10^{-3} \cdot 44.01 \cdot \sum_{i=1}^{c}{A_{n,sunlit,i,t}\cdot LAI_{sunlit,i,j} + A_{n,shade, i,t}\cdot LAI_{shade,i,j}}
 \end{equation}
-where $A_{n,i,t}^{sunlit}$ and $A_{n,i,t}^{shade}$ are the instantaneous net photosynthesis rates (in $\mu mol\, CO_2\cdot m^{-2}\cdot s^{-1}$) of sunlit and shade leaves, respectively, of cohort $i$ during time step $t$; and $LAI_{i,j}^{sunlit}$ and $LAI_{i,j}^{shade}$ are the leaf area index of sunlit and shade leaves, respectively of cohort $i$ in layer $j$ \@ref(eq:sunlitshadelai). For the special case of the lowest canopy layer, water vapor needs to include the evaporation from soil, i.e.:
+where $A_{n,sunlit,i,t}$ and $A_{n,shade,i,t}$ are the instantaneous net photosynthesis rates (in $\mu mol\, CO_2\cdot m^{-2}\cdot s^{-1}$) of sunlit and shade leaves, respectively, of cohort $i$ during time step $t$; and $LAI_{sunlit,i,j}$ and $LAI_{shade,i,j}$ are the leaf area index of sunlit and shade leaves, respectively of cohort $i$ in layer $j$ \@ref(eq:sunlitshadelai). For the special case of the lowest canopy layer, water vapor needs to include the evaporation from soil, i.e.:
 \begin{equation}
 S_{[H_2O],1} =  \frac{((In_{1,t}+Es_{t})/\Delta t) + E_{1,t}}{\Delta z}
 \end{equation}

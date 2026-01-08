@@ -33,9 +33,9 @@ Leaf area increment $\Delta LA$ only occurs when phenological state is *unfoldin
 \begin{equation}
 \Delta LA = \min( \Delta LA_{alloc}, \Delta LA_{source}, \Delta LA_{sink})
 \end{equation}
-First, $\Delta LA_{alloc}$ is the maximum leaf area increment allowed by the leaf area target set by the allocation rule, $LA^{target}$, in comparison with current leaf area $LA^{\phi}$:
+First, $\Delta LA_{alloc}$ is the maximum leaf area increment allowed by the leaf area target set by the allocation rule, $LA_{target}$, in comparison with current leaf area $LA_{\phi}$:
 \begin{equation}
-\Delta LA_{alloc} = \max(LA^{target} - LA^{\phi},0)
+\Delta LA_{alloc} = \max(LA_{target} - LA_{\phi},0)
 \end{equation}
 Remember that leaf area target is updated during *bud formation* (see \@ref(updateallocationtargets)). 
 
@@ -53,7 +53,7 @@ where cell relative expansion rate is divided by the maximum relative cell expan
 
 ### Sapwood growth {#sapwoodgrowth}
 
-Sapwood area increment $\Delta SA$ can only occur if $LA^{live}>0$. Newly assimilated carbon is preferentially allocated to leaves and fine roots whenever storage levels are low. $\Delta SA$ is defined as the minimum of two values expressing source and sink constraints:
+Sapwood area increment $\Delta SA$ can only occur if $LA_{live}>0$. Newly assimilated carbon is preferentially allocated to leaves and fine roots whenever storage levels are low. $\Delta SA$ is defined as the minimum of two values expressing source and sink constraints:
 \begin{equation}
 \Delta SA = \min(\Delta SA_{source}, \Delta SA_{sink})
 \end{equation}
@@ -75,7 +75,7 @@ for shrubs. Sapwood growth in trees is proportional to the cambium length (in $c
 \begin{equation}
 PCAC = 100 \cdot \frac{LAI^{\phi}}{LAI^{NC}}
 \end{equation}
-where $LAI^{\phi}$ is the currently expanded leaf area index and $LAI^{NC}$ is the leaf area index assuming no competition with other plants. Since $LAI^{\phi} = \phi \cdot LAI^{live}$ depends on the phenological status $\phi$, the sapwood growth rate will depend on phenology. Moreover, since $LAI^{live} \leq LAI^{NC}$, maximum growth rates will be achieved by cohorts lacking competition of taller cohorts and low self-competition. Since competition increases with forest development, the inclusion of $PCAC$ ensures that sapwood area growth rates will decrease for forests of larger basal area.
+where $LAI_{\phi}$ is the currently expanded leaf area index and $LAI_{NC}$ is the leaf area index assuming no competition with other plants. Since $LAI_{\phi} = \phi \cdot LAI_{live}$ depends on the phenological status $\phi$, the sapwood growth rate will depend on phenology. Moreover, since $LAI_{live} \leq LAI_{NC}$, maximum growth rates will be achieved by cohorts lacking competition of taller cohorts and low self-competition. Since competition increases with forest development, the inclusion of $PCAC$ ensures that sapwood area growth rates will decrease for forests of larger basal area.
 
 ### Fine root growth {#finerootgrowth}
 
@@ -111,9 +111,9 @@ p_{aging,leaf} = \frac{1}{365.25 \cdot LD}
 \end{equation}
 Senescence due to drought effects occurs as a consequence of stem cavitation. If the proportion of conductance loss has increased with respect to the preceeding day, the model determines the leaf area corresponding to the current level of cavitation:
 \begin{equation}
-LA^{cavitation} = (1 - PLC_{stem}) \cdot LA^{target}
+LA_{cavitation} = (1 - PLC_{stem}) \cdot LA_{target}
 \end{equation}
-if $LA^{cavitation} < LA^{\phi}$ then the corresponding proportion $p_{cavitation, leaf}$ is estimated. The maximum of $p_{aging,leaf}$ and $p_{cavitation, leaf}$ is applied as a reduction of leaf area. If growth is simulated using the advanced water model, it also checks whether the relative water content in leaves becomes less than 50\% (i.e. $RWC_{leaf} < 0.5$) and, if this happens, the plant cohort is completely defoliated.
+if $LA_{cavitation} < LA_{\phi}$ then the corresponding proportion $p_{cavitation, leaf}$ is estimated. The maximum of $p_{aging,leaf}$ and $p_{cavitation, leaf}$ is applied as a reduction of leaf area. If growth is simulated using the advanced water model, it also checks whether the relative water content in leaves becomes less than 50\% (i.e. $RWC_{leaf} < 0.5$) and, if this happens, the plant cohort is completely defoliated.
 
 Xylem cavitation not only causes defoliation but also mortality of buds, which has the effect of slowing down post-drought leaf area recovery. The percentage of the crown with active buds ($PCAB$) is reduced whenever the proportion of conductance loss has increased with respect to the preceeding day. 
 
@@ -144,11 +144,11 @@ where $T_{soil,s}$ is the temperature of soil layer $s$. When $SR_{fineroot}$ is
 
 Multiple anatomic and physiological parameters are updated every day after applying changes in the size of leaf, sapwood and fine root compartments, which creates a feedback to those hydraulic and physiological processes simulated in the water balance submodel. Hence, the growth model allows emulating plant acclimation to environmental cues, mediated by growth and senescence of plant tissues.
 
-First leaf area index ($LAI^{\phi}$) is updated from leaf area ($LA^{\phi}$) inverting eq. \@ref(eq:leafarea). The Huber value ($H_v$, the sapwood area to leaf area ratio; in $m^{2}\cdot m^{-2}$) is affected by changes in $LA^{live} = LA_{target}$ and sapwood area $SA$:
+First leaf area index ($LAI_{\phi}$) is updated from leaf area ($LA_{\phi}$) inverting eq. \@ref(eq:leafarea). The Huber value ($H_v$, the sapwood area to leaf area ratio; in $m^{2}\cdot m^{-2}$) is affected by changes in $LA_{live} = LA_{target}$ and sapwood area $SA$:
 \begin{equation}
-H_v = \frac{SA/10000}{LA^{live}}
+H_v = \frac{SA/10000}{LA_{live}}
 \end{equation}
-Note that we specify $LA^{live} = LA_{target}$ and not $LA^{\phi}$ to avoid variations in Huber value due to leaf phenology. By definition, fine root biomass changes in each soil layer ($B_{fineroot,s}$) lead to updates in the proportion of fine roots in each layer ($FRP_s$):
+Note that we specify $LA_{live} = LA_{target}$ and not $LA_{\phi}$ to avoid variations in Huber value due to leaf phenology. By definition, fine root biomass changes in each soil layer ($B_{fineroot,s}$) lead to updates in the proportion of fine roots in each layer ($FRP_s$):
 \begin{equation}
 FRP_s = \frac{B_{fineroot,s}}{\sum_{l}{B_{fineroot,l}}}
 \end{equation}
@@ -157,9 +157,9 @@ When we simulate growth with the advanced water balance model other parameters a
 \begin{equation}
 k_{stem, max} = \frac{1000}{0.018} \cdot \frac{K_{xylem, max} \cdot H_v}{(H/100)} \cdot \chi_{taper}
 \end{equation}
-where $\chi_{taper}$ is a factor to account for taper of xylem conduit with height [@Savage2010; @Christoffersen2016], 0.018 is the molar weight of water (in $kg\cdot mol^{-1}$). Both an increase in $SA$ or a decrease in $LA^{live}$ (i.e. an increase in $H_v$) increase $k_{stem, max}$ and, hence, alleviate drought effects (i.e. a lower decrease in water potential across the stem for the same flow). In contrast, an increase in plant height will decrease stem conductance and increase drought stress. Changes in stem maximum conductance has cascade effects on root maximum conductance. First, coarse root minimum resistance is defined as a fixed proportion of whole-plant minimum resistance, so an increase in stem maximum conductance will increase whole-plant conductance and coarse root conductance, $k_{root,max}$. 
+where $\chi_{taper}$ is a factor to account for taper of xylem conduit with height [@Savage2010; @Christoffersen2016], 0.018 is the molar weight of water (in $kg\cdot mol^{-1}$). Both an increase in $SA$ or a decrease in $LA_{live}$ (i.e. an increase in $H_v$) increase $k_{stem, max}$ and, hence, alleviate drought effects (i.e. a lower decrease in water potential across the stem for the same flow). In contrast, an increase in plant height will decrease stem conductance and increase drought stress. Changes in stem maximum conductance has cascade effects on root maximum conductance. First, coarse root minimum resistance is defined as a fixed proportion of whole-plant minimum resistance, so an increase in stem maximum conductance will increase whole-plant conductance and coarse root conductance, $k_{root,max}$. 
 
-Rhizosphere maximum conductance per leaf area unit in a given soil layer $s$ ($k_{rhizo, max, s}$; in $mmol \cdot m^{-2}\cdot s^{-1} \cdot MPa^{-1}$) depends on fine root biomass in this layer ($B_{fineroot,s}$) and on leaf area (i.e. $LA^{live}$). The equations regulating these relationships are modulated by several soil and species parameters, such as soil saturated hydraulic conductance, species-specific root length, root length density and density of fine roots. 
+Rhizosphere maximum conductance per leaf area unit in a given soil layer $s$ ($k_{rhizo, max, s}$; in $mmol \cdot m^{-2}\cdot s^{-1} \cdot MPa^{-1}$) depends on fine root biomass in this layer ($B_{fineroot,s}$) and on leaf area (i.e. $LA_{live}$). The equations regulating these relationships are modulated by several soil and species parameters, such as soil saturated hydraulic conductance, species-specific root length, root length density and density of fine roots. 
 
 The proportion of conductance loss due to cavitation ($PLC_{stem}$) is reduced whenever sapwood area growth occurs:
 \begin{equation}
@@ -181,9 +181,9 @@ PCAB_{t+1} = \min(PCAB_{t} + 100 \cdot \frac{\Delta SA}{SA}, 100)
 
 ### Leaf area and fine root biomass targets {#updateallocationtargets}
 
-Leaf area target ($LA^{live} = LA_{target}$) is updated when phenological phase is *bud formation*. If the allocation strategy pursues a **stable Huber value**, the model tries to bring $H_{v}$ close to an initial value $H_{v,target}$, and the leaf area target is defined as: 
+Leaf area target ($LA_{live} = LA_{target}$) is updated when phenological phase is *bud formation*. If the allocation strategy pursues a **stable Huber value**, the model tries to bring $H_{v}$ close to an initial value $H_{v,target}$, and the leaf area target is defined as: 
 \begin{equation}
-LA^{live} = LA_{target} = \frac{SA}{10000 \cdot H_{v,target}}
+LA_{live} = LA_{target} = \frac{SA}{10000 \cdot H_{v,target}}
 \end{equation}
 Note that the specification of $LA_{target}$ will cause sapwood area increases to be followed by leaf area increases, as long as $H_{v} > H_{v,target}$. On the contrary, if $H_{v} < H_{v,target}$ then leaf area growth is inhibited and sapwood area growth will progressively increase $H_{v}$. Fine root biomass target is set using:
 \begin{equation}
@@ -193,7 +193,7 @@ where $RLR$ is the root area to leaf area ratio, $\rho_{fineroot}$ is fine root 
 
 If the allocation strategy pursues a **stable whole-plant conductance**, the model tries to keep $k_{plant}$ close to an initial value $k_{plant,target}$, and here the leaf area target is defined as: 
 \begin{equation}
-LA_{target} = LA^{live} \cdot \frac{k_{plant,max}}{k_{plant,target}}
+LA_{target} = LA_{live} \cdot \frac{k_{plant,max}}{k_{plant,target}}
 \end{equation}
 In this strategy, increases in leaf area will be scheduled whenever the current whole-plant conductance is above target value (i.e. $k_{plant,max} > k_{plant,target}$). Analogously to the previous strategy, if $k_{plant,max} < k_{plant,target}$ then leaf area growth is inhibited and sapwood area growth will progressively increase $k_{plant,max}$. 
 
@@ -224,7 +224,7 @@ Since shrub structural variables are height and cover, shrub growth is done in a
 
 Starting from live leaf area ($m^2·m^{-2}$) we can calculate the foliar weight per shrub individual (in $kg · ind^{-1}$):
 \begin{equation}
-W_{leaves} = \frac{LAI^{live}} {(N/10000) \cdot SLA}
+W_{leaves} = \frac{LAI_{live}} {(N/10000) \cdot SLA}
 \end{equation}
 An allometric relationship relating the biomass of leaves plus small branches and crown phytovolume ($PV$; in $m^3·ind^{-1}$) can be drawn from fuel calculations:
 \begin{equation}

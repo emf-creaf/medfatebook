@@ -5,14 +5,14 @@ This chapter describes how daily plant cohort transpiration ($Tr_{cohorts}$) is 
 ## Plant transpiration and photosynthesis
 ### Maximum transpiration {#maximumtranspiration}
 
-Potential evapotranspiration ($PET$, in mm) is assumed to represent open water evaporation potential. Maximum canopy transpiration $Tr_{cohorts, \max}$ depends on both $PET$ and the amount of transpirating surface, i.e. the current cumulative $LAI$ of the vegetation, $LAI^{\phi}$. To estimate $Tr_{cohorts, \max}$ the model uses the empirical equation of @Granier1999, where $Tr_{cohorts, \max}/PET$ is a function of $LAI^{\phi}$:
+Potential evapotranspiration ($PET$, in mm) is assumed to represent open water evaporation potential. Maximum canopy transpiration $Tr_{cohorts, \max}$ depends on both $PET$ and the amount of transpirating surface, i.e. the current cumulative $LAI$ of the vegetation, $LAI_{\phi}$. To estimate $Tr_{cohorts, \max}$ the model uses the empirical equation of @Granier1999, where $Tr_{cohorts, \max}/PET$ is a function of $LAI_{\phi}$:
 
 \begin{equation}
-\frac{Tr_{cohorts, \max}}{PET}= -0.006\cdot (LAI^{\phi})^2+0.134\cdot LAI^{\phi}+0.036
+\frac{Tr_{cohorts, \max}}{PET}= -0.006\cdot (LAI_{\phi})^2+0.134\cdot LAI_{\phi}+0.036
 \end{equation}
 This equation has already been adopted for Mediterranean biomes [@Fyllas2009; @Ruffault2013]. 
 
-(ref:tmaxpet-cap) Empirical relationship between $Tr_{cohorts, \max}/PET$ and $LAI^{\phi}$
+(ref:tmaxpet-cap) Empirical relationship between $Tr_{cohorts, \max}/PET$ and $LAI_{\phi}$
 
 ```{r tmaxpet, fig.width=4, fig.height=4, fig.align = "center", echo=FALSE, fig.cap='(ref:tmaxpet-cap)'}
 par(mar=c(4,4,1,1))
@@ -23,7 +23,7 @@ plot(LAIc, TmaxPET, type="l", ylab="Tr_cohorts_max/PET", xlab="LAI", ylim=c(0,1)
 
 Since medfate's **ver. 2.1**, empirical coefficients can be species-specific and @Granier1999 empirical equation has been generalized to:
 \begin{equation}
-\frac{Tr_{cohorts, \max}}{PET}=  T_{max,LAI} \cdot LAI^{\phi} + T_{max,sqLAI} \cdot (LAI^{\phi})^2 
+\frac{Tr_{cohorts, \max}}{PET}=  T_{max,LAI} \cdot LAI_{\phi} + T_{max,sqLAI} \cdot (LAI_{\phi})^2 
 \end{equation}
 where $T_{max,LAI}$ and $T_{max,sqLAI}$ are species-specific parameters (if missing, they are given default values 0.134 and -0.006, respectively). 
 
@@ -124,14 +124,14 @@ where $e_{sat}(T)$ is a function giving the saturated vapor pressure for tempera
 
 Once the leaf level $E_{\min}$ is known for a give cohort $i$, we can scale this instantaneous rate to daily transpiration (in mm) at the cohort level using:
 \begin{equation}
-Tr_{\min,i} = E_{\min,i} \cdot 24 \cdot 3600 \cdot LAI_i^{\phi} \cdot 0.018
+Tr_{\min,i} = E_{\min,i} \cdot 24 \cdot 3600 \cdot LAI_{\phi,i} \cdot 0.018
 \end{equation}
 
 
 ### Transpiration with water pools {#transpirationpools}
 Considering water pools (i.e. setting `rhizosphereOverlap = "partial"` or `rhizosphereOverlap = "total"` in the control parameters) involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many plant water pools as plant cohorts, with proportions defined by their LAI values. For example, the fraction corresponding to plant cohort $j$ would be:
 \begin{equation}
-f_{pool,j} = \frac{LAI^{live}_j}{LAI^{live}_{stand}}
+f_{pool,j} = \frac{LAI_{live,j}}{LAI_{live}}
 \end{equation}
 Overall soil moisture is then related to moisture of plant water pools by the following equation, that is fulfilled for each soil layer $s$:
 \begin{equation}

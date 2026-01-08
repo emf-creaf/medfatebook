@@ -300,8 +300,8 @@ Since density and diameter have not been provided, simulations in this case will
 
 The structure presented above for `forest` objects corresponds to the required data elements. A forest object can contain additional information when this is available. In particular, data frames `treeData`, `shrubData` and `herbData` can contain additional columns:
 
-+ `LAI`: Leaf area index ($m^2 \cdot m^{-2}$), corresponding to $LAI^{live}$, avoiding the use of allometric relationships for leaf biomass in water balance simulations.
-+ `FoliarBiomass`: Standing dry biomass of leaves ($kg \cdot m^{-2}$), which together with $SLA$ will be used to estimate $LAI^{live}$, avoiding the use of allometric relationships for leaf biomass in water balance simulations.
++ `LAI`: Leaf area index ($m^2 \cdot m^{-2}$), corresponding to $LAI_{live}$, avoiding the use of allometric relationships for leaf biomass in water balance simulations.
++ `FoliarBiomass`: Standing dry biomass of leaves ($kg \cdot m^{-2}$), which together with $SLA$ will be used to estimate $LAI_{live}$, avoiding the use of allometric relationships for leaf biomass in water balance simulations.
 + `FuelLoading`: Fine fuel loading ($kg \cdot m^{-2}$), to avoid its calculation from allometric relationships.
 + `CrownRatio`: The ratio between crown length and total height (between 0 and 1), avoiding the use of allometric relationships for crown ratio in water balance simulations.
 + `Z100`: Depth (in $mm$) corresponding to 100% of fine roots (to specify a truncated root distribution).
@@ -380,40 +380,40 @@ Forest objects can include the description of soil organic matter pools, in an e
 
 #### Leaf area index of a plant cohort
 
-$LAI$ variables refer to *one-sided leaf area* of plants per surface area of the stand. Only living plant cohorts (or the collective herbaceous layer) contribute to the leaf area of the forest stand (i.e. seedlings or dead snags are assumed to not contribute significantly to leaf area). Leaves standing on branches of living plant cohorts can be alive or dead. We will call *total leaf area index* of a plant cohort $i$ ($LAI^{all}_{i}$) to the sum of its dead and live (and unfolded) leaf area:
+$LAI$ variables refer to *one-sided leaf area* of plants per surface area of the stand. Only living plant cohorts (or the collective herbaceous layer) contribute to the leaf area of the forest stand (i.e. seedlings or dead snags are assumed to not contribute significantly to leaf area). Leaves standing on branches of living plant cohorts can be alive or dead. We will call *total leaf area index* of a plant cohort $i$ ($LAI_{all,i}$) to the sum of its dead and live (and unfolded) leaf area:
 \begin{equation}
-LAI^{all}_{i} = LAI^{\phi}_{i}+LAI^{dead}_{i}
+LAI_{all,i} = LAI_{\phi,i}+LAI_{dead,i}
 \end{equation}
 
-For simulations not involving growth, winter-deciduous phenology is a prognosed variable, and the current level of leaves unfolded may be lower than the maximum (live) amount of leaves. In simulations involving growth, both $LAI^{\phi}$ and $LAI^{live}$ can change, the former due to leaf phenology (unfolding is simulated explicitly and has carbon costs) and the latter due to leaf allocation limits during plant development.
+For simulations not involving growth, winter-deciduous phenology is a prognosed variable, and the current level of leaves unfolded may be lower than the maximum (live) amount of leaves. In simulations involving growth, both $LAI_{\phi}$ and $LAI_{live}$ can change, the former due to leaf phenology (unfolding is simulated explicitly and has carbon costs) and the latter due to leaf allocation limits during plant development.
 
 #### Leaf area index of the forest stand
 
 If there are $c$ living plant cohorts, the leaf area index corresponding to living leaves, unfolded leaves and dead leaves can be aggregated across cohorts using:
 
 \begin{eqnarray}
-LAI^{live} &=& \sum_{i=1}^c{LAI_{i}^{live}} \\
-LAI^{\phi} &=& \sum_{i=1}^c{LAI_{i}^{\phi}} \\
-LAI^{dead} &=& \sum_{i=1}^c{LAI_{i}^{dead}}
+LAI_{live} &=& \sum_{i=1}^c{LAI_{live,i}} \\
+LAI_{\phi} &=& \sum_{i=1}^c{LAI_{\phi,i}} \\
+LAI_{dead} &=& \sum_{i=1}^c{LAI_{dead,i}}
 \end{eqnarray}
 
-We can also estimate the overall leaf area index of living plant cohorts ($LAI^{all}$), including dead leaves:
+We can also estimate the overall leaf area index of living plant cohorts ($LAI_{all}$), including dead leaves:
 
 \begin{eqnarray}
-LAI^{all} &=& \sum_{i=1}^{c}{\left[LAI^{\phi}_{i}+LAI^{dead}_{i}\right]} = LAI^{\phi}+LAI^{dead}
+LAI_{all} &=& \sum_{i=1}^{c}{\left[LAI_{\phi,i}+LAI_{dead,i}\right]} = LAI_{\phi}+LAI_{dead}
 \end{eqnarray}
 
-Finally, we can also estimate the overall leaf area index of the whole stand ($LAI^{all}_{stand}$), which also takes into account the collective herbaceous layer ($LAI_{herb}$), if defined:
+Finally, we can also estimate the overall leaf area index of the whole stand ($LAI_{all,stand}$), which also takes into account the collective herbaceous layer ($LAI_{herb}$), if defined:
 
 \begin{eqnarray}
-LAI^{all}_{stand} &=& LAI^{all} + LAI_{herb} = LAI^{\phi}+LAI^{dead} + LAI_{herb} 
+LAI_{all, stand} &=& LAI_{all} + LAI_{herb} = LAI_{\phi}+LAI_{dead} + LAI_{herb} 
 \end{eqnarray}
 
 #### Vertical leaf distribution {#leafdistribution}
 
-The vegetation input structures allow the package to determine the vertical distribution of leaves in the stand. The leaf area of any woody plant cohort is assumed to be distributed vertically following a **truncated Gaussian function** whose standardized values -1.5 and 1.5 correspond to crown base height ($H_{crown,i}$; in $cm$) and total plant height ($H_i$), respectively. Crown base height is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort ($CR_i$; a proportion between 0 and 1), which in turn can be estimated as explained in \@ref(eq:CrownHeight). 
+The vegetation input structures allow the package to determine the vertical distribution of leaves in the stand. The leaf area of any woody plant cohort is assumed to be distributed vertically following a **truncated Gaussian function** whose standardized values -1.5 and 1.5 correspond to crown base height ($H_{crown}$; in $cm$) and total plant height ($H$), respectively. Crown base height is defined as the height corresponding to the first living branch. It is calculated from the crown ratio of the cohort ($CR$; a proportion between 0 and 1), which in turn can be estimated as explained in \@ref(eq:CrownHeight). 
 
-Simulation models in **medfate** divide the vertical dimension into vertical layers (by default are 100 cm width, but see control parameter `verticalLayerSize`). Let us define $LAI_{i,j}^{all} = LAI_{i,j}^{\phi}+LAI_{i,j}^{dead}$ as the leaf area index of cohort $i$ in layer $j$ including both functional leaves and dead leaves standing on branches. The truncated Gaussian distribution defines the $LAI_{i,j}^{\phi}$ and $LAI_{i,j}^{dead}$ for all plant cohorts and vertical layers.
+Simulation models in **medfate** divide the vertical dimension into vertical layers (by default are 100 cm width, but see control parameter `verticalLayerSize`). Let us define $LAI_{all, i,j} = LAI_{\phi,i,j}+LAI_{dead,i,j}$ as the leaf area index of cohort $i$ in layer $j$ including both functional leaves and dead leaves standing on branches. The truncated Gaussian distribution defines the $LAI_{\phi,i,j}$ and $LAI_{dead,i,j}$ for all plant cohorts and vertical layers.
 
 Dividing the leaf area of a given layer by its width, one obtains the *leaf area density* ($LAD$ in $m^2 \cdot m^{-3}$). Figure \@ref(fig:leafareadensity) illustrates the leaf area density profile (see function `plot.forest()`) corresponding to the forest stand described in the example `forest` object that we showed above. 
 
@@ -454,7 +454,7 @@ By default, models in **medfate** assume that soil moisture under all plant coho
 
 Considering water pools involves partitioning the stand area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many water pools as plant cohorts, with proportions defined by their LAI values:
 \begin{equation}
-f_{pool,i} = \frac{LAI^{live}_i}{LAI^{live}_{stand}}
+f_{pool,i} = \frac{LAI_{live,i}}{LAI_{live}}
 \end{equation}
 Models assume that the rhizosphere of each plant cohort occupies its own water pool but may extend into the water pools under other plant cohorts. In other words, the root systems of different cohorts may overlap horizontally. Moreover, the horizontal overlap of root systems will vary across soil layers. A given plant cohort $i$ will have its roots in layer $s$ partitioned among different water pools. We thus need to define $fr_{i,s,j}$, the (horizontal) proportion of fine roots of cohort $i$ in layer $s$ of the water pool $j$, with the restriction that: 
 \begin{equation}

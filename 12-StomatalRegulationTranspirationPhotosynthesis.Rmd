@@ -942,13 +942,13 @@ abline(v=Gmax, col="gray", lwd=1.5)
 
 ### Plant-level transpiration rates and plant water potentials
 
-In the previous section, we considered stomatal regulation at the level of sunlit or shade leaves only. At the plant cohort level, the gain function could be build from a crown photosynthesis function $A(\Psi_{leaf})$, as shown in section \@ref(crownphotosynthesis). However, applying the profit maximization approach for a single crown photosynthesis function would imply the assumption that the same stomatal aperture occurs in all leaves of the plant cohort, independently of whether they are in shade or sunlit. A more realistic approach is to determine stomatal regulation by profit maximization for sunlit and shade leaves separately. The gain function and profit maximization calculations conducted for each leaf type yield instantaneous leaf water potentials $\Psi^{sunlit}_{leaf}$ and $\Psi^{shade}_{leaf}$ and instantaneous flow values $E^{shade}$ and $E^{sunlit}$ from the supply functions. The corresponding photosynthesis   functions allow determining values for leaf temperatures $T_{leaf}^{sunlit}$ and $T_{leaf}^{shade}$, vapor pressure deficits $VPD_{leaf}^{sunlit}$  $VPD_{leaf}^{shade}$, stomatal conductance $g_{sw}^{sunlit}$ and $g_{sw}^{shade}$ and net photosynthesis rates $A_{n}^{sunlit}$ and $A_{n}^{shade}$. This is a lot of useful information at the leaf level for each plant cohort, but we also need transpiration and photosynthesis values at the plant cohort-level.
+In the previous section, we considered stomatal regulation at the level of sunlit or shade leaves only. At the plant cohort level, the gain function could be build from a crown photosynthesis function $A(\Psi_{leaf})$, as shown in section \@ref(crownphotosynthesis). However, applying the profit maximization approach for a single crown photosynthesis function would imply the assumption that the same stomatal aperture occurs in all leaves of the plant cohort, independently of whether they are in shade or sunlit. A more realistic approach is to determine stomatal regulation by profit maximization for sunlit and shade leaves separately. The gain function and profit maximization calculations conducted for each leaf type yield instantaneous leaf water potentials $\Psi_{leaf, sunlit}$ and $\Psi_{leaf, shade}$ and instantaneous flow values $E_{shade}$ and $E_{sunlit}$ from the supply functions. The corresponding photosynthesis   functions allow determining values for leaf temperatures $T_{leaf,sunlit}$ and $T_{leaf,shade}$, vapor pressure deficits $VPD_{leaf,sunlit}$  $VPD_{leaf,shade}$, stomatal conductance $g_{sw,sunlit}$ and $g_{sw,shade}$ and net photosynthesis rates $A_{n,sunlit}$ and $A_{n,shade}$. This is a lot of useful information at the leaf level for each plant cohort, but we also need transpiration and photosynthesis values at the plant cohort-level.
 
 The average instantaneous flow rate ($\hat{E}$, in $mmol\, H_2O \cdot s^{-1} \cdot m^{-2}$) per leaf area unit of a plant cohort is the weighed average:
 \begin{equation}
-\hat{E} = \frac{E^{shade} \cdot LAI^{sunlit} + E^{shade} \cdot LAI^{shade}}{LAI^{\phi}}
+\hat{E} = \frac{E_{shade} \cdot LAI_{sunlit} + E_{shade} \cdot LAI_{shade}}{LAI_{\phi}}
 \end{equation}
-where $LAI^{sunlit}$ and $LAI^{shade}$ are the cohorts LAI values for sunlit and shade leaves, from eq. \@ref(eq:sunlitshadelai), and $LAI^{\phi}$ is the leaf area index of the plant cohort. The model then uses the hydraulic supply function to find the transpiration rate $E$ numerically closest to $\hat{E}$ (remember that the supply function is build in discrete steps). Finding the $E$ value numerically closest to $\hat{E}$  determines the $E_{plant}$, the instantaneous transpiration flow, and also leads to setting values for current time step of several other variables, such as water potentials ($\Psi_{leaf}$, $\Psi_{stem}$, $\Psi_{rootcrown}$, ...), the slope of the supply function ($d E/d\Psi$), and instantaneous soil water uptake rates ($U_{s}$).
+where $LAI_{sunlit}$ and $LAI_{shade}$ are the cohorts LAI values for sunlit and shade leaves, from eq. \@ref(eq:sunlitshadelai), and $LAI_{\phi}$ is the leaf area index of the plant cohort. The model then uses the hydraulic supply function to find the transpiration rate $E$ numerically closest to $\hat{E}$ (remember that the supply function is build in discrete steps). Finding the $E$ value numerically closest to $\hat{E}$  determines the $E_{plant}$, the instantaneous transpiration flow, and also leads to setting values for current time step of several other variables, such as water potentials ($\Psi_{leaf}$, $\Psi_{stem}$, $\Psi_{rootcrown}$, ...), the slope of the supply function ($d E/d\Psi$), and instantaneous soil water uptake rates ($U_{s}$).
 
 ## Stomatal regulation, transpiration and photosynthesis under Sureau's sub-model 
 
@@ -964,13 +964,13 @@ E_{plant} = E_{leaf} + E_{stem, cuti} = E_{stom} + E_{leaf, cuti} + E_{stem, cut
 Since there are sunlit and shade, leaves, both $E_{stom}$ and $E_{leaf, cuti}$ are computed as weighted averages of sunlit and shade leaf values:
 
 \begin{eqnarray}
- E_{stom} &=& \frac{E^{sunlit}_{stom} \cdot LAI^{sunlit} + E_{stom}^{shade} \cdot LAI^{shade}}{LAI^{\phi}} \\
- E_{leaf,cuti} &=& \frac{E^{sunlit}_{leaf,cuti} \cdot LAI^{sunlit} + E_{leaf,cuti}^{shade} \cdot LAI^{shade}}{LAI^{\phi}}
+ E_{stom} &=& \frac{E_{stom, sunlit} \cdot LAI^{sunlit} + E_{stom,shade} \cdot LAI_{shade}}{LAI_{\phi}} \\
+ E_{leaf,cuti} &=& \frac{E_{leaf,cuti,sunlit} \cdot LAI_{sunlit} + E_{leaf,cuti,shade} \cdot LAI_{shade}}{LAI_{\phi}}
 \end{eqnarray}
 
-In turn, $E_{leaf,stom}^{sunlit}$, $E_{leaf,stom}^{shade}$, $E_{leaf,cuti}^{sunlit}$ and $E_{leaf,cuti}^{shade}$ values (all in $mmol\, H_2O \cdot s^{-1} \cdot m^{-2}$) are the result of multiplying the water vapor gradient by a compound conductance formed by either stomatal or cuticular conductances (which will likely be different for sunlit and shade leaves) and the leaf boundary layer conductance, i.e. (we ommit the sunlit/shade superscripts):
+In turn, $E_{stom,sunlit}$, $E_{stom,shade}$, $E_{leaf,cuti,sunlit}$ and $E_{leaf,cuti,shade}$ values (all in $mmol\, H_2O \cdot s^{-1} \cdot m^{-2}$) are the result of multiplying the water vapor gradient by a compound conductance formed by either stomatal or cuticular conductances (which will likely be different for sunlit and shade leaves) and the leaf boundary layer conductance, i.e. (we ommit the sunlit/shade superscripts):
 \begin{eqnarray}
-E_{leaf, stom } &=&  \left( g_{sw}^{-1} + g_{bound}^{-1} \right)^{-1} \cdot \frac{VPD_{leaf}}{P_{atm}} \\
+E_{stom} &=&  \left( g_{sw}^{-1} + g_{bound}^{-1} \right)^{-1} \cdot \frac{VPD_{leaf}}{P_{atm}} \\
 E_{leaf, cuti} &=&  \left( g_{leaf, cuti}^{-1} + g_{bound}^{-1} \right)^{-1} \cdot \frac{VPD_{leaf}}{P_{atm}}
 \end{eqnarray}
 
@@ -1027,9 +1027,9 @@ Stomatal regulation according to light and temperature can be performed followin
 In the Jarvis-type approach [@jarvis_interpretation_1976], stomatal conductance according to light and temperature ($g_{sw, light, temp}$) is defined as:
 
 \begin{equation}
-g_{sw, light, temp} = g_{sw, night, temp} + (g_{sw, max, temp} - g_{sw,night, temp}) \cdot (1 - e^{-Q_{PAR}^{leaf} \cdot c_{PAR}})
+g_{sw, light, temp} = g_{sw, night, temp} + (g_{sw, max, temp} - g_{sw,night, temp}) \cdot (1 - e^{-Q_{PAR,leaf} \cdot c_{PAR}})
 \end{equation}
-where $g_{sw, max, temp}$ and $g_{sw, night, temp}$ are the maximum stomatal conductance and nocturnal stomatal conductance after accounting for temperature effects, $Q_{PAR}^{leaf}$ is the absorbed PAR photon flux per leaf area (\@ref(eq:leafQequation)) and $c_{PAR}$ is an empirical coefficient. Temperature effects on maximum stomatal conductance are modelled using:
+where $g_{sw, max, temp}$ and $g_{sw, night, temp}$ are the maximum stomatal conductance and nocturnal stomatal conductance after accounting for temperature effects, $Q_{PAR,leaf}$ is the absorbed PAR photon flux per leaf area (\@ref(eq:leafQequation)) and $c_{PAR}$ is an empirical coefficient. Temperature effects on maximum stomatal conductance are modelled using:
 \begin{equation}
 g_{sw, max, temp} = g_{sw, max} \cdot \left[ 1 + \left(\frac{T_{leaf} - T_{optim}}{T_{gs,sens}}\right)^2 \right]^{-1}
 \end{equation}
@@ -1055,13 +1055,13 @@ Note that $A_{n}$ is only calculated here to find the analytical solution to $g_
 
 ### Photosynthesis {#photosynthesissureau}
 
-Instantaneous gross and net photosynthesis rates for sunlit and shade leaves (i.e., $A_{g}^{shade}$, $A_{g}^{sunlit}$, $A_{n}^{shade}$, $A_{n}^{sunlit}$) are calculated using Farquhar's model (\@ref(leafphotosynthesis)) and assuming that $g_{c}$, the leaf diffusive conductance for $CO_2$ is influenced by leaf boundary ($g_{bound}$), stomatal ($g_{sw}$) and leaf cuticular ($g_{leaf, cuti}$) conductances, as explained in \@ref(leafgasexchange). Hence, non-zero gross assimilation can still occur with stomata completely closed.  
+Instantaneous gross and net photosynthesis rates for sunlit and shade leaves (i.e., $A_{g,shade}$, $A_{g,sunlit}$, $A_{n,shade}$, $A_{n,sunlit}$) are calculated using Farquhar's model (\@ref(leafphotosynthesis)) and assuming that $g_{c}$, the leaf diffusive conductance for $CO_2$ is influenced by leaf boundary ($g_{bound}$), stomatal ($g_{sw}$) and leaf cuticular ($g_{leaf, cuti}$) conductances, as explained in \@ref(leafgasexchange). Hence, non-zero gross assimilation can still occur with stomata completely closed.  
 
 ## Scaling of transpiration, soil water uptake and photosynthesis rates {#scalingtranspirationphotosynthesis}
 
 The amount of transpiration of a plant cohort in a given time step $t$ ($Tr_{cohorts, t}$, in $l \cdot m^{-2}$ of ground area, i.e. mm) is:
 \begin{equation}
-Tr_{cohorts,t} = E_{plant} \cdot LAI^{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step} 
+Tr_{cohorts,t} = E_{plant} \cdot LAI_{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step} 
 (\#eq:cohorttranspiration)
 \end{equation}
 where $E_{plant}$ is the instantaneous cohort-level transpiration rate ($mmol\,H_2O \cdot s^{-1} \cdot m^{-2}$ of leaf area), $0.01802$ is the molar weight (in $kg = l$) of water and $\Delta t_{step} = 86400/n_t$ the size of the time step in seconds, being $n_t$ the number of time steps. $f_{dry}$ is the fraction of the canopy that is assumed dry, which is necessary to avoid overestimating total evapo-transpiration. In non-rainy days $f_{dry} = 1$ whereas in rainy days it is derived from comparing the daily evaporation due to rainfall interception ($In$; in $mm$) with Penman's potential evapo-transpiration ($PET$; in $mm$):
@@ -1082,9 +1082,9 @@ Tr_{cohorts,t} = Ex_{cohorts,t} = \sum_s {Ex_{cohorts,s,t}}
 \end{equation}
 In contrast, under the SurEau model, soil extraction may not be equal to transpiration, leading to a change in plant water content (see \@ref(eq:plantwaterbalance)).
 
-Instantaneous net photosynthesis per leaf area of sunlit and shade leaves in a given time step $t$ (i.e. $A_{n,t}^{sunlit}$ and $A_{n,t}^{shade}$) are also aggregated into $A_{n,t}$, the net photosynthesis of the plant cohort for the time step $t$, in $g\,C \cdot m^{-2}$ of ground area:
+Instantaneous net photosynthesis per leaf area of sunlit and shade leaves in a given time step $t$ (i.e. $A_{n,sunlit,t}$ and $A_{n,shade,t}$) are also aggregated into $A_{n,t}$, the net photosynthesis of the plant cohort for the time step $t$, in $g\,C \cdot m^{-2}$ of ground area:
 \begin{equation}
- A_{n,t} = (A_{n,t}^{sunlit} \cdot LAI^{sunlit} + A_{n,t}^{shade} \cdot LAI^{shade}) \cdot 10^{-6} \cdot 12.01017 \cdot \Delta t_{step}
+ A_{n,t} = (A_{n,sunlit,t} \cdot LAI_{sunlit} + A_{n,shade,t} \cdot LAI_{shade}) \cdot 10^{-6} \cdot 12.01017 \cdot \Delta t_{step}
  (\#eq:cohortnetphotosynthesis)
 \end{equation}
 Scaling of gross photosynthesis rates is done analogously.

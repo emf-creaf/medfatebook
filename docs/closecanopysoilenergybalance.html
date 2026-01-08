@@ -248,7 +248,7 @@ div.csl-indent {
 <li class="chapter" data-level="4.1.1" data-path="leafphenologylight.html"><a href="leafphenologylight.html#phenological-types-and-leaf-expanded-area"><i class="fa fa-check"></i><b>4.1.1</b> Phenological types and leaf expanded area</a></li>
 <li class="chapter" data-level="4.1.2" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafphenobudburst"><i class="fa fa-check"></i><b>4.1.2</b> Bud burst and leaf unfolding</a></li>
 <li class="chapter" data-level="4.1.3" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafphenosenescence"><i class="fa fa-check"></i><b>4.1.3</b> Leaf senescence</a></li>
-<li class="chapter" data-level="4.1.4" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leaf-abscission"><i class="fa fa-check"></i><b>4.1.4</b> Leaf abscission</a></li>
+<li class="chapter" data-level="4.1.4" data-path="leafphenologylight.html"><a href="leafphenologylight.html#leafabscission"><i class="fa fa-check"></i><b>4.1.4</b> Leaf abscission</a></li>
 </ul></li>
 <li class="chapter" data-level="4.2" data-path="leafphenologylight.html"><a href="leafphenologylight.html#basiclightextinction"><i class="fa fa-check"></i><b>4.2</b> Radiation extinction</a></li>
 </ul></li>
@@ -445,7 +445,7 @@ div.csl-indent {
 <li class="chapter" data-level="15.1.4" data-path="growthmodelling.html"><a href="growthmodelling.html#update-of-structural-variables"><i class="fa fa-check"></i><b>15.1.4</b> Update of structural variables</a></li>
 <li class="chapter" data-level="15.1.5" data-path="growthmodelling.html"><a href="growthmodelling.html#mortalitydesign"><i class="fa fa-check"></i><b>15.1.5</b> Plant mortality</a></li>
 <li class="chapter" data-level="15.1.6" data-path="growthmodelling.html"><a href="growthmodelling.html#fireseveritydesign"><i class="fa fa-check"></i><b>15.1.6</b> Fire occurrence, severity and emissions</a></li>
-<li class="chapter" data-level="15.1.7" data-path="growthmodelling.html"><a href="growthmodelling.html#dead-carbon-pools-and-decomposition"><i class="fa fa-check"></i><b>15.1.7</b> Dead carbon pools and decomposition</a></li>
+<li class="chapter" data-level="15.1.7" data-path="growthmodelling.html"><a href="growthmodelling.html#organic-matter-decomposition"><i class="fa fa-check"></i><b>15.1.7</b> Organic matter decomposition</a></li>
 </ul></li>
 <li class="chapter" data-level="15.2" data-path="growthmodelling.html"><a href="growthmodelling.html#state-variables"><i class="fa fa-check"></i><b>15.2</b> State variables</a>
 <ul>
@@ -456,7 +456,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="15.3.1" data-path="growthmodelling.html"><a href="growthmodelling.html#water-and-energy-balance"><i class="fa fa-check"></i><b>15.3.1</b> Water and energy balance</a></li>
 <li class="chapter" data-level="15.3.2" data-path="growthmodelling.html"><a href="growthmodelling.html#labile-carbon-balance"><i class="fa fa-check"></i><b>15.3.2</b> Labile carbon balance</a></li>
-<li class="chapter" data-level="15.3.3" data-path="growthmodelling.html"><a href="growthmodelling.html#live-biomass-balance"><i class="fa fa-check"></i><b>15.3.3</b> Live biomass balance</a></li>
+<li class="chapter" data-level="15.3.3" data-path="growthmodelling.html"><a href="growthmodelling.html#plant-biomass-balance"><i class="fa fa-check"></i><b>15.3.3</b> Plant biomass balance</a></li>
 <li class="chapter" data-level="15.3.4" data-path="growthmodelling.html"><a href="growthmodelling.html#mass-balance-of-dead-elements"><i class="fa fa-check"></i><b>15.3.4</b> Mass balance of dead elements</a></li>
 <li class="chapter" data-level="15.3.5" data-path="growthmodelling.html"><a href="growthmodelling.html#stand-level-carbon-balance"><i class="fa fa-check"></i><b>15.3.5</b> Stand-level carbon balance</a></li>
 </ul></li>
@@ -788,10 +788,10 @@ where <span class="math inline">\(\rho_{atm}\)</span> and <span class="math inli
 \end{equation}\]</span>
 where <span class="math inline">\(TC_{can}\)</span> is the canopy thermal capacitance (in <span class="math inline">\(J \cdot m^{-2} \cdot K^{-1}\)</span>) and <span class="math inline">\(\Delta t_{step} = 86400/n_t\)</span> is the size of the time step in seconds. Canopy thermal capacitance depends on the leaf area index of the stand:
 <span class="math display" id="eq:canopythermalcapacitance">\[\begin{equation}
-TC_{can} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{stand} + 1.2 \cdot (LAI_{stand}^{phi} + \cdot LAI_{stand}^{dead})}{2}
+TC_{can} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{live} + 1.2 \cdot (LAI_{\phi} + \cdot LAI_{dead})}{2}
 \tag{13.4}
 \end{equation}\]</span>
-where <span class="math inline">\(TC_{LAI}\)</span> is the thermal capacitance per LAI unit, which is specified by the control parameter <code>thermalCapacityLAI</code>. By using both the maximum leaf area of the stand, <span class="math inline">\(LAI_{stand}\)</span>, and its current live/dead leaf area (<span class="math inline">\(LAI_{stand}^{phi}+LAI_{stand}^{dead}\)</span>) it is assumed that part of thermal capacitance corresponds to stems and branches, so that capacitance does not drop to zero for deciduous canopies.</p>
+where <span class="math inline">\(TC_{LAI}\)</span> is the thermal capacitance per LAI unit, which is specified by the control parameter <code>thermalCapacityLAI</code>. By using both the maximum leaf area of the stand, <span class="math inline">\(LAI_{live}\)</span>, and its current live/dead leaf area (<span class="math inline">\(LAI_{\phi}+LAI_{dead}\)</span>) it is assumed that part of thermal capacitance corresponds to stems and branches, so that capacitance does not drop to zero for deciduous canopies.</p>
 </div>
 <div id="soil-temperature-changes" class="section level3 hasAnchor" number="13.1.4">
 <h3><span class="header-section-number">13.1.4</span> Soil temperature changes<a href="closecanopysoilenergybalance.html#soil-temperature-changes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -827,28 +827,28 @@ LE_{vap, j} = \lambda_v(T_{air,j}) \cdot \left(\frac{In_{j,t}}{\Delta t_{step}} 
 \end{equation}\]</span>
 where <span class="math inline">\(\lambda_v(T_{air,j})\)</span> is the latent heat of vaporization at temperature <span class="math inline">\(T_{air,j}\)</span> (in <span class="math inline">\(J·kg^{-1}\)</span>), <span class="math inline">\(In_{j,t}\)</span> is the intercepted water that is evaporated from the canopy layer, determined by dividing <span class="math inline">\(In_{t}\)</span> among canopy layers according to the fraction of total LAI in each one:
 <span class="math display">\[\begin{equation}
-In_{j,t} = In_{t} \cdot \frac{\sum_{i=1}{LAI_{i,j}^{\phi}}}{LAI^{\phi}_{stand}}
+In_{j,t} = In_{t} \cdot \frac{\sum_{i=1}{LAI_{\phi,i,j}}}{LAI_{\phi}}
 \end{equation}\]</span>
 and <span class="math inline">\(E_{j,t}\)</span> is the instantaneous transpiration rate in layer <span class="math inline">\(j\)</span> (in <span class="math inline">\(kg\,H_2O\cdot m^{-2}\cdot s^{-1}\)</span>), given by:
 <span class="math display" id="eq:cohortlayertranspiration">\[\begin{equation}
-E_{j,t} = 10^{-3} \cdot 0.01802\cdot \sum_{i=1}^{c}{E_{i,t}^{sunlit}\cdot LAI_{i,j}^{sunlit} + E_{i,t}^{shade}\cdot LAI_{i,j}^{shade}}
+E_{j,t} = 10^{-3} \cdot 0.01802\cdot \sum_{i=1}^{c}{E_{sunlit,i,t}\cdot LAI_{sunlit,i,j} + E_{shade,i,t}\cdot LAI_{shade,i,j}}
 \tag{13.6}
 \end{equation}\]</span>
-where <span class="math inline">\(E_{i,t}^{sunlit}\)</span> and <span class="math inline">\(E_{i,t}^{shade}\)</span> are the instantaneous transpiration rates (in <span class="math inline">\(mmol\,H_2O\cdot m^{-2}\cdot s^{-1}\)</span>) of sunlit and shade leaves, respectively, of cohort <span class="math inline">\(i\)</span> during time step <span class="math inline">\(t\)</span>; and <span class="math inline">\(LAI_{i,j}^{sunlit}\)</span> and <span class="math inline">\(LAI_{i,j}^{shade}\)</span> are the leaf area index of sunlit and shade leaves, respectively, of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> <a href="radiationbalance.html#eq:sunlitshadelai">(9.1)</a>.</p>
+where <span class="math inline">\(E_{sunlit, i,t}\)</span> and <span class="math inline">\(E_{sunlit,i,t}\)</span> are the instantaneous transpiration rates (in <span class="math inline">\(mmol\,H_2O\cdot m^{-2}\cdot s^{-1}\)</span>) of sunlit and shade leaves, respectively, of cohort <span class="math inline">\(i\)</span> during time step <span class="math inline">\(t\)</span>; and <span class="math inline">\(LAI_{sunlit,i,j}\)</span> and <span class="math inline">\(LAI_{shade,i,j}\)</span> are the leaf area index of sunlit and shade leaves, respectively, of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> <a href="radiationbalance.html#eq:sunlitshadelai">(9.1)</a>.</p>
 <p>Latent heat derived from soil water evaporation and snow melting (<span class="math inline">\(LE_{vap, soil}\)</span> and <span class="math inline">\(LE_{fus, snow}\)</span>; in <span class="math inline">\(W\cdot m^{-2}\)</span>) are estimated as in the single-canopy case, using eqs. <a href="closecanopysoilenergybalance.html#eq:soillatentheat">(13.3)</a> and <a href="closecanopysoilenergybalance.html#eq:snowlatentheat">(13.2)</a>.</p>
 </div>
 <div id="sensible-heat-between-leaves-and-the-canopy-air-space" class="section level3 hasAnchor" number="13.2.2">
 <h3><span class="header-section-number">13.2.2</span> Sensible heat between leaves and the canopy air space<a href="closecanopysoilenergybalance.html#sensible-heat-between-leaves-and-the-canopy-air-space" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The sensible heat exchanged between the air of canopy layer <span class="math inline">\(j\)</span> and the leaves within it (<span class="math inline">\(H_{leaf,j}\)</span>; <span class="math inline">\(W\cdot m^{-2}\)</span>) is obtained using:
 <span class="math display">\[\begin{equation}
-H_{leaf,j} = \sum_{i=1}^c { LAI^{sunlit}_{i,j} \cdot H^{sunlit}_{i,j}  + LAI^{shade}_{i,j} \cdot H^{shade}_{i,j}}
+H_{leaf,j} = \sum_{i=1}^c { LAI_{sunlit,i,j} \cdot H_{sunlit,i,j}  + LAI_{shade,i,j} \cdot H_{shade,i,j}}
 \end{equation}\]</span>
-where <span class="math inline">\(LAI^{sunlit}_{i,j}\)</span> and <span class="math inline">\(LAI^{shade}_{i,j}\)</span> are the leaf area index of sunlit and shade leaves of plant cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span>, respectively (see eq. <a href="radiationbalance.html#eq:sunlitshadelai">(9.1)</a>). <span class="math inline">\(H^{sunlit}_{i,j}\)</span> and <span class="math inline">\(H^{shade}_{i,j}\)</span> are the sensible heat exchange between layer <span class="math inline">\(j\)</span> and sunlit or shade leaves of cohort <span class="math inline">\(i\)</span> <span class="citation">(<a href="#ref-Ma2019">Ma &amp; Liu 2019</a>)</span>:
+where <span class="math inline">\(LAI_{sunlit,i,j}\)</span> and <span class="math inline">\(LAI_{shade,i,j}\)</span> are the leaf area index of sunlit and shade leaves of plant cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span>, respectively (see eq. <a href="radiationbalance.html#eq:sunlitshadelai">(9.1)</a>). <span class="math inline">\(H_{sunlit,i,j}\)</span> and <span class="math inline">\(H_{shade,i,j}\)</span> are the sensible heat exchange between layer <span class="math inline">\(j\)</span> and sunlit or shade leaves of cohort <span class="math inline">\(i\)</span> <span class="citation">(<a href="#ref-Ma2019">Ma &amp; Liu 2019</a>)</span>:
 <span class="math display">\[\begin{eqnarray}
-H^{sunlit}_{i,j} &amp;=&amp; -2 \cdot C_p \cdot (T^{sunlit}_{leaf,i} - T_{air,j})\cdot g_{Ha,i,j}\\
-H^{shade}_{i,j} &amp;=&amp; -2\cdot C_p \cdot (T^{shade}_{leaf,i} - T_{air,j})\cdot g_{Ha,i,j}
+H_{sunlit,i,j} &amp;=&amp; -2 \cdot C_p \cdot (T_{leaf,sunlit,i} - T_{air,j})\cdot g_{Ha,i,j}\\
+H_{shade,i,j} &amp;=&amp; -2\cdot C_p \cdot (T_{leaf,shade,i} - T_{air,j})\cdot g_{Ha,i,j}
 \end{eqnarray}\]</span>
-where <span class="math inline">\(T^{sunlit}_{leaf,i}\)</span> and <span class="math inline">\(T^{shade}_{leaf,i}\)</span> are, respectively, the sunlit and shade leaf temperatures for cohort <span class="math inline">\(i\)</span> (determined using eq. <a href="plantphotosynthesis.html#eq:leaftemperatureequation">(11.1)</a>); <span class="math inline">\(T_{air,j}\)</span> is the current air temperature in canopy layer <span class="math inline">\(j\)</span>, <span class="math inline">\(C_p = 29.37152\,J \cdot mol^{-1} \cdot ºC^{-1}\)</span> is the specific heat capacity of dry air at constant pressure; and <span class="math inline">\(g_{Ha,i,j}\)</span> is the leaf boundary layer conductance for heat (<span class="math inline">\(mol \cdot m^{-2} \cdot s^{-1}\)</span>) for leaves of cohort <span class="math inline">\(i\)</span> and wind speed in layer <span class="math inline">\(j\)</span> (see eq. <a href="plantphotosynthesis.html#eq:leafboundaryconductances">(11.2)</a>).</p>
+where <span class="math inline">\(T_{leaf,sunlit,i}\)</span> and <span class="math inline">\(T_{leaf,shade,i}\)</span> are, respectively, the sunlit and shade leaf temperatures for cohort <span class="math inline">\(i\)</span> (determined using eq. <a href="plantphotosynthesis.html#eq:leaftemperatureequation">(11.1)</a>); <span class="math inline">\(T_{air,j}\)</span> is the current air temperature in canopy layer <span class="math inline">\(j\)</span>, <span class="math inline">\(C_p = 29.37152\,J \cdot mol^{-1} \cdot ºC^{-1}\)</span> is the specific heat capacity of dry air at constant pressure; and <span class="math inline">\(g_{Ha,i,j}\)</span> is the leaf boundary layer conductance for heat (<span class="math inline">\(mol \cdot m^{-2} \cdot s^{-1}\)</span>) for leaves of cohort <span class="math inline">\(i\)</span> and wind speed in layer <span class="math inline">\(j\)</span> (see eq. <a href="plantphotosynthesis.html#eq:leafboundaryconductances">(11.2)</a>).</p>
 </div>
 <div id="turbulent-heat-exchange" class="section level3 hasAnchor" number="13.2.3">
 <h3><span class="header-section-number">13.2.3</span> Turbulent heat exchange<a href="closecanopysoilenergybalance.html#turbulent-heat-exchange" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -878,7 +878,7 @@ And, finally, the topmost layer (i.e. <span class="math inline">\(j=l\)</span>)
 \end{equation}\]</span>
 where <span class="math inline">\(TC_{j}\)</span> is the thermal capacitance of canopy layer <span class="math inline">\(j\)</span> (in <span class="math inline">\(J \cdot m^{-2} \cdot K^{-1}\)</span>), found analogously to <span class="math inline">\(TC_{can}\)</span> (eq. <a href="closecanopysoilenergybalance.html#eq:canopythermalcapacitance">(13.4)</a>):
 <span class="math display">\[\begin{equation}
-TC_{j} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{j} + 1.2 \cdot (LAI_{j}^{phi} + \cdot LAI_{j}^{dead})}{2}
+TC_{j} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{live,j} + 1.2 \cdot (LAI_{\phi,j} + \cdot LAI_{dead,j})}{2}
 \end{equation}\]</span>
 <span class="math inline">\(\Delta t_{substep}\)</span> is the time step for closing the energy balance, which has to be smaller than <span class="math inline">\(\Delta t_{step}\)</span> to avoid numerical instabilities due to turbulent flow.</p>
 <p>When simulating a multiple-layer energy balance, we have to replace <span class="math inline">\(H_{can,soil}\)</span> by <span class="math inline">\(H_{1,soil}\)</span> in the energy inflow of soil layer 1: <a href="closecanopysoilenergybalance.html#eq:soilenergyinflow">(13.5)</a>:
@@ -910,9 +910,9 @@ S_{[CO_2],j} &amp;=&amp; - \frac{A_{n, j,t}}{\Delta z}
 \end{eqnarray}\]</span>
 where <span class="math inline">\(E_{j,t}\)</span> and <span class="math inline">\(A_{n,j,t}\)</span> are the instantaneous transpiration and photosynthesis rates in layer <span class="math inline">\(j\)</span>. The former was already defined in eq. <a href="closecanopysoilenergybalance.html#eq:cohortlayertranspiration">(13.6)</a>, whereas the latter (<span class="math inline">\(A_{n, j,t}\)</span>; in <span class="math inline">\(mg\,CO_2\cdot m^{-2} \cdot s^{-1}\)</span>) is defined analogously:
 <span class="math display">\[\begin{equation}
-A_{n, j,t} = 10^{-3} \cdot 44.01 \cdot \sum_{i=1}^{c}{A_{n,i,t}^{sunlit}\cdot LAI_{i,j}^{sunlit} + A_{n,i,t}^{shade}\cdot LAI_{i,j}^{shade}}
+A_{n, j,t} = 10^{-3} \cdot 44.01 \cdot \sum_{i=1}^{c}{A_{n,sunlit,i,t}\cdot LAI_{sunlit,i,j} + A_{n,shade, i,t}\cdot LAI_{shade,i,j}}
 \end{equation}\]</span>
-where <span class="math inline">\(A_{n,i,t}^{sunlit}\)</span> and <span class="math inline">\(A_{n,i,t}^{shade}\)</span> are the instantaneous net photosynthesis rates (in <span class="math inline">\(\mu mol\, CO_2\cdot m^{-2}\cdot s^{-1}\)</span>) of sunlit and shade leaves, respectively, of cohort <span class="math inline">\(i\)</span> during time step <span class="math inline">\(t\)</span>; and <span class="math inline">\(LAI_{i,j}^{sunlit}\)</span> and <span class="math inline">\(LAI_{i,j}^{shade}\)</span> are the leaf area index of sunlit and shade leaves, respectively of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> <a href="radiationbalance.html#eq:sunlitshadelai">(9.1)</a>. For the special case of the lowest canopy layer, water vapor needs to include the evaporation from soil, i.e.:
+where <span class="math inline">\(A_{n,sunlit,i,t}\)</span> and <span class="math inline">\(A_{n,shade,i,t}\)</span> are the instantaneous net photosynthesis rates (in <span class="math inline">\(\mu mol\, CO_2\cdot m^{-2}\cdot s^{-1}\)</span>) of sunlit and shade leaves, respectively, of cohort <span class="math inline">\(i\)</span> during time step <span class="math inline">\(t\)</span>; and <span class="math inline">\(LAI_{sunlit,i,j}\)</span> and <span class="math inline">\(LAI_{shade,i,j}\)</span> are the leaf area index of sunlit and shade leaves, respectively of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> <a href="radiationbalance.html#eq:sunlitshadelai">(9.1)</a>. For the special case of the lowest canopy layer, water vapor needs to include the evaporation from soil, i.e.:
 <span class="math display">\[\begin{equation}
 S_{[H_2O],1} =  \frac{((In_{1,t}+Es_{t})/\Delta t) + E_{1,t}}{\Delta z}
 \end{equation}\]</span></p>
