@@ -488,7 +488,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="16.2.1" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#gross-photosynthesis"><i class="fa fa-check"></i><b>16.2.1</b> Gross photosynthesis</a></li>
 <li class="chapter" data-level="16.2.2" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#maintenance-respiration"><i class="fa fa-check"></i><b>16.2.2</b> Maintenance respiration</a></li>
-<li class="chapter" data-level="16.2.3" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#growth-respiration"><i class="fa fa-check"></i><b>16.2.3</b> Growth respiration</a></li>
+<li class="chapter" data-level="16.2.3" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#growth-costs-and-synthesis-respiration"><i class="fa fa-check"></i><b>16.2.3</b> Growth costs and synthesis respiration</a></li>
 <li class="chapter" data-level="16.2.4" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#phloemtransport"><i class="fa fa-check"></i><b>16.2.4</b> Phloem transport</a></li>
 <li class="chapter" data-level="16.2.5" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#sugarstarchdynamics"><i class="fa fa-check"></i><b>16.2.5</b> Sugar-starch dynamics</a></li>
 <li class="chapter" data-level="16.2.6" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#root-exudation"><i class="fa fa-check"></i><b>16.2.6</b> Root exudation</a></li>
@@ -884,7 +884,7 @@ B_{total} &amp;= B_{leaf} + B_{living, twig} + B_{living, sapwood} + B_{fineroot
 <p>Here we provide the details of labile carbon balance calculations, i.e. how the components of eqs. <a href="growthmodelling.html#eq:leafcarbonbalanceequations">(15.1)</a> and <a href="growthmodelling.html#eq:sapwoodcarbonbalanceequations">(15.2)</a> are determined.</p>
 <div id="gross-photosynthesis" class="section level3 hasAnchor" number="16.2.1">
 <h3><span class="header-section-number">16.2.1</span> Gross photosynthesis<a href="carbonpoolsbalance.html#gross-photosynthesis" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The soil water balance submodel provides values of photosynthesis calculated at the plant cohort level, but note that the user output of function <code>spwb()</code> refers to net photosynthesis (<span class="math inline">\(A_n\)</span>) after accounting for an estimate of leaf respiration. In the basic water balance model there is no way to make the distinction between gross and net photosynthesis, so we will assume here that <span class="math inline">\(A_g = A_n\)</span> (in <span class="math inline">\(g\,C \cdot m^{-2}\)</span>) as calculated in section <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>. In the advance water balance model the output is also net photosynthesis, but the distinction is possible (see section <a href="plantphotosynthesis.html#leafenergybalancephoto">11.1</a>). In any case, here we start with a <span class="math inline">\(A_g\)</span> value in units of carbon per ground area unit, i.e. <span class="math inline">\(g\,C \cdot m^{-2}\)</span>, and to enter the carbon balance we need scale photosynthesis to units of glucose per individual (<span class="math inline">\(A\)</span>; in <span class="math inline">\(g\,gluc \cdot ind^{-1}\)</span>). This is done using:
+<p>The soil water balance submodel provides values of photosynthesis calculated at the plant cohort level, but note that the user output of function <code>spwb()</code> refers to net photosynthesis (<span class="math inline">\(A_n\)</span>) after accounting for an estimate of leaf respiration. In the basic water balance model there is no way to make the distinction between gross and net photosynthesis, so we will assume here that <span class="math inline">\(A_g = A_n\)</span> (in <span class="math inline">\(g\,C \cdot m^{-2}\)</span>) as calculated in section <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>. In the advance water balance model the output is also net photosynthesis, but the distinction is possible (see section <a href="plantphotosynthesis.html#leafenergybalancephoto">11.1</a>). In any case, here we start with a <span class="math inline">\(A_g\)</span> value in units of carbon per ground area unit, i.e. <span class="math inline">\(g\,C \cdot m^{-2}\)</span>, and to enter the labile carbon balance we need scale photosynthesis to units of glucose per individual (<span class="math inline">\(A\)</span>; in <span class="math inline">\(g\,gluc \cdot ind^{-1}\)</span>). This is done using:
 <span class="math display">\[\begin{equation}
 A = \frac{10000 \cdot A_g}{N} \cdot \frac{m_{gluc}}{m_{carbon} \cdot 6}
 \end{equation}\]</span>
@@ -895,34 +895,47 @@ where <span class="math inline">\(N\)</span> is the density of individuals per h
 <p>Maintenance respiration (in <span class="math inline">\(g\,gluc·ind^{-1}\)</span>) is calculated for each living compartment (leaves, twigs, sapwood, and fine roots) individually <span class="citation">(<a href="#ref-Mouillot2001">Mouillot <em>et al.</em> 2001</a>)</span>, and differs slightly depending on the complexity of the transpiration submodel.</p>
 <p>When simulating growth with the basic water balance, the model uses a <span class="math inline">\(Q_{10}\)</span> relationship of baseline respiration with temperature, which means that for every 10 ºC change in temperature there is a <span class="math inline">\(Q_{10}\)</span> factor change in respiration:
 <span class="math display">\[\begin{eqnarray}
-M_{leaf} &amp;=&amp; (B_{leaf} + B_{sugar,leaf}) \cdot MR_{leaf} \cdot Q_{10}^{(T_{mean}-20)/10} \cdot (L^{PAR})^{WUE_{decay}} \\
-M_{twig} &amp;=&amp; B_{living,twig} \cdot MR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
-M_{sapwood} &amp;=&amp; (B_{living,sapwood} + B_{sugar,sapwood}) \cdot MR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
-M_{fineroot} &amp;=&amp; B_{fineroot} \cdot MR_{fineroot} \cdot Q_{10}^{(T_{mean}-20)/10} \cdot ( LA_{\phi}/LA_{live})
+MR_{leaf} &amp;=&amp; (B_{leaf} + B_{sugar,leaf}) \cdot MRR_{leaf} \cdot Q_{10}^{(T_{mean}-20)/10} \cdot (L^{PAR})^{WUE_{decay}} \\
+MR_{twig} &amp;=&amp; B_{living,twig} \cdot MRR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
+MR_{sapwood} &amp;=&amp; (B_{living,sapwood} + B_{sugar,sapwood}) \cdot MRR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
+MR_{fineroot} &amp;=&amp; B_{fineroot} \cdot MRR_{fineroot} \cdot Q_{10}^{(T_{mean}-20)/10} \cdot ( LA_{\phi}/LA_{live})
 \end{eqnarray}\]</span>
-where <span class="math inline">\(T_{mean}\)</span> is the average daily temperature (in ºC). Baseline maintenance respiration rates per dry biomass (<span class="math inline">\(MR_{leaf}\)</span>, <span class="math inline">\(MR_{sapwood}\)</span> and <span class="math inline">\(MR_{fineroot}\)</span> for leaves, parenchymatic sapwood and fine roots, respectively; in <span class="math inline">\(g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}\)</span>) are can be supplied via species-specific parameters and should refer to 20 ºC. Leaf and fine root rates can also be estimated from nitrogen concentration, following <span class="citation">Reich <em>et al.</em> (<a href="#ref-Reich2008">2008</a>)</span> (see section <a href="modelparametrization.html#imputationRER">A.3.18</a>). Factor <span class="math inline">\(Q_{10}\)</span> has been found to decrease with temperature <span class="citation">(<a href="#ref-Tjoelker2001">Tjoelker <em>et al.</em> 2001</a>)</span>. For example, a 10 °C increase in measurement temperature at low measurement temperatures from 5 to 15 °C results in an approximate 2.8 fold increase in respiration rate, whereas an increase in temperature from 25 to 35 °C results in a less than two-fold (1.8) increase in rate. The general temperature relationship proposed by <span class="citation">Tjoelker <em>et al.</em> (<a href="#ref-Tjoelker2001">2001</a>)</span> is used here:
+where <span class="math inline">\(T_{mean}\)</span> is the average daily temperature (in ºC). Baseline maintenance respiration rates per dry biomass (<span class="math inline">\(MRR_{leaf}\)</span>, <span class="math inline">\(MRR_{sapwood}\)</span> and <span class="math inline">\(MRR_{fineroot}\)</span> for leaves, parenchymatic sapwood and fine roots, respectively; in <span class="math inline">\(g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}\)</span>) are can be supplied via species-specific parameters and should refer to 20 ºC. Leaf and fine root rates can also be estimated from nitrogen concentration, following <span class="citation">Reich <em>et al.</em> (<a href="#ref-Reich2008">2008</a>)</span> (see section <a href="modelparametrization.html#imputationRER">A.3.18</a>). Factor <span class="math inline">\(Q_{10}\)</span> has been found to decrease with temperature <span class="citation">(<a href="#ref-Tjoelker2001">Tjoelker <em>et al.</em> 2001</a>)</span>. For example, a 10 °C increase in measurement temperature at low measurement temperatures from 5 to 15 °C results in an approximate 2.8 fold increase in respiration rate, whereas an increase in temperature from 25 to 35 °C results in a less than two-fold (1.8) increase in rate. The general temperature relationship proposed by <span class="citation">Tjoelker <em>et al.</em> (<a href="#ref-Tjoelker2001">2001</a>)</span> is used here:
 <span class="math display">\[\begin{equation}
 Q_{10} = 3.22 - 0.046 \cdot T_{mean}
 \end{equation}\]</span>
-Factor <span class="math inline">\((L^{PAR})^{WUE_{decay}}\)</span> is added to reduce respiration rates in leaves under shade, analogously to the reduction of water use efficiency explained in <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>. Thus, it is assumed that the carbon use efficiency of the leaves is more or less constant. Factor <span class="math inline">\(LA_{\phi}/LA^{live}\)</span> is added to the maintenance respiration of fine roots to reduce respiration rates during winter in winter-deciduous species, assuming a decrease in respiration rates of fine roots parallel to that of leaves.</p>
+Factor <span class="math inline">\((L^{PAR})^{WUE_{decay}}\)</span> is added to reduce respiration rates in leaves under shade, analogously to the reduction of water use efficiency explained in <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>. Thus, it is assumed that the carbon use efficiency of the leaves is more or less constant. Factor <span class="math inline">\(LA_{\phi}/LA_{live}\)</span> is added to the maintenance respiration of fine roots to reduce respiration rates during winter in winter-deciduous species, assuming a decrease in respiration rates of fine roots parallel to that of leaves.</p>
 <p>When simulating growth with the advanced model, sub-daily leaf maintenance respiration rates are estimated as the difference between gross and net photosynthesis (see <a href="plantphotosynthesis.html#leafphotosynthesis">11.1.4</a>). Sapwood and fine root respiration rates are also estimated at sub-daily steps and, hence, sub-daily canopy temperature variation is taken into account (i.e. sub-daily canopy <span class="math inline">\(T_{can}\)</span> values are used instead of the daily temperature mean, <span class="math inline">\(T_{mean}\)</span>).</p>
 </div>
-<div id="growth-respiration" class="section level3 hasAnchor" number="16.2.3">
-<h3><span class="header-section-number">16.2.3</span> Growth respiration<a href="carbonpoolsbalance.html#growth-respiration" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Construction costs per unit dry weight of new tissue (<span class="math inline">\(CC_{leaf}\)</span>, <span class="math inline">\(CC_{sapwood}\)</span> and <span class="math inline">\(CC_{fineroot}\)</span> for leaves, sapwood and fine roots; in <span class="math inline">\(g\,gluc \cdot g\,dry^{-1}\)</span>) are specified as control parameters (i.e. they are not species-specific). These unitary costs include both the carbon used in respiration during growth and structural carbon. Given an increase in leaf area <span class="math inline">\(\Delta LA\)</span>, leaf growth respiration is:
+<div id="growth-costs-and-synthesis-respiration" class="section level3 hasAnchor" number="16.2.3">
+<h3><span class="header-section-number">16.2.3</span> Growth costs and synthesis respiration<a href="carbonpoolsbalance.html#growth-costs-and-synthesis-respiration" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Construction costs per unit dry weight of new tissue (<span class="math inline">\(CC_{leaf}\)</span>, <span class="math inline">\(CC_{sapwood}\)</span> and <span class="math inline">\(CC_{fineroot}\)</span> for leaves, sapwood and fine roots; in <span class="math inline">\(g\,gluc \cdot g\,dry^{-1}\)</span>) are specified as control parameters (i.e. they are not species-specific). These unitary costs include both the carbon used in respiration during growth and structural carbon. Given an increase in leaf area <span class="math inline">\(\Delta LA\)</span>, leaf carbon growth costs (in <span class="math inline">\(g\,gluc·ind^{-1}\)</span>) are:
 <span class="math display" id="eq:leafconstructioncost">\[\begin{equation}
-G_{leaf} = \Delta LA \cdot CC_{leaf} \cdot 1000 / SLA
+GC_{leaf} = \Delta LA \cdot CC_{leaf} \cdot 1000 / SLA
 \tag{16.4}
 \end{equation}\]</span>
-Analogously, given an increase in sapwood area <span class="math inline">\(\Delta LA\)</span>, sapwood growth respiration is:
-<span class="math display" id="eq:sapwoodconstructioncost">\[\begin{equation}
-G_{sapwood} = \Delta SA \cdot CC_{sapwood} \cdot (H + \sum_{s}{FRP_s \cdot L_s}) \cdot \rho_{wood}
+whereas the growth costs for the corresponding twigs are:
+<span class="math display" id="eq:twigconstructioncost">\[\begin{equation}
+GC_{twig} = \Delta LA \cdot CC_{sapwood} \cdot (r_{6.35} - 1) \cdot 1000 / SLA
 \tag{16.5}
 \end{equation}\]</span>
-Finally, and given an increase in fine root biomass <span class="math inline">\(\Delta B_{fineroot}\)</span>:
+Analogously, given an increase in sapwood area <span class="math inline">\(\Delta LA\)</span>, sapwood growth costs (in <span class="math inline">\(g\,gluc·ind^{-1}\)</span>) are:
+<span class="math display" id="eq:sapwoodconstructioncost">\[\begin{equation}
+GC_{sapwood} = \Delta SA \cdot CC_{sapwood} \cdot (H + \sum_{s}{FRP_s \cdot L_s}) \cdot \rho_{wood}
+\tag{16.6}
+\end{equation}\]</span>
+Finally, and given an increase in fine root biomass <span class="math inline">\(\Delta B_{fineroot}\)</span> has the following growth costs (in <span class="math inline">\(g\,gluc·ind^{-1}\)</span>) are:
 <span class="math display">\[\begin{equation}
-G_{fineroot} = \Delta B_{fineroot} \cdot CC_{fineroot}
+GC_{fineroot} = \Delta B_{fineroot} \cdot CC_{fineroot}
 \end{equation}\]</span></p>
+<p>Synthesis respiration (in <span class="math inline">\(g\,gluc·ind^{-1}\)</span>) associated to growth is less than growth costs, but can be found easily from growth costs, using construction costs per unit dry mass:
+<span class="math display">\[\begin{eqnarray}
+SR_{leaf} &amp;=&amp; GC_{leaf} \cdot \frac{CC_{leaf} - 1}{CC_{leaf}} \\
+SR_{twig} &amp;=&amp; GC_{twig} \cdot \frac{CC_{sapwood} - 1}{CC_{sapwood}} \\
+SR_{sapwood} &amp;=&amp; GC_{sapwood} \cdot \frac{CC_{sapwood} - 1}{CC_{sapwood}} \\
+SR_{fineroot} &amp;=&amp; GC_{fineroot} \cdot \frac{CC_{fineroot} - 1}{CC_{fineroot}}
+\end{eqnarray}\]</span></p>
+<p>The plant-level total synthesis respiration (required for stand-level carbon balance) is <span class="math inline">\(SR = SR_{leaf} + SR_{twig} + SR_{sapwood} + SR_{fineroot}\)</span>.</p>
 </div>
 <div id="phloemtransport" class="section level3 hasAnchor" number="16.2.4">
 <h3><span class="header-section-number">16.2.4</span> Phloem transport<a href="carbonpoolsbalance.html#phloemtransport" class="anchor-section" aria-label="Anchor link to header"></a></h3>
