@@ -473,14 +473,16 @@ div.csl-indent {
 <li class="chapter" data-level="15.5.4" data-path="growthmodelling.html"><a href="growthmodelling.html#forestgrowthoutput"><i class="fa fa-check"></i><b>15.5.4</b> Model output</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="16" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html"><i class="fa fa-check"></i><b>16</b> Carbon pools and components of the carbon balance</a>
+<li class="chapter" data-level="16" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html"><i class="fa fa-check"></i><b>16</b> Plant carbon pools and components of the labile carbon balance</a>
 <ul>
-<li class="chapter" data-level="16.1" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#estimationcarbonpools"><i class="fa fa-check"></i><b>16.1</b> Size of carbon pools</a>
+<li class="chapter" data-level="16.1" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#estimationcarbonpools"><i class="fa fa-check"></i><b>16.1</b> Size of plant carbon pools</a>
 <ul>
-<li class="chapter" data-level="16.1.1" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#leaf-structural-metabolic-and-storage-biomass"><i class="fa fa-check"></i><b>16.1.1</b> Leaf structural, metabolic and storage biomass</a></li>
-<li class="chapter" data-level="16.1.2" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#sapwood-structural-metabolic-and-storage-biomass"><i class="fa fa-check"></i><b>16.1.2</b> Sapwood structural, metabolic and storage biomass</a></li>
-<li class="chapter" data-level="16.1.3" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#fine-root-area-and-biomass"><i class="fa fa-check"></i><b>16.1.3</b> Fine root area and biomass</a></li>
-<li class="chapter" data-level="16.1.4" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#total-living-biomass"><i class="fa fa-check"></i><b>16.1.4</b> Total living biomass</a></li>
+<li class="chapter" data-level="16.1.1" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#leaf-structural-dead-metabolic-and-storage-biomass"><i class="fa fa-check"></i><b>16.1.1</b> Leaf structural, dead, metabolic and storage biomass</a></li>
+<li class="chapter" data-level="16.1.2" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#twig-structural-and-dead-biomass"><i class="fa fa-check"></i><b>16.1.2</b> Twig structural and dead biomass</a></li>
+<li class="chapter" data-level="16.1.3" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#sapwood-structural-metabolic-and-storage-biomass"><i class="fa fa-check"></i><b>16.1.3</b> Sapwood structural, metabolic and storage biomass</a></li>
+<li class="chapter" data-level="16.1.4" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#heartwood-biomass"><i class="fa fa-check"></i><b>16.1.4</b> Heartwood biomass</a></li>
+<li class="chapter" data-level="16.1.5" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#fine-root-area-and-biomass"><i class="fa fa-check"></i><b>16.1.5</b> Fine root area and biomass</a></li>
+<li class="chapter" data-level="16.1.6" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#total-living-biomass"><i class="fa fa-check"></i><b>16.1.6</b> Total living biomass</a></li>
 </ul></li>
 <li class="chapter" data-level="16.2" data-path="carbonpoolsbalance.html"><a href="carbonpoolsbalance.html#carbonbalancecomponents"><i class="fa fa-check"></i><b>16.2</b> Components of labile carbon balance</a>
 <ul>
@@ -960,31 +962,31 @@ Figure 15.4: Design of dead carbon pools and decomposition processes. Boxes are 
 <h3><span class="header-section-number">15.3.2</span> Labile carbon balance<a href="growthmodelling.html#labile-carbon-balance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The model performs daily carbon balance of <em>labile carbon</em> in leaves and sapwood (stem, branches and coarse roots) for each plant cohort. In each of these two compartments carbon balance is performed for the two labile carbon forms, dissolved sugars (i.e. <em>metabolic carbon</em>) and starch (i.e. <em>storage carbon</em>). In the following all carbon flows (i.e. the components of right hand side of equations) are assumed to be in units of <span class="math inline">\(g\,gluc\)</span>. At the leaf level, the carbon balance equations for dissolved sugars and starch are:</p>
 <p><span class="math display" id="eq:leafcarbonbalanceequations">\[\begin{eqnarray}
-\Delta{SS_{leaf}} \cdot V_{storage,leaf} &amp;=&amp; A - M_{leaf} - F_{phloem} - SC_{leaf} - TS_{leaf}\\
+\Delta{SS_{leaf}} \cdot V_{storage,leaf} &amp;=&amp; A - MR_{leaf} - F_{phloem} - SC_{leaf} - TS_{leaf}\\
 \Delta{ST_{leaf}} \cdot V_{storage,leaf} &amp;=&amp; SC_{leaf} - TT_{leaf}
 \tag{15.1}
 \end{eqnarray}\]</span>
-where <span class="math inline">\(A\)</span> is (gross) photosynthesis, <span class="math inline">\(M_{leaf}\)</span> is leaf maintenance respiration, <span class="math inline">\(F_{phloem}\)</span> is the sugar flow via phloem towards the stem and roots, <span class="math inline">\(SC_{leaf}\)</span> is the conversion from leaf sugar to leaf starch, <span class="math inline">\(TS_{leaf}\)</span> and <span class="math inline">\(TT_{leaf}\)</span> are the translocation of leaf sugars and starch into sapwood storage, respectively, during leaf senescence (see eq. <a href="growthmodelling.html#eq:sapwoodcarbonbalanceequations">(15.2)</a> below) or if leaf storage capacity is surpassed.</p>
+where <span class="math inline">\(A\)</span> is (gross) photosynthesis, <span class="math inline">\(MR_{leaf}\)</span> is leaf maintenance respiration, <span class="math inline">\(F_{phloem}\)</span> is the sugar flow via phloem towards the stem and roots, <span class="math inline">\(SC_{leaf}\)</span> is the conversion from leaf sugar to leaf starch, <span class="math inline">\(TS_{leaf}\)</span> and <span class="math inline">\(TT_{leaf}\)</span> are the translocation of leaf sugars and starch into sapwood storage, respectively, during leaf senescence (see eq. <a href="growthmodelling.html#eq:sapwoodcarbonbalanceequations">(15.2)</a> below) or if leaf storage capacity is surpassed.</p>
 <p>The corresponding carbon balance equations for sapwood dissolved sugars and starch are:
 <span class="math display" id="eq:sapwoodcarbonbalanceequations">\[\begin{eqnarray}
-\Delta{SS_{sapwood}} \cdot V_{storage,sapwood} &amp;=&amp; F_{phloem} - M_{sapwood} - M_{fineroot} \\
+\Delta{SS_{sapwood}} \cdot V_{storage,sapwood} &amp;=&amp; F_{phloem} - MR_{twig} - MR_{sapwood} - MR_{fineroot} \\
 &amp; &amp; - SC_{sapwood}  - TS_{sapwood} \\
 \Delta{ST_{sapwood}} \cdot V_{storage,sapwood} &amp;=&amp; SC_{sapwood} + TS_{leaf} + TT_{leaf} + TS_{sapwood} \\
-&amp; &amp; - G_{sapwood} - G_{leaf} - G_{fineroot} - RE_{sapwood}
+&amp; &amp; - GC_{sapwood} - GC_{leaf} - GC_{twig} - GC_{fineroot} - RE_{sapwood}
 \tag{15.2}
 \end{eqnarray}\]</span>
-where <span class="math inline">\(F_{phloem}\)</span> is the sugar inflow via phloem transport, <span class="math inline">\(M_{sapwood}\)</span> is the sum of maintenance respiration of branches, stem and coarse roots, <span class="math inline">\(M_{fineroot}\)</span> is the maintenance respiration of fine roots, <span class="math inline">\(G_{leaf}\)</span>, <span class="math inline">\(G_{sapwood}\)</span> and <span class="math inline">\(G_{fineroot}\)</span> are the carbon costs of forming new leaves, sapwood or fine roots (respectively), <span class="math inline">\(SC_{sapwood}\)</span> is the conversion of sapwood sugar to sapwood starch, <span class="math inline">\(TS_{sapwood}\)</span> is the translocation of sapwood sugars into starch during leaf senescence and <span class="math inline">\(RE_{sapwood}\)</span> is the root exudation of sapwood carbon.</p>
-<p>If we define <span class="math inline">\(S_{labile}\)</span> as the total amount of labile carbon for an individual plant (in <span class="math inline">\(g\,gluc\)</span>):
+where <span class="math inline">\(F_{phloem}\)</span> is the sugar inflow via phloem transport, <span class="math inline">\(MR_{twig}\)</span> is the maintenance respiration of twigs, <span class="math inline">\(MR_{sapwood}\)</span> is the sum of maintenance respiration of branches, stem and coarse roots, <span class="math inline">\(MR_{fineroot}\)</span> is the maintenance respiration of fine roots; <span class="math inline">\(GC_{leaf}\)</span>, <span class="math inline">\(GC_{twig}\)</span>, <span class="math inline">\(GC_{sapwood}\)</span> and <span class="math inline">\(GC_{fineroot}\)</span> are the carbon costs of forming new leaves, twigs, sapwood or fine roots (respectively), <span class="math inline">\(SC_{sapwood}\)</span> is the conversion of sapwood sugar to sapwood starch, <span class="math inline">\(TS_{sapwood}\)</span> is the translocation of sapwood sugars into starch during leaf senescence and <span class="math inline">\(RE_{sapwood}\)</span> is the root exudation of sapwood carbon.
+If we define <span class="math inline">\(S_{labile}\)</span> as the total amount of labile carbon for an individual plant (in <span class="math inline">\(g\,gluc\)</span>):
 <span class="math display" id="eq:totallabileplantequation">\[\begin{equation}
 S_{labile} = (SS_{leaf} + ST_{leaf}) \cdot V_{storage,leaf} + (SS_{sapwood} + ST_{sapwood}) \cdot V_{storage,sapwood}
 \tag{15.3}
 \end{equation}\]</span>
 then labile carbon balance at the plant level reduces to:
 <span class="math display" id="eq:plantcarbonbalanceequation">\[\begin{equation}
-\Delta{S_{labile}} = A - M - G - RE
+\Delta{S_{labile}} = A - MR - GC - RE
 \tag{15.4}
 \end{equation}\]</span>
-where <span class="math inline">\(M = M_{leaf} + M_{sapwood} + M_{fineroot}\)</span> is plant-level maintenance respiration, <span class="math inline">\(G = G_{leaf} + G_{sapwood} + G_{fineroot}\)</span> is plant-level growth costs and <span class="math inline">\(RE = RE_{sapwood}\)</span> is plant-level root exudation.</p>
+where <span class="math inline">\(MR = MR_{leaf} + MR_{twig} +MR_{sapwood} + MR_{fineroot}\)</span> is plant-level maintenance respiration, <span class="math inline">\(GC = GC_{leaf} + GC_{twig} +GC_{sapwood} + GC_{fineroot}\)</span> is plant-level growth costs and <span class="math inline">\(RE = RE_{sapwood}\)</span> is plant-level root exudation.</p>
 </div>
 <div id="plant-biomass-balance" class="section level3 hasAnchor" number="15.3.3">
 <h3><span class="header-section-number">15.3.3</span> Plant biomass balance<a href="growthmodelling.html#plant-biomass-balance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -1043,19 +1045,34 @@ where <span class="math inline">\(N_{dead}\)</span> is the density of dead indiv
 <h3><span class="header-section-number">15.3.5</span> Stand-level carbon balance<a href="growthmodelling.html#stand-level-carbon-balance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The model estimates several carbon fluxes at the stand level, all expressed in units of <span class="math inline">\(g\,C\cdot m^{-2}\)</span>:</p>
 <ul>
-<li><strong>Gross primary production</strong> (<span class="math inline">\(GPP\)</span>) is the sum of gross photosynthesis across plant cohorts.</li>
-<li><strong>Maintenance respiration</strong> (<span class="math inline">\(MR\)</span>) is the sum across plant cohorts of the carbon emitted to the atmosphere as a result of respiration required for the maintenance of living tissues (leaves, fine roots and sapwood parenchyma).</li>
-<li><strong>Synthesis respiration</strong> (<span class="math inline">\(SR\)</span>) is the sum across plant cohorts of the carbon returned to the atmosphere as a result of the process of synthesizing new structures. Note that this is less than the total carbon used for growth, as it does not include the carbon allocated to the new structures.</li>
-<li><strong>Net primary production</strong> (<span class="math inline">\(NPP\)</span>) is gross primary production minus the maintenance respiration and synthesis respiration terms. Net primary production should thus be equal to the increase in carbon allocated to new structures.</li>
+<li><strong>Gross primary production</strong> (<span class="math inline">\(GPP\)</span>) is the sum of gross photosynthesis (<span class="math inline">\(A_g\)</span>; in <span class="math inline">\(g\,C\cdot m^{-2}\)</span>) across plant cohorts:
+<span class="math display">\[\begin{equation}
+  GPP = \sum_{i}{A_{g,i}}
+  \end{equation}\]</span>
+where <span class="math inline">\(A_{g,i}\)</span> is the (cohort-level) gross photosyntesis for cohort <span class="math inline">\(i\)</span>.</li>
+<li><strong>Maintenance respiration</strong> (<span class="math inline">\(MR\)</span>) is the sum across plant cohorts of the carbon emitted to the atmosphere as a result of respiration required for the maintenance of living tissues (leaves, fine roots and sapwood parenchyma):
+<span class="math display">\[\begin{equation}
+  MR = \frac{m_{carbon} \cdot 6}{m_{gluc}} \cdot \sum_{i}{MR_i\cdot (N_i/10000)}
+  \end{equation}\]</span>
+where <span class="math inline">\(MR_i\)</span> is plant-level maintenance respiration for cohort <span class="math inline">\(i\)</span>.</li>
+<li><strong>Synthesis respiration</strong> (<span class="math inline">\(SR\)</span>) is the sum across plant cohorts of the carbon returned to the atmosphere as a result of the process of synthesizing new structures:
+<span class="math display">\[\begin{equation}
+  SR = \frac{m_{carbon} \cdot 6}{m_{gluc}} \cdot \sum_{i}{SR_i\cdot (N_i/10000)}
+  \end{equation}\]</span>
+where <span class="math inline">\(SR_i\)</span> is plant-level synthesis respiration for cohort <span class="math inline">\(i\)</span>. Note that this is less than the total carbon used for growth, as it does not include the carbon allocated to the new structures.</li>
+<li><strong>Net primary production</strong> (<span class="math inline">\(NPP\)</span>) is gross primary production minus the maintenance respiration and synthesis respiration terms:
+<span class="math display">\[\begin{equation}
+  NPP = GPP - MR - SR
+  \end{equation}\]</span>
+Net primary production should thus be equal to the carbon newly allocated to plant structures.</li>
 <li><strong>Heterotrophic respiration</strong> (<span class="math inline">\(HR\)</span>) is the sum of carbon returned to the atmosphere as a result of respiration occurred during decomposition processes.</li>
 <li><strong>Fire combustion</strong> (<span class="math inline">\(FC\)</span>) is the sum of carbon returned to the atmosphere as a result of combustion of plant tissues.</li>
-<li><strong>Net ecosystem production</strong> (<span class="math inline">\(NEP\)</span>) is the net carbon source of the forest ecosystem, i.e. the net primary production minus heterotrophic respiration and fire combustion.</li>
-</ul>
-<p>The overall carbon balance of the forest stand is the following:
+<li><strong>Net ecosystem production</strong> (<span class="math inline">\(NEP\)</span>) is the net carbon source of the forest ecosystem, i.e. the net primary production minus heterotrophic respiration and fire combustion. <span class="math inline">\(NEP\)</span> expresses the overall carbon balance of the forest stand:
 <span class="math display" id="eq:standcarbonbalanceequation">\[\begin{equation}
 \Delta{C}_{stand} = NEP = GPP - MR - SR - HR - FC = NPP - HR - FC
 \tag{15.12}
-\end{equation}\]</span></p>
+\end{equation}\]</span></li>
+</ul>
 </div>
 </div>
 <div id="growthscheduling" class="section level2 hasAnchor" number="15.4">

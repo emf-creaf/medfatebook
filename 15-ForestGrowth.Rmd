@@ -259,23 +259,21 @@ Since the growth model builds on soil and plant water balance models, the water 
 The model performs daily carbon balance of *labile carbon* in leaves and sapwood (stem, branches and coarse roots) for each plant cohort. In each of these two compartments carbon balance is performed for the two labile carbon forms, dissolved sugars (i.e. *metabolic carbon*) and starch (i.e. *storage carbon*). In the following all carbon flows (i.e. the components of right hand side of equations) are assumed to be in units of $g\,gluc$. At the leaf level, the carbon balance equations for dissolved sugars and starch are:
 
 \begin{eqnarray}
-\Delta{SS_{leaf}} \cdot V_{storage,leaf} &=& A - M_{leaf} - F_{phloem} - SC_{leaf} - TS_{leaf}\\
+\Delta{SS_{leaf}} \cdot V_{storage,leaf} &=& A - MR_{leaf} - F_{phloem} - SC_{leaf} - TS_{leaf}\\
 \Delta{ST_{leaf}} \cdot V_{storage,leaf} &=& SC_{leaf} - TT_{leaf}
 (\#eq:leafcarbonbalanceequations)
 \end{eqnarray}
-where $A$ is (gross) photosynthesis, $M_{leaf}$ is leaf maintenance respiration, $F_{phloem}$ is the sugar flow via phloem towards the stem and roots,  $SC_{leaf}$ is the conversion from leaf sugar to leaf starch, $TS_{leaf}$ and $TT_{leaf}$ are the translocation of leaf sugars and starch into sapwood storage, respectively, during leaf senescence (see eq. \@ref(eq:sapwoodcarbonbalanceequations) below) or if leaf storage capacity is surpassed. 
+where $A$ is (gross) photosynthesis, $MR_{leaf}$ is leaf maintenance respiration, $F_{phloem}$ is the sugar flow via phloem towards the stem and roots,  $SC_{leaf}$ is the conversion from leaf sugar to leaf starch, $TS_{leaf}$ and $TT_{leaf}$ are the translocation of leaf sugars and starch into sapwood storage, respectively, during leaf senescence (see eq. \@ref(eq:sapwoodcarbonbalanceequations) below) or if leaf storage capacity is surpassed. 
 
 The corresponding carbon balance equations for sapwood dissolved sugars and starch are:
 \begin{eqnarray}
-\Delta{SS_{sapwood}} \cdot V_{storage,sapwood} &=& F_{phloem} - M_{sapwood} - M_{fineroot} \\
+\Delta{SS_{sapwood}} \cdot V_{storage,sapwood} &=& F_{phloem} - MR_{twig} - MR_{sapwood} - MR_{fineroot} \\
 & & - SC_{sapwood}  - TS_{sapwood} \\
 \Delta{ST_{sapwood}} \cdot V_{storage,sapwood} &=& SC_{sapwood} + TS_{leaf} + TT_{leaf} + TS_{sapwood} \\
-& & - G_{sapwood} - G_{leaf} - G_{fineroot} - RE_{sapwood}
+& & - GC_{sapwood} - GC_{leaf} - GC_{twig} - GC_{fineroot} - RE_{sapwood}
 (\#eq:sapwoodcarbonbalanceequations)
 \end{eqnarray}
-where $F_{phloem}$ is the sugar inflow via phloem transport, $M_{sapwood}$ is the sum of maintenance respiration of branches, stem and coarse roots, $M_{fineroot}$ is the maintenance respiration of fine roots, $G_{leaf}$, $G_{sapwood}$ and $G_{fineroot}$ are the carbon costs of forming new leaves, sapwood or fine roots (respectively), $SC_{sapwood}$ is the conversion of sapwood sugar to sapwood starch, $TS_{sapwood}$ is the translocation of sapwood sugars into starch during leaf senescence and $RE_{sapwood}$ is the root exudation of sapwood carbon. 
-
-
+where $F_{phloem}$ is the sugar inflow via phloem transport, $MR_{twig}$ is the maintenance respiration of twigs, $MR_{sapwood}$ is the sum of maintenance respiration of branches, stem and coarse roots, $MR_{fineroot}$ is the maintenance respiration of fine roots; $GC_{leaf}$, $GC_{twig}$, $GC_{sapwood}$ and $GC_{fineroot}$ are the carbon costs of forming new leaves, twigs, sapwood or fine roots (respectively), $SC_{sapwood}$ is the conversion of sapwood sugar to sapwood starch, $TS_{sapwood}$ is the translocation of sapwood sugars into starch during leaf senescence and $RE_{sapwood}$ is the root exudation of sapwood carbon. 
 If we define $S_{labile}$ as the total amount of labile carbon for an individual plant (in $g\,gluc$):
 \begin{equation}
 S_{labile} = (SS_{leaf} + ST_{leaf}) \cdot V_{storage,leaf} + (SS_{sapwood} + ST_{sapwood}) \cdot V_{storage,sapwood}
@@ -283,10 +281,10 @@ S_{labile} = (SS_{leaf} + ST_{leaf}) \cdot V_{storage,leaf} + (SS_{sapwood} + ST
 \end{equation}
 then labile carbon balance at the plant level reduces to:
 \begin{equation}
-\Delta{S_{labile}} = A - M - G - RE
+\Delta{S_{labile}} = A - MR - GC - RE
 (\#eq:plantcarbonbalanceequation)
 \end{equation}
-where $M = M_{leaf} + M_{sapwood} + M_{fineroot}$ is plant-level maintenance respiration,  $G = G_{leaf} + G_{sapwood} + G_{fineroot}$ is plant-level growth costs and $RE = RE_{sapwood}$ is plant-level root exudation.
+where $MR = MR_{leaf} + MR_{twig} +MR_{sapwood} + MR_{fineroot}$ is plant-level maintenance respiration,  $GC = GC_{leaf} + GC_{twig} +GC_{sapwood} + GC_{fineroot}$ is plant-level growth costs and $RE = RE_{sapwood}$ is plant-level root exudation.
 
 ### Plant biomass balance
 
@@ -357,15 +355,29 @@ where $N_{dead}$ is the density of dead individuals and $B_{plant}$ is the initi
 
 The model estimates several carbon fluxes at the stand level, all expressed in units of $g\,C\cdot m^{-2}$:
 
-  + **Gross primary production** ($GPP$) is the sum of gross photosynthesis across plant cohorts.
-  + **Maintenance respiration** ($MR$) is the sum across plant cohorts of the carbon emitted to the atmosphere as a result of respiration required for the maintenance of living tissues (leaves, fine roots and sapwood parenchyma).
-  + **Synthesis respiration** ($SR$) is the sum across plant cohorts of the carbon returned to the atmosphere as a result of the process of synthesizing new structures. Note that this is less than the total carbon used for growth, as it does not include the carbon allocated to the new structures.
-  + **Net primary production** ($NPP$) is gross primary production minus the maintenance respiration and synthesis respiration terms. Net primary production should thus be equal to the increase in carbon allocated to new structures.
+  + **Gross primary production** ($GPP$) is the sum of gross photosynthesis ($A_g$; in $g\,C\cdot m^{-2}$) across plant cohorts:
+  \begin{equation}
+  GPP = \sum_{i}{A_{g,i}}
+  \end{equation}
+  where $A_{g,i}$ is the (cohort-level) gross photosyntesis for cohort $i$.
+  + **Maintenance respiration** ($MR$) is the sum across plant cohorts of the carbon emitted to the atmosphere as a result of respiration required for the maintenance of living tissues (leaves, fine roots and sapwood parenchyma): 
+  \begin{equation}
+  MR = \frac{m_{carbon} \cdot 6}{m_{gluc}} \cdot \sum_{i}{MR_i\cdot (N_i/10000)}
+  \end{equation}
+  where $MR_i$ is plant-level maintenance respiration for cohort $i$.
+  + **Synthesis respiration** ($SR$) is the sum across plant cohorts of the carbon returned to the atmosphere as a result of the process of synthesizing new structures: 
+  \begin{equation}
+  SR = \frac{m_{carbon} \cdot 6}{m_{gluc}} \cdot \sum_{i}{SR_i\cdot (N_i/10000)}
+  \end{equation}
+  where $SR_i$ is plant-level synthesis respiration for cohort $i$. Note that this is less than the total carbon used for growth, as it does not include the carbon allocated to the new structures.
+  + **Net primary production** ($NPP$) is gross primary production minus the maintenance respiration and synthesis respiration terms:
+  \begin{equation}
+  NPP = GPP - MR - SR 
+  \end{equation}
+  Net primary production should thus be equal to the carbon newly allocated to plant structures.
   + **Heterotrophic respiration** ($HR$) is the sum of carbon returned to the atmosphere as a result of respiration occurred during decomposition processes.
   + **Fire combustion** ($FC$) is the sum of carbon returned to the atmosphere as a result of combustion of plant tissues.
-  * **Net ecosystem production** ($NEP$) is the net carbon source of the forest ecosystem, i.e. the net primary production minus heterotrophic respiration and fire combustion.
-  
-The overall carbon balance of the forest stand is the following:
+  * **Net ecosystem production** ($NEP$) is the net carbon source of the forest ecosystem, i.e. the net primary production minus heterotrophic respiration and fire combustion. $NEP$ expresses the overall carbon balance of the forest stand:
 \begin{equation}
 \Delta{C}_{stand} = NEP = GPP - MR - SR - HR - FC = NPP - HR - FC 
 (\#eq:standcarbonbalanceequation)

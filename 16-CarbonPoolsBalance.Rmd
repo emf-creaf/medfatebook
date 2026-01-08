@@ -1,25 +1,37 @@
-# Carbon pools and components of the carbon balance {#carbonpoolsbalance}
+# Plant carbon pools and components of the labile carbon balance {#carbonpoolsbalance}
 
-## Size of carbon pools {#estimationcarbonpools}
+## Size of plant carbon pools {#estimationcarbonpools}
 
-Biomass of leaves, sapwood and fine roots is needed in the model to estimate respiratory costs and the size of the C storage pools. 
+Biomass of leaves, twigs, sapwood and fine roots is needed in the model to estimate respiratory costs and the size of the C storage pools. 
 
-### Leaf structural, metabolic and storage biomass
+### Leaf structural, dead, metabolic and storage biomass
 
 The live leaf area $LA_{live}$ per individual (in $m^2$) is:
 \begin{equation}
 LA_{live} = 10000 \cdot LAI_{live} / N
+(\#eq:maxleafarea)
 \end{equation}
 where $N$ is the density of the cohort and $LAI_{live}$ is the leaf area index. The actual (expanded) leaf area $LA_{\phi}$ is estimated analogously from $LAI_{\phi}$:
 \begin{equation}
 LA_{\phi} = 10000 \cdot LAI_{\phi} / N
 (\#eq:leafarea)
 \end{equation}
+And so is the dead leaf area, $LA_{dead}$:
+\begin{equation}
+LA_{dead} = 10000 \cdot LAI_{dead} / N
+(\#eq:deadleafarea)
+\end{equation}
+
 Structural leaf biomass per individual ($B_{leaf}$; $g\,dry·ind^{-1}$) is the result of dividing leaf area by $SLA$ ($m^{2} \cdot kg^{-1}$), the specific leaf area of the species:
 \begin{equation}
 B_{leaf} = 1000 \cdot LA_{\phi} / SLA
 \end{equation}
-where a factor 1000 is used to convert from kg to g. Hence, only expanded leaf area has respiratory cost (i.e. winter resistance buds do not). Leaf storage volume for an individual ($V_{storage,leaf}$; in $L \cdot ind^{-1}$) is:
+where a factor 1000 is used to convert from kg to g. Hence, only expanded leaf area has respiratory cost (i.e. winter resistance buds do not). An analogous equation is used to estimate dead leaf biomass per individual ($D_{leaf}$; $g\,dry·ind^{-1}$):
+\begin{equation}
+D_{leaf} = 1000 \cdot LA_{dead} / SLA
+\end{equation}
+
+Leaf storage volume for an individual ($V_{storage,leaf}$; in $L \cdot ind^{-1}$) is:
 \begin{equation}
 V_{storage, leaf} = LA_{\phi}  \cdot V_{leaf}
 \end{equation}
@@ -34,6 +46,23 @@ ST^{max}_{leaf} = 0.1 \cdot 1000 \cdot \frac{V_{storage, leaf} \cdot \rho_{starc
 
 where $\rho_{starch}$ is the density of starch and $m_{starch}$ is its molar mass.
 
+### Twig structural and dead biomass
+
+Structural twig biomass per individual ($B_{twig}$; $g\,dry·ind^{-1}$) is related to the biomass of leaves  ($B_{leaf}$), via the $r_{6.35}$ ratio, which is defined as the ratio between the biomass of leaves and twigs over the biomass of leaves:
+\begin{equation}
+B_{twig} = B_{leaf} / (r_{6.35} - 1)
+\end{equation}
+An analogous equation is used to estimate dead twig mass per individual ($D_{twig}$; $g\,dry·ind^{-1}$) from the mass of dead leaves ($D_{leaf}$):
+\begin{equation}
+D_{twig} = D_{leaf} / (r_{6.35} - 1)
+\end{equation}
+
+While $B_{twig}$ represents the structural twig biomass, it cannot be used to estimate twig respiration (see living sapwood biomass below). In addition, we assume that embolized parts of twigs do not contribute to twig respiration. Hence, twig living (respiratory) biomass is estimated using:
+\begin{equation}
+B_{living, twig} = B_{twig} \cdot (1 - PLC_{stem}) \cdot (1 - f_{conduits})
+\end{equation}
+
+
 ### Sapwood structural, metabolic and storage biomass
 
 Sapwood volume ($V_{sapwood}$; in $L \cdot ind^{-1}$) is defined as the product of sapwood area and the sum of aboveground height and belowground coarse root length:
@@ -46,7 +75,7 @@ B_{sapwood} = 1000 \cdot V_{sapwood} \cdot\rho_{wood}
 \end{equation}
 While $B_{sapwood}$ represents the structural sapwood biomass, it cannot be used to estimate sapwood respiration, since only xylem axial or radial parenchymatic rays (and not dead cells like tracheids or vessels) contribute to sapwood respiration. In addition, we assume that embolized parts of sapwood do not contribute to sapwood respiration. Hence, sapwood living (respiratory) biomass is estimated using:
 \begin{equation}
-B_{living, sapwood} = 1000 \cdot (1 - PLC_{stem}) \cdot V_{sapwood} \cdot\rho_{wood} \cdot (1 - f_{conduits})
+B_{living, sapwood} = B_{sapwood} \cdot (1 - PLC_{stem}) \cdot (1 - f_{conduits})
 \end{equation}
 where $PLC_{stem}$ is the current proportion of stem conductance lost and $f_{conduits}$ is the fraction of sapwood volume that corresponds to dead conducts, being the complement of the fraction of parenchymatic tissue. The volume available for metabolic or storage carbon within sapwood is limited by both the sapwood fraction that corresponds to parenchyma and wood porosity (i.e. $(1 - (\rho_{wood}/1.54))$). Sapwood storage volume ($V_{storage, sapwood}$; in $L \cdot ind^{-1}$) is:
 \begin{equation}
@@ -60,6 +89,22 @@ where $m_{gluc}$ is the molar mass of glucose. To estimate sapwood storage capac
 \begin{equation}
 ST^{max}_{sapwood} = 0.5 \cdot 1000 \cdot \frac{V_{storage,sapwood} \cdot \rho_{starch}}{m_{starch}}
 \end{equation}
+
+### Heartwood biomass
+
+Total wood volume ($V_{wood}$; in $L \cdot ind^{-1}$) is defined, analogously as sapwood volume, as the product of stem section area and the sum of aboveground height and belowground coarse root length:
+\begin{equation}
+V_{wood} = 1000 \cdot SSA\cdot (H + \sum_{s}{FRP_s \cdot L_s})
+\end{equation}
+where $SSA$ is stem section area (in $cm^2$; derived from $DBH$), $H$ is plant height, $FRP_{s}$ is the proportion of fine roots in soil layer $s$ and $L_{s}$ is the coarse root length in layer $s$ (all lengths expressed here in $m$). Once total wood volume and sapwood volume are known, we can determine heartwood volume as their difference:
+\begin{equation}
+V_{heartwood} = V_{wood} - V_{sapwood}
+\end{equation}
+Heartwood biomass per individual ($D_{heartwood}$; $g\,dry·ind^{-1}$) represents the heartwood mass of trunks, branches and coarse roots. Analogously to sapwood biomass, is defined as the product of $V_{heartwood}$ and wood density  ($\rho_{wood}$; $g dry·cm^{-3}$):
+\begin{equation}
+D_{heartwood} = 1000 \cdot V_{heartwood} \cdot\rho_{wood}
+\end{equation}
+
 
 ### Fine root area and biomass
 
@@ -87,7 +132,7 @@ FRA_{s} = 10^{-4}\cdot B_{fineroot,s} \cdot 2.0 \cdot \sqrt{\frac{\pi \cdot SRL}
 ### Total living biomass
 Total living biomass per individual (i.e. not accounting for heartwood or xylem conduits) is:
 \begin{align*}
-B_{total} &= B_{leaf} + B_{living, sapwood} + B_{fineroot} + \\
+B_{total} &= B_{leaf} + B_{living, twig} + B_{living, sapwood} + B_{fineroot} + \\
           &+ B_{sugar,leaf} + B_{starch,leaf}+ B_{sugar,sapwood} + B_{starch,sapwood}
 \end{align*}
 $B_{total}$ is used to express carbon balance components per dry weight of living biomass in the model output, which allows a better comparison across plant cohorts of different size and species.
@@ -105,19 +150,20 @@ A = \frac{10000 \cdot A_g}{N} \cdot \frac{m_{gluc}}{m_{carbon} \cdot 6}
 where $N$ is the density of individuals per hectare, $m_{gluc}$ is the glucose molar mass and $m_{carbon}$ is the carbon molar mass.
 
 ### Maintenance respiration
-Maintenance respiration (in $g\,gluc·ind^{-1}$) is calculated for each of the three compartments (leaves, sapwood, and fine roots) individually [@Mouillot2001], and differs slightly depending on the complexity of the transpiration submodel. 
+Maintenance respiration (in $g\,gluc·ind^{-1}$) is calculated for each living compartment (leaves, twigs, sapwood, and fine roots) individually [@Mouillot2001], and differs slightly depending on the complexity of the transpiration submodel. 
 
 When simulating growth with the basic water balance, the model uses a $Q_{10}$ relationship of baseline respiration with temperature, which means that for every 10 ºC change in temperature there is a $Q_{10}$ factor change in respiration:
 \begin{eqnarray}
 M_{leaf} &=& (B_{leaf} + B_{sugar,leaf}) \cdot MR_{leaf} \cdot Q_{10}^{(T_{mean}-20)/10} \cdot (L^{PAR})^{WUE_{decay}} \\
+M_{twig} &=& B_{living,twig} \cdot MR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
 M_{sapwood} &=& (B_{living,sapwood} + B_{sugar,sapwood}) \cdot MR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
-M_{fineroot} &=& B_{fineroot} \cdot MR_{fineroot} \cdot Q_{10}^{(T_{mean}-20)/10} \cdot ( LA_{i}/LA^{live}_i) 
+M_{fineroot} &=& B_{fineroot} \cdot MR_{fineroot} \cdot Q_{10}^{(T_{mean}-20)/10} \cdot ( LA_{\phi}/LA_{live}) 
 \end{eqnarray}
 where $T_{mean}$ is the average daily temperature (in ºC). Baseline maintenance respiration rates per dry biomass ($MR_{leaf}$, $MR_{sapwood}$ and $MR_{fineroot}$ for leaves, parenchymatic sapwood and fine roots, respectively; in $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$) are can be supplied via species-specific parameters and should refer to 20 ºC. Leaf and fine root rates can also be estimated from nitrogen concentration, following @Reich2008 (see section \@ref(imputationRER)). Factor $Q_{10}$ has been found to decrease with temperature [@Tjoelker2001]. For example, a 10 °C increase in measurement temperature at low measurement temperatures from 5 to 15 °C results in an approximate 2.8 fold increase in respiration rate, whereas an increase in temperature from 25 to 35 °C results in a less than two-fold (1.8) increase in rate. The general temperature relationship proposed by @Tjoelker2001 is used here:
 \begin{equation}
 Q_{10} = 3.22 - 0.046 \cdot T_{mean}
 \end{equation}
-Factor $(L^{PAR})^{WUE_{decay}}$ is added to reduce respiration rates in leaves under shade, analogously to the reduction of water use efficiency explained in \@ref(basicphotosynthesis). Thus, it is assumed that the carbon use efficiency of the leaves is more or less constant. Factor $LA_{i}/LA^{live}_i$ is added to the maintenance respiration of fine roots to reduce respiration rates during winter in winter-deciduous species, assuming a decrease in respiration rates of fine roots parallel to that of leaves.
+Factor $(L^{PAR})^{WUE_{decay}}$ is added to reduce respiration rates in leaves under shade, analogously to the reduction of water use efficiency explained in \@ref(basicphotosynthesis). Thus, it is assumed that the carbon use efficiency of the leaves is more or less constant. Factor $LA_{\phi}/LA^{live}$ is added to the maintenance respiration of fine roots to reduce respiration rates during winter in winter-deciduous species, assuming a decrease in respiration rates of fine roots parallel to that of leaves.
 
 When simulating growth with the advanced model, sub-daily leaf maintenance respiration rates are estimated as the difference between gross and net photosynthesis (see \@ref(leafphotosynthesis)). Sapwood and fine root respiration rates are also estimated at sub-daily steps and, hence, sub-daily canopy temperature variation is taken into account (i.e. sub-daily canopy $T_{can}$ values are used instead of the daily temperature mean, $T_{mean}$). 
 
