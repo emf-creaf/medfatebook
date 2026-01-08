@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-01-07" />
+<meta name="date" content="2026-01-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -879,8 +879,8 @@ Figure 15.4: Design of dead carbon pools and decomposition processes. Boxes are 
 <li>Density of living individuals in the plant cohort, <span class="math inline">\(N\)</span> (<span class="math inline">\(ind·ha^{-1}\)</span>).</li>
 <li>Density of dead individuals in the plant cohort, <span class="math inline">\(N^{dead}\)</span> (<span class="math inline">\(ind·ha^{-1}\)</span>).</li>
 <li>The proportion of fine roots, <span class="math inline">\(FRP_{s}\)</span>, in each soil layer <span class="math inline">\(s\)</span> ([0-1]).</li>
-<li>Cumulative mass of small dead branches corresponding to cohort dead individuals <span class="math inline">\(D_{smallbranches}\)</span> (<span class="math inline">\(g\,C·m^{-2}\)</span>).</li>
-<li>Cumulative mass of large dead wood corresponding to cohort dead individuals <span class="math inline">\(D_{largewood}\)</span> (<span class="math inline">\(g\,C·m^{-2}\)</span>).</li>
+<li>Cumulative mass of small dead branches (diameter between 0.635 cm an 7.5 cm; 10h and 100h fuels) corresponding to cohort dead individuals <span class="math inline">\(D_{smallbranches}\)</span> (<span class="math inline">\(g\,C·m^{-2}\)</span>).</li>
+<li>Cumulative mass of large dead wood (diameters &gt; 7.5 cm; 1000h and 10000h fuels) corresponding to cohort dead individuals <span class="math inline">\(D_{largewood}\)</span> (<span class="math inline">\(g\,C·m^{-2}\)</span>).</li>
 </ul>
 <p>Variables <span class="math inline">\(D_{smallbranches}\)</span> and <span class="math inline">\(D_{largewood}\)</span> are not to be confounded with state variables corresponding to decomposing snags (see below). In growth simulations <span class="math inline">\(D_{smallbranches}\)</span> and <span class="math inline">\(D_{largewood}\)</span> are used to track mass of dead wood only. In forest dynamic simulations, the values of <span class="math inline">\(D_{smallbranches}\)</span> and <span class="math inline">\(D_{largewood}\)</span> at the end of the simulated year are used by function <code>fordyn()</code> to create new snag cohorts to start the decomposition process the year after.</p>
 <p><em>Individual-level state variables</em> are needed in growth simulations:</p>
@@ -907,7 +907,7 @@ Figure 15.4: Design of dead carbon pools and decomposition processes. Boxes are 
 <li>Leaf biomass, <span class="math inline">\(B_{leaf}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA\)</span>.</li>
 <li>Twig biomass, <span class="math inline">\(B_{twig}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA\)</span>.</li>
 <li>Dead leaf mass, <span class="math inline">\(D_{leaf}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA^{dead}\)</span>.</li>
-<li>Dead twig mass, <span class="math inline">\(D_{twig}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA^{dead}\)</span>.</li>
+<li>Dead twig (diameter &lt; 0.635 cm) mass, <span class="math inline">\(D_{twig}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA^{dead}\)</span>.</li>
 <li>The radial length of coarse roots in each soil layer <span class="math inline">\(s\)</span>, <span class="math inline">\(L_{radial, s}\)</span> (<span class="math inline">\(mm\)</span>), from <span class="math inline">\(FRP_{s}\)</span>.</li>
 <li>Sapwood biomass, <span class="math inline">\(B_{sapwood}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(SA\)</span>, <span class="math inline">\(H\)</span> and <span class="math inline">\(FRP_{s}\)</span> and <span class="math inline">\(L_{radial,s}\)</span>.</li>
 <li>Heartwood mass, for trees, <span class="math inline">\(D_{heartwood}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(SA\)</span>, <span class="math inline">\(DBH\)</span>, <span class="math inline">\(H\)</span> and <span class="math inline">\(FRP_{s}\)</span> and <span class="math inline">\(L_{radial,s}\)</span>.</li>
@@ -920,23 +920,23 @@ Figure 15.4: Design of dead carbon pools and decomposition processes. Boxes are 
 <div id="state-variables-related-to-carbon-decomposition" class="section level3 hasAnchor" number="15.2.2">
 <h3><span class="header-section-number">15.2.2</span> State variables related to carbon decomposition<a href="growthmodelling.html#state-variables-related-to-carbon-decomposition" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p><strong>Dead standing wood cohorts</strong></p>
-<p>Cohorts of dead standing wood (i.e. snag cohorts) are identified by combinations of species, DBH of the original tree, height and dead age (i.e. the years passed since mortality occurred). Those properties are modified by the model of forest dynamics, whereas the growth model deals with the daily decomposition process. In the growth model, the following state variables are tracked for cohorts of dead standing wood:</p>
+<p>Cohorts of dead standing wood (i.e. snag cohorts) are identified by combinations of species, DBH of the original tree, height and dead age (i.e. the years passed since mortality occurred). Those properties match the element <code>snagData</code> of forest objects (see <a href="model-inputs.html#deadplantelements">2.4.2.4</a>) and are modified by the model of forest dynamics, whereas the growth model deals with the daily decomposition process. In the growth model, the following state variables are tracked for cohorts of dead standing wood:</p>
 <ul>
-<li>Mass of small dead branches, with diameters &lt; 7.5 cm, <span class="math inline">\(SN_{smallbranches}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
-<li>Mass of large dead wood, with diameters &gt; 7.5 cm, <span class="math inline">\(SN_{deadwood}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Mass of small dead branches, with diameters comprised between 0.635 cm and 7.5 cm (i.e. 10h and 100h fuels), <span class="math inline">\(SN_{smallbranches}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Mass of large dead wood, with diameters &gt; 7.5 cm (i.e. 1000h and 10000h fuels), <span class="math inline">\(SN_{deadwood}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
 </ul>
 <p><strong>Structural litter pools</strong></p>
-<p>Structural litter pools are <strong>species-specific</strong>. For each species, the following pools are tracked:</p>
+<p>Structural litter pools are <strong>species-specific</strong>. For each species, the following pools are tracked, matching the element <code>litterData</code> of forest objects (see <a href="model-inputs.html#deadplantelements">2.4.2.4</a>):</p>
 <ul>
 <li>Leaf structural litter, <span class="math inline">\(LI_{leaves}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
-<li>Twig structural litter, <span class="math inline">\(LI_{twigs}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
-<li>Small branches structural litter, <span class="math inline">\(LI_{smallbranches}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
-<li>Large wood structural litter, <span class="math inline">\(LI_{largewood}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Twig (diameter &lt; 0.635 cm; 1h fuels) structural litter, <span class="math inline">\(LI_{twigs}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Small branches (diameter between 0.635 cm an 7.5 cm; 10h and 100h fuels) structural litter, <span class="math inline">\(LI_{smallbranches}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
+<li>Large wood (diameter &gt; 7.5 cm; 1000h and 10000h fuels) structural litter, <span class="math inline">\(LI_{largewood}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
 <li>Coarse roots structural litter, <span class="math inline">\(LI_{coarseroots}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
 <li>Fine roots structural litter, <span class="math inline">\(LI_{fineroots}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
 </ul>
 <p><strong>Soil carbon pools</strong></p>
-<p>The decomposition model keeps track of the carbon amount in different organic matter pools:</p>
+<p>The decomposition model keeps track of the carbon amount in different organic matter pools which come from the CENTURY model and match the element <code>SOCData</code> of forest objects (see <a href="model-inputs.html#socpools">2.4.2.5</a>):</p>
 <ul>
 <li>Surface metabolic litter, <span class="math inline">\(LI_{surface,metabolic}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>
 <li>Surface active decomposition pool, <span class="math inline">\(SOC_{surface, active}\)</span> (<span class="math inline">\(g\,C ·m^{-2}\)</span>).</li>

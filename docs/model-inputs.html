@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-01-07" />
+<meta name="date" content="2026-01-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1477,96 +1477,8 @@ Z_{sat} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\the
 <li><code>ObsID</code>: A string identifying plant cohorts at the stage of forest sampling. Used to track the fate of particular plant cohorts in simulations of forest dynamics.</li>
 </ul>
 </div>
-<div id="deadplantelements" class="section level4 hasAnchor" number="2.4.2.3">
-<h4><span class="header-section-number">2.4.2.3</span> Dead plant elements<a href="model-inputs.html#deadplantelements" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<p>Forest objects can include the description of dead vegetation elements of forest stands. Dead elements are grouped into <em>standing dead wood</em> (e.g. tree snags), <em>downed litter</em> (e.g. branches, logs or leaf litter) and <em>belowground litter</em> (i.e. fine roots or coarse roots). They are used to model organic matter decomposition of standing or downed plant organs (see chapter <a href="decomposition.html#decomposition">18</a>) in simulations with functions <code>growth()</code> or <code>fordyn()</code>.</p>
-<p>The optional data frame <code>snagData</code> contains information about the <strong>standing dead wood</strong> of dead plant cohorts, with the following columns:</p>
-<table>
-<colgroup>
-<col width="18%" />
-<col width="81%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>R column</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>Species</code></td>
-<td>String with species (taxon) name</td>
-</tr>
-<tr class="even">
-<td><code>DBH</code></td>
-<td>Diameter at breast height (in cm) of the original living cohort, for tree snags only</td>
-</tr>
-<tr class="odd">
-<td><code>Height</code></td>
-<td>Height of the original living cohort (tree or shrub) (in cm)</td>
-</tr>
-<tr class="even">
-<td><code>DeathAge</code></td>
-<td>Years passed since plant death (in yrs)</td>
-</tr>
-<tr class="odd">
-<td><code>SmallBranches</code></td>
-<td>Necromass of (standing) small dead branches (in g C/m2)</td>
-</tr>
-<tr class="even">
-<td><code>LargeWood</code></td>
-<td>Necromass of (standing) large dead wood (in g C/m2).</td>
-</tr>
-</tbody>
-</table>
-<p>Dead plant cohorts are characterized by species, diameter (for trees), height and age since death. Note that the description of dead cohorts quantifies the abundance of branches and large wood (i.e. stems), but not leaves (or twigs), which are assumed to become litter before or soon after plant death.</p>
-<p>Elements corresponding to <strong>downed litter</strong> or <strong>belowground litter</strong> are described in an additional data frame called <code>litterData</code>, which contains the following columns:</p>
-<table>
-<colgroup>
-<col width="18%" />
-<col width="81%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>R column</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>Species</code></td>
-<td>String with species (taxon) name.</td>
-</tr>
-<tr class="even">
-<td><code>Leaves</code></td>
-<td>Necromass of leaf litter (in g C/m2).</td>
-</tr>
-<tr class="odd">
-<td><code>Twigs</code></td>
-<td>Necromass of twig litter (in g C/m2).</td>
-</tr>
-<tr class="even">
-<td><code>SmallBranches</code></td>
-<td>Necromass of (downed) small dead branches (in g C/m2).</td>
-</tr>
-<tr class="odd">
-<td><code>LargeWood</code></td>
-<td>Necromass of (downed) large dead wood (in g C/m2).</td>
-</tr>
-<tr class="even">
-<td><code>CoarseRoots</code></td>
-<td>Necromass of dead coarse roots (in g C/m2).</td>
-</tr>
-<tr class="odd">
-<td><code>FineRoots</code></td>
-<td>Necromass of fine root litter (in g C/m2).</td>
-</tr>
-</tbody>
-</table>
-<p>Note that litter elements are characterized by species, so that the model can decompose litter elements at different rates depending on species identity (see chapter <a href="decomposition.html#decomposition">18</a>).</p>
-</div>
-<div id="seedlingseedbanks" class="section level4 hasAnchor" number="2.4.2.4">
-<h4><span class="header-section-number">2.4.2.4</span> Seedling and seed banks<a href="model-inputs.html#seedlingseedbanks" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="seedlingseedbanks" class="section level4 hasAnchor" number="2.4.2.3">
+<h4><span class="header-section-number">2.4.2.3</span> Seedling and seed banks<a href="model-inputs.html#seedlingseedbanks" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Forest objects can include the description of the seed bank and the seedling bank in forest stands, which are used to model regeneration from seeds in simulations with function <code>fordyn()</code> (see chapter <a href="regeneration.html#regeneration">20</a>).</p>
 <p>The optional data frame <code>seedBank</code> contains information about the <strong>seed bank</strong>, with the following columns:</p>
 <table>
@@ -1619,6 +1531,140 @@ Z_{sat} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\the
 <tr class="odd">
 <td><code>Z95</code></td>
 <td>Depth (in mm) corresponding to 95% of fine roots.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="deadplantelements" class="section level4 hasAnchor" number="2.4.2.4">
+<h4><span class="header-section-number">2.4.2.4</span> Dead plant elements<a href="model-inputs.html#deadplantelements" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Forest objects can include the description of dead vegetation elements of forest stands. Dead elements are grouped into <em>standing dead wood</em> (e.g. tree snags), <em>downed litter</em> (e.g. branches, logs or leaf litter) and <em>belowground litter</em> (i.e. fine roots or coarse roots). They are used to model organic matter decomposition of standing or downed plant organs (see chapter <a href="decomposition.html#decomposition">18</a>) in simulations with functions <code>growth()</code> or <code>fordyn()</code>.</p>
+<p>The optional data frame <code>snagData</code> contains information about the <strong>standing dead wood</strong> of dead plant cohorts, with the following columns:</p>
+<table>
+<colgroup>
+<col width="18%" />
+<col width="81%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>R column</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Species</code></td>
+<td>String with species (taxon) name</td>
+</tr>
+<tr class="even">
+<td><code>DBH</code></td>
+<td>Diameter at breast height (in cm) of the original living cohort, for tree snags only</td>
+</tr>
+<tr class="odd">
+<td><code>Height</code></td>
+<td>Height of the original living cohort (tree or shrub) (in cm)</td>
+</tr>
+<tr class="even">
+<td><code>DeathAge</code></td>
+<td>Years passed since plant death (in yrs)</td>
+</tr>
+<tr class="odd">
+<td><code>SmallBranches</code></td>
+<td>Necromass of standing small dead branches (diameters between 0.635 cm an 7.5 cm; 10h and 100h fuels; in g C/m2)</td>
+</tr>
+<tr class="even">
+<td><code>LargeWood</code></td>
+<td>Necromass of standing large dead wood (diameters &gt; 7.5 cm; 1000h and 10000h fuels; in g C/m2).</td>
+</tr>
+</tbody>
+</table>
+<p>Dead plant cohorts are characterized by species, diameter (for trees), height and age since death. Note that the description of dead cohorts quantifies the abundance of branches and large wood (i.e. stems), but not leaves (or twigs), which are assumed to become litter before or soon after plant death.</p>
+<p>Elements corresponding to <strong>downed litter</strong> or <strong>belowground litter</strong> are described in an additional data frame called <code>litterData</code>, which contains the following columns:</p>
+<table>
+<colgroup>
+<col width="18%" />
+<col width="81%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>R column</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Species</code></td>
+<td>String with species (taxon) name.</td>
+</tr>
+<tr class="even">
+<td><code>Leaves</code></td>
+<td>Necromass of leaf litter (in g C/m2).</td>
+</tr>
+<tr class="odd">
+<td><code>Twigs</code></td>
+<td>Necromass of twig litter (diameters &lt; 0.635; in g C/m2).</td>
+</tr>
+<tr class="even">
+<td><code>SmallBranches</code></td>
+<td>Necromass of downed small dead branches (diameters between 0.635 cm an 7.5 cm; 10h and 100h fuels; in g C/m2).</td>
+</tr>
+<tr class="odd">
+<td><code>LargeWood</code></td>
+<td>Necromass of (downed) large dead wood (diameters &gt; 7.5 cm; 1000h and 10000h fuels; in g C/m2).</td>
+</tr>
+<tr class="even">
+<td><code>CoarseRoots</code></td>
+<td>Necromass of dead coarse roots (in g C/m2).</td>
+</tr>
+<tr class="odd">
+<td><code>FineRoots</code></td>
+<td>Necromass of fine root litter (in g C/m2).</td>
+</tr>
+</tbody>
+</table>
+<p>Note that litter elements are characterized by species, so that the model can decompose litter elements at different rates depending on species identity (see chapter <a href="decomposition.html#decomposition">18</a>).</p>
+</div>
+<div id="socpools" class="section level4 hasAnchor" number="2.4.2.5">
+<h4><span class="header-section-number">2.4.2.5</span> Soil organic carbon pools<a href="model-inputs.html#socpools" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Forest objects can include the description of soil organic matter pools, in an element called <code>SOCData</code>. Soil organic matter pools will depend on the decomposition model employed, being CENTURY the only available at present. <code>SOCData</code> for CENTURY is a named numerical vector with the following items:</p>
+<table>
+<colgroup>
+<col width="18%" />
+<col width="81%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>R items</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>SurfaceMetabolic</code></td>
+<td>Metabolic carbon in the surface (in g C/m2).</td>
+</tr>
+<tr class="even">
+<td><code>SoilMetabolic</code></td>
+<td>Metabolic carbon in the soil (in g C/m2).</td>
+</tr>
+<tr class="odd">
+<td><code>SurfaceActive</code></td>
+<td>Active decomposition carbon pool in the surface (in g C/m2).</td>
+</tr>
+<tr class="even">
+<td><code>SoilActive</code></td>
+<td>Active decomposition carbon pool in the soil (in g C/m2).</td>
+</tr>
+<tr class="odd">
+<td><code>SurfaceSlow</code></td>
+<td>Slow decomposition carbon pool in the surface (in g C/m2).</td>
+</tr>
+<tr class="even">
+<td><code>SoilSlow</code></td>
+<td>Slow decomposition carbon pool in the soil (in g C/m2).</td>
+</tr>
+<tr class="odd">
+<td><code>SoilPassive</code></td>
+<td>Passive decomposition carbon pool in the soil (in g C/m2).</td>
 </tr>
 </tbody>
 </table>

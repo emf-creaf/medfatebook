@@ -171,8 +171,8 @@ Many *cohort-level state variables* are inherited by the corresponding water bal
  + Density of living individuals in the plant cohort, $N$ ($ind·ha^{-1}$).
  + Density of dead individuals in the plant cohort, $N^{dead}$ ($ind·ha^{-1}$).
  + The proportion of fine roots, $FRP_{s}$, in each soil layer $s$  ([0-1]).
- + Cumulative mass of small dead branches corresponding to cohort dead individuals $D_{smallbranches}$ ($g\,C·m^{-2}$).
- + Cumulative mass of large dead wood corresponding to cohort dead individuals $D_{largewood}$ ($g\,C·m^{-2}$).
+ + Cumulative mass of small dead branches (diameter between 0.635 cm an 7.5 cm; 10h and 100h fuels) corresponding to cohort dead individuals $D_{smallbranches}$ ($g\,C·m^{-2}$).
+ + Cumulative mass of large dead wood (diameters > 7.5 cm; 1000h and 10000h fuels) corresponding to cohort dead individuals $D_{largewood}$ ($g\,C·m^{-2}$).
 
 Variables $D_{smallbranches}$ and $D_{largewood}$ are not to be confounded with state variables corresponding to decomposing snags (see below). In growth simulations $D_{smallbranches}$ and $D_{largewood}$ are used to track mass of dead wood only. In forest dynamic simulations, the values of $D_{smallbranches}$ and $D_{largewood}$ at the end of the simulated year are used by function `fordyn()` to create new snag cohorts to start the decomposition process the year after.
 
@@ -202,7 +202,7 @@ Other functional variables can be derived from the true state variables and, hen
  + Leaf biomass, $B_{leaf}$ ($g\,dry$), from $LA$.
  + Twig biomass, $B_{twig}$ ($g\,dry$), from $LA$.
  + Dead leaf mass, $D_{leaf}$ ($g\,dry$), from $LA^{dead}$.
- + Dead twig mass, $D_{twig}$ ($g\,dry$), from $LA^{dead}$.
+ + Dead twig (diameter < 0.635 cm) mass, $D_{twig}$ ($g\,dry$), from $LA^{dead}$.
  + The radial length of coarse roots in each soil layer $s$, $L_{radial, s}$ ($mm$), from $FRP_{s}$.
  + Sapwood biomass, $B_{sapwood}$ ($g\,dry$), from $SA$, $H$ and $FRP_{s}$ and $L_{radial,s}$.
  + Heartwood mass, for trees, $D_{heartwood}$ ($g\,dry$), from $SA$, $DBH$, $H$ and $FRP_{s}$ and $L_{radial,s}$.
@@ -216,25 +216,25 @@ Some belowground variables (such as the radial length of coarse roots) are only 
 
 **Dead standing wood cohorts**
 
-Cohorts of dead standing wood (i.e. snag cohorts) are identified by combinations of species, DBH of the original tree, height and dead age (i.e. the years passed since mortality occurred). Those properties are modified by the model of forest dynamics, whereas the growth model deals with the daily decomposition process. In the growth model, the following state variables are tracked for cohorts of dead standing wood:
+Cohorts of dead standing wood (i.e. snag cohorts) are identified by combinations of species, DBH of the original tree, height and dead age (i.e. the years passed since mortality occurred). Those properties match the element `snagData` of forest objects (see \@ref(deadplantelements)) and are modified by the model of forest dynamics, whereas the growth model deals with the daily decomposition process. In the growth model, the following state variables are tracked for cohorts of dead standing wood:
 
- + Mass of small dead branches, with diameters < 7.5 cm, $SN_{smallbranches}$ ($g\,C ·m^{-2}$).
- + Mass of large dead wood, with diameters > 7.5 cm, $SN_{deadwood}$ ($g\,C ·m^{-2}$).
+ + Mass of small dead branches, with diameters comprised between 0.635 cm and 7.5 cm (i.e. 10h and 100h fuels), $SN_{smallbranches}$ ($g\,C ·m^{-2}$).
+ + Mass of large dead wood, with diameters > 7.5 cm (i.e. 1000h and 10000h fuels), $SN_{deadwood}$ ($g\,C ·m^{-2}$).
 
 **Structural litter pools**
 
-Structural litter pools are **species-specific**. For each species, the following pools are tracked:
+Structural litter pools are **species-specific**.  For each species, the following pools are tracked, matching the element `litterData` of forest objects (see \@ref(deadplantelements)):
 
  + Leaf structural litter, $LI_{leaves}$ ($g\,C ·m^{-2}$).
- + Twig structural litter, $LI_{twigs}$ ($g\,C ·m^{-2}$).
- + Small branches structural litter, $LI_{smallbranches}$ ($g\,C ·m^{-2}$).
- + Large wood structural litter, $LI_{largewood}$ ($g\,C ·m^{-2}$).
+ + Twig (diameter < 0.635 cm; 1h fuels) structural litter, $LI_{twigs}$ ($g\,C ·m^{-2}$).
+ + Small branches (diameter between 0.635 cm an 7.5 cm; 10h and 100h fuels) structural litter, $LI_{smallbranches}$ ($g\,C ·m^{-2}$).
+ + Large wood (diameter > 7.5 cm; 1000h and 10000h fuels) structural litter, $LI_{largewood}$ ($g\,C ·m^{-2}$).
  + Coarse roots structural litter, $LI_{coarseroots}$ ($g\,C ·m^{-2}$).
  + Fine roots structural litter, $LI_{fineroots}$ ($g\,C ·m^{-2}$).
 
 **Soil carbon pools**
 
-The decomposition model keeps track of the carbon amount in different organic matter pools:
+The decomposition model keeps track of the carbon amount in different organic matter pools which come from the CENTURY model and match the element `SOCData` of forest objects (see \@ref(socpools)):
 
  + Surface metabolic litter, $LI_{surface,metabolic}$ ($g\,C ·m^{-2}$).
  + Surface active decomposition pool, $SOC_{surface, active}$ ($g\,C ·m^{-2}$).
