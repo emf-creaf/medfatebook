@@ -270,10 +270,10 @@ The corresponding carbon balance equations for sapwood dissolved sugars and star
 \Delta{SS_{sapwood}} \cdot V_{storage,sapwood} &=& F_{phloem} - MR_{twig} - MR_{sapwood} - MR_{fineroot} \\
 & & - SC_{sapwood}  - TS_{sapwood} \\
 \Delta{ST_{sapwood}} \cdot V_{storage,sapwood} &=& SC_{sapwood} + TS_{leaf} + TT_{leaf} + TS_{sapwood} \\
-& & - GC_{sapwood} - GC_{leaf} - GC_{twig} - GC_{fineroot} - RE_{sapwood}
+& & - GC_{sapwood} - GC_{leaf} - GC_{twig} - GC_{fineroot} - RE
 (\#eq:sapwoodcarbonbalanceequations)
 \end{eqnarray}
-where $F_{phloem}$ is the sugar inflow via phloem transport, $MR_{twig}$ is the maintenance respiration of twigs, $MR_{sapwood}$ is the sum of maintenance respiration of branches, stem and coarse roots, $MR_{fineroot}$ is the maintenance respiration of fine roots; $GC_{leaf}$, $GC_{twig}$, $GC_{sapwood}$ and $GC_{fineroot}$ are the carbon costs of forming new leaves, twigs, sapwood or fine roots (respectively), $SC_{sapwood}$ is the conversion of sapwood sugar to sapwood starch, $TS_{sapwood}$ is the translocation of sapwood sugars into starch during leaf senescence and $RE_{sapwood}$ is the root exudation of sapwood carbon. 
+where $F_{phloem}$ is the sugar inflow via phloem transport, $MR_{twig}$ is the maintenance respiration of twigs, $MR_{sapwood}$ is the sum of maintenance respiration of branches, stem and coarse roots, $MR_{fineroot}$ is the maintenance respiration of fine roots; $GC_{leaf}$, $GC_{twig}$, $GC_{sapwood}$ and $GC_{fineroot}$ are the carbon costs of forming new leaves, twigs, sapwood or fine roots (respectively), $SC_{sapwood}$ is the conversion of sapwood sugar to sapwood starch, $TS_{sapwood}$ is the translocation of sapwood sugars into starch during leaf senescence and $RE$ is the root exudation. 
 If we define $S_{labile}$ as the total amount of labile carbon for an individual plant (in $g\,gluc$):
 \begin{equation}
 S_{labile} = (SS_{leaf} + ST_{leaf}) \cdot V_{storage,leaf} + (SS_{sapwood} + ST_{sapwood}) \cdot V_{storage,sapwood}
@@ -284,7 +284,7 @@ then labile carbon balance at the plant level reduces to:
 \Delta{S_{labile}} = A - MR - GC - RE
 (\#eq:plantcarbonbalanceequation)
 \end{equation}
-where $MR = MR_{leaf} + MR_{twig} +MR_{sapwood} + MR_{fineroot}$ is plant-level maintenance respiration,  $GC = GC_{leaf} + GC_{twig} +GC_{sapwood} + GC_{fineroot}$ is plant-level growth costs and $RE = RE_{sapwood}$ is plant-level root exudation.
+where $MR = MR_{leaf} + MR_{twig} +MR_{sapwood} + MR_{fineroot}$ is plant-level maintenance respiration and $GC = GC_{leaf} + GC_{twig} +GC_{sapwood} + GC_{fineroot}$ is plant-level growth costs.
 
 ### Plant biomass balance
 
@@ -389,19 +389,20 @@ Growth simulations are conducted in **daily** time steps. If using the basic wat
 
 ### Regular scheduling
 
-For every day to be simulated, first executes soil water balance, transpiration and photosynthesis calculations by calling the basic water balance model (\@ref(basicwaterbalancescheduling)). After that, the model performs the following steps for each plant cohort:
+For every day to be simulated, the model first executes soil water balance, transpiration and photosynthesis calculations by calling the basic water balance model (\@ref(basicwaterbalancescheduling)). Then, the model evaluates fire occurrence and, if so, predicts fire behavior. After that, the model performs the following steps for each plant cohort:
 
 1. Determine the amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and storage capacity (\@ref(estimationcarbonpools)). 
-2. Calculate gross photosynthesis per individual ($A$), maintenance respiration for leaves ($M_{leaf}$), sapwood ($M_{sapwood}$) and fine roots ($M_{fineroot}$) (\@ref(carbonbalancecomponents)).
-3. If phenology indicates leaf unfolding, evaluate leaf temperature and turgor sink limitations, growth costs ($G_{leaf}$) and leaf area increase (\@ref(leafgrowth)). 
-4. If sapwood growth is permitted, evaluate sapwood temperature and turgor sink limitations, growth costs ($G_{sapwood}$) and sapwood area increase (\@ref(sapwoodgrowth)).
-5. Evaluate fineroot temperature and turgor sink limitations, growth costs ($G_{fineroot}$) and fineroot biomass increase (\@ref(finerootgrowth)).
-6. Update changes in sugar and starch compartments due to photosynthesis, maintenance respiration and growth. Apply transfer from leaf metabolic to sapwood metabolic carbon (\@ref(phloemtransport)) and conversions between storage and metabolic carbon (\@ref(sugarstarchdynamics)).  
-7. Determine leaf senescence due to aging or cavitation effects (\@ref(leafsenescence)). 
-8. Determine sapwood area senescence by aging (\@ref(sapwoodsenescence)).
-9. Determine fine root senescence by aging (\@ref(finerootsenescence)).
-10. Evaluate labile carbon translocation due to leaf and sapwood senescence ($TS_{leaf}$, $TT_{leaf}$ and $TS_{sapwood}$). If leaf storage carbon is surpassed, add the excess to $TT_{leaf}$. Add the sum of translocated carbon to the starch sapwood pool.
-11. Move any surplus in sapwood storage carbon to root exudation ($RE_{sapwood}$). This completes the daily carbon balance for leaf labile pools \@ref(eq:leafcarbonbalanceequations), sapwood labile pools \@ref(eq:sapwoodcarbonbalanceequations), and plant-level labile carbon. \@ref(eq:plantcarbonbalanceequation).
+2. If $LA_{\phi} > 0$, estimate gross photosynthesis per individual ($A$) from cohort-level photosynthesis ($A_g$).
+3. Estimate maintenance respiration for leaves ($MR_{leaf}$), twigs ($MR_{twig}$), sapwood ($MR_{sapwood}$) and fine roots ($MR_{fineroot}$) (\@ref(carbonbalancecomponents)).
+4. If phenology indicates leaf unfolding, evaluate leaf temperature and turgor sink limitations, leaf and twig growth costs ($GC_{leaf}$ and $GC_{twig}$, respectively), leaf and twig synthesis respiration ($SR_{leaf}$ and $SR_{twig}$, respectively) and leaf area increase (\@ref(leafgrowth)). 
+5. If sapwood growth is permitted, evaluate sapwood temperature and turgor sink limitations, sapwood growth costs ($GC_{sapwood}$), sapwood synthesis respiration ($SR_{sapwood}$) and sapwood area increase (\@ref(sapwoodgrowth)).
+6. If fineroot biomass is lower than the target biomass, evaluate fineroot temperature and turgor sink limitations, fineroot growth costs ($GC_{fineroot}$), fineroot synthesis respiration ($SR_{fineroot}$) and fineroot biomass increase (\@ref(finerootgrowth)).
+7. Update changes in sugar and starch compartments due to photosynthesis, maintenance respiration and growth. Apply transfer from leaf metabolic to sapwood metabolic carbon (\@ref(phloemtransport)) and conversions between storage and metabolic carbon (\@ref(sugarstarchdynamics)).  
+8. Determine leaf senescence due to aging and leaf/bud senescence due to cavitation effects (\@ref(leafsenescence)). 
+9. Determine sapwood senescence due to aging. For shrubs, convert sapwood senescence into mass of standing dead branches (\@ref(sapwoodsenescence)). 
+10. Determine fine root senescence by aging (\@ref(finerootsenescence)). Divide dead fine root mass between metabolic soil carbon pool and fine root litter pool. 
+11. Evaluate labile carbon translocation due to leaf and sapwood senescence ($TS_{leaf}$, $TT_{leaf}$ and $TS_{sapwood}$). If leaf storage carbon is surpassed, add the excess to $TT_{leaf}$. Add the sum of translocated carbon to the starch sapwood pool.
+11. Move any surplus in sapwood storage carbon to root exudation ($RE$). This completes the daily carbon balance for leaf labile pools \@ref(eq:leafcarbonbalanceequations), sapwood labile pools \@ref(eq:sapwoodcarbonbalanceequations), and plant-level labile carbon. \@ref(eq:plantcarbonbalanceequation).
 12. Update leaf area, sapwood area, fine root area and derived variables (e.g., leaf area index and Huber value) (\@ref(updateplanttraits)). 
 13. Determine if a wildfire stroke the forest stand and, if so, fire severity effects (\@ref(fireseverity)).
 14. Determine if plant death by starvation or desiccation occurred (\@ref(plantmortality)).
