@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-01-09" />
+<meta name="date" content="2026-01-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -457,14 +457,11 @@ div.csl-indent {
 <li class="chapter" data-level="15.3.1" data-path="growthmodelling.html"><a href="growthmodelling.html#water-and-energy-balance"><i class="fa fa-check"></i><b>15.3.1</b> Water and energy balance</a></li>
 <li class="chapter" data-level="15.3.2" data-path="growthmodelling.html"><a href="growthmodelling.html#labile-carbon-balance"><i class="fa fa-check"></i><b>15.3.2</b> Labile carbon balance</a></li>
 <li class="chapter" data-level="15.3.3" data-path="growthmodelling.html"><a href="growthmodelling.html#plant-biomass-balance"><i class="fa fa-check"></i><b>15.3.3</b> Plant biomass balance</a></li>
-<li class="chapter" data-level="15.3.4" data-path="growthmodelling.html"><a href="growthmodelling.html#mass-balance-of-dead-elements"><i class="fa fa-check"></i><b>15.3.4</b> Mass balance of dead elements</a></li>
-<li class="chapter" data-level="15.3.5" data-path="growthmodelling.html"><a href="growthmodelling.html#stand-level-carbon-balance"><i class="fa fa-check"></i><b>15.3.5</b> Stand-level carbon balance</a></li>
+<li class="chapter" data-level="15.3.4" data-path="growthmodelling.html"><a href="growthmodelling.html#mass-balance-of-decomposition-pools"><i class="fa fa-check"></i><b>15.3.4</b> Mass balance of decomposition pools</a></li>
+<li class="chapter" data-level="15.3.5" data-path="growthmodelling.html"><a href="growthmodelling.html#fire-combustion"><i class="fa fa-check"></i><b>15.3.5</b> Fire combustion</a></li>
+<li class="chapter" data-level="15.3.6" data-path="growthmodelling.html"><a href="growthmodelling.html#stand-level-carbon-balance"><i class="fa fa-check"></i><b>15.3.6</b> Stand-level carbon balance</a></li>
 </ul></li>
-<li class="chapter" data-level="15.4" data-path="growthmodelling.html"><a href="growthmodelling.html#growthscheduling"><i class="fa fa-check"></i><b>15.4</b> Process scheduling</a>
-<ul>
-<li class="chapter" data-level="15.4.1" data-path="growthmodelling.html"><a href="growthmodelling.html#regular-scheduling"><i class="fa fa-check"></i><b>15.4.1</b> Regular scheduling</a></li>
-<li class="chapter" data-level="15.4.2" data-path="growthmodelling.html"><a href="growthmodelling.html#advanced-scheduling"><i class="fa fa-check"></i><b>15.4.2</b> Advanced scheduling</a></li>
-</ul></li>
+<li class="chapter" data-level="15.4" data-path="growthmodelling.html"><a href="growthmodelling.html#growthscheduling"><i class="fa fa-check"></i><b>15.4</b> Process scheduling</a></li>
 <li class="chapter" data-level="15.5" data-path="growthmodelling.html"><a href="growthmodelling.html#inputs-and-outputs-1"><i class="fa fa-check"></i><b>15.5</b> Inputs and outputs</a>
 <ul>
 <li class="chapter" data-level="15.5.1" data-path="growthmodelling.html"><a href="growthmodelling.html#soil-vegetation-and-meteorology-2"><i class="fa fa-check"></i><b>15.5.1</b> Soil, vegetation and meteorology</a></li>
@@ -853,7 +850,7 @@ Figure 15.3: Design of fire effects on foliage, buds and cambium.
 </div>
 <p>While the severity sub-model described above is based on heat transfer and accumulation in tissues, causing necrosis, it is important to note that a growing number of studies increasingly have been documenting fire impacts on xylem hydraulic function, both via increased vapor pressure deficit (causing cavitation) and via structural damage in the xylem, affecting its efficiency and vulnerability <span class="citation">(<a href="#ref-hood_fire_2018">Hood <em>et al.</em> 2018</a>; <a href="#ref-bar_fire_2019">Bär <em>et al.</em> 2019</a>)</span>. These first-order effects are not considered here.</p>
 <p><strong>Fire emissions</strong></p>
-<p>Whenever foliage burning occurs, the corresponding dry biomass of leaves and twigs is added to the carbon emissions. In addition, for cohorts where above-ground mortality occurs 20% of tree wood biomass and 100% of shrub wood biomass are assumed to be lost via combustion and are added to fire carbon emissions (see fig. <a href="growthmodelling.html#fig:fireseverity">15.3</a>). The remaining 80% of aboveground tree wood biomass contributes to dead snag biomass. Belowground biomass assumed to die (unless resprouting is scheduled) but does not contribute to emissions.</p>
+<p>Whenever foliage burning occurs, the corresponding dry biomass of leaves and twigs is added to the carbon emissions. In addition, for cohorts where above-ground mortality occurs 20% of tree wood biomass and 100% of shrub wood biomass are assumed to be lost via combustion and are added to fire carbon emissions (see fig. <a href="growthmodelling.html#fig:fireseverity">15.3</a>). The remaining 80% of aboveground tree wood biomass contributes to dead snag biomass. Belowground biomass assumed to die (unless resprouting is scheduled) but does not contribute to emissions. Fire emissions include combustion of litter compartments (leaves, twigs and small branches).</p>
 <p>Details of the implementation of fire severity and emissions are given in section <a href="growthsenescencemortality.html#fireseverity">17.6</a>.</p>
 </div>
 <div id="organic-matter-decomposition" class="section level3 hasAnchor" number="15.1.7">
@@ -990,59 +987,84 @@ where <span class="math inline">\(MR = MR_{leaf} + MR_{twig} +MR_{sapwood} + MR_
 </div>
 <div id="plant-biomass-balance" class="section level3 hasAnchor" number="15.3.3">
 <h3><span class="header-section-number">15.3.3</span> Plant biomass balance<a href="growthmodelling.html#plant-biomass-balance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p><strong>Live biomass balance</strong></p>
-<p>In addition to changes in labile carbon pools, the model also implements changes in the size of carbon compartments (leaves, twigs, sapwood and fine roots), as a result of the interplay between growth and senescence processes. Hence, we can define the following structural equations:
+<p>In addition to changes in labile carbon pools, the model also implements changes in the size of structural and dead carbon compartments, as a result of the interplay between growth, senescence and foliage burning processes, as well as cohort-level biomass balance once mortality processes are taken into account.</p>
+<p><strong>Live biomass balance</strong>
+For the balance of structural carbon pools, we can define the following structural equations (all variables in <span class="math inline">\(g\,dry\)</span>):
 <span class="math display" id="eq:livestructurecarbonbalanceequations">\[\begin{eqnarray}
-\Delta{B_{leaves}} &amp;=&amp; B_{leaves, growth} - B_{leaves, senescence}\\
-\Delta{B_{twigs}} &amp;=&amp; B_{twigs, growth} - B_{twigs, senescence}\\
+\Delta{B_{leaves}} &amp;=&amp; B_{leaves, growth} - B_{leaves, senescence} - B_{leaves, burnt}\\
+\Delta{B_{twigs}} &amp;=&amp; B_{twigs, growth} - B_{twigs, senescence} - B_{twigs, burnt}\\
 \Delta{B_{sapwood}} &amp;=&amp; B_{sapwood, growth} - B_{sapwood, senescence}\\
 \Delta{B_{fineroot}} &amp;=&amp; B_{fineroot, growth} -  B_{fineroot, senescence}
 \tag{15.5}
 \end{eqnarray}\]</span>
-where all variables would be in units of <span class="math inline">\(g\,dry\)</span>.</p>
-<p>The following equation defines the biomass balance for (live) structural pools:</p>
+where <span class="math inline">\(B_{leaves, growth}\)</span>, <span class="math inline">\(B_{twigs, growth}\)</span>, <span class="math inline">\(B_{sapwood, growth}\)</span> and <span class="math inline">\(B_{fineroot, growth}\)</span> are the biomass increase due to growth for leaves, twigs, sapwood and fineroots, respectively; <span class="math inline">\(B_{leaves, senescence}\)</span>, <span class="math inline">\(B_{twigs, senescence}\)</span>, <span class="math inline">\(B_{sapwood, senescence}\)</span> and <span class="math inline">\(B_{fineroot, senescence}\)</span> are the biomass loss due to senescence for leaves, twigs, sapwood and fineroots, respectively; <span class="math inline">\(B_{leaves, burnt}\)</span> and <span class="math inline">\(B_{twigs, burnt}\)</span> are the biomass burnt of leaves and twigs.</p>
+<p>The following equation defines the biomass balance for (live) structural pools (in <span class="math inline">\(g\,dry\)</span>):</p>
 <p><span class="math display" id="eq:plantlivestructurecarbonbalanceequation">\[\begin{equation}
 \Delta{B_{structure}} = \Delta{B_{leaves}} + \Delta{B_{twigs}} + \Delta{B_{sapwood}} + \Delta{B_{fineroot}}
 \tag{15.6}
 \end{equation}\]</span></p>
 <p><strong>Dead mass balance</strong></p>
-<p>Senescence processes create carbon for dead pools. Hence, we can define the following structural equations:
+<p>Senescence processes increase carbon for dead tissue pools, whereas litter fall and foliage burn decrease them. Hence, we can define the following equations (all variables in <span class="math inline">\(g\,dry\)</span>):
 <span class="math display" id="eq:deadstructurecarbonbalanceequations">\[\begin{eqnarray}
-\Delta{D_{leaves}} &amp;=&amp; B_{leaves, senescence} - D_{leaves, fall}\\
-\Delta{D_{twigs}} &amp;=&amp; B_{twigs, senescence} - D_{twigs, fall}\\
+\Delta{D_{leaves}} &amp;=&amp; B_{leaves, senescence} - D_{leaves, fall} - D_{leaves, burnt}\\
+\Delta{D_{twigs}} &amp;=&amp; B_{twigs, senescence} - D_{twigs, fall} - D_{twigs, burnt}\\
 \Delta{D_{heartwood}} &amp;=&amp; B_{sapwood, senescence}\\
 \tag{15.7}
 \end{eqnarray}\]</span></p>
-<p>Where <span class="math inline">\(D_{leaves, fall}\)</span> and <span class="math inline">\(D_{twigs, fall}\)</span> are the mass of leaves and twigs, respectively. that falls and goes to litter pools. For trees, sapwood senescence (<span class="math inline">\(B_{sapwood, senescence}\)</span>) results in a corresponding increase in heartwood (<span class="math inline">\(D_{heartwood}\)</span>). In contrast, for shrubs heartwood is not considered and sapwood senescence (<span class="math inline">\(B_{sapwood, senescence}\)</span>) results in dead standing branch (snag) creation.</p>
-<p>The following equation defines the plant mass balance for dead pools:</p>
-<p><span class="math display" id="eq:plantdeadstructurecarbonbalanceequation">\[\begin{equation}
-\Delta{D_{dead}} = \Delta{D_{leaves}} + \Delta{D_{twigs}} + \Delta{D_{heartwood}}
+<p>Where <span class="math inline">\(D_{leaves, fall}\)</span> and <span class="math inline">\(D_{twigs, fall}\)</span> are the mass of dead leaves and twigs, respectively, that falls into litter compartments; and <span class="math inline">\(D_{leaves, burnt}\)</span> and <span class="math inline">\(D_{twigs, burnt}\)</span> are the mass of dead leaves and twigs, respectively, that are burnt. For trees, sapwood senescence (<span class="math inline">\(B_{sapwood, senescence}\)</span>) results in a corresponding increase in heartwood (<span class="math inline">\(D_{heartwood}\)</span>). In contrast, for shrubs heartwood is not considered and sapwood senescence (<span class="math inline">\(B_{sapwood, senescence}\)</span>) results in dead standing branch (snag) creation.</p>
+<p><strong>Total biomass balance</strong></p>
+<p>The overall mass balance at the <strong>individual level</strong> is completed if we add the labile biomass balance to the structural and dead tissue mass balances (in <span class="math inline">\(g\,dry\)</span>):
+<span class="math display" id="eq:planttotalcarbonbalanceequation">\[\begin{equation}
+\Delta{B_{plant}} = \Delta{B_{structure}} + \Delta{S_{labile}} + \Delta{D_{leaves}} + \Delta{D_{twigs}} + \Delta{D_{heartwood}}
 \tag{15.8}
 \end{equation}\]</span></p>
-<p><strong>Total plant mass balance</strong></p>
-<p>The overall mass balance at the <strong>individual level</strong> is completed if we add the labile biomass balance to the structural and dead mass balances:
-<span class="math display" id="eq:planttotalcarbonbalanceequation">\[\begin{equation}
-\Delta{B_{plant}} = \Delta{B_{structure}} + \Delta{D_{dead}} + \Delta{S_{labile}}
-\tag{15.9}
-\end{equation}\]</span></p>
-<p><strong>Cohort-level biomass balance</strong></p>
-<p>At the cohort level, we need to take into account that some individuals will die, so that the biomass balance needs to incorporate mortality losses:
+<p>To evaluate biomass balance at the cohort level, we need to take into account that some individuals will die, so that the biomass balance needs to incorporate mortality losses (all variables in <span class="math inline">\(g\,dry \cdot m^{-2}\)</span>):
 <span class="math display" id="eq:cohorttotalcarbonbalanceequation">\[\begin{equation}
-\Delta{B_{cohort}} = \Delta{B_{plant}} \cdot N_{cohort} - D_{mortality}
+\Delta{B_{cohort}} = \Delta{B_{plant}} \cdot N_{cohort} - D_{above, dead} - D_{below, dead}
+\tag{15.9}
+\end{equation}\]</span>
+where <span class="math inline">\(N_{cohort}\)</span> is the initial cohort density (before mortality occurred), <span class="math inline">\(D_{above, dead}\)</span> is the aboveground (leaves, twigs, small branches and large wood) biomass loss due to mortality of individuals and <span class="math inline">\(D_{below, dead}\)</span> is the belowground (coarse roots and fine roots) biomass loss due to mortality of individuals. The latter two are calculated using:
+<span class="math display" id="eq:mortalitycarbonlossequation">\[\begin{eqnarray}
+D_{above, dead} &amp;=&amp; (B_{plant, above} + \Delta{B_{plant, above}}) \cdot N_{dead} \\
+D_{below, dead} &amp;=&amp; (B_{plant, below} + \Delta{B_{plant, belowground}}) \cdot N_{dead, nonresp}
 \tag{15.10}
+\end{eqnarray}\]</span>
+where <span class="math inline">\(B_{plant, above}\)</span> is the initial plant aboveground biomass (leaves, twigs, small branches and large wood), <span class="math inline">\(B_{plant, below}\)</span> is the initial plant belowground biomass (coarse roots and fine roots); <span class="math inline">\(N_{dead}\)</span> is the density of dead individuals and <span class="math inline">\(N_{dead,noresp}\)</span> is the density of individuals that are dead and will not resprout next year (resprouting is handled by the forest dynamic model). In turn, <span class="math inline">\(D_{above, dead}\)</span> is divided between standing wood (<span class="math inline">\(D_{wood,non-burnt}\)</span>) and wood emissions due to wildfire combustion (<span class="math inline">\(D_{wood,burnt}\)</span>):
+<span class="math display">\[\begin{equation}
+D_{above, dead} = D_{wood,non-burnt} + D_{wood,burnt}
 \end{equation}\]</span>
-where <span class="math inline">\(N_{cohort}\)</span> is the initial cohort density (before mortality occurred) and <span class="math inline">\(D_{mortality}\)</span> is the biomass loss due to mortality of individuals, which in order to close the balance has to be defined as:
-<span class="math display" id="eq:mortalitycarbonlossequation">\[\begin{equation}
-D_{mortality} = (B_{plant} + \Delta{B_{plant}}) \cdot N_{dead}
-\tag{15.11}
+Note that <span class="math inline">\(D_{above,dead}\)</span> should include dead biomass of leaves and twigs, that is not shown here for simplicity.</p>
+</div>
+<div id="mass-balance-of-decomposition-pools" class="section level3 hasAnchor" number="15.3.4">
+<h3><span class="header-section-number">15.3.4</span> Mass balance of decomposition pools<a href="growthmodelling.html#mass-balance-of-decomposition-pools" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Let <span class="math inline">\(\Delta SN\)</span>, <span class="math inline">\(\Delta LI\)</span> and <span class="math inline">\(\Delta SOC\)</span> be the change in the amount of carbon in snag, litter and soil organic carbon pools (<span class="math inline">\(g\,C\cdot m^{-2}\)</span>). Now let <span class="math inline">\(\Delta DEC\)</span> be the sum of mass changes in all pools taken together:
+<span class="math display">\[\begin{equation}
+\Delta DEC = \Delta SN + \Delta LI +  \Delta SOC
 \end{equation}\]</span>
-where <span class="math inline">\(N_{dead}\)</span> is the density of dead individuals and <span class="math inline">\(B_{plant}\)</span> is the initial plant biomass.</p>
+<span class="math inline">\(\Delta DEC\)</span> is equal to litter and root exudation inputs minus heterotrophic respiration and snag/litter combustion:
+<span class="math display">\[\begin{equation}
+\Delta DEC =  \sum_{i}{(LI_{cohort,i}  + RE_i)} - SN_{burnt} - LI_{burnt} - HR
+\end{equation}\]</span>
+where <span class="math inline">\(RE_i\)</span> is root exudation for cohort <span class="math inline">\(i\)</span>, <span class="math inline">\(SN_{burnt}\)</span> is the mass of snags (small branches) burnt, <span class="math inline">\(LI_{burnt}\)</span> is the mass of litter burnt and <span class="math inline">\(HR\)</span> is heterotrophic respiration, all expressed in <span class="math inline">\(g\,C \cdot m^{-2}\)</span> units. Finally, <span class="math inline">\(LI_{cohort,i}\)</span> is the sum of litter inputs from cohort <span class="math inline">\(i\)</span>, i.e.:
+<span class="math display">\[\begin{equation}
+LI_{cohort,i} = D_{leaves, fall,i} + D_{twigs,fall,i}  + B_{fineroot, senescence,i} + D_{below, dead,i}
+\end{equation}\]</span>
+where <span class="math inline">\(D_{leaves, fall, i}\)</span> and <span class="math inline">\(D_{twigs, fall, i}\)</span> is the mass of fallen leaves, respectively, <span class="math inline">\(B_{fineroot,senescence,i}\)</span> is the mass of dead fine roots due to senescence (all after multiplication by cohort density, <span class="math inline">\(N_{cohort,i}\)</span>, and carbon content), <span class="math inline">\(D_{below, dead, i}\)</span> is the mass of coarse and fine roots entering decomposition after belowground mortality. The litter inputs corresponding to small branches and large wood are not included here because they are created by the model of forest dynamics as a result of snag fall.</p>
 </div>
-<div id="mass-balance-of-dead-elements" class="section level3 hasAnchor" number="15.3.4">
-<h3><span class="header-section-number">15.3.4</span> Mass balance of dead elements<a href="growthmodelling.html#mass-balance-of-dead-elements" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="fire-combustion" class="section level3 hasAnchor" number="15.3.5">
+<h3><span class="header-section-number">15.3.5</span> Fire combustion<a href="growthmodelling.html#fire-combustion" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Fire effects led to carbon emissions (<span class="math inline">\(FC\)</span>; <span class="math inline">\(g\,C \cdot m^{-2}\)</span>) corresponding the combustion of live and dead biomass from plant cohorts, snags and litter:</p>
+<p><span class="math display">\[\begin{equation}
+FC = \sum_{i}{B_{burnt,i}} + SN_{burnt} + LI_{burnt}
+\end{equation}\]</span>
+where <span class="math inline">\(SN_{burnt}\)</span> is the mass of snags burnt (small branches), <span class="math inline">\(LI_{burnt}\)</span> is the mass of litter burnt (only leaves, twigs and small branches) and <span class="math inline">\(B_{burnt,i}\)</span> is the biomass burnt for cohort <span class="math inline">\(i\)</span>:
+<span class="math display">\[\begin{equation}
+B_{burnt,i} = B_{leaves, burnt,i} + B_{twigs, burnt,i} + D_{leaves, burnt,i} + D_{twigs, burnt,i} + D_{wood, burnt,i}
+\end{equation}\]</span>
+where <span class="math inline">\(B_{leaves, burnt,i}\)</span> and <span class="math inline">\(B_{twigs, burnt,i}\)</span> are the mass of live leaves and twigs, respectively, that are burnt; <span class="math inline">\(D_{leaves, burnt,i}\)</span> and <span class="math inline">\(D_{twigs, burnt,i}\)</span> are the mass of dead leaves and twigs, respectively, that are burnt; <span class="math inline">\(D_{wood,burnt,i}\)</span> is the mass of burnt wood for cohort <span class="math inline">\(i\)</span>.</p>
 </div>
-<div id="stand-level-carbon-balance" class="section level3 hasAnchor" number="15.3.5">
-<h3><span class="header-section-number">15.3.5</span> Stand-level carbon balance<a href="growthmodelling.html#stand-level-carbon-balance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="stand-level-carbon-balance" class="section level3 hasAnchor" number="15.3.6">
+<h3><span class="header-section-number">15.3.6</span> Stand-level carbon balance<a href="growthmodelling.html#stand-level-carbon-balance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The model estimates several carbon fluxes at the stand level, all expressed in units of <span class="math inline">\(g\,C\cdot m^{-2}\)</span>:</p>
 <ul>
 <li><strong>Gross primary production</strong> (<span class="math inline">\(GPP\)</span>) is the sum of gross photosynthesis (<span class="math inline">\(A_g\)</span>; in <span class="math inline">\(g\,C\cdot m^{-2}\)</span>) across plant cohorts:
@@ -1064,25 +1086,35 @@ where <span class="math inline">\(SR_i\)</span> is plant-level synthesis respira
 <span class="math display">\[\begin{equation}
   NPP = GPP - MR - SR
   \end{equation}\]</span>
-Net primary production should thus be equal to the carbon newly allocated to plant structures.</li>
+Note that net primary production is in some models equal to the carbon allocated to new plant structures (i.e. growth), but in medfate NPP can be used to replenish labile carbon pools.</li>
 <li><strong>Heterotrophic respiration</strong> (<span class="math inline">\(HR\)</span>) is the amount of carbon returned to the atmosphere as a result of respiration occurred during decomposition processes.</li>
 <li><strong>Fire combustion</strong> (<span class="math inline">\(FC\)</span>) is the amount of carbon returned to the atmosphere as a result of combustion of plant tissues.</li>
-<li><strong>Net ecosystem production</strong> (<span class="math inline">\(NEP\)</span>) is the net carbon source of the forest ecosystem, i.e. the net primary production minus heterotrophic respiration and fire combustion. <span class="math inline">\(NEP\)</span> expresses the overall carbon balance of the forest stand:
-<span class="math display" id="eq:standcarbonbalanceequation">\[\begin{equation}
-\Delta{C}_{stand} = NEP = GPP - MR - SR - HR - FC = NPP - HR - FC
-\tag{15.12}
+<li><strong>Net ecosystem production</strong> (<span class="math inline">\(NEP\)</span>) is the net carbon source of the forest ecosystem, i.e. the net primary production minus heterotrophic respiration and fire combustion:
+<span class="math display" id="eq:NEPequation">\[\begin{equation}
+NEP = \Delta{C}_{stand} = NPP - HR - FC
+\tag{15.11}
 \end{equation}\]</span></li>
 </ul>
+<p><span class="math inline">\(NEP\)</span> expresses the overall carbon balance of the forest stand (<span class="math inline">\(\Delta{C}_{stand}\)</span>), i.e.:
+<span class="math display" id="eq:standcarbonbalanceequation">\[\begin{equation}
+\Delta{C}_{stand} = \Delta SN + \Delta LI +  \Delta SOC + \sum_{i}{(\Delta B_{cohort,i} + D_{snags,i})}
+\tag{15.12}
+\end{equation}\]</span>
+where <span class="math inline">\(D_{snags,i}\)</span> stands for standing dead wood from cohort <span class="math inline">\(i\)</span> that that will become snag cohorts (managed by the model of forest dynamics) and includes non-burnt aboveground mortality (<span class="math inline">\(D_{wood, nonburnt, i}\)</span>) and shrub sapwood senescence (<span class="math inline">\(B_{sapwood, senescence, i}\)</span>):
+<span class="math display">\[\begin{equation}
+D_{snags,i} = D_{wood, nonburnt, i} + B_{sapwood, senescence, i}
+\end{equation}\]</span></p>
 </div>
 </div>
 <div id="growthscheduling" class="section level2 hasAnchor" number="15.4">
 <h2><span class="header-section-number">15.4</span> Process scheduling<a href="growthmodelling.html#growthscheduling" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Growth simulations are conducted in <strong>daily</strong> time steps. If using the basic water balance sub-model, processes are scheduled following the <em>regular scheduling</em>. In contrast, if using the advanced water balance model, the growth processes can be simulated using a <em>detailed scheduling</em>.</p>
-<div id="regular-scheduling" class="section level3 hasAnchor" number="15.4.1">
-<h3><span class="header-section-number">15.4.1</span> Regular scheduling<a href="growthmodelling.html#regular-scheduling" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>For every day to be simulated, the model first executes soil water balance, transpiration and photosynthesis calculations by calling the basic water balance model (<a href="basicwaterbalance.html#basicwaterbalancescheduling">3.4</a>). Then, the model evaluates fire occurrence and, if so, predicts fire behavior. After that, the model performs the following steps for each plant cohort:</p>
+<p>Growth simulations are conducted in <strong>daily</strong> time steps. For every day to be simulated, the model performs the following blocks of steps:</p>
+<p><strong>A. Water and energy balance</strong></p>
+<p>Water and energy balance calculations are performed by calling the basic or the advanced water balance model (<a href="basicwaterbalance.html#basicwaterbalancescheduling">3.4</a>).</p>
+<p><strong>B. Individual-level carbon balance, growth and senescence</strong></p>
+<p>The model performs the following steps for each plant cohort:</p>
 <ol style="list-style-type: decimal">
-<li>Determine the amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and storage capacity (<a href="carbonpoolsbalance.html#estimationcarbonpools">16.1</a>).</li>
+<li>Determine the amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood), storage capacity (<a href="carbonpoolsbalance.html#estimationcarbonpools">16.1</a>) and the construction costs per unit tissue (area or dry weight).</li>
 <li>If <span class="math inline">\(LA_{\phi} &gt; 0\)</span>, estimate gross photosynthesis per individual (<span class="math inline">\(A\)</span>) from cohort-level photosynthesis (<span class="math inline">\(A_g\)</span>).</li>
 <li>Estimate maintenance respiration for leaves (<span class="math inline">\(MR_{leaf}\)</span>), twigs (<span class="math inline">\(MR_{twig}\)</span>), sapwood (<span class="math inline">\(MR_{sapwood}\)</span>) and fine roots (<span class="math inline">\(MR_{fineroot}\)</span>) (<a href="carbonpoolsbalance.html#carbonbalancecomponents">16.2</a>).</li>
 <li>If phenology indicates leaf unfolding, evaluate leaf temperature and turgor sink limitations, leaf and twig growth costs (<span class="math inline">\(GC_{leaf}\)</span> and <span class="math inline">\(GC_{twig}\)</span>, respectively), leaf and twig synthesis respiration (<span class="math inline">\(SR_{leaf}\)</span> and <span class="math inline">\(SR_{twig}\)</span>, respectively) and leaf area increase (<a href="growthsenescencemortality.html#leafgrowth">17.1.2</a>).</li>
@@ -1094,37 +1126,19 @@ Net primary production should thus be equal to the carbon newly allocated to pla
 <li>Determine sapwood senescence due to aging. For shrubs, convert sapwood senescence into mass of standing dead branches (<a href="growthsenescencemortality.html#sapwoodsenescence">17.2.2</a>).</li>
 <li>Determine fine root senescence by aging (<a href="growthsenescencemortality.html#finerootsenescence">17.2.3</a>). Divide dead fine root mass between metabolic soil carbon pool and fine root litter pool.</li>
 <li>Evaluate labile carbon translocation due to leaf and sapwood senescence (<span class="math inline">\(TS_{leaf}\)</span>, <span class="math inline">\(TT_{leaf}\)</span> and <span class="math inline">\(TS_{sapwood}\)</span>). If leaf storage carbon is surpassed, add the excess to <span class="math inline">\(TT_{leaf}\)</span>. Add the sum of translocated carbon to the starch sapwood pool.</li>
-<li>Move any surplus in sapwood storage carbon to root exudation (<span class="math inline">\(RE\)</span>). This completes the daily carbon balance for leaf labile pools <a href="growthmodelling.html#eq:leafcarbonbalanceequations">(15.1)</a>, sapwood labile pools <a href="growthmodelling.html#eq:sapwoodcarbonbalanceequations">(15.2)</a>, and plant-level labile carbon. <a href="growthmodelling.html#eq:plantcarbonbalanceequation">(15.4)</a>.</li>
-<li>Update leaf area, sapwood area, fine root area and derived variables (e.g., leaf area index and Huber value) (<a href="growthsenescencemortality.html#updateplanttraits">17.3.1</a>).</li>
-<li>Determine if a wildfire stroke the forest stand and, if so, fire severity effects (<a href="growthsenescencemortality.html#fireseverity">17.6</a>).</li>
-<li>Determine if plant death by starvation or desiccation occurred (<a href="growthsenescencemortality.html#plantmortality">17.5</a>).</li>
+<li>Move any surplus in sapwood storage carbon to root exudation (<span class="math inline">\(RE\)</span>). This completes the daily carbon balance for leaf labile pools <a href="growthmodelling.html#eq:leafcarbonbalanceequations">(15.1)</a>, sapwood labile pools <a href="growthmodelling.html#eq:sapwoodcarbonbalanceequations">(15.2)</a>, and plant-level labile carbon <a href="growthmodelling.html#eq:plantcarbonbalanceequation">(15.4)</a>. The model checks at this point the plant-level labile carbon balance.</li>
+<li>Update (expanded) leaf area, dead leaf area, sapwood area, fine root biomass and derived variables (e.g., leaf area index and Huber value) (<a href="growthsenescencemortality.html#updateplanttraits">17.3.1</a>).</li>
 <li>Update fine root area target and, if phenology indicates bud formation, update the leaf area target (<a href="growthsenescencemortality.html#updateallocationtargets">17.3.2</a>).</li>
-<li>Translate sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover), (<a href="growthsenescencemortality.html#structuralupdate">17.4</a>) and update storage volumes and the concentration of labile pools.</li>
+<li>Translate sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover), (<a href="growthsenescencemortality.html#structuralupdate">17.4</a>),</li>
+<li>Update leaf, sapwood and fine root tissue targets and update storage volumes and the concentration of labile pools.</li>
 </ol>
-</div>
-<div id="advanced-scheduling" class="section level3 hasAnchor" number="15.4.2">
-<h3><span class="header-section-number">15.4.2</span> Advanced scheduling<a href="growthmodelling.html#advanced-scheduling" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>For every day to be simulated, the model first executes soil water balance, energy balance, transpiration and photosynthesis calculations in subdaily times steps, by calling the advanced water balance model (<a href="advancedwaterbalance.html#advancedwaterbalancescheduling">7.5</a>). After that, the model performs the following steps for each plant cohort:</p>
-<ol style="list-style-type: decimal">
-<li>Determine the amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood) and storage capacity (<a href="carbonpoolsbalance.html#estimationcarbonpools">16.1</a>).</li>
-<li>For every <strong>subdaily</strong> step, perform carbon balance as follows:
-<ol style="list-style-type: lower-alpha">
-<li>Calculate gross photosynthesis per individual (<span class="math inline">\(A\)</span>) and maintenance respiration for leaves (<span class="math inline">\(M_{leaf}\)</span>), sapwood (<span class="math inline">\(M_{sapwood}\)</span>) and fine roots (<span class="math inline">\(M_{fineroot}\)</span>), taking into account both live structural biomass and labile sugar biomass (see <a href="carbonpoolsbalance.html#carbonbalancecomponents">16.2</a>).</li>
-<li>If phenology indicates leaf unfolding, evaluate temperature and turgor sink limitations for growth of leaves, estimate growth costs (<span class="math inline">\(G_{leaf}\)</span>) and record leaf area increases (<a href="growthsenescencemortality.html#leafgrowth">17.1.2</a>).</li>
-<li>If sapwood growth is permitted, evaluate temperature and turgor sink limitations for growth of sapwood, estimate growth costs (<span class="math inline">\(G_{sapwood}\)</span>) and record sapwood area increases (<a href="growthsenescencemortality.html#sapwoodgrowth">17.1.3</a>).</li>
-<li>Evaluate temperature and turgor sink limitations for growth of fine roots, estimate growth costs (<span class="math inline">\(G_{fineroot}\)</span>) and record fine root biomass increases (<a href="growthsenescencemortality.html#finerootgrowth">17.1.4</a>).</li>
-<li>Evaluate phloem transport (<span class="math inline">\(F_{phloem}\)</span>) and sugar-starch dynamics in the leaf and sapwood compartments <strong>at 1s time steps</strong> (<a href="carbonpoolsbalance.html#phloemtransport">16.2.4</a>), including photosynthesis, maintenance respiration and growth respiration as well as diversion towards root exudation if maximum leaf or sapwood starch capacity is attained (<span class="math inline">\(RE_{leaf}\)</span> and <span class="math inline">\(RE_{sapwood}\)</span>). This completes the sub-daily carbon balance for plant-level labile carbon <a href="growthmodelling.html#eq:plantcarbonbalanceequation">(15.4)</a>.</li>
-</ol></li>
-<li>Determine leaf senescence due to aging or cavitation effects (<a href="growthsenescencemortality.html#leafsenescence">17.2.1</a>).</li>
-<li>Determine sapwood area senescence by aging (<a href="growthsenescencemortality.html#sapwoodsenescence">17.2.2</a>).</li>
-<li>Determine fine root senescence by aging (<a href="growthsenescencemortality.html#finerootsenescence">17.2.3</a>).</li>
-<li>Evaluate labile carbon translocation due to leaf and sapwood senescence (<span class="math inline">\(TS_{leaf}\)</span>, <span class="math inline">\(TT_{leaf}\)</span> and <span class="math inline">\(TS_{sapwood}\)</span>), adding the resulting carbon to the starch sapwood pool. This completes the daily carbon balance for leaf labile pools <a href="growthmodelling.html#eq:leafcarbonbalanceequations">(15.1)</a>, sapwood labile pools <a href="growthmodelling.html#eq:sapwoodcarbonbalanceequations">(15.2)</a>, and plant-level labile carbon.</li>
-<li>Update leaf area, sapwood area, fine root biomass and distribution. Update derived variables (e.g., leaf area index, Huber values, hydraulic conductance of stems, roots and rhizosphere, osmotic potential at full turgor of leaves and sapwood) (<a href="growthsenescencemortality.html#updateplanttraits">17.3.1</a>).</li>
-<li>Determine if plant death by starvation or desiccation occurred (<a href="growthsenescencemortality.html#plantmortality">17.5</a>).</li>
-<li>If phenology indicates bud formation, update the leaf area target (<a href="growthsenescencemortality.html#updateallocationtargets">17.3.2</a>). Update the fine root biomass target, according to the hydraulic conductance in the rhizosphere (<a href="growthsenescencemortality.html#updateallocationtargets">17.3.2</a>).</li>
-<li>Translate sapwood area growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover), (<a href="growthsenescencemortality.html#structuralupdate">17.4</a>) and update storage volumes and the concentration of labile pools.</li>
-</ol>
-</div>
+<p>Steps 2-7 can be conducted at sub-daily time steps if the advanced model has been used for water balance (see control option <code>subdailyCarbonBalance</code>).</p>
+<p><strong>C. Fire occurrence and behavior</strong></p>
+<p>Then, the model evaluates fire occurrence and, if so, predicts fire behavior (see chapter <a href="fuelandfirebehavior.html#fuelandfirebehavior">26</a>).</p>
+<p><strong>D. Mortality and fire severity effects</strong></p>
+<p>D1. Determine if a wildfire stroke the forest stand and, if so, fire severity effects (<a href="growthsenescencemortality.html#fireseverity">17.6</a>).
+D2. Determine if plant death by starvation or desiccation occurred (<a href="growthsenescencemortality.html#plantmortality">17.5</a>).</p>
+<p><strong>E. Decomposition</strong></p>
 </div>
 <div id="inputs-and-outputs-1" class="section level2 hasAnchor" number="15.5">
 <h2><span class="header-section-number">15.5</span> Inputs and outputs<a href="growthmodelling.html#inputs-and-outputs-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
