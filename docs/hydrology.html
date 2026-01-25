@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-01-12" />
+<meta name="date" content="2026-01-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -816,11 +816,11 @@ PE_{soil} =  PET \cdot L^{SWR}_{ground}
 \end{equation}\]</span></p>
 <p>Actual evaporation from the soil surface is modeled as in <span class="citation">Mouillot <em>et al.</em> (<a href="#ref-Mouillot2001">2001</a>)</span>, who in turn followed <span class="citation">Ritchie (<a href="#ref-Ritchie1972">1972</a>)</span>. First, the model determines <span class="math inline">\(t_{soil}\)</span>, the time needed to evaporate the current water deficit (difference between field capacity and current moisture) in the surface soil layer:
 <span class="math display">\[\begin{equation}
-t_{soil} = \left \{ \frac{V_{fc,1}\cdot(1- W_1)}{\gamma_{soil}} \right \}
+t_{soil} = \left \{ \frac{V_{fc,1}\cdot(1- W_1)}{\gamma_{soil}} \right \}^2
 \end{equation}\]</span>
 where <span class="math inline">\(V_{fc,1}\)</span> is the water retention capacity of layer 1, <span class="math inline">\(W_1\)</span> is the proportion of moisture in relation to field capacity of layer 1 and <span class="math inline">\(\gamma_{soil}\)</span> is the maximum daily evaporation (<span class="math inline">\(mm \cdot day^{-1}\)</span>). The calculated time is used to determine the ‘supplied’ evaporation, <span class="math inline">\(SE_{soil}\)</span>:
 <span class="math display">\[\begin{equation}
-SE_{soil} = \gamma_{soil} \cdot (\sqrt{t_{soil}+1}-\sqrt{1})
+SE_{soil} = \gamma_{soil} \cdot (\sqrt{t_{soil}+1}-\sqrt{t_{soil}})
 \end{equation}\]</span>
 The amount of water actually evaporated from the soil, <span class="math inline">\(Es\)</span>, is then calculated as the minimum between supply, <span class="math inline">\(SE_{soil}\)</span>, and demand <span class="citation">(<a href="#ref-Federer1982">Federer 1982</a>)</span>, i.e. <span class="math inline">\(PE_{soil}\)</span> (see function <code>hydrology_soilEvaporationAmount</code>):</p>
 <p><span class="math display">\[\begin{equation}

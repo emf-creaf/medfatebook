@@ -160,11 +160,11 @@ PE_{soil} =  PET \cdot L^{SWR}_{ground}
 
 Actual evaporation from the soil surface is modeled as in @Mouillot2001, who in turn followed @Ritchie1972.  First, the model determines $t_{soil}$, the time needed to evaporate the current water deficit (difference between field capacity and current moisture) in the surface soil layer:
 \begin{equation}
-t_{soil} = \left \{ \frac{V_{fc,1}\cdot(1- W_1)}{\gamma_{soil}} \right \}
+t_{soil} = \left \{ \frac{V_{fc,1}\cdot(1- W_1)}{\gamma_{soil}} \right \}^2
 \end{equation}
 where $V_{fc,1}$  is the water retention capacity of layer 1, $W_1$ is the proportion of moisture in relation to field capacity of layer 1 and $\gamma_{soil}$ is the maximum daily evaporation ($mm \cdot day^{-1}$). The calculated time is used to determine the ‘supplied’ evaporation, $SE_{soil}$:
 \begin{equation}
-SE_{soil} = \gamma_{soil} \cdot (\sqrt{t_{soil}+1}-\sqrt{1})
+SE_{soil} = \gamma_{soil} \cdot (\sqrt{t_{soil}+1}-\sqrt{t_{soil}})
 \end{equation}
 The amount of water actually evaporated from the soil, $Es$, is then calculated as the minimum between supply, $SE_{soil}$, and demand [@Federer1982], i.e. $PE_{soil}$ (see function `hydrology_soilEvaporationAmount`): 
 
@@ -202,7 +202,7 @@ RunEvaporation<-function(Gsoil, d1,d2,d3, numDays = 15){
   PET = 100 #Not limited by PET
   Lground = 1
   
-  Theta_FC1=soil_psi2thetaSX(TS_clay, TS_sand, -33) #in m3/m3
+  Theta_FC1=soil_psi2thetaSX(TS_clay, TS_sand, -0.033, NA) #in m3/m3
   pcTS_gravel = 1-(TS_gravel/100)
   MaxVol1 = (d1*Theta_FC1*pcTS_gravel)
 
@@ -297,9 +297,9 @@ TS_gravel = 20
 SS_gravel = 40
 RL_gravel = 95
 
-Theta_FC1=soil_psi2thetaSX(TS_clay, TS_sand, -33) #in m3/m3
-Theta_FC2=soil_psi2thetaSX(SS_clay, SS_sand, -33) #in m3/m3
-Theta_FC3=soil_psi2thetaSX(RL_clay, RL_sand, -33) #in m3/m3
+Theta_FC1=soil_psi2thetaSX(TS_clay, TS_sand, -0.033, NA) #in m3/m3
+Theta_FC2=soil_psi2thetaSX(SS_clay, SS_sand, -0.033, NA) #in m3/m3
+Theta_FC3=soil_psi2thetaSX(RL_clay, RL_sand, -0.033, NA) #in m3/m3
 pcTS_gravel = 1-(TS_gravel/100)
 pcSS_gravel = 1-(SS_gravel/100)
 pcRL_gravel = 1-(RL_gravel/100)
