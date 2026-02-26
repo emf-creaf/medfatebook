@@ -149,17 +149,17 @@ percentResistance = 15
 #Sandy clay loam 
 krmax1 =hydraulics_findRhizosphereMaximumConductance(percentResistance, 
                       n1,alpha1, krootmax, rootc,rootd, kstemmax, stemc, stemd,
-                      kleafmax, leafc, leafd)
+                      kleafmax, leafc, leafd, 0)
 krmax1
 #Silt loam
 krmax2 =hydraulics_findRhizosphereMaximumConductance(percentResistance, 
                       n2,alpha2, krootmax, rootc,rootd, kstemmax, stemc, stemd,
-                      kleafmax, leafc, leafd)
+                      kleafmax, leafc, leafd, 0)
 krmax2
 #Silty clay
 krmax3 =hydraulics_findRhizosphereMaximumConductance(percentResistance, 
                       n3,alpha3, krootmax, rootc,rootd, kstemmax, stemc, stemd,
-                      kleafmax, leafc, leafd)
+                      kleafmax, leafc, leafd, 0)
 krmax3
 ```
 With these parameters, the resulting $k_{rhizo}(\Psi)$ functions can be displayed using the function `hydraulics_vanGenuchtenConductance()`:
@@ -299,14 +299,14 @@ psiSoil1 = -0.1
 psiSoil2 = -1.0
 psiSoil3 = -2.0
 psiSoil4 = -3.0
-E1 = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil1, kstemmax, stemc, stemd))
-E2 = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil2, kstemmax, stemc, stemd))
-E3 = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil3, kstemmax, stemc, stemd))
-E4 = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil4, kstemmax, stemc, stemd))
-E1emb = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil1, kstemmax, stemc, stemd, psiCav = psiCav))
-E2emb = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil2, kstemmax, stemc, stemd, psiCav = psiCav))
-E3emb = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil3, kstemmax, stemc, stemd, psiCav = psiCav))
-E4emb = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil4, kstemmax, stemc, stemd, psiCav = psiCav))
+E1 = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil1, kstemmax, stemc, stemd, TRUE, 0))
+E2 = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil2, kstemmax, stemc, stemd, TRUE, 0))
+E3 = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil3, kstemmax, stemc, stemd, TRUE, 0))
+E4 = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil4, kstemmax, stemc, stemd, TRUE, 0))
+E1emb = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil1, kstemmax, stemc, stemd, TRUE, psiCav = psiCav))
+E2emb = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil2, kstemmax, stemc, stemd, TRUE, psiCav = psiCav))
+E3emb = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil3, kstemmax, stemc, stemd, TRUE, psiCav = psiCav))
+E4emb = unlist(lapply(psiVec,hydraulics_EXylem, psiSoil4, kstemmax, stemc, stemd, TRUE, psiCav = psiCav))
 E1[E1<0] = NA
 E2[E2<0] = NA
 E3[E3<0] = NA
@@ -340,18 +340,18 @@ psiVec1 = psiSoil1+c(0,psiVec)
 psiVec2 = psiSoil2+c(0,psiVec)
 psiVec3 = psiSoil3+c(0,psiVec)
 psiVec4 = psiSoil4+c(0,psiVec)
-EVG11 = unlist(lapply(psiVec1,hydraulics_EVanGenuchten, psiSoil1, krmax1, n1, alpha1))
-EVG12 = unlist(lapply(psiVec2,hydraulics_EVanGenuchten, psiSoil2, krmax1, n1, alpha1))
-EVG13 = unlist(lapply(psiVec3,hydraulics_EVanGenuchten, psiSoil3, krmax1, n1, alpha1))
-EVG14 = unlist(lapply(psiVec4,hydraulics_EVanGenuchten, psiSoil4, krmax1, n1, alpha1))
-EVG21 = unlist(lapply(psiVec1,hydraulics_EVanGenuchten, psiSoil1, krmax2, n2, alpha2))
-EVG22 = unlist(lapply(psiVec2,hydraulics_EVanGenuchten, psiSoil2, krmax2, n2, alpha2))
-EVG23 = unlist(lapply(psiVec3,hydraulics_EVanGenuchten, psiSoil3, krmax2, n2, alpha2))
-EVG24 = unlist(lapply(psiVec4, hydraulics_EVanGenuchten, psiSoil4, krmax2, n2, alpha2))
-EVG31 = unlist(lapply(psiVec1, hydraulics_EVanGenuchten, psiSoil1, krmax3, n3, alpha3))
-EVG32 = unlist(lapply(psiVec2, hydraulics_EVanGenuchten, psiSoil2, krmax3, n3, alpha3))
-EVG33 = unlist(lapply(psiVec3, hydraulics_EVanGenuchten, psiSoil3, krmax3, n3, alpha3))
-EVG34 = unlist(lapply(psiVec4, hydraulics_EVanGenuchten, psiSoil4, krmax3, n3, alpha3))
+EVG11 = unlist(lapply(psiVec1,hydraulics_EVanGenuchten, psiSoil1, krmax1, n1, alpha1, l = 0.5))
+EVG12 = unlist(lapply(psiVec2,hydraulics_EVanGenuchten, psiSoil2, krmax1, n1, alpha1, l = 0.5))
+EVG13 = unlist(lapply(psiVec3,hydraulics_EVanGenuchten, psiSoil3, krmax1, n1, alpha1, l = 0.5))
+EVG14 = unlist(lapply(psiVec4,hydraulics_EVanGenuchten, psiSoil4, krmax1, n1, alpha1, l = 0.5))
+EVG21 = unlist(lapply(psiVec1,hydraulics_EVanGenuchten, psiSoil1, krmax2, n2, alpha2, l = 0.5))
+EVG22 = unlist(lapply(psiVec2,hydraulics_EVanGenuchten, psiSoil2, krmax2, n2, alpha2, l = 0.5))
+EVG23 = unlist(lapply(psiVec3,hydraulics_EVanGenuchten, psiSoil3, krmax2, n2, alpha2, l = 0.5))
+EVG24 = unlist(lapply(psiVec4, hydraulics_EVanGenuchten, psiSoil4, krmax2, n2, alpha2, l = 0.5))
+EVG31 = unlist(lapply(psiVec1, hydraulics_EVanGenuchten, psiSoil1, krmax3, n3, alpha3, l = 0.5))
+EVG32 = unlist(lapply(psiVec2, hydraulics_EVanGenuchten, psiSoil2, krmax3, n3, alpha3, l = 0.5))
+EVG33 = unlist(lapply(psiVec3, hydraulics_EVanGenuchten, psiSoil3, krmax3, n3, alpha3, l = 0.5))
+EVG34 = unlist(lapply(psiVec4, hydraulics_EVanGenuchten, psiSoil4, krmax3, n3, alpha3, l = 0.5))
 plot(-psiVec1, EVG11, type="l", ylab="Rhizosphere flow rate (mmol·m-2·s-1)", xlab = "Root pressure (-MPa)",  xlim=c(0, 7), ylim=c(0,2), col=col1)
 lines(-psiVec1, EVG21, lty=2, lwd=1.5, col=col1)
 lines(-psiVec1, EVG31, lty=3, lwd=1.5, col=col1)
