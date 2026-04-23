@@ -48,6 +48,7 @@ The following are state variables in the model under all simulations:
 + Cumulative degree days (a) to budburst, (b) to complete unfolding or (c) to senescence ($S_{eco,d}$, $S_{unf,d}$ or $S_{sen,d}$; all in $^\circ C$), are tracked by the model to determine leaf phenological status (see \@ref(leafphenology)).
 + Daily soil moisture content dynamics on each layer $s$ are tracked using $W_s = \theta_s(\Psi_s)/ \theta_{fc,s}$, the *proportion of soil moisture in relation to field capacity*, where moisture at field capacity, $\theta_{fc,s}$, is assumed to correspond to $\Psi_{fc} = -0.033$ MPa. Note that $W_s$ values larger than one are possible if the soil is between field capacity and saturation.
 + The air temperature within the canopy ($T_{can}$; ºC) and the temperature of each soil layer $s$ ($T_{soil,s}$; ºC) are tracked for every subdaily step.
++ Leaf area index ($LAI_i$) of each plant cohort $i$ will change during simulations according to phenology if the species is winter-deciduous.
 
 Additional state variables depend on the activation of specific control flags (see subsection \@ref(advancedwaterbalancecontrol)):
 
@@ -58,6 +59,7 @@ Additional state variables depend on the activation of specific control flags (s
   a. Air temperature, $T_{air,j}$
   b. Water vapor pressure, $e_{air,j}$
   c. $CO_2$ concentration, $C_{air,j}$.
++ *If cavitation-induced defoliation is considered* (i.e. `cavitationInducedDefoliation = TRUE`), then leaf area index ($LAI_i$) will become a state variable for all plant cohorts, including evergreen species (see \@ref(cavitationinduceddefoliationadvanced)).
 
 ## Water and energy balances {#waterenergybalances}
 
@@ -291,6 +293,7 @@ Other relevant control parameters relevant for the advanced water balance model 
   + `"total"` - instantaneous complete recovery.
   + `"rate"` - following a rate of new leaf or sapwood formation.
 + `cavitationRecoveryMaximumRate [= 0.05]`: Maximum rate of conductance recovery (see section \@ref(cavitationRecovery)).
++ `cavitationInducedDefoliation [= TRUE]`: Whether leaf hydraulic impairment induces defoliation (88 % PLC will correspond to 50 % defoliation).
 + `lfmcComponent [= "fine"]`: Plant component used to estimate LFMC, either "leaf" or "fine" (for fine fuel) (see section \@ref(lfmc)).
 
 A set of parameters is only relevant for `transpirationMode = "Sperry"`:

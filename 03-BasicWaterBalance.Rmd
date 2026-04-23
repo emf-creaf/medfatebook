@@ -23,12 +23,14 @@ The following are state variables in the model under all simulations:
 + Cumulative degree days (a) to budburst, (b) to complete unfolding or (c) to senescence ($S_{eco,d}$, $S_{unf,d}$ or $S_{sen,d}$; all in $^\circ C$), are tracked by the model to determine leaf phenological status (see \@ref(leafphenology)).
 + Soil moisture content dynamics on each layer $s$ are tracked daily using $W_s = \theta_s(\Psi)/ \theta_{fc,s}$, the *proportion of soil moisture in relation to field capacity*, where moisture at field capacity, $\theta_{fc,s}$, is assumed to correspond to $\Psi_{fc} = -0.033$ MPa. Note that $W_s$ values larger than one are possible if the soil is between field capacity and saturation (which can happen if deep drainage is not allowed).
 + Plant water potential ($\Psi_{plant,i}$) of each plant cohort $i$ are also tracked daily and follows the soil water potential of layers (or water pools) where fine roots are located.
++ Leaf area index ($LAI_i$) of each plant cohort $i$ will change during simulations according to phenology if the species is winter-deciduous.
 
 Additional state variables depend on the activation of specific control flags:
 
 + *If snow accumulation/melting is considered*, the model tracks $S_{snow}$, the snow water equivalent (in mm) of the snow pack storage over the surface.
 + *If stem cavitation is not completely reversible*, the model tracks $PLC_{stem, i}$ and $PLC_{leaf, i}$, the proportion of conductivity lost the stem and leaves, respectively, of plants of cohort $i$.
 + *If the degree of rhizosphere overlap between plant cohorts is not total* (i.e. if `rhizosphereOverlap = "none"` or `rhizosphereOverlap = "partial"`), the model also tracks $W_{i,s}$, the proportion of soil moisture in relation to field capacity for layer $s$ within the areal fraction of the stand covered by the plant cohort $i$.
++ *If cavitation-induced defoliation is considered* (i.e. `cavitationInducedDefoliation = TRUE`), then leaf area index ($LAI_i$) will become a state variable for all plant cohorts, including evergreen species (see \@ref(cavitationinduceddefoliationbasic)).
 
 ## Water balance {#soilwaterbalance}
 
@@ -219,6 +221,7 @@ The other relevant control parameters for the basic water balance model are:
   + `"total"` - instantaneous complete recovery.
   + `"rate"` - following a rate of new leaf or sapwood formation.
 + `cavitationRecoveryMaximumRate [= 0.05]`: Maximum rate of conductance recovery (see section \@ref(irreversiblecavitation)).
++ `cavitationInducedDefoliation [= TRUE]`: Whether leaf hydraulic impairment induces defoliation (88 % PLC will correspond to 50 % defoliation).
 + `lfmcComponent [= "fine"]`: Plant component used to estimate LFMC, either "leaf" or "fine" (for fine fuel) (see section \@ref(lfmc)).
 
 ### Model output {#basicwaterbalanceoutput}

@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-03-31" />
+<meta name="date" content="2026-04-23" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -278,7 +278,7 @@ div.csl-indent {
 <li class="chapter" data-level="5.7.6" data-path="hydrology.html"><a href="hydrology.html#finite-approximation-to-flows-in-the-macropore-domain"><i class="fa fa-check"></i><b>5.7.6</b> Finite approximation to flows in the macropore domain</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Plant cohort transpiration, photosynthesis and water status</a>
+<li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Plant cohort transpiration, photosynthesis and drought stress</a>
 <ul>
 <li class="chapter" data-level="6.1" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-transpiration-and-photosynthesis"><i class="fa fa-check"></i><b>6.1</b> Plant transpiration and photosynthesis</a>
 <ul>
@@ -293,6 +293,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="6.2.1" data-path="transpirationgranier.html"><a href="transpirationgranier.html#dailystressbasicwater"><i class="fa fa-check"></i><b>6.2.1</b> Daily drought stress</a></li>
 <li class="chapter" data-level="6.2.2" data-path="transpirationgranier.html"><a href="transpirationgranier.html#irreversiblecavitation"><i class="fa fa-check"></i><b>6.2.2</b> Cavitation and hydraulic recovery</a></li>
+<li class="chapter" data-level="6.2.3" data-path="transpirationgranier.html"><a href="transpirationgranier.html#cavitationinduceddefoliationbasic"><i class="fa fa-check"></i><b>6.2.3</b> Cavitation-induced defoliation and recovery</a></li>
 </ul></li>
 </ul></li>
 <li class="part"><span><b>III Advanced water balance modelling</b></span></li>
@@ -433,6 +434,7 @@ div.csl-indent {
 <li class="chapter" data-level="14.2" data-path="daylevelresults.html"><a href="daylevelresults.html#plant-water-potentials-and-relative-water-contents"><i class="fa fa-check"></i><b>14.2</b> Plant water potentials and relative water contents</a></li>
 <li class="chapter" data-level="14.3" data-path="daylevelresults.html"><a href="daylevelresults.html#advanceddroughtstress"><i class="fa fa-check"></i><b>14.3</b> Plant drought stress</a></li>
 <li class="chapter" data-level="14.4" data-path="daylevelresults.html"><a href="daylevelresults.html#cavitationRecovery"><i class="fa fa-check"></i><b>14.4</b> Cavitation and conduit refilling</a></li>
+<li class="chapter" data-level="14.5" data-path="daylevelresults.html"><a href="daylevelresults.html#cavitationinduceddefoliationadvanced"><i class="fa fa-check"></i><b>14.5</b> Cavitation-induced defoliation and recovery</a></li>
 </ul></li>
 <li class="part"><span><b>IV Forest growth modelling</b></span></li>
 <li class="chapter" data-level="15" data-path="growthmodelling.html"><a href="growthmodelling.html"><i class="fa fa-check"></i><b>15</b> Forest growth model</a>
@@ -812,6 +814,10 @@ PLC_{leaf} &amp;=&amp; \max \{0.0, PLC_{leaf} - (r_{refill}/H_v) \} \\
 PLC_{stem} &amp;=&amp; \max \{0.0, PLC_{stem} - (r_{refill}/H_v) \}
 \end{eqnarray}\]</span>
 where <span class="math inline">\(H_v\)</span> is the Huber value in units of <span class="math inline">\(cm^2 \cdot m^{-2}\)</span>.</p>
+</div>
+<div id="cavitationinduceddefoliationadvanced" class="section level2 hasAnchor" number="14.5">
+<h2><span class="header-section-number">14.5</span> Cavitation-induced defoliation and recovery<a href="daylevelresults.html#cavitationinduceddefoliationadvanced" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>By default, the water-balance model assumes that high levels of leaf hydraulic impairment will lead to defoliation (although this process can be deactivated if <code>cavitationInducedDefoliation = FALSE</code>). When cavitation-induced defoliation is considered, the model assumes that crowns are made of a population of leaves whose hydraulic vulnerability follows a Gaussian distribution centered on the water potential corresponding to 50% loss of conductance (i.e. <span class="math inline">\(\Psi_{50,leaf}\)</span>, or the corresponding value dictated by <span class="math inline">\(c_{leaf}\)</span> and <span class="math inline">\(d_{leaf}\)</span>) and with a known coefficient of variation set to 10 %, a modelling strategy developed by Hervé Cochard. The <span class="math inline">\(slope_{leaf}\)</span> parameter of the vulnerability curve, or the corresponding <span class="math inline">\(c_{leaf}\)</span> exponent in the case of a Weibull function, is considered constant. Leaves are hydraulically disconnected, and shedded, when their embolism rate exceeds a critical value set to 88 % of percent loss of conductance, which leads to a corresponding decrease in <span class="math inline">\(LAI_{\phi}\)</span> (see function <code>hydraulics_proportionDefoliationWeibull()</code>). In the water-balance model, <span class="math inline">\(LAI_{\phi}\)</span> recovery after drought will follow the conduit refilling process associated to decrease in <span class="math inline">\(PLC_{leaf}\)</span>.</p>
 
 </div>
 </div>

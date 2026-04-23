@@ -1,6 +1,6 @@
-# Plant cohort transpiration, photosynthesis and water status {#transpirationgranier}
+# Plant cohort transpiration, photosynthesis and drought stress {#transpirationgranier}
 
-This chapter describes how daily plant cohort transpiration ($Tr_{cohorts}$) is modelled in the basic water balance model, completing the flows needed to evaluate eq. \@ref(eq:basicwaterbalanceequation). The model uses the approach of BILJOU [@Granier1999] to estimate plant cohort maximum transpiration, and then divides this value among the contribution of plant cohorts and estimate actual transpiration depending on soil moisture and cohort functional parameters, which determine plant drought. The chapter also describes how is daily photosynthesis estimated, a process that in this model does not influence transpiration but is necessary for growth calculations (chapter \@ref(growthmodelling)). 
+This chapter describes how daily plant cohort transpiration ($Tr_{cohorts}$) is modelled in the basic water balance model, completing the flows needed to evaluate eq. \@ref(eq:basicwaterbalanceequation). The model uses the approach of BILJOU [@Granier1999] to estimate plant cohort maximum transpiration, and then divides this value among the contribution of plant cohorts and estimate actual transpiration depending on soil moisture and cohort functional parameters, which determine plant drought. The chapter also describes how is daily photosynthesis estimated, a process that in this model does not influence transpiration but is necessary for growth calculations (chapter \@ref(growthmodelling)). Finally, we include here the description of the estimation of plant water status, the effect of drought stress and how plants recover from drought legacies.
 
 ## Plant transpiration and photosynthesis
 ### Maximum transpiration {#maximumtranspiration}
@@ -194,7 +194,6 @@ PLC_{stem, i} &=& \max \{0.0, PLC_{stem, i} - (r_{refill}/H_v) \}
 \end{eqnarray}
 where $H_v$ is the Huber value (sapwood area to leaf area ratio) in units of $cm^2 \cdot m^{-2}$.
 
+### Cavitation-induced defoliation and recovery {#cavitationinduceddefoliationbasic}
 
-
-
-
+By default, the water-balance model assumes that high levels of leaf hydraulic impairment will lead to defoliation (although this process can be deactivated if `cavitationInducedDefoliation = FALSE`). When cavitation-induced defoliation is considered, the model assumes that crowns are made of a population of leaves whose hydraulic vulnerability follows a Gaussian distribution centered on the input water potential corresponding to 50% loss of conductance (which is dictated by $c_{leaf}$ and $d_{leaf}$) and with a known coefficient of variation set to 10 %, a modelling strategy developed by Hervé Cochard.  Leaves are hydraulically disconnected, and shedded, when their embolism rate exceeds a critical value set to 88 % of percent loss of conductance, which leads to a corresponding decrease in $LAI_{\phi}$ (see function `hydraulics_proportionDefoliationWeibull()`). In the water-balance model, $LAI_{\phi}$ recovery after drought will follow the conduit refilling process associated to decrease in $PLC_{leaf}$.
