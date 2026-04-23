@@ -1,8 +1,120 @@
 # Decomposition and soil biogeochemistry {#decomposition}
 TO BE WRITTEN
 
+\begin{equation}
+k_{i} = k_{\text{base,}i} \cdot f(T) \cdot f(\theta) \cdot f(pH)
+\end{equation}
+
+Where $k_{\text{base,}i}$ is the base daily decomposition rate for pool $i$ which is multiplied by three modifiers: $ƒ(T)$ is the effect of temperature, $f(\theta_{rel})$ is the effect of moisture relative to saturation, and $f(pH)$ is the effect of soil pH.
+
+### Effect of pH
+
+The effect of pH on decomposition, $f(pH)$ is calculated using:
+
+\begin{equation}
+f(pH) = b + \frac{c}{\pi} \cdot \text{tan}^{-1} [d \cdot (pH - a) \cdot \pi]
+\end{equation}
+
+where parameters $a$, $b$, $c$ and $d$ depend on the specific carbon pool:
+
+| Carbon pool(s)          | $a$ | $b$ | $c$ | $d$ |
+|-------------------------|-----|-----|-----|-----|
+| Surface/soil metabolic  | 4.8 | 0.5 | 1.14 | 0.7 |
+| Surface/soil structural  | 4.0 | 0.5 | 1.1 | 0.7 |
+| Surface active  | 4.0 | 0.5 | 1.1 | 0.7 |
+| Soil active  | 4.8 | 0.5 | 1.14 | 0.7 |
+| Surface/soil slow  | 4.0 | 0.5 | 1.1 | 0.7 |
+| Soil passive  | 3.0 | 0.5 | 1.1 | 0.7 |
+
+(ref:pH-decomp-cap) Effect of pH on decomposition rates, for different carbon pools.
+
+```{r, fig.align='center', fig.width=7, fig.height=3.5, echo = FALSE, fig.cap='(ref:pH-decomp-cap)'}
+df1 <- data.frame(pH = seq(4,8, by = 0.001), f = NA, Pool = "Surface/soil metabolic/active")
+df2 <- data.frame(pH = seq(4,8, by = 0.001), f = NA, Pool = "Surface/soil structural/slow")
+df3 <- data.frame(pH = seq(4,8, by = 0.001), f = NA, Pool = "Soil passive")
+for(i in 1:nrow(df1)) {
+  df1$f[i] = decomposition_pHEffect(df1$pH[i], "SurfaceMetabolic")
+  df2$f[i] = decomposition_pHEffect(df2$pH[i], "Leaves")
+  df3$f[i] = decomposition_pHEffect(df3$pH[i], "SoilPassive")
+}
+df <- rbind(df1, df2, df3)
+ggplot(df)+
+  geom_line(aes(x = pH, y = f, col = Pool)) +
+  ylim(0,1)+
+  xlab("pH") + ylab("pH effect on decomposition")+
+  theme_bw()
+```
+
+### Effect of temperature
+
+The effect of temperature on decomposition, $f(T)$, follows the same general structure as the effect of pH, but with fixed coefficients (i.e. $a = 15.7$, $b = 0.56$, $c = 1.46$ and $d = 0.031$):
+
+\begin{equation}
+f(T) = 0.56 + \frac{1.46}{\pi} \cdot \text{tan}^{-1} [0.031 \cdot \pi \cdot (T - 15.7) ]
+\end{equation}
+
+(ref:temp-decomp-cap) Effect of temperature on decomposition rates.
+
+```{r, fig.align='center', fig.width=5, fig.height=3.5, echo = FALSE, fig.cap='(ref:temp-decomp-cap)'}
+df <- data.frame(temperature = seq(0,60, by = 0.1), f = NA)
+for(i in 1:nrow(df)) {
+  df$f[i] = decomposition_temperatureEffect(df$temperature[i])
+}
+ggplot(df)+
+  geom_line(aes(x = temperature, y = f)) +
+  xlab("Temperature in Celsius") + ylab("Temperature effect on decomposition")+
+  theme_bw()
+```
+
+### Effect of moisture
+
+The effect of moisture is modelled using:
+
+\begin{equation}
+f(\theta_{rel}) = \left(\frac{\theta_{rel} - b}{a - b} \right) ^{d \cdot \frac{b-a}{a-c}} \cdot \left( \frac{\theta_{rel} - c}{a - c}\right) ^{d}
+\end{equation}
+
+where $\theta_{rel}$ is moisture relative to saturation, and here parameters $a$, $b$, $c$ and $d$ depend on soil texture: 
+
+| Soil texture          | $a$ | $b$ | $c$ | $d$ |
+|-------------------------|-----|-----|-----|-----|
+| Fine texture  | 0.6 | 1.27 | 0.0012 | 2.84 |
+| Coarse texture  | 0.55 | 1.7 | -0.007 | 3.22 |
+
+(ref:moisture-decomp-cap) Effect of moisture relative to saturation ($\theta_{rel}$) on decomposition rates, for fine textured and coarse textured soil.
+
+```{r, fig.align='center', fig.width=5, fig.height=3.5, echo = FALSE, fig.cap='(ref:moisture-decomp-cap)'}
+df1 <- data.frame(theta_rel = seq(0.002,0.999, by = 0.001), f = NA, texture = "fine")
+df2 <- data.frame(theta_rel = seq(0.002,0.999, by = 0.001), f = NA, texture = "coarse")
+for(i in 1:nrow(df1)) {
+  df1$f[i] = decomposition_moistureEffect(10,30, df1$theta_rel[i])
+  df2$f[i] = decomposition_moistureEffect(30,10, df2$theta_rel[i])
+}
+df <- rbind(df1, df2)
+ggplot(df)+
+  geom_line(aes(x = theta_rel, y = f, col = texture)) +
+  ylim(0,1)+
+  xlab("Relative moisture") + ylab("Moisture effect on decomposition")+
+  theme_bw()
+```
+
+
 ## Decomposition of standing dead wood and litter elements
 TO BE WRITTEN
+
+### Standing dead wood
+
+\begin{equation}
+k_{i} = k_{\text{base,}i} \cdot f(T) \cdot f(\theta_{rel}) \cdot exp(-3 \cdot f_{lig})
+\end{equation}
+
+where $f_{lig}$ is the fraction of wood lignin and atmosphere (or canopy in the case of advanced simulations) air temperature is used for temperature effects  (i.e. $T = T_{air}$ or $T = T_{can}$). Moisture relative to saturation ($\theta_{rel}$) is estimated as the ratio of actual fuel moisture to its maximum value:
+
+\begin{equation}
+\theta_{rel} = \theta_{Simard}(T_{air}, RH_{air})/\theta_{max}
+\end{equation}
+
+where $\theta_{Simard}$ is the equilibrium moisture content of fuel, according to air temperature and air relative humidity (Simard (1968); see also Viney (1991)) and $\theta_{max}$ is the maximum fuel moisture content, which depends on wood density.
 
 ## Dynamics of soil carbon pools
 

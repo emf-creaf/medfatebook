@@ -535,7 +535,13 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="18" data-path="decomposition.html"><a href="decomposition.html"><i class="fa fa-check"></i><b>18</b> Decomposition and soil biogeochemistry</a>
 <ul>
-<li class="chapter" data-level="18.1" data-path="decomposition.html"><a href="decomposition.html#decomposition-of-standing-dead-wood-and-litter-elements"><i class="fa fa-check"></i><b>18.1</b> Decomposition of standing dead wood and litter elements</a></li>
+<li class="chapter" data-level="18.0.1" data-path="decomposition.html"><a href="decomposition.html#effect-of-ph"><i class="fa fa-check"></i><b>18.0.1</b> Effect of pH</a></li>
+<li class="chapter" data-level="18.0.2" data-path="decomposition.html"><a href="decomposition.html#effect-of-temperature"><i class="fa fa-check"></i><b>18.0.2</b> Effect of temperature</a></li>
+<li class="chapter" data-level="18.0.3" data-path="decomposition.html"><a href="decomposition.html#effect-of-moisture"><i class="fa fa-check"></i><b>18.0.3</b> Effect of moisture</a></li>
+<li class="chapter" data-level="18.1" data-path="decomposition.html"><a href="decomposition.html#decomposition-of-standing-dead-wood-and-litter-elements"><i class="fa fa-check"></i><b>18.1</b> Decomposition of standing dead wood and litter elements</a>
+<ul>
+<li class="chapter" data-level="18.1.1" data-path="decomposition.html"><a href="decomposition.html#standing-dead-wood"><i class="fa fa-check"></i><b>18.1.1</b> Standing dead wood</a></li>
+</ul></li>
 <li class="chapter" data-level="18.2" data-path="decomposition.html"><a href="decomposition.html#dynamics-of-soil-carbon-pools"><i class="fa fa-check"></i><b>18.2</b> Dynamics of soil carbon pools</a></li>
 </ul></li>
 <li class="part"><span><b>V Forest dynamics modelling</b></span></li>
@@ -747,9 +753,150 @@ div.csl-indent {
 <div id="decomposition" class="section level1 hasAnchor" number="18">
 <h1><span class="header-section-number">Chapter 18</span> Decomposition and soil biogeochemistry<a href="decomposition.html#decomposition" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>TO BE WRITTEN</p>
+<p><span class="math display">\[\begin{equation}
+k_{i} = k_{\text{base,}i} \cdot f(T) \cdot f(\theta) \cdot f(pH)
+\end{equation}\]</span></p>
+<p>Where <span class="math inline">\(k_{\text{base,}i}\)</span> is the base daily decomposition rate for pool <span class="math inline">\(i\)</span> which is multiplied by three modifiers: <span class="math inline">\(ƒ(T)\)</span> is the effect of temperature, <span class="math inline">\(f(\theta_{rel})\)</span> is the effect of moisture relative to saturation, and <span class="math inline">\(f(pH)\)</span> is the effect of soil pH.</p>
+<div id="effect-of-ph" class="section level3 hasAnchor" number="18.0.1">
+<h3><span class="header-section-number">18.0.1</span> Effect of pH<a href="decomposition.html#effect-of-ph" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The effect of pH on decomposition, <span class="math inline">\(f(pH)\)</span> is calculated using:</p>
+<p><span class="math display">\[\begin{equation}
+f(pH) = b + \frac{c}{\pi} \cdot \text{tan}^{-1} [d \cdot (pH - a) \cdot \pi]
+\end{equation}\]</span></p>
+<p>where parameters <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, <span class="math inline">\(c\)</span> and <span class="math inline">\(d\)</span> depend on the specific carbon pool:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Carbon pool(s)</th>
+<th><span class="math inline">\(a\)</span></th>
+<th><span class="math inline">\(b\)</span></th>
+<th><span class="math inline">\(c\)</span></th>
+<th><span class="math inline">\(d\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Surface/soil metabolic</td>
+<td>4.8</td>
+<td>0.5</td>
+<td>1.14</td>
+<td>0.7</td>
+</tr>
+<tr class="even">
+<td>Surface/soil structural</td>
+<td>4.0</td>
+<td>0.5</td>
+<td>1.1</td>
+<td>0.7</td>
+</tr>
+<tr class="odd">
+<td>Surface active</td>
+<td>4.0</td>
+<td>0.5</td>
+<td>1.1</td>
+<td>0.7</td>
+</tr>
+<tr class="even">
+<td>Soil active</td>
+<td>4.8</td>
+<td>0.5</td>
+<td>1.14</td>
+<td>0.7</td>
+</tr>
+<tr class="odd">
+<td>Surface/soil slow</td>
+<td>4.0</td>
+<td>0.5</td>
+<td>1.1</td>
+<td>0.7</td>
+</tr>
+<tr class="even">
+<td>Soil passive</td>
+<td>3.0</td>
+<td>0.5</td>
+<td>1.1</td>
+<td>0.7</td>
+</tr>
+</tbody>
+</table>
+
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-56"></span>
+<img src="medfatebook_files/figure-html/unnamed-chunk-56-1.png" alt="Effect of pH on decomposition rates, for different carbon pools." width="672" />
+<p class="caption">
+Figure 18.1: Effect of pH on decomposition rates, for different carbon pools.
+</p>
+</div>
+</div>
+<div id="effect-of-temperature" class="section level3 hasAnchor" number="18.0.2">
+<h3><span class="header-section-number">18.0.2</span> Effect of temperature<a href="decomposition.html#effect-of-temperature" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The effect of temperature on decomposition, <span class="math inline">\(f(T)\)</span>, follows the same general structure as the effect of pH, but with fixed coefficients (i.e. <span class="math inline">\(a = 15.7\)</span>, <span class="math inline">\(b = 0.56\)</span>, <span class="math inline">\(c = 1.46\)</span> and <span class="math inline">\(d = 0.031\)</span>):</p>
+<p><span class="math display">\[\begin{equation}
+f(T) = 0.56 + \frac{1.46}{\pi} \cdot \text{tan}^{-1} [0.031 \cdot \pi \cdot (T - 15.7) ]
+\end{equation}\]</span></p>
+
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-57"></span>
+<img src="medfatebook_files/figure-html/unnamed-chunk-57-1.png" alt="Effect of temperature on decomposition rates." width="480" />
+<p class="caption">
+Figure 18.2: Effect of temperature on decomposition rates.
+</p>
+</div>
+</div>
+<div id="effect-of-moisture" class="section level3 hasAnchor" number="18.0.3">
+<h3><span class="header-section-number">18.0.3</span> Effect of moisture<a href="decomposition.html#effect-of-moisture" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The effect of moisture is modelled using:</p>
+<p><span class="math display">\[\begin{equation}
+f(\theta_{rel}) = \left(\frac{\theta_{rel} - b}{a - b} \right) ^{d \cdot \frac{b-a}{a-c}} \cdot \left( \frac{\theta_{rel} - c}{a - c}\right) ^{d}
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\theta_{rel}\)</span> is moisture relative to saturation, and here parameters <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, <span class="math inline">\(c\)</span> and <span class="math inline">\(d\)</span> depend on soil texture:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Soil texture</th>
+<th><span class="math inline">\(a\)</span></th>
+<th><span class="math inline">\(b\)</span></th>
+<th><span class="math inline">\(c\)</span></th>
+<th><span class="math inline">\(d\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Fine texture</td>
+<td>0.6</td>
+<td>1.27</td>
+<td>0.0012</td>
+<td>2.84</td>
+</tr>
+<tr class="even">
+<td>Coarse texture</td>
+<td>0.55</td>
+<td>1.7</td>
+<td>-0.007</td>
+<td>3.22</td>
+</tr>
+</tbody>
+</table>
+
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-58"></span>
+<img src="medfatebook_files/figure-html/unnamed-chunk-58-1.png" alt="Effect of moisture relative to saturation (\(\theta_{rel}\)) on decomposition rates, for fine textured and coarse textured soil." width="480" />
+<p class="caption">
+Figure 18.3: Effect of moisture relative to saturation (<span class="math inline">\(\theta_{rel}\)</span>) on decomposition rates, for fine textured and coarse textured soil.
+</p>
+</div>
+</div>
 <div id="decomposition-of-standing-dead-wood-and-litter-elements" class="section level2 hasAnchor" number="18.1">
 <h2><span class="header-section-number">18.1</span> Decomposition of standing dead wood and litter elements<a href="decomposition.html#decomposition-of-standing-dead-wood-and-litter-elements" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>TO BE WRITTEN</p>
+<div id="standing-dead-wood" class="section level3 hasAnchor" number="18.1.1">
+<h3><span class="header-section-number">18.1.1</span> Standing dead wood<a href="decomposition.html#standing-dead-wood" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><span class="math display">\[\begin{equation}
+k_{i} = k_{\text{base,}i} \cdot f(T) \cdot f(\theta_{rel}) \cdot exp(-3 \cdot f_{lig})
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(f_{lig}\)</span> is the fraction of wood lignin and atmosphere (or canopy in the case of advanced simulations) air temperature is used for temperature effects (i.e. <span class="math inline">\(T = T_{air}\)</span> or <span class="math inline">\(T = T_{can}\)</span>). Moisture relative to saturation (<span class="math inline">\(\theta_{rel}\)</span>) is estimated as the ratio of actual fuel moisture to its maximum value:</p>
+<p><span class="math display">\[\begin{equation}
+\theta_{rel} = \theta_{Simard}(T_{air}, RH_{air})/\theta_{max}
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\theta_{Simard}\)</span> is the equilibrium moisture content of fuel, according to air temperature and air relative humidity (Simard (1968); see also Viney (1991)) and <span class="math inline">\(\theta_{max}\)</span> is the maximum fuel moisture content, which depends on wood density.</p>
+</div>
 </div>
 <div id="dynamics-of-soil-carbon-pools" class="section level2 hasAnchor" number="18.2">
 <h2><span class="header-section-number">18.2</span> Dynamics of soil carbon pools<a href="decomposition.html#dynamics-of-soil-carbon-pools" class="anchor-section" aria-label="Anchor link to header"></a></h2>
