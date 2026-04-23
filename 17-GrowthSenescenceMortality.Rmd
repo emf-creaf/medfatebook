@@ -103,24 +103,23 @@ cell relative expansion rate is divided by the maximum relative cell expansion r
 
 ## Senescence
 
-### Leaf senescence and cavitation effects on leaves and buds {#leafsenescence}
+### Leaf aging and cavitation effects on leaves and buds {#leafsenescence}
 
-Leaf senescence can occur due to two processes: aging or dessication. Senescence due to advanced leaf age is assumed to be programmed (Ca+ accumulation?). In deciduous species all live leaf area turns to death leaf area when the phenology submodel indicates it (\@ref(leafphenosenescence)). In evergreen species the proportion of leaf area that undergoes senescence each day is determined by the species-specific leaf duration parameter ($LD$):
+Leaf senescence can occur due to two processes: aging or hydraulic disconnection related to cavitation. Senescence due to advanced leaf age is assumed to be programmed (Ca+ accumulation?). In deciduous species all live leaf area turns to death leaf area when the phenology submodel indicates it (\@ref(leafphenosenescence)). In evergreen species the proportion of leaf area that undergoes senescence each day is determined by the species-specific leaf duration parameter ($LD$):
 \begin{equation}
 p_{aging,leaf} = \frac{1}{365.25 \cdot LD}
 \end{equation}
-Senescence due to drought effects occurs as a consequence of stem cavitation. If the proportion of conductance loss has increased with respect to the preceeding day, the model determines the leaf area corresponding to the current level of cavitation:
-\begin{equation}
-LA_{cavitation} = (1 - PLC_{stem}) \cdot LA_{target}
-\end{equation}
-if $LA_{cavitation} < LA_{\phi}$ then the corresponding proportion $p_{cavitation, leaf}$ is estimated. The maximum of $p_{aging,leaf}$ and $p_{cavitation, leaf}$ is applied as a reduction of leaf area. If growth is simulated using the advanced water model, it also checks whether the relative water content in leaves becomes less than 50\% (i.e. $RWC_{leaf} < 0.5$) and, if this happens, the plant cohort is completely defoliated.
+Leaf senescence can also occur as a consequence of hydraulic disconnection, as described in \@ref(cavitationinduceddefoliationbasic) and \@ref(cavitationinduceddefoliationadvanced), for the basic or advanced water balance models, respectively. If the proportion of stem conductance loss has increased with respect to the preceeding day, the model determines  $LA_{cavitation}$, the maximum leaf area allowed according to the current level of cavitation, by estimating the cavitation-induced defoliation proportion and applying it to the maximum leaf area ($LA_{target}$). If $LA_{cavitation} < LA$ then the corresponding proportion $p_{cavitation, leaf}$ is estimated for senescence. 
 
-Xylem cavitation not only causes defoliation but also mortality of buds, which has the effect of slowing down post-drought leaf area recovery. The percentage of the crown with active buds ($PCAB$) is reduced whenever the proportion of conductance loss has increased with respect to the preceeding day. 
+The maximum of $p_{aging,leaf}$ and $p_{cavitation, leaf}$ is finally applied to reduce $LA$ and increase $LA_{dead}$ correspondingly. 
+
+Xylem cavitation not only causes defoliation but also mortality of buds, which has the effect of slowing down post-drought leaf area recovery. The percentage of the crown with active buds ($PCAB$) is reduced whenever the proportion of conductance loss has increased with respect to the preceeding day: 
 
 \begin{equation}
 PCAB = \min(PCAB, 100 \cdot (1 - PLC_{stem}))
 \end{equation}
 
+This reduction has an effect on subsequent leaf growth (see \@ref(leafgrowth)).
 
 ### Sapwood senescence {#sapwoodsenescence}
 

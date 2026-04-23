@@ -504,7 +504,7 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="17.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#senescence"><i class="fa fa-check"></i><b>17.2</b> Senescence</a>
 <ul>
-<li class="chapter" data-level="17.2.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#leafsenescence"><i class="fa fa-check"></i><b>17.2.1</b> Leaf senescence and cavitation effects on leaves and buds</a></li>
+<li class="chapter" data-level="17.2.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#leafsenescence"><i class="fa fa-check"></i><b>17.2.1</b> Leaf aging and cavitation effects on leaves and buds</a></li>
 <li class="chapter" data-level="17.2.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#sapwoodsenescence"><i class="fa fa-check"></i><b>17.2.2</b> Sapwood senescence</a></li>
 <li class="chapter" data-level="17.2.3" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#finerootsenescence"><i class="fa fa-check"></i><b>17.2.3</b> Fine root senescence</a></li>
 </ul></li>
@@ -843,20 +843,18 @@ cell relative expansion rate is divided by the maximum relative cell expansion r
 <div id="senescence" class="section level2 hasAnchor" number="17.2">
 <h2><span class="header-section-number">17.2</span> Senescence<a href="growthsenescencemortality.html#senescence" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div id="leafsenescence" class="section level3 hasAnchor" number="17.2.1">
-<h3><span class="header-section-number">17.2.1</span> Leaf senescence and cavitation effects on leaves and buds<a href="growthsenescencemortality.html#leafsenescence" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Leaf senescence can occur due to two processes: aging or dessication. Senescence due to advanced leaf age is assumed to be programmed (Ca+ accumulation?). In deciduous species all live leaf area turns to death leaf area when the phenology submodel indicates it (<a href="leafphenologylight.html#leafphenosenescence">4.1.3</a>). In evergreen species the proportion of leaf area that undergoes senescence each day is determined by the species-specific leaf duration parameter (<span class="math inline">\(LD\)</span>):
+<h3><span class="header-section-number">17.2.1</span> Leaf aging and cavitation effects on leaves and buds<a href="growthsenescencemortality.html#leafsenescence" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Leaf senescence can occur due to two processes: aging or hydraulic disconnection related to cavitation. Senescence due to advanced leaf age is assumed to be programmed (Ca+ accumulation?). In deciduous species all live leaf area turns to death leaf area when the phenology submodel indicates it (<a href="leafphenologylight.html#leafphenosenescence">4.1.3</a>). In evergreen species the proportion of leaf area that undergoes senescence each day is determined by the species-specific leaf duration parameter (<span class="math inline">\(LD\)</span>):
 <span class="math display">\[\begin{equation}
 p_{aging,leaf} = \frac{1}{365.25 \cdot LD}
 \end{equation}\]</span>
-Senescence due to drought effects occurs as a consequence of stem cavitation. If the proportion of conductance loss has increased with respect to the preceeding day, the model determines the leaf area corresponding to the current level of cavitation:
-<span class="math display">\[\begin{equation}
-LA_{cavitation} = (1 - PLC_{stem}) \cdot LA_{target}
-\end{equation}\]</span>
-if <span class="math inline">\(LA_{cavitation} &lt; LA_{\phi}\)</span> then the corresponding proportion <span class="math inline">\(p_{cavitation, leaf}\)</span> is estimated. The maximum of <span class="math inline">\(p_{aging,leaf}\)</span> and <span class="math inline">\(p_{cavitation, leaf}\)</span> is applied as a reduction of leaf area. If growth is simulated using the advanced water model, it also checks whether the relative water content in leaves becomes less than 50% (i.e. <span class="math inline">\(RWC_{leaf} &lt; 0.5\)</span>) and, if this happens, the plant cohort is completely defoliated.</p>
-<p>Xylem cavitation not only causes defoliation but also mortality of buds, which has the effect of slowing down post-drought leaf area recovery. The percentage of the crown with active buds (<span class="math inline">\(PCAB\)</span>) is reduced whenever the proportion of conductance loss has increased with respect to the preceeding day.</p>
+Leaf senescence can also occur as a consequence of hydraulic disconnection, as described in <a href="transpirationgranier.html#cavitationinduceddefoliationbasic">6.2.3</a> and <a href="daylevelresults.html#cavitationinduceddefoliationadvanced">14.5</a>, for the basic or advanced water balance models, respectively. If the proportion of stem conductance loss has increased with respect to the preceeding day, the model determines <span class="math inline">\(LA_{cavitation}\)</span>, the maximum leaf area allowed according to the current level of cavitation, by estimating the cavitation-induced defoliation proportion and applying it to the maximum leaf area (<span class="math inline">\(LA_{target}\)</span>). If <span class="math inline">\(LA_{cavitation} &lt; LA\)</span> then the corresponding proportion <span class="math inline">\(p_{cavitation, leaf}\)</span> is estimated for senescence.</p>
+<p>The maximum of <span class="math inline">\(p_{aging,leaf}\)</span> and <span class="math inline">\(p_{cavitation, leaf}\)</span> is finally applied to reduce <span class="math inline">\(LA\)</span> and increase <span class="math inline">\(LA_{dead}\)</span> correspondingly.</p>
+<p>Xylem cavitation not only causes defoliation but also mortality of buds, which has the effect of slowing down post-drought leaf area recovery. The percentage of the crown with active buds (<span class="math inline">\(PCAB\)</span>) is reduced whenever the proportion of conductance loss has increased with respect to the preceeding day:</p>
 <p><span class="math display">\[\begin{equation}
 PCAB = \min(PCAB, 100 \cdot (1 - PLC_{stem}))
 \end{equation}\]</span></p>
+<p>This reduction has an effect on subsequent leaf growth (see <a href="growthsenescencemortality.html#leafgrowth">17.1.2</a>).</p>
 </div>
 <div id="sapwoodsenescence" class="section level3 hasAnchor" number="17.2.2">
 <h3><span class="header-section-number">17.2.2</span> Sapwood senescence<a href="growthsenescencemortality.html#sapwoodsenescence" class="anchor-section" aria-label="Anchor link to header"></a></h3>
