@@ -28,7 +28,7 @@ where parameters $a$, $b$, $c$ and $d$ depend on the specific carbon pool:
 
 (ref:pH-decomp-cap) Effect of pH on decomposition rates, for different carbon pools.
 
-```{r, fig.align='center', fig.width=7, fig.height=3.5, echo = FALSE, fig.cap='(ref:pH-decomp-cap)'}
+```{r, fig.align='center', fig.width=6, fig.height=3.5, echo = FALSE, fig.cap='(ref:pH-decomp-cap)'}
 df1 <- data.frame(pH = seq(4,8, by = 0.001), f = NA, Pool = "Surface/soil metabolic/active")
 df2 <- data.frame(pH = seq(4,8, by = 0.001), f = NA, Pool = "Surface/soil structural/slow")
 df3 <- data.frame(pH = seq(4,8, by = 0.001), f = NA, Pool = "Soil passive")
@@ -40,23 +40,25 @@ for(i in 1:nrow(df1)) {
 df <- rbind(df1, df2, df3)
 ggplot(df)+
   geom_line(aes(x = pH, y = f, col = Pool)) +
+  scale_color_discrete(name = NULL)+
   ylim(0,1)+
   xlab("pH") + ylab("pH effect on decomposition")+
-  theme_bw()
+  theme_bw()+
+  theme(legend.position = c(0.8,0.2))
 ```
 
 ### Effect of temperature
 
-The effect of temperature on decomposition, $f(T)$, follows the same general structure as the effect of pH, but with fixed coefficients (i.e. $a = 15.7$, $b = 0.56$, $c = 1.46$ and $d = 0.031$):
+The effect of temperature on decomposition, $f(T)$, follows the same general structure as the effect of pH, but with fixed coefficients (i.e. $a = 15.7$, $b = 0.56$, $c = 1.46$ and $d = 0.031$) [@del_grosso_modeling_2005]:
 
 \begin{equation}
-f(T) = 0.56 + \frac{1.46}{\pi} \cdot \text{tan}^{-1} [0.031 \cdot \pi \cdot (T - 15.7) ]
+f(T) = 0.56 + \frac{1.46}{\pi} \cdot \text{tan}^{-1} [0.0309 \cdot \pi \cdot (T - 15.7) ]
 \end{equation}
 
 (ref:temp-decomp-cap) Effect of temperature on decomposition rates.
 
-```{r, fig.align='center', fig.width=5, fig.height=3.5, echo = FALSE, fig.cap='(ref:temp-decomp-cap)'}
-df <- data.frame(temperature = seq(0,60, by = 0.1), f = NA)
+```{r, fig.align='center', fig.width=6, fig.height=3.5, echo = FALSE, fig.cap='(ref:temp-decomp-cap)'}
+df <- data.frame(temperature = seq(0,30, by = 0.1), f = NA)
 for(i in 1:nrow(df)) {
   df$f[i] = decomposition_temperatureEffect(df$temperature[i])
 }
@@ -68,13 +70,13 @@ ggplot(df)+
 
 ### Effect of moisture
 
-The effect of moisture is modelled using:
+The effect of moisture is modelled using [@kelly_intra-annual_2000]:
 
 \begin{equation}
-f(\theta_{rel}) = \left(\frac{\theta_{rel} - b}{a - b} \right) ^{d \cdot \frac{b-a}{a-c}} \cdot \left( \frac{\theta_{rel} - c}{a - c}\right) ^{d}
+f(\theta_{rel}) = \left(\frac{\theta_{rel} - b}{a - b} \right) ^{ \frac{d\cdot(b-a)}{a-c}} \cdot \left( \frac{\theta_{rel} - c}{a - c}\right) ^{d}
 \end{equation}
 
-where $\theta_{rel}$ is moisture relative to saturation, and here parameters $a$, $b$, $c$ and $d$ depend on soil texture: 
+where $\theta_{rel}$ is moisture relative to saturation, and here parameters $a$, $b$, $c$ and $d$ depend on soil texture [@kelly_intra-annual_2000]: 
 
 | Soil texture          | $a$ | $b$ | $c$ | $d$ |
 |-------------------------|-----|-----|-----|-----|
@@ -83,7 +85,7 @@ where $\theta_{rel}$ is moisture relative to saturation, and here parameters $a$
 
 (ref:moisture-decomp-cap) Effect of moisture relative to saturation ($\theta_{rel}$) on decomposition rates, for fine textured and coarse textured soil.
 
-```{r, fig.align='center', fig.width=5, fig.height=3.5, echo = FALSE, fig.cap='(ref:moisture-decomp-cap)'}
+```{r, fig.align='center', fig.width=6, fig.height=3.5, echo = FALSE, fig.cap='(ref:moisture-decomp-cap)'}
 df1 <- data.frame(theta_rel = seq(0.002,0.999, by = 0.001), f = NA, texture = "fine")
 df2 <- data.frame(theta_rel = seq(0.002,0.999, by = 0.001), f = NA, texture = "coarse")
 for(i in 1:nrow(df1)) {
@@ -93,9 +95,11 @@ for(i in 1:nrow(df1)) {
 df <- rbind(df1, df2)
 ggplot(df)+
   geom_line(aes(x = theta_rel, y = f, col = texture)) +
+  scale_color_discrete(name = NULL)+
   ylim(0,1)+
   xlab("Relative moisture") + ylab("Moisture effect on decomposition")+
-  theme_bw()
+  theme_bw() +
+  theme(legend.position = c(0.2,0.8))
 ```
 
 
@@ -104,17 +108,29 @@ TO BE WRITTEN
 
 ### Standing dead wood
 
+Two types carbon pools are considered for standing dead wood (fig. \@ref(fig:decompositionpools)): **small branches** (diameters between 0.635 cm and 7.5 cm; 10h and 100h fuels; in $g C \cdot m^{-2}$) and **large wood** (diameters larger than 7.5 cm; 1000h and 10000h fuels; in $g C \cdot m^{-2}$).
+
+The rate of decomposition of a standing dead pool $i$ is:
+
 \begin{equation}
-k_{i} = k_{\text{base,}i} \cdot f(T) \cdot f(\theta_{rel}) \cdot exp(-3 \cdot f_{lig})
+k_{i} = k_{\text{base,}i} \cdot f(T) \cdot f(\theta_{rel}) \cdot \exp(-3 \cdot f_{lig})
 \end{equation}
 
-where $f_{lig}$ is the fraction of wood lignin and atmosphere (or canopy in the case of advanced simulations) air temperature is used for temperature effects  (i.e. $T = T_{air}$ or $T = T_{can}$). Moisture relative to saturation ($\theta_{rel}$) is estimated as the ratio of actual fuel moisture to its maximum value:
+where $k_{\text{base,}i}$ is the base daily decomposition rate (which is higher for small branches than large wood); $f_{lig}$ is the fraction of wood lignin; and atmosphere (or canopy in the case of advanced simulations) air temperature is used for temperature effects  (i.e. $T = T_{air}$ or $T = T_{can}$). Moisture relative to saturation ($\theta_{rel}$) is estimated as the ratio of actual fuel moisture to its maximum value (both with units of percent of water mass to dry mass):
 
 \begin{equation}
 \theta_{rel} = \theta_{Simard}(T_{air}, RH_{air})/\theta_{max}
 \end{equation}
 
-where $\theta_{Simard}$ is the equilibrium moisture content of fuel, according to air temperature and air relative humidity (Simard (1968); see also Viney (1991)) and $\theta_{max}$ is the maximum fuel moisture content, which depends on wood density.
+where $\theta_{Simard}$ is the equilibrium moisture content (Simard 1968) of wood, according to an empirical relationship with air temperature and air relative humidity [@viney_review_1991] and $\theta_{max}$ is the maximum fuel moisture content, which depends on wood density (assuming the density of water as $1\,\, g\cdot cm^{-3}$):
+
+\begin{equation}
+\theta_{max} = 100 \cdot \left(\frac{1}{\rho_{wood}} - \frac{1}{\rho_{ws}} \right)
+\end{equation}
+
+where $\rho_{wood}$ is wood density ($g\cdot cm^{-3}$) and $\rho_{ws} = 1.53\,\,g\cdot cm^{-3}$ is the density of the wood substance (a constant). Since $\theta_{Simard}$ ranges between 0% and 30%, whereas $\theta_{max}$ ranges between 45% ($\rho_{wood} = 0.9$) and 135% ($\rho_{wood} = 0.5$), the $\theta_{rel}$ ratio is frequently lower than the same ratio assessed from soil moisture, resulting in slower decomposition rates.
+
+### Litter structural and metabolic pools
 
 ## Dynamics of soil carbon pools
 
