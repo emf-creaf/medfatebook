@@ -1,11 +1,31 @@
 # Decomposition and soil biogeochemistry {#decomposition}
-TO BE WRITTEN
+
+## Carbon pools
+
+Carbon pools and fluxes between them were described in the design section and illustrated in fig. \@ref(fig:decompositionpools). The following table provides the terminologic mapping between carbon pools in MEDFATE, which follows Bonan et al. -@bonan_climate_2019, and the corresponding pools in CENTURY:
+
+| MEDFATE (Bonan et al.) |	CENTURY (Parton et al.) |	CENTURY code |
+|------------------------|--------------------------|--------------|
+| Surface structural |	Surface structural |	`strucc(1)` |
+| Metabolic surface	 | Surface metabolic | `metabc(1)` |
+| Active surface	   | Surface microbe	 | `som1c(1)`  |
+| Slow surface	| | 	`som2c(1)` |
+| Belowground structural |	Belowground structural |	`strucc(2)` |
+| Metabolic soil |	Belowground metabolic	| `metabc(2)` |
+| Active soil	| Active organic | `som1c(2)` |
+| Slow soil	| Slow organic | `som2c(2)` |
+| Passive soil	| Passive	| `som3c` |
+
+
+## Decomposition rates
+
+The base decomposition rates of carbon pools are reduced by multiplicative functions of environmental factors:
 
 \begin{equation}
 k_{i} = k_{\text{base,}i} \cdot f(T) \cdot f(\theta) \cdot f(pH)
 \end{equation}
 
-Where $k_{\text{base,}i}$ is the base daily decomposition rate for pool $i$ which is multiplied by three modifiers: $ƒ(T)$ is the effect of temperature, $f(\theta_{rel})$ is the effect of moisture relative to saturation, and $f(pH)$ is the effect of soil pH.
+Where $k_{\text{base,}i}$ is the base daily decomposition rate for pool $i$ which is multiplied by three modifiers: $ƒ(T)$ is the effect of temperature, $f(\theta_{rel})$ is the effect of moisture relative to saturation, and $f(pH)$ is the effect of soil pH. Additional factors are considered for specific pools. For example, belowground pools include a factor to account for anaerobic conditions. Similarly, structural carbon pools include a factor to account for the effect of lignin percent on decay rates.
 
 ### Effect of pH
 
@@ -103,8 +123,29 @@ ggplot(df)+
 ```
 
 
-## Decomposition of standing dead wood and litter elements
-TO BE WRITTEN
+## Decomposition process in litter and woody debris
+
+### Leaf and fine root litter
+
+When leaf or fine root litter is produced, the corresponding carbon is divided into structural and metabolic. Metabolic litter is labile material that decomposes quickly, whereas structural material contains cellullose and ligning and decomposes more slowly. The fraction of leaf and fine root litter that is added to the corresponding metabolic pool is determined using:
+
+\begin{equation}
+f_{metabolic} = 0.85 - 0.0013 (\text{lignin/N})
+\end{equation}
+
+A higher lignin/N ratio results in more structural litter, which has a slower decaying rate (by default $k=8\text{y}^{-1}$ and $k=18.5\text{y}^{-1}$ for leaves and fine roots, respectively) compared to metabolic (by default $k=2\text{y}^{-1}$ and $k=4.9\text{y}^{-1}$ for leaves and fine roots, respectively).
+
+### Downed woody debris
+
+Three types of carbon pools are considered for downed woody debris (fig. \@ref(fig:decompositionpools)): **twigs** (diameters lower than 0.635 cm; 1h fuels), **small branches** (diameters between 0.635 cm and 7.5 cm; 10h and 100h fuels; in $g C \cdot m^{-2}$) and **large wood** (diameters larger than 7.5 cm; 1000h and 10000h fuels; in $g C \cdot m^{-2}$). In contrast to litter, there is no separation between structural and metabolic components, since all carbon is considered to be structural.
+
+The rate of decomposition of a downed dead pool $i$ is:
+
+\begin{equation}
+k_{i} = k_{\text{base,}i} \cdot f(T) \cdot f(\theta_{rel}) \cdot \exp(-3 \cdot f_{lig})
+\end{equation}
+
+where $k_{\text{base,}i}$ is the base daily decomposition rate (which is higher for twigs, than small branches, in turn larger than large wood); $f_{lig}$ is the fraction of wood lignin; temperature and moisture factors are the same as for litter.
 
 ### Standing dead wood
 
@@ -130,8 +171,6 @@ where $\theta_{Simard}$ is the equilibrium moisture content (Simard 1968) of woo
 
 where $\rho_{wood}$ is wood density ($g\cdot cm^{-3}$) and $\rho_{ws} = 1.53\,\,g\cdot cm^{-3}$ is the density of the wood substance (a constant). Since $\theta_{Simard}$ ranges between 0% and 30%, whereas $\theta_{max}$ ranges between 45% ($\rho_{wood} = 0.9$) and 135% ($\rho_{wood} = 0.5$), the $\theta_{rel}$ ratio is frequently lower than the same ratio assessed from soil moisture, resulting in slower decomposition rates.
 
-### Litter structural and metabolic pools
-
-## Dynamics of soil carbon pools
+## Decomposition in soil carbon pools
 
 TO BE WRITTEN
