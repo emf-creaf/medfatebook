@@ -19,10 +19,10 @@ Carbon pools and fluxes between them were described in the design section and il
 
 ## Decomposition rates
 
-The base decomposition rates of carbon pools are reduced by multiplicative functions of environmental factors:
+Each carbon pool $i$ has its own base decomposition rate ($k_{\text{base},i}$). The base decomposition rates of a carbon pool $i$ are reduced by multiplicative functions of environmental factors:
 
 \begin{equation}
-k_{i} = k_{\text{base,}i} \cdot f(T) \cdot f(\theta) \cdot f(pH)
+k_{i} = k_{\text{base},i} \cdot f(T) \cdot f(\theta) \cdot f(pH)
 \end{equation}
 
 Where $k_{\text{base,}i}$ is the base daily decomposition rate for pool $i$ which is multiplied by three modifiers: $ƒ(T)$ is the effect of temperature, $f(\theta_{rel})$ is the effect of moisture relative to saturation, and $f(pH)$ is the effect of soil pH. Additional factors are considered for specific pools. For example, belowground pools include a factor to account for anaerobic conditions. Similarly, structural carbon pools include a factor to account for the effect of lignin percent on decay rates.
@@ -123,53 +123,155 @@ ggplot(df)+
 ```
 
 
-## Decomposition process in litter and woody debris
+### Effect of anaerobiosis
+
+Decomposition of belowground pools includes an effect for anaerobic soils, represented by a rate factor $f(O_2)$ that varies between zero and one and that decreases decomposition rates as soil becomes increasingly waterlogged.
+
+## Decomposition process in aboveground/belowground litter, coarse woody debris and standing dead wood
 
 ### Leaf and fine root litter
 
-When leaf or fine root litter is produced, the corresponding carbon is divided into structural and metabolic. Metabolic litter is labile material that decomposes quickly, whereas structural material contains cellullose and ligning and decomposes more slowly. The fraction of leaf and fine root litter that is added to the corresponding metabolic pool is determined using:
+When leaf or fine root litter is produced, the corresponding carbon is divided into structural and metabolic pools. Metabolic litter is labile material that decomposes quickly, whereas structural material contains cellullose and ligning and decomposes more slowly. The fraction of leaf and fine root litter that is added to the corresponding metabolic pool is determined using:
 
 \begin{equation}
 f_{metabolic} = 0.85 - 0.0013 (\text{lignin/N})
 \end{equation}
 
-A higher lignin/N ratio results in more structural litter, which has a slower decaying rate (by default $k=8\text{y}^{-1}$ and $k=18.5\text{y}^{-1}$ for leaves and fine roots, respectively) compared to metabolic (by default $k=2\text{y}^{-1}$ and $k=4.9\text{y}^{-1}$ for leaves and fine roots, respectively).
+A higher lignin/N ratio results in more structural litter, which has a slower decaying rate (by default $k_{\text{base,leaf-struct}}=8\text{y}^{-1}$ and $k_{\text{base,fineroot-struct}}=18.5\text{y}^{-1}$ for leaves and fine roots, respectively) compared to metabolic (by default $k_{\text{base,leaf-metabolic}}=2\text{y}^{-1}$ and $k_{\text{base,fineroot-metabolic}}=4.9\text{y}^{-1}$ for leaves and fine roots, respectively).
+
+There are as many leaf and fine root structural pools as plant species, because decomposition rates depend on lignin content. In contrast, there is only one leaf metabolic pool and one fine root metabolic pool.
+
+#### Leaf structural pools
+
+The rate of decomposition of a leaf structural pool $i$ with leaf lignin content $f_{\text{leaf-lignin},i}$ is:
+
+\begin{equation}
+k_{\text{leaf-struct}, i} = k_{\text{base, leaf-struct}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH) \cdot \exp(-3 \cdot f_{\text{leaf-lignin}, i})
+\end{equation}
+
+The loss of carbon from a leaf structural pool ($\Delta C_{\text{leaf-struct}, i}$) is apportioned between heterotrophic respiration ($HR_{\text{leaf-struct}, i}$) and the carbon flux to the surface active ($f_{\text{leaf-struct}, \text{surface-active},i}$) and surface slow ($f_{\text{leaf-struct}, \text{surface-slow},i}$) pools:
+
+\begin{eqnarray}
+HR_{\text{leaf-struct}, i} &=& \Delta C_{\text{leaf-struct}, i} \cdot (f_{\text{leaf-lignin},i} \cdot 0.30 + (1.0 - f_{\text{leaf-lignin},i}) \cdot 0.45) \\
+f_{\text{leaf-struct}, \text{surface-active},i} &=& \Delta C_{\text{leaf-struct}, i} \cdot  (1.0 - f_{\text{leaf-lignin},i}) \cdot (1 - 0.45) \\
+f_{\text{leaf-struct}, \text{surface-slow},i} &=& \Delta C_{\text{leaf-struct}, i} \cdot  f_{\text{leaf-lignin},i} \cdot (1 - 0.30)
+\end{eqnarray}
+
+#### Leaf metabolic pool
+
+The rate of decomposition of the leaf metabolic pool is:
+
+\begin{equation}
+k_{\text{leaf-metabolic}} = k_{\text{base,leaf-metabolic}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH)
+\end{equation}
+
+The loss of carbon from the leaf (surface) metabolic pool ($\Delta C_{\text{leaf-metabolic}}$) is apportioned between heterotrophic respiration ($HR_{\text{leaf-metabolic}, i}$) and the carbon flux to the surface active ($f_{\text{leaf-metabolic}, \text{surface-act},i}$) pool:
+
+\begin{eqnarray}
+HR_{\text{leaf-metabolic}} &=& \Delta C_{\text{leaf-metabolic}} \cdot 0.55 \\
+f_{\text{leaf-metabolic}, \text{surface-active}} &=& \Delta C_{\text{leaf-metabolic}} \cdot  (1 - 0.55)
+\end{eqnarray}
+
+#### Fine root structural pools
+
+The rate of decomposition of a fine root structural pool $i$ with fine root lignin content $f_{\text{fineroot-lignin},i}$ is:
+
+\begin{equation}
+k_{\text{fineroot-struct}, i} = k_{\text{base, fineroot-struct}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH) \cdot \exp(-3 \cdot f_{\text{fineroot-lignin}, i}) \cdot f(O_2)
+\end{equation}
+
+The loss of carbon from a fine root structural pool ($\Delta C_{\text{fineroot-struct}, i}$) is apportioned between heterotrophic respiration ($HR_{\text{fineroot-struct}, i}$) and the carbon flux to the soil active ($f_{\text{fineroot-struct}, \text{soil-active},i}$) and soil slow ($f_{\text{fineroot-struct}, \text{soil-slow},i}$) pools:
+
+\begin{eqnarray}
+HR_{\text{fineroot-struct}, i} &=& \Delta C_{\text{fineroot-struct}, i} \cdot (f_{\text{fineroot-lignin},i} \cdot 0.30 + (1.0 - f_{\text{leaf-lignin},i}) \cdot 0.55) \\
+f_{\text{fineroot-struct}, \text{soil-active},i} &=& \Delta C_{\text{fineroot-struct}, i} \cdot  (1.0 - f_{\text{fineroot-lignin},i}) \cdot (1 - 0.55) \\
+f_{\text{fineroot-struct}, \text{soil-slow},i} &=& \Delta C_{\text{fineroot-struct}, i} \cdot  f_{\text{fineroot-lignin},i} \cdot (1 - 0.30)
+\end{eqnarray}
+
+#### Fine root metabolic pool
+
+The rate of decomposition of the fine root metabolic pool is:
+
+\begin{equation}
+k_{\text{fineroot-metabolic}} = k_{\text{base,fineroot-metabolic}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH) \cdot f(O_2)
+\end{equation}
+
+The loss of carbon from the fine root (soil) metabolic pool ($\Delta C_{\text{fineroot-metabolic}}$) is apportioned between heterotrophic respiration ($HR_{\text{fineroot-metabolic}, i}$) and the carbon flux to the soil active ($f_{\text{fineroot-metabolic}, \text{soil-active},i}$) pool:
+
+\begin{eqnarray}
+HR_{\text{fineroot-metabolic}} &=& \Delta C_{\text{fineroot-metabolic}} \cdot 0.55 \\
+f_{\text{fineroot-metabolic}, \text{soil-active}} &=& \Delta C_{\text{fineroot-metabolic}} \cdot  (1 - 0.55)
+\end{eqnarray}
+
+### Coarse roots
+
+Coarse root carbon pools (in $g C \cdot m^{-2}$) include belowground woody material of all sizes. The rate of decomposition of a coarse root pool $i$ with lignin content $f_{\text{woody-lignin},i}$ is:
+
+\begin{equation}
+k_{\text{coarseroot},i} = k_{\text{base, coarseroot}} \cdot f(T) \cdot f(\theta_{rel}) \cdot \exp(-3 \cdot f_{\text{woody-lignin},i}) \cdot f(O_2)
+\end{equation}
+
+And the loss of carbon ($\Delta C_{\text{coarseroot}, i}$) is apportioned between heterotrophic respiration ($HR_{\text{coarseroot},i}$) and the carbon flux to the soil active ($f_{\text{coarseroot, soil-active},i}$) and soil slow ($f_{\text{coarseroot, soil-slow}, i}$) pools:
+
+\begin{eqnarray}
+HR_{\text{coarseroot},i} &=& \Delta C_{\text{coarseroot},i} \cdot (f_{\text{woody-lignin},i} \cdot 0.30 + (1.0 - f_{\text{woody-lignin},i}) \cdot 0.45) \\
+f_{\text{coarseroot, soil-active},i} &=& \Delta C_{\text{coarseroot},i} \cdot  (1.0 - f_{\text{woody-lignin},i}) \cdot (1 - 0.45) \\
+f_{\text{coarseroot, soil-slow}, i} &=& \Delta C_{\text{coarseroot},i} \cdot  f_{\text{woody-lignin},i} \cdot (1 - 0.30)
+\end{eqnarray}
 
 ### Downed woody debris
 
 Three types of carbon pools are considered for downed woody debris (fig. \@ref(fig:decompositionpools)): **twigs** (diameters lower than 0.635 cm; 1h fuels), **small branches** (diameters between 0.635 cm and 7.5 cm; 10h and 100h fuels; in $g C \cdot m^{-2}$) and **large wood** (diameters larger than 7.5 cm; 1000h and 10000h fuels; in $g C \cdot m^{-2}$). In contrast to litter, there is no separation between structural and metabolic components, since all carbon is considered to be structural.
 
-The rate of decomposition of a downed dead pool $i$ is:
+The rate of decomposition of a downed dead pool $i$ with lignin content $f_{\text{woody-lignin},i}$ is:
 
 \begin{equation}
-k_{i} = k_{\text{base,}i} \cdot f(T) \cdot f(\theta_{rel}) \cdot \exp(-3 \cdot f_{lig})
+k_{i} = k_{\text{base,downed-woody}} \cdot f(T) \cdot f(\theta_{rel}) \cdot \exp(-3 \cdot f_{\text{woody-lignin},i})
 \end{equation}
 
-where $k_{\text{base,}i}$ is the base daily decomposition rate (which is higher for twigs, than small branches, in turn larger than large wood); $f_{lig}$ is the fraction of wood lignin; temperature and moisture factors are the same as for litter.
+where $k_{\text{base,downed-woody}}$ is the base daily decomposition rate for downed woody elements (which is higher for twigs, than small branches, in turn larger than large wood); temperature and moisture factors are the same as for leaf litter.
+
+
+The loss of carbon from downed coarse wood ($\Delta C_{\text{downed-woody},i}$) is apportioned between heterotrophic respiration ($HR_{\text{downed-woody},i}$) and the carbon flux to the surface active ($f_{\text{downed-woody,surface-active},i}$) and surface slow ($f_{ \text{downed-woody,surface-slow},i}$) pools:
+
+\begin{eqnarray}
+HR_{\text{downed-woody},i} &=& \Delta C_{\text{downed-woody},i} \cdot (f_{\text{woody-lignin},i} \cdot 0.30 + (1.0 - f_{\text{woody-lignin},i}) \cdot 0.45) \\
+f_{\text{downed-woody,surface-active},i} &=& \Delta C_{\text{downed-woody},i} \cdot  (1.0 - f_{\text{woody-lignin},i}) \cdot (1 - 0.45) \\
+f_{ \text{downed-woody,surface-slow},i} &=& \Delta C_{\text{downed-woody},i} \cdot  f_{\text{woody-lignin},i} \cdot (1 - 0.30)
+\end{eqnarray}
 
 ### Standing dead wood
 
 Two types carbon pools are considered for standing dead wood (fig. \@ref(fig:decompositionpools)): **small branches** (diameters between 0.635 cm and 7.5 cm; 10h and 100h fuels; in $g C \cdot m^{-2}$) and **large wood** (diameters larger than 7.5 cm; 1000h and 10000h fuels; in $g C \cdot m^{-2}$).
 
-The rate of decomposition of a standing dead pool $i$ is:
+The rate of decomposition of a standing dead pool $i$ with lignin content $f_{\text{woody-lignin},i}$ is:
 
 \begin{equation}
-k_{i} = k_{\text{base,}i} \cdot f(T) \cdot f(\theta_{rel}) \cdot \exp(-3 \cdot f_{lig})
+k_{\text{standing-woody},i} = k_{\text{standing-woody,base}} \cdot f(T) \cdot f(\theta_{rel}) \cdot \exp(-3 \cdot f_{\text{woody-lignin},i})
 \end{equation}
 
-where $k_{\text{base,}i}$ is the base daily decomposition rate (which is higher for small branches than large wood); $f_{lig}$ is the fraction of wood lignin; and atmosphere (or canopy in the case of advanced simulations) air temperature is used for temperature effects  (i.e. $T = T_{air}$ or $T = T_{can}$). Moisture relative to saturation ($\theta_{rel}$) is estimated as the ratio of actual fuel moisture to its maximum value (both with units of percent of water mass to dry mass):
+where $k_{\text{standing-woody,base}}$ is the base daily decomposition rate for standing woody elements (which is higher for small branches than large wood); and atmosphere (or canopy in the case of advanced simulations) air temperature is used for temperature effects  (i.e. $T = T_{air}$ or $T = T_{can}$). Moisture relative to saturation ($\theta_{rel}$) is estimated as the ratio of actual fuel moisture to its maximum value (both with units of percent of water mass to dry mass):
 
 \begin{equation}
-\theta_{rel} = \theta_{Simard}(T_{air}, RH_{air})/\theta_{max}
+\theta_{rel} = \theta_{simard}(T_{air}, RH_{air})/\theta_{max}
 \end{equation}
 
-where $\theta_{Simard}$ is the equilibrium moisture content (Simard 1968) of wood, according to an empirical relationship with air temperature and air relative humidity [@viney_review_1991] and $\theta_{max}$ is the maximum fuel moisture content, which depends on wood density (assuming the density of water as $1\,\, g\cdot cm^{-3}$):
+where $\theta_{simard}$ is the equilibrium moisture content (Simard 1968) of wood, according to an empirical relationship with air temperature and air relative humidity [@viney_review_1991] and $\theta_{max}$ is the maximum fuel moisture content, which depends on wood density (assuming the density of water as $1\,\, g\cdot cm^{-3}$):
 
 \begin{equation}
 \theta_{max} = 100 \cdot \left(\frac{1}{\rho_{wood}} - \frac{1}{\rho_{ws}} \right)
 \end{equation}
 
 where $\rho_{wood}$ is wood density ($g\cdot cm^{-3}$) and $\rho_{ws} = 1.53\,\,g\cdot cm^{-3}$ is the density of the wood substance (a constant). Since $\theta_{Simard}$ ranges between 0% and 30%, whereas $\theta_{max}$ ranges between 45% ($\rho_{wood} = 0.9$) and 135% ($\rho_{wood} = 0.5$), the $\theta_{rel}$ ratio is frequently lower than the same ratio assessed from soil moisture, resulting in slower decomposition rates.
+
+Similarly to the downed dead wood, the loss of carbon from standing dead pools ($\Delta C_{\text{standing-woody},i}$) is apportioned between heterotrophic respiration ($HR_{\text{standing-woody},i}$) and the carbon flux to the surface active ($f_{\text{standing-woody,surface-active},i}$) and surface slow ($f_{\text{standing-woody,surface-slow},i}$) pools:
+
+\begin{eqnarray}
+HR_{\text{standing-woody},i} &=& \Delta C_{\text{standing-woody},i} \cdot (f_{\text{woody-lignin},i} \cdot 0.30 + (1.0 - f_{\text{woody-lignin},i}) \cdot 0.45) \\
+f_{\text{standing-woody,surface-active},i} &=& \Delta C_{\text{standing-woody},i} \cdot  (1.0 - f_{\text{woody-lignin},i}) \cdot (1 - 0.45) \\
+f_{\text{standing-woody,surface-slow},i} &=& \Delta C_{\text{standing-woody},i} \cdot  f_{\text{woody-lignin},i} \cdot (1 - 0.30)
+\end{eqnarray}
+
 
 ## Decomposition in soil carbon pools
 
