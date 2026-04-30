@@ -771,6 +771,11 @@ div.csl-indent {
 <h2><span class="header-section-number">18.1</span> Carbon pools, losses and fluxes<a href="decomposition.html#carbon-pools-losses-and-fluxes" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Carbon pools and fluxes between them were described in the design section and illustrated in fig. <a href="growthmodelling.html#fig:decompositionpools">15.4</a>. The following table provides the terminologic mapping between carbon pools in MEDFATE, which follows Bonan et al. <span class="citation">(<a href="#ref-bonan_climate_2019">2019</a>)</span>, and the corresponding pools in CENTURY:</p>
 <table>
+<colgroup>
+<col width="37%" />
+<col width="40%" />
+<col width="21%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>MEDFATE (Bonan et al.)</th>
@@ -780,46 +785,51 @@ div.csl-indent {
 </thead>
 <tbody>
 <tr class="odd">
-<td>Surface structural</td>
+<td>Standing structural (small branches, large wood)</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Surface structural (leaves, twigs, small branches, large wood)</td>
 <td>Surface structural</td>
 <td><code>strucc(1)</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Metabolic surface</td>
 <td>Surface metabolic</td>
 <td><code>metabc(1)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Active surface</td>
 <td>Surface microbe</td>
 <td><code>som1c(1)</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Slow surface</td>
 <td></td>
 <td><code>som2c(1)</code></td>
 </tr>
-<tr class="odd">
-<td>Belowground structural</td>
+<tr class="even">
+<td>Belowground structural (fine roots, coarse roots)</td>
 <td>Belowground structural</td>
 <td><code>strucc(2)</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Metabolic belowground</td>
 <td>Belowground metabolic</td>
 <td><code>metabc(2)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Active belowground</td>
 <td>Active organic</td>
 <td><code>som1c(2)</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Slow belowground</td>
 <td>Slow organic</td>
 <td><code>som2c(2)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Passive belowground</td>
 <td>Passive</td>
 <td><code>som3c</code></td>
@@ -1105,11 +1115,11 @@ F_{\text{surface-active}, \text{surface-slow}} &amp;=&amp; \Delta C_{\text{surfa
 k_{\text{surface-slow}} = (k_{\text{base,surface-slow}} \cdot f(pH) + k_{\text{mixing}}) \cdot f(T) \cdot f(\theta_{rel})
 \end{equation}\]</span></p>
 <p>where <span class="math inline">\(k_{\text{mixing}}\)</span> is the rate of carbon flux from slow surface to slow belowground due to mixing.
-The loss of carbon from the surface slow pool (<span class="math inline">\(\Delta C_{\text{surface-slow}}\)</span>) is apportioned between heterotrophic respiration (<span class="math inline">\(HR_{\text{surface-slow}}\)</span>), the carbon flux to back to the surface active pool (<span class="math inline">\(F_{\text{surface-slow}, \text{surface-active}}\)</span>) and the carbon flux to the belowground slow pool (<span class="math inline">\(F_{\text{surface-slow}, \text{soil-slow}}\)</span>):</p>
+The loss of carbon from the surface slow pool (<span class="math inline">\(\Delta C_{\text{surface-slow}}\)</span>) is apportioned between heterotrophic respiration (<span class="math inline">\(HR_{\text{surface-slow}}\)</span>), the carbon flux to back to the surface active pool (<span class="math inline">\(F_{\text{surface-slow}, \text{surface-active}}\)</span>) and the carbon flux to the belowground slow pool (<span class="math inline">\(F_{\text{surface-slow}, \text{belowground-slow}}\)</span>):</p>
 <p><span class="math display">\[\begin{eqnarray}
 HR_{\text{surface-slow}} &amp;=&amp; \Delta C_{\text{surface-slow}} \cdot (1 - k_{mix,frac}) \cdot 0.55 \\
 F_{\text{surface-slow}, \text{surface-active}} &amp;=&amp; \Delta C_{\text{surface-slow}} \cdot  (1 - k_{mix,frac}) \cdot (1 - 0.55) \\
-F_{\text{surface-slow}, \text{soil-slow}} &amp;=&amp; \Delta C_{\text{surface-slow}} \cdot  k_{mix,frac}
+F_{\text{surface-slow}, \text{belowground-slow}} &amp;=&amp; \Delta C_{\text{surface-slow}} \cdot  k_{mix,frac}
 \end{eqnarray}\]</span></p>
 <p>where <span class="math inline">\(k_{mix,frac} = k_{\text{mixing}}/(k_{\text{base,surface-slow}} \cdot f(pH) + k_{\text{mixing}})\)</span>.</p>
 </div>
@@ -1123,10 +1133,10 @@ k_{\text{belowground-active}} = k_{\text{base,belowground-active}} \cdot f(T) \c
 <p>The loss of carbon from the belowground active pool (<span class="math inline">\(\Delta C_{\text{belowground-active}}\)</span>) is apportioned between heterotrophic respiration (<span class="math inline">\(HR_{\text{belowground-active}}\)</span>), the carbon flux to the belowground slow pool (<span class="math inline">\(F_{\text{belowground-active}, \text{belowground-slow}}\)</span>) and the carbon flux to the belowground passive pool (<span class="math inline">\(F_{\text{belowground-active}, \text{belowground-passive}}\)</span>), as a function of <span class="math inline">\(P_{clay}\)</span>:</p>
 <p><span class="math display">\[\begin{eqnarray}
 HR_{\text{belowground-active}} &amp;=&amp; \Delta C_{\text{belowground-active}} \cdot (0.17 + 0.68 \cdot P_{clay}) \\
-F_{\text{belowground-active}, \text{belowground-passive}} &amp;=&amp; \Delta C_{\text{belowground-active}} \cdot (0.003 + 0.032 \cdot P_{clay}) \cdot f(O_2) \\
+F_{\text{belowground-active}, \text{belowground-passive}} &amp;=&amp; \Delta C_{\text{belowground-active}} \cdot (0.003 + 0.032 \cdot P_{clay}) \cdot f_{anaer} \\
 F_{\text{belowground-active}, \text{belowground-slow}} &amp;=&amp; \Delta C_{\text{belowground-active}} - HR_{\text{belowground-active}} - F_{\text{belowground-active}, \text{belowground-passive}}
 \end{eqnarray}\]</span></p>
-<p>Thus, the decomposition rate of the belowground active pool increases and the respiration fraction of carbon losses also increases along with the sand fraction.</p>
+<p>where <span class="math inline">\(f_anaer = (1 + 5 \cdot (1 - f(O_2)))\)</span>. Thus, the decomposition rate of the belowground active pool increases and the respiration fraction of carbon losses also increases along with the sand fraction.</p>
 </div>
 <div id="slow-belowground-pool" class="section level3 hasAnchor" number="18.4.4">
 <h3><span class="header-section-number">18.4.4</span> Slow belowground pool<a href="decomposition.html#slow-belowground-pool" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -1134,6 +1144,13 @@ F_{\text{belowground-active}, \text{belowground-slow}} &amp;=&amp; \Delta C_{\te
 <p><span class="math display">\[\begin{equation}
 k_{\text{belowground-slow}} = k_{\text{base,belowground-slow}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH) \cdot f(O_2)
 \end{equation}\]</span></p>
+<p>The loss of carbon from the belowground slow pool (<span class="math inline">\(\Delta C_{\text{belowground-slow}}\)</span>) is apportioned between heterotrophic respiration (<span class="math inline">\(HR_{\text{belowground-slow}}\)</span>), the carbon flux to back to the belowground active pool (<span class="math inline">\(F_{\text{belowground-slow}, \text{belowground-active}}\)</span>) and the carbon flux to the belowground passive pool (<span class="math inline">\(F_{\text{belowground-slow}, \text{belowground-passive}}\)</span>):</p>
+<p><span class="math display">\[\begin{eqnarray}
+HR_{\text{belowground-slow}} &amp;=&amp; \Delta C_{\text{belowground-slow}} \cdot 0.55 \\
+F_{\text{belowground-slow}, \text{belowground-active}} &amp;=&amp; \Delta C_{\text{belowground-slow}} \cdot  (1 - (0.003 + 0.009 \cdot P_{clay}) \cdot f_{anaer} - 0.55) \\
+F_{\text{belowground-slow}, \text{belowground-passive}} &amp;=&amp; \Delta C_{\text{belowground-slow}} \cdot (0.003 + 0.009 \cdot P_{clay}) \cdot f_{anaer}
+\end{eqnarray}\]</span></p>
+<p>where <span class="math inline">\(f_{anaer} = (1 + 5 \cdot (1 - f(O_2)))\)</span>.</p>
 </div>
 <div id="passive-belowground-pool" class="section level3 hasAnchor" number="18.4.5">
 <h3><span class="header-section-number">18.4.5</span> Passive belowground pool<a href="decomposition.html#passive-belowground-pool" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -1141,6 +1158,11 @@ k_{\text{belowground-slow}} = k_{\text{base,belowground-slow}} \cdot f(T) \cdot 
 <p><span class="math display">\[\begin{equation}
 k_{\text{belowground-passive}} = k_{\text{base,belowground-passive}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH) \cdot f(O_2)
 \end{equation}\]</span></p>
+<p>The loss of carbon from the passive slow pool (<span class="math inline">\(\Delta C_{\text{belowground-passive}}\)</span>) is apportioned between heterotrophic respiration (<span class="math inline">\(HR_{\text{belowground-passive}}\)</span>), the carbon flux to back to the belowground active pool (<span class="math inline">\(F_{\text{belowground-passive}, \text{belowground-active}}\)</span>):</p>
+<p><span class="math display">\[\begin{eqnarray}
+HR_{\text{belowground-passive}} &amp;=&amp; \Delta C_{\text{belowground-passive}} \cdot 0.55 \cdot f(O_2) \\
+F_{\text{belowground-passive}, \text{belowground-active}} &amp;=&amp; \Delta C_{\text{belowground-passive}} \cdot  (1 - 0.55 \cdot f(O_2))
+\end{eqnarray}\]</span></p>
 
 </div>
 </div>
