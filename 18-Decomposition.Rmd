@@ -1,6 +1,6 @@
 # Decomposition and soil biogeochemistry {#decomposition}
 
-## Carbon pools
+## Carbon pools, losses and fluxes
 
 Carbon pools and fluxes between them were described in the design section and illustrated in fig. \@ref(fig:decompositionpools). The following table provides the terminologic mapping between carbon pools in MEDFATE, which follows Bonan et al. -@bonan_climate_2019, and the corresponding pools in CENTURY:
 
@@ -11,11 +11,17 @@ Carbon pools and fluxes between them were described in the design section and il
 | Active surface	   | Surface microbe	 | `som1c(1)`  |
 | Slow surface	| | 	`som2c(1)` |
 | Belowground structural |	Belowground structural |	`strucc(2)` |
-| Metabolic soil |	Belowground metabolic	| `metabc(2)` |
-| Active soil	| Active organic | `som1c(2)` |
-| Slow soil	| Slow organic | `som2c(2)` |
-| Passive soil	| Passive	| `som3c` |
+| Metabolic belowground |	Belowground metabolic	| `metabc(2)` |
+| Active belowground	| Active organic | `som1c(2)` |
+| Slow belowground	| Slow organic | `som2c(2)` |
+| Passive belowground	| Passive	| `som3c` |
 
+Each (daily) time step a decomposition rate $k_{i}$ is estimated for each carbon pool $i$. This decomposition rate leads to an amount of carbon ($\Delta C_{i}$) being loss from the carbon pool:
+\begin{equation}
+\Delta C_{i} = k_{i} \cdot \Delta t
+\end{equation}
+
+The carbon lost can exit the carbon pool as heterotrophic respiration ($HR_{i}$) or it can lead to a carbon flux to another carbon pool $j$, e.g. $F_{i,j}$. The dynamics of the whole set of pools can solved using matrix algebra. The following sections detail how decomposition rates are estimated as well as the estimation of respiration and fluxes between carbon pools.
 
 ## Decomposition rates
 
@@ -131,15 +137,15 @@ Decomposition of belowground pools includes an effect for anaerobic soils, repre
 
 ### Leaf and fine root litter
 
-When leaf or fine root litter is produced, the corresponding carbon is divided into structural and metabolic pools. Metabolic litter is labile material that decomposes quickly, whereas structural material contains cellullose and ligning and decomposes more slowly. The fraction of leaf and fine root litter that is added to the corresponding metabolic pool is determined using:
+When leaf or fine root litter is produced, the corresponding carbon is divided into structural and metabolic pools (fig. \@ref(fig:decompositionpools)). Metabolic litter is labile material that decomposes quickly, whereas structural material contains cellullose and ligning and decomposes more slowly. The fraction of leaf and fine root litter that is added to the corresponding surface or belowground metabolic pool is determined using:
 
 \begin{equation}
-f_{metabolic} = 0.85 - 0.0013 (\text{lignin/N})
+f_{\text{metabolic}} = 0.85 - 0.0013 (\text{lignin/N})
 \end{equation}
 
-A higher lignin/N ratio results in more structural litter, which has a slower decaying rate (by default $k_{\text{base,leaf-struct}}=8\text{y}^{-1}$ and $k_{\text{base,fineroot-struct}}=18.5\text{y}^{-1}$ for leaves and fine roots, respectively) compared to metabolic (by default $k_{\text{base,leaf-metabolic}}=2\text{y}^{-1}$ and $k_{\text{base,fineroot-metabolic}}=4.9\text{y}^{-1}$ for leaves and fine roots, respectively).
+A higher lignin/N ratio thus results in more structural litter. In turn, structural litter pools have a slower decaying rate (by default $k_{\text{base,leaf-struct}}=2\text{y}^{-1}$ and $k_{\text{base,fineroot-struct}}=4.9\text{y}^{-1}$ for leaves and fine roots, respectively) compared to their corresponding metabolic pools (by default $k_{\text{base,surface-metabolic}}=8\text{y}^{-1}$ and $k_{\text{base,belowground-metabolic}}=18.5\text{y}^{-1}$ for surface and belowground pools, respectively).
 
-There are as many leaf and fine root structural pools as plant species, because decomposition rates depend on lignin content. In contrast, there is only one leaf metabolic pool and one fine root metabolic pool.
+There are as many leaf and fine root structural pools as plant species, because decomposition rates depend on lignin content. In contrast, there is only one surface metabolic pool and one belowground metabolic pool.
 
 #### Leaf structural pools
 
@@ -149,27 +155,27 @@ The rate of decomposition of a leaf structural pool $i$ with leaf lignin content
 k_{\text{leaf-struct}, i} = k_{\text{base, leaf-struct}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH) \cdot \exp(-3 \cdot f_{\text{leaf-lignin}, i})
 \end{equation}
 
-The loss of carbon from a leaf structural pool ($\Delta C_{\text{leaf-struct}, i}$) is apportioned between heterotrophic respiration ($HR_{\text{leaf-struct}, i}$) and the carbon flux to the surface active ($f_{\text{leaf-struct}, \text{surface-active},i}$) and surface slow ($f_{\text{leaf-struct}, \text{surface-slow},i}$) pools:
+The loss of carbon from a leaf structural pool ($\Delta C_{\text{leaf-struct}, i}$) is apportioned between heterotrophic respiration ($HR_{\text{leaf-struct}, i}$) and the carbon flux to the surface active ($F_{\text{leaf-struct}, \text{surface-active},i}$) and surface slow ($F_{\text{leaf-struct}, \text{surface-slow},i}$) pools:
 
 \begin{eqnarray}
 HR_{\text{leaf-struct}, i} &=& \Delta C_{\text{leaf-struct}, i} \cdot (f_{\text{leaf-lignin},i} \cdot 0.30 + (1.0 - f_{\text{leaf-lignin},i}) \cdot 0.45) \\
-f_{\text{leaf-struct}, \text{surface-active},i} &=& \Delta C_{\text{leaf-struct}, i} \cdot  (1.0 - f_{\text{leaf-lignin},i}) \cdot (1 - 0.45) \\
-f_{\text{leaf-struct}, \text{surface-slow},i} &=& \Delta C_{\text{leaf-struct}, i} \cdot  f_{\text{leaf-lignin},i} \cdot (1 - 0.30)
+F_{\text{leaf-struct}, \text{surface-active},i} &=& \Delta C_{\text{leaf-struct}, i} \cdot  (1.0 - f_{\text{leaf-lignin},i}) \cdot (1 - 0.45) \\
+F_{\text{leaf-struct}, \text{surface-slow},i} &=& \Delta C_{\text{leaf-struct}, i} \cdot  f_{\text{leaf-lignin},i} \cdot (1 - 0.30)
 \end{eqnarray}
 
-#### Leaf metabolic pool
+#### Surface metabolic pool
 
-The rate of decomposition of the leaf metabolic pool is:
+The rate of decomposition of the surface metabolic pool is:
 
 \begin{equation}
-k_{\text{leaf-metabolic}} = k_{\text{base,leaf-metabolic}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH)
+k_{\text{surface-metabolic}} = k_{\text{base,surface-metabolic}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH)
 \end{equation}
 
-The loss of carbon from the leaf (surface) metabolic pool ($\Delta C_{\text{leaf-metabolic}}$) is apportioned between heterotrophic respiration ($HR_{\text{leaf-metabolic}, i}$) and the carbon flux to the surface active ($f_{\text{leaf-metabolic}, \text{surface-act},i}$) pool:
+The loss of carbon from the surface metabolic pool ($\Delta C_{\text{surface-metabolic}}$) is apportioned between heterotrophic respiration ($HR_{\text{surface-metabolic}}$) and the carbon flux to the surface active ($F_{\text{surface-metabolic}, \text{surface-active}}$) pool:
 
 \begin{eqnarray}
-HR_{\text{leaf-metabolic}} &=& \Delta C_{\text{leaf-metabolic}} \cdot 0.55 \\
-f_{\text{leaf-metabolic}, \text{surface-active}} &=& \Delta C_{\text{leaf-metabolic}} \cdot  (1 - 0.55)
+HR_{\text{surface-metabolic}} &=& \Delta C_{\text{surface-metabolic}} \cdot 0.55 \\
+F_{\text{surface-metabolic}, \text{surface-active}} &=& \Delta C_{\text{surface-metabolic}} \cdot  (1 - 0.55)
 \end{eqnarray}
 
 #### Fine root structural pools
@@ -180,27 +186,27 @@ The rate of decomposition of a fine root structural pool $i$ with fine root lign
 k_{\text{fineroot-struct}, i} = k_{\text{base, fineroot-struct}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH) \cdot \exp(-3 \cdot f_{\text{fineroot-lignin}, i}) \cdot f(O_2)
 \end{equation}
 
-The loss of carbon from a fine root structural pool ($\Delta C_{\text{fineroot-struct}, i}$) is apportioned between heterotrophic respiration ($HR_{\text{fineroot-struct}, i}$) and the carbon flux to the soil active ($f_{\text{fineroot-struct}, \text{soil-active},i}$) and soil slow ($f_{\text{fineroot-struct}, \text{soil-slow},i}$) pools:
+The loss of carbon from a fine root structural pool ($\Delta C_{\text{fineroot-struct}, i}$) is apportioned between heterotrophic respiration ($HR_{\text{fineroot-struct}, i}$) and the carbon flux to the belowground active ($F_{\text{fineroot-struct}, \text{belowground-active},i}$) and belowground slow ($F_{\text{fineroot-struct}, \text{belowground-slow},i}$) pools:
 
 \begin{eqnarray}
 HR_{\text{fineroot-struct}, i} &=& \Delta C_{\text{fineroot-struct}, i} \cdot (f_{\text{fineroot-lignin},i} \cdot 0.30 + (1.0 - f_{\text{leaf-lignin},i}) \cdot 0.55) \\
-f_{\text{fineroot-struct}, \text{soil-active},i} &=& \Delta C_{\text{fineroot-struct}, i} \cdot  (1.0 - f_{\text{fineroot-lignin},i}) \cdot (1 - 0.55) \\
-f_{\text{fineroot-struct}, \text{soil-slow},i} &=& \Delta C_{\text{fineroot-struct}, i} \cdot  f_{\text{fineroot-lignin},i} \cdot (1 - 0.30)
+F_{\text{fineroot-struct}, \text{belowground-active},i} &=& \Delta C_{\text{fineroot-struct}, i} \cdot  (1.0 - f_{\text{fineroot-lignin},i}) \cdot (1 - 0.55) \\
+F_{\text{fineroot-struct}, \text{belowground-slow},i} &=& \Delta C_{\text{fineroot-struct}, i} \cdot  f_{\text{fineroot-lignin},i} \cdot (1 - 0.30)
 \end{eqnarray}
 
-#### Fine root metabolic pool
+#### Belowground metabolic pool
 
-The rate of decomposition of the fine root metabolic pool is:
+The rate of decomposition of the belowground metabolic pool is:
 
 \begin{equation}
-k_{\text{fineroot-metabolic}} = k_{\text{base,fineroot-metabolic}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH) \cdot f(O_2)
+k_{\text{belowground-metabolic}} = k_{\text{base,belowground-metabolic}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH) \cdot f(O_2)
 \end{equation}
 
-The loss of carbon from the fine root (soil) metabolic pool ($\Delta C_{\text{fineroot-metabolic}}$) is apportioned between heterotrophic respiration ($HR_{\text{fineroot-metabolic}, i}$) and the carbon flux to the soil active ($f_{\text{fineroot-metabolic}, \text{soil-active},i}$) pool:
+The loss of carbon from the belowground metabolic pool ($\Delta C_{\text{belowground-metabolic}}$) is apportioned between heterotrophic respiration ($HR_{\text{belowground-metabolic}}$) and the carbon flux to the belowground active ($F_{\text{belowground-metabolic}, \text{belowground-active}}$) pool:
 
 \begin{eqnarray}
-HR_{\text{fineroot-metabolic}} &=& \Delta C_{\text{fineroot-metabolic}} \cdot 0.55 \\
-f_{\text{fineroot-metabolic}, \text{soil-active}} &=& \Delta C_{\text{fineroot-metabolic}} \cdot  (1 - 0.55)
+HR_{\text{belowground-metabolic}} &=& \Delta C_{\text{belowground-metabolic}} \cdot 0.55 \\
+F_{\text{belowground-metabolic}, \text{belowground-active}} &=& \Delta C_{\text{belowground-metabolic}} \cdot  (1 - 0.55)
 \end{eqnarray}
 
 ### Coarse roots
@@ -211,12 +217,12 @@ Coarse root carbon pools (in $g C \cdot m^{-2}$) include belowground woody mater
 k_{\text{coarseroot},i} = k_{\text{base, coarseroot}} \cdot f(T) \cdot f(\theta_{rel}) \cdot \exp(-3 \cdot f_{\text{woody-lignin},i}) \cdot f(O_2)
 \end{equation}
 
-And the loss of carbon ($\Delta C_{\text{coarseroot}, i}$) is apportioned between heterotrophic respiration ($HR_{\text{coarseroot},i}$) and the carbon flux to the soil active ($f_{\text{coarseroot, soil-active},i}$) and soil slow ($f_{\text{coarseroot, soil-slow}, i}$) pools:
+And the loss of carbon ($\Delta C_{\text{coarseroot}, i}$) is apportioned between heterotrophic respiration ($HR_{\text{coarseroot},i}$) and the carbon flux to the belowground active ($F_{\text{coarseroot, belowground-active},i}$) and belowground slow ($F_{\text{coarseroot, belowground-slow}, i}$) pools:
 
 \begin{eqnarray}
 HR_{\text{coarseroot},i} &=& \Delta C_{\text{coarseroot},i} \cdot (f_{\text{woody-lignin},i} \cdot 0.30 + (1.0 - f_{\text{woody-lignin},i}) \cdot 0.45) \\
-f_{\text{coarseroot, soil-active},i} &=& \Delta C_{\text{coarseroot},i} \cdot  (1.0 - f_{\text{woody-lignin},i}) \cdot (1 - 0.45) \\
-f_{\text{coarseroot, soil-slow}, i} &=& \Delta C_{\text{coarseroot},i} \cdot  f_{\text{woody-lignin},i} \cdot (1 - 0.30)
+F_{\text{coarseroot, belowground-active},i} &=& \Delta C_{\text{coarseroot},i} \cdot  (1.0 - f_{\text{woody-lignin},i}) \cdot (1 - 0.45) \\
+F_{\text{coarseroot, belowground-slow}, i} &=& \Delta C_{\text{coarseroot},i} \cdot  f_{\text{woody-lignin},i} \cdot (1 - 0.30)
 \end{eqnarray}
 
 ### Downed woody debris
@@ -232,12 +238,12 @@ k_{i} = k_{\text{base,downed-woody}} \cdot f(T) \cdot f(\theta_{rel}) \cdot \exp
 where $k_{\text{base,downed-woody}}$ is the base daily decomposition rate for downed woody elements (which is higher for twigs, than small branches, in turn larger than large wood); temperature and moisture factors are the same as for leaf litter.
 
 
-The loss of carbon from downed coarse wood ($\Delta C_{\text{downed-woody},i}$) is apportioned between heterotrophic respiration ($HR_{\text{downed-woody},i}$) and the carbon flux to the surface active ($f_{\text{downed-woody,surface-active},i}$) and surface slow ($f_{ \text{downed-woody,surface-slow},i}$) pools:
+The loss of carbon from downed coarse wood ($\Delta C_{\text{downed-woody},i}$) is apportioned between heterotrophic respiration ($HR_{\text{downed-woody},i}$) and the carbon flux to the surface active ($F_{\text{downed-woody,surface-active},i}$) and surface slow ($F_{ \text{downed-woody,surface-slow},i}$) pools:
 
 \begin{eqnarray}
 HR_{\text{downed-woody},i} &=& \Delta C_{\text{downed-woody},i} \cdot (f_{\text{woody-lignin},i} \cdot 0.30 + (1.0 - f_{\text{woody-lignin},i}) \cdot 0.45) \\
-f_{\text{downed-woody,surface-active},i} &=& \Delta C_{\text{downed-woody},i} \cdot  (1.0 - f_{\text{woody-lignin},i}) \cdot (1 - 0.45) \\
-f_{ \text{downed-woody,surface-slow},i} &=& \Delta C_{\text{downed-woody},i} \cdot  f_{\text{woody-lignin},i} \cdot (1 - 0.30)
+F_{\text{downed-woody,surface-active},i} &=& \Delta C_{\text{downed-woody},i} \cdot  (1.0 - f_{\text{woody-lignin},i}) \cdot (1 - 0.45) \\
+F_{ \text{downed-woody,surface-slow},i} &=& \Delta C_{\text{downed-woody},i} \cdot  f_{\text{woody-lignin},i} \cdot (1 - 0.30)
 \end{eqnarray}
 
 ### Standing dead wood
@@ -264,15 +270,89 @@ where $\theta_{simard}$ is the equilibrium moisture content (Simard 1968) of woo
 
 where $\rho_{wood}$ is wood density ($g\cdot cm^{-3}$) and $\rho_{ws} = 1.53\,\,g\cdot cm^{-3}$ is the density of the wood substance (a constant). Since $\theta_{Simard}$ ranges between 0% and 30%, whereas $\theta_{max}$ ranges between 45% ($\rho_{wood} = 0.9$) and 135% ($\rho_{wood} = 0.5$), the $\theta_{rel}$ ratio is frequently lower than the same ratio assessed from soil moisture, resulting in slower decomposition rates.
 
-Similarly to the downed dead wood, the loss of carbon from standing dead pools ($\Delta C_{\text{standing-woody},i}$) is apportioned between heterotrophic respiration ($HR_{\text{standing-woody},i}$) and the carbon flux to the surface active ($f_{\text{standing-woody,surface-active},i}$) and surface slow ($f_{\text{standing-woody,surface-slow},i}$) pools:
+Similarly to the downed dead wood, the loss of carbon from standing dead pools ($\Delta C_{\text{standing-woody},i}$) is apportioned between heterotrophic respiration ($HR_{\text{standing-woody},i}$) and the carbon flux to the surface active ($F_{\text{standing-woody,surface-active},i}$) and surface slow ($F_{\text{standing-woody,surface-slow},i}$) pools:
 
 \begin{eqnarray}
 HR_{\text{standing-woody},i} &=& \Delta C_{\text{standing-woody},i} \cdot (f_{\text{woody-lignin},i} \cdot 0.30 + (1.0 - f_{\text{woody-lignin},i}) \cdot 0.45) \\
-f_{\text{standing-woody,surface-active},i} &=& \Delta C_{\text{standing-woody},i} \cdot  (1.0 - f_{\text{woody-lignin},i}) \cdot (1 - 0.45) \\
-f_{\text{standing-woody,surface-slow},i} &=& \Delta C_{\text{standing-woody},i} \cdot  f_{\text{woody-lignin},i} \cdot (1 - 0.30)
+F_{\text{standing-woody,surface-active},i} &=& \Delta C_{\text{standing-woody},i} \cdot  (1.0 - f_{\text{woody-lignin},i}) \cdot (1 - 0.45) \\
+F_{\text{standing-woody,surface-slow},i} &=& \Delta C_{\text{standing-woody},i} \cdot  f_{\text{woody-lignin},i} \cdot (1 - 0.30)
 \end{eqnarray}
 
 
-## Decomposition in soil carbon pools
+## Decomposition in soil organic carbon pools
 
-TO BE WRITTEN
+Soil organic matter is represented by pools of active, slow and passive carbon that represent material with increasingly longer turnover time. These pools have a surface and belowground component, except for the passive pool, which occurs belowground only (fig. \@ref(fig:decompositionpools)). The active pools represent live soil microbes and microbial products and decomposes rapidly. The slow pool includes decay-resistant plant material from the lignin portion of structural litter and soil-stabilized material from the active pool. Carbon fluxes exist between the active and slow pools of the surface and belowground layers, as well as between the active and passive belowground pools. In addition, a carbon flux connection between surface and belowground is included via physical mixing between slow pools. The following details the carbon losses, heterotrophic respiration and fluxes for and between pools.
+
+### Active surface pool
+
+The rate of decomposition of the active surface pool is:
+
+\begin{equation}
+k_{\text{surface-active}} = k_{\text{base,surface-active}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH)
+\end{equation}
+
+The loss of carbon from the surface active pool ($\Delta C_{\text{surface-active}}$) is apportioned between heterotrophic respiration ($HR_{\text{surface-active}}$) and the carbon flux to the surface slow pool ($F_{\text{surface-active}, \text{surface-slow}}$):
+
+\begin{eqnarray}
+HR_{\text{surface-active}} &=& \Delta C_{\text{surface-active}} \cdot 0.60 \\
+F_{\text{surface-active}, \text{surface-slow}} &=& \Delta C_{\text{surface-active}} \cdot  (1 - 0.60)
+\end{eqnarray}
+
+
+### Slow surface pool
+
+
+The rate of decomposition of the slow surface pool is:
+
+\begin{equation}
+k_{\text{surface-slow}} = (k_{\text{base,surface-slow}} \cdot f(pH) + k_{\text{mixing}}) \cdot f(T) \cdot f(\theta_{rel})
+\end{equation}
+
+where $k_{\text{mixing}}$ is the rate of carbon flux from slow surface to slow belowground due to mixing. 
+The loss of carbon from the surface slow pool ($\Delta C_{\text{surface-slow}}$) is apportioned between heterotrophic respiration ($HR_{\text{surface-slow}}$), the carbon flux to back to the surface active pool ($F_{\text{surface-slow}, \text{surface-active}}$) and the carbon flux to the belowground slow pool ($F_{\text{surface-slow}, \text{soil-slow}}$):
+
+\begin{eqnarray}
+HR_{\text{surface-slow}} &=& \Delta C_{\text{surface-slow}} \cdot (1 - k_{mix,frac}) \cdot 0.55 \\
+F_{\text{surface-slow}, \text{surface-active}} &=& \Delta C_{\text{surface-slow}} \cdot  (1 - k_{mix,frac}) \cdot (1 - 0.55) \\
+F_{\text{surface-slow}, \text{soil-slow}} &=& \Delta C_{\text{surface-slow}} \cdot  k_{mix,frac}
+\end{eqnarray}
+
+where $k_{mix,frac} = k_{\text{mixing}}/(k_{\text{base,surface-slow}} \cdot f(pH) + k_{\text{mixing}})$.
+
+
+### Active belowground pool
+
+ The rate of decomposition of the active belowground pool is:
+
+\begin{equation}
+k_{\text{belowground-active}} = k_{\text{base,belowground-active}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH) \cdot f_{texture} \cdot f(O_2)
+\end{equation}
+
+where $f_{texture} = 0.25 + 0.75 \cdot P_{sand}$ and $P_{sand}$ is the proportion of sand. 
+
+The loss of carbon from the belowground active pool ($\Delta C_{\text{belowground-active}}$) is apportioned between heterotrophic respiration ($HR_{\text{belowground-active}}$), the carbon flux to the belowground slow pool ($F_{\text{belowground-active}, \text{belowground-slow}}$) and the carbon flux to the belowground passive pool ($F_{\text{belowground-active}, \text{belowground-passive}}$), as a function of $P_{clay}$:
+
+\begin{eqnarray}
+HR_{\text{belowground-active}} &=& \Delta C_{\text{belowground-active}} \cdot (0.17 + 0.68 \cdot P_{clay}) \\
+F_{\text{belowground-active}, \text{belowground-passive}} &=& \Delta C_{\text{belowground-active}} \cdot (0.003 + 0.032 \cdot P_{clay}) \cdot f(O_2) \\
+F_{\text{belowground-active}, \text{belowground-slow}} &=& \Delta C_{\text{belowground-active}} - HR_{\text{belowground-active}} - F_{\text{belowground-active}, \text{belowground-passive}}
+\end{eqnarray}
+
+Thus, the decomposition rate of the belowground active pool increases and the respiration fraction of carbon losses also increases along with the sand fraction.
+
+### Slow belowground pool
+
+The rate of decomposition of the slow belowground pool is:
+
+\begin{equation}
+k_{\text{belowground-slow}} = k_{\text{base,belowground-slow}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH) \cdot f(O_2)
+\end{equation}
+
+
+### Passive belowground pool
+
+The rate of decomposition of the passive belowground pool is:
+
+\begin{equation}
+k_{\text{belowground-passive}} = k_{\text{base,belowground-passive}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH) \cdot f(O_2)
+\end{equation}
