@@ -46,23 +46,23 @@ where parameters $a$, $b$, $c$ and $d$ depend on the specific carbon pool:
 
 | Carbon pool(s)          | $a$ | $b$ | $c$ | $d$ |
 |-------------------------|-----|-----|-----|-----|
-| Surface/soil metabolic  | 4.8 | 0.5 | 1.14 | 0.7 |
-| Surface/soil structural  | 4.0 | 0.5 | 1.1 | 0.7 |
+| Surface/belowground metabolic  | 4.8 | 0.5 | 1.14 | 0.7 |
+| Surface/belowground structural  | 4.0 | 0.5 | 1.1 | 0.7 |
 | Surface active  | 4.0 | 0.5 | 1.1 | 0.7 |
-| Soil active  | 4.8 | 0.5 | 1.14 | 0.7 |
-| Surface/soil slow  | 4.0 | 0.5 | 1.1 | 0.7 |
-| Soil passive  | 3.0 | 0.5 | 1.1 | 0.7 |
+| Belowground active  | 4.8 | 0.5 | 1.14 | 0.7 |
+| Surface/belowground slow  | 4.0 | 0.5 | 1.1 | 0.7 |
+| Belowground passive  | 3.0 | 0.5 | 1.1 | 0.7 |
 
 (ref:pH-decomp-cap) Effect of pH on decomposition rates, for different carbon pools.
 
 ```{r, fig.align='center', fig.width=6, fig.height=3.5, echo = FALSE, fig.cap='(ref:pH-decomp-cap)'}
-df1 <- data.frame(pH = seq(4,8, by = 0.001), f = NA, Pool = "Surface/soil metabolic/active")
-df2 <- data.frame(pH = seq(4,8, by = 0.001), f = NA, Pool = "Surface/soil structural/slow")
-df3 <- data.frame(pH = seq(4,8, by = 0.001), f = NA, Pool = "Soil passive")
+df1 <- data.frame(pH = seq(4,8, by = 0.001), f = NA, Pool = "Surface/belowground metabolic/active")
+df2 <- data.frame(pH = seq(4,8, by = 0.001), f = NA, Pool = "Surface/belowground structural/slow")
+df3 <- data.frame(pH = seq(4,8, by = 0.001), f = NA, Pool = "Belowground passive")
 for(i in 1:nrow(df1)) {
   df1$f[i] = decomposition_pHEffect(df1$pH[i], "SurfaceMetabolic")
   df2$f[i] = decomposition_pHEffect(df2$pH[i], "Leaves")
-  df3$f[i] = decomposition_pHEffect(df3$pH[i], "SoilPassive")
+  df3$f[i] = decomposition_pHEffect(df3$pH[i], "BelowgroundPassive")
 }
 df <- rbind(df1, df2, df3)
 ggplot(df)+
@@ -71,7 +71,7 @@ ggplot(df)+
   ylim(0,1)+
   xlab("pH") + ylab("pH effect on decomposition")+
   theme_bw()+
-  theme(legend.position = c(0.8,0.2))
+  theme(legend.position = c(0.7,0.2))
 ```
 
 ### Effect of temperature
@@ -94,6 +94,7 @@ ggplot(df)+
   xlab("Temperature in Celsius") + ylab("Temperature effect on decomposition")+
   theme_bw()
 ```
+For most carbon pools, the temperature value is that corresponding to the first (top) soil layer. For decomposition of snags, the temperature within the canopy is used. 
 
 ### Effect of moisture
 
@@ -129,12 +130,13 @@ ggplot(df)+
   theme(legend.position = c(0.2,0.8))
 ```
 
+For most carbon pools, relative moisture is estimated from the moisture of the first (top) soil layer. In the case of snag carbon pools, relative moisture is estimated from a ratio of moisture content in equilibrium with air relative humidity and moisture content at saturation. 
 
 ### Effect of anaerobiosis
 
 Decomposition of belowground pools includes an effect for anaerobic soils, represented by a rate factor $f(O_2)$ that varies between zero and one and that decreases decomposition rates as soil becomes increasingly waterlogged.
 
-## Decomposition process in aboveground/belowground litter, coarse woody debris and standing dead wood
+## Decomposition process of leaf and fine root litter, coarse woody debris and standing dead wood
 
 ### Leaf and fine root litter
 
@@ -286,7 +288,7 @@ Soil organic matter is represented by pools of active, slow and passive carbon t
 
 ### Active surface pool
 
-The active surface pool receives carbon from surface structural litter pools, the metabolic surface pool and from the slow surface pool. The rate of decomposition of the active surface pool is:
+The active surface pool receives carbon from surface structural pools, the metabolic surface pool and from the slow surface pool. The rate of decomposition of the active surface pool is:
 
 \begin{equation}
 k_{\text{surface-active}} = k_{\text{base,surface-active}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH)
@@ -322,7 +324,7 @@ where $k_{mix,frac} = k_{\text{mixing}}/(k_{\text{base,surface-slow}} \cdot f(pH
 
 ### Active belowground pool
 
-The active belowground pool receives carbon from belowground structural pools as well as the slow and passive belowground pools. The rate of decomposition of the active belowground pool is:
+The active belowground pool receives carbon from belowground structural and metabolic pools as well as from the slow and passive belowground pools. The rate of decomposition of the active belowground pool is:
 
 \begin{equation}
 k_{\text{belowground-active}} = k_{\text{base,belowground-active}} \cdot f(T) \cdot f(\theta_{rel}) \cdot f(pH) \cdot f_{texture} \cdot f(O_2)
