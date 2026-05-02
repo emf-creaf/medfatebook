@@ -6,7 +6,7 @@ This chapter provides an overview of a forest dynamics model, which builds on th
 
 ## Design principles
 
-The design of the forest dynamics model is, to a large degree, inherited from the energy/water balance and growth models it builds on. Readers should refer to former sections to learn the design of the basic water balance (see \@ref(basicdesign)), advanced water/energy balance (see \@ref(advanceddesign)) or growth/mortality processes (see \@ref(growthdesign)). Regeneration, from either seed germination and establishment or via resprouting, and forest management are explicitly simulated at the level of `fordyn()` and hence their design will be the focus of this chapter, with implementation details described in chapter \@ref(regeneration). 
+The design of the forest dynamics model is, to a large degree, inherited from the energy/water balance and growth models it builds on. Readers should refer to former sections to learn the design of the basic water balance (see \@ref(basicdesign)), advanced water/energy balance (see \@ref(advanceddesign)) or growth/mortality processes (see \@ref(growthdesign)). Regeneration, from either seed germination and establishment or via resprouting, forest management and snag fall are explicitly simulated at the level of `fordyn()` and hence their design will be the focus of this chapter, with implementation details described in chapter \@ref(regeneration). More generally, the processes implemented at the level of `fordyn()` are those that are represented at annual resolution, as opposed to the daily (or subdaily) process resolution of the previous models.
 
 ### Recruitment from seeds
 
@@ -39,6 +39,9 @@ Although the former design allows users to tailor management functions to their 
 
 The former models apply cuts on tree cohorts irrespective of their species. The default management function applies shrub clearing each time there is an operation on trees, resulting in removal of any shrub cover above a given maximum value. 
 
+### Snag fall {#snagfall}
+
+Snag fall based on a simplification of the model by Vanderwel et al. [-@vanderwel_snag_2006], where 5-yr. probability of snag fall depends on DBH, decay class and species identity. Following the results of Oberle et al. [-@oberle_when_2018], we defined species identity effects as a function of wood durability. Following the distribution of years of death determined by Aakala et al. [-@aakala_standing_2008] for snags corresponding to different age classes, we defined snag decay class as a function of age.
 
 ## State variables
 

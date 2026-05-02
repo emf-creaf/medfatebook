@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-05-01" />
+<meta name="date" content="2026-05-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -567,6 +567,7 @@ div.csl-indent {
 <li class="chapter" data-level="19.1.1" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#recruitment-from-seeds"><i class="fa fa-check"></i><b>19.1.1</b> Recruitment from seeds</a></li>
 <li class="chapter" data-level="19.1.2" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#resprouting"><i class="fa fa-check"></i><b>19.1.2</b> Resprouting</a></li>
 <li class="chapter" data-level="19.1.3" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#forest-management"><i class="fa fa-check"></i><b>19.1.3</b> Forest management</a></li>
+<li class="chapter" data-level="19.1.4" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#snagfall"><i class="fa fa-check"></i><b>19.1.4</b> Snag fall</a></li>
 </ul></li>
 <li class="chapter" data-level="19.2" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#state-variables-1"><i class="fa fa-check"></i><b>19.2</b> State variables</a></li>
 <li class="chapter" data-level="19.3" data-path="dynamicsmodelling.html"><a href="dynamicsmodelling.html#process-scheduling"><i class="fa fa-check"></i><b>19.3</b> Process scheduling</a></li>
@@ -770,7 +771,7 @@ div.csl-indent {
 <p>This chapter provides an overview of a forest dynamics model, which builds on the previous models and allows simulating the recruitment, growth, mortality and management of woody plant cohorts in a forest stand. The model was described in <span class="citation">De Cáceres <em>et al.</em> (<a href="#ref-de_caceres_medfate_2023">2023</a>)</span> and is run using function <code>fordyn()</code> for a set of years.</p>
 <div id="design-principles" class="section level2 hasAnchor" number="19.1">
 <h2><span class="header-section-number">19.1</span> Design principles<a href="dynamicsmodelling.html#design-principles" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The design of the forest dynamics model is, to a large degree, inherited from the energy/water balance and growth models it builds on. Readers should refer to former sections to learn the design of the basic water balance (see <a href="basicwaterbalance.html#basicdesign">3.1</a>), advanced water/energy balance (see <a href="advancedwaterbalance.html#advanceddesign">7.2</a>) or growth/mortality processes (see <a href="growthmodelling.html#growthdesign">15.1</a>). Regeneration, from either seed germination and establishment or via resprouting, and forest management are explicitly simulated at the level of <code>fordyn()</code> and hence their design will be the focus of this chapter, with implementation details described in chapter <a href="regeneration.html#regeneration">20</a>.</p>
+<p>The design of the forest dynamics model is, to a large degree, inherited from the energy/water balance and growth models it builds on. Readers should refer to former sections to learn the design of the basic water balance (see <a href="basicwaterbalance.html#basicdesign">3.1</a>), advanced water/energy balance (see <a href="advancedwaterbalance.html#advanceddesign">7.2</a>) or growth/mortality processes (see <a href="growthmodelling.html#growthdesign">15.1</a>). Regeneration, from either seed germination and establishment or via resprouting, forest management and snag fall are explicitly simulated at the level of <code>fordyn()</code> and hence their design will be the focus of this chapter, with implementation details described in chapter <a href="regeneration.html#regeneration">20</a>. More generally, the processes implemented at the level of <code>fordyn()</code> are those that are represented at annual resolution, as opposed to the daily (or subdaily) process resolution of the previous models.</p>
 <div id="recruitment-from-seeds" class="section level3 hasAnchor" number="19.1.1">
 <h3><span class="header-section-number">19.1.1</span> Recruitment from seeds<a href="dynamicsmodelling.html#recruitment-from-seeds" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Recruitment of saplings involves a number of processes (flowering and pollination, fruit/seed production, dispersal, storage, seed predation, germination, seedling establishment and survival until the sapling stage). All these processes have their own biotic and abiotic drivers <span class="citation">(<a href="#ref-Price2001">Price <em>et al.</em> 2001</a>)</span>, so that modelling becomes a challenging task. Processes leading to sapling recruitment are frequently extremely simplified or their mechanisms ignored in many forest models <span class="citation">(<a href="#ref-Price2001">Price <em>et al.</em> 2001</a>)</span>. The design of the forest dynamics model with respect to recruitment follows that of many gap models. Local seed production is considered in a binary way, where plants are considered fertile and able to produce viable seeds if they reach a given height (different for shrubs and trees). Alternatively, the user can specify a set of species whose seeds arrive to the target stand via simulation control parameters or dispersal processes (see chapter <a href="seeddispersal.html#seeddispersal">22</a>). A seed bank exists in the forest stand, where seed levels are relative (up to 100%) and result from the interplay between seed rain and seed mortality. Germination is scheduled once a year (assumed to be in winter), and results in age cohorts entering a seedling bank. A constant probability of germination determines is used as a statistical surrogate of processes affecting germination success. Once successfully germinated, the germinant enters the most vulnerable life-stage of a tree, characterized by the highest mortality of the whole plant life-cycle. During the years between germination and recruitment the amount of seedlings decreases due to environmental filtering, depending on a set of regeneration <em>thresholds</em>. Typically, regeneration thresholds concern environmental conditions, although some models also consider ungulate browsing <span class="citation">(<a href="#ref-Wehrli2007">Wehrli <em>et al.</em> 2007</a>)</span>. In our case we focus on three environmental drivers limiting the transition from seedlings to saplings:</p>
@@ -797,6 +798,10 @@ div.csl-indent {
 <li><em>Regular management</em>: An even-aged (monospecific) stand is managed in cycles where thinning (preparatory) cuts are followed by final (regeneration) cuts. Thinning operations are similar as those of irregular management. One or several final cuts can be scheduled, the first starting whenever mean diameter surpasses a chosen threshold, and the following after a chosen number of years. Optionally, tree planting (of a chosen species) can be scheduled to occur after the last final cut.</li>
 </ul>
 <p>The former models apply cuts on tree cohorts irrespective of their species. The default management function applies shrub clearing each time there is an operation on trees, resulting in removal of any shrub cover above a given maximum value.</p>
+</div>
+<div id="snagfall" class="section level3 hasAnchor" number="19.1.4">
+<h3><span class="header-section-number">19.1.4</span> Snag fall<a href="dynamicsmodelling.html#snagfall" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Snag fall based on a simplification of the model by Vanderwel et al. <span class="citation">(<a href="#ref-vanderwel_snag_2006">2006</a>)</span>, where 5-yr. probability of snag fall depends on DBH, decay class and species identity. Following the results of Oberle et al. <span class="citation">(<a href="#ref-oberle_when_2018">2018</a>)</span>, we defined species identity effects as a function of wood durability. Following the distribution of years of death determined by Aakala et al. <span class="citation">(<a href="#ref-aakala_standing_2008">2008</a>)</span> for snags corresponding to different age classes, we defined snag decay class as a function of age.</p>
 </div>
 </div>
 <div id="state-variables-1" class="section level2 hasAnchor" number="19.2">
@@ -1081,6 +1086,9 @@ div.csl-indent {
 </div>
 <h3>Bibliography<a href="bibliography.html#bibliography" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-aakala_standing_2008" class="csl-entry">
+Aakala, T., Kuuluvainen, T., Gauthier, S. &amp; De Grandpré, L. (2008). <a href="https://doi.org/10.1016/j.foreco.2007.09.008">Standing dead trees and their decay-class dynamics in the northeastern boreal old-growth forests of <span>Quebec</span></a>. <em>Forest Ecology and Management</em>.
+</div>
 <div id="ref-de_caceres_medfate_2023" class="csl-entry">
 De Cáceres, M., Molowny-Horas, R., Cabon, A., Martínez-Vilalta, J., Mencuccini, M., García-Valdés, R., <em>et al.</em> (2023). <a href="https://doi.org/10.5194/gmd-16-3165-2023"><span>MEDFATE</span> 2.9.3: <span>A</span> trait-enabled model to simulate <span>Mediterranean</span> forest function and dynamics at regional scales</a>. <em>Geoscientific Model Development</em>, 16, 3165–3201.
 </div>
@@ -1099,6 +1107,9 @@ Marañón, T., Zamora, R., Villar, R., Zavala, M.A., Quero, J.L., Pérez-Ramos, 
 <div id="ref-moreira_resprout_2012" class="csl-entry">
 Moreira, B., Tormo, J. &amp; Pausas, J.G. (2012). <a href="https://doi.org/10.1111/j.1600-0706.2011.20258.x">To resprout or not to resprout: Factors driving intraspecific variability in resprouting</a>. <em>Oikos</em>, 121, 1577–1584.
 </div>
+<div id="ref-oberle_when_2018" class="csl-entry">
+Oberle, B., Ogle, K., Zanne, A.E. &amp; Woodall, C.W. (2018). <a href="https://doi.org/10.1371/journal.pone.0196712">When a tree falls: <span>Controls</span> on wood decay predict standing dead tree fall and new risks in changing forests</a>. <em>PLOS ONE</em>, 13, e0196712.
+</div>
 <div id="ref-padilla_rooting_2007" class="csl-entry">
 Padilla, F.M. &amp; Pugnaire, F.I. (2007). <a href="https://doi.org/10.1111/j.1365-2435.2007.01267.x">Rooting depth and soil moisture control <span>Mediterranean</span> woody seedling survival during drought</a>. <em>Functional Ecology</em>, 21, 489–495.
 </div>
@@ -1110,6 +1121,9 @@ Price, D., Zimmermann, N. &amp; Meer, P.V.D. (2001). <a href="http://link.spring
 </div>
 <div id="ref-retana_regeneration_1992" class="csl-entry">
 Retana, J., Riba, M., Castell, C. &amp; Espelta, J.M. (1992). <a href="https://doi.org/10.1007/BF00118242">Regeneration by sprouting of holm-oak (<span>Quercus</span> ilex) stands exploited by selection thinning</a>. <em>Vegetatio</em>, 99, 355–364.
+</div>
+<div id="ref-vanderwel_snag_2006" class="csl-entry">
+Vanderwel, M.C., Caspersen, J.P. &amp; Woods, M.E. (2006). <a href="https://doi.org/10.1139/x06-173">Snag dynamics in partially harvested and unmanaged northern hardwood forests</a>. <em>Canadian Journal of Forest Research</em>, 36, 2769–2779.
 </div>
 <div id="ref-Wehrli2007" class="csl-entry">
 Wehrli, A., Weisberg, P.J., Schönenberger, W., Brang, P. &amp; Bugmann, H. (2007). <a href="https://doi.org/10.1007/s10342-006-0142-6">Improving the establishment submodel of a forest patch model to assess the long-term protective effect of mountain forests</a>. <em>European Journal of Forest Research</em>, 126, 131–145.
