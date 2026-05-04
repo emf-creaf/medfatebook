@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-05-02" />
+<meta name="date" content="2026-05-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -770,7 +770,7 @@ div.csl-indent {
 <h1><span class="header-section-number">Chapter 18</span> Decomposition and soil biogeochemistry<a href="decomposition.html#decomposition" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <div id="carbon-pools-losses-and-fluxes" class="section level2 hasAnchor" number="18.1">
 <h2><span class="header-section-number">18.1</span> Carbon pools, losses and fluxes<a href="decomposition.html#carbon-pools-losses-and-fluxes" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Carbon pools and fluxes between them were described in the design section and illustrated in fig. <a href="growthmodelling.html#fig:decompositionpools">15.4</a>. The following table provides the terminologic mapping between carbon pools in MEDFATE, which follows Bonan et al. <span class="citation">(<a href="#ref-bonan_climate_2019">2019</a>)</span>, and the corresponding pools in CENTURY:</p>
+<p>Carbon pools and fluxes between them were described in the design section and illustrated in fig. <a href="growthmodelling.html#fig:decompositionpools">15.4</a>. The following table provides the terminologic mapping between carbon pools in MEDFATE, which mainly follows Bonan et al. <span class="citation">(<a href="#ref-bonan_climate_2019">2019</a>)</span>, and the corresponding pools in CENTURY:</p>
 <table>
 <colgroup>
 <col width="37%" />
@@ -779,64 +779,90 @@ div.csl-indent {
 </colgroup>
 <thead>
 <tr class="header">
-<th>MEDFATE (Bonan et al.)</th>
+<th>MEDFATE</th>
 <th>CENTURY (Parton et al.)</th>
 <th>CENTURY code</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Standing structural (small branches, large wood)</td>
+<td>Small branches snags*</td>
 <td></td>
 <td></td>
 </tr>
 <tr class="even">
-<td>Surface structural (leaves, twigs, small branches, large wood)</td>
+<td>Large wood snags*</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Twig litter*</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Small branch litter</td>
+<td>Dead fine branch</td>
+<td><code>wood1c</code></td>
+</tr>
+<tr class="odd">
+<td>Large wood litter</td>
+<td>Dead large wood</td>
+<td><code>wood2c</code></td>
+</tr>
+<tr class="even">
+<td>Coarse root litter</td>
+<td>Dead coarse roots</td>
+<td><code>wood2c</code></td>
+</tr>
+<tr class="odd">
+<td>Structural leaf litter</td>
 <td>Surface structural</td>
 <td><code>strucc(1)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Metabolic surface</td>
 <td>Surface metabolic</td>
 <td><code>metabc(1)</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Active surface</td>
 <td>Surface microbe</td>
 <td><code>som1c(1)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Slow surface</td>
 <td></td>
 <td><code>som2c(1)</code></td>
 </tr>
-<tr class="even">
-<td>Belowground structural (fine roots, coarse roots)</td>
+<tr class="odd">
+<td>Structural fine root litter</td>
 <td>Belowground structural</td>
 <td><code>strucc(2)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Metabolic belowground</td>
 <td>Belowground metabolic</td>
 <td><code>metabc(2)</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Active belowground</td>
 <td>Active organic</td>
 <td><code>som1c(2)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Slow belowground</td>
 <td>Slow organic</td>
 <td><code>som2c(2)</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Passive belowground</td>
 <td>Passive</td>
 <td><code>som3c</code></td>
 </tr>
 </tbody>
 </table>
+<p>The first three pools (marked with an asterisk) are those new to MEDFATE, in comparison with Bonan et al. <span class="citation">(<a href="#ref-bonan_climate_2019">2019</a>)</span>. In CENTURY, only leaf litter and fine root litter are those conforming structural pools, whereas dead wood (either fine branches, large wood or coarse roots) is considered separately.</p>
 <p>Each (daily) time step a decomposition rate <span class="math inline">\(k_{i}\)</span> is estimated for each carbon pool <span class="math inline">\(i\)</span>. This decomposition rate leads to an amount of carbon (<span class="math inline">\(\Delta C_{i}\)</span>) being loss from the carbon pool:
 <span class="math display">\[\begin{equation}
 \Delta C_{i} = k_{i} \cdot \Delta t
