@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-06-09" />
+<meta name="date" content="2026-06-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -287,7 +287,8 @@ div.csl-indent {
 <li class="chapter" data-level="6.1.3" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-water-potential"><i class="fa fa-check"></i><b>6.1.3</b> Plant water potential</a></li>
 <li class="chapter" data-level="6.1.4" data-path="transpirationgranier.html"><a href="transpirationgranier.html#minimum-transpiration"><i class="fa fa-check"></i><b>6.1.4</b> Minimum transpiration</a></li>
 <li class="chapter" data-level="6.1.5" data-path="transpirationgranier.html"><a href="transpirationgranier.html#transpirationpools"><i class="fa fa-check"></i><b>6.1.5</b> Transpiration with water pools</a></li>
-<li class="chapter" data-level="6.1.6" data-path="transpirationgranier.html"><a href="transpirationgranier.html#basicphotosynthesis"><i class="fa fa-check"></i><b>6.1.6</b> Plant photosynthesis</a></li>
+<li class="chapter" data-level="6.1.6" data-path="transpirationgranier.html"><a href="transpirationgranier.html#mistletoetranspiration"><i class="fa fa-check"></i><b>6.1.6</b> Transpiration of hemi-parasitic plants</a></li>
+<li class="chapter" data-level="6.1.7" data-path="transpirationgranier.html"><a href="transpirationgranier.html#basicphotosynthesis"><i class="fa fa-check"></i><b>6.1.7</b> Plant photosynthesis</a></li>
 </ul></li>
 <li class="chapter" data-level="6.2" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-drought-stress-and-cavitation"><i class="fa fa-check"></i><b>6.2</b> Plant drought stress and cavitation</a>
 <ul>
@@ -1135,16 +1136,11 @@ where <span class="math inline">\(K_{sat,ref}\)</span> is the reference conducti
 <p>Below is an example of soil initialization:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="model-inputs.html#cb7-1" tabindex="-1"></a>soilinit <span class="ot">&lt;-</span> <span class="fu">soil</span>(soildf)</span>
 <span id="cb7-2"><a href="model-inputs.html#cb7-2" tabindex="-1"></a>soilinit</span></code></pre></div>
-<pre><code>##   widths sand clay      usda om nitrogen ph  bd rfc  macro     Ksat VG_alpha     VG_n VG_theta_res
-## 1    300   25   25 Silt loam NA       NA NA 1.5  25 0.0485 5401.471 89.16112 1.303861        0.041
-## 2    700   25   25 Silt loam NA       NA NA 1.5  45 0.0485 5401.471 89.16112 1.303861        0.041
-## 3   1000   25   25 Silt loam NA       NA NA 1.5  75 0.0485 5401.471 89.16112 1.303861        0.041
-## 4   2000   25   25 Silt loam NA       NA NA 1.5  95 0.0485 5401.471 89.16112 1.303861        0.041
-##   VG_theta_sat W Temp
-## 1     0.423715 1   NA
-## 2     0.423715 1   NA
-## 3     0.423715 1   NA
-## 4     0.423715 1   NA</code></pre>
+<pre><code>##   widths sand clay      usda om nitrogen ph  bd rfc  macro     Ksat VG_alpha     VG_n VG_theta_res VG_theta_sat W Temp
+## 1    300   25   25 Silt loam NA       NA NA 1.5  25 0.0485 5401.471 89.16112 1.303861        0.041     0.423715 1   NA
+## 2    700   25   25 Silt loam NA       NA NA 1.5  45 0.0485 5401.471 89.16112 1.303861        0.041     0.423715 1   NA
+## 3   1000   25   25 Silt loam NA       NA NA 1.5  75 0.0485 5401.471 89.16112 1.303861        0.041     0.423715 1   NA
+## 4   2000   25   25 Silt loam NA       NA NA 1.5  95 0.0485 5401.471 89.16112 1.303861        0.041     0.423715 1   NA</code></pre>
 <p>Besides defining soil parameters, function <code>soil()</code> also initializes <em>soil state variables</em> for each soil layer:</p>
 <table>
 <colgroup>
@@ -1492,6 +1488,7 @@ Z_{sat} = \sum_{s}{d_s \cdot \min\left[1,(\theta_{sat,s} - \theta(\Psi_s))/(\the
 <p>The structure presented above for <code>forest</code> objects corresponds to the required data elements. A forest object can contain additional information when this is available. In particular, data frames <code>treeData</code>, <code>shrubData</code> and <code>herbData</code> can contain additional columns:</p>
 <ul>
 <li><code>LAI</code>: Leaf area index (<span class="math inline">\(m^2 \cdot m^{-2}\)</span>), corresponding to <span class="math inline">\(LAI_{live}\)</span>, avoiding the use of allometric relationships for leaf biomass in water balance simulations.</li>
+<li><code>LAIMistletoe</code>: Leaf area index (<span class="math inline">\(m^2 \cdot m^{-2}\)</span>) of hemi-parasitic (mistletoe) plants.</li>
 <li><code>FoliarBiomass</code>: Standing dry biomass of leaves (<span class="math inline">\(kg \cdot m^{-2}\)</span>), which together with <span class="math inline">\(SLA\)</span> will be used to estimate <span class="math inline">\(LAI_{live}\)</span>, avoiding the use of allometric relationships for leaf biomass in water balance simulations.</li>
 <li><code>FuelLoading</code>: Fine fuel loading (<span class="math inline">\(kg \cdot m^{-2}\)</span>), to avoid its calculation from allometric relationships.</li>
 <li><code>CrownRatio</code>: The ratio between crown length and total height (between 0 and 1), avoiding the use of allometric relationships for crown ratio in water balance simulations.</li>
@@ -1705,19 +1702,20 @@ LAI_{all,i} = LAI_{\phi,i}+LAI_{dead,i}
 </div>
 <div id="leaf-area-index-of-the-forest-stand" class="section level4 hasAnchor" number="2.4.3.2">
 <h4><span class="header-section-number">2.4.3.2</span> Leaf area index of the forest stand<a href="model-inputs.html#leaf-area-index-of-the-forest-stand" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<p>If there are <span class="math inline">\(c\)</span> living plant cohorts, the leaf area index corresponding to living leaves, unfolded leaves and dead leaves can be aggregated across cohorts using:</p>
+<p>If there are <span class="math inline">\(c\)</span> living plant cohorts, the leaf area index corresponding to living leaves, unfolded leaves, dead leaves and leaves of hemi-parasitic (mistletoe) plants can be aggregated across cohorts using:</p>
 <p><span class="math display">\[\begin{eqnarray}
 LAI_{live} &amp;=&amp; \sum_{i=1}^c{LAI_{live,i}} \\
 LAI_{\phi} &amp;=&amp; \sum_{i=1}^c{LAI_{\phi,i}} \\
-LAI_{dead} &amp;=&amp; \sum_{i=1}^c{LAI_{dead,i}}
+LAI_{dead} &amp;=&amp; \sum_{i=1}^c{LAI_{dead,i}} \\
+LAI_{mistletoe} &amp;=&amp; \sum_{i=1}^c{LAI_{mistletoe,i}}
 \end{eqnarray}\]</span></p>
 <p>We can also estimate the overall leaf area index of living plant cohorts (<span class="math inline">\(LAI_{all}\)</span>), including dead leaves:</p>
 <p><span class="math display">\[\begin{eqnarray}
 LAI_{all} &amp;=&amp; \sum_{i=1}^{c}{\left[LAI_{\phi,i}+LAI_{dead,i}\right]} = LAI_{\phi}+LAI_{dead}
 \end{eqnarray}\]</span></p>
-<p>Finally, we can also estimate the overall leaf area index of the whole stand (<span class="math inline">\(LAI_{all,stand}\)</span>), which also takes into account the collective herbaceous layer (<span class="math inline">\(LAI_{herb}\)</span>), if defined:</p>
+<p>Finally, we can also estimate the overall leaf area index of the whole stand (<span class="math inline">\(LAI_{all,stand}\)</span>), which also takes into account the leaf area of mistletoes (<span class="math inline">\(LAI_{mistletoe}\)</span>) and the collective herbaceous layer (<span class="math inline">\(LAI_{herb}\)</span>), if defined:</p>
 <p><span class="math display">\[\begin{eqnarray}
-LAI_{all, stand} &amp;=&amp; LAI_{all} + LAI_{herb} = LAI_{\phi}+LAI_{dead} + LAI_{herb}
+LAI_{all, stand} &amp;=&amp; LAI_{all} + LAI_{herb} = LAI_{\phi}+LAI_{dead} + LAI_{mistletoe} + LAI_{herb}
 \end{eqnarray}\]</span></p>
 </div>
 <div id="leafdistribution" class="section level4 hasAnchor" number="2.4.3.3">
@@ -1996,65 +1994,36 @@ If <span class="math inline">\(Area_{i,s} \leq AreaPool_{i}\)</span>, then the r
 <h2><span class="header-section-number">2.6</span> Simulation control<a href="model-inputs.html#controlparameters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Simulation control parameters are a list of global parameter values, initialized using function <code>defaultControl()</code>, that the user can modify to change the general behavior of simulation functions. Here is the set of global control parameters currently accepted in <strong>medfate</strong>:</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="model-inputs.html#cb20-1" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">defaultControl</span>())</span></code></pre></div>
-<pre><code>##   [1] &quot;fillMissingRootParams&quot;              &quot;fillMissingSpParams&quot;               
-##   [3] &quot;fillMissingWithGenusParams&quot;         &quot;verbose&quot;                           
-##   [5] &quot;subdailyResults&quot;                    &quot;standResults&quot;                      
-##   [7] &quot;soilResults&quot;                        &quot;soilPoolResults&quot;                   
-##   [9] &quot;snowResults&quot;                        &quot;plantResults&quot;                      
-##  [11] &quot;labileCarbonBalanceResults&quot;         &quot;plantStructureResults&quot;             
-##  [13] &quot;growthMortalityResults&quot;             &quot;decompositionPoolResults&quot;          
-##  [15] &quot;leafResults&quot;                        &quot;temperatureResults&quot;                
-##  [17] &quot;fireHazardResults&quot;                  &quot;fireHazardStandardWind&quot;            
-##  [19] &quot;fireHazardStandardDFMC&quot;             &quot;transpirationMode&quot;                 
-##  [21] &quot;soilDomains&quot;                        &quot;rhizosphereOverlap&quot;                
-##  [23] &quot;truncateRootDistribution&quot;           &quot;fullRhizosphereOverlapConductivity&quot;
-##  [25] &quot;soilFunctions&quot;                      &quot;VG_PTF&quot;                            
-##  [27] &quot;ndailysteps&quot;                        &quot;max_nsubsteps_soil&quot;                
-##  [29] &quot;defaultWindSpeed&quot;                   &quot;defaultCO2&quot;                        
-##  [31] &quot;defaultRainfallIntensityPerMonth&quot;   &quot;leafPhenology&quot;                     
-##  [33] &quot;bareSoilEvaporation&quot;                &quot;unlimitedSoilWater&quot;                
-##  [35] &quot;interceptionMode&quot;                   &quot;infiltrationMode&quot;                  
-##  [37] &quot;infiltrationCorrection&quot;             &quot;unfoldingDD&quot;                       
-##  [39] &quot;verticalLayerSize&quot;                  &quot;windMeasurementHeight&quot;             
-##  [41] &quot;segmentedXylemVulnerability&quot;        &quot;stemCavitationRecovery&quot;            
-##  [43] &quot;leafCavitationRecovery&quot;             &quot;lfmcComponent&quot;                     
-##  [45] &quot;cavitationInducedDefoliation&quot;       &quot;hydraulicRedistributionFraction&quot;   
-##  [47] &quot;nsubsteps_canopy&quot;                   &quot;taper&quot;                             
-##  [49] &quot;multiLayerBalance&quot;                  &quot;sapFluidityVariation&quot;              
-##  [51] &quot;TPhase_gmin&quot;                        &quot;Q10_1_gmin&quot;                        
-##  [53] &quot;Q10_2_gmin&quot;                         &quot;rootRadialConductance&quot;             
-##  [55] &quot;averageFracRhizosphereResistance&quot;   &quot;thermalCapacityLAI&quot;                
-##  [57] &quot;boundaryLayerSize&quot;                  &quot;cavitationRecoveryMaximumRate&quot;     
-##  [59] &quot;sunlitShade&quot;                        &quot;numericParams&quot;                     
-##  [61] &quot;leafCavitationEffects&quot;              &quot;stemCavitationEffects&quot;             
-##  [63] &quot;stomatalSubmodel&quot;                   &quot;plantCapacitance&quot;                  
-##  [65] &quot;cavitationFlux&quot;                     &quot;leafCuticularTranspiration&quot;        
-##  [67] &quot;stemCuticularTranspiration&quot;         &quot;C_SApoInit&quot;                        
-##  [69] &quot;C_LApoInit&quot;                         &quot;k_SSym&quot;                            
-##  [71] &quot;fractionLeafSymplasm&quot;               &quot;gs_NightFrac&quot;                      
-##  [73] &quot;JarvisPAR&quot;                          &quot;fTRBToLeaf&quot;                        
-##  [75] &quot;subdailyCarbonBalance&quot;              &quot;allowDessication&quot;                  
-##  [77] &quot;allowStarvation&quot;                    &quot;sinkLimitation&quot;                    
-##  [79] &quot;shrubDynamics&quot;                      &quot;herbDynamics&quot;                      
-##  [81] &quot;allocationStrategy&quot;                 &quot;phloemConductanceFactor&quot;           
-##  [83] &quot;nonSugarConcentration&quot;              &quot;equilibriumOsmoticConcentration&quot;   
-##  [85] &quot;minimumRelativeStarchForGrowth&quot;     &quot;constructionCosts&quot;                 
-##  [87] &quot;senescenceRates&quot;                    &quot;maximumRelativeGrowthRates&quot;        
-##  [89] &quot;mortalityMode&quot;                      &quot;mortalityBaselineRate&quot;             
-##  [91] &quot;mortalityRelativeSugarThreshold&quot;    &quot;mortalityRWCThreshold&quot;             
-##  [93] &quot;recrTreeDBH&quot;                        &quot;recrTreeDensity&quot;                   
-##  [95] &quot;ingrowthTreeDBH&quot;                    &quot;ingrowthTreeDensity&quot;               
-##  [97] &quot;decompositionAnnualBaseRates&quot;       &quot;decompositionAnnualTurnoverRate&quot;   
-##  [99] &quot;allowSeedBankDynamics&quot;              &quot;allowRecruitment&quot;                  
-## [101] &quot;allowResprouting&quot;                   &quot;recruitmentMode&quot;                   
-## [103] &quot;removeEmptyCohorts&quot;                 &quot;minimumTreeCohortDensity&quot;          
-## [105] &quot;minimumShrubCohortCover&quot;            &quot;dynamicallyMergeCohorts&quot;           
-## [107] &quot;keepCohortsWithObsID&quot;               &quot;seedRain&quot;                          
-## [109] &quot;seedProductionTreeHeight&quot;           &quot;seedProductionShrubHeight&quot;         
-## [111] &quot;probRecr&quot;                           &quot;minTempRecr&quot;                       
-## [113] &quot;minMoistureRecr&quot;                    &quot;minFPARRecr&quot;                       
-## [115] &quot;recrAge&quot;                            &quot;recrTreeHeight&quot;                    
-## [117] &quot;recrShrubCover&quot;                     &quot;recrShrubHeight&quot;</code></pre>
+<pre><code>##   [1] &quot;fillMissingRootParams&quot;              &quot;fillMissingSpParams&quot;                &quot;fillMissingWithGenusParams&quot;         &quot;verbose&quot;                           
+##   [5] &quot;subdailyResults&quot;                    &quot;standResults&quot;                       &quot;soilResults&quot;                        &quot;soilPoolResults&quot;                   
+##   [9] &quot;snowResults&quot;                        &quot;plantResults&quot;                       &quot;labileCarbonBalanceResults&quot;         &quot;plantStructureResults&quot;             
+##  [13] &quot;growthMortalityResults&quot;             &quot;decompositionPoolResults&quot;           &quot;leafResults&quot;                        &quot;temperatureResults&quot;                
+##  [17] &quot;fireHazardResults&quot;                  &quot;fireHazardStandardWind&quot;             &quot;fireHazardStandardDFMC&quot;             &quot;transpirationMode&quot;                 
+##  [21] &quot;soilDomains&quot;                        &quot;rhizosphereOverlap&quot;                 &quot;truncateRootDistribution&quot;           &quot;fullRhizosphereOverlapConductivity&quot;
+##  [25] &quot;soilFunctions&quot;                      &quot;VG_PTF&quot;                             &quot;ndailysteps&quot;                        &quot;max_nsubsteps_soil&quot;                
+##  [29] &quot;defaultWindSpeed&quot;                   &quot;defaultCO2&quot;                         &quot;defaultRainfallIntensityPerMonth&quot;   &quot;leafPhenology&quot;                     
+##  [33] &quot;bareSoilEvaporation&quot;                &quot;unlimitedSoilWater&quot;                 &quot;interceptionMode&quot;                   &quot;infiltrationMode&quot;                  
+##  [37] &quot;infiltrationCorrection&quot;             &quot;unfoldingDD&quot;                        &quot;verticalLayerSize&quot;                  &quot;windMeasurementHeight&quot;             
+##  [41] &quot;segmentedXylemVulnerability&quot;        &quot;stemCavitationRecovery&quot;             &quot;leafCavitationRecovery&quot;             &quot;lfmcComponent&quot;                     
+##  [45] &quot;cavitationInducedDefoliation&quot;       &quot;mistletoeParams&quot;                    &quot;hydraulicRedistributionFraction&quot;    &quot;nsubsteps_canopy&quot;                  
+##  [49] &quot;taper&quot;                              &quot;multiLayerBalance&quot;                  &quot;sapFluidityVariation&quot;               &quot;TPhase_gmin&quot;                       
+##  [53] &quot;Q10_1_gmin&quot;                         &quot;Q10_2_gmin&quot;                         &quot;rootRadialConductance&quot;              &quot;averageFracRhizosphereResistance&quot;  
+##  [57] &quot;thermalCapacityLAI&quot;                 &quot;boundaryLayerSize&quot;                  &quot;cavitationRecoveryMaximumRate&quot;      &quot;sunlitShade&quot;                       
+##  [61] &quot;numericParams&quot;                      &quot;leafCavitationEffects&quot;              &quot;stemCavitationEffects&quot;              &quot;stomatalSubmodel&quot;                  
+##  [65] &quot;plantCapacitance&quot;                   &quot;cavitationFlux&quot;                     &quot;leafCuticularTranspiration&quot;         &quot;stemCuticularTranspiration&quot;        
+##  [69] &quot;C_SApoInit&quot;                         &quot;C_LApoInit&quot;                         &quot;k_SSym&quot;                             &quot;fractionLeafSymplasm&quot;              
+##  [73] &quot;gs_NightFrac&quot;                       &quot;JarvisPAR&quot;                          &quot;fTRBToLeaf&quot;                         &quot;subdailyCarbonBalance&quot;             
+##  [77] &quot;allowDessication&quot;                   &quot;allowStarvation&quot;                    &quot;sinkLimitation&quot;                     &quot;shrubDynamics&quot;                     
+##  [81] &quot;herbDynamics&quot;                       &quot;allocationStrategy&quot;                 &quot;phloemConductanceFactor&quot;            &quot;nonSugarConcentration&quot;             
+##  [85] &quot;equilibriumOsmoticConcentration&quot;    &quot;minimumRelativeStarchForGrowth&quot;     &quot;constructionCosts&quot;                  &quot;senescenceRates&quot;                   
+##  [89] &quot;maximumRelativeGrowthRates&quot;         &quot;mortalityMode&quot;                      &quot;mortalityBaselineRate&quot;              &quot;mortalityRelativeSugarThreshold&quot;   
+##  [93] &quot;mortalityRWCThreshold&quot;              &quot;recrTreeDBH&quot;                        &quot;recrTreeDensity&quot;                    &quot;ingrowthTreeDBH&quot;                   
+##  [97] &quot;ingrowthTreeDensity&quot;                &quot;decompositionAnnualBaseRates&quot;       &quot;decompositionAnnualTurnoverRate&quot;    &quot;allowSeedBankDynamics&quot;             
+## [101] &quot;allowRecruitment&quot;                   &quot;allowResprouting&quot;                   &quot;recruitmentMode&quot;                    &quot;removeEmptyCohorts&quot;                
+## [105] &quot;minimumTreeCohortDensity&quot;           &quot;minimumShrubCohortCover&quot;            &quot;dynamicallyMergeCohorts&quot;            &quot;keepCohortsWithObsID&quot;              
+## [109] &quot;seedRain&quot;                           &quot;seedProductionTreeHeight&quot;           &quot;seedProductionShrubHeight&quot;          &quot;probRecr&quot;                          
+## [113] &quot;minTempRecr&quot;                        &quot;minMoistureRecr&quot;                    &quot;minFPARRecr&quot;                        &quot;recrAge&quot;                           
+## [117] &quot;recrTreeHeight&quot;                     &quot;recrShrubCover&quot;                     &quot;recrShrubHeight&quot;</code></pre>
 <p>Control parameters are employed when initializing vegetation inputs and state variables using functions <code>spwbInput()</code> and <code>growthInput()</code>, since they are needed also to make decisions at the point of initialization. Control parameters are also stored in the result of these functions, so the user does not need to specify again control parameters when calling simulation functions such as <code>spwb()</code> or <code>growth()</code>. Function <code>fordyn()</code> is different than the other simulation functions, because the list control parameters is directly passed to the function (see <a href="model-inputs.html#inputstructuresmedfate">2.1.1</a>).</p>
 <p>Even if the list of control parameters is long, not all control parameters are relevant to all simulation functions (this will be indicated in the following chapters), and most of them should not be altered from their default values. However, there are a set of parameters that are worth learning:</p>
 <ul>

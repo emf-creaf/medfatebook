@@ -151,6 +151,16 @@ Estimating transpiration with water pools is analogous to estimating transpirati
 
 Finally, note that the amount of water extracted from the soil layer $s$ of given water pool $j$ (i.e. from $W_{j,s}$) will not be $Tr_{i,s,j}$ (whose units are referred to the overall stand) but $Tr_{i,s,j}/f_{pool,j}$.
 
+### Transpiration of hemi-parasitic plants {#mistletoetranspiration}
+
+When mistletoes are considered in water balance simulations, they are included in radiation extinction calculations. The maximum transpiration of mistletoe in cohort $i$ is ($Tr_{mistletoe, i, \max}$):
+
+\begin{equation}
+   Tr_{mistletoe, i, \max} =  PET \cdot (T_{max,LAI} \cdot LAI_{\phi} + T_{max,sqLAI} \cdot (LAI_{\phi})^2 ) \cdot \frac{f_i^{0.75}}{\sum_{j}{f_j^{0.75}}} \cdot \frac{LAI_{mistletoe,i}}{LAI_{\phi,i}+LAI_{mistletoe,i}}
+\end{equation}
+
+Maximum transpiration is then reduced to actual transpiration (i.e. $Tr_{mistletoe, i}$) according to the water potential of the plant cohort ($\Psi_{plant,i}$), following a sigmoid function with parameters $Gs_{P50, mistletoe}$ and $Gs_{slope, mistletoe}$ (defined in control parameters). Soil water extraction corresponding to mistletoe transpiration is added to extraction caused by the corresponding plant cohort. 
+
 ### Plant photosynthesis {#basicphotosynthesis}
 
 Because it is useful for growth, and for compatibility with the 'Sperry' transpiration mode (chapter \@ref(advancedwaterbalance)), the water balance model using 'Granier' transpiration mode also calculates gross assimilated carbon. Gross photosynthesis for a given plant cohort $i$ (in $g\,C \cdot m^{-2}$) is estimated as a function of transpiration:
@@ -165,6 +175,7 @@ Different effects are taken into account in the estimation of gross photosynthes
 ```{r WUErelationship, out.width='100%', fig.align="center", fig.cap="Relationship between the percentage of PAR available to a cohort and the water use efficiency (left) or the water use efficiency relative to the maximum value observed in the stand for the same species (right). WUE values were estimated using the advanced water balance model and a non-linear regression was fitted.", echo=FALSE}
 knitr::include_graphics("figures/WUE_relationship.png")
 ```
+
 
 ## Plant drought stress and cavitation
 
@@ -199,3 +210,7 @@ where $H_v$ is the Huber value (sapwood area to leaf area ratio) in units of $cm
 By default, the water-balance model assumes that high levels of leaf hydraulic impairment will lead to defoliation (although this process can be deactivated if `cavitationInducedDefoliation = FALSE`). When cavitation-induced defoliation is considered, the model assumes that crowns are made of a population of leaves whose hydraulic vulnerability follows a Gaussian distribution centered on the input water potential corresponding to 50% loss of conductance (which is dictated by $c_{leaf}$ and $d_{leaf}$) and with a known coefficient of variation set to 10 %, a modelling strategy developed by Hervé Cochard.  Leaves are hydraulically disconnected and die when their embolism rate exceeds a critical value set to 88 % of percent loss of conductance (see function `hydraulics_proportionDefoliationWeibull()`). Ultimately, the assumed variability of hydraulic vulnerability and the current plant water potential lead to a proportion of cavitation-induced crown defoliation.
 
 In the water-balance model, the proportion of crown defoliation leads to a corresponding decrease $LAI_{\phi}$, and recovery of foliage after drought will follow the conduit refilling process associated to decrease in $PLC_{leaf}$. In the growth model, the proportion of crown defoliation is used to determine leaf senescence and the recovery of foliage is simulated via explicit leaf growth (see chapter \@ref(growthsenescencemortality)).
+
+
+
+

@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-06-09" />
+<meta name="date" content="2026-06-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -287,7 +287,8 @@ div.csl-indent {
 <li class="chapter" data-level="6.1.3" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-water-potential"><i class="fa fa-check"></i><b>6.1.3</b> Plant water potential</a></li>
 <li class="chapter" data-level="6.1.4" data-path="transpirationgranier.html"><a href="transpirationgranier.html#minimum-transpiration"><i class="fa fa-check"></i><b>6.1.4</b> Minimum transpiration</a></li>
 <li class="chapter" data-level="6.1.5" data-path="transpirationgranier.html"><a href="transpirationgranier.html#transpirationpools"><i class="fa fa-check"></i><b>6.1.5</b> Transpiration with water pools</a></li>
-<li class="chapter" data-level="6.1.6" data-path="transpirationgranier.html"><a href="transpirationgranier.html#basicphotosynthesis"><i class="fa fa-check"></i><b>6.1.6</b> Plant photosynthesis</a></li>
+<li class="chapter" data-level="6.1.6" data-path="transpirationgranier.html"><a href="transpirationgranier.html#mistletoetranspiration"><i class="fa fa-check"></i><b>6.1.6</b> Transpiration of hemi-parasitic plants</a></li>
+<li class="chapter" data-level="6.1.7" data-path="transpirationgranier.html"><a href="transpirationgranier.html#basicphotosynthesis"><i class="fa fa-check"></i><b>6.1.7</b> Plant photosynthesis</a></li>
 </ul></li>
 <li class="chapter" data-level="6.2" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-drought-stress-and-cavitation"><i class="fa fa-check"></i><b>6.2</b> Plant drought stress and cavitation</a>
 <ul>
@@ -776,6 +777,7 @@ div.csl-indent {
 <p>The water balance model considers only the vertical spatial dimension of the stand and not the horizontal distribution of plants within it. In other words, the model is not spatially explicit (i.e., plants do not have horizontal coordinates nor interact for space explicitly). Living plants in the stand are represented in groups, here referred to as <em>plant cohorts</em>, of different species, height and leaf area index (<span class="math inline">\(LAI\)</span>). Height and <span class="math inline">\(LAI\)</span> values determine competition for light. <span class="math inline">\(LAI\)</span> values also drive competition for soil water, along with fine root distribution. The model can also consider a collective layer herbaceous vegetation (see <a href="model-inputs.html#collectiveherbs">2.4.1.2</a>), which also has a height value and <span class="math inline">\(LAI\)</span>, but where plant cohorts are not distinguished and with fine roots confined to the topmost layer.</p>
 <p>The soil water balance initially followed mostly the design principles of SIERRA <span class="citation">(<a href="#ref-Mouillot2001">Mouillot <em>et al.</em> 2001</a>; <a href="#ref-Ruffault2013">Ruffault <em>et al.</em> 2013</a>, <a href="#ref-Ruffault2014">2014</a>)</span> and BILJOU <span class="citation">(<a href="#ref-Granier1999">Granier <em>et al.</em> 1999</a>, <a href="#ref-Granier2007">2007</a>)</span>, although nowadays it has evolved substantially. Hydrological processes include rainfall interception loss <span class="citation">(<a href="#ref-Gash1995">Gash <em>et al.</em> 1995</a>; <a href="#ref-liu_evaluation_2001">Liu 2001</a>)</span>, plant transpiration, evaporation from bare soil <span class="citation">(<a href="#ref-Ritchie1972">Ritchie 1972</a>)</span>, snow melt, infiltration into the soil matrix <span class="citation">(<a href="#ref-green_studies_1911">Green &amp; Ampt 1911</a>; <a href="#ref-Boughton1989">Boughton 1989</a>)</span> and vertical water movement within the soil, the latter following either a single-domain model <span class="citation">(<a href="#ref-bonan_climate_2019">Bonan 2019</a>)</span> or a dual-permeability model <span class="citation">(<a href="#ref-jarvis_modelling_1991">Jarvis <em>et al.</em> 1991</a>; <a href="#ref-larsbo_improved_2005">Larsbo <em>et al.</em> 2005</a>)</span>, where total porosity is partitioned into two separate flow regions (matrix and macropores), each with its own degree of saturation, conductivity and flux rate. Potential evapo-transpiration (<span class="math inline">\(PET\)</span>) determines maximum herbaceous and maximum canopy transpiration (<span class="math inline">\(Tr_{\max}\)</span>) using an empirical relationship between the <span class="math inline">\(LAI\)</span> of the stand and the ratio <span class="math inline">\(Tr_{\max}/PET\)</span> <span class="citation">(<a href="#ref-Granier1999">Granier <em>et al.</em> 1999</a>)</span>. Actual plant transpiration is estimated using a function that depends not only on <span class="math inline">\(Tr_{\max}\)</span> but also on current soil moisture levels, cohort-specific drought resistance, fine root distribution and the degree of shading of the target plant cohort. When soil water deficit progresses, transpiration rates are consequently reduced, but minimum transpiration rates of plant cohorts are not zero, because of the role of cuticular transpiration and imperfectly closed stomata <span class="citation">(<a href="#ref-Duursma2018">Duursma <em>et al.</em> 2018</a>)</span>. Plant water status (i.e. plant water potential and, hence, plant water content) follows variations of soil moisture in the soil layers where fine roots are located.</p>
 <p>By default, the model assumes that soil moisture under all plant cohorts is the same (i.e. water sources corresponding to vertical soil layers are shared among cohorts). However, 3D variations in soil moisture beneath plant cohorts can be simulated in spatially-explicit forest ecosystem models <span class="citation">(<a href="#ref-Manoli2017">Manoli <em>et al.</em> 2017</a>; <a href="#ref-Rotzer2017">Rötzer <em>et al.</em> 2017</a>)</span>. The water balance model does not simulate horizontal spatial processes explicitly, but allows considering more or less independent water pools for plant cohorts. If partial or completely independent water pools are considered, hydrological processes are replicated for the fraction of soil corresponding to each plant cohort. Transpiration of each plant cohort depends on the soil moisture beneath itself and, depending on the degree of rhizosphere overlap, on the soil moisture beneath other plant cohorts.</p>
+<p>Optionally, the model can simulate additional transpiration caused by hemi-parasitic plants (mistletoe) attached to specific plant cohorts. This causes water update from the corresponding soil water pools to be higher than cohort transpiration.</p>
 </div>
 <div id="statevariablesbasic" class="section level2 hasAnchor" number="3.2">
 <h2><span class="header-section-number">3.2</span> State variables<a href="basicwaterbalance.html#statevariablesbasic" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -814,7 +816,10 @@ Several water sources can contribute to soil infiltration, namely net rainfall (
 If = Pr_{net} + Sm + Ro - Ie
 \tag{3.2}
 \end{equation}\]</span>
-where <span class="math inline">\(Ie\)</span> is the infiltration excess that may occur. Other water inputs into the soil can come via capillarity rise (<span class="math inline">\(Cr\)</span>) from the water table (if present) or via lateral interflow from nearby locations (<span class="math inline">\(Lw\)</span>; if provided, assumed positive in the direction of entering the local soil). There are multiple ways water can leave the soil. Regarding purely physical processes we have the evaporation from soil surface (<span class="math inline">\(Es\)</span>), saturation excess (<span class="math inline">\(Se\)</span>) and deep drainage (<span class="math inline">\(Dd\)</span>). Fluxes mediated by plants are the transpiration made by herbaceous plants (<span class="math inline">\(Tr_{herb}\)</span>) and the transpiration made by plant cohorts (<span class="math inline">\(Tr_{cohorts}\)</span>).</p>
+where <span class="math inline">\(Ie\)</span> is the infiltration excess that may occur. Other water inputs into the soil can come via capillarity rise (<span class="math inline">\(Cr\)</span>) from the water table (if present) or via lateral interflow from nearby locations (<span class="math inline">\(Lw\)</span>; if provided, assumed positive in the direction of entering the local soil). There are multiple ways water can leave the soil. Regarding purely physical processes we have the evaporation from soil surface (<span class="math inline">\(Es\)</span>), saturation excess (<span class="math inline">\(Se\)</span>) and deep drainage (<span class="math inline">\(Dd\)</span>). Fluxes mediated by plants are the transpiration (<span class="math inline">\(Tr\)</span>) made by herbaceous plants (<span class="math inline">\(Tr_{herb}\)</span>), by plant cohorts (<span class="math inline">\(Tr_{cohorts}\)</span>) and (sometimes) by hemi-parasitic (mistletoe) plants (<span class="math inline">\(Tr_{mistletoe}\)</span>):</p>
+<p><span class="math display">\[\begin{equation}
+Tr = Tr_{herb} + Tr_{cohorts} + Tr_{mistletoe}
+\end{equation}\]</span></p>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:waterbalance"></span>
 <img src="figures/waterbalance.jpg" alt="Schematic representation of soil and snow pack water balance components. Subsurface lateral source/sinks  and surface runon are omitted for simplicity. Green and blue boxes represent outflows corresponding to green and blue water respectively." width="100%" />
 <p class="caption">
@@ -823,7 +828,7 @@ Figure 3.1: Schematic representation of soil and snow pack water balance compone
 </div>
 <p>Taking all input and output terms, daily variations in soil water content (<span class="math inline">\(\Delta{V_{soil}}\)</span> in mm) are then summarized as:
 <span class="math display" id="eq:basicwaterbalanceequation">\[\begin{equation}
-\Delta{V_{soil}} = (If + Lw + Cr) - (Dd + Se + Es + Tr_{herb} + Tr_{cohorts})
+\Delta{V_{soil}} = (If + Lw + Cr) - (Dd + Se + Es + Tr)
 \tag{3.3}
 \end{equation}\]</span>
 The water leaving the soil via surface runoff (<span class="math inline">\(Ru\)</span>) is defined as the sum of infiltration excess (<span class="math inline">\(Ie\)</span>) and saturation excess (<span class="math inline">\(Se\)</span>):
@@ -833,10 +838,10 @@ Ru = Ie + Se
 \end{equation}\]</span></p>
 <p>If we consider soil and snow pack altogether, the water balance of the whole forest becomes:
 <span class="math display" id="eq:forestwaterbalanceequation">\[\begin{equation}
-\Delta{V_{soil}} + \Delta{S_{snow}} = (P + Ro + Lw + Cr) - (Dd + Ru + In + Es + Tr_{herb} + Tr_{cohorts})
+\Delta{V_{soil}} + \Delta{S_{snow}} = (P + Ro + Lw + Cr) - (Dd + Ru + In + Es + Tr)
 \tag{3.5}
 \end{equation}\]</span>
-Among inputs, precipitation (<span class="math inline">\(P\)</span>) will the most relevant inflow on most instances. The liquid water fluxes contributing to <strong>blue water</strong> outflow (i.e. entering river networks or leading to ground water) are runoff (<span class="math inline">\(Ru\)</span>) and deep drainage (<span class="math inline">\(Dd\)</span>). Water vapor fluxes (<span class="math inline">\(Es\)</span>, <span class="math inline">\(Tr_{cohorts}\)</span>, <span class="math inline">\(Tr_{herb}\)</span>, <span class="math inline">\(In\)</span>) contribute to total evapotranspiration, or <strong>green water</strong> (i.e. water vapor returning to the atmosphere). These are represented in Fig. <a href="basicwaterbalance.html#fig:waterbalance">3.1</a> using blue/green boxes.</p>
+Among inputs, precipitation (<span class="math inline">\(P\)</span>) will the most relevant inflow on most instances. The liquid water fluxes contributing to <strong>blue water</strong> outflow (i.e. entering river networks or leading to ground water) are runoff (<span class="math inline">\(Ru\)</span>) and deep drainage (<span class="math inline">\(Dd\)</span>). Water vapor fluxes (<span class="math inline">\(Es\)</span>, <span class="math inline">\(Tr_{cohorts}\)</span>, <span class="math inline">\(Tr_{herb}\)</span>, <span class="math inline">\(Tr_{mist}\)</span>, <span class="math inline">\(In\)</span>) contribute to total evapotranspiration, or <strong>green water</strong> (i.e. water vapor returning to the atmosphere). These are represented in Fig. <a href="basicwaterbalance.html#fig:waterbalance">3.1</a> using blue/green boxes.</p>
 <p>While the above describes the default water balance equations, variations can occur depending on specific control flags:</p>
 <ol style="list-style-type: lower-alpha">
 <li><em>If snow dynamics are considered</em> [<code>snowpack</code>], evaporation from bare soil cannot occur if there is a snow pack over the soil (i.e., if <span class="math inline">\(S_{snow}&gt;0\)</span> then <span class="math inline">\(Es = 0\)</span>).</li>
@@ -851,7 +856,7 @@ Among inputs, precipitation (<span class="math inline">\(P\)</span>) will the mo
 <li>Update leaf area values according to the phenology of species and recalculate radiation extinction (sections <a href="leafphenologylight.html#leafphenology">4.1</a> and <a href="leafphenologylight.html#basiclightextinction">4.2</a>).</li>
 <li>Determine rainfall interception loss (<span class="math inline">\(In\)</span>) and net rainfall (<span class="math inline">\(Pr_{net}\)</span>) (section <a href="hydrology.html#interception">5.3</a>). The amount of water reaching the soil surface from the rainfall event is the sum of net rainfall (<span class="math inline">\(Pr_{net}\)</span>) and surface runon (<span class="math inline">\(Ro\)</span>), if given. If snow dynamics are included, increase snow pack from snow precipitation (<span class="math inline">\(Ps\)</span>) and decrease it following snow melt (<span class="math inline">\(Sm\)</span>) (section <a href="hydrology.html#snowpack">5.2</a>).</li>
 <li>Determine bare soil evaporation (<span class="math inline">\(Es\)</span>), if snow is not present (section <a href="hydrology.html#soilevaporation">5.4</a>), and herbaceous layer transpiration (<span class="math inline">\(Tr_{herb}\)</span>; section <a href="hydrology.html#herbaceoustranspiration">5.5</a>) if required.</li>
-<li>Determine plant cohort transpiration (<span class="math inline">\(Tr_{cohorts}\)</span>), including hydraulic redistribution, and photosynthesis (chapter <a href="transpirationgranier.html#transpirationgranier">6</a>). Update plant water potential (<span class="math inline">\(\Psi_{plant}\)</span>) and plant drought stress for each plant cohort.</li>
+<li>Determine plant cohort transpiration (<span class="math inline">\(Tr_{cohorts}\)</span>), including hydraulic redistribution, and photosynthesis (chapter <a href="transpirationgranier.html#transpirationgranier">6</a>). Update plant water potential (<span class="math inline">\(\Psi_{plant}\)</span>) and plant drought stress for each plant cohort. If necessary, determine mistletoe transpiration (<span class="math inline">\(Tr_{mistletoe}\)</span>) and the correspoindg additional soil water uptake (section <a href="transpirationgranier.html#mistletoetranspiration">6.1.6</a>).</li>
 <li>Determine rainfall infiltration (section <a href="hydrology.html#infiltration">5.6</a>) and vertical water movement within the soil (section <a href="hydrology.html#soilflows">5.7</a>), while considering soil layer source/sinks from snow melt, bare soil evaporation and herbaceous layer transpiration and water uptake/redistribution by plant cohorts. This updates soil moisture and returns infiltration (<span class="math inline">\(If\)</span>), runoff (<span class="math inline">\(Ru\)</span>) and deep drainage (<span class="math inline">\(Dd\)</span>).</li>
 <li>If fire hazard calculations are requested, estimate live and dead fuel moisture and potential fire behaviour (chapter <a href="fuelandfirebehavior.html#fuelandfirebehavior">26</a>).</li>
 </ol>
@@ -864,7 +869,7 @@ Among inputs, precipitation (<span class="math inline">\(P\)</span>) will the mo
 <p><strong>Soil</strong></p>
 <p>Soil input requirements are fully described in section <a href="model-inputs.html#soilinput">2.3</a>.</p>
 <p><strong>Vegetation</strong></p>
-<p>Vegetation input requirements are fully described in section <a href="model-inputs.html#vegetationinput">2.4</a>. Tree, shrub and herb cohorts do not need to be characterized with different variables in soil water balance calculations, since all living plant cohorts have a <span class="math inline">\(LAI\)</span> value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. <span class="math inline">\(LAI_{live}\)</span>, because normally at the starting point all leaves are expanded (i.e. <span class="math inline">\(LAI_{\phi} = LAI_{live}\)</span>) and one can assume no dead leaves in the canopy (i.e., <span class="math inline">\(LAI_{dead} = 0\)</span>). Vegetation characteristics stay constant during simulations using function <code>spwb()</code>, although the actual expanded leaf area (<span class="math inline">\(LAI_{\phi}\)</span>) and dead leaf area (<span class="math inline">\(LAI_{dead}\)</span>) may vary is the species is winter deciduous.</p>
+<p>Vegetation input requirements are fully described in section <a href="model-inputs.html#vegetationinput">2.4</a>. Tree, shrub and herb cohorts do not need to be characterized with different variables in soil water balance calculations, since all living plant cohorts have a <span class="math inline">\(LAI\)</span> value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. <span class="math inline">\(LAI_{live}\)</span>, because normally at the starting point all leaves are expanded (i.e. <span class="math inline">\(LAI_{\phi} = LAI_{live}\)</span>) and one can assume no dead leaves in the canopy (i.e., <span class="math inline">\(LAI_{dead} = 0\)</span>). Vegetation characteristics stay constant during simulations using function <code>spwb()</code>, although the actual expanded leaf area (<span class="math inline">\(LAI_{\phi}\)</span>) and dead leaf area (<span class="math inline">\(LAI_{dead}\)</span>) may vary is the species is winter deciduous. For each plant cohort with hemi-parasitic (mistletoe) plants living on crowns, a corresponding value of mistletoe leaf area index (<span class="math inline">\(LAI_{mistletoe}\)</span>) needs to be defined.</p>
 <p><strong>Meteorology</strong></p>
 <p>The minimum weather variables required to run the model are min/max temperatures (<span class="math inline">\(T_{min}\)</span> and <span class="math inline">\(T_{max}\)</span>), min/max relative humidity (<span class="math inline">\(RH_{min}\)</span> and <span class="math inline">\(RH_{max}\)</span>), precipitation (<span class="math inline">\(P\)</span>) and solar radiation (<span class="math inline">\(Rad\)</span>). Wind speed (<span class="math inline">\(u\)</span>) is also needed, but the user may use missing values if not available (a default value will be used in this case). Wind speed is assumed to have been measured at a specific height above the canopy (by default at 2 m). Atmospheric <span class="math inline">\(CO_2\)</span> concentration (<span class="math inline">\(C_{atm}\)</span>) may also be specified, but if missing a default constant value is assumed, which is taken from the control parameters. Definitions and units of these variables were given in section <a href="model-inputs.html#meteoinput">2.5</a>.</p>
 </div>
@@ -1117,25 +1122,25 @@ Among inputs, precipitation (<span class="math inline">\(P\)</span>) will the mo
 <td><span class="math inline">\(WUE_{\max}\)</span></td>
 <td><span class="math inline">\(g\, C \cdot mm^{-1}\)</span></td>
 <td><code>WUE</code></td>
-<td>Water use efficiency at VPD = 1kPa and without light or CO2 limitations (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>).</td>
+<td>Water use efficiency at VPD = 1kPa and without light or CO2 limitations (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.7</a>).</td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(WUE_{PAR}\)</span></td>
 <td></td>
 <td><code>WUE_par</code></td>
-<td>Coefficient describing the progressive decay of WUE with lower light levels (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>).</td>
+<td>Coefficient describing the progressive decay of WUE with lower light levels (see section <a href="transpirationgranier.html#basicphotosynthesis">6.1.7</a>).</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(WUE_{CO2}\)</span></td>
 <td></td>
 <td><code>WUE_co2</code></td>
-<td>Coefficient for WUE dependency on atmospheric CO2 concentration <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>).</td>
+<td>Coefficient for WUE dependency on atmospheric CO2 concentration <a href="transpirationgranier.html#basicphotosynthesis">6.1.7</a>).</td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(WUE_{VPD}\)</span></td>
 <td></td>
 <td><code>WUE_vpd</code></td>
-<td>Coefficient for WUE dependency on vapor pressure deficit <a href="transpirationgranier.html#basicphotosynthesis">6.1.6</a>).</td>
+<td>Coefficient for WUE dependency on vapor pressure deficit <a href="transpirationgranier.html#basicphotosynthesis">6.1.7</a>).</td>
 </tr>
 </tbody>
 </table>
@@ -1253,6 +1258,15 @@ Among inputs, precipitation (<span class="math inline">\(P\)</span>) will the mo
 <li><code>cavitationRecoveryMaximumRate [= 0.05]</code>: Maximum rate of conductance recovery (see section <a href="transpirationgranier.html#irreversiblecavitation">6.2.2</a>).</li>
 <li><code>cavitationInducedDefoliation [= TRUE]</code>: Whether leaf hydraulic impairment induces defoliation (88 % PLC will correspond to 50 % defoliation).</li>
 <li><code>lfmcComponent [= "fine"]</code>: Plant component used to estimate LFMC, either “leaf” or “fine” (for fine fuel) (see section <a href="planthydraulics.html#lfmc">10.3.4</a>).</li>
+<li><code>mistletoeParams</code>: A list with the following elements:
+<ul>
+<li><code>kPAR [= 0.5]</code>: Mistletoe light extinction coefficient.</li>
+<li><code>g [= 0.8]</code>: Mistletoe water storage capacity per LAI unit.</li>
+<li><code>Tmax_LAI [= 0.134]</code>: Empirical coefficient relating mistletoe LAI with the ratio of maximum transpiration over potential evapotranspiration.</li>
+<li><code>Tmax_LAIsq [= -0.006]</code>: Empirical coefficient relating squared mistletoe LAI with the ratio of maximum transpiration over potential evapotranspiration.</li>
+<li><code>Gs_P50 [= -4.0]</code>: Water potential corresponding to 50% reduction of mistletoe stomatal conductance.</li>
+<li><code>Gs_slope [= 30]</code>: Rate of decrease in mistletoe stomatal conductance at Gs_P50.</li>
+</ul></li>
 </ul>
 </div>
 <div id="basicwaterbalanceoutput" class="section level3 hasAnchor" number="3.5.4">

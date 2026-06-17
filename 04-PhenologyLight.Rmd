@@ -74,9 +74,9 @@ where $u$ is wind speed in ($m \cdot s^{-1}$), $LAI_{dead,i,d-1}$ is the dead le
 The proportion of photosynthetically active radiation (PAR) and short-wave radiation (SWR; 400-3000 nm) decreases through the canopy following the Beer-Lambert’s light extinction equation. 
 $L^{PAR}_{herb}$, the proportion of PAR that reaches the herbaceous layer, is calculated as:
 \begin{equation}
-L^{PAR}_{herb}=e^{-\sum_{i=1}^{c}{k_{PAR,i} \cdot LAI_{all,i}}}
+L^{PAR}_{herb}=\exp \left(-\sum_{i=1}^{c}{k_{PAR,i} \cdot LAI_{all,i} + k_{PAR, mistletoe} \cdot LAI_{mistletoe,i}} \right)
 \end{equation}
-where $k_{PAR,i}$ is the PAR extinction coefficient of plant cohort $i$. If we add the extinction caused by the herbaceous layer, we have that $L^{PAR}_{ground}$, the proportion of PAR that reaches the ground, is calculated as:
+where $k_{PAR,i}$ is the PAR extinction coefficient of plant cohort $i$ and $k_{PAR,mistletoe}$ is the PAR extinction coefficient of mistletoe. If we add the extinction caused by the herbaceous layer, we have that $L^{PAR}_{ground}$, the proportion of PAR that reaches the ground, is calculated as:
 \begin{equation}
 L^{PAR}_{ground}=L^{PAR}_{herb}e^{-0.5 \cdot LAI_{herb}}
 \end{equation}
@@ -95,12 +95,11 @@ plot_grid(g1, g2, nrow=1, ncol=2)
 
 To calculate radiation absorption, where the vertical dimension of the plot is divided into layers (as explained in \@ref(leafdistribution)), and the SWR absorbed is calculated for each plant cohort in each layer. Let $l$ be the number of vertical layers. The fraction of radiation incident on layer $j$ that is absorbed in the same layer is:
 \begin{equation}
-f_j=1 - e^{-\sum_{i=1}^{c}{k_{SWR,i} \cdot LAI_{all, i,j}}}
+f_j=1 - \exp \left(-\sum_{i=1}^{c}{k_{SWR,i} \cdot LAI_{all, i,j} + k_{SWR, mistletoe} \cdot LAI_{mistletoe,i,j}} \right)
 \end{equation}
-where $LAI_{i,j}^{all}$ is the leaf area index of cohort $i$ in layer $j$. Hence, the fraction transmitted is $(1-f_j)$. The fraction of radiation incident on layer $j$ that is absorbed by expanded leaves of plant cohort $i$ in that layer ($f_{ij}$) is calculated from the relative
-contribution of these leaves to the total absorption in the layer:
+where $LAI_{all,i,j}$ is the leaf area index of cohort $i$ in layer $j$ and $LAI_{mistletoe,i,j}$ is the leaf area index of mistletoe of cohort $i$ in layer $j$. Hence, the fraction transmitted is $(1-f_j)$. The fraction of radiation incident on layer $j$ that is absorbed by expanded leaves of plant cohort $i$ in that layer ($f_{ij}$) is calculated from the relative contribution of these leaves to the total absorption in the layer:
 \begin{equation}
-f_{ij} = f_j \cdot \frac{k_{SWR,i}\cdot LAI_{\phi, i,j}}{\sum_{h=1}^{c}{k_{SWR,h} \cdot LAI_{all, h,j}}}
+f_{ij} = f_j \cdot \frac{k_{SWR,i}\cdot LAI_{\phi, i,j}}{\sum_{h=1}^{c}{k_{SWR,h} \cdot LAI_{all, h,j} + k_{SWR, mistletoe} \cdot LAI_{mistletoe,h,j}}}
 \end{equation}
 The fraction of canopy radiation absorbed by a plant cohort $i$ across all layers is found by adding the fraction absorbed in each layer:
 \begin{equation}

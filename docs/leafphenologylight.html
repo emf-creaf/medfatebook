@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-06-09" />
+<meta name="date" content="2026-06-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -287,7 +287,8 @@ div.csl-indent {
 <li class="chapter" data-level="6.1.3" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-water-potential"><i class="fa fa-check"></i><b>6.1.3</b> Plant water potential</a></li>
 <li class="chapter" data-level="6.1.4" data-path="transpirationgranier.html"><a href="transpirationgranier.html#minimum-transpiration"><i class="fa fa-check"></i><b>6.1.4</b> Minimum transpiration</a></li>
 <li class="chapter" data-level="6.1.5" data-path="transpirationgranier.html"><a href="transpirationgranier.html#transpirationpools"><i class="fa fa-check"></i><b>6.1.5</b> Transpiration with water pools</a></li>
-<li class="chapter" data-level="6.1.6" data-path="transpirationgranier.html"><a href="transpirationgranier.html#basicphotosynthesis"><i class="fa fa-check"></i><b>6.1.6</b> Plant photosynthesis</a></li>
+<li class="chapter" data-level="6.1.6" data-path="transpirationgranier.html"><a href="transpirationgranier.html#mistletoetranspiration"><i class="fa fa-check"></i><b>6.1.6</b> Transpiration of hemi-parasitic plants</a></li>
+<li class="chapter" data-level="6.1.7" data-path="transpirationgranier.html"><a href="transpirationgranier.html#basicphotosynthesis"><i class="fa fa-check"></i><b>6.1.7</b> Plant photosynthesis</a></li>
 </ul></li>
 <li class="chapter" data-level="6.2" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-drought-stress-and-cavitation"><i class="fa fa-check"></i><b>6.2</b> Plant drought stress and cavitation</a>
 <ul>
@@ -841,9 +842,9 @@ where <span class="math inline">\(u\)</span> is wind speed in (<span class="math
 <p>The proportion of photosynthetically active radiation (PAR) and short-wave radiation (SWR; 400-3000 nm) decreases through the canopy following the Beer-Lambert’s light extinction equation.
 <span class="math inline">\(L^{PAR}_{herb}\)</span>, the proportion of PAR that reaches the herbaceous layer, is calculated as:
 <span class="math display">\[\begin{equation}
-L^{PAR}_{herb}=e^{-\sum_{i=1}^{c}{k_{PAR,i} \cdot LAI_{all,i}}}
+L^{PAR}_{herb}=\exp \left(-\sum_{i=1}^{c}{k_{PAR,i} \cdot LAI_{all,i} + k_{PAR, mistletoe} \cdot LAI_{mistletoe,i}} \right)
 \end{equation}\]</span>
-where <span class="math inline">\(k_{PAR,i}\)</span> is the PAR extinction coefficient of plant cohort <span class="math inline">\(i\)</span>. If we add the extinction caused by the herbaceous layer, we have that <span class="math inline">\(L^{PAR}_{ground}\)</span>, the proportion of PAR that reaches the ground, is calculated as:
+where <span class="math inline">\(k_{PAR,i}\)</span> is the PAR extinction coefficient of plant cohort <span class="math inline">\(i\)</span> and <span class="math inline">\(k_{PAR,mistletoe}\)</span> is the PAR extinction coefficient of mistletoe. If we add the extinction caused by the herbaceous layer, we have that <span class="math inline">\(L^{PAR}_{ground}\)</span>, the proportion of PAR that reaches the ground, is calculated as:
 <span class="math display">\[\begin{equation}
 L^{PAR}_{ground}=L^{PAR}_{herb}e^{-0.5 \cdot LAI_{herb}}
 \end{equation}\]</span>
@@ -859,12 +860,11 @@ Figure 4.2: Light extinction in a forest stand. Note the sharper decrease of PAR
 </div>
 <p>To calculate radiation absorption, where the vertical dimension of the plot is divided into layers (as explained in <a href="model-inputs.html#leafdistribution">2.4.3.3</a>), and the SWR absorbed is calculated for each plant cohort in each layer. Let <span class="math inline">\(l\)</span> be the number of vertical layers. The fraction of radiation incident on layer <span class="math inline">\(j\)</span> that is absorbed in the same layer is:
 <span class="math display">\[\begin{equation}
-f_j=1 - e^{-\sum_{i=1}^{c}{k_{SWR,i} \cdot LAI_{all, i,j}}}
+f_j=1 - \exp \left(-\sum_{i=1}^{c}{k_{SWR,i} \cdot LAI_{all, i,j} + k_{SWR, mistletoe} \cdot LAI_{mistletoe,i,j}} \right)
 \end{equation}\]</span>
-where <span class="math inline">\(LAI_{i,j}^{all}\)</span> is the leaf area index of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span>. Hence, the fraction transmitted is <span class="math inline">\((1-f_j)\)</span>. The fraction of radiation incident on layer <span class="math inline">\(j\)</span> that is absorbed by expanded leaves of plant cohort <span class="math inline">\(i\)</span> in that layer (<span class="math inline">\(f_{ij}\)</span>) is calculated from the relative
-contribution of these leaves to the total absorption in the layer:
+where <span class="math inline">\(LAI_{all,i,j}\)</span> is the leaf area index of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span> and <span class="math inline">\(LAI_{mistletoe,i,j}\)</span> is the leaf area index of mistletoe of cohort <span class="math inline">\(i\)</span> in layer <span class="math inline">\(j\)</span>. Hence, the fraction transmitted is <span class="math inline">\((1-f_j)\)</span>. The fraction of radiation incident on layer <span class="math inline">\(j\)</span> that is absorbed by expanded leaves of plant cohort <span class="math inline">\(i\)</span> in that layer (<span class="math inline">\(f_{ij}\)</span>) is calculated from the relative contribution of these leaves to the total absorption in the layer:
 <span class="math display">\[\begin{equation}
-f_{ij} = f_j \cdot \frac{k_{SWR,i}\cdot LAI_{\phi, i,j}}{\sum_{h=1}^{c}{k_{SWR,h} \cdot LAI_{all, h,j}}}
+f_{ij} = f_j \cdot \frac{k_{SWR,i}\cdot LAI_{\phi, i,j}}{\sum_{h=1}^{c}{k_{SWR,h} \cdot LAI_{all, h,j} + k_{SWR, mistletoe} \cdot LAI_{mistletoe,h,j}}}
 \end{equation}\]</span>
 The fraction of canopy radiation absorbed by a plant cohort <span class="math inline">\(i\)</span> across all layers is found by adding the fraction absorbed in each layer:
 <span class="math display">\[\begin{equation}

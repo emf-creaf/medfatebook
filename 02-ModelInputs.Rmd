@@ -301,6 +301,7 @@ Since density and diameter have not been provided, simulations in this case will
 The structure presented above for `forest` objects corresponds to the required data elements. A forest object can contain additional information when this is available. In particular, data frames `treeData`, `shrubData` and `herbData` can contain additional columns:
 
 + `LAI`: Leaf area index ($m^2 \cdot m^{-2}$), corresponding to $LAI_{live}$, avoiding the use of allometric relationships for leaf biomass in water balance simulations.
++ `LAIMistletoe`: Leaf area index ($m^2 \cdot m^{-2}$) of hemi-parasitic (mistletoe) plants.
 + `FoliarBiomass`: Standing dry biomass of leaves ($kg \cdot m^{-2}$), which together with $SLA$ will be used to estimate $LAI_{live}$, avoiding the use of allometric relationships for leaf biomass in water balance simulations.
 + `FuelLoading`: Fine fuel loading ($kg \cdot m^{-2}$), to avoid its calculation from allometric relationships.
 + `CrownRatio`: The ratio between crown length and total height (between 0 and 1), avoiding the use of allometric relationships for crown ratio in water balance simulations.
@@ -389,12 +390,13 @@ For simulations not involving growth, winter-deciduous phenology is a prognosed 
 
 #### Leaf area index of the forest stand
 
-If there are $c$ living plant cohorts, the leaf area index corresponding to living leaves, unfolded leaves and dead leaves can be aggregated across cohorts using:
+If there are $c$ living plant cohorts, the leaf area index corresponding to living leaves, unfolded leaves, dead leaves and leaves of hemi-parasitic (mistletoe) plants can be aggregated across cohorts using:
 
 \begin{eqnarray}
 LAI_{live} &=& \sum_{i=1}^c{LAI_{live,i}} \\
 LAI_{\phi} &=& \sum_{i=1}^c{LAI_{\phi,i}} \\
-LAI_{dead} &=& \sum_{i=1}^c{LAI_{dead,i}}
+LAI_{dead} &=& \sum_{i=1}^c{LAI_{dead,i}} \\
+LAI_{mistletoe} &=& \sum_{i=1}^c{LAI_{mistletoe,i}}
 \end{eqnarray}
 
 We can also estimate the overall leaf area index of living plant cohorts ($LAI_{all}$), including dead leaves:
@@ -403,10 +405,10 @@ We can also estimate the overall leaf area index of living plant cohorts ($LAI_{
 LAI_{all} &=& \sum_{i=1}^{c}{\left[LAI_{\phi,i}+LAI_{dead,i}\right]} = LAI_{\phi}+LAI_{dead}
 \end{eqnarray}
 
-Finally, we can also estimate the overall leaf area index of the whole stand ($LAI_{all,stand}$), which also takes into account the collective herbaceous layer ($LAI_{herb}$), if defined:
+Finally, we can also estimate the overall leaf area index of the whole stand ($LAI_{all,stand}$), which also takes into account the leaf area of mistletoes ($LAI_{mistletoe}$) and the collective herbaceous layer ($LAI_{herb}$), if defined:
 
 \begin{eqnarray}
-LAI_{all, stand} &=& LAI_{all} + LAI_{herb} = LAI_{\phi}+LAI_{dead} + LAI_{herb} 
+LAI_{all, stand} &=& LAI_{all} + LAI_{herb} = LAI_{\phi}+LAI_{dead} + LAI_{mistletoe} + LAI_{herb} 
 \end{eqnarray}
 
 #### Vertical leaf distribution {#leafdistribution}

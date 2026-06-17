@@ -73,6 +73,7 @@ nlayer = 10
 LAIlayerlive = matrix(rep(LAI/nlayer,nlayer),nlayer,1)
 LAIlayermax = matrix(rep(LAI/nlayer,nlayer),nlayer,1)
 LAIlayerdead = matrix(0,nlayer,1)
+LAIlayermist = matrix(0,nlayer,1)
 ```
 
 We will also define the coefficients of diffuse extinction, leaf absorbance and leaf reflection for PAR and SWR:
@@ -89,13 +90,16 @@ These definitions, and that of direct extinction coefficient, lead to a percenta
 (ref:irradianceperlayer) The left panel shows irradiance per layer of diffuse and direct PAR and SWR assuming a LAI of 2 equally distributed among layers (see function `light_layerIrradianceFraction()`). The right panel shows the corresponding proportions of sunlit and shade leaves in each layer (see function `light_layerSunlitFraction()`).
 
 ```{r irradianceperlayer, fig.height=4, fig.width=8, echo=FALSE, fig.align = 'center', fig.cap = '(ref:irradianceperlayer)'}
-Ibfpar <- light_layerDirectIrradianceFraction(LAIlayerlive,LAIlayerdead,LAIlayermax, 
+Ibfpar <- light_layerDirectIrradianceFraction(LAIlayerlive,LAIlayerdead,LAIlayermax, LAIlayermist,
                                              kb, clumping,
-                                             alpha_PAR, gamma_PAR)
-Ibfswr <- light_layerDirectIrradianceFraction(LAIlayerlive,LAIlayerdead,LAIlayermax, 
+                                             alpha_PAR, gamma_PAR,
+                                             kb_mistletoe = 0.9, CI_mistletoe = 0.75, alpha_mistletoe = 0.7, gamma_mistletoe = 0.14)
+Ibfswr <- light_layerDirectIrradianceFraction(LAIlayerlive,LAIlayerdead,LAIlayermax, LAIlayermist,
                                              kb, clumping,
-                                             alpha_SWR, gamma_SWR)
-fsunlit = light_layerSunlitFraction(LAIlayerlive, LAIlayerdead, kb, clumping)
+                                             alpha_SWR, gamma_SWR,
+                                             kb_mistletoe = 0.9, CI_mistletoe = 0.75, alpha_mistletoe = 0.7, gamma_mistletoe = 0.14)
+fsunlit = light_layerSunlitFraction(LAIlayerlive, LAIlayerdead, LAIlayermist, kb, clumping,
+                                    kb_mistletoe = 0.9, CI_mistletoe = 0.75)
 SHarea = (1-fsunlit)*LAIlayerlive[,1] 
 SLarea = fsunlit*LAIlayerlive[,1] 
 
@@ -162,13 +166,15 @@ KDIFF
 
 ```{r absorbanceperlayer, echo=FALSE, fig.width=7, fig.height=4, fig.align="center", fig.cap='(ref:absorbanceperlayer-cap)'}
 abs_PAR <- light_cohortSunlitShadeAbsorbedRadiation(PAR_direct, PAR_diffuse,
-                                                   LAIlayerlive, LAIlayerdead, LAIlayermax, 
+                                                   LAIlayerlive, LAIlayerdead, LAIlayermax, LAIlayermist, 
                                                    kb, KDIFF, clumping, ZF, 
-                                                   alpha_PAR, gamma_PAR)
+                                                   alpha_PAR, gamma_PAR,
+                                                   kb_mistletoe = 0.9, K_mistletoe = KDIFF[1,], CI_mistletoe = 0.75, alpha_mistletoe = 0.7, gamma_mistletoe = 0.14)
 abs_SWR <- light_cohortSunlitShadeAbsorbedRadiation(SWR_direct, SWR_diffuse,
-                                                   LAIlayerlive, LAIlayerdead, LAIlayermax, 
+                                                   LAIlayerlive, LAIlayerdead, LAIlayermax, LAIlayermist,
                                                    kb, KDIFF, clumping, ZF, 
-                                                   alpha_SWR, gamma_SWR)
+                                                   alpha_SWR, gamma_SWR,
+                                                   kb_mistletoe = 0.9, K_mistletoe = KDIFF[1,], CI_mistletoe = 0.75, alpha_mistletoe = 0.7, gamma_mistletoe = 0.14)
 par(mar=c(4,4,1,1), mfrow=c(1,2))
 absRadSL = abs_SWR$I_sunlit[,1]
 absRadSH = abs_SWR$I_shade[,1]
