@@ -1015,7 +1015,7 @@ g_{sw} = \lambda(\Psi_{leaf,sym}) \cdot g_{sw, light, temp}
 where $g_{sw, light, temp}$ is the stomatal conductance value without water stress, and $\lambda$ is a regulation factor that varies between 0 and 1 to represent stomatal closure according to leaf symplasmic water potential ($\Psi_{leaf,sym}$) using a sigmoid-type function:
 
 \begin{equation}
-\lambda(\Psi_{leaf,sym}) = 1 - \left(1 + e^{(slope_{gs}/25) \cdot (\Psi_{leaf,sym} - \Psi50_{gs}}) \right)^{-1}
+\lambda(\Psi_{leaf,sym}) = 1 - \left(1 + e^{(slope_{gs}/25) \cdot (\Psi_{leaf,sym} - \Psi50_{gs})} \right)^{-1}
 \end{equation}
 
 depending on the potential at 50 % of stomatal closure ($\Psi50_{gs}$) and a shape parameter ($slope_{gs}$) describing the rate of decrease in stomatal conductance per unit of water potential drop. With the current implementation, $\lambda$ will be the same for sunlit and shade leaves (i.e. there is only one symplasmic water potential for both kind of leaves) but $g_{sw, light, temp}$ will differ because of the different light and temperature conditions.
@@ -1088,4 +1088,43 @@ Instantaneous net photosynthesis per leaf area of sunlit and shade leaves in a g
  (\#eq:cohortnetphotosynthesis)
 \end{equation}
 Scaling of gross photosynthesis rates is done analogously.
+
+## Stomatal regulation and transpiration of hemi-parasitic plants {#mistletoetranspirationadvanced}
+
+The model does not try to simulate mistletoe hydraulics, because the focus is on estimating the effect of mistletoe transpiration on the host plant cohort. Mistletoe hydraulic conductance (or water potential drop) is not explicitly represented. Instead, the water potential driving transpiration in mistletoe is assumed to be *equal to the leaf water potential of the host plant*. In other words, it is assumed that the drop in water potential in mistletoe branches and leaves is comparable to the drop from the mistletoe branch insertion point to the host leaf (but see different water potential values in @sancho-knapik_viscum_2026). 
+
+Stomatal regulation and transpiration of mistletoe is performed separately for sunlit and shade leaves. Leaf temperature (i.e. energy balance) is first estimated, using the absorbed short-wave radiation and net long-wave radiation per leaf area unit of the corresponding sunlit or shade leaves of the host cohort, but employing the mistletoe transpiration rate of the previous subdaily time step and its leaf width (see \@ref(leafenergybalancephoto)). Next, the corresponding vapor pressure deficit of sunlit and shade mistletoe leaves (i.e. $VPD_{leaf, mistletoe}$) are estimated as described in \@ref(leafVPD). Stomatal regulation follows an approach similar to that described for the SurEau submodel (see \@ref(transpirationsureau)). Stomatal conductance (and photosynthesis) is first estimated for current temperature and light conditions assuming no water limitation (i.e. $g_{sw, light, temp, mistletoe}$), using the approach of Baldocchi [-@baldocchi_analytical_1994]:
+\begin{equation}
+g_{sw, light, temp, mistletoe} = g_{sw, 0, mistletoe} + m_{wue, mistletoe} \cdot \frac{A_{n, mistletoe}}{C_{s, mistletoe}}
+\end{equation}
+where $m_{wue, mistletoe}$ is a dimensionless slope representing the water use efficiency, $A_{n, mistletoe}$ is net mistletoe photosynthesis as determined by Farquhar's model (which accounts for light and temperature effects on mistletoe photosynthetic capacity parameters), $g_{sw, 0, mistletoe}$ is the zero intercept when $A_{n, mistletoe} = 0$, here taken as $g_{sw,0, mistletoe} = g_{sw, night}$ and $C_{s, mistletoe}$ is the $CO_2$ concentration inside mistletoe stomata, i.e.:
+\begin{equation}
+C_{s, mistletoe} = C_{air} - (A_{n, mistletoe}/g_{bc})
+\end{equation}
+where $C_{air}$ is the inside the canopy $CO_2$ concentration and $g_{bc}$ is the boundary layer for $CO_2$:
+\begin{equation}
+g_{bc} = g_{bound}/1.6
+\end{equation}
+
+The stomatal conductance of mistletoe taking into account the dependence of leaf water status (i.e. $g_{sw, mistletoe}$) is: 
+\begin{equation}
+g_{sw, mistletoe} = \lambda_{mistletoe}(\Psi_{leaf,sym}) \cdot g_{sw, light, temp, mistletoe} 
+\end{equation}
+
+where $\lambda_{mistletoe}$ is a regulation factor that varies between 0 and 1 to represent stomatal closure according to the host leaf symplasmic water potential ($\Psi_{leaf,sym}$) using a sigmoid-type function:
+
+\begin{equation}
+\lambda_{mistletoe}(\Psi_{leaf,sym}) = 1 - \left(1 + e^{(slope_{gs,mistletoe}/25) \cdot (\Psi_{leaf,sym} - \Psi50_{gs, mistletoe})} \right)^{-1}
+\end{equation}
+
+with $\Psi50_{gs, mistletoe}$ and $slope_{gs,mistletoe}$ being parameters of the stomatal vulnerability curve described as control parameters.
+
+Mistletoe transpiration flow $E_{mistletoe}$ is estimated (for sunlit or shade leaves) using Fick's law:
+\begin{equation}
+E_{mistletoe}  = g_{w, mistletoe} \cdot \frac{VPD_{leaf, mistletoe}}{P_{atm}}
+\end{equation}
+where $VPD_{leaf, mistletoe}$ is the vapor pressure deficit of the mistletoe leaf and $g_{w, mistletoe}$ is the diffusive conductance incorporating both mistletoe stomatal conductance and boundary layer conductance.
+
+Mistletoe transpiration effects are not modelled directly on the plant host, but rather as additional soil water uptake from the soil layers (or pools) where the host is connected, which feedbacks on the water status of the host at later time steps. Under the Sperry transpiration submodel, mistletoe transpiration is added to the average instantaneous flow rate $\hat{E}$ and the hydraulic supply function of the host is used to find the transpiration rate $E$ numerically closest to $\hat{E}$ (remember that the supply function is build in discrete steps). Finding the $E$ value numerically closest to $\hat{E}$ allows determining the total (i.e. host + mistletoe) instantaneous soil water uptake rates ($U_{s}$) from each soil layer $s$. Under the Sureau transpiration submodel, mistletoe transpiration is calculated at small time steps and it is added to soil water uptake following the same soil layer uptake proportions determined for the direct uptake of the host plant cohort.
+
 

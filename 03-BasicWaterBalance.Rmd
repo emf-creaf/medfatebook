@@ -97,7 +97,7 @@ For every day to be simulated, the model performs the following steps:
   1. Update leaf area values according to the phenology of species and recalculate radiation extinction (sections \@ref(leafphenology) and \@ref(basiclightextinction)).
   2. Determine rainfall interception loss ($In$) and net rainfall ($Pr_{net}$) (section \@ref(interception)). The amount of water reaching the soil surface from the rainfall event is the sum of net rainfall ($Pr_{net}$) and surface runon ($Ro$), if given. If snow dynamics are included, increase snow pack from snow precipitation ($Ps$) and decrease it following snow melt ($Sm$) (section \@ref(snowpack)).
   3. Determine bare soil evaporation ($Es$), if snow is not present (section \@ref(soilevaporation)), and herbaceous layer transpiration ($Tr_{herb}$; section \@ref(herbaceoustranspiration)) if required.
-  4. Determine plant cohort transpiration ($Tr_{cohorts}$), including hydraulic redistribution, and photosynthesis (chapter \@ref(transpirationgranier)). Update plant water potential ($\Psi_{plant}$) and plant drought stress for each plant cohort. If necessary, determine mistletoe transpiration ($Tr_{mistletoe}$) and the correspoindg additional soil water uptake (section \@ref(mistletoetranspiration)).
+  4. Determine plant cohort transpiration ($Tr_{cohorts}$), including hydraulic redistribution, and photosynthesis (chapter \@ref(transpirationgranier)). Update plant water potential ($\Psi_{plant}$) and plant drought stress for each plant cohort. If necessary, determine mistletoe transpiration ($Tr_{mistletoe}$) and the corresponding additional soil water uptake (section \@ref(mistletoetranspirationbasic)).
   5. Determine rainfall infiltration (section \@ref(infiltration)) and vertical water movement within the soil (section \@ref(soilflows)), while considering soil layer source/sinks from snow melt, bare soil evaporation and herbaceous layer transpiration and water uptake/redistribution by plant cohorts. This updates soil moisture and returns infiltration ($If$), runoff ($Ru$) and deep drainage ($Dd$). 
   6. If fire hazard calculations are requested, estimate live and dead fuel moisture and potential fire behaviour (chapter \@ref(fuelandfirebehavior)).
 
@@ -234,8 +234,8 @@ The other relevant control parameters for the basic water balance model are:
     + `g [= 0.8]`: Mistletoe water storage capacity per LAI unit.
     + `Tmax_LAI [= 0.134]`: Empirical coefficient relating mistletoe LAI with the ratio of maximum transpiration over potential evapotranspiration.
     + `Tmax_LAIsq [= -0.006]`: Empirical coefficient relating squared mistletoe LAI with the ratio of maximum transpiration over potential evapotranspiration.
-    + `Gs_P50 [= -4.0]`: Water potential corresponding to 50% reduction of mistletoe stomatal conductance.
-    + `Gs_slope [= 30]`: Rate of decrease in mistletoe stomatal conductance at Gs_P50.
+    + `Gs_P50 [= -4.0]`: Water potential corresponding to 50% reduction of mistletoe stomatal conductance (i.e. $\Psi50_{gs, mistletoe}$).
+    + `Gs_slope [= 30]`: Rate of decrease in mistletoe stomatal conductance at Gs_P50 (i.e. $slope_{gs, mistletoe}$).
 
 ### Model output {#basicwaterbalanceoutput}
 

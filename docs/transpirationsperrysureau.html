@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-06-17" />
+<meta name="date" content="2026-06-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -278,7 +278,7 @@ div.csl-indent {
 <li class="chapter" data-level="5.7.6" data-path="hydrology.html"><a href="hydrology.html#finite-approximation-to-flows-in-the-macropore-domain"><i class="fa fa-check"></i><b>5.7.6</b> Finite approximation to flows in the macropore domain</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Plant cohort transpiration, photosynthesis and drought stress</a>
+<li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Plant transpiration, photosynthesis and drought stress</a>
 <ul>
 <li class="chapter" data-level="6.1" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-transpiration-and-photosynthesis"><i class="fa fa-check"></i><b>6.1</b> Plant transpiration and photosynthesis</a>
 <ul>
@@ -287,7 +287,7 @@ div.csl-indent {
 <li class="chapter" data-level="6.1.3" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-water-potential"><i class="fa fa-check"></i><b>6.1.3</b> Plant water potential</a></li>
 <li class="chapter" data-level="6.1.4" data-path="transpirationgranier.html"><a href="transpirationgranier.html#minimum-transpiration"><i class="fa fa-check"></i><b>6.1.4</b> Minimum transpiration</a></li>
 <li class="chapter" data-level="6.1.5" data-path="transpirationgranier.html"><a href="transpirationgranier.html#transpirationpools"><i class="fa fa-check"></i><b>6.1.5</b> Transpiration with water pools</a></li>
-<li class="chapter" data-level="6.1.6" data-path="transpirationgranier.html"><a href="transpirationgranier.html#mistletoetranspiration"><i class="fa fa-check"></i><b>6.1.6</b> Transpiration of hemi-parasitic plants</a></li>
+<li class="chapter" data-level="6.1.6" data-path="transpirationgranier.html"><a href="transpirationgranier.html#mistletoetranspirationbasic"><i class="fa fa-check"></i><b>6.1.6</b> Transpiration of hemi-parasitic plants</a></li>
 <li class="chapter" data-level="6.1.7" data-path="transpirationgranier.html"><a href="transpirationgranier.html#basicphotosynthesis"><i class="fa fa-check"></i><b>6.1.7</b> Plant photosynthesis</a></li>
 </ul></li>
 <li class="chapter" data-level="6.2" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-drought-stress-and-cavitation"><i class="fa fa-check"></i><b>6.2</b> Plant drought stress and cavitation</a>
@@ -410,6 +410,7 @@ div.csl-indent {
 <li class="chapter" data-level="12.2.4" data-path="transpirationsperrysureau.html"><a href="transpirationsperrysureau.html#photosynthesissureau"><i class="fa fa-check"></i><b>12.2.4</b> Photosynthesis</a></li>
 </ul></li>
 <li class="chapter" data-level="12.3" data-path="transpirationsperrysureau.html"><a href="transpirationsperrysureau.html#scalingtranspirationphotosynthesis"><i class="fa fa-check"></i><b>12.3</b> Scaling of transpiration, soil water uptake and photosynthesis rates</a></li>
+<li class="chapter" data-level="12.4" data-path="transpirationsperrysureau.html"><a href="transpirationsperrysureau.html#mistletoetranspirationadvanced"><i class="fa fa-check"></i><b>12.4</b> Stomatal regulation and transpiration of hemi-parasitic plants</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html"><i class="fa fa-check"></i><b>13</b> Closing energy balances</a>
 <ul>
@@ -969,7 +970,7 @@ g_{sw} = \lambda(\Psi_{leaf,sym}) \cdot g_{sw, light, temp}
 \end{equation}\]</span></p>
 <p>where <span class="math inline">\(g_{sw, light, temp}\)</span> is the stomatal conductance value without water stress, and <span class="math inline">\(\lambda\)</span> is a regulation factor that varies between 0 and 1 to represent stomatal closure according to leaf symplasmic water potential (<span class="math inline">\(\Psi_{leaf,sym}\)</span>) using a sigmoid-type function:</p>
 <p><span class="math display">\[\begin{equation}
-\lambda(\Psi_{leaf,sym}) = 1 - \left(1 + e^{(slope_{gs}/25) \cdot (\Psi_{leaf,sym} - \Psi50_{gs}}) \right)^{-1}
+\lambda(\Psi_{leaf,sym}) = 1 - \left(1 + e^{(slope_{gs}/25) \cdot (\Psi_{leaf,sym} - \Psi50_{gs})} \right)^{-1}
 \end{equation}\]</span></p>
 <p>depending on the potential at 50 % of stomatal closure (<span class="math inline">\(\Psi50_{gs}\)</span>) and a shape parameter (<span class="math inline">\(slope_{gs}\)</span>) describing the rate of decrease in stomatal conductance per unit of water potential drop. With the current implementation, <span class="math inline">\(\lambda\)</span> will be the same for sunlit and shade leaves (i.e. there is only one symplasmic water potential for both kind of leaves) but <span class="math inline">\(g_{sw, light, temp}\)</span> will differ because of the different light and temperature conditions.</p>
 <p>Stomatal regulation according to light and temperature can be performed following either a Jarvis <span class="citation">(<a href="#ref-jarvis_interpretation_1976">1976</a>)</span> or Baldocchi <span class="citation">(<a href="#ref-baldocchi_analytical_1994">1994</a>)</span>, as dictated by the control parameter <code>stomatalSubmodel</code> (by default set to Baldocchi-type).</p>
@@ -1030,6 +1031,37 @@ A_{n,t} = (A_{n,sunlit,t} \cdot LAI_{sunlit} + A_{n,shade,t} \cdot LAI_{shade}) 
 \tag{12.3}
 \end{equation}\]</span>
 Scaling of gross photosynthesis rates is done analogously.</p>
+</div>
+<div id="mistletoetranspirationadvanced" class="section level2 hasAnchor" number="12.4">
+<h2><span class="header-section-number">12.4</span> Stomatal regulation and transpiration of hemi-parasitic plants<a href="transpirationsperrysureau.html#mistletoetranspirationadvanced" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The model does not try to simulate mistletoe hydraulics, because the focus is on estimating the effect of mistletoe transpiration on the host plant cohort. Mistletoe hydraulic conductance (or water potential drop) is not explicitly represented. Instead, the water potential driving transpiration in mistletoe is assumed to be <em>equal to the leaf water potential of the host plant</em>. In other words, it is assumed that the drop in water potential in mistletoe branches and leaves is comparable to the drop from the mistletoe branch insertion point to the host leaf (but see different water potential values in <span class="citation">Sancho-Knapik <em>et al.</em> (<a href="#ref-sancho-knapik_viscum_2026">2026</a>)</span>).</p>
+<p>Stomatal regulation and transpiration of mistletoe is performed separately for sunlit and shade leaves. Leaf temperature (i.e. energy balance) is first estimated, using the absorbed short-wave radiation and net long-wave radiation per leaf area unit of the corresponding sunlit or shade leaves of the host cohort, but employing the mistletoe transpiration rate of the previous subdaily time step and its leaf width (see <a href="plantphotosynthesis.html#leafenergybalancephoto">11.1</a>). Next, the corresponding vapor pressure deficit of sunlit and shade mistletoe leaves (i.e. <span class="math inline">\(VPD_{leaf, mistletoe}\)</span>) are estimated as described in <a href="plantphotosynthesis.html#leafVPD">11.1.2</a>. Stomatal regulation follows an approach similar to that described for the SurEau submodel (see <a href="transpirationsperrysureau.html#transpirationsureau">12.2.1</a>). Stomatal conductance (and photosynthesis) is first estimated for current temperature and light conditions assuming no water limitation (i.e. <span class="math inline">\(g_{sw, light, temp, mistletoe}\)</span>), using the approach of Baldocchi <span class="citation">(<a href="#ref-baldocchi_analytical_1994">1994</a>)</span>:
+<span class="math display">\[\begin{equation}
+g_{sw, light, temp, mistletoe} = g_{sw, 0, mistletoe} + m_{wue, mistletoe} \cdot \frac{A_{n, mistletoe}}{C_{s, mistletoe}}
+\end{equation}\]</span>
+where <span class="math inline">\(m_{wue, mistletoe}\)</span> is a dimensionless slope representing the water use efficiency, <span class="math inline">\(A_{n, mistletoe}\)</span> is net mistletoe photosynthesis as determined by Farquhar’s model (which accounts for light and temperature effects on mistletoe photosynthetic capacity parameters), <span class="math inline">\(g_{sw, 0, mistletoe}\)</span> is the zero intercept when <span class="math inline">\(A_{n, mistletoe} = 0\)</span>, here taken as <span class="math inline">\(g_{sw,0, mistletoe} = g_{sw, night}\)</span> and <span class="math inline">\(C_{s, mistletoe}\)</span> is the <span class="math inline">\(CO_2\)</span> concentration inside mistletoe stomata, i.e.:
+<span class="math display">\[\begin{equation}
+C_{s, mistletoe} = C_{air} - (A_{n, mistletoe}/g_{bc})
+\end{equation}\]</span>
+where <span class="math inline">\(C_{air}\)</span> is the inside the canopy <span class="math inline">\(CO_2\)</span> concentration and <span class="math inline">\(g_{bc}\)</span> is the boundary layer for <span class="math inline">\(CO_2\)</span>:
+<span class="math display">\[\begin{equation}
+g_{bc} = g_{bound}/1.6
+\end{equation}\]</span></p>
+<p>The stomatal conductance of mistletoe taking into account the dependence of leaf water status (i.e. <span class="math inline">\(g_{sw, mistletoe}\)</span>) is:
+<span class="math display">\[\begin{equation}
+g_{sw, mistletoe} = \lambda_{mistletoe}(\Psi_{leaf,sym}) \cdot g_{sw, light, temp, mistletoe}
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\lambda_{mistletoe}\)</span> is a regulation factor that varies between 0 and 1 to represent stomatal closure according to the host leaf symplasmic water potential (<span class="math inline">\(\Psi_{leaf,sym}\)</span>) using a sigmoid-type function:</p>
+<p><span class="math display">\[\begin{equation}
+\lambda_{mistletoe}(\Psi_{leaf,sym}) = 1 - \left(1 + e^{(slope_{gs,mistletoe}/25) \cdot (\Psi_{leaf,sym} - \Psi50_{gs, mistletoe})} \right)^{-1}
+\end{equation}\]</span></p>
+<p>with <span class="math inline">\(\Psi50_{gs, mistletoe}\)</span> and <span class="math inline">\(slope_{gs,mistletoe}\)</span> being parameters of the stomatal vulnerability curve described as control parameters.</p>
+<p>Mistletoe transpiration flow <span class="math inline">\(E_{mistletoe}\)</span> is estimated (for sunlit or shade leaves) using Fick’s law:
+<span class="math display">\[\begin{equation}
+E_{mistletoe}  = g_{w, mistletoe} \cdot \frac{VPD_{leaf, mistletoe}}{P_{atm}}
+\end{equation}\]</span>
+where <span class="math inline">\(VPD_{leaf, mistletoe}\)</span> is the vapor pressure deficit of the mistletoe leaf and <span class="math inline">\(g_{w, mistletoe}\)</span> is the diffusive conductance incorporating both mistletoe stomatal conductance and boundary layer conductance.</p>
+<p>Mistletoe transpiration effects are not modelled directly on the plant host, but rather as additional soil water uptake from the soil layers (or pools) where the host is connected, which feedbacks on the water status of the host at later time steps. Under the Sperry transpiration submodel, mistletoe transpiration is added to the average instantaneous flow rate <span class="math inline">\(\hat{E}\)</span> and the hydraulic supply function of the host is used to find the transpiration rate <span class="math inline">\(E\)</span> numerically closest to <span class="math inline">\(\hat{E}\)</span> (remember that the supply function is build in discrete steps). Finding the <span class="math inline">\(E\)</span> value numerically closest to <span class="math inline">\(\hat{E}\)</span> allows determining the total (i.e. host + mistletoe) instantaneous soil water uptake rates (<span class="math inline">\(U_{s}\)</span>) from each soil layer <span class="math inline">\(s\)</span>. Under the Sureau transpiration submodel, mistletoe transpiration is calculated at small time steps and it is added to soil water uptake following the same soil layer uptake proportions determined for the direct uptake of the host plant cohort.</p>
 
 </div>
 </div>
@@ -1046,6 +1078,9 @@ Jarvis, P.G. (1976). <a href="https://doi.org/10.1098/rstb.1976.0035">The <span>
 </div>
 <div id="ref-ruffault_sureau-ecos_2022" class="csl-entry">
 Ruffault, J., Pimont, F., Cochard, H., Dupuy, J.-L. &amp; Martin-StPaul, N. (2022). <a href="https://doi.org/10.5194/gmd-15-5593-2022"><span>SurEau</span>-<span>Ecos</span> v2.0: A trait-based plant hydraulics model for simulations of plant water status and drought-induced mortality at the ecosystem level</a>. <em>Geoscientific Model Development</em>, 15, 5593–5626.
+</div>
+<div id="ref-sancho-knapik_viscum_2026" class="csl-entry">
+Sancho-Knapik, D., Ferrio, J.P., Gil-Pelegrín, E., López-Ballesteros, A. &amp; Peguero-Pina, J.J. (2026). <a href="https://doi.org/10.1093/treephys/tpag020"><em><span>Viscum</span> album</em> shares hydraulic traits but causes a water uncoupling despite the adjustments of its host <em><span>Pinus</span> sylvestris</em></a>. <em>Tree Physiology</em>, 46, tpag020.
 </div>
 <div id="ref-Sperry1998" class="csl-entry">
 Sperry, J.S., Adler, F.R., Campbell, G.S. &amp; Comstock, J.P. (1998). <a href="https://doi.org/10.1046/j.1365-3040.1998.00287.x">Limitation of plant water use by rhizosphere and xylem conductance: Results from a model</a>. <em>Plant, Cell &amp; Environment</em>, 21, 347–359.

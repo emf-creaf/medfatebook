@@ -1,4 +1,4 @@
-# Plant cohort transpiration, photosynthesis and drought stress {#transpirationgranier}
+# Plant transpiration, photosynthesis and drought stress {#transpirationgranier}
 
 This chapter describes how daily plant cohort transpiration ($Tr_{cohorts}$) is modelled in the basic water balance model, completing the flows needed to evaluate eq. \@ref(eq:basicwaterbalanceequation). The model uses the approach of BILJOU [@Granier1999] to estimate plant cohort maximum transpiration, and then divides this value among the contribution of plant cohorts and estimate actual transpiration depending on soil moisture and cohort functional parameters, which determine plant drought. The chapter also describes how is daily photosynthesis estimated, a process that in this model does not influence transpiration but is necessary for growth calculations (chapter \@ref(growthmodelling)). Finally, we include here the description of the estimation of plant water status, the effect of drought stress and how plants recover from drought legacies.
 
@@ -151,7 +151,7 @@ Estimating transpiration with water pools is analogous to estimating transpirati
 
 Finally, note that the amount of water extracted from the soil layer $s$ of given water pool $j$ (i.e. from $W_{j,s}$) will not be $Tr_{i,s,j}$ (whose units are referred to the overall stand) but $Tr_{i,s,j}/f_{pool,j}$.
 
-### Transpiration of hemi-parasitic plants {#mistletoetranspiration}
+### Transpiration of hemi-parasitic plants {#mistletoetranspirationbasic}
 
 When mistletoes are considered in water balance simulations, they are included in radiation extinction calculations. The maximum transpiration of mistletoe in cohort $i$ is ($Tr_{mistletoe, i, \max}$):
 
@@ -159,7 +159,7 @@ When mistletoes are considered in water balance simulations, they are included i
    Tr_{mistletoe, i, \max} =  PET \cdot (T_{max,LAI} \cdot LAI_{\phi} + T_{max,sqLAI} \cdot (LAI_{\phi})^2 ) \cdot \frac{f_i^{0.75}}{\sum_{j}{f_j^{0.75}}} \cdot \frac{LAI_{mistletoe,i}}{LAI_{\phi,i}+LAI_{mistletoe,i}}
 \end{equation}
 
-Maximum transpiration is then reduced to actual transpiration (i.e. $Tr_{mistletoe, i}$) according to the water potential of the plant cohort ($\Psi_{plant,i}$), following a sigmoid function with parameters $Gs_{P50, mistletoe}$ and $Gs_{slope, mistletoe}$ (defined in control parameters). Soil water extraction corresponding to mistletoe transpiration is added to extraction caused by the corresponding plant cohort. 
+Maximum transpiration is then reduced to actual transpiration (i.e. $Tr_{mistletoe, i}$) according to the water potential of the plant cohort ($\Psi_{plant,i}$), following a sigmoid function with parameters  $\Psi50_{gs, mistletoe}$  and $slope_{gs, mistletoe}$ (defined in control parameters). Soil water extraction corresponding to mistletoe transpiration is added to extraction caused by the corresponding plant cohort. 
 
 ### Plant photosynthesis {#basicphotosynthesis}
 

@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-06-17" />
+<meta name="date" content="2026-06-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -278,7 +278,7 @@ div.csl-indent {
 <li class="chapter" data-level="5.7.6" data-path="hydrology.html"><a href="hydrology.html#finite-approximation-to-flows-in-the-macropore-domain"><i class="fa fa-check"></i><b>5.7.6</b> Finite approximation to flows in the macropore domain</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Plant cohort transpiration, photosynthesis and drought stress</a>
+<li class="chapter" data-level="6" data-path="transpirationgranier.html"><a href="transpirationgranier.html"><i class="fa fa-check"></i><b>6</b> Plant transpiration, photosynthesis and drought stress</a>
 <ul>
 <li class="chapter" data-level="6.1" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-transpiration-and-photosynthesis"><i class="fa fa-check"></i><b>6.1</b> Plant transpiration and photosynthesis</a>
 <ul>
@@ -287,7 +287,7 @@ div.csl-indent {
 <li class="chapter" data-level="6.1.3" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-water-potential"><i class="fa fa-check"></i><b>6.1.3</b> Plant water potential</a></li>
 <li class="chapter" data-level="6.1.4" data-path="transpirationgranier.html"><a href="transpirationgranier.html#minimum-transpiration"><i class="fa fa-check"></i><b>6.1.4</b> Minimum transpiration</a></li>
 <li class="chapter" data-level="6.1.5" data-path="transpirationgranier.html"><a href="transpirationgranier.html#transpirationpools"><i class="fa fa-check"></i><b>6.1.5</b> Transpiration with water pools</a></li>
-<li class="chapter" data-level="6.1.6" data-path="transpirationgranier.html"><a href="transpirationgranier.html#mistletoetranspiration"><i class="fa fa-check"></i><b>6.1.6</b> Transpiration of hemi-parasitic plants</a></li>
+<li class="chapter" data-level="6.1.6" data-path="transpirationgranier.html"><a href="transpirationgranier.html#mistletoetranspirationbasic"><i class="fa fa-check"></i><b>6.1.6</b> Transpiration of hemi-parasitic plants</a></li>
 <li class="chapter" data-level="6.1.7" data-path="transpirationgranier.html"><a href="transpirationgranier.html#basicphotosynthesis"><i class="fa fa-check"></i><b>6.1.7</b> Plant photosynthesis</a></li>
 </ul></li>
 <li class="chapter" data-level="6.2" data-path="transpirationgranier.html"><a href="transpirationgranier.html#plant-drought-stress-and-cavitation"><i class="fa fa-check"></i><b>6.2</b> Plant drought stress and cavitation</a>
@@ -410,6 +410,7 @@ div.csl-indent {
 <li class="chapter" data-level="12.2.4" data-path="transpirationsperrysureau.html"><a href="transpirationsperrysureau.html#photosynthesissureau"><i class="fa fa-check"></i><b>12.2.4</b> Photosynthesis</a></li>
 </ul></li>
 <li class="chapter" data-level="12.3" data-path="transpirationsperrysureau.html"><a href="transpirationsperrysureau.html#scalingtranspirationphotosynthesis"><i class="fa fa-check"></i><b>12.3</b> Scaling of transpiration, soil water uptake and photosynthesis rates</a></li>
+<li class="chapter" data-level="12.4" data-path="transpirationsperrysureau.html"><a href="transpirationsperrysureau.html#mistletoetranspirationadvanced"><i class="fa fa-check"></i><b>12.4</b> Stomatal regulation and transpiration of hemi-parasitic plants</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="closecanopysoilenergybalance.html"><a href="closecanopysoilenergybalance.html"><i class="fa fa-check"></i><b>13</b> Closing energy balances</a>
 <ul>
@@ -798,6 +799,7 @@ div.csl-indent {
 <li><p>If <code>transpirationMode = "Sureau"</code>, plant water compartments are always included, and water flows follow Darcy’s law, as described in <span class="citation">Ruffault <em>et al.</em> (<a href="#ref-ruffault_sureau-ecos_2022">2022</a>)</span>. In this case, stomatal regulation follows a Baldocchi-type or Jarvis-type model.</p></li>
 </ul>
 <p>Like in the basic water model, the advanced model assumes by default that soil moisture under all plant cohorts is the same (i.e. vertical soil layers are shared among cohorts). However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can be simulated. In this case, hydrological processes are replicated for the fraction of soil corresponding to each cohort. Transpiration of each plant cohort depends on the soil moisture beneath itself and, depending on root overlap, on the soil moisture beneath other plant cohorts.</p>
+<p>Optionally, the model can simulate additional transpiration caused by hemi-parasitic plants (mistletoe) attached to specific plant cohorts, as done in the basic water model. This causes water update from the corresponding soil water pools to be higher than cohort transpiration.</p>
 </div>
 <div id="statevariablesadvanced" class="section level2 hasAnchor" number="7.3">
 <h2><span class="header-section-number">7.3</span> State variables<a href="advancedwaterbalance.html#statevariablesadvanced" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -831,9 +833,9 @@ div.csl-indent {
 \Delta{V_{soil}} = (If + Lw + Cr) - (Dd + Se + Es + Tr_{herb} + Ex_{cohorts})
 \tag{7.1}
 \end{equation}\]</span>
-where all the other terms were defined in <a href="basicwaterbalance.html#soilwaterbalance">3.3</a>. Soil water extraction (<span class="math inline">\(Ex_{cohorts}\)</span>) and plant transpiration (<span class="math inline">\(Tr_{cohorts}\)</span>) will be equal if plant capacitance effects are not considered. Otherwise the amount of water stored in the plant tissues changes according to:
+where all the other terms were defined in <a href="basicwaterbalance.html#soilwaterbalance">3.3</a>. Soil water extraction (<span class="math inline">\(Ex_{cohorts}\)</span>) and plant transpiration (<span class="math inline">\(Tr_{cohorts}\)</span>) will be equal if plant capacitance effects or transpiration by hemi-parasitic (mistletoe) plants (<span class="math inline">\(Tr_{mistletoe}\)</span>) are not considered. More generally, the amount of water stored in the plant tissues changes according to:
 <span class="math display" id="eq:plantwaterbalance">\[\begin{equation}
-\Delta{V_{plant}} = Ex_{cohorts} - Tr_{cohorts}
+\Delta{V_{plant}} = Ex_{cohorts} - Tr_{cohorts} - Tr_{mistletoe}
 \tag{7.2}
 \end{equation}\]</span></p>
 <p>Variations of the water balance can occur depending on specific control flags, as explained in section <a href="basicwaterbalance.html#soilwaterbalance">3.3</a>. Unlike the basic water balance, in this model water balance components contributing to latent heat of vaporization (plant transpiration, evaporation from soil surface and rainfall intercepted by canopy surfaces) or latent heat of fusion (snow melt) are included in the energy balance equations of the canopy and soil, therefore coupling water and energy balances.</p>
@@ -891,6 +893,7 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <li>Calculate leaf energy balance and photosynthesis (for shade and sunlit leaves of each plant cohort) corresponding to each transpiration value of the supply function (section <a href="plantphotosynthesis.html#leafenergybalancephoto">11.1</a>). If plant capacitance effects are considered this concerns the stem-to-leaf hydraulic supply function.</li>
 <li>Determine stomatal conductance, transpiration and photosynthesis on shade and sunlit leaves of each plant cohort according to Sperry’s <span class="citation">(<a href="#ref-Sperry2016">2017</a>)</span> profit maximization strategy (section <a href="transpirationsperrysureau.html#stomatalregulation">12.1.3</a>).</li>
 <li>Update leaf and stem PLC values.</li>
+<li>If necessary, determine mistletoe transpiration (<span class="math inline">\(Tr_{mistletoe}\)</span>) and the corresponding additional soil water uptake (section <a href="transpirationsperrysureau.html#mistletoetranspirationadvanced">12.4</a>).</li>
 </ol></li>
 <li><p>If <code>transpirationMode = "Sureau"</code>, for each plant cohort leaf energy balance, stomatal and cuticular conductances, transpirational flows, photosynthesis and plant hydraulics are computed iteratively in small temporal sub-steps (e.g. 10 min):</p>
 <ol style="list-style-type: lower-roman">
@@ -899,6 +902,7 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <li>Calculate stomatal regulation and stomatal transpiration for sunlit and shade leaves (<a href="transpirationsperrysureau.html#stomatalconductancesureau">12.2.3</a>).</li>
 <li>Calculate instantaneous gross and net photosynthesis rates for sunlit and shade leaves.</li>
 <li>Update water potentials, water fluxes (including soil water uptake) and hydraulic conductances across the plant hydraulic network.</li>
+<li>If necessary, determine mistletoe transpiration (<span class="math inline">\(Tr_{mistletoe}\)</span>) and the corresponding additional soil water uptake (section <a href="transpirationsperrysureau.html#mistletoetranspirationadvanced">12.4</a>).</li>
 </ol></li>
 <li><p>Scale transpiration (<span class="math inline">\(Tr_{cohorts}\)</span>), soil water extraction (<span class="math inline">\(Ex_{cohorts}\)</span>) and photosynthesis to the plant cohort level (section <a href="transpirationsperrysureau.html#scalingtranspirationphotosynthesis">12.3</a>).</p></li>
 <li><p>Complete energy balance of the canopy and the soil, after translating plant transpiration, evaporation from bare soil, snow melt and interception loss to latent heat and calculating convective heat exchange for both the canopy and the soil. Alternatively, perform energy balance for individual canopy layers, while including turbulent heat exchange and turbulent transport of water vapor and <span class="math inline">\(CO_2\)</span> between layers (chapter <a href="closecanopysoilenergybalance.html#closecanopysoilenergybalance">13</a>).</p></li>
@@ -1379,6 +1383,17 @@ where <span class="math inline">\(G_{s-1,s}\)</span> is the energy inflow from l
 <li><code>cavitationRecoveryMaximumRate [= 0.05]</code>: Maximum rate of conductance recovery (see section <a href="daylevelresults.html#cavitationRecovery">14.4</a>).</li>
 <li><code>cavitationInducedDefoliation [= TRUE]</code>: Whether leaf hydraulic impairment induces defoliation (88 % PLC will correspond to 50 % defoliation).</li>
 <li><code>lfmcComponent [= "fine"]</code>: Plant component used to estimate LFMC, either “leaf” or “fine” (for fine fuel) (see section <a href="planthydraulics.html#lfmc">10.3.4</a>).</li>
+<li><code>mistletoeParams</code>: A list with the following elements:
+<ul>
+<li><code>kPAR [= 0.5]</code>: Mistletoe light extinction coefficient.</li>
+<li><code>g [= 0.8]</code>: Mistletoe water storage capacity per LAI unit.</li>
+<li><code>Gs_P50 [= -4.0]</code>: Water potential corresponding to 50% reduction of mistletoe stomatal conductance (i.e. <span class="math inline">\(\Psi50_{gs, mistletoe}\)</span>).</li>
+<li><code>Gs_slope [= 30]</code>: Rate of decrease in mistletoe stomatal conductance at Gs_P50 (i.e. <span class="math inline">\(slope_{gs, mistletoe}\)</span>).</li>
+<li><code>Vmax298 [= 80]</code>: Maximum Rubisco carboxylation rate at 298K.</li>
+<li><code>Jmax298 [= 120]</code>: Maximum rate of electron transport at 298K.</li>
+<li><code>Gsw_AC_slope [=6]</code>: Slope of the Gsw vs Ac/Cs relationship (<span class="math inline">\(m_{wue, mistletoe}\)</span> of the Baldocchi model).</li>
+<li><code>LeafWidth [=1]</code>: Mistletoe leaf width (cm).</li>
+</ul></li>
 </ul>
 <p>A set of parameters is only relevant for <code>transpirationMode = "Sperry"</code>:</p>
 <ul>

@@ -41,6 +41,8 @@ Plant hydraulics and stomatal regulation follow different designs depending on t
 
 Like in the basic water model, the advanced model assumes by default that soil moisture under all plant cohorts is the same (i.e. vertical soil layers are shared among cohorts). However, variations in soil moisture beneath plant cohorts (and, implicitly, horizontal variation of soil moisture) can be simulated. In this case, hydrological processes are replicated for the fraction of soil corresponding to each cohort. Transpiration of each plant cohort depends on the soil moisture beneath itself and, depending on root overlap, on the soil moisture beneath other plant cohorts.
 
+Optionally, the model can simulate additional transpiration caused by hemi-parasitic plants (mistletoe) attached to specific plant cohorts, as done in the basic water model. This causes water update from the corresponding soil water pools to be higher than cohort transpiration.
+
 ## State variables {#statevariablesadvanced}
 
 The following are state variables in the model under all simulations:
@@ -70,9 +72,9 @@ The water balance equations for the soil and snowpack of the advanced model are 
 \Delta{V_{soil}} = (If + Lw + Cr) - (Dd + Se + Es + Tr_{herb} + Ex_{cohorts})
 (\#eq:advancedwaterbalanceequation)
 \end{equation}
-where all the other terms were defined in \@ref(soilwaterbalance). Soil water extraction ($Ex_{cohorts}$) and plant transpiration ($Tr_{cohorts}$) will be equal if plant capacitance effects are not considered. Otherwise the amount of water stored in the plant tissues changes according to:
+where all the other terms were defined in \@ref(soilwaterbalance). Soil water extraction ($Ex_{cohorts}$) and plant transpiration ($Tr_{cohorts}$) will be equal if plant capacitance effects or transpiration by hemi-parasitic (mistletoe) plants ($Tr_{mistletoe}$) are not considered. More generally, the amount of water stored in the plant tissues changes according to:
 \begin{equation}
-\Delta{V_{plant}} = Ex_{cohorts} - Tr_{cohorts}
+\Delta{V_{plant}} = Ex_{cohorts} - Tr_{cohorts} - Tr_{mistletoe}
 (\#eq:plantwaterbalance)
 \end{equation}
 
@@ -131,6 +133,7 @@ For every day to be simulated, the model performs the following steps:
         i. Calculate leaf energy balance and photosynthesis (for shade and sunlit leaves of each plant cohort) corresponding to each transpiration value of the supply function (section \@ref(leafenergybalancephoto)). If plant capacitance effects are considered this concerns the stem-to-leaf hydraulic supply function.
         ii. Determine stomatal conductance, transpiration and photosynthesis on shade and sunlit leaves of each plant cohort according to Sperry's [-@Sperry2016] profit maximization strategy (section \@ref(stomatalregulation)).
         iii. Update leaf and stem PLC values.
+        iv. If necessary, determine mistletoe transpiration ($Tr_{mistletoe}$) and the corresponding additional soil water uptake (section \@ref(mistletoetranspirationadvanced)).
         
     c. If `transpirationMode = "Sureau"`, for each plant cohort leaf energy balance, stomatal and cuticular conductances, transpirational flows, photosynthesis and plant hydraulics are computed iteratively in small temporal sub-steps (e.g. 10 min):
        
@@ -139,6 +142,7 @@ For every day to be simulated, the model performs the following steps:
         iii. Calculate stomatal regulation and stomatal transpiration for sunlit and shade leaves (\@ref(stomatalconductancesureau)).
         iv. Calculate instantaneous gross and net photosynthesis rates for sunlit and shade leaves.
         v. Update water potentials, water fluxes (including soil water uptake) and hydraulic conductances across the plant hydraulic network.
+        vi. If necessary, determine mistletoe transpiration ($Tr_{mistletoe}$) and the corresponding additional soil water uptake (section \@ref(mistletoetranspirationadvanced)).
        
     d. Scale transpiration ($Tr_{cohorts}$), soil water extraction ($Ex_{cohorts}$) and photosynthesis to the plant cohort level (section \@ref(scalingtranspirationphotosynthesis)).
     e. Complete energy balance of the canopy and the soil, after translating plant transpiration, evaporation from bare soil, snow melt and interception loss to latent heat and calculating convective heat exchange for both the canopy and the soil. Alternatively, perform energy balance for individual canopy layers, while including turbulent heat exchange and turbulent transport of water vapor and $CO_2$ between layers (chapter \@ref(closecanopysoilenergybalance)).
@@ -295,6 +299,15 @@ Other relevant control parameters relevant for the advanced water balance model 
 + `cavitationRecoveryMaximumRate [= 0.05]`: Maximum rate of conductance recovery (see section \@ref(cavitationRecovery)).
 + `cavitationInducedDefoliation [= TRUE]`: Whether leaf hydraulic impairment induces defoliation (88 % PLC will correspond to 50 % defoliation).
 + `lfmcComponent [= "fine"]`: Plant component used to estimate LFMC, either "leaf" or "fine" (for fine fuel) (see section \@ref(lfmc)).
++  `mistletoeParams`: A list with the following elements:
+    + `kPAR [= 0.5]`: Mistletoe light extinction coefficient.
+    + `g [= 0.8]`: Mistletoe water storage capacity per LAI unit.
+    + `Gs_P50 [= -4.0]`: Water potential corresponding to 50% reduction of mistletoe stomatal conductance (i.e. $\Psi50_{gs, mistletoe}$).
+    + `Gs_slope [= 30]`: Rate of decrease in mistletoe stomatal conductance at Gs_P50 (i.e. $slope_{gs, mistletoe}$).
+    + `Vmax298 [= 80]`: Maximum Rubisco carboxylation rate at 298K.
+    + `Jmax298 [= 120]`: Maximum rate of electron transport at 298K.
+    + `Gsw_AC_slope [=6]`: Slope of the Gsw vs Ac/Cs relationship ($m_{wue, mistletoe}$  of the Baldocchi model).
+    + `LeafWidth [=1]`: Mistletoe leaf width (cm).
 
 A set of parameters is only relevant for `transpirationMode = "Sperry"`:
 
