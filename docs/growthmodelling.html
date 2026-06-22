@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-06-19" />
+<meta name="date" content="2026-06-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -826,7 +826,7 @@ Figure 15.2: Design of leaf, fine root and sapwood growth and senescence drivers
 <p>The growth rates in all three compartments are modulated by parameters specifying <em>maximum daily growth rates relative to the amount of sapwood area</em>. Nevertheless, tree leaf area and fine root biomass targets are constrained by leaf biomass allometric equations, which limits leaf and fine root growth to the replacement of aging tissues, unless there are changes in forest structure, i.e. competition is released or the target tree increases in diameter (see fig. <a href="growthmodelling.html#fig:allocationdiagram">15.2</a>). In contrast, the sapwood area target modulates sapwood senescence (i.e. the conversion to heartwood), but not sapwood growth. Sapwood growth rates are determined by maximum relative growth rates (which can be parameterized with empirical observations), hormonal control, carbon availability and sink limitations. Since sapwood formation leads to tree diameter increases, maximum sapwood growth rate indirectly determine the rate of growth of leaves and fine roots at seasonal and annual scales, hence determining the whole-plant maximum growth rate.</p>
 <p>Two options are possible regarding the relationship between structural carbon of leaves and sapwood:</p>
 <ol style="list-style-type: decimal">
-<li><em>Stable Huber value</em>: In this strategy, growth of leaf area and sapwood area need are coordinated so that the ratio of sapwood area to leaf area (i.e. Huber value) is in dynamic equilibrium around its initial value. To this aim, sapwood senescence is scheduled whenever the current Huber value is larger than the target (i.e. there is an excess of sapwood area). This approach is similar to the LPG model <span class="citation">(<a href="#ref-Sitch2003">Sitch <em>et al.</em> 2003</a>)</span>, where different turnover rates are applied for different tissues, but then the model tries to satisfy the pipe model <span class="citation">(<a href="#ref-Shinozaki1964">Shinozaki <em>et al.</em> 1964</a>)</span> by allocating C where it is more limiting. Note that in this strategy the whole-plant conductance will progressively decrease with the increase in plant height, because of the increase in the length of stem xylem pathway.</li>
+<li><em>Stable Huber value</em>: In this strategy, growth of leaf area and sapwood area need are coordinated so that the ratio of sapwood area to leaf area (i.e. Huber value) is in dynamic equilibrium around its initial value. To this aim, sapwood senescence is scheduled whenever the current Huber value is larger than the target (i.e. there is an excess of sapwood area). This approach is similar to the LPG model <span class="citation">(<a href="#ref-Sitch2003"><span class="nocase">Sitch <em>et al.</em></span> 2003</a>)</span>, where different turnover rates are applied for different tissues, but then the model tries to satisfy the pipe model <span class="citation">(<a href="#ref-Shinozaki1964">Shinozaki <em>et al.</em> 1964</a>)</span> by allocating C where it is more limiting. Note that in this strategy the whole-plant conductance will progressively decrease with the increase in plant height, because of the increase in the length of stem xylem pathway.</li>
 <li><em>Stable whole-plant conductance</em>: Ratios of sapwood area to leaf area (i.e. Huber values) can vary within species, due to environmental conditions <span class="citation">(<a href="#ref-mencuccini_climate_1995">Mencuccini &amp; Grace 1995</a>)</span>. In this allocation strategy, growth of leaf area, sapwood area and height needs to be coordinated so that whole-plant conductance (i.e. from roots to leaves) is in dynamic equilibrium around its initial value. Sapwood senescence is scheduled whenever the current whole-plant conductance is above the target value. In this strategy, the Huber value will tend to increase with the increase in plant height, thereby increasing the sapwood respiratory demands.</li>
 </ol>
 <p>When running the growth model along with the basic water balance submodel, a stable Huber value is the only strategy available and fine root area growth also follows the need to achieve a stable ratio between leaf area and fine root area. In contrast, the two strategies are possible when simulating growth along with the advanced water balance. In this case, fine root area growth is coordinated with the formation of the other tissues via the need to ensure an <em>average resistance fraction in the rhizosphere</em>, which is used to define the fine root area target and, hence, the allocation to fine roots.</p>
@@ -1410,54 +1410,60 @@ D2. Determine if plant death by starvation or desiccation occurred (<a href="gro
 <td>Maximum daily fine root relative growth rate</td>
 </tr>
 <tr class="odd">
+<td><span class="math inline">\(RGR_{bud}\)</span></td>
+<td><span class="math inline">\(m^2 \cdot m^{-2}\)</span></td>
+<td><code>RGRbud</code></td>
+<td>Bud (potential leaf area) daily growth rate, relative to leaf area growth</td>
+</tr>
+<tr class="even">
 <td><span class="math inline">\(CC_{leaf}\)</span></td>
 <td><span class="math inline">\(g\,gluc\cdot g\,dry^{-1}\)</span></td>
 <td><code>CCleaf</code></td>
 <td>Leaf construction cost</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(CC_{sapwood}\)</span></td>
 <td><span class="math inline">\(g\,gluc\cdot g\,dry^{-1}\)</span></td>
 <td><code>CCsapwood</code></td>
 <td>Sapwood construction cost</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(CC_{fineroot}\)</span></td>
 <td><span class="math inline">\(g\,gluc\cdot g\,dry^{-1}\)</span></td>
 <td><code>CCfineroot</code></td>
 <td>Fine root construction cost</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(SR_{sapwood}\)</span></td>
 <td><span class="math inline">\(day^{-1}\)</span></td>
 <td><code>SRsapwood</code></td>
 <td>Daily sapwood senescence rate</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(SR_{fineroot}\)</span></td>
 <td><span class="math inline">\(day^{-1}\)</span></td>
 <td><code>SRfineroot</code></td>
 <td>Daily fine root senescence rate</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(RSSG\)</span></td>
 <td>[0-1]</td>
 <td><code>RSSG</code></td>
 <td>Minimum relative starch for sapwood growth to occur.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(f_{HD,min}\)</span></td>
 <td><span class="math inline">\(cm \cdot cm^{-1}\)</span></td>
 <td><code>fHDmin</code></td>
 <td>Minimum height-to-diameter ratio</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="math inline">\(f_{HD,max}\)</span></td>
 <td><span class="math inline">\(cm \cdot cm^{-1}\)</span></td>
 <td><code>fHDmax</code></td>
 <td>Maximum height-to-diameter ratio</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td></td>
 <td><span class="math inline">\(g\, C \cdot g^{-1} dry\)</span></td>
 <td><code>WoodC</code></td>
@@ -2055,7 +2061,7 @@ Scott, J.H. &amp; Reinhardt, E.D. (2002). Estimating canopy fuels in conifer for
 Shinozaki, K., Yoda, K., Hozumi, K. &amp; Kira, T. (1964). A quantitative analysis of plant form - the pipe model theory. <span>I</span>. <span>Basic</span> analysis. <em>Japanese Journal of Ecology</em>, 14, 97–105.
 </div>
 <div id="ref-Sitch2003" class="csl-entry">
-Sitch, S., Smith, B., Prentice, I.C., Arneth, a., Bondeau, a., Cramer, W., <em>et al.</em> (2003). <a href="https://doi.org/10.1046/j.1365-2486.2003.00569.x">Evaluation of ecosystem dynamics, plant geography and terrestrial carbon cycling in the <span>LPJ</span> dynamic global vegetation model</a>. <em>Global Change Biology</em>, 9, 161–185.
+<span class="nocase">Sitch, S., Smith, B., Prentice, I.C., Arneth, a., Bondeau, a., Cramer, W., <em>et al.</em></span> (2003). <a href="https://doi.org/10.1046/j.1365-2486.2003.00569.x">Evaluation of ecosystem dynamics, plant geography and terrestrial carbon cycling in the <span>LPJ</span> dynamic global vegetation model</a>. <em>Global Change Biology</em>, 9, 161–185.
 </div>
 <div id="ref-Spicer2005" class="csl-entry">
 Spicer, R. (2005). <a href="https://doi.org/10.1016/B978-012088457-5/50024-1">Senescence in <span>Secondary</span> <span>Xylem</span>: <span>Heartwood</span> <span>Formation</span> as an <span>Active</span> <span>Developmental</span> <span>Program</span></a>. <em>Vascular Transport in Plants</em>, 457–475.
