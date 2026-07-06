@@ -1015,7 +1015,7 @@ g_{sw} = \lambda(\Psi_{leaf,sym}) \cdot g_{sw, light, temp}
 where $g_{sw, light, temp}$ is the stomatal conductance value without water stress, and $\lambda$ is a regulation factor that varies between 0 and 1 to represent stomatal closure according to leaf symplasmic water potential ($\Psi_{leaf,sym}$) using a sigmoid-type function:
 
 \begin{equation}
-\lambda(\Psi_{leaf,sym}) = 1 - \left(1 + e^{(slope_{gs}/25) \cdot (\Psi_{leaf,sym} - \Psi50_{gs})} \right)^{-1}
+\lambda(\Psi_{leaf,sym}) = 1 - \left(1 + e^{(slope_{gsw, bald}/25) \cdot (\Psi_{leaf,sym} - \Psi50_{gsw, bald})} \right)^{-1}
 \end{equation}
 
 depending on the potential at 50 % of stomatal closure ($\Psi50_{gs}$) and a shape parameter ($slope_{gs}$) describing the rate of decrease in stomatal conductance per unit of water potential drop. With the current implementation, $\lambda$ will be the same for sunlit and shade leaves (i.e. there is only one symplasmic water potential for both kind of leaves) but $g_{sw, light, temp}$ will differ because of the different light and temperature conditions.
@@ -1031,17 +1031,17 @@ g_{sw, light, temp} = g_{sw, night, temp} + (g_{sw, max, temp} - g_{sw,night, te
 \end{equation}
 where $g_{sw, max, temp}$ and $g_{sw, night, temp}$ are the maximum stomatal conductance and nocturnal stomatal conductance after accounting for temperature effects, $Q_{PAR,leaf}$ is the absorbed PAR photon flux per leaf area (\@ref(eq:leafQequation)) and $c_{PAR}$ is an empirical coefficient. Temperature effects on maximum stomatal conductance are modelled using:
 \begin{equation}
-g_{sw, max, temp} = g_{sw, max} \cdot \left[ 1 + \left(\frac{T_{leaf} - T_{optim}}{T_{gs,sens}}\right)^2 \right]^{-1}
+g_{sw, max, temp} = g_{sw, max} \cdot \left[ 1 + \left(\frac{T_{leaf} - T_{gsw, optim, jarv}}{T_{gsw,sens, jarv}}\right)^2 \right]^{-1}
 \end{equation}
-where $T_{leaf}$ is the current leaf temperature, $T_{optim}$ is the optimal temperature and $T_{gs, sens}$ is an empirical coefficient. Temperature effects on nocturnal stomatal conductance are modelled analogously.
+where $T_{leaf}$ is the current leaf temperature, $T_{gsw, optim, jarv}$ is the optimal temperature and $T_{gsw, sens, jarv}$ is an empirical coefficient. Temperature effects on nocturnal stomatal conductance are modelled analogously.
 
 **Baldocchi-type stomatal regulation**
 
 Baldocchi [-@baldocchi_analytical_1994] presented an analytical solution of the coupled leaf photosyntesis and stomatal conductance models. Baldocchi's approach uses Farquhar's model to determine photosynthesis, and the stomatal conductance equation is:
 \begin{equation}
-g_{sw, light, temp} = g_{sw, 0} + m_{wue} \cdot \frac{A_n}{C_s}
+g_{sw, light, temp} = g_{sw, 0} + m_{wue, bald} \cdot \frac{A_n}{C_s}
 \end{equation}
-where $m_{wue}$ is a dimensionless slope representing the water use efficiency, $A_n$ is net photosynthesis as determined by Farquhar's model (which accounts for light and temperature effects), $g_{sw, 0}$ is the zero intercept when $A_{n} = 0$, here taken as $g_{sw,0} = g_{sw, night}$ and $C_{s}$ is the $CO_2$ concentration inside stomata, i.e.:
+where $m_{wue, bald}$ is a dimensionless slope representing the water use efficiency, $A_n$ is net photosynthesis as determined by Farquhar's model (which accounts for light and temperature effects), $g_{sw, 0}$ is the zero intercept when $A_{n} = 0$, here taken as $g_{sw,0} = g_{sw, night}$ and $C_{s}$ is the $CO_2$ concentration inside stomata, i.e.:
 \begin{equation}
 C_{s} = C_{air} - (A_{n}/g_{bc})
 \end{equation}
@@ -1093,9 +1093,9 @@ Scaling of gross photosynthesis rates is done analogously.
 
 Stomatal regulation and transpiration of mistletoe is performed separately for sunlit and shade leaves. Leaf temperature (i.e. energy balance) is first estimated, using the absorbed short-wave radiation and net long-wave radiation per leaf area unit of the corresponding sunlit or shade leaves of the host cohort, but employing the mistletoe transpiration rate of the previous subdaily time step and its leaf width (see \@ref(leafenergybalancephoto)). Next, the corresponding vapor pressure deficit of sunlit and shade mistletoe leaves (i.e. $VPD_{leaf, mistletoe}$) are estimated as described in \@ref(leafVPD). Stomatal regulation follows an approach similar to that described for the SurEau submodel (see \@ref(transpirationsureau)). Stomatal conductance (and photosynthesis) is first estimated for current temperature and light conditions assuming no water limitation (i.e. $g_{sw, light, temp, mistletoe}$), using the approach of Baldocchi [-@baldocchi_analytical_1994]:
 \begin{equation}
-g_{sw, light, temp, mistletoe} = g_{sw, 0, mistletoe} + m_{wue, mistletoe} \cdot \frac{A_{n, mistletoe}}{C_{s, mistletoe}}
+g_{sw, light, temp, mistletoe} = g_{sw, 0, mistletoe} + m_{wue, bald, mistletoe} \cdot \frac{A_{n, mistletoe}}{C_{s, mistletoe}}
 \end{equation}
-where $m_{wue, mistletoe}$ is a dimensionless slope representing the water use efficiency, $A_{n, mistletoe}$ is net mistletoe photosynthesis as determined by Farquhar's model (which accounts for light and temperature effects on mistletoe photosynthetic capacity parameters), $g_{sw, 0, mistletoe}$ is the zero intercept when $A_{n, mistletoe} = 0$, here taken as $g_{sw,0, mistletoe} = g_{sw, night}$ and $C_{s, mistletoe}$ is the $CO_2$ concentration inside mistletoe stomata, i.e.:
+where $m_{wue, bald, mistletoe}$ is a dimensionless slope representing the water use efficiency, $A_{n, mistletoe}$ is net mistletoe photosynthesis as determined by Farquhar's model (which accounts for light and temperature effects on mistletoe photosynthetic capacity parameters), $g_{sw, 0, mistletoe}$ is the zero intercept when $A_{n, mistletoe} = 0$, here taken as $g_{sw,0, mistletoe} = g_{sw, night}$ and $C_{s, mistletoe}$ is the $CO_2$ concentration inside mistletoe stomata, i.e.:
 \begin{equation}
 C_{s, mistletoe} = C_{air} - (A_{n, mistletoe}/g_{bc})
 \end{equation}
@@ -1112,10 +1112,10 @@ g_{sw, mistletoe} = \lambda_{mistletoe}(\Psi_{leaf,sym}) \cdot g_{sw, light, tem
 where $\lambda_{mistletoe}$ is a regulation factor that varies between 0 and 1 to represent stomatal closure according to the host leaf symplasmic water potential ($\Psi_{leaf,sym}$) using a sigmoid-type function:
 
 \begin{equation}
-\lambda_{mistletoe}(\Psi_{leaf,sym}) = 1 - \left(1 + e^{(slope_{gs,mistletoe}/25) \cdot (\Psi_{leaf,sym} - \Psi50_{gs, mistletoe})} \right)^{-1}
+\lambda_{mistletoe}(\Psi_{leaf,sym}) = 1 - \left(1 + e^{(slope_{gs, bald, mistletoe}/25) \cdot (\Psi_{leaf,sym} - \Psi50_{gs, bald, mistletoe})} \right)^{-1}
 \end{equation}
 
-with $\Psi50_{gs, mistletoe}$ and $slope_{gs,mistletoe}$ being parameters of the stomatal vulnerability curve described as control parameters.
+with $\Psi50_{gs, bald, mistletoe}$ and $slope_{gs, bald, mistletoe}$ being parameters of the stomatal vulnerability curve described as control parameters.
 
 Mistletoe transpiration flow $E_{mistletoe}$ is estimated (for sunlit or shade leaves) using Fick's law:
 \begin{equation}
