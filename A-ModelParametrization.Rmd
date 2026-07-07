@@ -178,11 +178,28 @@ The following tables describe how the different functional parameters are dealt 
 
 ## Imputation of missing values
 
+### Genus-level imputation
+
+Given that plant traits have some degree of phylogenetic conservatism, parameter imputation of species parameter values is performed primarily by looking for the corresponding genus-average, which should be available in `SpParams`. This genus-based imputation can be controlled using `fillMissingWithGenusParams`, which by default is `TRUE` (setting it to `FALSE` is not normally recommended). Should the parameter be also missing at the genus level, `medfate` will try an imputation based on trait coordination or family-level average values, depending on the case. In the following subsections we report the percentage of species-level variance that is accounted for by genus-level or family-level averages, and detail trait-coordination relationships when used for imputation. 
+
 The following figure summarizes the percentage of missing values in `SpParamsMED` for different model parameters and the other model parameters used for the imputation of missing values:
 
 ```{r, out.width='100%', fig.align="center", fig.cap="Representation of imputation relationships between model parameters. The percentage of missing parameter values increases from left to right. Left-most parameters are strict.", echo=FALSE}
 knitr::include_graphics("figures/imputation.png")
 ```
+
+```{r, include = FALSE}
+taxonomic_partitioning <- readRDS("~/OneDrive/mcaceres_work/model_development/medfate_parameterization/traits_and_models/data/taxonomic_partitioning.rds") |>
+  dplyr::mutate(genus = genus*100,
+                family = family*100,
+                total = total*100) |>
+  dplyr::rename("Trait" = trait,
+                "spp." = n,
+                "Genus (%)" = genus,
+                "Family (%)" = family,
+                "Total (%)" = total)
+```
+
 
 ### Rooting depth {#imputationRootingDepth}
 
@@ -246,30 +263,40 @@ Leaf width ($LW$), specific leaf area ($SLA$) and the ratio between the weight o
 These estimates have been obtained by averaging species-level values across combinations of the categorical variables.
 
 ### Tissue density {#imputationtissuedensity}
-Default values for the dry weight density of leaves and wood (in $g \cdot cm^{-3}$) are determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
+Imputation of the dry weight density of leaves, wood and fine roots (in $g \cdot cm^{-3}$) is first performed at the genus level using the corresponding row of `SpParams`. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set  `medfate:::trait_family_means`). The percentage of species-level explained variance of these imputations is reported in the following table:
+
 ```{r echo = FALSE}
-tfm = medfate:::trait_family_means
-knitr::kable(tfm[!is.na(tfm$LeafDensity) | !is.na(tfm$WoodDensity),
-                 c("LeafDensity", "WoodDensity"),drop=FALSE],
-             caption = 'Default leaf density and wood density values by taxonomic family.')
+knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("LeafDensity", "WoodDensity", "FineRootDensity")),
+                ,
+             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of leaf density, wood density and fine root density.')
 ```
 
-If the family is not any of those in the table, default values  are $\rho_{leaf} = 0.7$ and $\rho_{wood} = 0.652$. The default value for fine root density is always $\rho_{fineroot} = 0.165$.
+
+If the family is not any of those in the table, default values  are $\rho_{leaf} = 0.7$ and $\rho_{wood} = 0.652$ and $\rho_{fineroot} = 0.165$.
 
 
 ### Specific root length and root length density {#imputationSRLRLD}
 
-Default values for specific fine root length and fine root length density are $3870\, cm \cdot g^{-1}$  and $10\, cm \cdot cm^{-3}$, respectively. [JUSTIFICATION MISSING]
+Imputation of specific fine root length and fine root length density is first performed at the genus level using the corresponding row of `SpParams`. When genus-level averages are also missing, imputation of specific fine root length is performed using taxonomic family (internal data set  `medfate:::trait_family_means`). The percentage of species-level explained variance of these imputations is reported in the following table:
+
+```{r echo = FALSE}
+knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("SRL")),
+                ,
+             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of specific fine root length.')
+```
+
+Default value for specific fine root length is $3870\, cm \cdot g^{-1}$. Fine root length density is imputed a value $10\, cm \cdot cm^{-3}$ when missing at the genus level.
 
 ### Huber value and ratio of conduits to sapwood {#imputationAl2As}
-Missing values for `Al2As`, the inverse of the Huber value ($1/Hv$) are determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
+Imputation of the `Al2As`, the inverse of the Huber value ($1/Hv$) and the fraction of sapwood area corresponding to xylem conduits (`conduit2sapwood`; $f_{conduits}$) is first performed at the genus level using the corresponding row of `SpParams`. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set  `medfate:::trait_family_means`). The percentage of species-level explained variance of these imputations is reported in the following table:
+
+
 ```{r echo = FALSE}
-tfm = medfate:::trait_family_means
-tfm$Hv = 10000/tfm$Al2As
-knitr::kable(tfm[!is.na(tfm$Al2As) | !is.na(tfm$conduit2sapwood),
-                 c("Al2As", "Hv", "conduit2sapwood"),drop=FALSE],
-             caption = 'Default leaf area to sapwood area (m2/m2) / Huber value (cm2/m2) and fraction of sapwood corresponding to conduits by taxonomic family.')
+knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("Al2As", "conduit2sapwood")),
+                ,
+             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of leaf area to sapwood area and fraction of sapwood corresponding to xylem elements.')
 ```
+
 
 If there is no information derived from taxonomic family for `Al2As`, a default value is given depending on leaf shape and leaf size:
 
@@ -330,13 +357,14 @@ where $k_{PAR}$ is the diffuse PAR extinction coefficient, $\alpha_{SWR}$ is the
 
 ### Stomatal conductance {#imputationstomatalconductance}
 
-Default values for minimum and maximum conductance to water vapour ($g_{swmin}$ and $g_{swmax}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) were defined depending on taxonomic family, from @Duursma2018 and @Hoshika2018, and stored in an internal data set (`medfate:::trait_family_means`):
+Imputation of the minimum and maximum conductance to water vapour ($g_{swmin}$ and $g_{swmax}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) is first performed at the genus level using the corresponding row of `SpParams`. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set  `medfate:::trait_family_means`). The percentage of species-level explained variance of these imputations is reported in the following table.
+
 ```{r echo = FALSE}
-tfm = medfate:::trait_family_means
-knitr::kable(tfm[!is.na(tfm$Gswmin) | !is.na(tfm$Gswmax),
-                 c("Gswmin", "Gswmax"),drop=FALSE],
-             caption = 'Default minimum and maximum conductance to water vapour by taxonomic family.')
+knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("Gswmin", "Gswmax")),
+                ,
+             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of minimum and maximum conductance to water vapour.')
 ```
+
 If there is no information derived from taxonomic family, $g_{swmin} = 0.0049$ and $g_{swmax} = 0.200$. 
 
 ### Pressure-volume curves {#inputationPV}
@@ -353,26 +381,30 @@ When parameters for stem tissue are missing, **medfate** estimates them from woo
 \end{equation}
 while the apoplastic fraction of stem is assumed $f_{apo,stem} = f_{conduits}$ (see \@ref(imputationAl2As)).
 
-Default values for leaf pressure-volume parameters, i.e. $\pi_{0,leaf}$, $\epsilon_{leaf}$ and $f_{apo,leaf}$, are determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
+Imputation of leaf pressure-volume parameters, i.e. $\pi_{0,leaf}$ (`LeafPI0`), $\epsilon_{leaf}$ (`LeafEPS`) and $f_{apo,leaf}$ (`LeafAF`), is first performed at the genus level using the corresponding row of `SpParams`. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set  `medfate:::trait_family_means`). The percentage of species-level explained variance of these imputations is reported in the following table.
+
 ```{r echo = FALSE}
-tfm = medfate:::trait_family_means
-knitr::kable(tfm[!is.na(tfm$LeafPI0) | !is.na(tfm$LeafEPS) | !is.na(tfm$LeafAF), c("LeafPI0", "LeafEPS", "LeafAF"),drop=FALSE],
-             caption = 'Default leaf pressure-volume parameters by taxonomic family.')
+knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("LeafPI0", "LeafEPS", "LeafAF")),
+                ,
+             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of leaf pressure-volume parameters.')
 ```
+
 
 If family-level values are missing, following @Bartlett2012 average values for Mediterranean climate leaves are taken as defaults, i.e. $\pi_{0,leaf} = -2$ MPa, $\epsilon_{leaf} = 17$, whereas a 29\% leaf apoplastic fraction is assumed (i.e. $f_{apo,leaf} = 0.29$).
 
 ### Stem and root maximum hydraulic conductivity {#imputationKstemKroot}
 
-Tissue-level maximum conductivity parameters (i.e. $K_{stem,max,ref}$ and $K_{root,max,ref}$) are not direct parameters to simulation functions. Instead, theay are scaled to estimate stem- and root-level hydraulic conductances (i.e. $k_{stem, \max}$ and $k_{root, \max}$) using plant size (see \@ref(scalingkstem) and \@ref(scalingkroot) for details). $K_{stem,max,ref}$ and $K_{root,max,ref}$ are supplied via species parameter table and missing values can therefore occur. 
+Tissue-level maximum conductivity parameters (i.e. $K_{stem,max,ref}$ and $K_{root,max,ref}$) are not direct parameters to simulation functions. Instead, they are scaled to estimate stem- and root-level hydraulic conductances (i.e. $k_{stem, \max}$ and $k_{root, \max}$) using plant size (see \@ref(scalingkstem) and \@ref(scalingkroot) for details). $K_{stem,max,ref}$ and $K_{root,max,ref}$ are supplied via species parameter table and missing values can therefore occur. 
 
 
-Default values for $K_{stem,max,ref}$ are determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
+Imputation of $K_{stem,max,ref}$ (`Ks` or `Kmax_stemxylem`) is first performed at the genus level using the corresponding row of `SpParams`. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set  `medfate:::trait_family_means`). The percentage of species-level explained variance of these imputations is reported in the following table.
+
 ```{r echo = FALSE}
-tfm = medfate:::trait_family_means
-knitr::kable(tfm[!is.na(tfm$Kmax_stemxylem), c("Kmax_stemxylem"),drop=FALSE],
-             caption = 'Default maximum stem hydraulic conductivity by taxonomic family.')
+knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("Ks")),
+                ,
+             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of maximum stem hydraulic conductivity.')
 ```
+
 
 If family-level values are missing, suitable $K_{stem,max,ref}$ values are decided according to combinations of taxon group (either Angiosperm or Gymnosperm), growth form (either tree or shrub) and leaf phenology [@maherali_adaptive_2004]:
 
@@ -396,12 +428,18 @@ Note that values for $g_{swmax}$ may also be imputed (see \@ref(imputationstomat
 
 ### Xylem vulnerability  {#imputationVCs}
 
-Default values for $\Psi_{50,stem}$ are determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
+**Stem vulnerability**
+
+Imputation of $\Psi_{50,stem}$ is first performed at the genus level using the corresponding row of `SpParams`. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set  `medfate:::trait_family_means`). The percentage of species-level explained variance of these imputations is reported in the following table.
+
+
 ```{r echo = FALSE}
-tfm = medfate:::trait_family_means
-knitr::kable(tfm[!is.na(tfm$VCstem_P50), c("VCstem_P50"),drop=FALSE],
-             caption = 'Default stem P50 values by taxonomic family.')
+knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("VCstem_P50")),
+                ,
+             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of stem P50.')
 ```
+
+
 
 If family-level values is missing, a suitable estimate of $\Psi_{50,stem}$ the water potential corresponding to 50\% of conductance loss, can be obtained from @maherali_adaptive_2004 according to combinations of taxon group (either Angiosperm or Gymnosperm), growth form (either tree or shrub) and leaf phenology:
 
@@ -415,24 +453,73 @@ If family-level values is missing, a suitable estimate of $\Psi_{50,stem}$ the w
 
 $\Psi_{50,stem}$ estimates are taken for parameter $\Psi_{critic}$, in the case of the basic water balance model. 
 
-Vulnerability curves in the advanced model need to be specified for leaves, stem and root segments via the two parameters of the Weibull function (see \@ref(vulnerabilitycurves)). When any of the parameters of the stem vulnerability curve is missing, a regression equation using data from @Choat2012 can be used to estimate $\Psi_{88,stem}$ from $\Psi_{50,stem}$:
+Water potentials corresponding to 12% and 88% PLC ($\Psi_{12,stem}$ and $\Psi_{88,stem}$), when missing are not estimated using genus-level averages, in order to avoid inconsistencies in the stem vulnerability curve (i.e., with respect to $\Psi_{50,stem}$). When $\Psi_{88,stem}$ is missing, a regression equation is used to estimate it from $\Psi_{50,stem}$ ($R^2_{adj} = 0.633$; data compiled using **forestables**):
 \begin{equation}
-\Psi_{88,stem} = -1.4264 + 1.2593 \cdot \Psi_{50,stem}
+\Psi_{88,stem} = 1.43637 \cdot \Psi_{50,stem}
 \end{equation}
 
-Finally, estimates for $c_{stem}$ and $d_{stem}$ are obtained from $\Psi_{50,stem}$ and $\Psi_{88,stem}$ via function `hydraulics_psi2Weibull()`.
-
-Vulnerability curves for root xylem are less common than for stem xylem. If these values are missing, $\Psi_{50,stem}$ is first estimated according to its definition and the stem vulnerability curve parameters, $c_{stem}$ and $d_{stem}$. Then, a relationship from @Bartlett2016 is used to estimate $\Psi_{50, root}$ from $\Psi_{50,stem}$:
+Similarly, when $\Psi_{12,stem}$ is missing, a similar regression equation is used to estimate it from $\Psi_{50,stem}$ ($R^2_{adj} = 0.724$; data compiled using **forestables**):
 \begin{equation}
-\Psi_{50, root} = 0.4892 + 0.742 \cdot \Psi_{50,stem}
+\Psi_{12,stem} = 0.626191 \cdot \Psi_{50,stem}
+\end{equation}
+
+Finally, estimates of the Weibull function ($c_{stem}$ and $d_{stem}$) are obtained from $\Psi_{50,stem}$ and $\Psi_{88,stem}$ via function `hydraulics_psi2Weibull()`.
+
+**Root vulnerability**
+
+Imputation of $\Psi_{50,stem}$ is first performed at the genus level using the corresponding row of `SpParams`. The percentage of species-level explained variance of imputations using genus averages is reported in the following table.
+
+```{r echo = FALSE}
+knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("VCroot_P50")),
+                ,
+             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of root P50.')
+```
+
+Note that vulnerability curves for root xylem are less common than for stem xylem. If genus-level averages  are missing, a linear relationship is used to estimate $\Psi_{50, root}$ from $\Psi_{50,stem}$ ($R^2_{adj} = 0.499$; data compiled using **forestables**):
+\begin{equation}
+\Psi_{50, root} = 0.627 \cdot \Psi_{50,stem}
 \end{equation}
 Finally, $\Psi_{88,stem}$ and the Weibull vulnerability parameters are obtained as explained for stems.
 
-Vulnerability curves for leaf xylem are also less common than for stem xylem. If these values are missing, the water potential at turgor los point $\Psi_{tlp}$ is first estimated from $\pi_{leaf}$ and $\epsilon_{leaf}$ according to eq. \@ref(eq:turgorlosspoint). Then, a relationship calibrated with data from @Bartlett2016 is used to estimate $\Psi_{50, leaf}$ from $\Psi_{tlp}$:
+Water potentials corresponding to 12% and 88% root PLC ($\Psi_{12,root}$ and $\Psi_{88,root}$), when missing are not estimated using genus-level averages, in order to avoid inconsistencies in the root vulnerability curve (i.e., with respect to $\Psi_{50,root}$). Similarly to the stem vulnerability curve, when $\Psi_{88,root}$ is missing, a regression equation is used to estimate it from $\Psi_{50,root}$ ($R^2_{adj} = 0.742$; data compiled using **forestables**):
+\begin{equation}
+\Psi_{88,root} = 1.57274 \cdot \Psi_{50,root}
+\end{equation}
+
+Similarly, when $\Psi_{12,root}$ is missing, a similar regression equation is used to estimate it from $\Psi_{50,root}$ ($R^2_{adj} = 0.804$):
+\begin{equation}
+\Psi_{12,root} = 0.52103 \cdot \Psi_{50,root}
+\end{equation}
+
+Finally, estimates of the Weibull function ($c_{root}$ and $d_{root}$) are obtained from $\Psi_{50,root}$ and $\Psi_{88,root}$ via function `hydraulics_psi2Weibull()`.
+
+**Leaf vulnerability**
+
+Imputation of $\Psi_{50,leaf}$ is first performed at the genus level using the corresponding row of `SpParams`. The percentage of species-level explained variance of imputations using genus averages is reported in the following table.
+
+```{r echo = FALSE}
+knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("VCleaf_P50")),
+                ,
+             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of leaf P50.')
+```
+
+
+Vulnerability curves for leaf xylem are also less common than for stem xylem. If genus-level averages values are missing, a relationship calibrated with data from @Bartlett2016 is used to estimate $\Psi_{50, leaf}$ from the water potential at turgor loss point ($\Psi_{tlp}$):
 \begin{equation}
 \Psi_{50, leaf} = 0.2486 + 0.9944 \cdot \Psi_{tlp}
 \end{equation}
-Finally, $\Psi_{88,leaf}$ and the Weibull vulnerability parameters are obtained as explained for stems.
+
+Water potentials corresponding to 12% and 88% leaf PLC ($\Psi_{12,leaf}$ and $\Psi_{88,leaf}$), when missing are not estimated using genus-level averages, in order to avoid inconsistencies in the leaf vulnerability curve (i.e., with respect to $\Psi_{50,leaf}$). Similarly to the stem vulnerability curve, when $\Psi_{88,leaf}$ is missing, a regression equation is used to estimate it from $\Psi_{50,leaf}$ ($R^2_{adj} = 0.765$; data compiled using **forestables**):
+\begin{equation}
+\Psi_{88,leaf} = 1.28837 \cdot \Psi_{50,leaf}
+\end{equation}
+
+Similarly, when $\Psi_{12,leaf}$ is missing, a similar regression equation is used to estimate it from $\Psi_{50,leaf}$ ($R^2_{adj} = 0.766$):
+\begin{equation}
+\Psi_{12,leaf} = 0.76389 \cdot \Psi_{50,leaf}
+\end{equation}
+
+Finally, estimates of the Weibull function ($c_{leaf}$ and $d_{leaf}$) are obtained from $\Psi_{50,leaf}$ and $\Psi_{88,leaf}$ via function `hydraulics_psi2Weibull()`.
 
 
 ### Photosynthesis rates {#imputationphotosynthesis}
@@ -452,7 +539,7 @@ J_{max, 298} = e^{1.197 + 0.847\cdot \log(V_{max,298})}
 
 ### Maintenance respiration rates {#imputationRER}
 
-When missing at the species parameter table, maintenance respiration rates for leaves, sapwood and fine roots ($RER_{leaf}$, $RER_{sapwood}$ and $RER_{fineroot}$; all in $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$) are estimated from corresponding tissue nitrogen concentrations ($N_{leaf}$, $N_{sapwood}$ and $N_{fineroot}$; all in $mg\,N \cdot g\,dry^{-1}$) following the equations given by @Reich2008 (after appropriate unit conversion):
+Imputation of maintenance respiration rates for leaves, sapwood and fine roots ($RER_{leaf}$, $RER_{sapwood}$ and $RER_{fineroot}$; all in $g\,gluc\cdot g\,dry^{-1}\cdot day^{-1}$) is first performed at the genus level using the corresponding row of `SpParams`. When missing at the genus, they  are estimated from corresponding tissue nitrogen concentrations ($N_{leaf}$, $N_{sapwood}$ and $N_{fineroot}$; all in $mg\,N \cdot g\,dry^{-1}$) following the equations given by @Reich2008 (after appropriate unit conversion):
 \begin{eqnarray}
 RER_{leaf} &=& e^{0.691+ 1.639 \cdot \log(N_{leaf}))} \\
 RER_{sapwood} &=& e^{1.024 + 1.344 \cdot \log(N_{sapwood}))} \\
@@ -460,13 +547,14 @@ RER_{fineroot} &=& e^{0.980 + 1.352 \cdot \log(N_{fineroot}))}
 \end{eqnarray}
 where in the previous equations nitrogen concentrations are in $mmol\,N\cdot g\,dry^{-1}$ and respiration rates in $nmol\,CO2\cdot g\,dry^{-1}\cdot s^{-1}$.
 
-In turn, when tissue nitrogen concentrations are missing they are estimated from taxonomic family using an internal data set (`medfate:::trait_family_means`):
+In turn, imputation of tissue nitrogen concentration is first performed at the genus level using the corresponding row of `SpParams`. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set  `medfate:::trait_family_means`). The percentage of species-level explained variance of these imputations is reported in the following table.
+
 ```{r echo = FALSE}
-tfm = medfate:::trait_family_means
-knitr::kable(tfm[!is.na(tfm$Nleaf),
-                 c("Nleaf", "Nsapwood", "Nfineroot"),drop=FALSE],
-             caption = 'Default nitrogen concentration per dry mass in different tissues by taxonomic family.')
+knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("Nleaf", "Nsapwood", "Nfineroot")),
+                ,
+             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of tissue nitrogen concentration.')
 ```
+
 
 When family values are also missing, default tissue-averaged nitrogen concentrations are given: $N_{leaf} = 20.088$, $N_{sapwood} = 3.9791$ and $N_{fineroot} = 12.207$.
 
@@ -486,14 +574,16 @@ When missing at the species parameter table, the minimum relative starch for sap
 
 ### Wood carbon {#imputationCwood}
 
-Default values for $C_{wood}$ are determined from taxonomic family using an internal data set (`medfate:::trait_family_means`):
+Imputation of $C_{wood}$ is first performed at the genus level using the corresponding row of `SpParams`. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set  `medfate:::trait_family_means`). The percentage of species-level explained variance of these imputations is reported in the following table.
+
 ```{r echo = FALSE}
-tfm = medfate:::trait_family_means
-knitr::kable(tfm[!is.na(tfm$WoodC), c("WoodC"),drop=FALSE],
-             caption = 'Default wood carbon content by taxonomic family.')
+knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("WoodC")),
+                ,
+             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of wood carbon content.')
 ```
 
-If family-level values are missing, default value of $C_{wood} = 0.5\,g\,C\cdot g\,dry^{-1}$ is used.
+
+If family-level values are also missing, default value of $C_{wood} = 0.5\,g\,C\cdot g\,dry^{-1}$ is used.
 
 ### Mortality baseline rate {#imputationMortalityBaseline}
 
