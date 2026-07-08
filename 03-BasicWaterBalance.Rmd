@@ -227,7 +227,6 @@ The other relevant control parameters for the basic water balance model are:
   + `"total"` - instantaneous complete recovery.
   + `"rate"` - following a rate of new leaf or sapwood formation.
 + `cavitationRecoveryMaximumRate [= 0.05]`: Maximum rate of conductance recovery (see section \@ref(irreversiblecavitation)).
-+ `cavitationInducedDefoliation [= TRUE]`: Whether leaf hydraulic impairment induces defoliation (88 % PLC will correspond to 50 % defoliation).
 + `lfmcComponent [= "fine"]`: Plant component used to estimate LFMC, either "leaf" or "fine" (for fine fuel) (see section \@ref(lfmc)).
 +  `mistletoeParams`: A list with the following elements:
     + `kPAR [= 0.5]`: Mistletoe light extinction coefficient.
@@ -236,7 +235,11 @@ The other relevant control parameters for the basic water balance model are:
     + `Tmax_LAIsq [= -0.006]`: Empirical coefficient relating squared mistletoe LAI with the ratio of maximum transpiration over potential evapotranspiration.
     + `Gs_P50_Baldocchi [= -2.5]`: Water potential corresponding to 50% reduction of mistletoe stomatal conductance (i.e. $\Psi50_{gs, bald,  mistletoe}$).
     + `Gs_slope_Baldocchi [= 30]`: Rate of decrease in mistletoe stomatal conductance at Gs_P50 (i.e. $slope_{gs, bald, mistletoe}$).
-
++  `defoliationParams`: A list with the following elements:
+    + `cavitationInducedDefoliation [= TRUE]`: Whether leaf hydraulic impairment induces defoliation.
+    + `criticalLeafPLC [= 0.88]`: Level of PLC (a proportion) corresponding to 50 % crown defoliation.
+    + `cvLeafP50 [= 10.0]`: Coefficient of variation (in percent) of leaf P50 within crown leaves.
+    
 ### Model output {#basicwaterbalanceoutput}
 
 Function `spwb()` returns a list of a class with the same name. The first four elements of this list (i.e., `latitude`, `topography`, `weather` and `spwbInput`) are simply copies of model inputs. The next element is `spwbOutput`, which contains the state of the input object at the end of the simulation (this can be used to perform further simulations starting with current values of state variables). The next five elements correspond to *water balance flows*, *soil state* variables, *stand-level* variables, *plant-level* and *fire hazard* results:
