@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>A Inbuilt parameter estimation | The medfate reference book</title>
   <meta name="description" content="This is a reference book for models implemented in packages medfate and medfateland." />
-  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.47 and GitBook 2.6.7" />
 
   <meta property="og:title" content="A Inbuilt parameter estimation | The medfate reference book" />
   <meta property="og:type" content="book" />
@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-07-08" />
+<meta name="date" content="2026-07-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -2389,9 +2389,10 @@ Z_{100}  &amp;=&amp; \exp(\log(Z_{95})/0.95)
 </div>
 <div id="imputationstomatalconductance" class="section level3 hasAnchor" number="27.3.13">
 <h3><span class="header-section-number">A.3.13</span> Stomatal conductance<a href="modelparametrization.html#imputationstomatalconductance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Imputation of the minimum and maximum conductance to water vapour (<span class="math inline">\(g_{swmin}\)</span> and <span class="math inline">\(g_{swmax}\)</span>; in <span class="math inline">\(mol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>) is first performed at the genus level using the corresponding row of <code>SpParams</code>. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set <code>medfate:::trait_family_means</code>). The percentage of species-level explained variance of these imputations is reported in the following table.</p>
+<p><strong>Minimum stomatal conductance</strong></p>
+<p>Imputation of the minimum and maximum conductance to water vapour (<span class="math inline">\(g_{swmin}\)</span>; in <span class="math inline">\(mol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>) is first performed at the genus level using the corresponding row of <code>SpParams</code>. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set <code>medfate:::trait_family_means</code>). The percentage of species-level explained variance of these imputations is reported in the following table.</p>
 <table>
-<caption><span id="tab:unnamed-chunk-65">Table A.4: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of minimum and maximum conductance to water vapour.</caption>
+<caption><span id="tab:unnamed-chunk-65">Table A.4: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of leaf minimum conductance to water vapour.</caption>
 <thead>
 <tr class="header">
 <th align="left">Trait</th>
@@ -2409,16 +2410,35 @@ Z_{100}  &amp;=&amp; \exp(\log(Z_{95})/0.95)
 <td align="right">82.84</td>
 <td align="right">76.5</td>
 </tr>
-<tr class="even">
+</tbody>
+</table>
+<p>If there is no information derived from taxonomic family, <span class="math inline">\(g_{swmin} = 0.0049\)</span>.</p>
+<p><strong>Maximum stomatal conductance</strong></p>
+<p>Imputation of <span class="math inline">\(g_{swmax}\)</span> is first performed at the genus level using the corresponding row of <code>SpParams</code>. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set <code>medfate:::trait_family_means</code>). The percentage of species-level explained variance of these imputations is reported in the following table:</p>
+<table>
+<caption><span id="tab:unnamed-chunk-66">Table A.5: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of maximum conductance to water vapour.</caption>
+<thead>
+<tr class="header">
+<th align="left">Trait</th>
+<th align="right">spp.</th>
+<th align="right">Family (%)</th>
+<th align="right">Genus (%)</th>
+<th align="right">Total (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
 <td align="left">Gswmax</td>
 <td align="right">536</td>
 <td align="right">3.79</td>
 <td align="right">-4.78</td>
-<td align="right">-1.0</td>
+<td align="right">-1</td>
 </tr>
 </tbody>
 </table>
-<p>If there is no information derived from taxonomic family, <span class="math inline">\(g_{swmin} = 0.0049\)</span> and <span class="math inline">\(g_{swmax} = 0.200\)</span>.</p>
+<p>If there is no information derived from taxonomic family, <span class="math inline">\(g_{swmax} = 0.200\)</span>.</p>
+<p>The table above evidences a low explanatory power of taxonomy, and therefore we should avoid taxonomically-informed imputation. Note that a low phylogenetic signal is reported in <span class="citation">Ávila‐Lovera <em>et al.</em> (<a href="#ref-avilalovera_evidence_2023">2023</a>)</span>.</p>
+<p>Decades of theory have focused on the basis of anatomical maximum conductance to water vapour (<span class="math inline">\(g_{swmax}\)</span>; in <span class="math inline">\(mol\, H_2O \cdot s^{-1} \cdot m^{-2}\)</span>), with stomatal density and size being the main predictors <span class="citation">(<a href="#ref-sack_developmental_2016">Sack &amp; Buckley 2016</a>; <a href="#ref-ochoa_pinpointing_2024">Ochoa <em>et al.</em> 2024</a>)</span>, usually incorporating assumptions about allometries among guard cell dimensions. This is frequently used to infer maximum stomatal conductance of the fossil record <span class="citation">(<a href="#ref-franks_maximum_2009">Franks &amp; Beerling 2009</a>)</span>. However, anatomical (theoretical) estimates of <span class="math inline">\(g_{swmax}\)</span> are often much higher the relationship than operational (observed physiological) <span class="math inline">\(g_{swmax}\)</span> <span class="citation">(<a href="#ref-mcelwain_using_2016">McElwain <em>et al.</em> 2016</a>)</span>, for several reasons <span class="citation">(<a href="#ref-sack_developmental_2016">Sack &amp; Buckley 2016</a>)</span>. The anatomical <span class="math inline">\(g_{swmax}\)</span> is therefore a theoretical value estimating the maximum stomatal diffusion capacity. Alternatively, operational <span class="math inline">\(g_{swmax}\)</span> has been shown to be coordinated with <span class="math inline">\(k_{l, max}\)</span> <span class="citation">(<a href="#ref-Franks2006">Franks 2006</a>)</span> and the density of veins in leaves <span class="citation">(<a href="#ref-mcelwain_using_2016">McElwain <em>et al.</em> 2016</a>)</span>.</p>
 </div>
 <div id="inputationPV" class="section level3 hasAnchor" number="27.3.14">
 <h3><span class="header-section-number">A.3.14</span> Pressure-volume curves<a href="modelparametrization.html#inputationPV" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -2433,7 +2453,7 @@ Z_{100}  &amp;=&amp; \exp(\log(Z_{95})/0.95)
 while the apoplastic fraction of stem is assumed <span class="math inline">\(f_{apo,stem} = f_{conduits}\)</span> (see <a href="modelparametrization.html#imputationAl2As">A.3.8</a>).</p>
 <p>Imputation of leaf pressure-volume parameters, i.e. <span class="math inline">\(\pi_{0,leaf}\)</span> (<code>LeafPI0</code>), <span class="math inline">\(\epsilon_{leaf}\)</span> (<code>LeafEPS</code>) and <span class="math inline">\(f_{apo,leaf}\)</span> (<code>LeafAF</code>), is first performed at the genus level using the corresponding row of <code>SpParams</code>. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set <code>medfate:::trait_family_means</code>). The percentage of species-level explained variance of these imputations is reported in the following table.</p>
 <table>
-<caption><span id="tab:unnamed-chunk-66">Table A.5: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of leaf pressure-volume parameters.</caption>
+<caption><span id="tab:unnamed-chunk-67">Table A.6: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of leaf pressure-volume parameters.</caption>
 <thead>
 <tr class="header">
 <th align="left">Trait</th>
@@ -2474,7 +2494,7 @@ while the apoplastic fraction of stem is assumed <span class="math inline">\(f_{
 <p>Tissue-level maximum conductivity parameters (i.e. <span class="math inline">\(K_{stem,max,ref}\)</span> and <span class="math inline">\(K_{root,max,ref}\)</span>) are not direct parameters to simulation functions. Instead, they are scaled to estimate stem- and root-level hydraulic conductances (i.e. <span class="math inline">\(k_{stem, \max}\)</span> and <span class="math inline">\(k_{root, \max}\)</span>) using plant size (see <a href="modelparametrization.html#scalingkstem">A.4.1</a> and <a href="modelparametrization.html#scalingkroot">A.4.3</a> for details). <span class="math inline">\(K_{stem,max,ref}\)</span> and <span class="math inline">\(K_{root,max,ref}\)</span> are supplied via species parameter table and missing values can therefore occur.</p>
 <p>Imputation of <span class="math inline">\(K_{stem,max,ref}\)</span> (<code>Ks</code> or <code>Kmax_stemxylem</code>) is first performed at the genus level using the corresponding row of <code>SpParams</code>. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set <code>medfate:::trait_family_means</code>). The percentage of species-level explained variance of these imputations is reported in the following table.</p>
 <table>
-<caption><span id="tab:unnamed-chunk-67">Table A.6: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of maximum stem hydraulic conductivity.</caption>
+<caption><span id="tab:unnamed-chunk-68">Table A.7: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of maximum stem hydraulic conductivity.</caption>
 <thead>
 <tr class="header">
 <th align="left">Trait</th>
@@ -2541,18 +2561,41 @@ while the apoplastic fraction of stem is assumed <span class="math inline">\(f_{
 </div>
 <div id="imputationkleaf" class="section level3 hasAnchor" number="27.3.16">
 <h3><span class="header-section-number">A.3.16</span> Leaf maximum hydraulic conductance<a href="modelparametrization.html#imputationkleaf" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Leaf maximum hydraulic conductance (<span class="math inline">\(k_{l, max}\)</span>, in <span class="math inline">\(mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}\)</span>) is an input parameter that should be provided for each species. When missing, leaf maximum hydraulic conductance can be estimated from maximum stomatal conductance (<span class="math inline">\(g_{swmax}\)</span>), following <span class="citation">Franks (<a href="#ref-Franks2006">2006</a>)</span> (original coefficients were modified for better fit):
+<p>Leaf maximum hydraulic conductance (<span class="math inline">\(k_{l, max}\)</span>, in <span class="math inline">\(mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}\)</span>) is not scaled, unlike stem hydraulic conductance, but an input parameter that should be provided for each species. Imputation of <span class="math inline">\(k_{l, max}\)</span> is first performed at the genus level using the corresponding row of <code>SpParams</code>. The percentage of species-level explained variance of these imputations is reported in the following table.</p>
+<table>
+<caption><span id="tab:unnamed-chunk-69">Table A.8: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of leaf maximum hydraulic conductance.</caption>
+<thead>
+<tr class="header">
+<th align="left">Trait</th>
+<th align="right">spp.</th>
+<th align="right">Family (%)</th>
+<th align="right">Genus (%)</th>
+<th align="right">Total (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">kleaf</td>
+<td align="right">308</td>
+<td align="right">5.41</td>
+<td align="right">44.27</td>
+<td align="right">49.7</td>
+</tr>
+</tbody>
+</table>
+<p>When genus-level averages are also missing, leaf maximum hydraulic conductance is estimated from a relationship with maximum stomatal conductance (<span class="math inline">\(g_{swmax}\)</span>), following <span class="citation">Franks (<a href="#ref-Franks2006">2006</a>)</span> (original coefficients were modified for better fit):
 <span class="math display">\[\begin{equation}
 k_{l, max} = (g_{swmax}/0.015)^{1/1.3}
 \end{equation}\]</span>
-Note that values for <span class="math inline">\(g_{swmax}\)</span> may also be imputed (see <a href="modelparametrization.html#imputationstomatalconductance">A.3.13</a>).</p>
+Note that values for <span class="math inline">\(g_{swmax}\)</span> may also be imputed (see <a href="modelparametrization.html#imputationstomatalconductance">A.3.13</a>), and that this imputation is uncertain, so that coordination with <span class="math inline">\(g_{swmax}\)</span> should be avoided. Alternatively, <span class="math inline">\(k_{l, max}\)</span> has also been related to maximum photosynthetic capacity and leaf nitrogen content <span class="citation">(<a href="#ref-scoffoni_hydraulic_2016">Scoffoni <em>et al.</em> 2016</a>)</span>, and to leaf xylem vulnerability <span class="citation">(<a href="#ref-yan_leaf_2020">Yan <em>et al.</em> 2020</a>)</span>. Focusing on its relationships with anatomical features, leaf maximum hydraulic conductance is known to be coordinated with vein density (also known as vein length per unit area), of which 80% of its length comes from minor veins <span class="citation">(<a href="#ref-scoffoni_hydraulic_2016">Scoffoni <em>et al.</em> 2016</a>)</span>.</p>
+<p>Note that leaf hydraulic conductance is influenced by petiole and vein traits that affect the hydraulic conductance of the leaf xylem (leaf apoplastic conductance) and of the pathways outside of the xylem, that is, through the bundle sheath and the mesophyll (extra-xylem or symplastic conductance) <span class="citation">(<a href="#ref-Sack2006">Sack &amp; Holbrook 2006</a>; <a href="#ref-sack_leaf_2013">Sack &amp; Scoffoni 2013</a>)</span>. In medfate, leaf extra-xylary conductance is assumed to contribute, by default, to 50% of total maximum leaf hydraulic conductance (see control parameter <code>fractionLeafSymplasm</code>). Vein architecture contributes to both xylary and extra-xylary components: the former because of wider and more numerous xylem conduits increase water conductance; the latter because minor vein density decreases the distance for water to move from the xylem to the transpiration site <span class="citation">(<a href="#ref-sack_leaf_2013">Sack &amp; Scoffoni 2013</a>)</span>.</p>
 </div>
 <div id="imputationVCs" class="section level3 hasAnchor" number="27.3.17">
 <h3><span class="header-section-number">A.3.17</span> Xylem vulnerability<a href="modelparametrization.html#imputationVCs" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p><strong>Stem vulnerability</strong></p>
 <p>Imputation of <span class="math inline">\(\Psi_{50,stem}\)</span> is first performed at the genus level using the corresponding row of <code>SpParams</code>. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set <code>medfate:::trait_family_means</code>). The percentage of species-level explained variance of these imputations is reported in the following table.</p>
 <table>
-<caption><span id="tab:unnamed-chunk-68">Table A.7: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of stem P50.</caption>
+<caption><span id="tab:unnamed-chunk-70">Table A.9: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of stem P50.</caption>
 <thead>
 <tr class="header">
 <th align="left">Trait</th>
@@ -2628,7 +2671,7 @@ Note that values for <span class="math inline">\(g_{swmax}\)</span> may also be 
 <p><strong>Root vulnerability</strong></p>
 <p>Imputation of <span class="math inline">\(\Psi_{50,stem}\)</span> is first performed at the genus level using the corresponding row of <code>SpParams</code>. The percentage of species-level explained variance of imputations using genus averages is reported in the following table.</p>
 <table>
-<caption><span id="tab:unnamed-chunk-69">Table A.8: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of root P50.</caption>
+<caption><span id="tab:unnamed-chunk-71">Table A.10: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of root P50.</caption>
 <thead>
 <tr class="header">
 <th align="left">Trait</th>
@@ -2665,7 +2708,7 @@ Finally, <span class="math inline">\(\Psi_{88,stem}\)</span> and the Weibull vul
 <p><strong>Leaf vulnerability</strong></p>
 <p>Imputation of <span class="math inline">\(\Psi_{50,leaf}\)</span> is first performed at the genus level using the corresponding row of <code>SpParams</code>. The percentage of species-level explained variance of imputations using genus averages is reported in the following table.</p>
 <table>
-<caption><span id="tab:unnamed-chunk-70">Table A.9: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of leaf P50.</caption>
+<caption><span id="tab:unnamed-chunk-72">Table A.11: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of leaf P50.</caption>
 <thead>
 <tr class="header">
 <th align="left">Trait</th>
@@ -2722,7 +2765,7 @@ RER_{fineroot} &amp;=&amp; e^{0.980 + 1.352 \cdot \log(N_{fineroot}))}
 where in the previous equations nitrogen concentrations are in <span class="math inline">\(mmol\,N\cdot g\,dry^{-1}\)</span> and respiration rates in <span class="math inline">\(nmol\,CO2\cdot g\,dry^{-1}\cdot s^{-1}\)</span>.</p>
 <p>In turn, imputation of tissue nitrogen concentration is first performed at the genus level using the corresponding row of <code>SpParams</code>. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set <code>medfate:::trait_family_means</code>). The percentage of species-level explained variance of these imputations is reported in the following table.</p>
 <table>
-<caption><span id="tab:unnamed-chunk-71">Table A.10: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of tissue nitrogen concentration.</caption>
+<caption><span id="tab:unnamed-chunk-73">Table A.12: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of tissue nitrogen concentration.</caption>
 <thead>
 <tr class="header">
 <th align="left">Trait</th>
@@ -2775,7 +2818,7 @@ where in the previous equations nitrogen concentrations are in <span class="math
 <h3><span class="header-section-number">A.3.23</span> Wood carbon<a href="modelparametrization.html#imputationCwood" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Imputation of <span class="math inline">\(C_{wood}\)</span> is first performed at the genus level using the corresponding row of <code>SpParams</code>. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set <code>medfate:::trait_family_means</code>). The percentage of species-level explained variance of these imputations is reported in the following table.</p>
 <table>
-<caption><span id="tab:unnamed-chunk-72">Table A.11: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of wood carbon content.</caption>
+<caption><span id="tab:unnamed-chunk-74">Table A.13: </span>Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of wood carbon content.</caption>
 <thead>
 <tr class="header">
 <th align="left">Trait</th>
@@ -2892,7 +2935,7 @@ where in the previous equations nitrogen concentrations are in <span class="math
 K_{s,max,cor}&amp;=&amp;K_{s,max,ref}\cdot (r_{int,H}/r_{int,ref})^{2}
 \end{eqnarray}\]</span>
 Where <span class="math inline">\(r_{int,H}\)</span> is the radius of conduits for a terminal branch of a tree of height <span class="math inline">\(H\)</span> and <span class="math inline">\(r_{int,ref}\)</span> is the corresponding radius for a tree of height <span class="math inline">\(H_{ref}\)</span> (<span class="math inline">\(H\)</span> and <span class="math inline">\(H_{ref}\)</span> are measured in m). The form of the empirical relationship by <span class="citation">Olson <em>et al.</em> (<a href="#ref-Olson2014">2014</a>)</span> is:</p>
-<p><img src="medfatebook_files/figure-html/unnamed-chunk-73-1.png" alt="" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="medfatebook_files/figure-html/unnamed-chunk-75-1.png" alt="" width="480" style="display: block; margin: auto;" /></p>
 <p>Let’s consider an example for a <em>Quercus ilex</em> target tree of 4m height and where species-specific conductivity <span class="math inline">\(K_{s,max,ref} = 0.77\)</span> is the apical value for trees of <span class="math inline">\(H_{ref} = 6.6\)</span> m (in , values of <span class="math inline">\(H_{ref}\)</span> are taken from median height values; see parameter <code>Hmed</code> in <code>SpParamsMED</code>). The corrected conductivity for a tree of height 4 m will be a bit lower than that of the reference height:</p>
 <div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="modelparametrization.html#cb65-1" tabindex="-1"></a>xylem_kmax <span class="ot">=</span> <span class="fl">0.77</span></span>
 <span id="cb65-2"><a href="modelparametrization.html#cb65-2" tabindex="-1"></a>H <span class="ot">=</span> <span class="dv">400</span> <span class="co"># in cm</span></span>
@@ -2926,7 +2969,7 @@ where <span class="math inline">\(r_{int, pet}\)</span> is the radius of the pet
 <div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="modelparametrization.html#cb71-1" tabindex="-1"></a><span class="fu">hydraulics_terminalConduitRadius</span>(<span class="fl">100.0</span>)</span></code></pre></div>
 <pre><code>## [1] 9.035871</code></pre>
 <p><span class="math inline">\(\chi_{tap:notap,ag}(H)\)</span> is calculated as described in the Appendix 1 section of <span class="citation">Christoffersen <em>et al.</em> (<a href="#ref-Christoffersen2016">2016</a>)</span> (see also <span class="citation">Savage <em>et al.</em> (<a href="#ref-Savage2010">2010</a>)</span>). The following figure shows the value of <span class="math inline">\(\chi_{tap:notap,ag}\)</span> for different heights:</p>
-<p><img src="medfatebook_files/figure-html/unnamed-chunk-77-1.png" alt="" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="medfatebook_files/figure-html/unnamed-chunk-79-1.png" alt="" width="480" style="display: block; margin: auto;" /></p>
 <p>Note that, since <span class="math inline">\(\chi_{tap:notap,ag}(1) = 3.82\)</span> (indicated using grey dashed lines in the last figure), the equation of maximum conductance with taper would give a higher conductance than the equation without taper for a tree of 1 m height, which is supposed to have a conductance equal to conductivity. To solve this issue we define the taper factor as <span class="math inline">\(\chi_{tap:notap,ag}(H)/\chi_{tap:notap,ag}(1)\)</span>:
 <span class="math display">\[\begin{equation}
 k_{s, max, taper}=\frac{1000}{0.018} \cdot \frac{K_{s,max,pet}\cdot A_{s}}{H\cdot A_{l}}\cdot \frac{\chi_{tap:notap,ag}(H)}{\chi_{tap:notap,ag}(1)}
@@ -2937,7 +2980,7 @@ The maximum stem conductance with taper (<span class="math inline">\(k_{s, max, 
 <span id="cb73-3"><a href="modelparametrization.html#cb73-3" tabindex="-1"></a>kstemmax_tap</span></code></pre></div>
 <pre><code>## [1] 4.764396</code></pre>
 <p>The next two plots show the variation of <span class="math inline">\(k_{s,max}\)</span> for <em>Q. ilex</em> depending on the tree height and with/without considering taper of conduits. The plot on the right (both axes in log) show the slope of the dependency of conductance with height in both cases:</p>
-<p><img src="medfatebook_files/figure-html/unnamed-chunk-79-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="medfatebook_files/figure-html/unnamed-chunk-81-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
 </div>
 <div id="scalingkleaf" class="section level3 hasAnchor" number="27.4.2">
 <h3><span class="header-section-number">A.4.2</span> Leaf maximum hydraulic conductance<a href="modelparametrization.html#scalingkleaf" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -2986,36 +3029,36 @@ The maximum stem conductance with taper (<span class="math inline">\(k_{s, max, 
 <div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="modelparametrization.html#cb91-1" tabindex="-1"></a>(<span class="dv">1</span><span class="sc">/</span>kstemmax)<span class="sc">/</span>((<span class="dv">1</span><span class="sc">/</span>kstemmax)<span class="sc">+</span>(<span class="dv">1</span><span class="sc">/</span>krootmax))</span></code></pre></div>
 <pre><code>## [1] 0.625</code></pre>
 <p>In contrast with the approach of <span class="citation">Christoffersen <em>et al.</em> (<a href="#ref-Christoffersen2016">2016</a>)</span>, in this approach the root maximum conductance depends root length and distribution, and is not a fixed fraction of stem maximum conductance. Assuming constant root length, then the proportion of total resistance due to the stem will increase with tree height <span class="citation">(<a href="#ref-Magnani2000">Magnani <em>et al.</em> 2000</a>)</span>:</p>
-<p><img src="medfatebook_files/figure-html/unnamed-chunk-89-1.png" alt="" width="432" style="display: block; margin: auto;" /></p>
+<p><img src="medfatebook_files/figure-html/unnamed-chunk-91-1.png" alt="" width="432" style="display: block; margin: auto;" /></p>
 <p>where the horizontal gray line indicates the value of 62.5%. Of course rooting depth also increases with tree age, but young trees have higher root-to-shoot ratios than older ones. Hence, a root maximum conductance that is not fixed but increases with age seems a priori more realistic. Moreover, <span class="citation">Christoffersen <em>et al.</em> (<a href="#ref-Christoffersen2016">2016</a>)</span> justify the value of 62.5% from a study which quantified total aboveground and belowground resistance in tropical trees <span class="citation">(<a href="#ref-Fisher2006">Fisher <em>et al.</em> 2006</a>)</span> under near-saturated (wet season) conditions, but values of belowground resistance reported in this study for wet conditions and trees of 30 m height are around 13%, which equals to 87% fraction of aboveground resistance. On the other hand, while rooting depths are limited by soil depth, lateral root length increases with age and, hence, the model could be made more realistic if this is taken into account and the curve above would probably saturate at lower percentages.</p>
 </div>
 <div id="scalingkrhizo" class="section level3 hasAnchor" number="27.4.4">
 <h3><span class="header-section-number">A.4.4</span> Rhizosphere maximum hydraulic conductance<a href="modelparametrization.html#scalingkrhizo" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Maximum rhizosphere conductance (<span class="math inline">\(k_{rh, max}\)</span>, in <span class="math inline">\(mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}\)</span>) is difficult to measure directly, as it depends on the rhizosphere (i.e. fine root) surface in each soil layer, and will probably always be a parameter to be calibrated. Instead of trying to estimate rhizosphere surface from root architecture <span class="citation">(<a href="#ref-Sperry1998">Sperry <em>et al.</em> 1998</a>)</span>, we follow <span class="citation">Sperry <em>et al.</em> (<a href="#ref-Sperry2016a">2016</a>)</span> and determine the maximum rhizosphere conductance in each layer from an inputed ‘average percentage rhizosphere resistance’. The percentage of continuum resistance corresponding to the rhizosphere is calculated from the vulnerability curves of stem, root and rhizosphere at the same water potential. The average resistance is found by evaluating the percentage for water potential values between 0 and <span class="math inline">\(\Psi_{crit}\)</span>. The following figure illustrates how the supply function, for different soil water potentials, is affected by increasing values of the average percentage of rhizosphere resistance:</p>
-<p><img src="medfatebook_files/figure-html/unnamed-chunk-90-1.png" alt="" width="432" style="display: block; margin: auto;" /></p>
+<p><img src="medfatebook_files/figure-html/unnamed-chunk-92-1.png" alt="" width="432" style="display: block; margin: auto;" /></p>
 <p><span class="citation">Sperry <em>et al.</em> (<a href="#ref-Sperry2016a">2016</a>)</span> found average percentages of rhizosphere resistance around 67%, but these exceptionally-high values were probably a consequence of using an unsegmented supply function (i.e. single vulnerability curve for roots, stem and leaves). If we specify a 15% of average resistance in the rhizosphere (see parameter <code>averageFracRhizosphereResistance</code> in function <code>defaultControl()</code>), the maximum rhizosphere conductance values for the three layers are found calling:</p>
 <div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="modelparametrization.html#cb93-1" tabindex="-1"></a>krmax <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">0</span>,<span class="dv">3</span>) </span>
 <span id="cb93-2"><a href="modelparametrization.html#cb93-2" tabindex="-1"></a>krmax[<span class="dv">1</span>]<span class="ot">=</span> <span class="fu">hydraulics_findRhizosphereMaximumConductance</span>(<span class="dv">15</span>, </span>
 <span id="cb93-3"><a href="modelparametrization.html#cb93-3" tabindex="-1"></a>                     s<span class="sc">$</span>VG_n[<span class="dv">1</span>],s<span class="sc">$</span>VG_alpha[<span class="dv">1</span>],</span>
 <span id="cb93-4"><a href="modelparametrization.html#cb93-4" tabindex="-1"></a>                     krootmax, rootc,rootd, </span>
 <span id="cb93-5"><a href="modelparametrization.html#cb93-5" tabindex="-1"></a>                     kstemmax, stemc, stemd,</span>
-<span id="cb93-6"><a href="modelparametrization.html#cb93-6" tabindex="-1"></a>                     kleafmax, leafc, leafd, <span class="dv">0</span>)</span>
+<span id="cb93-6"><a href="modelparametrization.html#cb93-6" tabindex="-1"></a>                     kleafmax, leafc, leafd, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">0</span>)</span>
 <span id="cb93-7"><a href="modelparametrization.html#cb93-7" tabindex="-1"></a>krmax[<span class="dv">2</span>] <span class="ot">=</span> <span class="fu">hydraulics_findRhizosphereMaximumConductance</span>(<span class="dv">15</span>, </span>
 <span id="cb93-8"><a href="modelparametrization.html#cb93-8" tabindex="-1"></a>                      s<span class="sc">$</span>VG_n[<span class="dv">2</span>],s<span class="sc">$</span>VG_alpha[<span class="dv">2</span>],</span>
 <span id="cb93-9"><a href="modelparametrization.html#cb93-9" tabindex="-1"></a>                      krootmax, rootc,rootd, </span>
 <span id="cb93-10"><a href="modelparametrization.html#cb93-10" tabindex="-1"></a>                      kstemmax, stemc, stemd,</span>
-<span id="cb93-11"><a href="modelparametrization.html#cb93-11" tabindex="-1"></a>                      kleafmax, leafc, leafd, <span class="dv">0</span>)</span>
+<span id="cb93-11"><a href="modelparametrization.html#cb93-11" tabindex="-1"></a>                      kleafmax, leafc, leafd, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">0</span>)</span>
 <span id="cb93-12"><a href="modelparametrization.html#cb93-12" tabindex="-1"></a>krmax[<span class="dv">3</span>] <span class="ot">=</span> <span class="fu">hydraulics_findRhizosphereMaximumConductance</span>(<span class="dv">15</span>, </span>
 <span id="cb93-13"><a href="modelparametrization.html#cb93-13" tabindex="-1"></a>                      s<span class="sc">$</span>VG_n[<span class="dv">3</span>],s<span class="sc">$</span>VG_alpha[<span class="dv">3</span>],</span>
 <span id="cb93-14"><a href="modelparametrization.html#cb93-14" tabindex="-1"></a>                      krootmax, rootc,rootd, </span>
 <span id="cb93-15"><a href="modelparametrization.html#cb93-15" tabindex="-1"></a>                      kstemmax, stemc, stemd,</span>
-<span id="cb93-16"><a href="modelparametrization.html#cb93-16" tabindex="-1"></a>                      kleafmax, leafc, leafd, <span class="dv">0</span>)</span>
+<span id="cb93-16"><a href="modelparametrization.html#cb93-16" tabindex="-1"></a>                      kleafmax, leafc, leafd, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">0</span>)</span>
 <span id="cb93-17"><a href="modelparametrization.html#cb93-17" tabindex="-1"></a>krmax</span></code></pre></div>
-<pre><code>## [1] 85636744 85636744 85636744</code></pre>
+<pre><code>## [1] 48037860 48037860 48037860</code></pre>
 <p>The values are the same because the texture of the three layers is the same in this case. If we take into account root distribution, actual maximum rhizosphere conductance values are:</p>
 <div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="modelparametrization.html#cb95-1" tabindex="-1"></a>krmax<span class="sc">*</span>v1</span></code></pre></div>
 <pre><code>##          [,1]     [,2]    [,3]
-## [1,] 57042945 23842581 4751218</code></pre>
+## [1,] 31998192 13374476 2665192</code></pre>
 </div>
 <div id="plantwaterstoragecapacity" class="section level3 hasAnchor" number="27.4.5">
 <h3><span class="header-section-number">A.4.5</span> Plant water storage capacity<a href="modelparametrization.html#plantwaterstoragecapacity" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -3072,6 +3115,9 @@ Note that if <span class="math inline">\(f_{overlap} = 0\)</span> then <span cla
 </div>
 <h3>Bibliography<a href="bibliography.html#bibliography" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-avilalovera_evidence_2023" class="csl-entry">
+Ávila‐Lovera, E., Winter, K. &amp; Goldsmith, G.R. (2023). <a href="https://doi.org/10.1111/nph.18565">Evidence for phylogenetic signal and correlated evolution in plant–water relation traits</a>. <em>New Phytologist</em>, 237, 392–407.
+</div>
 <div id="ref-Bartlett2016" class="csl-entry">
 Bartlett, M.K., Klein, T., Jansen, S., Choat, B. &amp; Sack, L. (2016). <a href="https://doi.org/10.1073/pnas.1604088113">The correlations and sequence of plant stomatal, hydraulic, and wilting responses to drought.</a> <em>Proceedings of the National Academy of Sciences of the United States of America</em>, 113, 13098–13103.
 </div>
@@ -3096,6 +3142,9 @@ Fisher, R.A., Williams, M., Do Vale, L.R., Da Costa, A.L. &amp; Meir, P. (2006).
 <div id="ref-Franks2006" class="csl-entry">
 Franks, P.J. (2006). <a href="https://doi.org/10.1111/j.1365-3040.2005.01434.x">Higher rates of leaf gas exchange are associated with higher leaf hydrodynamic pressure gradients</a>. <em>Plant, Cell and Environment</em>, 29, 584–592.
 </div>
+<div id="ref-franks_maximum_2009" class="csl-entry">
+Franks, P.J. &amp; Beerling, D.J. (2009). <a href="https://doi.org/10.1073/pnas.0904209106">Maximum leaf conductance driven by <span>CO</span> <span class="math inline">\(_{\textrm{2}}\)</span> effects on stomatal size and density over geologic time</a>. <em>Proceedings of the National Academy of Sciences</em>, 106, 10343–10347.
+</div>
 <div id="ref-gill_global_2000" class="csl-entry">
 Gill, R.A. &amp; Jackson, R.B. (2000). <a href="https://doi.org/10.1046/j.1469-8137.2000.00681.x">Global patterns of root turnover for terrestrial ecosystems</a>. <em>New Phytologist</em>, 147, 13–31.
 </div>
@@ -3107,6 +3156,12 @@ Magnani, F., Mencuccini, M. &amp; Grace, J. (2000). <a href="https://doi.org/10.
 </div>
 <div id="ref-maherali_adaptive_2004" class="csl-entry">
 Maherali, H., Pockman, W. &amp; Jackson, R. (2004). <a href="https://doi.org/10.1890/02-0538">Adaptive variation in the vulnerability of woody plants to xylem cavitation</a>. <em>Ecology</em>, 85, 2184–2199.
+</div>
+<div id="ref-mcelwain_using_2016" class="csl-entry">
+McElwain, J.C., Yiotis, C. &amp; Lawson, T. (2016). <a href="https://doi.org/10.1111/nph.13579">Using modern plant trait relationships between observed and theoretical maximum stomatal conductance and vein density to examine patterns of plant macroevolution</a>. <em>New Phytologist</em>, 209, 94–103.
+</div>
+<div id="ref-ochoa_pinpointing_2024" class="csl-entry">
+Ochoa, M.E., Henry, C., John, G.P., Medeiros, C.D., Pan, R., Scoffoni, C., <em>et al.</em> (2024). <a href="https://doi.org/10.1093/plphys/kiae292">Pinpointing the causal influences of stomatal anatomy and behavior on minimum, operational, and maximum leaf surface conductance</a>. <em>Plant Physiology</em>, 196, 51–66.
 </div>
 <div id="ref-Ogle2009" class="csl-entry">
 Ogle, K. &amp; Pacala, S.W. (2009). <a href="https://doi.org/10.1093/treephys/tpn051">A modeling framework for inferring tree growth and allocation from physiological, morphological and allometric traits</a>. <em>Tree Physiology</em>, 29, 587–605.
@@ -3123,8 +3178,20 @@ Plavcová, L. &amp; Jansen, S. (2015). <a href="https://doi.org/10.1007/978-3-31
 <div id="ref-Reich2008" class="csl-entry">
 Reich, P.B., Tjoelker, M.G., Pregitzer, K.S., Wright, I.J., Oleksyn, J. &amp; Machado, J.L. (2008). <a href="https://doi.org/10.1111/j.1461-0248.2008.01185.x">Scaling of respiration to nitrogen in leaves, stems and roots of higher land plants</a>. <em>Ecology Letters</em>, 11, 793–801.
 </div>
+<div id="ref-sack_developmental_2016" class="csl-entry">
+Sack, L. &amp; Buckley, T.N. (2016). <a href="https://doi.org/10.1104/pp.16.00476">The <span>Developmental</span> <span>Basis</span> of <span>Stomatal</span> <span>Density</span> and <span>Flux</span></a>. <em>Plant Physiology</em>, 171, 2358–2363.
+</div>
+<div id="ref-Sack2006" class="csl-entry">
+Sack, L. &amp; Holbrook, N.M. (2006). <a href="https://doi.org/10.1146/annurev.arplant.56.032604.144141">Leaf <span>Hydraulics</span></a>. <em>Annual Review of Plant Biology</em>, 57, 361–381.
+</div>
+<div id="ref-sack_leaf_2013" class="csl-entry">
+Sack, L. &amp; Scoffoni, C. (2013). <a href="https://doi.org/10.1111/nph.12253">Leaf venation: Structure, function, development, evolution, ecology and applications in the past, present and future</a>. <em>New Phytologist</em>, 198, 983–1000.
+</div>
 <div id="ref-Savage2010" class="csl-entry">
 Savage, V.M., Bentley, L.P., Enquist, B.J., Sperry, J.S., Smith, D.D., Reich, P.B., <em>et al.</em> (2010). <a href="https://doi.org/10.1073/pnas.1012194108">Hydraulic trade-offs and space filling enable better predictions of vascular structure and function in plants.</a> <em>Proceedings of the National Academy of Sciences of the United States of America</em>, 107, 22722–7.
+</div>
+<div id="ref-scoffoni_hydraulic_2016" class="csl-entry">
+Scoffoni, C., Chatelet, D.S., Pasquet-kok, J., Rawls, M., Donoghue, M.J., Edwards, E.J., <em>et al.</em> (2016). <a href="https://doi.org/10.1038/nplants.2016.72">Hydraulic basis for the evolution of photosynthetic productivity</a>. <em>Nature Plants</em>, 2, 16072.
 </div>
 <div id="ref-Sperry1998" class="csl-entry">
 Sperry, J.S., Adler, F.R., Campbell, G.S. &amp; Comstock, J.P. (1998). <a href="https://doi.org/10.1046/j.1365-3040.1998.00287.x">Limitation of plant water use by rhizosphere and xylem conductance: Results from a model</a>. <em>Plant, Cell &amp; Environment</em>, 21, 347–359.
@@ -3137,6 +3204,9 @@ Sperry, J.S., Wang, Y., Wolfe, B.T., Mackay, D.S., Anderegg, W.R.L., Mcdowell, N
 </div>
 <div id="ref-Walker2014" class="csl-entry">
 Walker, A.P., Beckerman, A.P., Gu, L., Kattge, J., Cernusak, L.A., Domingues, T.F., <em>et al.</em> (2014). <a href="https://doi.org/10.1002/ece3.1173">The relationship of leaf photosynthetic traits - <span>Vcmax</span> and <span>Jmax</span> - to leaf nitrogen, leaf phosphorus, and specific leaf area: <span>A</span> meta-analysis and modeling study</a>. <em>Ecology and Evolution</em>, 4, 3218–3235.
+</div>
+<div id="ref-yan_leaf_2020" class="csl-entry">
+Yan, C.-L., Ni, M.-Y., Cao, K.-F. &amp; Zhu, S.-D. (2020). <a href="https://doi.org/10.1098/rsbl.2020.0456">Leaf hydraulic safety margin and safety–efficiency trade-off across angiosperm woody species</a>. <em>Biology Letters</em>, 16, 20200456.
 </div>
 </div>
             </section>

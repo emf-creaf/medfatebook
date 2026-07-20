@@ -357,15 +357,36 @@ where $k_{PAR}$ is the diffuse PAR extinction coefficient, $\alpha_{SWR}$ is the
 
 ### Stomatal conductance {#imputationstomatalconductance}
 
-Imputation of the minimum and maximum conductance to water vapour ($g_{swmin}$ and $g_{swmax}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) is first performed at the genus level using the corresponding row of `SpParams`. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set  `medfate:::trait_family_means`). The percentage of species-level explained variance of these imputations is reported in the following table.
+**Minimum stomatal conductance**
+
+
+Imputation of the minimum and maximum conductance to water vapour ($g_{swmin}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$) is first performed at the genus level using the corresponding row of `SpParams`. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set  `medfate:::trait_family_means`). The percentage of species-level explained variance of these imputations is reported in the following table.
 
 ```{r echo = FALSE}
-knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("Gswmin", "Gswmax")),
+knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("Gswmin")),
                 ,
-             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of minimum and maximum conductance to water vapour.')
+             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of leaf minimum conductance to water vapour.')
 ```
 
-If there is no information derived from taxonomic family, $g_{swmin} = 0.0049$ and $g_{swmax} = 0.200$. 
+If there is no information derived from taxonomic family, $g_{swmin} = 0.0049$. 
+
+**Maximum stomatal conductance**
+
+
+
+Imputation of $g_{swmax}$ is first performed at the genus level using the corresponding row of `SpParams`. When genus-level averages are also missing, imputation is performed using taxonomic family (internal data set  `medfate:::trait_family_means`). The percentage of species-level explained variance of these imputations is reported in the following table:
+
+```{r echo = FALSE}
+knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("Gswmax")),
+                ,
+             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of maximum conductance to water vapour.')
+```
+
+If there is no information derived from taxonomic family, $g_{swmax} = 0.200$.  
+
+The table above evidences a low explanatory power of taxonomy, and therefore we should avoid taxonomically-informed imputation. Note that a low phylogenetic signal is reported in @avilalovera_evidence_2023. 
+
+Decades of theory have focused on the basis of anatomical maximum conductance to water vapour ($g_{swmax}$; in $mol\, H_2O \cdot s^{-1} \cdot m^{-2}$), with stomatal density and size being the main predictors [@sack_developmental_2016; @ochoa_pinpointing_2024], usually incorporating assumptions about allometries among guard cell dimensions. This is frequently used to infer maximum stomatal conductance of the fossil record [@franks_maximum_2009]. However, anatomical (theoretical) estimates of $g_{swmax}$ are often much higher the relationship than operational (observed physiological) $g_{swmax}$ [@mcelwain_using_2016], for several reasons [@sack_developmental_2016]. The anatomical $g_{swmax}$ is therefore a theoretical value estimating the maximum stomatal diffusion capacity. Alternatively, operational $g_{swmax}$ has been shown to be coordinated with $k_{l, max}$ [@Franks2006] and the density of veins in leaves [@mcelwain_using_2016].
 
 ### Pressure-volume curves {#inputationPV}
 
@@ -419,12 +440,22 @@ If family-level values are missing, suitable $K_{stem,max,ref}$ values are decid
 Following @Oliveras2003, missing values for $K_{root,max,ref}$ are assumed to be four-times the values given or estimated for $K_{stem,max,ref}$.
 
 ### Leaf maximum hydraulic conductance {#imputationkleaf}
-Leaf maximum hydraulic conductance ($k_{l, max}$, in $mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}$) is an input parameter that should be provided for each species. When missing, leaf maximum hydraulic conductance can be estimated from maximum stomatal conductance ($g_{swmax}$), following @Franks2006 (original coefficients were modified for better fit):
+
+Leaf maximum hydraulic conductance ($k_{l, max}$, in $mmol \cdot m^{-2} \cdot s^{-1} \cdot MPa^{-1}$) is not scaled, unlike stem hydraulic conductance, but an input parameter that should be provided for each species. Imputation of $k_{l, max}$ is first performed at the genus level using the corresponding row of `SpParams`. The percentage of species-level explained variance of these imputations is reported in the following table.
+
+```{r echo = FALSE}
+knitr::kable(taxonomic_partitioning |> dplyr::filter(Trait %in% c("kleaf")),
+                ,
+             caption = 'Number of species with available data and percentage of variance explained individually by family and genus, and total explained variance for taxonomically-based imputations of leaf maximum hydraulic conductance.')
+```
+
+When genus-level averages are also missing, leaf maximum hydraulic conductance is estimated from a relationship with maximum stomatal conductance ($g_{swmax}$), following @Franks2006 (original coefficients were modified for better fit):
 \begin{equation}
 k_{l, max} = (g_{swmax}/0.015)^{1/1.3}
 \end{equation}
-Note that values for $g_{swmax}$ may also be imputed (see \@ref(imputationstomatalconductance)).
+Note that values for $g_{swmax}$ may also be imputed (see \@ref(imputationstomatalconductance)), and that this imputation is uncertain, so that coordination with $g_{swmax}$ should be avoided. Alternatively, $k_{l, max}$ has also been related to maximum photosynthetic capacity and leaf nitrogen content [@scoffoni_hydraulic_2016], and to leaf xylem vulnerability [@yan_leaf_2020]. Focusing on its relationships with anatomical features, leaf maximum hydraulic conductance is known to be coordinated with vein density (also known as vein length per unit area), of which 80% of its length comes from minor veins [@scoffoni_hydraulic_2016]. 
 
+Note that leaf hydraulic conductance is influenced by petiole and vein traits that affect the hydraulic conductance of the leaf xylem (leaf apoplastic conductance) and of the pathways outside of the xylem, that is, through the bundle sheath and the mesophyll (extra-xylem or symplastic conductance) [@Sack2006; @sack_leaf_2013]. In medfate, leaf extra-xylary conductance is assumed to contribute, by default, to 50% of total maximum leaf hydraulic conductance (see control parameter `fractionLeafSymplasm`). Vein architecture contributes to both xylary and extra-xylary components: the former because of wider and more numerous xylem conduits increase water conductance; the latter because minor vein density decreases the distance for water to move from the xylem to the transpiration site [@sack_leaf_2013].
 
 ### Xylem vulnerability  {#imputationVCs}
 
@@ -817,17 +848,17 @@ for(i in 1:length(pres)) {
                      s$VG_n[1],s$VG_alpha[1],
                      krootmax, rootc,rootd, 
                      kstemmax, stemc, stemd,
-                     kleafmax, leafc, leafd, 0)
+                     kleafmax, leafc, leafd, -2, 0)
   krhizomaxvec1[2]= hydraulics_findRhizosphereMaximumConductance(pres[i], 
                      s$VG_n[2],s$VG_alpha[2],
                      krootmax, rootc,rootd, 
                      kstemmax, stemc, stemd,
-                     kleafmax, leafc, leafd, 0)
+                     kleafmax, leafc, leafd, -2, 0)
   krhizomaxvec1[3]= hydraulics_findRhizosphereMaximumConductance(pres[i], 
                      s$VG_n[3],s$VG_alpha[3],
                      krootmax, rootc,rootd, 
                      kstemmax, stemc, stemd,
-                     kleafmax, leafc, leafd, 0)
+                     kleafmax, leafc, leafd, -2, 0)
   control <- defaultControl("Sperry")
   hn1 <- list("numericParams" = control$numericParams,
              "stemCavitationEffects" = TRUE,
@@ -872,17 +903,17 @@ krmax[1]= hydraulics_findRhizosphereMaximumConductance(15,
                      s$VG_n[1],s$VG_alpha[1],
                      krootmax, rootc,rootd, 
                      kstemmax, stemc, stemd,
-                     kleafmax, leafc, leafd, 0)
+                     kleafmax, leafc, leafd, -2, 0)
 krmax[2] = hydraulics_findRhizosphereMaximumConductance(15, 
                       s$VG_n[2],s$VG_alpha[2],
                       krootmax, rootc,rootd, 
                       kstemmax, stemc, stemd,
-                      kleafmax, leafc, leafd, 0)
+                      kleafmax, leafc, leafd, -2, 0)
 krmax[3] = hydraulics_findRhizosphereMaximumConductance(15, 
                       s$VG_n[3],s$VG_alpha[3],
                       krootmax, rootc,rootd, 
                       kstemmax, stemc, stemd,
-                      kleafmax, leafc, leafd, 0)
+                      kleafmax, leafc, leafd, -2, 0)
 krmax
 ```
 
