@@ -363,6 +363,7 @@ df$StemEPS =  sqrt(1.02*exp(8.5*df$WoodDensity)-2.89)
 df$Psi_RWC40 = NA
 df$Psi_PLC60 = NA
 for(i in 1:nrow(df)) {
+  if(is.na(df$VCstem_P88[i])) df$VCstem_P88[i] <- df$VCstem_P50[i] - abs(df$VCstem_P12[i] - df$VCstem_P50[i])
   pars  = hydraulics_psi2Weibull(df$VCstem_P50[i], df$VCstem_P88[i], df$VCstem_P12[i])
   df$Psi_RWC40[i] = moisture_symplasticPsi(0.4, df$StemPI0[i], df$StemEPS[i])
   df$Psi_PLC60[i] = hydraulics_xylemPsi(0.4, 1.0, pars["c"], pars["d"])
