@@ -33,11 +33,20 @@ Leaf area increment $\Delta LA$ only occurs when phenological state is *unfoldin
 \begin{equation}
 \Delta LA = \min( \Delta LA_{alloc}, \Delta LA_{source}, \Delta LA_{sink})
 \end{equation}
-First, $\Delta LA_{alloc}$ is the maximum leaf area increment allowed by the leaf area target set by the allocation rule, $LA_{target}$, in comparison with current leaf area $LA_{\phi}$:
+
+First, $\Delta LA_{alloc}$ is the increase in leaf area dictated by allocation. In plants with *progressive evergreen* phenology (see \@ref(leafphenology)), organogenesis is not separated from leaf expansion and $\Delta LA_{alloc}$ is the maximum leaf area increment allowed by the leaf area target ($LA_{target}$; see \@ref(updateallocationtargets)), minus the current expanded leaf area ($LA_{\phi}$):
 \begin{equation}
 \Delta LA_{alloc} = \max(LA_{target} - LA_{\phi},0)
 \end{equation}
-Remember that leaf area target is updated during *bud formation* (see \@ref(updateallocationtargets)). 
+In plants with other phenology types, $\Delta LA_{alloc}$ is equal to the preformed (in buds) leaf area that remains to be expanded $LA_{preformed}$:
+\begin{equation}
+\Delta LA_{alloc} = LA_{preformed}
+\end{equation}
+In turn, $LA_{preformed}$ is set at the end of the previous period of *bud formation* as follows:
+\begin{equation}
+LA_{preformed} = (LA_{target} \cdot (PCAB/100)  - 1/LD) \cdot org_{eff}
+\end{equation}
+where $PCAB$ is the percentage of crown active buds, $LD$ is leaf duration in years, and $org_{eff}$ is the  organogenesis efficiency, i.e. the ratio of cell expansion rate accounting for turgor effects relative to the maximum cell expansion rate (i.e. $r_{cell}(30, \Psi_{symp,leaf})/ r_{cell,max}$), averaged across the duration of the *bud formation* period.
 
 Second, $\Delta LA_{source}$ represents the leaf area increment expected given carbon source limitations and is calculated:
 \begin{equation}
@@ -119,7 +128,7 @@ Leaf senescence can also occur as a consequence of hydraulic disconnection, as d
 
 The maximum of $p_{aging,leaf}$ and $p_{cavitation, leaf}$ is finally applied to reduce $LA$ and increase $LA_{dead}$ correspondingly. 
 
-Xylem cavitation not only causes defoliation but also mortality of buds, which has the effect of slowing down post-drought leaf area recovery. The percentage of the crown with active buds ($PCAB$) is reduced whenever the proportion of conductance loss has increased with respect to the preceeding day: 
+Xylem cavitation not only causes defoliation but also mortality of buds, which has the effect of slowing down post-drought leaf area recovery. The percentage of the crown with active buds ($PCAB$) is reduced whenever the proportion of conductance loss has increased with respect to the preceding day: 
 
 \begin{equation}
 PCAB = \min(PCAB, 100 \cdot (1 - PLC_{stem}))
