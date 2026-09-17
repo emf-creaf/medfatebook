@@ -34,31 +34,39 @@ Leaf area increment $\Delta LA$ only occurs when phenological state is *unfoldin
 \Delta LA = \min( \Delta LA_{alloc}, \Delta LA_{source}, \Delta LA_{sink})
 \end{equation}
 
-First, $\Delta LA_{alloc}$ is the increase in leaf area dictated by allocation. In plants with *progressive evergreen* phenology (see \@ref(leafphenology)), organogenesis is not separated from leaf expansion and $\Delta LA_{alloc}$ is the maximum leaf area increment allowed by the leaf area target ($LA_{target}$; see \@ref(updateallocationtargets)), minus the current expanded leaf area ($LA_{\phi}$):
+**Allocation**
+
+$\Delta LA_{alloc}$ is the increase in leaf area dictated by allocation. In plants with *evergreen-progressive* phenology (see \@ref(leafphenology)), organogenesis is not separated from leaf expansion and $\Delta LA_{alloc}$ is the maximum leaf area increment allowed by the leaf area target ($LA_{target}$; see \@ref(updateallocationtargets)), minus the current expanded leaf area ($LA_{\phi}$):
 \begin{equation}
 \Delta LA_{alloc} = \max(LA_{target} - LA_{\phi},0)
 \end{equation}
-In plants with other phenology types, $\Delta LA_{alloc}$ is equal to the preformed (in buds) leaf area that remains to be expanded $LA_{preformed}$:
+In plants with other phenology types, allocation is often dictated by preformed leaves within buds. If there is leaf area to be elongated (i.e. $LA_{preformed} > 0.0$) then $\Delta LA_{alloc}$ is equal to the preformed (in buds) leaf area that remains to be elongated:
 \begin{equation}
 \Delta LA_{alloc} = LA_{preformed}
 \end{equation}
-In turn, $LA_{preformed}$ is set at the end of the previous period of *bud formation* as follows:
+where $LA_{preformed}$ is set at the end of the previous period of *bud formation* as follows:
 \begin{equation}
 LA_{preformed} = (LA_{target} \cdot (PCAB/100)  - 1/LD) \cdot org_{eff}
 \end{equation}
-where $PCAB$ is the percentage of crown active buds, $LD$ is leaf duration in years, and $org_{eff}$ is the  organogenesis efficiency, i.e. the ratio of cell expansion rate accounting for turgor effects relative to the maximum cell expansion rate (i.e. $r_{cell}(30, \Psi_{symp,leaf})/ r_{cell,max}$), averaged across the duration of the *bud formation* period.
+where $PCAB$ is the percentage of crown active buds, $LD$ is leaf duration in years, and $org_{eff}$ is the organogenesis efficiency, i.e. the ratio of cell expansion rate accounting for turgor effects relative to the maximum cell expansion rate (i.e. $r_{cell}(30, \Psi_{symp,leaf})/ r_{cell,max}$), averaged across the duration of the *bud formation* period. In phenology types that allow additional leaves to be formed after the elongation of preformed leaves (i.e. in *evergreen-polycyclic*, *winter-deciduous* and *winter-semideciduous*), when $LA_{preformed} = 0.0$ then $LA_{alloc} = \max(LA_{target} - LA_{\phi},0)$ as with *evergreen-progressive* phenology. 
 
-Second, $\Delta LA_{source}$ represents the leaf area increment expected given carbon source limitations and is calculated:
+**Carbon source limitations**
+
+$\Delta LA_{source}$ represents the leaf area increment expected given carbon source limitations and is calculated:
 \begin{equation}
 \Delta LA_{source} = \frac{ST_{sapwood}\cdot m_{gluc}\cdot V_{sapwood,leaf}}{1000 \cdot CC_{leaf} / SLA}
 \end{equation}
 where $ST_{sapwood}$ is the current concentration of sapwood storage carbon (starch), $V_{storage,sapwood}$ is the sapwood storage volume and $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per leaf area unit, see eq. \@ref(eq:leafconstructioncost). 
 
-Finally, $\Delta LA_{sink}$ represents the leaf area increment expected by taking into account the maximum leaf tissue growth rate relative to sapwood area ($RGR_{leaf, max}$; in $m^2 \cdot cm^{-2} \cdot day^{-1}$), the percentage of the crown with active buds ($PCAB$) and the relative cell expansion rate given $T_{day}$, $\Psi_{symp,leaf}$ and $\pi_{0,leaf}$: 
+**Sink limitations**
+
+$\Delta LA_{sink}$ represents the leaf area increment expected by taking into account the maximum leaf tissue growth rate relative to sapwood area ($RGR_{leaf, max}$; in $m^2 \cdot cm^{-2} \cdot day^{-1}$), the percentage of the crown with active buds ($PCAB$) and the relative cell expansion rate given $T_{day}$, $\Psi_{symp,leaf}$ and $\pi_{0,leaf}$: 
 \begin{equation}
 \Delta LA_{sink} = SA \cdot (PCAB/100) \cdot RGR_{leaf, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{symp,leaf})}{r_{cell,max}}
 \end{equation}
 where cell relative expansion rate is divided by the maximum relative cell expansion rate $r_{cell,max}$, so that $RGR_{leaf, max}$ is attained when sink conditions are optimal. The final expression of $\Delta LA_{sink}$ reduces to a product of the maximum leaf area growth times two factors (for turgor and temperature) bounded between 0 and 1.
+
+**Update of crown active buds**
 
 If previous drought or fire impacts had reduced the percentage of the crown with active buds ($PCAB$), this percentage is increased along with primary growth (i.e. with leaf growth), until it achieves 100\%:
 \begin{equation}
@@ -72,11 +80,16 @@ Sapwood area increment $\Delta SA$ can only occur if $LA_{live}>0$. Newly assimi
 \begin{equation}
 \Delta SA = \min(\Delta SA_{source}, \Delta SA_{sink})
 \end{equation}
+
+**Carbon source limitations**
+
 $\Delta SA_{source}$ represents the sapwood area increment expected given carbon source limitations and is calculated using:
 \begin{equation}
 \Delta SA_{source} = \frac{\max(ST_{sapwood}-ST_{sapwood,growth},0)\cdot m_{gluc}\cdot V_{storage,sapwood}}{CC_{sapwood} \cdot (H + \sum_{s}{FRP_s \cdot L_s}) \cdot \rho_{wood}}
 \end{equation}
 where $ST_{sapwood}$ is the current starch concentration, $ST_{sapwood,growth}$ is the minimum starch concentration required for sapwood growth, $V_{storage,sapwood}$ is the sapwood storage volume, $m_{gluc}$ is glucose molar mass and the denominator contains the construction costs per sapwood area unit, see eq. \@ref(eq:sapwoodconstructioncost). $ST_{sapwood,growth}$ is related to the minimum relative starch concentration for growth ($RSSG$), which is specified via the species-specific parameter `RSSG` or the control parameter `minimumRelativeStarchForGrowth`. This parameter is important because it allows specifying to which extent a given plant species stops growth and saves carbon to ensure survival (e.g. shadow tolerant species), as opposed to a species strongly investing in growth to reach the top of the canopy and have access to high light levels (e.g. light-demanding species).  
+
+**Sink limitations**
 
 Assuming that the maximum relative sapwood growth rate ($RGR_{cambium, max}$ or $RGR_{sapwood, max}$) corresponds to a maximum rate of daily ring area increase, we have that the daily increase in sapwood area according to sink limitations, $\Delta SA_{sink}$, is defined as:
 \begin{equation}
@@ -98,18 +111,26 @@ Fine root biomass increment is modelled for each soil layer separately, and is d
 \begin{equation}
 \Delta B_{fineroot} = \min( \Delta B_{fineroot,alloc}, \Delta B_{fineroot,source}, \Delta B_{fineroot,sink})
 \end{equation}
-First, $\Delta B_{fineroot,alloc}$ is the maximum fine root biomass increment allowed by the biomass target set by the allocation rule, $B_{fineroot,target}$ (see \@ref(updateallocationtargets)), in comparison with current biomass, $B_{fineroot}$:
+
+**Allocation**
+
+$\Delta B_{fineroot,alloc}$ is the maximum fine root biomass increment allowed by the biomass target set by the allocation rule, $B_{fineroot,target}$ (see \@ref(updateallocationtargets)), in comparison with current biomass, $B_{fineroot}$:
 \begin{equation}
 \Delta B_{fineroot,alloc} = \max(B_{fineroot,target} - B_{fineroot},0)
 \end{equation}
 
-Second, $\Delta B_{fineroot,source}$ represents the biomass increment expected given the available storage carbon (starch):
+**Carbon source limitations**
+
+$\Delta B_{fineroot,source}$ represents the biomass increment expected given the available storage carbon (starch):
 \begin{equation}
 \Delta B_{fineroot,source} = \frac{ST_{sapwood} \cdot m_{gluc}\cdot V_{storage,sapwood}}{CC_{fineroot}}
 \end{equation}
 where $ST_{sapwood}$ is the current sapwood concentration of storage carbon,  $V_{storage,sapwood}$ is the sapwood storage volume, $m_{gluc}$ is glucose molar mass and $CC_{fineroot}$ is the construction costs per fine root biomass unit.
 
-Finally, $\Delta B_{fineroot,sink}$ represents the biomass increment expected by taking into account maximum  tissue growth rate ($RGR_{fineroot, max}$; in $g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$) and the relative cell expansion rate given temperature ($T_{day}$) and water potential in the rhizosphere ($\Psi_{rhizo,s}$): 
+
+**Sink limitations**
+
+$\Delta B_{fineroot,sink}$ represents the biomass increment expected by taking into account maximum  tissue growth rate ($RGR_{fineroot, max}$; in $g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$) and the relative cell expansion rate given temperature ($T_{day}$) and water potential in the rhizosphere ($\Psi_{rhizo,s}$): 
 \begin{equation}
 \Delta B_{fineroot,sink} = B_{fineroot} \cdot RGR_{fineroot, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{rhizo,s})}{r_{cell,max}} 
 \end{equation}
