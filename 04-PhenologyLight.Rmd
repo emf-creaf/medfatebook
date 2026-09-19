@@ -4,25 +4,16 @@ Leaf phenology determines seasonal variations in the surface area of leaves, hen
 
 ## Leaf phenology  {#leafphenology}
 
-Leaf phenology is explained here for the basic water balance model, but its design applies as well for the advanced water balance model and the growth model that are later described in this book. Importantly, some phenological phases (bud formation and leaf unfolding) become relevant for modelling primary growth (i.e. leaf growth) in the case of the growth model.
 
-### Phenological types
+### Leaf phenology and phenological models
 
-While acknowledging that the phenology of specific plants may not fit exactly into them, in MEDFATE the following five phenological types are distinguished (see processes and timings in Fig. \@ref(fig:phenology)):
+The following three phenological types are currently distinguished (see also primary growth phenology in \@ref(growthdesign)):
 
-  + *Progressive evergreen*: Progressive evergreen plants are assumed to shed old leaves at the same time as new leaves appear. In the water balance models, this phenological behaviour means that the leaf area of the cohort remains constant throughout the year. In the case of the growth model, leaf senescence and leaf formation can occur continuously throughout the year, and leaf growth occurs without preformation of organs within persistent buds.
-  + *One-flush evergreen*: One-flush evergreen plants are assumed concentrate leaf elongation and leaf senescence during similar periods. More specifically, leaf senescence occurs at the same time as the start of elongation of new leaves, so that leaf area is partially reduced for a small period. In the growth model, the amount of leaf area to be flushed is decided during the persistent bud formation period, when leaf organogenesis is assumed to occur. This is assumed to occur between DOY 200 and the start of dormancy. Hence, limitations to the amount of new leaves can occur during bud formation or leaf elongation periods.
-  + *Polycyclic evergreen*: Polycyclic plants have a mixed growth strategy. Like one-flush plants, persistent buds are formed in autumn and a first set of leaves is flushed in spring. Additionally, the plant can continue forming new leaves after these initial ones have finished elongation, in the same way as a continuous evergreen plants, until there is a decrease in photoperiod. From that moment on, persistent buds are formed for the next year. In the water balance model this phenology cannot be distinguished from one-flush evergreen plants.
-  + *Winter-deciduous*: In winter-deciduous plants, leaf shedding and leaf bud formation both occur in autumn, and buds remain under dormancy until spring, when budburst and elongation occurs. Therefore, the plant has a non-zero leaf area during the period limited by leaf elongation and leaf shedding events. After the elongation of preformed leaves, leaf organogenesis and elongation can continue during the growing season, until the decrease in photoperiod surpasses a threshold, as in polycyclic plants. Like in one-flush evergreen plants, the amount of leaf area to be flushed is decided during the bud formation period for the growth model, which in this case is set to occur between the decrease of photoperiod and the start of dormancy. 
-  + *Winter semi-deciduous*: Winter semideciduous plants are like deciduous ones in terms of senescence, bud formation, organogenesis and leaf elongation. The only difference between semi-deciduous and deciduous plants is that the former retain dead leaves in the plant until next season elongation period, so that leaf fall is retarded (note that leaf fall is not represented in Fig. \@ref(fig:phenology)). 
+  + *Evergreen*: Evergreen plant cohort keep the same amount of leaves constant throughout the year (unless there is cavitation-induced defoliation).  
+  + *Winter-deciduous*: In winter-deciduous plants, leaf shedding and leaf bud formation both occur in autumn, and buds remain under dormancy until spring, when budburst and elongation occurs. Therefore, the plant has a non-zero leaf area during the period limited by leaf elongation and leaf shedding events.  
+  + *Winter semi-deciduous*: Winter semideciduous plants are like deciduous ones in terms of senescence, bud formation, organogenesis and leaf elongation. The only difference between semi-deciduous and deciduous plants is that the former retain dead leaves in the plant until next season elongation period, so that leaf fall is retarded. 
 
-```{r phenology, out.width='100%', fig.align="center", fig.cap="Schematic representation of processes and timings for different leaf phenology types", echo=FALSE}
-knitr::include_graphics("figures/leaf_phenology.png")
-```
-
-### Leaf expanded status and phenological models
-
-Continuous evergreen plants thus maintain constant leaf area over the year, whereas in other phenology types leaf-expanded status is updated daily, represented by $\phi_i$, the fraction of maximum leaf area for cohort $i$:
+Evergreen plants thus maintain constant leaf area over the year, whereas in other leaf phenology types leaf-expanded status is updated daily, represented by $\phi_i$, the fraction of maximum leaf area for cohort $i$:
 
 \begin{equation}
 LAI_{\phi,i}=LAI_{live,i}\,\cdot\phi_i

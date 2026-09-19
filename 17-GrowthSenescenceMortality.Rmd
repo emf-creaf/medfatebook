@@ -31,24 +31,24 @@ In **medfate**, we assume a constant value of $\pi_0 = -1$ in meristematic tissu
 
 Leaf area increment $\Delta LA$ only occurs when phenological state is *unfolding*, and is defined as the minimum of three values expressing three corresponding constraints:
 \begin{equation}
-\Delta LA = \min( \Delta LA_{alloc}, \Delta LA_{source}, \Delta LA_{sink})
+\Delta LA = \min( \Delta LA_{target}, \Delta LA_{source}, \Delta LA_{sink})
 \end{equation}
 
-**Allocation**
+**Target leaf area increase**
 
-$\Delta LA_{alloc}$ is the increase in leaf area dictated by allocation. In plants with *evergreen-progressive* phenology (see \@ref(leafphenology)), organogenesis is not separated from leaf expansion and $\Delta LA_{alloc}$ is the maximum leaf area increment allowed by the leaf area target ($LA_{target}$; see \@ref(updateallocationtargets)), minus the current expanded leaf area ($LA_{\phi}$):
+$\Delta LA_{target}$ is the increase in leaf area that would be expected by leaf growth targets and crown bud availability. In plants with *evergreen-progressive* phenology (see \@ref(leafphenology)), organogenesis is not separated from leaf expansion and $\Delta LA_{target}$ is directly leaf area increment allowed by the live leaf area ($LA_{live}$; see \@ref(updateallocationtargets)), minus the current expanded leaf area ($LA_{\phi}$):
 \begin{equation}
-\Delta LA_{alloc} = \max(LA_{target} - LA_{\phi},0)
+\Delta LA_{target} = \max(LA_{live} - LA_{\phi},0) = \max(LA_{target} \cdot (PCAB/100) - LA_{\phi},0)
 \end{equation}
-In plants with other phenology types, allocation is often dictated by preformed leaves within buds. If there is leaf area to be elongated (i.e. $LA_{preformed} > 0.0$) then $\Delta LA_{alloc}$ is equal to the preformed (in buds) leaf area that remains to be elongated:
+In plants with other phenology types, targets are first dictated by preformed leaves within buds. If there is leaf area to be elongated (i.e. $LA_{preformed} > 0.0$) then $\Delta LA_{target}$ is simply equal to the preformed (in buds) leaf area that remains to be elongated:
 \begin{equation}
-\Delta LA_{alloc} = LA_{preformed}
+\Delta LA_{target} = LA_{preformed}
 \end{equation}
-where $LA_{preformed}$ is set at the end of the previous period of *bud formation* as follows:
+where $LA_{preformed}$ has been set at the end of the previous period of *bud formation* as follows:
 \begin{equation}
-LA_{preformed} = (LA_{target} \cdot (PCAB/100)  - 1/LD) \cdot org_{eff}
+LA_{preformed} = \frac{LA_{live}}{LD} \cdot org_{eff} = \frac{LA_{target} \cdot (PCAB/100)}{LD} \cdot org_{eff}
 \end{equation}
-where $PCAB$ is the percentage of crown active buds, $LD$ is leaf duration in years, and $org_{eff}$ is the organogenesis efficiency, i.e. the ratio of cell expansion rate accounting for turgor effects relative to the maximum cell expansion rate (i.e. $r_{cell}(30, \Psi_{symp,leaf})/ r_{cell,max}$), averaged across the duration of the *bud formation* period. In phenology types that allow additional leaves to be formed after the elongation of preformed leaves (i.e. in *evergreen-polycyclic*, *winter-deciduous* and *winter-semideciduous*), when $LA_{preformed} = 0.0$ then $LA_{alloc} = \max(LA_{target} - LA_{\phi},0)$ as with *evergreen-progressive* phenology. 
+where $PCAB$ is the percentage of crown active buds, $LD$ is leaf duration in years, and $org_{eff}$ is the organogenesis efficiency, i.e. the ratio of cell expansion rate accounting for turgor effects relative to the maximum cell expansion rate (i.e. $r_{cell}(30, \Psi_{symp,leaf})/ r_{cell,max}$), averaged across the duration of the *bud formation* period. In phenology types that allow additional leaves to be formed after the elongation of preformed leaves (i.e. in *evergreen-polycyclic*, *winter-deciduous* and *winter-semideciduous*), when $LA_{preformed} = 0.0$ then $\Delta LA_{target}$ is set as detailed above for *evergreen-progressive* phenology. 
 
 **Carbon source limitations**
 
@@ -60,7 +60,7 @@ where $ST_{sapwood}$ is the current concentration of sapwood storage carbon (sta
 
 **Sink limitations**
 
-$\Delta LA_{sink}$ represents the leaf area increment expected by taking into account the maximum leaf tissue growth rate relative to sapwood area ($RGR_{leaf, max}$; in $m^2 \cdot cm^{-2} \cdot day^{-1}$), the percentage of the crown with active buds ($PCAB$) and the relative cell expansion rate given $T_{day}$, $\Psi_{symp,leaf}$ and $\pi_{0,leaf}$: 
+$\Delta LA_{sink}$ represents the leaf area increment resulting from the maximum leaf tissue growth rate relative to sapwood area ($RGR_{leaf, max}$; in $m^2 \cdot cm^{-2} \cdot day^{-1}$), the percentage of the crown with active buds ($PCAB$) and the relative cell expansion rate given $T_{day}$, $\Psi_{symp,leaf}$ and $\pi_{0,leaf}$: 
 \begin{equation}
 \Delta LA_{sink} = SA \cdot (PCAB/100) \cdot RGR_{leaf, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{symp,leaf})}{r_{cell,max}}
 \end{equation}
@@ -76,10 +76,19 @@ where $RGR_{bud}$ is the growth rate of buds per unit per unit leaf area growth 
 
 ### Sapwood growth {#sapwoodgrowth}
 
-Sapwood area increment $\Delta SA$ can only occur if $LA_{live}>0$. Newly assimilated carbon is preferentially allocated to leaves and fine roots whenever storage levels are low. $\Delta SA$ is defined as the minimum of two values expressing source and sink constraints:
+Newly assimilated carbon is preferentially allocated to leaves and fine roots whenever storage levels are low. $\Delta SA$ is defined as the minimum of three values expressing targets, source and sink constraints:
 \begin{equation}
-\Delta SA = \min(\Delta SA_{source}, \Delta SA_{sink})
+\Delta SA = \min(\Delta SA_{target}, \Delta SA_{source}, \Delta SA_{sink})
 \end{equation}
+
+**Sapwood area target**
+
+$\Delta SA_{target}$ is the increase in sapwood area that would be expected comparing the sapwood target with the current functional sapwood area:
+
+\begin{equation}
+\Delta SA_{target} = \max(SA_{target} - SA \cdot (1.0 - PLC_{stem}))
+\end{equation}
+where $SA_{target}$ is the target sapwood area dictated by functional coordination (see \@ref(updateallocationtargets)) and $PLC_{stem}$ is the proportion of stem conductance loss due to cavitation.
 
 **Carbon source limitations**
 
