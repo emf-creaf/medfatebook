@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-09-25" />
+<meta name="date" content="2026-09-29" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -446,10 +446,10 @@ div.csl-indent {
 <li class="chapter" data-level="15.1.1" data-path="growthmodelling.html"><a href="growthmodelling.html#overview"><i class="fa fa-check"></i><b>15.1.1</b> Overview</a></li>
 <li class="chapter" data-level="15.1.2" data-path="growthmodelling.html"><a href="growthmodelling.html#plant-carbon-pools-and-carbon-flows"><i class="fa fa-check"></i><b>15.1.2</b> Plant carbon pools and carbon flows</a></li>
 <li class="chapter" data-level="15.1.3" data-path="growthmodelling.html"><a href="growthmodelling.html#growthphenologydesign"><i class="fa fa-check"></i><b>15.1.3</b> Growth phenology</a></li>
-<li class="chapter" data-level="15.1.4" data-path="growthmodelling.html"><a href="growthmodelling.html#growthsenescencedesign"><i class="fa fa-check"></i><b>15.1.4</b> Tissue growth and senescence processes</a></li>
+<li class="chapter" data-level="15.1.4" data-path="growthmodelling.html"><a href="growthmodelling.html#growthsenescencedesign"><i class="fa fa-check"></i><b>15.1.4</b> Growth and senescence processes</a></li>
 <li class="chapter" data-level="15.1.5" data-path="growthmodelling.html"><a href="growthmodelling.html#sourcesinkdesign"><i class="fa fa-check"></i><b>15.1.5</b> Source and sink limitations to growth</a></li>
 <li class="chapter" data-level="15.1.6" data-path="growthmodelling.html"><a href="growthmodelling.html#growthcoordinationdesign"><i class="fa fa-check"></i><b>15.1.6</b> Growth coordination</a></li>
-<li class="chapter" data-level="15.1.7" data-path="growthmodelling.html"><a href="growthmodelling.html#update-of-structural-variables"><i class="fa fa-check"></i><b>15.1.7</b> Update of structural variables</a></li>
+<li class="chapter" data-level="15.1.7" data-path="growthmodelling.html"><a href="growthmodelling.html#updatestructuredesign"><i class="fa fa-check"></i><b>15.1.7</b> Update of structural variables</a></li>
 <li class="chapter" data-level="15.1.8" data-path="growthmodelling.html"><a href="growthmodelling.html#mortalitydesign"><i class="fa fa-check"></i><b>15.1.8</b> Plant mortality</a></li>
 <li class="chapter" data-level="15.1.9" data-path="growthmodelling.html"><a href="growthmodelling.html#fireseveritydesign"><i class="fa fa-check"></i><b>15.1.9</b> Fire occurrence, severity and emissions</a></li>
 <li class="chapter" data-level="15.1.10" data-path="growthmodelling.html"><a href="growthmodelling.html#organic-matter-decomposition"><i class="fa fa-check"></i><b>15.1.10</b> Organic matter decomposition</a></li>
@@ -817,15 +817,15 @@ and then defining an unfolding development status <span class="math inline">\(S_
 <span class="math display">\[\begin{equation}
 \phi_{i,d} = S_{unf,d}/S_{unf}^*
 \end{equation}\]</span>
-until <span class="math inline">\(S_{unf,d} \geq S_{unf}^*\)</span> and the unfolding process ends, where <span class="math inline">\(S_{unf}^*\)</span> is a simulation control parameter <code>unfoldingDD</code>.</p>
+until <span class="math inline">\(S_{unf,d} \geq S_{unf}^*\)</span> and the unfolding process ends, where <span class="math inline">\(S_{unf}^*\)</span> is another plant-specific parameter of <code>spwbInput</code>. By design, leaf elongation cannot extend beyond DOY = 212 (corresponding to 31st July in the northern hemisphere), i.e. <span class="math inline">\(\phi_{i,d} = 1\)</span> at this date.</p>
 </div>
 <div id="leafphenosenescence" class="section level3 hasAnchor" number="4.1.3">
 <h3><span class="header-section-number">4.1.3</span> Leaf senescence<a href="leafphenologylight.html#leafphenosenescence" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Leaf senescence for winter (semi)-deciduous plants follows the models developed by <span class="citation">Delpierre <em>et al.</em> (<a href="#ref-Delpierre2009">2009</a>)</span>. The daily rate of development of senescence <span class="math inline">\(R_{sen,d}\)</span> is defined on the basis of daily photoperiod (<span class="math inline">\(Ph_{d}\)</span>, in hours) and temperature (<span class="math inline">\(T_d\)</span>, in <span class="math inline">\(^{\circ} \mathrm{C}\)</span>):
 <span class="math display">\[\begin{equation}
 R_{sen,d}(Ph_d, T_d) = \begin{cases}
-                            0  &amp; T_d \geq T_{sen} \,\, or \,\, Ph_d&gt;Ph_{sen} \\
-                           (T_d - T_{sen})^{x_{sen}} \cdot (Ph_d/Ph_{sen})^{y_{sen}}  &amp; T_d &lt; T_{sen} \,\,and \,\, Ph_d&lt;Ph_{sen}
+                            0  &amp; T_d \geq T_{sen} \,\, \mathrm{or} \,\, Ph_d&gt;Ph_{sen} \\
+                           (T_d - T_{sen})^{x_{sen}} \cdot (Ph_d/Ph_{sen})^{y_{sen}} &amp; T_d &lt; T_{sen} \,\, \mathrm{and} \,\, Ph_d&lt;Ph_{sen}
                        \end{cases}
 \end{equation}\]</span>
 where <span class="math inline">\(Ph_{sen}\)</span> is the maximum photoperiod to start counting the senescence; <span class="math inline">\({x_{sen}}\)</span> and <span class="math inline">\({y_{sen}}\)</span> are exponents regulating the importance of temperature and photoperiod on leaf senescence. The state of development of senescence <span class="math inline">\(S_{sen,d}\)</span> is defined

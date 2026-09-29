@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-09-25" />
+<meta name="date" content="2026-09-29" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -446,10 +446,10 @@ div.csl-indent {
 <li class="chapter" data-level="15.1.1" data-path="growthmodelling.html"><a href="growthmodelling.html#overview"><i class="fa fa-check"></i><b>15.1.1</b> Overview</a></li>
 <li class="chapter" data-level="15.1.2" data-path="growthmodelling.html"><a href="growthmodelling.html#plant-carbon-pools-and-carbon-flows"><i class="fa fa-check"></i><b>15.1.2</b> Plant carbon pools and carbon flows</a></li>
 <li class="chapter" data-level="15.1.3" data-path="growthmodelling.html"><a href="growthmodelling.html#growthphenologydesign"><i class="fa fa-check"></i><b>15.1.3</b> Growth phenology</a></li>
-<li class="chapter" data-level="15.1.4" data-path="growthmodelling.html"><a href="growthmodelling.html#growthsenescencedesign"><i class="fa fa-check"></i><b>15.1.4</b> Tissue growth and senescence processes</a></li>
+<li class="chapter" data-level="15.1.4" data-path="growthmodelling.html"><a href="growthmodelling.html#growthsenescencedesign"><i class="fa fa-check"></i><b>15.1.4</b> Growth and senescence processes</a></li>
 <li class="chapter" data-level="15.1.5" data-path="growthmodelling.html"><a href="growthmodelling.html#sourcesinkdesign"><i class="fa fa-check"></i><b>15.1.5</b> Source and sink limitations to growth</a></li>
 <li class="chapter" data-level="15.1.6" data-path="growthmodelling.html"><a href="growthmodelling.html#growthcoordinationdesign"><i class="fa fa-check"></i><b>15.1.6</b> Growth coordination</a></li>
-<li class="chapter" data-level="15.1.7" data-path="growthmodelling.html"><a href="growthmodelling.html#update-of-structural-variables"><i class="fa fa-check"></i><b>15.1.7</b> Update of structural variables</a></li>
+<li class="chapter" data-level="15.1.7" data-path="growthmodelling.html"><a href="growthmodelling.html#updatestructuredesign"><i class="fa fa-check"></i><b>15.1.7</b> Update of structural variables</a></li>
 <li class="chapter" data-level="15.1.8" data-path="growthmodelling.html"><a href="growthmodelling.html#mortalitydesign"><i class="fa fa-check"></i><b>15.1.8</b> Plant mortality</a></li>
 <li class="chapter" data-level="15.1.9" data-path="growthmodelling.html"><a href="growthmodelling.html#fireseveritydesign"><i class="fa fa-check"></i><b>15.1.9</b> Fire occurrence, severity and emissions</a></li>
 <li class="chapter" data-level="15.1.10" data-path="growthmodelling.html"><a href="growthmodelling.html#organic-matter-decomposition"><i class="fa fa-check"></i><b>15.1.10</b> Organic matter decomposition</a></li>
@@ -2262,26 +2262,47 @@ Z_{100}  &amp;=&amp; \exp(\log(Z_{95})/0.95)
 </div>
 <div id="imputationphenology" class="section level3 hasAnchor" number="27.3.10">
 <h3><span class="header-section-number">A.3.10</span> Leaf phenology<a href="modelparametrization.html#imputationphenology" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>When missing, leaf duration is assigned a value of 1 year for winter-deciduous species and 2.41 years for the remaining leaf phenology types.</p>
-<p>Default values for leaf phenological parameters are the same regardless of the leaf phenology type:</p>
-<table style="width:100%;">
-<colgroup>
-<col width="22%" />
-<col width="9%" />
-<col width="9%" />
-<col width="9%" />
-<col width="9%" />
-<col width="9%" />
-<col width="9%" />
-<col width="9%" />
-<col width="9%" />
-</colgroup>
+<p>When missing, leaf duration (<code>LeafDuration</code>) is assigned a value of 1 year for winter-deciduous species and 2.41 years for the remaining leaf phenology types. Missing values for the number of days required to complete bud formation (<code>BudFormationDays</code>) are assigned 20 days.</p>
+<p>Current default values for leaf budburst parameters are the same regardless of the leaf phenology type:</p>
+<table>
 <thead>
 <tr class="header">
 <th align="left">Phenology type</th>
 <th align="center"><code>t0gdd</code></th>
 <th align="center"><code>Sgdd</code></th>
+<th align="center"><code>Ugdd</code></th>
 <th align="center"><code>Tbgdd</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Evergreen</td>
+<td align="center">50</td>
+<td align="center">200</td>
+<td align="center">300</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="left">Winter deciduous</td>
+<td align="center">50</td>
+<td align="center">200</td>
+<td align="center">300</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Winter semi-deciduous</td>
+<td align="center">50</td>
+<td align="center">200</td>
+<td align="center">300</td>
+<td align="center">0</td>
+</tr>
+</tbody>
+</table>
+<p>Current default values for leaf senescence parameters are the same regardless of the leaf phenology type:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Phenology type</th>
 <th align="center"><code>Ssen</code></th>
 <th align="center"><code>Phsen</code></th>
 <th align="center"><code>Tbsen</code></th>
@@ -2291,10 +2312,7 @@ Z_{100}  &amp;=&amp; \exp(\log(Z_{95})/0.95)
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">One-flush evergreen</td>
-<td align="center">50</td>
-<td align="center">200</td>
-<td align="center">0</td>
+<td align="left">Evergreen</td>
 <td align="center">8268</td>
 <td align="center">12.5</td>
 <td align="center">28.5</td>
@@ -2303,9 +2321,6 @@ Z_{100}  &amp;=&amp; \exp(\log(Z_{95})/0.95)
 </tr>
 <tr class="even">
 <td align="left">Winter deciduous</td>
-<td align="center">50</td>
-<td align="center">200</td>
-<td align="center">0</td>
 <td align="center">8268</td>
 <td align="center">12.5</td>
 <td align="center">28.5</td>
@@ -2314,20 +2329,6 @@ Z_{100}  &amp;=&amp; \exp(\log(Z_{95})/0.95)
 </tr>
 <tr class="odd">
 <td align="left">Winter semi-deciduous</td>
-<td align="center">50</td>
-<td align="center">200</td>
-<td align="center">0</td>
-<td align="center">8268</td>
-<td align="center">12.5</td>
-<td align="center">28.5</td>
-<td align="center">2</td>
-<td align="center">2</td>
-</tr>
-<tr class="even">
-<td align="left">Drought deciduous</td>
-<td align="center">50</td>
-<td align="center">200</td>
-<td align="center">0</td>
 <td align="center">8268</td>
 <td align="center">12.5</td>
 <td align="center">28.5</td>

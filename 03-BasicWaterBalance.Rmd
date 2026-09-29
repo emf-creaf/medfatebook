@@ -130,9 +130,11 @@ A first set of functional parameters refers to leaf phenology (`paramsPhenology`
 |        |       |  `PhenologyType`  | Leaf phenology type (evergreen, winter-deciduous, or winter-semideciduous). |
 |        |       |  `GrowthDeterminacy`  | Primary growth determinacy (determined, indetermined or intermediate), only relevant for the growth model (see \@ref(growthdesign)). |
 | $LD$ | years  | `LeafDuration` | Average duration of leaves (in years). |
+| $BFD$ | days   | `BudFormationDays` | Number of days required to complete bud formation (only relevant for the growth model (see \@ref(growthdesign)).  |
 | $t_{0,eco}$ | days | `t0gdd` | Date to start the accumulation of degree days. |
-| $S^*_{eco}$ | $^{\circ} \mathrm{C}$ | `Sgdd` | Degree days corresponding to leaf budburst (see section \@ref(leafphenobudburst)). |
-| $T_{eco}$ | $^{\circ} \mathrm{C}$ | `Tbgdd` | Base temperature for the calculation of degree days to leaf budburst (see section \@ref(leafphenobudburst)). |
+| $S^*_{eco}$ | $^{\circ} \mathrm{C}$ | `Sgdd` | Cumulative degree days required for leaf budburst (see section \@ref(leafphenobudburst)). |
+| $S_{unf}^*$ |$^{\circ} \mathrm{C}$ | `Ugdd` | Cumulative degree-days required to complete leaf unfolding after budburst has occurred (see section \@ref(leafphenobudburst)). |
+| $T_{eco}$ | $^{\circ} \mathrm{C}$ | `Tbgdd` | Base temperature for the calculation of degree days to leaf budburst and unfolding (see section \@ref(leafphenobudburst)). |
 | $S^*_{sen}$ | $^{\circ} \mathrm{C}$ | `Ssen` | Degree days corresponding to leaf senescence (see section \@ref(leafphenosenescence)). |
 | $Ph_{sen}$ | hours | `Phsen` | Photoperiod corresponding to start counting senescence degree-days (see section \@ref(leafphenosenescence)). |
 | $T_{sen}$ | $^{\circ} \mathrm{C}$ | `Tbsen` | Base temperature for the calculation of degree days to leaf senescence (see section \@ref(leafphenosenescence)). |
@@ -210,7 +212,6 @@ The other relevant control parameters for the basic water balance model are:
 + `leafPhenology [ = TRUE]`:  Whether leaf phenology is simulated (see section \@ref(leafphenology)). If `FALSE` then all species are assumed to be evergreen.
 + `bareSoilEvaporation [= TRUE]`:  Whether evaporation from the soil surface is simulated (see section \@ref(soilevaporation)).
 + `unlimitedSoilWater [=FALSE]`: Boolean flag to indicate the simulation of plant transpiration assuming that soil water is always at field capacity.
-+ `unfoldingDD [= 300]`: Degree-days for complete leaf unfolding after budburst has occurred ($S_{unf}^*$; see section \@ref(leafphenobudburst)).
 + `interceptionMode [= "Gash1995"]`: Infiltration model, either "Gash1995" or "Liu2001"; see section \@ref(interception).
 + `infiltrationMode [= "GreenAmpt1911"]`: Infiltration model, either "GreenAmpt1911" or "Boughton1989"; see section \@ref(infiltration).
 + `soilDomains [="buckets"]`: Either `"buckets"` (for multi-bucket model), `"single"` (for single-domain Richards model) and `"dual"` (for dual-permeability model). See \@ref(soilflows).
