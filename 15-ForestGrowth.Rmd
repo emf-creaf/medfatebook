@@ -598,7 +598,7 @@ An important parameter concerns the allocation strategy:
 
 + `allocationStrategy  [="Plant_kmax"]` defines the allocation strategy (investment in leaf area vs. sapwood area) of the growth model. If `allocationStrategy = "Plant_kmax"` then the target leaf area is set to maintain the input whole-plant maximum conductance. If `allocationStrategy = "Al2As"` then the target leaf area is set to maintain the input Huber value.
 
-A number of control parameters regulate carbon balance:
+A number of control parameters regulate carbon balance, growth and senescence processes:
 
 + `phloemConductanceFactor [= 0.2]`: Factor to transform stem xylem conductance to phloem conductance (only for `transpirationMode = "Sperry"`).
 + `nonSugarConcentration [=0.25]`: A constant specifying non-sugar (inorganic) solute concentration ($mol \cdot L^{-1}$) in cells.
@@ -607,6 +607,8 @@ A number of control parameters regulate carbon balance:
 + `senescenceRates [= c(sapwood = 0.0001261398, fineroot = 0.001897231)]`: Relative senescence rates ($day^{-1}$) for sapwood and fine roots. Default are equivalent to 4.5% and 50% annual turnover for sapwood and fine roots, respectively. Leaf senescence rates depend on leaf lifespan (i.e. leaf duration) for evergreen species. These are default values used when relative growth rates are not specified via species-specific `SpParams`.
 + `constructionCosts [= c(leaf = 1.5, sapwood = 1.47, fineroot = 1.30)]`: Default construction costs, including respiration and structural carbon, per dry weight of new tissue ($g\,gluc \cdot g\,dry^{-1}$). These are default values used when relative growth rates are not specified via species-specific `SpParams`.
 + `maximumRelativeGrowthRates [= c(leaf = 0.01, cambium = 0.005, sapwood = 0.002, fineroot = 0.1)]`: Default maximum relative growth rates for leaves ($m^{2}\cdot cm^{-2} \cdot day^{-1}$), tree sapwood ($cm^{2}\cdot cm^{-1} \cdot day^{-1}$), shrub sapwood ($cm^{2}\cdot cm^{-2} \cdot day^{-1}$) and fine roots ($g\,dry \cdot g\,dry^{-1} \cdot day^{-1}$). These are default values used when relative growth rates are not specified via species-specific `SpParams`.
++ `organogenesisEfficiencyModulator [= 1]`: Exponent relating turgor-related relative growth rate with leaf organogenesis efficiency.
++ `elongationEfficiencyModulator [= 1]`: Exponent relating turgor-related relative growth rate with leaf elongation efficiency.
 
 A set of parameters control defoliation and crown bud mortality:
 
