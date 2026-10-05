@@ -7,13 +7,15 @@ Leaf phenology determines seasonal variations in the surface area of leaves, hen
 
 ### Leaf phenology and phenological models
 
-The following three phenological types are currently distinguished:
+The following three phenological types are currently distinguished (see parameter `PhenologyType`):
 
   + *Evergreen*: Evergreen plants involve continuous presence of leaves throughout the year, although the the amount of leaves can vary seasonally.
   + *Winter-deciduous*: In winter-deciduous plants, all leaves are shed in autumn and buds remain under dormancy until spring, when budburst and elongation occurs. Therefore, the plant has a non-zero leaf area during the period limited by leaf elongation and leaf shedding events. 
   + *Winter semi-deciduous*: Winter semi-deciduous plants are like deciduous ones, with the difference that they retain dead leaves in the plant until next season elongation period, so that leaf abscission is retarded. 
 
-Whereas leaves of deciduous plants always undergo senescence in autumn and new leaves are flushed in spring, different strategies can be distinguished with respect to seasonality in evergreen plants. In particular, we distinguish two possibilities for leaf growth - i.e. *whole-year growth* vs. *spring growth*) and three possibilities for leaf senescence - i.e. *whole-year senescence* vs *autumn senescence* or *spring senescence*). The most usual combinations are shown in Fig. \@ref(fig:leafphenology) (see also primary growth phenology in \@ref(growthdesign)):
+Whereas leaves of deciduous plants always undergo senescence in autumn and new leaves are flushed in spring, different strategies can be distinguished with respect to seasonality in evergreen plants. In particular, we distinguish two possibilities for leaf growth period (parameter `GrowthPeriod`) - i.e. *whole-year growth* vs. *spring growth* -  and three possibilities for leaf senescence period (parameter `SenescencePeriod`)  - i.e. *whole-year senescence* vs *autumn senescence* or *spring senescence* - . 
+
+The most usual combinations of phenology type and growth/senescence periods are shown in Fig. \@ref(fig:leafphenology) (see also primary growth phenology in \@ref(growthdesign)):
 
 ```{r leafphenology, out.width='100%', fig.align="center", fig.cap="Schematic representation of processes and timings for different leaf phenology types", echo=FALSE}
 knitr::include_graphics("figures/leaf_phenology.png")
@@ -23,20 +25,20 @@ Evergreen plants with whole-year leaf senescence and growth are typical of tropi
 
 ### Leaf phenological models
 
-Evergreen plants thus maintain constant leaf area over the year, whereas in other leaf phenology types leaf-expanded status is updated daily, represented by $\phi_i$, the fraction of maximum leaf area for cohort $i$:
+In winter-deciduous leaf phenology, leaf-expanded status is updated daily, represented by $\phi_i$, the fraction of maximum leaf area for cohort $i$:
 
 \begin{equation}
 LAI_{\phi,i}=LAI_{live,i}\,\cdot\phi_i
 \end{equation}
 whereas for evergreen species $LAI_{\phi,i}=LAI_{live,i}$ (or equivalently $\phi_i = 1$ at all times).
 
-The general structure of process based phenological models explained in @Chuine2013. These models aim determine, for a given phenological phase $n$ (endodormancy, ecodormancy, maturation, etc), the day of its finalisation $d_n$, such that the following equation holds:
+The general structure of process based phenological models explained in @Chuine2013. These models aim to determine, for a given phenological phase $n$ (endodormancy, ecodormancy, maturation, etc), the day of its finalisation $d_n$, such that the following equation holds:
 \begin{equation} 
 S_{n,d} = \sum_{d_{n-1}}^{d_n} R_{n,d} = S_n^*
 \end{equation}
 where $S_{n,d}$ is the state of development on day $d$ in phase $n$, and $d_{n-1}$ is the end of the previous phase. $R_{n,d}$ is the rate of development during phase $n$ on day $d$, which depends on environmental variables (temperature, photoperiod,...) and $S_n^*$ is the critical threshold to achieve the change of phase. 
 
-In the water balance model leaf area index ($LAI$) values of winter (semi-)deciduous plants are adjusted for leaf phenology following a leaf development model in spring and a leaf senescence model in autumn. Function `pheno_updateLeaves()` updates the status of expanded leaves and dead leaves in a simulation object. Regardless of leaf phenology type, when control parameter `cavitationInducedDefoliation = TRUE` the function `pheno_updateLeaves()` will take into account the degree of cavitation (i.e. using $PLC_{leaf}$) to determine the degree of defoliation (see \@ref(cavitationinduceddefoliationbasic)).
+In the water balance model, leaf area index ($LAI$) values of winter (semi-)deciduous plants are adjusted for leaf phenology following a leaf development model in spring and a leaf senescence model in autumn. Similarly, evergreen species whose leaf growth period is in spring but leaf senescence occurs in autumn also have a $LAI$ that varies according to those models. Function `pheno_updateLeaves()` updates the status of expanded leaves and dead leaves in a simulation object. Regardless of leaf phenology type, when control parameter `cavitationInducedDefoliation = TRUE` the function `pheno_updateLeaves()` will take into account the degree of cavitation (i.e. using $PLC_{leaf}$) to determine the degree of defoliation (see \@ref(cavitationinduceddefoliationbasic)).
 
 
 ### Bud burst and leaf unfolding {#leafphenobudburst}
@@ -47,7 +49,7 @@ R_{eco,d}(T_d) = \begin{cases}
                       T_d - T_{eco}  & T_d > T_{eco}
                  \end{cases}
 \end{equation}
-Degree accumulation starts after the year date surpasses parameter $t_{0,eco}$. If $DOY > t_{0,eco}$, daily $R_{eco,d}$ values are added to the cumulative sum $S_{eco}$ and budburst occurs the first day that $S_{eco} \geq S_{eco}^*$. Both $T_{eco}$ and $S_{eco}^*$ are plant-specific parameters in `spwbInput`. 
+Degree accumulation starts after the year date surpasses parameter $t_{0,eco}$. If $DOY > t_{0,eco}$, daily $R_{eco,d}$ values are added to the cumulative sum $S_{eco}$ and budburst occurs the first day that $S_{eco} \geq S_{eco}^*$  (see Fig. \@ref(fig:leafphenology)). Both $T_{eco}$ and $S_{eco}^*$ are plant-specific parameters in `spwbInput`. 
 
 After budburst, we model progressive leaf unfolding and elongation in a similar manner, by accumulating degree days using the same definition as for $R_{eco,d}$ and then defining an unfolding development status $S_{unf} = S_{eco} - S_{eco}^*$, which we use to determine $\phi_{i}$, the degree of leaf elongation of cohort $i$:
 \begin{equation}
@@ -56,21 +58,21 @@ After budburst, we model progressive leaf unfolding and elongation in a similar 
 where $S_{unf}^*$ is another plant-specific parameter of `spwbInput`. The leaf elongation process continues until $S_{unf} \geq S_{unf}^*$ (equivalently, when $S_{eco} \geq S_{eco}^* + S_{unf}^*$, see Fig. \@ref(fig:leafphenology)). By design, leaf elongation cannot extend beyond $DOY = 212$ (corresponding to 31st July in the northern hemisphere), i.e. the phenology submodel forces $\phi_{i} = 1$ at this date.
 
 ### Leaf senescence {#leafphenosenescence}
-Leaf senescence for winter (semi)-deciduous plants or evergreen plants of type III extends the design of the models developed by @Delpierre2009 for leaf colouring. The daily rate of senescence forcing $R_{sen,d}$ is defined on the basis of daily photoperiod ($Ph_{d}$, in hours) and temperature ($T_d$, in $^{\circ} \mathrm{C}$):
+Leaf senescence for deciduous or evergreen plants with autumn senescence extends the design of the models developed by @Delpierre2009 for leaf colouring. The daily rate of senescence forcing $R_{sen,d}$ is defined on the basis of daily photoperiod ($Ph_{d}$, in hours) and temperature ($T_d$, in $^{\circ} \mathrm{C}$):
 \begin{equation}
 R_{sen,d}(Ph_d, T_d) = \begin{cases} 
                             0  & T_d \geq T_{sen} \,\, \mathrm{or} \,\, Ph_d>Ph_{sen} \\
                            (T_{sen} - T_d)^{x_{sen}} \cdot (Ph_d/Ph_{sen})^{y_{sen}} & T_d < T_{sen} \,\, \mathrm{and} \,\, Ph_d<Ph_{sen}
                        \end{cases}
 \end{equation}
-where $Ph_{sen}$ is the maximum photoperiod to start counting the senescence; $T_{sen}$ is the base temperature for the calculation of degree days forcing senescence; ${x_{sen}}$ and ${y_{sen}}$ are exponents regulating the importance of temperature and photoperiod on leaf senescence. The state of development of senescence $S_{sen}$ is defined as the sum of senescence forcing:
+where $Ph_{sen}$ is the maximum photoperiod to start counting the senescence; $T_{sen}$ is the base temperature for the calculation of degrees of forcing senescence; ${x_{sen}}$ and ${y_{sen}}$ are exponents regulating the importance of temperature and photoperiod on leaf senescence. The state of development of senescence $S_{sen}$ is defined as the sum of senescence forcing:
 \begin{equation} 
 S_{sen} = \sum R_{sen,d}
 \end{equation}
-The ratio $S_{sen}/S_{sen}^*$ can be conceptually understood as the proportion of chlorophyll degradation and nutrient translocation in crown leaves. When $S_{sen}  \geq  S_{sen}^*$ then leaves are assumed to have lost their green color (i.e. turned yellow or brown) and be ready for the terminal senescence phase, which involves cell death and separation in the abscission zone. From this point on, the fraction of crown leaves that are considered ready to abscission and fall increases due to further forcing accumulation, until $S_{sen}  \geq  S_{sen}^* + F_{sen}^*$ (see Fig. \@ref(fig:leafphenology)). The senescence submodel is implemented in function `pheno_leafSenescenceStatus()` and returns $\phi_{i,d}=1$ for all days until $S_{sen}  \geq  S_{sen}^*$ when it returns $\phi_{i,d}=(S_{sen} - S_{sen}^*)/F_{sen}$. Parameters $Ph_{sen}$, $T_{sen}$, $x_{sen}$, $y_{sen}$, $S_{sen}^*$ and $F_{sen}^*$ are plant-specific parameters in `spwbInput`.  
+The ratio $S_{sen}/S_{sen}^*$ can be conceptually understood as the proportion of chlorophyll degradation and nutrient translocation in crown leaves (but at present it is not used to downregulate transpiration nor photosynthesis). When $S_{sen}  \geq  S_{sen}^*$ then leaves are assumed to have lost their green color (i.e. turned yellow or brown) and be ready for the terminal senescence phase (see Fig. \@ref(fig:leafphenology)), which involves cell death and separation in the abscission zone. From this point on, the fraction of crown leaves that are considered ready to abscission and fall increases due to further forcing accumulation, until $S_{sen}  \geq  S_{sen}^* + F_{sen}^*$ (see Fig. \@ref(fig:leafphenology)). The senescence submodel is implemented in function `pheno_leafSenescenceStatus()` and returns $\phi_{i,d}=1$ for all days until $S_{sen}  \geq  S_{sen}^*$. After that, the function returns progressively lower values, dictated by $\phi_{i,d}=(S_{sen} - S_{sen}^*)/F_{sen}$. Parameters $Ph_{sen}$, $T_{sen}$, $x_{sen}$, $y_{sen}$, $S_{sen}^*$ and $F_{sen}^*$ are plant-specific parameters in `spwbInput`.  
 
-### Leaf abscission {#leafabscission}
-The decrease in $\phi_i$ causes live expanded leaves to become dead leaves attached to branches and ready to fall. Dead leaves are kept in the canopy and they are reduced daily using a negative exponential function of wind speed:
+### Leaf abscission and fall {#leafabscission}
+The decrease in $\phi_i$ causes live expanded leaves to become dead leaves, still attached to branches but ready to be detached by wind action. Dead leaves are kept in the canopy and they are reduced daily using a negative exponential function of wind speed:
 \begin{equation}
 LAI_{dead,i, d}=LAI_{dead,i,d-1}\,\cdot e^{- u/10}
 \end{equation}
