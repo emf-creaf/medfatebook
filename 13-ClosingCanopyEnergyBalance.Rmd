@@ -48,10 +48,10 @@ After evaluating the canopy energy balance equation \@ref(eq:canopyenergybalance
 \end{equation}
 where $TC_{can}$ is the canopy thermal capacitance (in $J \cdot m^{-2} \cdot K^{-1}$) and $\Delta t_{step} = 86400/n_t$ is the size of the time step in seconds. Canopy thermal capacitance depends on the leaf area index of the stand:
 \begin{equation}
-TC_{can} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{live} + 1.2 \cdot (LAI_{\phi} + \cdot LAI_{dead})}{2}
+TC_{can} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{live} + 1.2 \cdot (LAI_{act} + \cdot LAI_{dead})}{2}
 (\#eq:canopythermalcapacitance)
 \end{equation}
-where $TC_{LAI}$ is the thermal capacitance per LAI unit, which is specified by the control parameter `thermalCapacityLAI`. By using both the maximum leaf area of the stand, $LAI_{live}$, and its current live/dead leaf area ($LAI_{\phi}+LAI_{dead}$) it is assumed that part of thermal capacitance corresponds to stems and branches, so that capacitance does not drop to zero for deciduous canopies.
+where $TC_{LAI}$ is the thermal capacitance per LAI unit, which is specified by the control parameter `thermalCapacityLAI`. By using both the maximum leaf area of the stand, $LAI_{live}$, and its current live/dead leaf area ($LAI_{act}+LAI_{dead}$) it is assumed that part of thermal capacitance corresponds to stems and branches, so that capacitance does not drop to zero for deciduous canopies.
 
 ### Soil temperature changes
 Analogously to the canopy, the change in temperature for a given soil layer $s$ in the current time step is given by rearranging eq. \@ref(eq:deepsoilenergybalance):
@@ -86,7 +86,7 @@ LE_{vap, j} = \lambda_v(T_{air,j}) \cdot \left(\frac{In_{j,t}}{\Delta t_{step}} 
 \end{equation}
 where $\lambda_v(T_{air,j})$ is the latent heat of vaporization at temperature $T_{air,j}$ (in $J·kg^{-1}$), $In_{j,t}$ is the intercepted water that is evaporated from the canopy layer, determined by dividing $In_{t}$ among canopy layers according to the fraction of total LAI in each one:
 \begin{equation}
-In_{j,t} = In_{t} \cdot \frac{\sum_{i=1}{LAI_{\phi,i,j}}}{LAI_{\phi}}
+In_{j,t} = In_{t} \cdot \frac{\sum_{i=1}{LAI_{act,i,j}}}{LAI_{act}}
 \end{equation}
 and $E_{j,t}$ is the instantaneous transpiration rate in layer $j$ (in $kg\,H_2O\cdot m^{-2}\cdot s^{-1}$), given by:
 \begin{equation}
@@ -137,7 +137,7 @@ Evaluation of the canopy layer energy balance equation \@ref(eq:canopylayerenerg
 \end{equation}
 where $TC_{j}$ is the  thermal capacitance of canopy layer $j$ (in $J \cdot m^{-2} \cdot K^{-1}$), found analogously to $TC_{can}$ (eq. \@ref(eq:canopythermalcapacitance)):
 \begin{equation}
-TC_{j} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{live,j} + 1.2 \cdot (LAI_{\phi,j} + \cdot LAI_{dead,j})}{2}
+TC_{j} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{live,j} + 1.2 \cdot (LAI_{act,j} + \cdot LAI_{dead,j})}{2}
 \end{equation}
 $\Delta t_{substep}$ is the time step for closing the energy balance, which has to be smaller than $\Delta t_{step}$ to avoid numerical instabilities due to turbulent flow.
 

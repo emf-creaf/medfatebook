@@ -781,21 +781,21 @@ div.csl-indent {
 <h2><span class="header-section-number">6.1</span> Plant transpiration and photosynthesis<a href="transpirationgranier.html#plant-transpiration-and-photosynthesis" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div id="maximumtranspiration" class="section level3 hasAnchor" number="6.1.1">
 <h3><span class="header-section-number">6.1.1</span> Maximum transpiration<a href="transpirationgranier.html#maximumtranspiration" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Potential evapotranspiration (<span class="math inline">\(PET\)</span>, in mm) is assumed to represent open water evaporation potential. Maximum canopy transpiration <span class="math inline">\(Tr_{cohorts, \max}\)</span> depends on both <span class="math inline">\(PET\)</span> and the amount of transpirating surface, i.e. the current cumulative <span class="math inline">\(LAI\)</span> of the vegetation, <span class="math inline">\(LAI_{\phi}\)</span>. To estimate <span class="math inline">\(Tr_{cohorts, \max}\)</span> the model uses the empirical equation of <span class="citation">Granier <em>et al.</em> (<a href="#ref-Granier1999">1999</a>)</span>, where <span class="math inline">\(Tr_{cohorts, \max}/PET\)</span> is a function of <span class="math inline">\(LAI_{\phi}\)</span>:</p>
+<p>Potential evapotranspiration (<span class="math inline">\(PET\)</span>, in mm) is assumed to represent open water evaporation potential. Maximum canopy transpiration <span class="math inline">\(Tr_{cohorts, \max}\)</span> depends on both <span class="math inline">\(PET\)</span> and the amount of transpirating surface, i.e. the current cumulative <span class="math inline">\(LAI\)</span> of the vegetation, <span class="math inline">\(LAI_{act}\)</span>. To estimate <span class="math inline">\(Tr_{cohorts, \max}\)</span> the model uses the empirical equation of <span class="citation">Granier <em>et al.</em> (<a href="#ref-Granier1999">1999</a>)</span>, where <span class="math inline">\(Tr_{cohorts, \max}/PET\)</span> is a function of <span class="math inline">\(LAI_{act}\)</span>:</p>
 <p><span class="math display">\[\begin{equation}
-\frac{Tr_{cohorts, \max}}{PET}= -0.006\cdot (LAI_{\phi})^2+0.134\cdot LAI_{\phi}+0.036
+\frac{Tr_{cohorts, \max}}{PET}= -0.006\cdot (LAI_{act})^2+0.134\cdot LAI_{act}+0.036
 \end{equation}\]</span>
 This equation has already been adopted for Mediterranean biomes <span class="citation">(<a href="#ref-Fyllas2009">Fyllas &amp; Troumbis 2009</a>; <a href="#ref-Ruffault2013">Ruffault <em>et al.</em> 2013</a>)</span>.</p>
 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:tmaxpet"></span>
-<img src="medfatebook_files/figure-html/tmaxpet-1.png" alt="Empirical relationship between \(Tr_{cohorts, \max}/PET\) and \(LAI_{\phi}\)" width="384" />
+<img src="medfatebook_files/figure-html/tmaxpet-1.png" alt="Empirical relationship between \(Tr_{cohorts, \max}/PET\) and \(LAI_{act}\)" width="384" />
 <p class="caption">
-Figure 6.1: Empirical relationship between <span class="math inline">\(Tr_{cohorts, \max}/PET\)</span> and <span class="math inline">\(LAI_{\phi}\)</span>
+Figure 6.1: Empirical relationship between <span class="math inline">\(Tr_{cohorts, \max}/PET\)</span> and <span class="math inline">\(LAI_{act}\)</span>
 </p>
 </div>
 <p>Since medfate’s <strong>ver. 2.1</strong>, empirical coefficients can be species-specific and <span class="citation">Granier <em>et al.</em> (<a href="#ref-Granier1999">1999</a>)</span> empirical equation has been generalized to:
 <span class="math display">\[\begin{equation}
-\frac{Tr_{cohorts, \max}}{PET}=  T_{max,LAI} \cdot LAI_{\phi} + T_{max,sqLAI} \cdot (LAI_{\phi})^2
+\frac{Tr_{cohorts, \max}}{PET}=  T_{max,LAI} \cdot LAI_{act} + T_{max,sqLAI} \cdot (LAI_{act})^2
 \end{equation}\]</span>
 where <span class="math inline">\(T_{max,LAI}\)</span> and <span class="math inline">\(T_{max,sqLAI}\)</span> are species-specific parameters (if missing, they are given default values 0.134 and -0.006, respectively).</p>
 <p>The maximum transpiration for a given plant cohort <span class="math inline">\(i\)</span> is calculated using the portion of <span class="math inline">\(Tr_{\max}\)</span> defined by <span class="math inline">\(f_i\)</span> the fraction of total absorbed SWR that is due
@@ -881,7 +881,7 @@ e_{leaf}(T_{leaf}, \Psi_{leaf}) = e_{sat}(T_{leaf}) \cdot \exp\left\{\frac{2.17 
 where <span class="math inline">\(e_{sat}(T)\)</span> is a function giving the saturated vapor pressure for temperature <span class="math inline">\(T\)</span> (see <a href="http://emf-creaf.github.io/meteolandbook/miscellaneous.html#physicalutils">utility functions</a> of the <strong>meteoland</strong> reference manual). Given the simplicity of the basic water balance model, here we make the assumption that <span class="math inline">\(\Psi_{leaf} = \Psi_{plant}\)</span> (from the previous time step). Furthermore, we assume that leaf temperature is coupled with the temperature of the surrounding air. Given the non-linearity of <span class="math inline">\(e_{leaf}\)</span> we average the wapor pressure values provided by <span class="math inline">\(e_{leaf}(T_{\min}, \Psi_{plant})\)</span> and <span class="math inline">\(e_{leaf}(T_{\max}, \Psi_{plant})\)</span>.</p>
 <p>Once the leaf level <span class="math inline">\(E_{\min}\)</span> is known for a give cohort <span class="math inline">\(i\)</span>, we can scale this instantaneous rate to daily transpiration (in mm) at the cohort level using:
 <span class="math display">\[\begin{equation}
-Tr_{\min,i} = E_{\min,i} \cdot 24 \cdot 3600 \cdot LAI_{\phi,i} \cdot 0.018
+Tr_{\min,i} = E_{\min,i} \cdot 24 \cdot 3600 \cdot LAI_{act,i} \cdot 0.018
 \end{equation}\]</span></p>
 </div>
 <div id="transpirationpools" class="section level3 hasAnchor" number="6.1.5">
@@ -910,7 +910,7 @@ Estimating transpiration with water pools is analogous to estimating transpirati
 <h3><span class="header-section-number">6.1.6</span> Transpiration of hemi-parasitic plants<a href="transpirationgranier.html#mistletoetranspirationbasic" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>When mistletoes are considered in water balance simulations, they are included in radiation extinction calculations. The maximum transpiration of mistletoe in cohort <span class="math inline">\(i\)</span> is (<span class="math inline">\(Tr_{mistletoe, i, \max}\)</span>):</p>
 <p><span class="math display">\[\begin{equation}
-   Tr_{mistletoe, i, \max} =  PET \cdot (T_{max,LAI} \cdot LAI_{\phi} + T_{max,sqLAI} \cdot (LAI_{\phi})^2 ) \cdot \frac{f_i^{0.75}}{\sum_{j}{f_j^{0.75}}} \cdot \frac{LAI_{mistletoe,i}}{LAI_{\phi,i}+LAI_{mistletoe,i}}
+   Tr_{mistletoe, i, \max} =  PET \cdot (T_{max,LAI} \cdot LAI_{act} + T_{max,sqLAI} \cdot (LAI_{act})^2 ) \cdot \frac{f_i^{0.75}}{\sum_{j}{f_j^{0.75}}} \cdot \frac{LAI_{mistletoe,i}}{LAI_{act,i}+LAI_{mistletoe,i}}
 \end{equation}\]</span></p>
 <p>Maximum transpiration is then reduced to actual transpiration (i.e. <span class="math inline">\(Tr_{mistletoe, i}\)</span>) according to the water potential of the plant cohort (<span class="math inline">\(\Psi_{plant,i}\)</span>), following a sigmoid function with parameters <span class="math inline">\(\Psi50_{gs, bald, mistletoe}\)</span> and <span class="math inline">\(slope_{gs, bald, mistletoe}\)</span> (defined in control parameters). Soil water extraction corresponding to mistletoe transpiration is added to extraction caused by the corresponding plant cohort.</p>
 </div>
@@ -939,7 +939,7 @@ Figure 6.3: Relationship between the percentage of PAR available to a cohort and
 <span class="math display">\[\begin{equation}
 DDS_i=\phi_i \cdot (1-K_{i}(\Psi_{plant,i}))
 \end{equation}\]</span>
-Leaf-phenological status is included to prevent winter deciduous plants from suffering drought stress during winter. Daily drought stress values can be later used to define other drought stress indices for larger temporal scales.</p>
+Leaf-phenological status is included (only in winter-deciduous or winter semi-deciduous plants) to avoid drought stress during leafless periods. Daily drought stress values can be later used to define other drought stress indices for larger temporal scales.</p>
 </div>
 <div id="irreversiblecavitation" class="section level3 hasAnchor" number="6.2.2">
 <h3><span class="header-section-number">6.2.2</span> Cavitation and hydraulic recovery<a href="transpirationgranier.html#irreversiblecavitation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -962,7 +962,7 @@ where <span class="math inline">\(H_v\)</span> is the Huber value (sapwood area 
 <div id="cavitationinduceddefoliationbasic" class="section level3 hasAnchor" number="6.2.3">
 <h3><span class="header-section-number">6.2.3</span> Cavitation-induced defoliation and recovery<a href="transpirationgranier.html#cavitationinduceddefoliationbasic" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>By default, the water-balance model assumes that high levels of leaf hydraulic impairment will lead to defoliation (although this process can be deactivated if <code>cavitationInducedDefoliation = FALSE</code>). When cavitation-induced defoliation is considered, the model assumes that crowns are made of a population of leaves whose hydraulic vulnerability follows a Gaussian distribution centered on the input water potential corresponding to 50% loss of conductance (which is dictated by <span class="math inline">\(c_{leaf}\)</span> and <span class="math inline">\(d_{leaf}\)</span>) and with a known coefficient of variation set to 10 % (by default), a modelling strategy developed by Hervé Cochard. Leaves are hydraulically disconnected and die when their embolism rate exceeds a critical value set to 88 % of percent loss of conductance, by default (see defoliation control parameters and function <code>hydraulics_proportionDefoliationWeibull()</code>). Ultimately, the assumed variability of hydraulic vulnerability and the current plant water potential lead to a proportion of cavitation-induced crown defoliation.</p>
-<p>In the water-balance model, the proportion of crown defoliation leads to a corresponding decrease <span class="math inline">\(LAI_{\phi}\)</span>, and recovery of foliage after drought will follow the conduit refilling process associated to decrease in <span class="math inline">\(PLC_{leaf}\)</span>. In the growth model, the proportion of crown defoliation is used to determine leaf senescence and the recovery of foliage is simulated via explicit leaf growth (see chapter <a href="growthsenescencemortality.html#growthsenescencemortality">17</a>).</p>
+<p>In the water-balance model, the proportion of crown defoliation leads to a corresponding decrease <span class="math inline">\(LAI_{act}\)</span>, and recovery of foliage after drought will follow the conduit refilling process associated to decrease in <span class="math inline">\(PLC_{leaf}\)</span>. In the growth model, the proportion of crown defoliation is used to determine leaf senescence and the recovery of foliage is simulated via explicit leaf growth (see chapter <a href="growthsenescencemortality.html#growthsenescencemortality">17</a>).</p>
 
 </div>
 </div>

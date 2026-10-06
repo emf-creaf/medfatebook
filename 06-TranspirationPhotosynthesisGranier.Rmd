@@ -5,14 +5,14 @@ This chapter describes how daily plant cohort transpiration ($Tr_{cohorts}$) is 
 ## Plant transpiration and photosynthesis
 ### Maximum transpiration {#maximumtranspiration}
 
-Potential evapotranspiration ($PET$, in mm) is assumed to represent open water evaporation potential. Maximum canopy transpiration $Tr_{cohorts, \max}$ depends on both $PET$ and the amount of transpirating surface, i.e. the current cumulative $LAI$ of the vegetation, $LAI_{\phi}$. To estimate $Tr_{cohorts, \max}$ the model uses the empirical equation of @Granier1999, where $Tr_{cohorts, \max}/PET$ is a function of $LAI_{\phi}$:
+Potential evapotranspiration ($PET$, in mm) is assumed to represent open water evaporation potential. Maximum canopy transpiration $Tr_{cohorts, \max}$ depends on both $PET$ and the amount of transpirating surface, i.e. the current cumulative $LAI$ of the vegetation, $LAI_{act}$. To estimate $Tr_{cohorts, \max}$ the model uses the empirical equation of @Granier1999, where $Tr_{cohorts, \max}/PET$ is a function of $LAI_{act}$:
 
 \begin{equation}
-\frac{Tr_{cohorts, \max}}{PET}= -0.006\cdot (LAI_{\phi})^2+0.134\cdot LAI_{\phi}+0.036
+\frac{Tr_{cohorts, \max}}{PET}= -0.006\cdot (LAI_{act})^2+0.134\cdot LAI_{act}+0.036
 \end{equation}
 This equation has already been adopted for Mediterranean biomes [@Fyllas2009; @Ruffault2013]. 
 
-(ref:tmaxpet-cap) Empirical relationship between $Tr_{cohorts, \max}/PET$ and $LAI_{\phi}$
+(ref:tmaxpet-cap) Empirical relationship between $Tr_{cohorts, \max}/PET$ and $LAI_{act}$
 
 ```{r tmaxpet, fig.width=4, fig.height=4, fig.align = "center", echo=FALSE, fig.cap='(ref:tmaxpet-cap)'}
 par(mar=c(4,4,1,1))
@@ -23,7 +23,7 @@ plot(LAIc, TmaxPET, type="l", ylab="Tr_cohorts_max/PET", xlab="LAI", ylim=c(0,1)
 
 Since medfate's **ver. 2.1**, empirical coefficients can be species-specific and @Granier1999 empirical equation has been generalized to:
 \begin{equation}
-\frac{Tr_{cohorts, \max}}{PET}=  T_{max,LAI} \cdot LAI_{\phi} + T_{max,sqLAI} \cdot (LAI_{\phi})^2 
+\frac{Tr_{cohorts, \max}}{PET}=  T_{max,LAI} \cdot LAI_{act} + T_{max,sqLAI} \cdot (LAI_{act})^2 
 \end{equation}
 where $T_{max,LAI}$ and $T_{max,sqLAI}$ are species-specific parameters (if missing, they are given default values 0.134 and -0.006, respectively). 
 
@@ -124,7 +124,7 @@ where $e_{sat}(T)$ is a function giving the saturated vapor pressure for tempera
 
 Once the leaf level $E_{\min}$ is known for a give cohort $i$, we can scale this instantaneous rate to daily transpiration (in mm) at the cohort level using:
 \begin{equation}
-Tr_{\min,i} = E_{\min,i} \cdot 24 \cdot 3600 \cdot LAI_{\phi,i} \cdot 0.018
+Tr_{\min,i} = E_{\min,i} \cdot 24 \cdot 3600 \cdot LAI_{act,i} \cdot 0.018
 \end{equation}
 
 
@@ -156,7 +156,7 @@ Finally, note that the amount of water extracted from the soil layer $s$ of give
 When mistletoes are considered in water balance simulations, they are included in radiation extinction calculations. The maximum transpiration of mistletoe in cohort $i$ is ($Tr_{mistletoe, i, \max}$):
 
 \begin{equation}
-   Tr_{mistletoe, i, \max} =  PET \cdot (T_{max,LAI} \cdot LAI_{\phi} + T_{max,sqLAI} \cdot (LAI_{\phi})^2 ) \cdot \frac{f_i^{0.75}}{\sum_{j}{f_j^{0.75}}} \cdot \frac{LAI_{mistletoe,i}}{LAI_{\phi,i}+LAI_{mistletoe,i}}
+   Tr_{mistletoe, i, \max} =  PET \cdot (T_{max,LAI} \cdot LAI_{act} + T_{max,sqLAI} \cdot (LAI_{act})^2 ) \cdot \frac{f_i^{0.75}}{\sum_{j}{f_j^{0.75}}} \cdot \frac{LAI_{mistletoe,i}}{LAI_{act,i}+LAI_{mistletoe,i}}
 \end{equation}
 
 Maximum transpiration is then reduced to actual transpiration (i.e. $Tr_{mistletoe, i}$) according to the water potential of the plant cohort ($\Psi_{plant,i}$), following a sigmoid function with parameters  $\Psi50_{gs, bald, mistletoe}$  and $slope_{gs, bald, mistletoe}$ (defined in control parameters). Soil water extraction corresponding to mistletoe transpiration is added to extraction caused by the corresponding plant cohort. 
@@ -185,7 +185,7 @@ Similarly to @Mouillot2002, daily drought stress of a given plant cohort $i$, $D
 \begin{equation}
 DDS_i=\phi_i \cdot (1-K_{i}(\Psi_{plant,i}))
 \end{equation}
-Leaf-phenological status is included to prevent winter deciduous plants from suffering drought stress during winter. Daily drought stress values can be later used to define other drought stress indices for larger temporal scales.
+Leaf-phenological status is included (only in winter-deciduous or winter semi-deciduous plants) to avoid drought stress during leafless periods. Daily drought stress values can be later used to define other drought stress indices for larger temporal scales.
  
 ### Cavitation and hydraulic recovery {#irreversiblecavitation}
 The water balance model is normally run assuming that although soil drought may reduce transpiration, embolized xylem conduits are automatically refilled when soil moisture recovers (in other words, cavitation is reversible and `stemCavitationRecovery = "total"`). It is possible to simulate irreversible cavitation by setting `stemCavitationRecovery = "none"`, `stemCavitationRecovery = "rate"` or `stemCavitationRecovery = "annual"` in the control parameters. Any of these options cause the model to keep track of the maximum value of cavitation so far experienced using the proportion of of lost conductance for leaves and the stem the plant cohort $i$ ($PLC_{leaf, i}$ and $PLC_{stem, i}$), which are modelled from $\Psi_{plant}$ using Weibull functions:
@@ -209,7 +209,7 @@ where $H_v$ is the Huber value (sapwood area to leaf area ratio) in units of $cm
 
 By default, the water-balance model assumes that high levels of leaf hydraulic impairment will lead to defoliation (although this process can be deactivated if `cavitationInducedDefoliation = FALSE`). When cavitation-induced defoliation is considered, the model assumes that crowns are made of a population of leaves whose hydraulic vulnerability follows a Gaussian distribution centered on the input water potential corresponding to 50% loss of conductance (which is dictated by $c_{leaf}$ and $d_{leaf}$) and with a known coefficient of variation set to 10 % (by default), a modelling strategy developed by Hervé Cochard.  Leaves are hydraulically disconnected and die when their embolism rate exceeds a critical value set to 88 % of percent loss of conductance, by default (see defoliation control parameters and function `hydraulics_proportionDefoliationWeibull()`). Ultimately, the assumed variability of hydraulic vulnerability and the current plant water potential lead to a proportion of cavitation-induced crown defoliation.
 
-In the water-balance model, the proportion of crown defoliation leads to a corresponding decrease $LAI_{\phi}$, and recovery of foliage after drought will follow the conduit refilling process associated to decrease in $PLC_{leaf}$. In the growth model, the proportion of crown defoliation is used to determine leaf senescence and the recovery of foliage is simulated via explicit leaf growth (see chapter \@ref(growthsenescencemortality)).
+In the water-balance model, the proportion of crown defoliation leads to a corresponding decrease $LAI_{act}$, and recovery of foliage after drought will follow the conduit refilling process associated to decrease in $PLC_{leaf}$. In the growth model, the proportion of crown defoliation is used to determine leaf senescence and the recovery of foliage is simulated via explicit leaf growth (see chapter \@ref(growthsenescencemortality)).
 
 
 

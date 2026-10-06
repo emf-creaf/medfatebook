@@ -946,9 +946,9 @@ In the previous section, we considered stomatal regulation at the level of sunli
 
 The average instantaneous flow rate ($\hat{E}$, in $mmol\, H_2O \cdot s^{-1} \cdot m^{-2}$) per leaf area unit of a plant cohort is the weighed average:
 \begin{equation}
-\hat{E} = \frac{E_{shade} \cdot LAI_{sunlit} + E_{shade} \cdot LAI_{shade}}{LAI_{\phi}}
+\hat{E} = \frac{E_{shade} \cdot LAI_{sunlit} + E_{shade} \cdot LAI_{shade}}{LAI_{act}}
 \end{equation}
-where $LAI_{sunlit}$ and $LAI_{shade}$ are the cohorts LAI values for sunlit and shade leaves, from eq. \@ref(eq:sunlitshadelai), and $LAI_{\phi}$ is the leaf area index of the plant cohort. The model then uses the hydraulic supply function to find the transpiration rate $E$ numerically closest to $\hat{E}$ (remember that the supply function is build in discrete steps). Finding the $E$ value numerically closest to $\hat{E}$  determines the $E_{plant}$, the instantaneous transpiration flow, and also leads to setting values for current time step of several other variables, such as water potentials ($\Psi_{leaf}$, $\Psi_{stem}$, $\Psi_{rootcrown}$, ...), the slope of the supply function ($d E/d\Psi$), and instantaneous soil water uptake rates ($U_{s}$).
+where $LAI_{sunlit}$ and $LAI_{shade}$ are the cohorts LAI values for sunlit and shade leaves, from eq. \@ref(eq:sunlitshadelai), and $LAI_{act}$ is the leaf area index of the plant cohort. The model then uses the hydraulic supply function to find the transpiration rate $E$ numerically closest to $\hat{E}$ (remember that the supply function is build in discrete steps). Finding the $E$ value numerically closest to $\hat{E}$  determines the $E_{plant}$, the instantaneous transpiration flow, and also leads to setting values for current time step of several other variables, such as water potentials ($\Psi_{leaf}$, $\Psi_{stem}$, $\Psi_{rootcrown}$, ...), the slope of the supply function ($d E/d\Psi$), and instantaneous soil water uptake rates ($U_{s}$).
 
 ## Stomatal regulation, transpiration and photosynthesis under Sureau's sub-model 
 
@@ -964,8 +964,8 @@ E_{plant} = E_{leaf} + E_{stem, cuti} = E_{stom} + E_{leaf, cuti} + E_{stem, cut
 Since there are sunlit and shade, leaves, both $E_{stom}$ and $E_{leaf, cuti}$ are computed as weighted averages of sunlit and shade leaf values:
 
 \begin{eqnarray}
- E_{stom} &=& \frac{E_{stom, sunlit} \cdot LAI^{sunlit} + E_{stom,shade} \cdot LAI_{shade}}{LAI_{\phi}} \\
- E_{leaf,cuti} &=& \frac{E_{leaf,cuti,sunlit} \cdot LAI_{sunlit} + E_{leaf,cuti,shade} \cdot LAI_{shade}}{LAI_{\phi}}
+ E_{stom} &=& \frac{E_{stom, sunlit} \cdot LAI^{sunlit} + E_{stom,shade} \cdot LAI_{shade}}{LAI_{act}} \\
+ E_{leaf,cuti} &=& \frac{E_{leaf,cuti,sunlit} \cdot LAI_{sunlit} + E_{leaf,cuti,shade} \cdot LAI_{shade}}{LAI_{act}}
 \end{eqnarray}
 
 In turn, $E_{stom,sunlit}$, $E_{stom,shade}$, $E_{leaf,cuti,sunlit}$ and $E_{leaf,cuti,shade}$ values (all in $mmol\, H_2O \cdot s^{-1} \cdot m^{-2}$) are the result of multiplying the water vapor gradient by a compound conductance formed by either stomatal or cuticular conductances (which will likely be different for sunlit and shade leaves) and the leaf boundary layer conductance, i.e. (we ommit the sunlit/shade superscripts):
@@ -1061,7 +1061,7 @@ Instantaneous gross and net photosynthesis rates for sunlit and shade leaves (i.
 
 The amount of transpiration of a plant cohort in a given time step $t$ ($Tr_{cohorts, t}$, in $l \cdot m^{-2}$ of ground area, i.e. mm) is:
 \begin{equation}
-Tr_{cohorts,t} = E_{plant} \cdot LAI_{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step} 
+Tr_{cohorts,t} = E_{plant} \cdot LAI_{act} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step} 
 (\#eq:cohorttranspiration)
 \end{equation}
 where $E_{plant}$ is the instantaneous cohort-level transpiration rate ($mmol\,H_2O \cdot s^{-1} \cdot m^{-2}$ of leaf area), $0.01802$ is the molar weight (in $kg = l$) of water and $\Delta t_{step} = 86400/n_t$ the size of the time step in seconds, being $n_t$ the number of time steps. $f_{dry}$ is the fraction of the canopy that is assumed dry, which is necessary to avoid overestimating total evapo-transpiration. In non-rainy days $f_{dry} = 1$ whereas in rainy days it is derived from comparing the daily evaporation due to rainfall interception ($In$; in $mm$) with Penman's potential evapo-transpiration ($PET$; in $mm$):
@@ -1072,7 +1072,7 @@ f_{dry} = 1.0 - \frac{In}{PET}
 
 Instantaneous water uptake rates from a given soil layer $s$ ($U_{s}$; in $mmol\,H_2O \cdot s^{-1} \cdot m^{-2}$ of leaf area) are scaled to the time step as done for transpiration:
 \begin{equation}
-Ex_{cohorts,s,t} = U_{s} \cdot LAI^{\phi} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
+Ex_{cohorts,s,t} = U_{s} \cdot LAI^{act} \cdot f_{dry} \cdot 10^{-3} \cdot 0.01802 \cdot \Delta t_{step}
 (\#eq:cohortextraction)
 \end{equation}
 

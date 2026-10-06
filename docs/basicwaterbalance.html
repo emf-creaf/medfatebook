@@ -793,14 +793,14 @@ div.csl-indent {
 <li>Cumulative degree days (a) to budburst, (b) to complete unfolding or (c) to senescence (<span class="math inline">\(S_{eco,d}\)</span>, <span class="math inline">\(S_{unf,d}\)</span> or <span class="math inline">\(S_{sen,d}\)</span>; all in <span class="math inline">\(^\circ C\)</span>), are tracked by the model to determine leaf phenological status (see <a href="leafphenologylight.html#leafphenology">4.1</a>).</li>
 <li>Soil moisture content dynamics on each layer <span class="math inline">\(s\)</span> are tracked daily using <span class="math inline">\(W_s = \theta_s(\Psi)/ \theta_{fc,s}\)</span>, the <em>proportion of soil moisture in relation to field capacity</em>, where moisture at field capacity, <span class="math inline">\(\theta_{fc,s}\)</span>, is assumed to correspond to <span class="math inline">\(\Psi_{fc} = -0.033\)</span> MPa. Note that <span class="math inline">\(W_s\)</span> values larger than one are possible if the soil is between field capacity and saturation (which can happen if deep drainage is not allowed).</li>
 <li>Plant water potential (<span class="math inline">\(\Psi_{plant,i}\)</span>) of each plant cohort <span class="math inline">\(i\)</span> are also tracked daily and follows the soil water potential of layers (or water pools) where fine roots are located.</li>
-<li>Leaf area index (<span class="math inline">\(LAI_i\)</span>) of each plant cohort <span class="math inline">\(i\)</span> will change during simulations according to phenology if the species is winter-deciduous.</li>
+<li>Leaf area index (<span class="math inline">\(LAI_{act,i}\)</span>) of each plant cohort <span class="math inline">\(i\)</span> will change during simulations according to phenology if the species is winter-deciduous or evergreen with autumn leaf senescence.</li>
 </ul>
 <p>Additional state variables depend on the activation of specific control flags:</p>
 <ul>
 <li><em>If snow accumulation/melting is considered</em>, the model tracks <span class="math inline">\(S_{snow}\)</span>, the snow water equivalent (in mm) of the snow pack storage over the surface.</li>
 <li><em>If stem cavitation is not completely reversible</em>, the model tracks <span class="math inline">\(PLC_{stem, i}\)</span> and <span class="math inline">\(PLC_{leaf, i}\)</span>, the proportion of conductivity lost the stem and leaves, respectively, of plants of cohort <span class="math inline">\(i\)</span>.</li>
 <li><em>If the degree of rhizosphere overlap between plant cohorts is not total</em> (i.e. if <code>rhizosphereOverlap = "none"</code> or <code>rhizosphereOverlap = "partial"</code>), the model also tracks <span class="math inline">\(W_{i,s}\)</span>, the proportion of soil moisture in relation to field capacity for layer <span class="math inline">\(s\)</span> within the areal fraction of the stand covered by the plant cohort <span class="math inline">\(i\)</span>.</li>
-<li><em>If cavitation-induced defoliation is considered</em> (i.e. <code>cavitationInducedDefoliation = TRUE</code>), then leaf area index (<span class="math inline">\(LAI_i\)</span>) will become a state variable for all plant cohorts, including evergreen species (see <a href="transpirationgranier.html#cavitationinduceddefoliationbasic">6.2.3</a>).</li>
+<li><em>If cavitation-induced defoliation is considered</em> (i.e. <code>cavitationInducedDefoliation = TRUE</code>), then leaf area index (<span class="math inline">\(LAI_{act,i}\)</span>) will become a state variable for all plant cohorts (see <a href="transpirationgranier.html#cavitationinduceddefoliationbasic">6.2.3</a>).</li>
 </ul>
 </div>
 <div id="soilwaterbalance" class="section level2 hasAnchor" number="3.3">
@@ -876,7 +876,7 @@ Among inputs, precipitation (<span class="math inline">\(P\)</span>) will the mo
 <p><strong>Soil</strong></p>
 <p>Soil input requirements are fully described in section <a href="model-inputs.html#soilinput">2.3</a>.</p>
 <p><strong>Vegetation</strong></p>
-<p>Vegetation input requirements are fully described in section <a href="model-inputs.html#vegetationinput">2.4</a>. Tree, shrub and herb cohorts do not need to be characterized with different variables in soil water balance calculations, since all living plant cohorts have a <span class="math inline">\(LAI\)</span> value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. <span class="math inline">\(LAI_{live}\)</span>, because normally at the starting point all leaves are expanded (i.e. <span class="math inline">\(LAI_{\phi} = LAI_{live}\)</span>) and one can assume no dead leaves in the canopy (i.e., <span class="math inline">\(LAI_{dead} = 0\)</span>). Vegetation characteristics stay constant during simulations using function <code>spwb()</code>, although the actual expanded leaf area (<span class="math inline">\(LAI_{\phi}\)</span>) and dead leaf area (<span class="math inline">\(LAI_{dead}\)</span>) may vary is the species is winter deciduous. For each plant cohort with hemi-parasitic (mistletoe) plants living on crowns, a corresponding value of mistletoe leaf area index (<span class="math inline">\(LAI_{mistletoe}\)</span>) needs to be defined.</p>
+<p>Vegetation input requirements are fully described in section <a href="model-inputs.html#vegetationinput">2.4</a>. Tree, shrub and herb cohorts do not need to be characterized with different structural variables in soil water balance calculations, as long as all plant cohorts have a <span class="math inline">\(LAI\)</span> value. In most cases, users only need to estimate the leaf area index corresponding to live leaves, i.e. <span class="math inline">\(LAI_{live}\)</span>, because normally at the starting point all leaves are expanded (i.e. <span class="math inline">\(LAI_{act} = LAI_{live}\)</span>) and one can assume no dead leaves in the canopy (i.e., <span class="math inline">\(LAI_{dead} = 0\)</span>). Vegetation characteristics stay constant during simulations using function <code>spwb()</code>, although the actual expanded leaf area (<span class="math inline">\(LAI_{act}\)</span>) and dead leaf area (<span class="math inline">\(LAI_{dead}\)</span>) may vary is the species is winter deciduous. For each plant cohort with hemi-parasitic (mistletoe) plants living on crowns, a corresponding value of mistletoe leaf area index (<span class="math inline">\(LAI_{mistletoe}\)</span>) needs to be defined.</p>
 <p><strong>Meteorology</strong></p>
 <p>The minimum weather variables required to run the model are min/max temperatures (<span class="math inline">\(T_{min}\)</span> and <span class="math inline">\(T_{max}\)</span>), min/max relative humidity (<span class="math inline">\(RH_{min}\)</span> and <span class="math inline">\(RH_{max}\)</span>), precipitation (<span class="math inline">\(P\)</span>) and solar radiation (<span class="math inline">\(Rad\)</span>). Wind speed (<span class="math inline">\(u\)</span>) is also needed, but the user may use missing values if not available (a default value will be used in this case). Wind speed is assumed to have been measured at a specific height above the canopy (by default at 2 m). Atmospheric <span class="math inline">\(CO_2\)</span> concentration (<span class="math inline">\(C_{atm}\)</span>) may also be specified, but if missing a default constant value is assumed, which is taken from the control parameters. Definitions and units of these variables were given in section <a href="model-inputs.html#meteoinput">2.5</a>.</p>
 </div>
@@ -1341,11 +1341,11 @@ Among inputs, precipitation (<span class="math inline">\(P\)</span>) will the mo
 </tr>
 <tr class="odd">
 <td><code>Stand</code></td>
-<td>Stand-level variables, such as <span class="math inline">\(LAI_{\phi}\)</span>, <span class="math inline">\(LAI_{dead}\)</span>, the water retention capacity of the canopy (<span class="math inline">\(S_{canopy}\)</span>) or the fraction of light reaching the ground (<span class="math inline">\(L^{PAR}_{ground}\)</span> and <span class="math inline">\(L^{SWR}_{ground}\)</span>). Only returned if <code>standResults = TRUE</code>.</td>
+<td>Stand-level variables, such as <span class="math inline">\(LAI_{act}\)</span>, <span class="math inline">\(LAI_{live}\)</span>, <span class="math inline">\(LAI_{dead}\)</span>, the water retention capacity of the canopy (<span class="math inline">\(S_{canopy}\)</span>) or the fraction of light reaching the ground (<span class="math inline">\(L^{PAR}_{ground}\)</span> and <span class="math inline">\(L^{SWR}_{ground}\)</span>). Only returned if <code>standResults = TRUE</code>.</td>
 </tr>
 <tr class="even">
 <td><code>Plants</code></td>
-<td>Variables defined at the level of plant cohort, such as expanded leaf area (<span class="math inline">\(LAI_{\phi,i}\)</span>), transpiration, photosynthesis, water potential, etc. Only returned if <code>plantResults = TRUE</code>.</td>
+<td>Variables defined at the level of plant cohort, such as expanded leaf area (<span class="math inline">\(LAI_{act,i}\)</span>), transpiration, photosynthesis, water potential, etc. Only returned if <code>plantResults = TRUE</code>.</td>
 </tr>
 <tr class="odd">
 <td><code>FireHazard</code></td>
@@ -1372,15 +1372,27 @@ Among inputs, precipitation (<span class="math inline">\(P\)</span>) will the mo
 <tbody>
 <tr class="odd">
 <td><code>LAI</code></td>
-<td><span class="math inline">\(LAI_{\phi}\)</span></td>
+<td><span class="math inline">\(LAI_{act}\)</span></td>
 <td><span class="math inline">\(m^2 \cdot m^{-2}\)</span></td>
-<td>Leaf area index (expanded).</td>
+<td>Actual leaf area index (expanded).</td>
 </tr>
 <tr class="even">
 <td><code>LAIlive</code></td>
 <td><span class="math inline">\(LAI_{live}\)</span></td>
 <td><span class="math inline">\(m^2 \cdot m^{-2}\)</span></td>
-<td>Leaf area index (live).</td>
+<td>Leaf area index (live) without accounting for phenology or drought-induced defoliation.</td>
+</tr>
+<tr class="odd">
+<td><code>Phenology</code></td>
+<td></td>
+<td></td>
+<td>Daily phenological status for each plant cohort (bud formation, bud dormancy, leaf elongation, leaf senescence), codified into an integer value.</td>
+</tr>
+<tr class="even">
+<td><code>FPAR</code></td>
+<td></td>
+<td>[0-1]</td>
+<td>Fraction of of PAR at the canopy level of each plant cohort.</td>
 </tr>
 <tr class="odd">
 <td><code>AbsorbedSWRFraction</code></td>

@@ -819,10 +819,10 @@ where <span class="math inline">\(\rho_{atm}\)</span> and <span class="math inli
 \end{equation}\]</span>
 where <span class="math inline">\(TC_{can}\)</span> is the canopy thermal capacitance (in <span class="math inline">\(J \cdot m^{-2} \cdot K^{-1}\)</span>) and <span class="math inline">\(\Delta t_{step} = 86400/n_t\)</span> is the size of the time step in seconds. Canopy thermal capacitance depends on the leaf area index of the stand:
 <span class="math display" id="eq:canopythermalcapacitance">\[\begin{equation}
-TC_{can} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{live} + 1.2 \cdot (LAI_{\phi} + \cdot LAI_{dead})}{2}
+TC_{can} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{live} + 1.2 \cdot (LAI_{act} + \cdot LAI_{dead})}{2}
 \tag{13.4}
 \end{equation}\]</span>
-where <span class="math inline">\(TC_{LAI}\)</span> is the thermal capacitance per LAI unit, which is specified by the control parameter <code>thermalCapacityLAI</code>. By using both the maximum leaf area of the stand, <span class="math inline">\(LAI_{live}\)</span>, and its current live/dead leaf area (<span class="math inline">\(LAI_{\phi}+LAI_{dead}\)</span>) it is assumed that part of thermal capacitance corresponds to stems and branches, so that capacitance does not drop to zero for deciduous canopies.</p>
+where <span class="math inline">\(TC_{LAI}\)</span> is the thermal capacitance per LAI unit, which is specified by the control parameter <code>thermalCapacityLAI</code>. By using both the maximum leaf area of the stand, <span class="math inline">\(LAI_{live}\)</span>, and its current live/dead leaf area (<span class="math inline">\(LAI_{act}+LAI_{dead}\)</span>) it is assumed that part of thermal capacitance corresponds to stems and branches, so that capacitance does not drop to zero for deciduous canopies.</p>
 </div>
 <div id="soil-temperature-changes" class="section level3 hasAnchor" number="13.1.4">
 <h3><span class="header-section-number">13.1.4</span> Soil temperature changes<a href="closecanopysoilenergybalance.html#soil-temperature-changes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -858,7 +858,7 @@ LE_{vap, j} = \lambda_v(T_{air,j}) \cdot \left(\frac{In_{j,t}}{\Delta t_{step}} 
 \end{equation}\]</span>
 where <span class="math inline">\(\lambda_v(T_{air,j})\)</span> is the latent heat of vaporization at temperature <span class="math inline">\(T_{air,j}\)</span> (in <span class="math inline">\(J·kg^{-1}\)</span>), <span class="math inline">\(In_{j,t}\)</span> is the intercepted water that is evaporated from the canopy layer, determined by dividing <span class="math inline">\(In_{t}\)</span> among canopy layers according to the fraction of total LAI in each one:
 <span class="math display">\[\begin{equation}
-In_{j,t} = In_{t} \cdot \frac{\sum_{i=1}{LAI_{\phi,i,j}}}{LAI_{\phi}}
+In_{j,t} = In_{t} \cdot \frac{\sum_{i=1}{LAI_{act,i,j}}}{LAI_{act}}
 \end{equation}\]</span>
 and <span class="math inline">\(E_{j,t}\)</span> is the instantaneous transpiration rate in layer <span class="math inline">\(j\)</span> (in <span class="math inline">\(kg\,H_2O\cdot m^{-2}\cdot s^{-1}\)</span>), given by:
 <span class="math display" id="eq:cohortlayertranspiration">\[\begin{equation}
@@ -909,7 +909,7 @@ And, finally, the topmost layer (i.e. <span class="math inline">\(j=l\)</span>)
 \end{equation}\]</span>
 where <span class="math inline">\(TC_{j}\)</span> is the thermal capacitance of canopy layer <span class="math inline">\(j\)</span> (in <span class="math inline">\(J \cdot m^{-2} \cdot K^{-1}\)</span>), found analogously to <span class="math inline">\(TC_{can}\)</span> (eq. <a href="closecanopysoilenergybalance.html#eq:canopythermalcapacitance">(13.4)</a>):
 <span class="math display">\[\begin{equation}
-TC_{j} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{live,j} + 1.2 \cdot (LAI_{\phi,j} + \cdot LAI_{dead,j})}{2}
+TC_{j} = TC_{LAI} \cdot \frac{0.8 \cdot LAI_{live,j} + 1.2 \cdot (LAI_{act,j} + \cdot LAI_{dead,j})}{2}
 \end{equation}\]</span>
 <span class="math inline">\(\Delta t_{substep}\)</span> is the time step for closing the energy balance, which has to be smaller than <span class="math inline">\(\Delta t_{step}\)</span> to avoid numerical instabilities due to turbulent flow.</p>
 <p>When simulating a multiple-layer energy balance, we have to replace <span class="math inline">\(H_{can,soil}\)</span> by <span class="math inline">\(H_{1,soil}\)</span> in the energy inflow of soil layer 1: <a href="closecanopysoilenergybalance.html#eq:soilenergyinflow">(13.5)</a>:

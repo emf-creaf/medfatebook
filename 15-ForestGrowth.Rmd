@@ -643,14 +643,15 @@ Functions `growth()` returns a list of a class with the same name. The first fou
 | `BiomassBalance` | Stand-level biomass balance components. All of them in $g\,dry \cdot m^{-2}$. |
 | `Temperature` | Minimum and maximum temperature values for topsoil, canopy and atmosphere (if `transpirationMode = "Sperry"`) |
 | `Soil`| Soil variables for each soil layer: Moisture relative to field capacity ($W_s$), water potential ($\Psi_s$) and volumetric water content ($V_s$). |
-| `Stand`| Stand-level variables, such as $LAI^{\phi}_{stand} = LAI^{live}_{stand}$, $LAI^{dead}_{stand}$, the water retention capacity of the canopy ($S_{canopy}$) or the fraction of light reaching the ground ($L^{PAR}_{ground}$ and $L^{SWR}_{ground}$).|
-| `Plants`| Plant-level variables, such as $LAI^{phi}_i$, plant transpiration, plant water potential, etc. |
-| `SunlitLeaves` | Leaf-level output variables for sunlit leaves (`transpirationMode = "Sperry"`). |
-| `ShadeLeaves` | Leaf-level output variables for shade leaves (`transpirationMode = "Sperry"`). |
+| `Stand`| Stand-level variables, such as $LAI^{total}_{stand}$, $LAI^{act}_{stand}$, $LAI^{live}_{stand}$, $LAI^{dead}_{stand}$, the water retention capacity of the canopy ($S_{canopy}$) or the fraction of light reaching the ground ($L^{PAR}_{ground}$ and $L^{SWR}_{ground}$).|
+| `Plants`| Plant-level variables, such as $LAI_{act}$, $LAI_{live}$, phenological status, plant transpiration, plant water potential, etc. |
+| `SunlitLeaves` | Leaf-level output variables for sunlit leaves (advanced model). |
+| `ShadeLeaves` | Leaf-level output variables for shade leaves (advanced model). |
 | `LabileCarbonBalance`| A list with the daily results of labile carbon balance components and carbon pools. |
 | `PlantBiomassBalance`| A list with the daily results of biomass balance components for plant cohorts. |
 | `PlantStructure`| A list with daily results of plant compartment sizes, in terms of area and biomass. |
 | `GrowthMortality`| A list with daily results of growth rates for leaf, sapwood and fine roots; as well as daily mortality rates. |
+|`DecompositionPools` | A data frame with daily values of carbon decomposition pools. |
 
 
 Elements `WaterBalance` to `ShadeLeaves` are equal to the output of function `spwb()` and were described in previous chapters (see \@ref(basicwaterbalanceoutput) and \@ref(advancedwaterbalanceoutput)). 
@@ -689,6 +690,7 @@ The following table describes the child elements of `PlantStructure`, again each
 | `SapwoodBiomass`|$B_{sapwood,i}$ | $g\,dry \cdot ind^{-1}$ | Daily sapwood structural biomass for an average individual. |
 | `FineRootBiomass`|$B_{fineroot,i}$ | $g\,dry \cdot ind^{-1}$ | Daily fine root biomass for an average individual. |
 | `LeafArea`|$LA_{i}$ | $m^{2}$ | Daily amount of leaf area for an average individual. |
+| `CrownFoliageCompleteness` | | [0-1] | Leaf area expressed as a proportion of the maximum crown foliage for an average individual of each plant cohort. |
 | `SapwoodArea`|$SA_{i}$ | $cm^{2}$ | Daily amount of sapwood area for an average individual. |
 | `FineRootArea`|$FRA_{i}$ | $m^{2}$ | Daily amount of fine root area for an average individual. |
 | `HuberValue` | $H_{v}$ | $cm^2 \cdot m^{-2}$ | The ratio of sapwood area to (target) leaf area |

@@ -170,21 +170,37 @@ cell relative expansion rate is divided by the maximum relative cell expansion r
 
 ### Leaf aging and cavitation effects on leaves and buds {#leafsenescence}
 
-Leaf senescence can occur due to two processes: aging or hydraulic disconnection related to cavitation. Senescence due to advanced leaf age is assumed to be programmed (Ca+ accumulation?). In deciduous species all live leaf area turns to death leaf area when the phenology submodel indicates it (\@ref(leafphenosenescence)). In evergreen species the proportion of leaf area that undergoes senescence each day is determined by the species-specific leaf duration parameter ($LD$):
+Leaf senescence can occur due to two processes: programmed senescence (aging) or hydraulic disconnection related to cavitation. Each day, the model estimates the proportion of leaves that can be lost due to each process, i.e. $p_{aging,leaf}$ and $p_{cavitation, leaf}$, and the maximum of the two values is finally applied to reduce $LA_{act}$ and increase $LA_{dead}$ correspondingly. 
+
+**Programmed leaf senescence**
+
+In evergreen species whose senescence period is `"whole-year"`,  the proportion of leaf area that undergoes programmed senescence each day is determined by the species-specific leaf duration parameter ($LD$):
 \begin{equation}
 p_{aging,leaf} = \frac{1}{365.25 \cdot LD}
 \end{equation}
-Leaf senescence can also occur as a consequence of hydraulic disconnection, as described in \@ref(cavitationinduceddefoliationbasic) and \@ref(cavitationinduceddefoliationadvanced), for the basic or advanced water balance models, respectively. If the proportion of stem conductance loss has increased with respect to the preceeding day, the model determines  $LA_{cavitation}$, the maximum leaf area allowed according to the current level of cavitation, by estimating the cavitation-induced defoliation proportion and applying it to the maximum leaf area ($LA_{target}$). If $LA_{cavitation} < LA$ then the corresponding proportion $p_{cavitation, leaf}$ is estimated for senescence. 
-
-The maximum of $p_{aging,leaf}$ and $p_{cavitation, leaf}$ is finally applied to reduce $LA$ and increase $LA_{dead}$ correspondingly. 
-
-Xylem cavitation not only causes defoliation but also mortality of buds, which has the effect of slowing down post-drought leaf area recovery. The percentage of the crown with active buds ($PCAB$) is reduced whenever the proportion of conductance loss has increased with respect to the preceding day: 
-
+For the remaining species (i.e. with `"autumn"` or `"spring"` senescence), a target leaf area for programmed senescence ($LA_{progsen}$) is set at the beginning of the senescence period and then leaves progressively die during the senescence period. First, a maximum target leaf area for senescence ($LA_{progsen, max}$) is estimated. In the case of winter (semi-)deciduous species $LA_{progsen, max} = LA_{act}$, whereas for evergreens it is set as $LA_{progsen, max} = LA_{act}/LD$. The actual target leaf area for programmed senescence ($LA_{progrsen}$) can be lower if the crown is already defoliated:
 \begin{equation}
-PCAB = \min(PCAB, 100 \cdot (1 - PLC_{stem}))
+LA_{progrsen} = \max(0.0, LA_{progrsen, max} - (LA_{live} - LA_{act}))
 \end{equation}
+This has the advantage of avoiding conducting programmed senescence on crowns that have already suffered from drought-induced defoliation (i.e where $LA_{act} - LA_{live}$) at the start of the senescence period. 
 
-This reduction has an effect on subsequent leaf growth (see \@ref(leafgrowth)).
+During each day of the leaf senescence period, the proportion of leaf senescence is set as:
+\begin{equation}
+p_{aging,leaf} = \frac{LA_{progrsen} \cdot (\phi_{t-1} - \phi_{t})}{LA_{act}}
+\end{equation}
+for `"autumn"` senescence, and:
+\begin{equation}
+p_{aging,leaf} = \frac{LA_{progrsen} \cdot (\phi_{t} - \phi_{t-1})}{LA_{act}}
+\end{equation}
+for `"spring"` senescence.
+
+**Drought-induced senescence**
+
+Leaf senescence can also occur as a consequence of hydraulic disconnection, as described in \@ref(cavitationinduceddefoliationbasic) and \@ref(cavitationinduceddefoliationadvanced), for the basic or advanced water balance models, respectively. 
+
+If the proportion of leaf conductance loss (i.e. $PLC_{leaf}$) has increased with respect to the preceeding day, the model determines  $LA_{cavitation}$, the maximum leaf area allowed according to the current level of leaf cavitation, by estimating the cavitation-induced defoliation proportion and applying it to the maximum leaf area ($LA_{target}$). Drought-induced leaf senescence effects are modulated with control parameters `criticalLeafPLC` and `cvLeafP50`. If $LA_{cavitation} < LA_{act}$ then the corresponding proportion $p_{cavitation, leaf}$ is estimated for senescence. 
+
+Xylem cavitation not only causes defoliation but also mortality of persistent buds, which has the effect of slowing down post-drought leaf area recovery. The percentage of the crown with active buds ($PCAB$) is reduced whenever the proportion of conductance loss has increased with respect to the preceding day, using the same approach taken for leaves, but using $PLC_{stem}$ as driver and with different thresholds (see control parameters `criticalBudPLC` and `cvBudP50`).
 
 ### Sapwood senescence {#sapwoodsenescence}
 
