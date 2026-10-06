@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-10-05" />
+<meta name="date" content="2026-10-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -504,9 +504,10 @@ div.csl-indent {
 <li class="chapter" data-level="17.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#growth"><i class="fa fa-check"></i><b>17.1</b> Growth</a>
 <ul>
 <li class="chapter" data-level="17.1.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#temperature-and-turgor-sink-limitations"><i class="fa fa-check"></i><b>17.1.1</b> Temperature and turgor sink limitations</a></li>
-<li class="chapter" data-level="17.1.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#leafgrowth"><i class="fa fa-check"></i><b>17.1.2</b> Leaf growth</a></li>
-<li class="chapter" data-level="17.1.3" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#sapwoodgrowth"><i class="fa fa-check"></i><b>17.1.3</b> Sapwood growth</a></li>
-<li class="chapter" data-level="17.1.4" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#finerootgrowth"><i class="fa fa-check"></i><b>17.1.4</b> Fine root growth</a></li>
+<li class="chapter" data-level="17.1.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#budformation"><i class="fa fa-check"></i><b>17.1.2</b> Persistent bud formation</a></li>
+<li class="chapter" data-level="17.1.3" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#leafgrowth"><i class="fa fa-check"></i><b>17.1.3</b> Leaf growth</a></li>
+<li class="chapter" data-level="17.1.4" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#sapwoodgrowth"><i class="fa fa-check"></i><b>17.1.4</b> Sapwood growth</a></li>
+<li class="chapter" data-level="17.1.5" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#finerootgrowth"><i class="fa fa-check"></i><b>17.1.5</b> Fine root growth</a></li>
 </ul></li>
 <li class="chapter" data-level="17.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#senescence"><i class="fa fa-check"></i><b>17.2</b> Senescence</a>
 <ul>
@@ -785,11 +786,11 @@ r_{cell} = \frac{dV}{Vdt}
 \end{equation}\]</span>
 <span class="citation">Cabon <em>et al.</em> (<a href="#ref-Cabon2019">2020a</a>)</span> first suggested to model the dependence of <span class="math inline">\(r_{cell}\)</span> on cell turgor using Lockhart’s equation:
 <span class="math display">\[\begin{equation}
-r_{cell}(\Psi, \pi_0) = \phi_{max} \cdot (\Psi - \pi_0  - Y_{P})
+r_{cell}(\Psi, \pi_0) = \xi_{max} \cdot (\Psi - \pi_0  - Y_{P})
 \end{equation}\]</span>
-where <span class="math inline">\(\Psi\)</span> is the water potential, <span class="math inline">\(\pi_0\)</span> is the osmotic water potential at full turgor, <span class="math inline">\(Y_P\)</span> is the turgor yield threshold and <span class="math inline">\(\phi_{max}\)</span> is the maximum cell wall extensibility. Later, <span class="citation">Cabon <em>et al.</em> (<a href="#ref-Cabon2020">2020b</a>)</span> suggested to account for both turgor and temperature limitations on <span class="math inline">\(r_{cell}\)</span> using the following expanded equation:
+where <span class="math inline">\(\Psi\)</span> is the water potential, <span class="math inline">\(\pi_0\)</span> is the osmotic water potential at full turgor, <span class="math inline">\(Y_P\)</span> is the turgor yield threshold and <span class="math inline">\(\xi_{max}\)</span> is the maximum cell wall extensibility. Later, <span class="citation">Cabon <em>et al.</em> (<a href="#ref-Cabon2020">2020b</a>)</span> suggested to account for both turgor and temperature limitations on <span class="math inline">\(r_{cell}\)</span> using the following expanded equation:
 <span class="math display" id="eq:cellexpansion">\[\begin{equation}
-r_{cell}(T, \Psi, \pi_0) = \phi_{max} \cdot (\Psi - \pi_0  - Y_{P}) \cdot \frac{f_{met}(T_K)}{f_{met}(288.15)} \cdot{f_{micro}(T, T_{thr})}
+r_{cell}(T, \Psi, \pi_0) = \xi_{max} \cdot (\Psi - \pi_0  - Y_{P}) \cdot \frac{f_{met}(T_K)}{f_{met}(288.15)} \cdot{f_{micro}(T, T_{thr})}
 \tag{17.1}
 \end{equation}\]</span>
 where <span class="math inline">\(T\)</span> is temperature, <span class="math inline">\(f_{met}(T_K)\)</span> is a function modulating the effect of temperature <span class="math inline">\(T_K\)</span> in Kelvin, on metabolic rate, and <span class="math inline">\(f_{micro}(T, T_{thr})\)</span> is a sigmoidal function modulating the effect of temperature on microtubule stability, depending on a temperature threshold <span class="math inline">\(T_{thr}\)</span>.
@@ -798,28 +799,36 @@ Function <span class="math inline">\(f_{met}(T_K)\)</span> is defined as:
 f_{met}(T_K) = \frac{T_K \cdot \exp \big\{ \frac{\Delta H_A}{R^n \cdot T_K}\big\}}{1 + \exp \big\{ \frac{\Delta S_D}{R^n} \cdot \left(1 - \frac{\Delta H_D}{\Delta S_D \cdot T_K} \right)\big\}}
 \end{equation}\]</span>
 where <span class="math inline">\(R^n\)</span> is the ideal gas constant, <span class="math inline">\(\Delta H_A = 87500\)</span> the enthalpy of activation and <span class="math inline">\(\Delta H_D = 333000\)</span> and <span class="math inline">\(\Delta S_D = 1090\)</span> the enthalpy and entropy difference (respectively) between the catalytically active and inactive states of the enzymatic system).</p>
-<p>In <strong>medfate</strong>, we assume a constant value of <span class="math inline">\(\pi_0 = -1\)</span> in meristematic tissues, so that <span class="math inline">\(r_{cell}\)</span> depends on <span class="math inline">\(\Psi\)</span> and <span class="math inline">\(T\)</span> only. Scaling from the cell to the tissue level is conducted by assuming that maximum cell-level expansion rates correspond to maximum tissue-level relative growth rates. Maximum cell-level expansion rates, <span class="math inline">\(r_{cell, max}\)</span>, are assumed to occur at <span class="math inline">\(T = 30^\circ C\)</span> and <span class="math inline">\(\Psi = 0\)</span>. Other parameters for eq. <a href="growthsenescencemortality.html#eq:cellexpansion">(17.1)</a> are set to <span class="math inline">\(\phi_{max} = 0.5\)</span> (which becomes irrelevant), <span class="math inline">\(Y_{P} = 0.05\,MPa\)</span> and <span class="math inline">\(T_{thr} = 5^\circ C\)</span>.</p>
+<p>In <strong>medfate</strong>, we assume a constant value of <span class="math inline">\(\pi_0 = -1\)</span> in meristematic tissues, so that <span class="math inline">\(r_{cell}\)</span> depends on <span class="math inline">\(\Psi\)</span> and <span class="math inline">\(T\)</span> only. Scaling from the cell to the tissue level is conducted by assuming that maximum cell-level expansion rates correspond to maximum tissue-level relative growth rates. Maximum cell-level expansion rates, <span class="math inline">\(r_{cell, max}\)</span>, are assumed to occur at <span class="math inline">\(T = 30^\circ C\)</span> and <span class="math inline">\(\Psi = 0\)</span>. Other parameters for eq. <a href="growthsenescencemortality.html#eq:cellexpansion">(17.1)</a> are set to <span class="math inline">\(\xi_{max} = 0.5\)</span> (which becomes irrelevant), <span class="math inline">\(Y_{P} = 0.05\,MPa\)</span> and <span class="math inline">\(T_{thr} = 5^\circ C\)</span>.</p>
 </div>
-<div id="leafgrowth" class="section level3 hasAnchor" number="17.1.2">
-<h3><span class="header-section-number">17.1.2</span> Leaf growth<a href="growthsenescencemortality.html#leafgrowth" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="budformation" class="section level3 hasAnchor" number="17.1.2">
+<h3><span class="header-section-number">17.1.2</span> Persistent bud formation<a href="growthsenescencemortality.html#budformation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Persistent bud formation is a process required for species whose primary growth determinacy is either determined or intermediate (see <a href="growthmodelling.html#growthphenologydesign">15.1.3</a>). The process is scheduled to start at the end of the leaf growth period, normally between summer and autumn, and its duration is controlled by the species-specific parameter <span class="math inline">\(BFD\)</span> (<code>BudFormationDays</code>). Bud formation involves leaf organogenesis and budset formation, and sets the leaf area preformed in persistent buds, <span class="math inline">\(LA_{preformed}\)</span> (<span class="math inline">\(m^2\)</span>):</p>
+<p><span class="math display">\[\begin{equation}
+LA_{preformed} = 1.1  \cdot LOE \cdot \frac{LA_{live}}{LD} = 1.1  \cdot LOE \cdot \frac{LA_{target} \cdot (PCAB/100)}{LD}
+\end{equation}\]</span></p>
+<p>Whereas <span class="math inline">\(LA_{live}/LD\)</span> sets the target leaf area to overcome the annual fraction of leaves that are expected to undergo senescence, the <span class="math inline">\(1.1\)</span> factor increases this target by 10% to account for expected sink limitations to growth. Finally, <span class="math inline">\(LOE\)</span> is the leaf organogenesis efficiency, which is estimated by averaging turgor limitations over the bud formation period:</p>
+<p><span class="math display">\[\begin{equation}
+LOE = \frac{\sum_{i}^{BFD}{\left(\frac{r_{cell}(30, \Psi_i)}{r_{cell, max}} \right)^{m_{LOE}}}}{BFD}
+\end{equation}\]</span></p>
+<p>Note from the previous equation that only daily water potential limitations (i.e. <span class="math inline">\(\Psi_i\)</span>) to organogenesis are considered (i.e. temperature is assumed to be optimal). Here <span class="math inline">\(m_{LOE}\)</span> is an exponent (control parameter <code>organogenesisEfficiencyModulator</code>) modulating the effect of turgor limitations on organogenesis efficiency.</p>
+</div>
+<div id="leafgrowth" class="section level3 hasAnchor" number="17.1.3">
+<h3><span class="header-section-number">17.1.3</span> Leaf growth<a href="growthsenescencemortality.html#leafgrowth" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Leaf area increment <span class="math inline">\(\Delta LA\)</span> only occurs when phenological state is <em>unfolding</em>, and is defined as the minimum of three values expressing three corresponding constraints:
 <span class="math display">\[\begin{equation}
-\Delta LA = \min( \Delta LA_{target}, \Delta LA_{source}, \Delta LA_{sink})
+\Delta LA = \min( \Delta LA_{pheno}, \Delta LA_{source}, \Delta LA_{sink})
 \end{equation}\]</span></p>
 <p><strong>Target leaf area increase</strong></p>
-<p><span class="math inline">\(\Delta LA_{target}\)</span> is the increase in leaf area that would be expected by leaf growth targets and crown bud availability. In plants with <em>evergreen-progressive</em> phenology (see <a href="leafphenologylight.html#leafphenology">4.1</a>), organogenesis is not separated from leaf expansion and <span class="math inline">\(\Delta LA_{target}\)</span> is directly leaf area increment allowed by the live leaf area (<span class="math inline">\(LA_{live}\)</span>; see <a href="growthsenescencemortality.html#updateallocationtargets">17.3.2</a>), minus the current expanded leaf area (<span class="math inline">\(LA_{\phi}\)</span>):
+<p><span class="math inline">\(\Delta LA_{pheno}\)</span> is the increase in leaf area that would be expected by leaf growth targets and crown bud availability. In plants with indetermined primary growth, or with intermediate growth after finishing the elongation of preformed leaves (see <a href="growthmodelling.html#growthphenologydesign">15.1.3</a>), organogenesis is not separated from leaf expansion and <span class="math inline">\(\Delta LA_{pheno}\)</span> is directly leaf area increment allowed by the live leaf area (<span class="math inline">\(LA_{live}\)</span>; see <a href="growthsenescencemortality.html#updateallocationtargets">17.3.2</a>), minus the current expanded leaf area (<span class="math inline">\(LA_{act}\)</span>):
 <span class="math display">\[\begin{equation}
-\Delta LA_{target} = \max(LA_{live} - LA_{\phi},0) = \max(LA_{target} \cdot (PCAB/100) - LA_{\phi},0)
+\Delta LA_{pheno} = \max(LA_{live} - LA_{act},0) = \max(LA_{target} \cdot (PCAB/100) - LA_{act},0)
 \end{equation}\]</span>
-In plants with other phenology types, targets are first dictated by preformed leaves within buds. If there is leaf area to be elongated (i.e. <span class="math inline">\(LA_{preformed} &gt; 0.0\)</span>) then <span class="math inline">\(\Delta LA_{target}\)</span> is simply equal to the preformed (in buds) leaf area that remains to be elongated:
+In contrast, in plants with determined primary growth, or during elongation of preformed leaves in plants with intermediate growth, the leaf are target is dictated by preformed leaves within buds. If there is leaf area to be elongated (i.e. <span class="math inline">\(LA_{preformed} &gt; 0.0\)</span>) then <span class="math inline">\(\Delta LA_{target}\)</span> is simply equal to the preformed (in buds) leaf area that is to be elongated according to the leaf unfolding model (see <a href="leafphenologylight.html#leafphenobudburst">4.1.3</a>):
 <span class="math display">\[\begin{equation}
-\Delta LA_{target} = LA_{preformed}
+\Delta LA_{pheno} = LA_{preformed} \cdot (\phi_{t} - \phi_{t-1})
 \end{equation}\]</span>
-where <span class="math inline">\(LA_{preformed}\)</span> has been set at the end of the previous period of <em>bud formation</em> as follows:
-<span class="math display">\[\begin{equation}
-LA_{preformed} = \frac{LA_{live}}{LD} \cdot org_{eff} = \frac{LA_{target} \cdot (PCAB/100)}{LD} \cdot org_{eff}
-\end{equation}\]</span>
-where <span class="math inline">\(PCAB\)</span> is the percentage of crown active buds, <span class="math inline">\(LD\)</span> is leaf duration in years, and <span class="math inline">\(org_{eff}\)</span> is the organogenesis efficiency, i.e. the ratio of cell expansion rate accounting for turgor effects relative to the maximum cell expansion rate (i.e. <span class="math inline">\(r_{cell}(30, \Psi_{symp,leaf})/ r_{cell,max}\)</span>), averaged across the duration of the <em>bud formation</em> period. In phenology types that allow additional leaves to be formed after the elongation of preformed leaves (i.e. in <em>evergreen-polycyclic</em>, <em>winter-deciduous</em> and <em>winter-semideciduous</em>), when <span class="math inline">\(LA_{preformed} = 0.0\)</span> then <span class="math inline">\(\Delta LA_{target}\)</span> is set as detailed above for <em>evergreen-progressive</em> phenology.</p>
+where <span class="math inline">\(\phi_{t}\)</span> and <span class="math inline">\(\phi_{t-1}\)</span> are the leaf elongation status at the current day and the previous day, respectively. When <span class="math inline">\(LA_{preformed} = 0.0\)</span> then <span class="math inline">\(\Delta LA_{pheno}\)</span> is set as detailed above for indetermined primary growth.</p>
 <p><strong>Carbon source limitations</strong></p>
 <p><span class="math inline">\(\Delta LA_{source}\)</span> represents the leaf area increment expected given carbon source limitations and is calculated:
 <span class="math display">\[\begin{equation}
@@ -827,7 +836,12 @@ where <span class="math inline">\(PCAB\)</span> is the percentage of crown activ
 \end{equation}\]</span>
 where <span class="math inline">\(ST_{sapwood}\)</span> is the current concentration of sapwood storage carbon (starch), <span class="math inline">\(V_{storage,sapwood}\)</span> is the sapwood storage volume and <span class="math inline">\(m_{gluc}\)</span> is glucose molar mass and the denominator contains the construction costs per leaf area unit, see eq. <a href="carbonpoolsbalance.html#eq:leafconstructioncost">(16.4)</a>.</p>
 <p><strong>Sink limitations</strong></p>
-<p><span class="math inline">\(\Delta LA_{sink}\)</span> represents the leaf area increment resulting from the maximum leaf tissue growth rate relative to sapwood area (<span class="math inline">\(RGR_{leaf, max}\)</span>; in <span class="math inline">\(m^2 \cdot cm^{-2} \cdot day^{-1}\)</span>), the percentage of the crown with active buds (<span class="math inline">\(PCAB\)</span>) and the relative cell expansion rate given <span class="math inline">\(T_{day}\)</span>, <span class="math inline">\(\Psi_{symp,leaf}\)</span> and <span class="math inline">\(\pi_{0,leaf}\)</span>:
+<p><span class="math inline">\(\Delta LA_{sink}\)</span> represents the leaf area increment resulting from sink limitations. If leaf growth is occurring via leaf elongation of preformed leaves, only turgor limitations are considered, because temperature effects are already taken into account in the phenological model of leaf elongation:</p>
+<p><span class="math display">\[\begin{equation}
+\Delta LA_{sink} = \Delta LA_{pheno} \cdot \left(\frac{r_{cell}(30, \Psi_i)}{r_{cell, max}} \right)^{m_{LEE}}
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(m_{LEE}\)</span> is an exponent (control parameter <code>elongationEfficiencyModulator</code>) modulating the effect of turgor limitations on leaf elongation efficiency.</p>
+<p>For indetermined leaf growth, both temperature and turgor limitations are considered; and <span class="math inline">\(\Delta LA_{sink}\)</span> is estimated using the maximum leaf tissue growth rate relative to sapwood area (<span class="math inline">\(RGR_{leaf, max}\)</span>; in <span class="math inline">\(m^2 \cdot cm^{-2} \cdot day^{-1}\)</span>), the percentage of the crown with active buds (<span class="math inline">\(PCAB\)</span>) and the relative cell expansion rate given <span class="math inline">\(T_{day}\)</span> and <span class="math inline">\(\Psi_{symp,leaf}\)</span>:
 <span class="math display">\[\begin{equation}
 \Delta LA_{sink} = SA \cdot (PCAB/100) \cdot RGR_{leaf, max} \cdot \frac{r_{cell}(T_{day}, \Psi_{symp,leaf})}{r_{cell,max}}
 \end{equation}\]</span>
@@ -839,16 +853,16 @@ PCAB_{t+1} = \min(PCAB_{t} + RGR_{bud} \cdot \frac{\Delta LA}{LA_{target}}, 100)
 \end{equation}\]</span>
 where <span class="math inline">\(RGR_{bud}\)</span> is the growth rate of buds per unit per unit leaf area growth (<span class="math inline">\(m^2 \cdot m^{-2}\)</span>).</p>
 </div>
-<div id="sapwoodgrowth" class="section level3 hasAnchor" number="17.1.3">
-<h3><span class="header-section-number">17.1.3</span> Sapwood growth<a href="growthsenescencemortality.html#sapwoodgrowth" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="sapwoodgrowth" class="section level3 hasAnchor" number="17.1.4">
+<h3><span class="header-section-number">17.1.4</span> Sapwood growth<a href="growthsenescencemortality.html#sapwoodgrowth" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Newly assimilated carbon is preferentially allocated to leaves and fine roots whenever storage levels are low. <span class="math inline">\(\Delta SA\)</span> is defined as the minimum of three values expressing targets, source and sink constraints:
 <span class="math display">\[\begin{equation}
 \Delta SA = \min(\Delta SA_{target}, \Delta SA_{source}, \Delta SA_{sink})
 \end{equation}\]</span></p>
 <p><strong>Sapwood area target</strong></p>
-<p><span class="math inline">\(\Delta SA_{target}\)</span> is the increase in sapwood area that would be expected comparing the sapwood target with the current functional sapwood area:</p>
+<p><span class="math inline">\(\Delta SA_{pheno}\)</span> is the increase in sapwood area that would be expected comparing the sapwood target with the current functional sapwood area:</p>
 <p><span class="math display">\[\begin{equation}
-\Delta SA_{target} = \max(SA_{target} - SA \cdot (1.0 - PLC_{stem}))
+\Delta SA_{pheno} = \max(SA_{target} - SA \cdot (1.0 - PLC_{stem}))
 \end{equation}\]</span>
 where <span class="math inline">\(SA_{target}\)</span> is the target sapwood area dictated by functional coordination (see <a href="growthsenescencemortality.html#updateallocationtargets">17.3.2</a>) and <span class="math inline">\(PLC_{stem}\)</span> is the proportion of stem conductance loss due to cavitation.</p>
 <p><strong>Carbon source limitations</strong></p>
@@ -868,20 +882,20 @@ for trees, and as:
 \end{equation}\]</span>
 for shrubs. Sapwood growth in trees is proportional to the cambium length (in <span class="math inline">\(cm\)</span>), whereas in trees it is proportional to the current sapwood area (in <span class="math inline">\(cm^2\)</span>). Hence, two different maximum relative growth rates are defined for trees (<span class="math inline">\(RGR_{cambium, max}\)</span>) and shrubs (<span class="math inline">\(RGR_{sapwood, max}\)</span>). In the above equations, <span class="math inline">\(PCAC\)</span> is the percentage of active cambium cells, which is assumed to be controlled by the amount of foliage via the synthesis of growth hormones that then are transported through phloem. In practice, <span class="math inline">\(PCAC\)</span> is estimated as:
 <span class="math display">\[\begin{equation}
-PCAC = 100 \cdot \frac{LAI^{\phi}}{LAI^{NC}}
+PCAC = 100 \cdot \frac{LAI_{act}}{LAI_{NC}}
 \end{equation}\]</span>
-where <span class="math inline">\(LAI_{\phi}\)</span> is the currently expanded leaf area index and <span class="math inline">\(LAI_{NC}\)</span> is the leaf area index assuming no competition with other plants. Since <span class="math inline">\(LAI_{\phi} = \phi \cdot LAI_{live}\)</span> depends on the phenological status <span class="math inline">\(\phi\)</span>, the sapwood growth rate will depend on phenology. Moreover, since <span class="math inline">\(LAI_{live} \leq LAI_{NC}\)</span>, maximum growth rates will be achieved by cohorts lacking competition of taller cohorts and low self-competition. Since competition increases with forest development, the inclusion of <span class="math inline">\(PCAC\)</span> ensures that sapwood area growth rates will decrease for forests of larger basal area.</p>
+where <span class="math inline">\(LAI_{act}\)</span> is the currently expanded leaf area index and <span class="math inline">\(LAI_{NC}\)</span> is the leaf area index assuming no light competition from taller plants. Since <span class="math inline">\(LAI_{act}\)</span> depends on the phenological status for some species, the sapwood growth rate will depend on leaf phenology. Moreover, since <span class="math inline">\(LAI_{act} \leq LAI_{live} \leq LAI_{NC}\)</span>, maximum growth rates will be achieved by cohorts having fully developed crowns and lacking competition of taller cohorts and low self-competition. Since competition increases with forest stand development, the inclusion of <span class="math inline">\(PCAC\)</span> ensures that sapwood area growth rates will decrease for forest stands of larger basal area.</p>
 </div>
-<div id="finerootgrowth" class="section level3 hasAnchor" number="17.1.4">
-<h3><span class="header-section-number">17.1.4</span> Fine root growth<a href="growthsenescencemortality.html#finerootgrowth" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="finerootgrowth" class="section level3 hasAnchor" number="17.1.5">
+<h3><span class="header-section-number">17.1.5</span> Fine root growth<a href="growthsenescencemortality.html#finerootgrowth" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Fine root biomass increment is modelled for each soil layer separately, and is defined analogously to leaf area increment:
 <span class="math display">\[\begin{equation}
-\Delta B_{fineroot} = \min( \Delta B_{fineroot,alloc}, \Delta B_{fineroot,source}, \Delta B_{fineroot,sink})
+\Delta B_{fineroot} = \min( \Delta B_{fineroot,pheno}, \Delta B_{fineroot,source}, \Delta B_{fineroot,sink})
 \end{equation}\]</span></p>
-<p><strong>Allocation</strong></p>
-<p><span class="math inline">\(\Delta B_{fineroot,alloc}\)</span> is the maximum fine root biomass increment allowed by the biomass target set by the allocation rule, <span class="math inline">\(B_{fineroot,target}\)</span> (see <a href="growthsenescencemortality.html#updateallocationtargets">17.3.2</a>), in comparison with current biomass, <span class="math inline">\(B_{fineroot}\)</span>:
+<p><strong>Fineroot biomass target</strong></p>
+<p><span class="math inline">\(\Delta B_{fineroot,pheno}\)</span> is the maximum fine root biomass increment allowed by the biomass target set by the allocation rule, <span class="math inline">\(B_{fineroot,target}\)</span> (see <a href="growthsenescencemortality.html#updateallocationtargets">17.3.2</a>), in comparison with current biomass, <span class="math inline">\(B_{fineroot}\)</span>:
 <span class="math display">\[\begin{equation}
-\Delta B_{fineroot,alloc} = \max(B_{fineroot,target} - B_{fineroot},0)
+\Delta B_{fineroot,pheno} = \max(B_{fineroot,target} - B_{fineroot},0)
 \end{equation}\]</span></p>
 <p><strong>Carbon source limitations</strong></p>
 <p><span class="math inline">\(\Delta B_{fineroot,source}\)</span> represents the biomass increment expected given the available storage carbon (starch):
@@ -911,7 +925,7 @@ Leaf senescence can also occur as a consequence of hydraulic disconnection, as d
 <p><span class="math display">\[\begin{equation}
 PCAB = \min(PCAB, 100 \cdot (1 - PLC_{stem}))
 \end{equation}\]</span></p>
-<p>This reduction has an effect on subsequent leaf growth (see <a href="growthsenescencemortality.html#leafgrowth">17.1.2</a>).</p>
+<p>This reduction has an effect on subsequent leaf growth (see <a href="growthsenescencemortality.html#leafgrowth">17.1.3</a>).</p>
 </div>
 <div id="sapwoodsenescence" class="section level3 hasAnchor" number="17.2.2">
 <h3><span class="header-section-number">17.2.2</span> Sapwood senescence<a href="growthsenescencemortality.html#sapwoodsenescence" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -935,7 +949,7 @@ where <span class="math inline">\(T_{soil,s}\)</span> is the temperature of soil
 <div id="updateplanttraits" class="section level3 hasAnchor" number="17.3.1">
 <h3><span class="header-section-number">17.3.1</span> Plant traits<a href="growthsenescencemortality.html#updateplanttraits" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Multiple anatomic and physiological parameters are updated every day after applying changes in the size of leaf, sapwood and fine root compartments, which creates a feedback to those hydraulic and physiological processes simulated in the water balance submodel. Hence, the growth model allows emulating plant acclimation to environmental cues, mediated by growth and senescence of plant tissues.</p>
-<p>First leaf area index (<span class="math inline">\(LAI_{\phi}\)</span>) is updated from leaf area (<span class="math inline">\(LA_{\phi}\)</span>) inverting eq. <a href="carbonpoolsbalance.html#eq:leafarea">(16.2)</a>. The Huber value (<span class="math inline">\(H_v\)</span>, the sapwood area to leaf area ratio; in <span class="math inline">\(m^{2}\cdot m^{-2}\)</span>) is affected by changes in <span class="math inline">\(LA_{live} = LA_{target}\)</span> and sapwood area <span class="math inline">\(SA\)</span>:
+<p>First leaf area index (<span class="math inline">\(LAI_act\)</span>) is updated from leaf area (<span class="math inline">\(LA_{\phi}\)</span>) inverting eq. <a href="carbonpoolsbalance.html#eq:leafarea">(16.2)</a>. The Huber value (<span class="math inline">\(H_v\)</span>, the sapwood area to leaf area ratio; in <span class="math inline">\(m^{2}\cdot m^{-2}\)</span>) is affected by changes in <span class="math inline">\(LA_{live} = LA_{target}\)</span> and sapwood area <span class="math inline">\(SA\)</span>:
 <span class="math display">\[\begin{equation}
 H_v = \frac{SA/10000}{LA_{live}}
 \end{equation}\]</span>

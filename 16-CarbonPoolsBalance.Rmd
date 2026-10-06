@@ -11,9 +11,9 @@ The live leaf area $LA_{live}$ per individual (in $m^2$) is:
 LA_{live} = 10000 \cdot LAI_{live} / N
 (\#eq:maxleafarea)
 \end{equation}
-where $N$ is the density of the cohort and $LAI_{live}$ is the leaf area index. The actual (expanded) leaf area $LA_{\phi}$ is estimated analogously from $LAI_{\phi}$:
+where $N$ is the density of the cohort and $LAI_{live}$ is the leaf area index. The actual (expanded) leaf area $LA_{act}$ is estimated analogously from $LAI_{act}$:
 \begin{equation}
-LA_{\phi} = 10000 \cdot LAI_{\phi} / N
+LA_{act} = 10000 \cdot LAI_{act} / N
 (\#eq:leafarea)
 \end{equation}
 And so is the dead leaf area, $LA_{dead}$:
@@ -24,7 +24,7 @@ LA_{dead} = 10000 \cdot LAI_{dead} / N
 
 Structural leaf biomass per individual ($B_{leaf}$; $g\,dry·ind^{-1}$) is the result of dividing leaf area by $SLA$ ($m^{2} \cdot kg^{-1}$), the specific leaf area of the species:
 \begin{equation}
-B_{leaf} = 1000 \cdot LA_{\phi} / SLA
+B_{leaf} = 1000 \cdot LA_{act} / SLA
 \end{equation}
 where a factor 1000 is used to convert from kg to g. Hence, only expanded leaf area has respiratory cost (i.e. winter resistance buds do not). An analogous equation is used to estimate dead leaf biomass per individual ($D_{leaf}$; $g\,dry·ind^{-1}$):
 \begin{equation}
@@ -33,7 +33,7 @@ D_{leaf} = 1000 \cdot LA_{dead} / SLA
 
 Leaf storage volume for an individual ($V_{storage,leaf}$; in $L \cdot ind^{-1}$) is:
 \begin{equation}
-V_{storage, leaf} = LA_{\phi}  \cdot V_{leaf}
+V_{storage, leaf} = LA_{act}  \cdot V_{leaf}
 \end{equation}
 where $V_{leaf}$ is the water storage capacity of leaf tissue per leaf area unit (in $L\cdot m^{-2}$) (see \@ref(plantwaterstoragecapacity)). Leaf storage volume is necessary to estimate the biomass of metabolic (sugars) or storage (starch) from the concentration of these substances in leaves ($SS_{leaf}$ and $ST_{leaf}$, which are expressed in $mol\,gluc \cdot L^{-1}$), and conversely. For example:
 \begin{equation}
@@ -110,7 +110,7 @@ D_{heartwood} = 1000 \cdot V_{heartwood} \cdot\rho_{wood}
 
 The fine root compartment does not have labile carbon (i.e. the model supplies labile carbon for fine roots from sapwood compartment), so that only the structural biomass of fine roots needs to be estimated. If growth is simulated using the *basic* water balance model, the initial area of fine roots ($FRA$, $m^2$) for layer $s$ is estimated from leaf area using:
 \begin{equation}
-FRA = FRP_{s} \cdot LA_{\phi} \cdot RLR
+FRA = FRP_{s} \cdot LA_{act} \cdot RLR
 \end{equation}
 where $FRP_s$ is the proportion of fine roots in layer $s$ and $RLR$ is the species-specific root area to leaf area ratio. Biomass of fine roots per individual for a given layer $s$ ($B_{fineroot,s}$; $g\,dry·ind^{-1}$) is then estimated from $FRA_s$ using:
 \begin{equation}
@@ -157,13 +157,13 @@ When simulating growth with the basic water balance, the model uses a $Q_{10}$ r
 MR_{leaf} &=& (B_{leaf} + B_{sugar,leaf}) \cdot MRR_{leaf} \cdot Q_{10}^{(T_{mean}-20)/10} \cdot (L^{PAR})^{WUE_{decay}} \\
 MR_{twig} &=& B_{living,twig} \cdot MRR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
 MR_{sapwood} &=& (B_{living,sapwood} + B_{sugar,sapwood}) \cdot MRR_{sapwood} \cdot Q_{10}^{(T_{mean}-20)/10} \\
-MR_{fineroot} &=& B_{fineroot} \cdot MRR_{fineroot} \cdot Q_{10}^{(T_{mean}-20)/10} \cdot ( LA_{\phi}/LA_{live}) 
+MR_{fineroot} &=& B_{fineroot} \cdot MRR_{fineroot} \cdot Q_{10}^{(T_{mean}-20)/10} \cdot ( LA_{act}/LA_{live}) 
 \end{eqnarray}
 where $T_{mean}$ is the average daily temperature (in ºC). Baseline maintenance respiration rates per dry biomass ($MRR_{leaf}$, $MRR_{sapwood}$ and $MRR_{fineroot}$ for leaves, parenchymatic sapwood and fine roots, respectively; in $g\,gluc \cdot g\,dry^{-1} \cdot day^{-1}$) are can be supplied via species-specific parameters and should refer to 20 ºC. Leaf and fine root rates can also be estimated from nitrogen concentration, following @Reich2008 (see section \@ref(imputationRER)). Factor $Q_{10}$ has been found to decrease with temperature [@Tjoelker2001]. For example, a 10 °C increase in measurement temperature at low measurement temperatures from 5 to 15 °C results in an approximate 2.8 fold increase in respiration rate, whereas an increase in temperature from 25 to 35 °C results in a less than two-fold (1.8) increase in rate. The general temperature relationship proposed by @Tjoelker2001 is used here:
 \begin{equation}
 Q_{10} = 3.22 - 0.046 \cdot T_{mean}
 \end{equation}
-Factor $(L^{PAR})^{WUE_{decay}}$ is added to reduce respiration rates in leaves under shade, analogously to the reduction of water use efficiency explained in \@ref(basicphotosynthesis). Thus, it is assumed that the carbon use efficiency of the leaves is more or less constant. Factor $LA_{\phi}/LA_{live}$ is added to the maintenance respiration of fine roots to reduce respiration rates during winter in winter-deciduous species, assuming a decrease in respiration rates of fine roots parallel to that of leaves.
+Factor $(L^{PAR})^{WUE_{decay}}$ is added to reduce respiration rates in leaves under shade, analogously to the reduction of water use efficiency explained in \@ref(basicphotosynthesis). Thus, it is assumed that the carbon use efficiency of the leaves is more or less constant. Factor $LA_{act}/LA_{live}$ is added to the maintenance respiration of fine roots to reduce respiration rates during decreased leaf periods, assuming a decrease in respiration rates of fine roots parallel to that of leaves.
 
 When simulating growth with the advanced model, sub-daily leaf maintenance respiration rates are estimated as the difference between gross and net photosynthesis (see \@ref(leafphotosynthesis)). Sapwood and fine root respiration rates are also estimated at sub-daily steps and, hence, sub-daily canopy temperature variation is taken into account (i.e. sub-daily canopy $T_{can}$ values are used instead of the daily temperature mean, $T_{mean}$). 
 

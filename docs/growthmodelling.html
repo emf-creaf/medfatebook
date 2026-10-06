@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-10-05" />
+<meta name="date" content="2026-10-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -504,9 +504,10 @@ div.csl-indent {
 <li class="chapter" data-level="17.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#growth"><i class="fa fa-check"></i><b>17.1</b> Growth</a>
 <ul>
 <li class="chapter" data-level="17.1.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#temperature-and-turgor-sink-limitations"><i class="fa fa-check"></i><b>17.1.1</b> Temperature and turgor sink limitations</a></li>
-<li class="chapter" data-level="17.1.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#leafgrowth"><i class="fa fa-check"></i><b>17.1.2</b> Leaf growth</a></li>
-<li class="chapter" data-level="17.1.3" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#sapwoodgrowth"><i class="fa fa-check"></i><b>17.1.3</b> Sapwood growth</a></li>
-<li class="chapter" data-level="17.1.4" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#finerootgrowth"><i class="fa fa-check"></i><b>17.1.4</b> Fine root growth</a></li>
+<li class="chapter" data-level="17.1.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#budformation"><i class="fa fa-check"></i><b>17.1.2</b> Persistent bud formation</a></li>
+<li class="chapter" data-level="17.1.3" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#leafgrowth"><i class="fa fa-check"></i><b>17.1.3</b> Leaf growth</a></li>
+<li class="chapter" data-level="17.1.4" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#sapwoodgrowth"><i class="fa fa-check"></i><b>17.1.4</b> Sapwood growth</a></li>
+<li class="chapter" data-level="17.1.5" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#finerootgrowth"><i class="fa fa-check"></i><b>17.1.5</b> Fine root growth</a></li>
 </ul></li>
 <li class="chapter" data-level="17.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#senescence"><i class="fa fa-check"></i><b>17.2</b> Senescence</a>
 <ul>
@@ -934,7 +935,8 @@ Figure 15.5: Design of dead carbon pools and decomposition processes. Boxes are 
 <p>Many <em>cohort-level state variables</em> are inherited by the corresponding water balance model and depend on its level of complexity (see <a href="basicwaterbalance.html#statevariablesbasic">3.2</a> and <a href="advancedwaterbalance.html#statevariablesadvanced">7.3</a>). Several variables were treated as fixed parameters in the water balance models and become variable here:</p>
 <ul>
 <li>Leaf area index of live leaves, <span class="math inline">\(LAI_{live}\)</span> (<span class="math inline">\(m^2·m^{-2}\)</span>).</li>
-<li>Actual expanded leaf area, <span class="math inline">\(LAI_{\phi}\)</span> (<span class="math inline">\(m^2·m^{-2}\)</span>).</li>
+<li>Leaf area index expected assuming no light competition from larger plants <span class="math inline">\(LAI_{NC}\)</span> (<span class="math inline">\(m^2·m^{-2}\)</span>).</li>
+<li>Actual expanded leaf area, <span class="math inline">\(LAI_{act}\)</span> (<span class="math inline">\(m^2·m^{-2}\)</span>).</li>
 <li>Dead leaf area, <span class="math inline">\(LAI_{dead}\)</span> (<span class="math inline">\(m^2·m^{-2}\)</span>).</li>
 <li>Percent cover of shrubs, <span class="math inline">\(Cover\)</span> (%).</li>
 <li>Density of living individuals in the plant cohort, <span class="math inline">\(N\)</span> (<span class="math inline">\(ind·ha^{-1}\)</span>).</li>
@@ -949,7 +951,7 @@ Figure 15.5: Design of dead carbon pools and decomposition processes. Boxes are 
 <li>Plant height, <span class="math inline">\(H\)</span> (<span class="math inline">\(cm\)</span>).</li>
 <li>Diameter at breast height for trees, <span class="math inline">\(DBH\)</span> (<span class="math inline">\(cm\)</span>).</li>
 <li>Crown ratio, <span class="math inline">\(CR\)</span> ([0-1]).</li>
-<li>Leaf area, <span class="math inline">\(LA\)</span> (<span class="math inline">\(m^2\)</span>).</li>
+<li>Actual leaf area, <span class="math inline">\(LA_{act}\)</span> (<span class="math inline">\(m^2\)</span>).</li>
 <li>Target leaf area, <span class="math inline">\(LA_{target}\)</span> (<span class="math inline">\(m^2\)</span>).</li>
 <li>Dead leaf area <span class="math inline">\(LA_{dead}\)</span> (<span class="math inline">\(m^2\)</span>).</li>
 <li>Preformed leaf area in persistent buds, <span class="math inline">\(LA_{preformed}\)</span> (<span class="math inline">\(m^2\)</span>).</li>
@@ -963,13 +965,13 @@ Figure 15.5: Design of dead carbon pools and decomposition processes. Boxes are 
 <li>Sugar concentration in sapwood (stem, branches and coarse roots), <span class="math inline">\(SS_{sapwood}\)</span> (<span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span>).</li>
 <li>Starch concentration in sapwood (stem, branches and coarse roots), <span class="math inline">\(ST_{sapwood}\)</span> (<span class="math inline">\(mol\,gluc \cdot L^{-1}\)</span>).</li>
 </ul>
-<p>Note that <span class="math inline">\(LA\)</span> is the same state variable as <span class="math inline">\(LAI_{\phi}\)</span>, but expressed at the individual level. The same happens between <span class="math inline">\(LA_{live}\)</span> (a derived variable) and <span class="math inline">\(LAI_{live}\)</span>; and between <span class="math inline">\(LA_{dead}\)</span> and <span class="math inline">\(LAI_{dead}\)</span>. These pairs of state variables are related by cohort density (<span class="math inline">\(N\)</span>).</p>
+<p>Note that <span class="math inline">\(LA_{act}\)</span> is the same state variable as <span class="math inline">\(LAI_{act}\)</span>, but expressed at the individual level. The same happens between <span class="math inline">\(LA_{live}\)</span> (a derived variable) and <span class="math inline">\(LAI_{live}\)</span>; and between <span class="math inline">\(LA_{dead}\)</span> and <span class="math inline">\(LAI_{dead}\)</span>. These pairs of state variables are related by cohort density (<span class="math inline">\(N\)</span>).</p>
 <p><strong>Derived variables</strong></p>
 <p>Other individual-level variables can be derived from the true state variables and, hence, hence do not need to be treated as state variables themselves but are often used in equations instead of the true state variables:</p>
 <ul>
 <li>Live leaf area, <span class="math inline">\(LA_{live}\)</span>, from <span class="math inline">\(LA_{target}\)</span> and the percentage of crown active buds (<span class="math inline">\(PCAB\)</span>).</li>
-<li>Leaf biomass, <span class="math inline">\(B_{leaf}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA\)</span>.</li>
-<li>Twig biomass, <span class="math inline">\(B_{twig}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA\)</span>.</li>
+<li>Leaf biomass, <span class="math inline">\(B_{leaf}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA_{act}\)</span>.</li>
+<li>Twig biomass, <span class="math inline">\(B_{twig}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA_{act}\)</span>.</li>
 <li>Dead leaf mass, <span class="math inline">\(D_{leaf}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA_{dead}\)</span>.</li>
 <li>Dead twig (diameter &lt; 0.635 cm) mass, <span class="math inline">\(D_{twig}\)</span> (<span class="math inline">\(g\,dry\)</span>), from <span class="math inline">\(LA_{dead}\)</span>.</li>
 <li>The radial length of coarse roots in each soil layer <span class="math inline">\(s\)</span>, <span class="math inline">\(L_{radial, s}\)</span> (<span class="math inline">\(mm\)</span>), from <span class="math inline">\(FRP_{s}\)</span>.</li>
@@ -1180,9 +1182,9 @@ D_{snags,i} = D_{wood, nonburnt, i} + B_{sapwood, senescence, i}
 <li>Determine the amount of live structural biomass (in leaves, sapwood and fine root compartments), storage volume (in leaves and sapwood), storage capacity (<a href="carbonpoolsbalance.html#estimationcarbonpools">16.1</a>) and the construction costs per unit tissue (area or dry weight).</li>
 <li>If <span class="math inline">\(LA_{\phi} &gt; 0\)</span>, estimate gross photosynthesis per individual (<span class="math inline">\(A\)</span>) from cohort-level photosynthesis (<span class="math inline">\(A_g\)</span>).</li>
 <li>Estimate maintenance respiration for leaves (<span class="math inline">\(MR_{leaf}\)</span>), twigs (<span class="math inline">\(MR_{twig}\)</span>), sapwood (<span class="math inline">\(MR_{sapwood}\)</span>) and fine roots (<span class="math inline">\(MR_{fineroot}\)</span>) (<a href="carbonpoolsbalance.html#carbonbalancecomponents">16.2</a>).</li>
-<li>If phenology indicates leaf unfolding, evaluate leaf temperature and turgor sink limitations, leaf and twig growth costs (<span class="math inline">\(GC_{leaf}\)</span> and <span class="math inline">\(GC_{twig}\)</span>, respectively), leaf and twig synthesis respiration (<span class="math inline">\(SR_{leaf}\)</span> and <span class="math inline">\(SR_{twig}\)</span>, respectively) and leaf area increase (<a href="growthsenescencemortality.html#leafgrowth">17.1.2</a>).</li>
-<li>If sapwood growth is permitted, evaluate sapwood temperature and turgor sink limitations, sapwood growth costs (<span class="math inline">\(GC_{sapwood}\)</span>), sapwood synthesis respiration (<span class="math inline">\(SR_{sapwood}\)</span>) and sapwood area increase (<a href="growthsenescencemortality.html#sapwoodgrowth">17.1.3</a>).</li>
-<li>If fineroot biomass is lower than the target biomass, evaluate fineroot temperature and turgor sink limitations, fineroot growth costs (<span class="math inline">\(GC_{fineroot}\)</span>), fineroot synthesis respiration (<span class="math inline">\(SR_{fineroot}\)</span>) and fineroot biomass increase (<a href="growthsenescencemortality.html#finerootgrowth">17.1.4</a>).</li>
+<li>If phenology indicates leaf unfolding, evaluate leaf temperature and turgor sink limitations, leaf and twig growth costs (<span class="math inline">\(GC_{leaf}\)</span> and <span class="math inline">\(GC_{twig}\)</span>, respectively), leaf and twig synthesis respiration (<span class="math inline">\(SR_{leaf}\)</span> and <span class="math inline">\(SR_{twig}\)</span>, respectively) and leaf area increase (<a href="growthsenescencemortality.html#leafgrowth">17.1.3</a>).</li>
+<li>If sapwood growth is permitted, evaluate sapwood temperature and turgor sink limitations, sapwood growth costs (<span class="math inline">\(GC_{sapwood}\)</span>), sapwood synthesis respiration (<span class="math inline">\(SR_{sapwood}\)</span>) and sapwood area increase (<a href="growthsenescencemortality.html#sapwoodgrowth">17.1.4</a>).</li>
+<li>If fineroot biomass is lower than the target biomass, evaluate fineroot temperature and turgor sink limitations, fineroot growth costs (<span class="math inline">\(GC_{fineroot}\)</span>), fineroot synthesis respiration (<span class="math inline">\(SR_{fineroot}\)</span>) and fineroot biomass increase (<a href="growthsenescencemortality.html#finerootgrowth">17.1.5</a>).</li>
 <li>Update changes in sugar and starch compartments due to photosynthesis, maintenance respiration and growth. Apply transfer from leaf metabolic to sapwood metabolic carbon (<a href="carbonpoolsbalance.html#phloemtransport">16.2.4</a>) and conversions between storage and metabolic carbon (<a href="carbonpoolsbalance.html#sugarstarchdynamics">16.2.5</a>).<br />
 </li>
 <li>Determine leaf senescence due to aging and leaf/bud senescence due to cavitation effects (<a href="growthsenescencemortality.html#leafsenescence">17.2.1</a>).</li>
