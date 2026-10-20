@@ -529,9 +529,9 @@ A first set of parameters refers to leaf phenology (`paramsPhenology`), most of 
 | $T_{sen}$ | $^{\circ} \mathrm{C}$ | `Tbsen` | Base temperature for the calculation of degree days to leaf senescence (see section \@ref(leafphenosenescence)). |
 | $x_{sen}$ | {0,1,2}  | `xsen` | Discrete values, to allow for any absent/proportional/more than proportional effects of temperature on senescence (see section \@ref(leafphenosenescence)). |
 | $y_{sen}$ | {0,1,2}  | `ysen` | Discrete values, to allow for any absent/proportional/more than proportional effects of photoperiod on senescence (see section \@ref(leafphenosenescence)). |
-|      | [0,1] | `LeafPLCCrit` | Leaf PLC (a proportion) associated to cavitation-induced leaf senescence. |
-|      | [0,1] | `BudPLCCrit` | Stem PLC (a proportion) associated to cavitation-induced bud (branch) senescence. |
-|  $T_{senescence, crit}$    | $^{\circ} \mathrm{C}$ | `LeafTSCrit` | Critical leaf temperature associated to heat-induced leaf senescence. |
+|  $PLC_{leaf,senescence}$  | [0,1] | `LeafPLCCrit` | Leaf PLC (a proportion) associated to cavitation-induced leaf senescence. |
+|  $PLC_{bud,senescence}$  | [0,1] | `BudPLCCrit` | Stem PLC (a proportion) associated to cavitation-induced bud (branch) senescence. |
+|  $T_{leaf,senescence}$    | $^{\circ} \mathrm{C}$ | `LeafTSCrit` | Critical leaf temperature associated to heat-induced leaf senescence. |
 
 
 A second set of parameters refers to anatomical features (`paramsAnatomy`), most of them already required by water balance model simulations:
@@ -637,12 +637,12 @@ A set of parameters control defoliation and crown bud mortality:
 
 +  `defoliationParams`: A list with the following elements:
     + `cavitationInducedDefoliation [= TRUE]`: Whether leaf hydraulic impairment induces defoliation and bud senescence.
-    + `criticalLeafPLC [= 0.50]`: Default value of PLC (a proportion) associated to cavitation-induced leaf senescence.
-    + `criticalBudPLC [= 0.88]`: Default value of PLC (a proportion) associated to cavitation-induced bud (branch) senescence.
+    + `criticalLeafPLC [= 0.50]`: Default value of PLC (a proportion) associated to cavitation-induced leaf senescence (i.e. default value for $PLC_{leaf,senescence}$).
+    + `criticalBudPLC [= 0.88]`: Default value of PLC (a proportion) associated to cavitation-induced bud (branch) senescence  (i.e. default value for $PLC_{bud,senescence}$).
     + `cvLeafP50 [= 10.0]`: Coefficient of variation (in percent) of leaf P50 within crown.
     + `cvBudP50 [= 10.0]`: Coefficient of variation (in percent) of bud P50 within crown.
     + `temperatureInducedDefoliation [=TRUE]`: Whether heat stress induces defoliation.
-    + `criticalLeafTS [= 50.0]`: Default value for critical leaf temperature associated to heat-induced leaf senescence.
+    + `criticalLeafTS [= 50.0]`: Default value for critical leaf temperature associated to heat-induced leaf senescence (i.e. default value for $T_{leaf,senescence}$).
     + `cvLeafTS [= 5.0]`: Coefficient of variation (in percent) of leaf critical senescence temperature within crown.
     
 Finally, we have the following options regarding whole-plant mortality:
