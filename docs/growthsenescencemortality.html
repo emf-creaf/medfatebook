@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-10-06" />
+<meta name="date" content="2026-10-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -511,7 +511,7 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="17.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#senescence"><i class="fa fa-check"></i><b>17.2</b> Senescence</a>
 <ul>
-<li class="chapter" data-level="17.2.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#leafsenescence"><i class="fa fa-check"></i><b>17.2.1</b> Leaf aging and cavitation effects on leaves and buds</a></li>
+<li class="chapter" data-level="17.2.1" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#leafsenescence"><i class="fa fa-check"></i><b>17.2.1</b> Leaf senescence</a></li>
 <li class="chapter" data-level="17.2.2" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#sapwoodsenescence"><i class="fa fa-check"></i><b>17.2.2</b> Sapwood senescence</a></li>
 <li class="chapter" data-level="17.2.3" data-path="growthsenescencemortality.html"><a href="growthsenescencemortality.html#finerootsenescence"><i class="fa fa-check"></i><b>17.2.3</b> Fine root senescence</a></li>
 </ul></li>
@@ -911,8 +911,8 @@ cell relative expansion rate is divided by the maximum relative cell expansion r
 <div id="senescence" class="section level2 hasAnchor" number="17.2">
 <h2><span class="header-section-number">17.2</span> Senescence<a href="growthsenescencemortality.html#senescence" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div id="leafsenescence" class="section level3 hasAnchor" number="17.2.1">
-<h3><span class="header-section-number">17.2.1</span> Leaf aging and cavitation effects on leaves and buds<a href="growthsenescencemortality.html#leafsenescence" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Leaf senescence can occur due to two processes: programmed senescence (aging) or hydraulic disconnection related to cavitation. Each day, the model estimates the proportion of leaves that can be lost due to each process, i.e. <span class="math inline">\(p_{aging,leaf}\)</span> and <span class="math inline">\(p_{cavitation, leaf}\)</span>, and the maximum of the two values is finally applied to reduce <span class="math inline">\(LA_{act}\)</span> and increase <span class="math inline">\(LA_{dead}\)</span> correspondingly.</p>
+<h3><span class="header-section-number">17.2.1</span> Leaf senescence<a href="growthsenescencemortality.html#leafsenescence" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Leaf senescence can occur due to three processes: programmed senescence (aging), hydraulic disconnection related to cavitation or heat-induced senescence. Each day, the model estimates the proportion of leaves that can be lost due to each process, i.e. <span class="math inline">\(p_{aging,leaf}\)</span>, <span class="math inline">\(p_{cavitation, leaf}\)</span> and <span class="math inline">\(p_{heat, leaf}\)</span>; and the maximum of the two values is finally applied to reduce <span class="math inline">\(LA_{act}\)</span> and increase <span class="math inline">\(LA_{dead}\)</span> correspondingly.</p>
 <p><strong>Programmed leaf senescence</strong></p>
 <p>In evergreen species whose senescence period is <code>"whole-year"</code>, the proportion of leaf area that undergoes programmed senescence each day is determined by the species-specific leaf duration parameter (<span class="math inline">\(LD\)</span>):
 <span class="math display">\[\begin{equation}
@@ -932,10 +932,12 @@ for <code>"autumn"</code> senescence, and:
 p_{aging,leaf} = \frac{LA_{progrsen} \cdot (\phi_{t} - \phi_{t-1})}{LA_{act}}
 \end{equation}\]</span>
 for <code>"spring"</code> senescence.</p>
-<p><strong>Drought-induced senescence</strong></p>
+<p><strong>Cavitation-induced leaf senescence</strong></p>
 <p>Leaf senescence can also occur as a consequence of hydraulic disconnection, as described in <a href="transpirationgranier.html#cavitationinduceddefoliationbasic">6.2.3</a> and <a href="daylevelresults.html#cavitationinduceddefoliationadvanced">14.5</a>, for the basic or advanced water balance models, respectively.</p>
-<p>If the proportion of leaf conductance loss (i.e. <span class="math inline">\(PLC_{leaf}\)</span>) has increased with respect to the preceeding day, the model determines <span class="math inline">\(LA_{cavitation}\)</span>, the maximum leaf area allowed according to the current level of leaf cavitation, by estimating the cavitation-induced defoliation proportion and applying it to the maximum leaf area (<span class="math inline">\(LA_{target}\)</span>). Drought-induced leaf senescence effects are modulated with control parameters <code>criticalLeafPLC</code> and <code>cvLeafP50</code>. If <span class="math inline">\(LA_{cavitation} &lt; LA_{act}\)</span> then the corresponding proportion <span class="math inline">\(p_{cavitation, leaf}\)</span> is estimated for senescence.</p>
+<p>If the proportion of leaf conductance loss (i.e. <span class="math inline">\(PLC_{leaf}\)</span>) has increased with respect to the preceeding day, the model determines <span class="math inline">\(LA_{cavitation}\)</span>, the maximum leaf area allowed according to the current level of leaf cavitation, by estimating the cavitation-induced defoliation proportion and applying it to the maximum leaf area (<span class="math inline">\(LA_{target}\)</span>). Cavitation-induced leaf senescence effects are modulated with control parameters <code>criticalLeafPLC</code> and <code>cvLeafP50</code>. If <span class="math inline">\(LA_{cavitation} &lt; LA_{act}\)</span> then the corresponding proportion <span class="math inline">\(p_{cavitation, leaf}\)</span> is estimated for senescence.</p>
 <p>Xylem cavitation not only causes defoliation but also mortality of persistent buds, which has the effect of slowing down post-drought leaf area recovery. The percentage of the crown with active buds (<span class="math inline">\(PCAB\)</span>) is reduced whenever the proportion of conductance loss has increased with respect to the preceding day, using the same approach taken for leaves, but using <span class="math inline">\(PLC_{stem}\)</span> as driver and with different thresholds (see control parameters <code>criticalBudPLC</code> and <code>cvBudP50</code>).</p>
+<p><strong>Heat-induced leaf senescence</strong></p>
+<p>Heat-induced leaf senescence is only available when growth is simulated in combination with advanced water balance, because only in this case leaf energy balance is performed for sunlit and shade leaves (see <a href="plantphotosynthesis.html#leafenergybalancephoto">11.1</a>), resulting in <span class="math inline">\(T_{sunlit}\)</span> and <span class="math inline">\(T_{shade}\)</span>. Recall that the proportion of sunlit and shade leaves varies within the day and across vertical layers (see <a href="radiationbalance.html#sunlitshadeleaves">9.1.2</a>). Therefore, the model estimates the proportion of leaves suffering an excess of heat for each sub-daily time step <span class="math inline">\(n\)</span>, <span class="math inline">\(p_{heat, leaf, n}\)</span>, by comparing <span class="math inline">\(T_{sunlit}\)</span> and <span class="math inline">\(T_{shade}\)</span> against a species-specific senescence threshold <span class="math inline">\(T_{senescence, crit}\)</span>, and using the proportion of sunlit leaves (<span class="math inline">\(f_{SL}\)</span>) of the layer corresponding to the midcrown height. In order to avoid sudden defoliation of all sunlit or shade leaves, these temperature comparisons take into account the variation of <span class="math inline">\(T_{senescence, crit}\)</span> across crown leaves (or, equivalently, variation of <span class="math inline">\(T_{leaf}\)</span> across leaves), as indicated by the coefficient of variation <code>cvLeafTS</code> of the control parameters. The proportion of leaves lost due to heat-induced apoptosis for the current day (<span class="math inline">\(p_{heat, leaf}\)</span>) is estimated by combining <span class="math inline">\(p_{heat, leaf, n}\)</span> across time steps. Specifically, by finding the proportion of leaves whose temperature has been above a species-specific senescence threshold for at least three hours.</p>
 </div>
 <div id="sapwoodsenescence" class="section level3 hasAnchor" number="17.2.2">
 <h3><span class="header-section-number">17.2.2</span> Sapwood senescence<a href="growthsenescencemortality.html#sapwoodsenescence" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -1134,11 +1136,6 @@ P_{starv, annual} = 1.0 - \frac{\exp(40 \cdot (ST^{sapwood}_{relative}  - ST_{re
 P_{starv, daily} = 1.0 - \exp(\log(1.0 - P_{starv, annual})/356)
 \end{equation}\]</span></p>
 <p>Assuming a relative threshold <span class="math inline">\(ST_{relative}^{thresh} = 0.4\)</span>, the figure below illustrates the shape of the sigmoidal function (top) and the corresponding daily probability function.</p>
-<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-## ℹ Please use `linewidth` instead.
-## This warning is displayed once per session.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
 <div class="figure"><span style="display:block;" id="fig:unnamed-chunk-49"></span>
 <img src="medfatebook_files/figure-html/unnamed-chunk-49-1.png" alt="Annual (top) and daily (bottom) probability of starvation as a function of sapwood starch concentration relative to its equilibrium value." width="768" />
 <p class="caption">

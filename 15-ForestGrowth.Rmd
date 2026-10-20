@@ -70,8 +70,8 @@ The forest growth model allows simulating the variation of living tissues via th
 
  i. **Bud formation**: Organogenesis during persistent bud formation does not consume any carbon, and is scheduled to last a number of days (see parameter `BudFormationDays`).
  ii. **Leaf/twig growth**:  Leaf area increase occurs during *leaf elongation* periods (after budburst) or during *indetermined (free) growth*. Unlike bud formation, leaf elongation or indetermined (free) leaf growth does consume carbon. Moreover, leaf growth includes an additional carbon cost in *twig growth*, according to the biomass ratio between both.
- iii. **Leaf/twig senescence and leaf fall**: Leaf/twig senescence (and the corresponding increases in dead leaf area) can occur in the model due to *leaf aging* in evergreen species, due to *programmed leaf senescence* in deciduous species, or due to *leaf dessication*. Leaf dessication is assumed to occur because cavitation in tracheids or vessels leads to a hydraulic disconnection of leaves, which inhibits replacing the water lost. To avoid sudden defoliation of whole crowns, the model assumes a variation in the hydraulic vulnerability of the branches supporting leaves. Leaf senescence increases the leaf area index corresponding to dead leaves, thereby increasing the leaf and twig dead carbon pools. *Leaf fall* is the process that transforms dead leaf area into leaf and twig litter, which triggers decomposition processes (see fig. \@ref(fig:carbonpools)). In addition, fires can induce *foliage burning*, which also leads to a decrease in dead and live leaf area (but where non-structural carbon reallocation is not possible) and produces carbon emissions due to leaf and twig combustion.
- iv. **Branch senescence and recovery**: Branch biomass is not explicitly modeled. Instead, the model tracks a state variable representing the percentage of viable crown buds with respect to a fully developed crown, which implicitly represents the availability of live branches. Cavitation-induced *bud dessication* processes lead to a decrease in the amount of crown buds, which then limits primary growth. In turn, *primary growth* (i.e. leaf growth) is assumed to lead to the progressive recovery in the percentage of viable crown buds, again implicitly assuming the growth of new branches.
+ iii. **Leaf/twig senescence and leaf fall**: Leaf/twig senescence (and the corresponding increases in dead leaf area) can occur in the model due to *programmed leaf senescence* (aging), *cavitation-induced leaf senescence*, or *heat-induced leaf senescence*. Cavitation-induced leaf senescence is assumed to occur because cavitation in tracheids or vessels leads to a hydraulic disconnection of leaves, which inhibits replacing the water lost. To avoid sudden defoliation of whole crowns, the model assumes a variation in the hydraulic vulnerability of the branches supporting leaves. Heat-induced leaf senescence is only available when growth is simulated in combination with advanced water balance. The process occurs whenever sunlit or shade leaf temperatures are higher than lethal thresholds leading to leaf cell apoptosis. Analogously to cavitation-induced senescence, the model assumes a variation in the temperature vulnerability across crown leaves. Leaf senescence increases the leaf area index corresponding to dead leaves, thereby increasing the leaf and twig dead carbon pools.  *Leaf fall* is the process that transforms dead leaf area into leaf and twig litter, which triggers decomposition processes (see fig. \@ref(fig:carbonpools)). In addition, fires can induce *foliage burning*, which also leads to a decrease in dead and live leaf area (but where non-structural carbon reallocation is not possible) and produces carbon emissions due to leaf and twig combustion.
+ iv. **Branch senescence and recovery**: Branch biomass is not explicitly modeled. Instead, the model tracks a state variable representing the percentage of viable crown buds with respect to a fully developed crown, which implicitly represents the availability of live branches. *Cavitation-induced bud senescence* processes lead to a decrease in the amount of crown buds, which then limits primary growth. In turn, *primary growth* (i.e. leaf growth) is assumed to lead to the progressive recovery in the percentage of viable crown buds, again implicitly assuming the growth of new branches.
  v. **Sapwood growth**: Sapwood formation corresponds mostly to secondary growth (but primary growth occurs at the same time due to diameter-height relationships, see \@ref(updatestructuredesign)). The model assumes that the hormonal signals controlling cambium division have been mainly synthesized in leaves. Auxins are known to be primarily generated in the plant's apical meristems, young leaves, and flower buds; from where they are transported throughout the plant via the phloem [@bajguz_biosynthetic_2023]. More specifically, we assume that the levels of secondary growth hormones (auxines) depend linearly on the *current amount of foliage relative to the expected maximum foliage of the same plant without competition*. This entails that: (a) leaf phenological status of deciduous species will affect sapwood growth rates; (b) for a given plant size (i.e. cambium surface) the amount of foliage will be higher or lower depending on the shading created by taller plants and, hence, understory plants or densely-crowded plants will have lower sapwood growth rates than plants that are isolated or overtop the other plants; (c) defoliation events (e.g. from drought impacts) will have an effect on sapwood growth rates, as observed empirically [@javoy_impact_2025]. 
  vi. **Sapwood senescence**:  Losses in sapwood area (i.e. conversion to heartwood) occur via tissue *aging* (i.e. assuming a daily rate of conversion). Since xylem tracheids and vessels are already dead cells, sapwood senescence refers to the death of parenchymatic tissue. Similarly to 3-PG [@Landsberg1997] we assume that the relative turnover rate of sapwood is smallest for young plants, and it increases up to a maximum value. However, recent reviews indicate that heartwood formation should be viewed as an active developmental program during which a conductive but vulnerable sapwood is transformed in a non-conductive but durable heartwood [@Spicer2005]. Sapwood senescence also occurs whenever the sapwood area exceeds the amount required to sustain the current leaf area target. Note that stem *cavitation* reduces the area of sapwood that is effectively functional for water transport, but does not lead to sapwood senescence *per se*, unless mortality occurs. Sapwood senescence produces heartwood biomass in trees, which does not decompose as long as the trees are alive. In contrast, sapwood senescence leads to increase the mass of standing dead branches in shrubs (see fig. \@ref(fig:carbonpools)).
  vii. **Fine root growth**: Fine root growth can in principle occur any time of the year (i.e. the model does not explicitly consider root phenology), but since fine root biomass targets depend on leaf area, seasonal fine root area patterns may follow phenological changes in leaf area. 
@@ -465,7 +465,7 @@ The model performs the following steps for each plant cohort:
   5. If sapwood growth is permitted, evaluate sapwood temperature and turgor sink limitations, sapwood growth costs ($GC_{sapwood}$), sapwood synthesis respiration ($SR_{sapwood}$) and sapwood area increase (\@ref(sapwoodgrowth)).
   6. If fineroot biomass is lower than the target biomass, evaluate fineroot temperature and turgor sink limitations, fineroot growth costs ($GC_{fineroot}$), fineroot synthesis respiration ($SR_{fineroot}$) and fineroot biomass increase (\@ref(finerootgrowth)).
   7. Update changes in sugar and starch compartments due to photosynthesis, maintenance respiration and growth. Apply transfer from leaf metabolic to sapwood metabolic carbon (\@ref(phloemtransport)) and conversions between storage and metabolic carbon (\@ref(sugarstarchdynamics)).  
-  8. Determine leaf senescence due to aging and leaf/bud senescence due to cavitation effects (\@ref(leafsenescence)). 
+  8. Determine leaf senescence due to aging, leaf/bud senescence due to cavitation effects and (in advanced simulations including leaf energy balance) leaf senescence due to heat stress  (\@ref(leafsenescence)). 
   9. Determine sapwood senescence due to aging. For shrubs, convert sapwood senescence into mass of standing dead branches (\@ref(sapwoodsenescence)). 
   10. Determine fine root senescence by aging (\@ref(finerootsenescence)). Divide dead fine root mass between metabolic soil carbon pool and fine root litter pool. 
   11. Evaluate labile carbon translocation due to leaf and sapwood senescence ($TS_{leaf}$, $TT_{leaf}$ and $TS_{sapwood}$). If leaf storage carbon is surpassed, add the excess to $TT_{leaf}$. Add the sum of translocated carbon to the starch sapwood pool.
@@ -510,7 +510,31 @@ The minimum weather variables required to run the model are min/max temperatures
 
 The growth model requires many functional parameters to be specified for plant cohorts. Some of them depend on whether the basic or advanced water balance is adopted. Here we report functional parameters needed in addition to those necessary for the water balance submodel.
 
-A first set of parameters refers to anatomical features (`paramsAnatomy`), most of them already required by water balance model simulations:
+A first set of parameters refers to leaf phenology (`paramsPhenology`), most of them already required by water balance model simulations:
+
+| Symbol | Units | R  | Description                                  | 
+|--------|-------|----| ---------------------------------------------|
+|        |       |  `PhenologyType`  | Leaf phenology type  (`"evergreen"`, `"winter-deciduous"`, or `"winter-semideciduous"`). |
+|        |       |  `SenescencePeriod` | Period of senescence for evergreen plants ( `"whole-year"`, `"spring"` or `"autumn"`). |
+|        |       |  `GrowthPeriod` | Period of primary growth for evergreen plants ( `"whole-year”` or `"spring”`). |
+|        |       |  `GrowthDeterminacy`  | Primary growth determinacy (`"determined"`, `"indetermined"` or `"intermediate"`). |
+| $LD$ | years  | `LeafDuration` | Average duration of leaves (in years). |
+| $BFD$   | days   | `BudFormationDays` | Number of days required to complete bud formation.  |
+| $S^*_{eco}$ | $^{\circ} \mathrm{C}$ | `Sgdd` | Cumulative degree days required for leaf budburst (see section \@ref(leafphenobudburst)). |
+| $S_{unf}^*$ |$^{\circ} \mathrm{C}$ | `Ugdd` | Cumulative degree-days required to complete leaf unfolding after budburst has occurred (see section \@ref(leafphenobudburst)). |
+| $T_{eco}$ | $^{\circ} \mathrm{C}$ | `Tbgdd` | Base temperature for the calculation of degree days to leaf budburst and unfolding (see section \@ref(leafphenobudburst)). |
+| $S^*_{sen}$ | $^{\circ} \mathrm{C}$ | `Ssen` | Degree days corresponding to leaf senescence (see section \@ref(leafphenosenescence)). |
+| $F^*_{sen}$ | $^{\circ} \mathrm{C}$ | `Fsen` | Cumulative degree days corresponding to complete leaf senescence (see section \@ref(leafphenosenescence)). |
+| $Ph_{sen}$ | hours | `Phsen` | Photoperiod corresponding to start counting senescence degree-days (see section \@ref(leafphenosenescence)). |
+| $T_{sen}$ | $^{\circ} \mathrm{C}$ | `Tbsen` | Base temperature for the calculation of degree days to leaf senescence (see section \@ref(leafphenosenescence)). |
+| $x_{sen}$ | {0,1,2}  | `xsen` | Discrete values, to allow for any absent/proportional/more than proportional effects of temperature on senescence (see section \@ref(leafphenosenescence)). |
+| $y_{sen}$ | {0,1,2}  | `ysen` | Discrete values, to allow for any absent/proportional/more than proportional effects of photoperiod on senescence (see section \@ref(leafphenosenescence)). |
+|      | [0,1] | `LeafPLCCrit` | Leaf PLC (a proportion) associated to cavitation-induced leaf senescence. |
+|      | [0,1] | `BudPLCCrit` | Stem PLC (a proportion) associated to cavitation-induced bud (branch) senescence. |
+|  $T_{senescence, crit}$    | $^{\circ} \mathrm{C}$ | `LeafTSCrit` | Critical leaf temperature associated to heat-induced leaf senescence. |
+
+
+A second set of parameters refers to anatomical features (`paramsAnatomy`), most of them already required by water balance model simulations:
 
 | Symbol | Units | R  | Description                                  | 
 |--------|-------|----| ---------------------------------------------|
@@ -528,7 +552,7 @@ A first set of parameters refers to anatomical features (`paramsAnatomy`), most 
 | $RLD$ | $cm \cdot cm^{-3}$ | `RLD` | Fine root length density (i.e. density of root length per soil volume) |
 | $r_{6.35}$ | | `r635` | Ratio between the weight of leaves plus branches and the weight of leaves alone for branches of 6.35 mm |
 
-A second set of parameters refers to allometric coefficients needed for structural updates (`paramsAllometries`).
+A third set of parameters refers to allometric coefficients needed for structural updates (`paramsAllometries`).
 
 | Symbol       | Units | R param       | Description                      |
 |--------------|-------|---------------|----------------------------------|
@@ -539,7 +563,7 @@ A second set of parameters refers to allometric coefficients needed for structur
 | $a_{cw}$, $b_{cw}$ | | `Acw`, `Bcw` | Regression coefficients used to calculate the crown width of trees (as intermediary step to obtain the crown ratio).|
 | $a_{bt}$, $b_{bt}$ | | `Abt`, `Bbt` | Regression coefficients used to calculate the bark thickness of trees |
 
-A third set of parameters refers to growth parameters (`paramsGrowth`).
+A fourth set of parameters refers to growth parameters (`paramsGrowth`).
 
 | Symbol       | Units | R param       | Description                      |
 |--------------|-------|---------------|----------------------------------|
@@ -565,8 +589,7 @@ A third set of parameters refers to growth parameters (`paramsGrowth`).
 |  | $g\, C \cdot g^{-1} dry$ | `WoodC` | Wood carbon content per dry weight |
 
 
-
-A third set of parameters refers to mortality/regeneration parameters (`paramsMortalityRegeneration`).
+A fifth set of parameters refers to mortality/regeneration parameters (`paramsMortalityRegeneration`).
 
 | Symbol       | Units | R param       | Description                      |
 |--------------|-------|---------------|----------------------------------|
@@ -614,10 +637,13 @@ A set of parameters control defoliation and crown bud mortality:
 
 +  `defoliationParams`: A list with the following elements:
     + `cavitationInducedDefoliation [= TRUE]`: Whether leaf hydraulic impairment induces defoliation and bud senescence.
-    + `criticalLeafPLC [= 0.50]`: Level of PLC (a proportion) corresponding to 50 % crown defoliation.
-    + `criticalBudPLC [= 0.88]`: Level of PLC (a proportion) corresponding to 50 % crown bud senescence.
+    + `criticalLeafPLC [= 0.50]`: Default value of PLC (a proportion) associated to cavitation-induced leaf senescence.
+    + `criticalBudPLC [= 0.88]`: Default value of PLC (a proportion) associated to cavitation-induced bud (branch) senescence.
     + `cvLeafP50 [= 10.0]`: Coefficient of variation (in percent) of leaf P50 within crown.
     + `cvBudP50 [= 10.0]`: Coefficient of variation (in percent) of bud P50 within crown.
+    + `temperatureInducedDefoliation [=TRUE]`: Whether heat stress induces defoliation.
+    + `criticalLeafTS [= 50.0]`: Default value for critical leaf temperature associated to heat-induced leaf senescence.
+    + `cvLeafTS [= 5.0]`: Coefficient of variation (in percent) of leaf critical senescence temperature within crown.
     
 Finally, we have the following options regarding whole-plant mortality:
 

@@ -168,9 +168,9 @@ cell relative expansion rate is divided by the maximum relative cell expansion r
 
 ## Senescence
 
-### Leaf aging and cavitation effects on leaves and buds {#leafsenescence}
+### Leaf senescence {#leafsenescence}
 
-Leaf senescence can occur due to two processes: programmed senescence (aging) or hydraulic disconnection related to cavitation. Each day, the model estimates the proportion of leaves that can be lost due to each process, i.e. $p_{aging,leaf}$ and $p_{cavitation, leaf}$, and the maximum of the two values is finally applied to reduce $LA_{act}$ and increase $LA_{dead}$ correspondingly. 
+Leaf senescence can occur due to three processes: programmed senescence (aging), hydraulic disconnection related to cavitation or heat-induced senescence. Each day, the model estimates the proportion of leaves that can be lost due to each process, i.e. $p_{aging,leaf}$, $p_{cavitation, leaf}$ and $p_{heat, leaf}$; and the maximum of the two values is finally applied to reduce $LA_{act}$ and increase $LA_{dead}$ correspondingly. 
 
 **Programmed leaf senescence**
 
@@ -194,13 +194,18 @@ p_{aging,leaf} = \frac{LA_{progrsen} \cdot (\phi_{t} - \phi_{t-1})}{LA_{act}}
 \end{equation}
 for `"spring"` senescence.
 
-**Drought-induced senescence**
+**Cavitation-induced leaf senescence**
 
 Leaf senescence can also occur as a consequence of hydraulic disconnection, as described in \@ref(cavitationinduceddefoliationbasic) and \@ref(cavitationinduceddefoliationadvanced), for the basic or advanced water balance models, respectively. 
 
-If the proportion of leaf conductance loss (i.e. $PLC_{leaf}$) has increased with respect to the preceeding day, the model determines  $LA_{cavitation}$, the maximum leaf area allowed according to the current level of leaf cavitation, by estimating the cavitation-induced defoliation proportion and applying it to the maximum leaf area ($LA_{target}$). Drought-induced leaf senescence effects are modulated with control parameters `criticalLeafPLC` and `cvLeafP50`. If $LA_{cavitation} < LA_{act}$ then the corresponding proportion $p_{cavitation, leaf}$ is estimated for senescence. 
+If the proportion of leaf conductance loss (i.e. $PLC_{leaf}$) has increased with respect to the preceeding day, the model determines  $LA_{cavitation}$, the maximum leaf area allowed according to the current level of leaf cavitation, by estimating the cavitation-induced defoliation proportion and applying it to the maximum leaf area ($LA_{target}$). Cavitation-induced leaf senescence effects are modulated with control parameters `criticalLeafPLC` and `cvLeafP50`. If $LA_{cavitation} < LA_{act}$ then the corresponding proportion $p_{cavitation, leaf}$ is estimated for senescence. 
 
 Xylem cavitation not only causes defoliation but also mortality of persistent buds, which has the effect of slowing down post-drought leaf area recovery. The percentage of the crown with active buds ($PCAB$) is reduced whenever the proportion of conductance loss has increased with respect to the preceding day, using the same approach taken for leaves, but using $PLC_{stem}$ as driver and with different thresholds (see control parameters `criticalBudPLC` and `cvBudP50`).
+
+**Heat-induced leaf senescence**
+
+Heat-induced leaf senescence is only available when growth is simulated in combination with advanced water balance, because only in this case leaf energy balance is performed for sunlit and shade leaves (see \@ref(leafenergybalancephoto)), resulting in $T_{sunlit}$ and $T_{shade}$. Recall that the proportion of sunlit and shade leaves varies within the day and across vertical layers (see \@ref(sunlitshadeleaves)). Therefore, the model estimates the proportion of leaves suffering an excess of heat for each sub-daily time step $n$, $p_{heat, leaf, n}$, by comparing $T_{sunlit}$ and $T_{shade}$ against a species-specific senescence threshold $T_{senescence, crit}$, and using the proportion of sunlit leaves ($f_{SL}$) of the layer corresponding to the midcrown height. In order to avoid sudden defoliation of all sunlit or shade leaves, these temperature comparisons take into account the variation of $T_{senescence, crit}$ across crown leaves (or, equivalently, variation of $T_{leaf}$ across leaves), as indicated by the coefficient of variation `cvLeafTS` of the control parameters. The proportion of leaves lost due to heat-induced apoptosis for the current day ($p_{heat, leaf}$) is estimated by combining $p_{heat, leaf, n}$ across time steps. Specifically, by finding the proportion of leaves whose temperature has been above a species-specific senescence threshold for at least three hours.
+
 
 ### Sapwood senescence {#sapwoodsenescence}
 

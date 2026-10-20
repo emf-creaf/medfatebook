@@ -181,9 +181,7 @@ The advanced water balance model requires many functional parameters to be speci
 |        |       |  `PhenologyType`  | Leaf phenology type  (`"evergreen"`, `"winter-deciduous"`, or `"winter-semideciduous"`). |
 |        |       |  `SenescencePeriod` | Period of senescence for evergreen plants ( `"whole-year"`, `"spring"` or `"autumn"`). |
 |        |       |  `GrowthPeriod` | Period of primary growth for evergreen plants ( `"whole-year”` or `"spring”`). |
-|        |       |  `GrowthDeterminacy`  | Primary growth determinacy (`"determined"`, `"indetermined"` or `"intermediate"`), only relevant for the growth model (see \@ref(growthphenologydesign)). |
 | $LD$ | years  | `LeafDuration` | Average duration of leaves (in years). |
-| $BFD$   | days   | `BudFormationDays` | Number of days required to complete bud formation (only relevant for the growth model (see \@ref(growthphenologydesign)).  |
 | $S^*_{eco}$ | $^{\circ} \mathrm{C}$ | `Sgdd` | Cumulative degree days required for leaf budburst (see section \@ref(leafphenobudburst)). |
 | $S_{unf}^*$ |$^{\circ} \mathrm{C}$ | `Ugdd` | Cumulative degree-days required to complete leaf unfolding after budburst has occurred (see section \@ref(leafphenobudburst)). |
 | $T_{eco}$ | $^{\circ} \mathrm{C}$ | `Tbgdd` | Base temperature for the calculation of degree days to leaf budburst and unfolding (see section \@ref(leafphenobudburst)). |
@@ -191,6 +189,9 @@ The advanced water balance model requires many functional parameters to be speci
 | $F^*_{sen}$ | $^{\circ} \mathrm{C}$ | `Fsen` | Cumulative degree days corresponding to complete leaf senescence (see section \@ref(leafphenosenescence)). |
 | $Ph_{sen}$ | hours | `Phsen` | Photoperiod corresponding to start counting senescence degree-days (see section \@ref(leafphenosenescence)). |
 | $T_{sen}$ | $^{\circ} \mathrm{C}$ | `Tbsen` | Base temperature for the calculation of degree days to leaf senescence (see section \@ref(leafphenosenescence)). |
+| $x_{sen}$ | {0,1,2}  | `xsen` | Discrete values, to allow for any absent/proportional/more than proportional effects of temperature on senescence (see section \@ref(leafphenosenescence)). |
+| $y_{sen}$ | {0,1,2}  | `ysen` | Discrete values, to allow for any absent/proportional/more than proportional effects of photoperiod on senescence (see section \@ref(leafphenosenescence)). |
+|      | [0,1] | `LeafPLCCrit` | Leaf PLC (a proportion) associated to cavitation-induced leaf senescence. |
 
 A second set of functional parameters relate to light extinction and water interception (`paramsInterception`):
 
@@ -315,8 +316,8 @@ Other relevant control parameters relevant for the advanced water balance model 
     + `LeafWidth [=1]`: Mistletoe leaf width (cm).
 +  `defoliationParams`: A list with the following elements:
     + `cavitationInducedDefoliation [= TRUE]`: Whether leaf hydraulic impairment induces defoliation.
-    + `criticalLeafPLC [= 0.88]`: Level of PLC (a proportion) corresponding to 50 % crown defoliation.
-    + `cvLeafP50 [= 10.0]`: Coefficient of variation (in percent) of leaf P50 within crown leaves.
+    + `criticalLeafPLC [= 0.88]`: Default value of PLC (a proportion) associated to cavitation-induced leaf senescence.
+    + `cvLeafP50 [= 10.0]`: Coefficient of variation (in percent) of leaf P50 within crown.
 
 A set of parameters is only relevant for `transpirationMode = "Sperry"`:
 
