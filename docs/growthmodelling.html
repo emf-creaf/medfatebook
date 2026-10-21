@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-10-20" />
+<meta name="date" content="2026-10-21" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1189,7 +1189,7 @@ D_{snags,i} = D_{wood, nonburnt, i} + B_{sapwood, senescence, i}
 <li>Evaluate labile carbon translocation due to leaf and sapwood senescence (<span class="math inline">\(TS_{leaf}\)</span>, <span class="math inline">\(TT_{leaf}\)</span> and <span class="math inline">\(TS_{sapwood}\)</span>). If leaf storage carbon is surpassed, add the excess to <span class="math inline">\(TT_{leaf}\)</span>. Add the sum of translocated carbon to the starch sapwood pool.</li>
 <li>Move any surplus in sapwood storage carbon to root exudation (<span class="math inline">\(RE\)</span>). This completes the daily carbon balance for leaf labile pools <a href="growthmodelling.html#eq:leafcarbonbalanceequations">(15.1)</a>, sapwood labile pools <a href="growthmodelling.html#eq:sapwoodcarbonbalanceequations">(15.2)</a>, and plant-level labile carbon <a href="growthmodelling.html#eq:plantcarbonbalanceequation">(15.4)</a>. The model checks at this point the plant-level labile carbon balance.</li>
 <li>Use growth and senescence results to update actual leaf area, dead leaf area, sapwood area, fine root biomass and derived traits (<a href="growthsenescencemortality.html#updateplanttraits">17.3.1</a>).</li>
-<li>Translate growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover) and update leaf area targets (<a href="growthsenescencemortality.html#structuralupdate">17.3.2</a>),</li>
+<li>Translate growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover) and update leaf area targets (<a href="growthsenescencemortality.html#structuralupdate">17.3.2</a>). Note that this step can be turned off by changing the value of control parameters <code>treeDynamics</code>, <code>shrubDynamics</code> or <code>herbDynamics</code>.</li>
 <li>Update sapwood area and fine root biomass targets (<a href="growthsenescencemortality.html#updateallocationtargets">17.3.3</a>).</li>
 <li>Update storage volumes and the concentration of labile pools (<a href="growthsenescencemortality.html#updatestorage">17.3.4</a>).</li>
 </ol>
@@ -1710,8 +1710,10 @@ D2. Determine if plant death by starvation or desiccation occurred (<a href="gro
 <li><code>allowDessication [=TRUE]</code>: Boolean flag to indicate that mortality by dessication is allowed.</li>
 <li><code>allowStarvation [=TRUE]</code>: Boolean flag to indicate that mortality by starvation is allowed.</li>
 <li><code>sinkLimitation [=TRUE]</code>: Boolean flag to indicate that temperature and turgor limitations to growth are applied.</li>
-<li><code>shrubDynamics [= TRUE]</code>: Boolean flag to allow the application of demographic processes to shrubs.</li>
-<li><code>herbDynamics [= TRUE]</code>: Boolean flag to allow dynamic herb leaf area as a function of shading due to leaf area of woody cohorts.</li>
+<li><code>treeDynamics [= TRUE]</code>: Boolean flag to allow the application of demographic processes to tree cohorts.</li>
+<li><code>shrubDynamics [= TRUE]</code>: Boolean flag to allow the application of demographic processes to shrub cohorts.</li>
+<li><code>herbDynamics [= TRUE]</code>: Boolean flag to allow the application of demographic processes to herb cohorts.</li>
+<li><code>herbLayerDynamics [= TRUE]</code>: Boolean flag to allow dynamic herb leaf area as a function of shading due to leaf area of woody cohorts.</li>
 </ul>
 <p>An important parameter concerns the allocation strategy:</p>
 <ul>

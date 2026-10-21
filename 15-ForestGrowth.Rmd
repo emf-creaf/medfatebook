@@ -471,7 +471,7 @@ The model performs the following steps for each plant cohort:
   11. Evaluate labile carbon translocation due to leaf and sapwood senescence ($TS_{leaf}$, $TT_{leaf}$ and $TS_{sapwood}$). If leaf storage carbon is surpassed, add the excess to $TT_{leaf}$. Add the sum of translocated carbon to the starch sapwood pool.
   12. Move any surplus in sapwood storage carbon to root exudation ($RE$). This completes the daily carbon balance for leaf labile pools \@ref(eq:leafcarbonbalanceequations), sapwood labile pools \@ref(eq:sapwoodcarbonbalanceequations), and plant-level labile carbon \@ref(eq:plantcarbonbalanceequation). The model checks at this point the plant-level labile carbon balance.
   13. Use growth and senescence results to update actual leaf area, dead leaf area, sapwood area, fine root biomass and derived traits (\@ref(updateplanttraits)). 
-  14. Translate growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover) and update leaf area targets (\@ref(structuralupdate)),
+  14. Translate growth into structural variables (i.e., plant height, tree DBH, tree crown ratio and shrub cover) and update leaf area targets (\@ref(structuralupdate)). Note that this step can be turned off by changing the value of control parameters `treeDynamics`, `shrubDynamics` or `herbDynamics`.
   15. Update sapwood area and fine root biomass targets (\@ref(updateallocationtargets)). 
   16. Update storage volumes and the concentration of labile pools (\@ref(updatestorage)).
 
@@ -614,8 +614,10 @@ First, there are flags that regulate the application of processes:
 + `allowDessication [=TRUE]`: Boolean flag to indicate that mortality by dessication is allowed.
 + `allowStarvation [=TRUE]`: Boolean flag to indicate that mortality by starvation is allowed.
 + `sinkLimitation [=TRUE]`: Boolean flag to indicate that temperature and turgor limitations to growth are applied.
-+ `shrubDynamics [= TRUE]`: Boolean flag to allow the application of demographic processes to shrubs.
-+ `herbDynamics [= TRUE]`: Boolean flag to allow dynamic herb leaf area as a function of shading due to leaf area of woody cohorts.
++ `treeDynamics [= TRUE]`: Boolean flag to allow the application of demographic processes to tree cohorts.
++ `shrubDynamics [= TRUE]`: Boolean flag to allow the application of demographic processes to shrub cohorts.
++ `herbDynamics [= TRUE]`: Boolean flag to allow the application of demographic processes to herb cohorts.
++ `herbLayerDynamics [= TRUE]`: Boolean flag to allow dynamic herb leaf area as a function of shading due to leaf area of woody cohorts.
 
 An important parameter concerns the allocation strategy: 
 

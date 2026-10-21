@@ -170,7 +170,7 @@ cell relative expansion rate is divided by the maximum relative cell expansion r
 
 ### Leaf senescence {#leafsenescence}
 
-Leaf senescence can occur due to three processes: programmed senescence (aging), hydraulic disconnection related to cavitation or heat-induced senescence. Each day, the model estimates the proportion of leaves that can be lost due to each process, i.e. $p_{aging,leaf}$, $p_{cavitation, leaf}$ and $p_{heat, leaf}$; and the maximum of the two values is finally applied to reduce $LA_{act}$ and increase $LA_{dead}$ correspondingly. 
+Leaf senescence can occur due to three processes: programmed senescence (aging), hydraulic disconnection related to cavitation or heat-induced senescence. Each day, the model estimates the proportion of leaves that can be lost due to each process, i.e. $p_{aging,leaf}$, $p_{cavitation, leaf}$ and $p_{heat, leaf}$; and the maximum of the three values is finally applied to reduce $LA_{act}$ and increase $LA_{dead}$ correspondingly. 
 
 **Programmed leaf senescence**
 
@@ -200,7 +200,9 @@ Leaf senescence can also occur as a consequence of hydraulic disconnection, as d
 
 If the proportion of leaf conductance loss (i.e. $PLC_{leaf}$) has increased with respect to the preceeding day, the model determines  $LA_{cavitation}$, the maximum leaf area allowed according to the current level of leaf cavitation, by estimating the cavitation-induced defoliation proportion and applying it to the maximum leaf area ($LA_{target}$). Cavitation-induced leaf senescence effects are modulated by the species-specific PLC threshold $PLC_{leaf,senescence}$ and the control parameter `cvLeafP50`. If $LA_{cavitation} < LA_{act}$ then the corresponding proportion $p_{cavitation, leaf}$ is estimated for senescence. 
 
-Xylem cavitation not only causes defoliation but also mortality of persistent buds, which has the effect of slowing down post-drought leaf area recovery. The percentage of the crown with active buds ($PCAB$) is reduced whenever the proportion of conductance loss has increased with respect to the preceding day, using the same approach taken for leaves, but using $PLC_{stem}$ as driver and the effects being modulated by the species-specific PLC threshold $PLC_{bud,senescence}$ and the control parameter `cvBudP50`.
+**Cavitation-induced bud senescence**
+
+Xylem cavitation not only causes defoliation but also mortality of persistent buds, which has the effect of slowing down post-drought leaf area recovery because of a reduction in the percentage of crown with active buds, $PCAB$ (see \@ref(leafgrowth)). The percentage of the crown with active buds ($PCAB$) is reduced whenever the proportion of conductance loss has increased with respect to the preceding day, using the same approach taken for leaves, but using $PLC_{stem}$ as driver and the effects being modulated by the species-specific PLC threshold $PLC_{bud,senescence}$ and the control parameter `cvBudP50`.
 
 **Heat-induced leaf senescence**
 
