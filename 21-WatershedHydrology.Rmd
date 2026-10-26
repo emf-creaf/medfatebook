@@ -179,13 +179,6 @@ Distributed hydrological models can produce very detailed spatial and temporal o
 
 Note that while simulations can be performed for sub-watersheds separately, at present the model does not produce results at the sub-watershed level. However, the partitioning of sub-watersheds is included in the output, so that users can cross it with `outlet_export_m3s` to get the discharge generated in each sub-watershed.
 
-### Simulation tips
-
-In this subsection we provide some recommendations aimed at guiding user for distributed watershed water balance modelling.
-
-**1. Watershed level water balance closure** - When using Richards-solving (i.e. `soilDomains = "single"` or `soilDomains = "dual"`), there is no warranty that the water balance will be closed at the the watershed level (see \@ref(watershedbalance)). The reason is that errors can accumulate when solving Richards equations, that the soil water balance model tries to fit into either deep drainage term or the capillarity rise term. Since capillarity is drawn from the aquifer below, users can check whether the latter occurred by inspecting the column `NegativeAquiferCorrection` from the `watershed_balance` output data frame. Some combinations of watershed control parameters are more prone to errors in water balance closure. We recommend addressing those errors by decreasing `richards_tolerance` in local control options, increasing `num_daily_substeps` in watershed control options, or both. Naturally, this will come at the cost of larger computational time.
-
-**2. Computational strategy for sensitivity analysis and calibration** - The cohort-based description of vegetation increases computation times of distributed watershed simulations. At the stage of calibrating watershed parameters or analyzing the hydrological sensitivity to them, one can decrease the cost of vegetation calculations, by decreasing the number of plant cohorts in `"wildland"` cells. This can be done by using function `initialize_landscape()`. Specially effective will be to use option `reduce_to_dominant = TRUE`, which will choose the dominant tree species (and shrub, if present), while keeping the same leaf area index for the cell.
 
 ## Process details {#watershedbalancedetails}
 
@@ -261,3 +254,13 @@ Channel routing is performed after water balance simulations of the watershed (o
 ### Losses towards a deeper aquifer {#deepaquiferloss}
 
 Daily losses from the aquifer towards a deeper aquifer not connected to watershed outlets are simulated by means of a daily maximum loss rate (which can be specified either via the watershed control parameter called `deep_aquifer_loss` or using an input `sf` column with the same name) that is compared with the current aquifer content. The minimum of those values is subtracted from the current aquifer content.
+
+
+## Simulation tips
+
+In this last section we provide some recommendations aimed at guiding user for distributed watershed water balance modelling.
+
+**1. Watershed level water balance closure** - When using Richards-solving (i.e. `soilDomains = "single"` or `soilDomains = "dual"`), there is no warranty that the water balance will be closed at the the watershed level (see \@ref(watershedbalance)). The reason is that errors can accumulate when solving Richards equations, that the soil water balance model tries to fit into either deep drainage term or the capillarity rise term. Since capillarity is drawn from the aquifer below, users can check whether the latter occurred by inspecting the column `NegativeAquiferCorrection` from the `watershed_balance` output data frame. Some combinations of watershed control parameters are more prone to errors in water balance closure than others, and our experience tells us that this happens with low values of $n_{lat}$ combined with high values of $R_{lat}$. We recommend addressing those errors by decreasing `richards_tolerance` in local control options, increasing `num_daily_substeps` in watershed control options, or both. Naturally, this will come at the cost of larger computational time.
+
+**2. Computational strategy for sensitivity analysis and calibration** - The cohort-based description of vegetation increases computation times of distributed watershed simulations. At the stage of calibrating watershed parameters or analyzing the hydrological sensitivity to them, one can decrease the cost of vegetation calculations, by decreasing the number of plant cohorts in `"wildland"` cells. This can be done by using function `initialize_landscape()`. Specially effective will be to use option `reduce_to_dominant = TRUE`, which will choose the dominant tree species (and shrub, if present), while keeping the same leaf area index for the cell.
+

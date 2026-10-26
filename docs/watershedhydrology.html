@@ -608,7 +608,6 @@ div.csl-indent {
 <li class="chapter" data-level="21.5.3" data-path="watershedhydrology.html"><a href="watershedhydrology.html#relevantcontrol"><i class="fa fa-check"></i><b>21.5.3</b> Local control parameters rellevant for hydrological simulations</a></li>
 <li class="chapter" data-level="21.5.4" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedbalancecontrol"><i class="fa fa-check"></i><b>21.5.4</b> Watershed hydraulic control parameters</a></li>
 <li class="chapter" data-level="21.5.5" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedbalanceoutput"><i class="fa fa-check"></i><b>21.5.5</b> Model outputs</a></li>
-<li class="chapter" data-level="21.5.6" data-path="watershedhydrology.html"><a href="watershedhydrology.html#simulation-tips"><i class="fa fa-check"></i><b>21.5.6</b> Simulation tips</a></li>
 </ul></li>
 <li class="chapter" data-level="21.6" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedbalancedetails"><i class="fa fa-check"></i><b>21.6</b> Process details</a>
 <ul>
@@ -618,6 +617,7 @@ div.csl-indent {
 <li class="chapter" data-level="21.6.4" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedexport"><i class="fa fa-check"></i><b>21.6.4</b> Channel routing and water exported from the watershed</a></li>
 <li class="chapter" data-level="21.6.5" data-path="watershedhydrology.html"><a href="watershedhydrology.html#deepaquiferloss"><i class="fa fa-check"></i><b>21.6.5</b> Losses towards a deeper aquifer</a></li>
 </ul></li>
+<li class="chapter" data-level="21.7" data-path="watershedhydrology.html"><a href="watershedhydrology.html#simulation-tips"><i class="fa fa-check"></i><b>21.7</b> Simulation tips</a></li>
 </ul></li>
 <li class="chapter" data-level="22" data-path="seeddispersal.html"><a href="seeddispersal.html"><i class="fa fa-check"></i><b>22</b> Seed dispersal</a>
 <ul>
@@ -1049,12 +1049,6 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 </table>
 <p>Note that while simulations can be performed for sub-watersheds separately, at present the model does not produce results at the sub-watershed level. However, the partitioning of sub-watersheds is included in the output, so that users can cross it with <code>outlet_export_m3s</code> to get the discharge generated in each sub-watershed.</p>
 </div>
-<div id="simulation-tips" class="section level3 hasAnchor" number="21.5.6">
-<h3><span class="header-section-number">21.5.6</span> Simulation tips<a href="watershedhydrology.html#simulation-tips" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>In this subsection we provide some recommendations aimed at guiding user for distributed watershed water balance modelling.</p>
-<p><strong>1. Watershed level water balance closure</strong> - When using Richards-solving (i.e. <code>soilDomains = "single"</code> or <code>soilDomains = "dual"</code>), there is no warranty that the water balance will be closed at the the watershed level (see <a href="watershedhydrology.html#watershedbalance">21.3</a>). The reason is that errors can accumulate when solving Richards equations, that the soil water balance model tries to fit into either deep drainage term or the capillarity rise term. Since capillarity is drawn from the aquifer below, users can check whether the latter occurred by inspecting the column <code>NegativeAquiferCorrection</code> from the <code>watershed_balance</code> output data frame. Some combinations of watershed control parameters are more prone to errors in water balance closure. We recommend addressing those errors by decreasing <code>richards_tolerance</code> in local control options, increasing <code>num_daily_substeps</code> in watershed control options, or both. Naturally, this will come at the cost of larger computational time.</p>
-<p><strong>2. Computational strategy for sensitivity analysis and calibration</strong> - The cohort-based description of vegetation increases computation times of distributed watershed simulations. At the stage of calibrating watershed parameters or analyzing the hydrological sensitivity to them, one can decrease the cost of vegetation calculations, by decreasing the number of plant cohorts in <code>"wildland"</code> cells. This can be done by using function <code>initialize_landscape()</code>. Specially effective will be to use option <code>reduce_to_dominant = TRUE</code>, which will choose the dominant tree species (and shrub, if present), while keeping the same leaf area index for the cell.</p>
-</div>
 </div>
 <div id="watershedbalancedetails" class="section level2 hasAnchor" number="21.6">
 <h2><span class="header-section-number">21.6</span> Process details<a href="watershedhydrology.html#watershedbalancedetails" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -1121,8 +1115,14 @@ Ro_j = Ro_j + Ru_i \cdot q_{ij}
 <div id="deepaquiferloss" class="section level3 hasAnchor" number="21.6.5">
 <h3><span class="header-section-number">21.6.5</span> Losses towards a deeper aquifer<a href="watershedhydrology.html#deepaquiferloss" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Daily losses from the aquifer towards a deeper aquifer not connected to watershed outlets are simulated by means of a daily maximum loss rate (which can be specified either via the watershed control parameter called <code>deep_aquifer_loss</code> or using an input <code>sf</code> column with the same name) that is compared with the current aquifer content. The minimum of those values is subtracted from the current aquifer content.</p>
-
 </div>
+</div>
+<div id="simulation-tips" class="section level2 hasAnchor" number="21.7">
+<h2><span class="header-section-number">21.7</span> Simulation tips<a href="watershedhydrology.html#simulation-tips" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In this last section we provide some recommendations aimed at guiding user for distributed watershed water balance modelling.</p>
+<p><strong>1. Watershed level water balance closure</strong> - When using Richards-solving (i.e. <code>soilDomains = "single"</code> or <code>soilDomains = "dual"</code>), there is no warranty that the water balance will be closed at the the watershed level (see <a href="watershedhydrology.html#watershedbalance">21.3</a>). The reason is that errors can accumulate when solving Richards equations, that the soil water balance model tries to fit into either deep drainage term or the capillarity rise term. Since capillarity is drawn from the aquifer below, users can check whether the latter occurred by inspecting the column <code>NegativeAquiferCorrection</code> from the <code>watershed_balance</code> output data frame. Some combinations of watershed control parameters are more prone to errors in water balance closure than others, and our experience tells us that this happens with low values of <span class="math inline">\(n_{lat}\)</span> combined with high values of <span class="math inline">\(R_{lat}\)</span>. We recommend addressing those errors by decreasing <code>richards_tolerance</code> in local control options, increasing <code>num_daily_substeps</code> in watershed control options, or both. Naturally, this will come at the cost of larger computational time.</p>
+<p><strong>2. Computational strategy for sensitivity analysis and calibration</strong> - The cohort-based description of vegetation increases computation times of distributed watershed simulations. At the stage of calibrating watershed parameters or analyzing the hydrological sensitivity to them, one can decrease the cost of vegetation calculations, by decreasing the number of plant cohorts in <code>"wildland"</code> cells. This can be done by using function <code>initialize_landscape()</code>. Specially effective will be to use option <code>reduce_to_dominant = TRUE</code>, which will choose the dominant tree species (and shrub, if present), while keeping the same leaf area index for the cell.</p>
+
 </div>
 </div>
 <h3>Bibliography<a href="bibliography.html#bibliography" class="anchor-section" aria-label="Anchor link to header"></a></h3>
