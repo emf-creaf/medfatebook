@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-10-21" />
+<meta name="date" content="2026-10-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -605,8 +605,10 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="21.5.1" data-path="watershedhydrology.html"><a href="watershedhydrology.html#gridded-inputs"><i class="fa fa-check"></i><b>21.5.1</b> Gridded inputs</a></li>
 <li class="chapter" data-level="21.5.2" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershed-meteorology-input"><i class="fa fa-check"></i><b>21.5.2</b> Watershed meteorology input</a></li>
-<li class="chapter" data-level="21.5.3" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedbalancecontrol"><i class="fa fa-check"></i><b>21.5.3</b> Watershed hydraulic control parameters</a></li>
-<li class="chapter" data-level="21.5.4" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedbalanceoutput"><i class="fa fa-check"></i><b>21.5.4</b> Model outputs</a></li>
+<li class="chapter" data-level="21.5.3" data-path="watershedhydrology.html"><a href="watershedhydrology.html#relevantcontrol"><i class="fa fa-check"></i><b>21.5.3</b> Local control parameters rellevant for hydrological simulations</a></li>
+<li class="chapter" data-level="21.5.4" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedbalancecontrol"><i class="fa fa-check"></i><b>21.5.4</b> Watershed hydraulic control parameters</a></li>
+<li class="chapter" data-level="21.5.5" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedbalanceoutput"><i class="fa fa-check"></i><b>21.5.5</b> Model outputs</a></li>
+<li class="chapter" data-level="21.5.6" data-path="watershedhydrology.html"><a href="watershedhydrology.html#simulation-tips"><i class="fa fa-check"></i><b>21.5.6</b> Simulation tips</a></li>
 </ul></li>
 <li class="chapter" data-level="21.6" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedbalancedetails"><i class="fa fa-check"></i><b>21.6</b> Process details</a>
 <ul>
@@ -895,8 +897,19 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 <li>If an interpolator object of class <code>stars</code> is provided, the model will call function <code>interpolate_data()</code> for every day to be simulated (see <strong>meteoland</strong> package documentation).</li>
 </ul>
 </div>
-<div id="watershedbalancecontrol" class="section level3 hasAnchor" number="21.5.3">
-<h3><span class="header-section-number">21.5.3</span> Watershed hydraulic control parameters<a href="watershedhydrology.html#watershedbalancecontrol" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="relevantcontrol" class="section level3 hasAnchor" number="21.5.3">
+<h3><span class="header-section-number">21.5.3</span> Local control parameters rellevant for hydrological simulations<a href="watershedhydrology.html#relevantcontrol" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Hydrological simulations require specifying how local processes are simulated for each cell via control parameters (see <a href="basicwaterbalance.html#basicwaterbalancecontrol">3.5.3</a>). While some of them may be changed depending the specific application, there are some of them that are highly relevant for hydrological simulations, because of their effect on local soil water balance:</p>
+<ul>
+<li><code>soilDomains [= "buckets"]</code>: Either ‘buckets’ (for multi-bucket model), ‘single’ (for single-domain Richards model) or ‘dual’ (for dual-permeability model). Note that if no local control parameters are supplied, the model will employ <code>soilDomains = "single"</code>, meaning that vertical bulk soil flows are simulated using a single permeability domain with Richards equation.</li>
+<li><code>infiltrationCorrection [= 5.0]</code>: Factor to correct infiltration amount in the GreenAmpt1911 model in single-domain simulations.</li>
+<li><code>ndailysteps [= 24]</code>: Number of steps into which each day is divided for determination of soil water balance, stomatal conductance, transpiration and photosynthesis (24 equals 1-hour intervals).</li>
+<li><code>max_nsubsteps_soil [= 300]</code>: Maximum number of substeps within each subdaily (hourly) step for soil water balance solving.</li>
+<li><code>richards_tolerance [= 0.001]</code>: Error tolerance (mm) when solving Richards equations for each subdaily (hourly) step.</li>
+</ul>
+</div>
+<div id="watershedbalancecontrol" class="section level3 hasAnchor" number="21.5.4">
+<h3><span class="header-section-number">21.5.4</span> Watershed hydraulic control parameters<a href="watershedhydrology.html#watershedbalancecontrol" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Distributed hydrological models suffer from the need to specify many parameters. Frances et al. <span class="citation">(<a href="#ref-Frances2007">2007</a>)</span> demonstrated that by using a proper parameter structure, it is possible to obtain an excellent automatic calibration of a distributed conceptual model while maintaining the spatial variability of parameters. In particular, they showed how to define effective model parameters for those quantities normally estimated at the point scale, so that model parameters and estimates usually suffer from being <em>uncommensurable</em>. Effective model parameters can in this situation be defined as a <em>correction function</em> of the corresponding hydrological characteristic. If the correction function takes into account the model and input errors, the temporal and spatial scale effects and also the hydrological characteristics estimation error, it is reasonable to assume the correction function for each parameter will be common to all cells within the watershed. Frances et al. <span class="citation">(<a href="#ref-Frances2007">2007</a>)</span> suggest using a correction factor for each hydraulic parameter, in a strategy called <em>split-parameter</em>. From the calibration point of view, a very important consequence of the split-parameter approach is that the number of variables to be adjusted is reduced dramatically.</p>
 <p>Our model follows Frances et al. <span class="citation">(<a href="#ref-Frances2007">2007</a>)</span> in that correction factors are defined for three hydraulic parameters with spatial variation across the watershed:</p>
 <ul>
@@ -993,8 +1006,8 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 </tbody>
 </table>
 </div>
-<div id="watershedbalanceoutput" class="section level3 hasAnchor" number="21.5.4">
-<h3><span class="header-section-number">21.5.4</span> Model outputs<a href="watershedhydrology.html#watershedbalanceoutput" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="watershedbalanceoutput" class="section level3 hasAnchor" number="21.5.5">
+<h3><span class="header-section-number">21.5.5</span> Model outputs<a href="watershedhydrology.html#watershedbalanceoutput" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Distributed hydrological models can produce very detailed spatial and temporal outputs, hence consuming lots of memory resources. While the model runs at a daily scale, functions <code>spwb_land()</code> and <code>growth_land()</code> can be asked to retain spatial outputs and summaries at coarser temporal scales (i.e. weekly, monthly, etc.). The output of functions <code>spwb_land()</code> and <code>growth_land()</code> is an S3 list with the following data elements:</p>
 <table>
 <colgroup>
@@ -1036,6 +1049,12 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 </table>
 <p>Note that while simulations can be performed for sub-watersheds separately, at present the model does not produce results at the sub-watershed level. However, the partitioning of sub-watersheds is included in the output, so that users can cross it with <code>outlet_export_m3s</code> to get the discharge generated in each sub-watershed.</p>
 </div>
+<div id="simulation-tips" class="section level3 hasAnchor" number="21.5.6">
+<h3><span class="header-section-number">21.5.6</span> Simulation tips<a href="watershedhydrology.html#simulation-tips" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In this subsection we provide some recommendations aimed at guiding user for distributed watershed water balance modelling.</p>
+<p><strong>1. Watershed level water balance closure</strong> - When using Richards-solving (i.e. <code>soilDomains = "single"</code> or <code>soilDomains = "dual"</code>), there is no warranty that the water balance will be closed at the the watershed level (see <a href="watershedhydrology.html#watershedbalance">21.3</a>). The reason is that errors can accumulate when solving Richards equations, that the soil water balance model tries to fit into either deep drainage term or the capillarity rise term. Since capillarity is drawn from the aquifer below, users can check whether the latter occurred by inspecting the column <code>NegativeAquiferCorrection</code> from the <code>watershed_balance</code> output data frame. Some combinations of watershed control parameters are more prone to errors in water balance closure. We recommend addressing those errors by decreasing <code>richards_tolerance</code> in local control options, increasing <code>num_daily_substeps</code> in watershed control options, or both. Naturally, this will come at the cost of larger computational time.</p>
+<p><strong>2. Computational strategy for sensitivity analysis and calibration</strong> - The cohort-based description of vegetation increases computation times of distributed watershed simulations. At the stage of calibrating watershed parameters or analyzing the hydrological sensitivity to them, one can decrease the cost of vegetation calculations, by decreasing the number of plant cohorts in <code>"wildland"</code> cells. This can be done by using function <code>initialize_landscape()</code>. Specially effective will be to use option <code>reduce_to_dominant = TRUE</code>, which will choose the dominant tree species (and shrub, if present), while keeping the same leaf area index for the cell.</p>
+</div>
 </div>
 <div id="watershedbalancedetails" class="section level2 hasAnchor" number="21.6">
 <h2><span class="header-section-number">21.6</span> Process details<a href="watershedhydrology.html#watershedbalancedetails" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -1057,7 +1076,7 @@ where <span class="math inline">\(K_{sat,i}\)</span> is the saturated conductivi
 <span class="math display">\[\begin{equation}
 \Delta{S_{lat,i}} = S_{lat, in} - S_{lat, out} = \sum_{j}{q_{lat, ji}} - \sum_{j}{q_{lat, ij}}
 \end{equation}\]</span>
-Hence, soil layers are not considered separately in the estimation of soil saturated flows and balance. For their source/sink effect on local soil water balance, however, the resulting lateral flow is divided between soil layers according to the water volume present (i.e. layers with larger amounts of water are assumed to exchange water more easily than layers that are drier, regardless of the soil volume they occupy).</p>
+Hence, soil layers are not considered separately in the estimation of soil saturated flows and balance. For their source/sink effect on local soil water balance, however, the resulting lateral flow is divided between soil layers. For positive flows, mode water will be entering those layers with larger saturation deficit, whereas for negative flows more water will be removed from layers where there is a larger excess from field capacity.</p>
 </div>
 <div id="groundwaterflows" class="section level3 hasAnchor" number="21.6.2">
 <h3><span class="header-section-number">21.6.2</span> Groundwater lateral flow<a href="watershedhydrology.html#groundwaterflows" class="anchor-section" aria-label="Anchor link to header"></a></h3>
