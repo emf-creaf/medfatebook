@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-10-26" />
+<meta name="date" content="2026-10-29" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -605,7 +605,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="21.5.1" data-path="watershedhydrology.html"><a href="watershedhydrology.html#gridded-inputs"><i class="fa fa-check"></i><b>21.5.1</b> Gridded inputs</a></li>
 <li class="chapter" data-level="21.5.2" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershed-meteorology-input"><i class="fa fa-check"></i><b>21.5.2</b> Watershed meteorology input</a></li>
-<li class="chapter" data-level="21.5.3" data-path="watershedhydrology.html"><a href="watershedhydrology.html#relevantcontrol"><i class="fa fa-check"></i><b>21.5.3</b> Local control parameters rellevant for hydrological simulations</a></li>
+<li class="chapter" data-level="21.5.3" data-path="watershedhydrology.html"><a href="watershedhydrology.html#relevantcontrol"><i class="fa fa-check"></i><b>21.5.3</b> Local control parameters relevant for hydrological simulations</a></li>
 <li class="chapter" data-level="21.5.4" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedbalancecontrol"><i class="fa fa-check"></i><b>21.5.4</b> Watershed hydraulic control parameters</a></li>
 <li class="chapter" data-level="21.5.5" data-path="watershedhydrology.html"><a href="watershedhydrology.html#watershedbalanceoutput"><i class="fa fa-check"></i><b>21.5.5</b> Model outputs</a></li>
 </ul></li>
@@ -904,10 +904,11 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 </ul>
 </div>
 <div id="relevantcontrol" class="section level3 hasAnchor" number="21.5.3">
-<h3><span class="header-section-number">21.5.3</span> Local control parameters rellevant for hydrological simulations<a href="watershedhydrology.html#relevantcontrol" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<h3><span class="header-section-number">21.5.3</span> Local control parameters relevant for hydrological simulations<a href="watershedhydrology.html#relevantcontrol" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Hydrological simulations require specifying how local processes are simulated for each cell via control parameters (see <a href="basicwaterbalance.html#basicwaterbalancecontrol">3.5.3</a>). While some of them may be changed depending the specific application, there are some of them that are highly relevant for hydrological simulations, because of their effect on local soil water balance:</p>
 <ul>
 <li><code>soilDomains [= "buckets"]</code>: Either ‘buckets’ (for multi-bucket model), ‘single’ (for single-domain Richards model) or ‘dual’ (for dual-permeability model). Note that if no local control parameters are supplied, the model will employ <code>soilDomains = "single"</code>, meaning that vertical bulk soil flows are simulated using a single permeability domain with Richards equation.</li>
+<li><code>rhizosphereOverlap [="partial"]</code>: A string indicating the degree of rhizosphere spatial overlap between plant cohorts: Either <code>"none"</code> (no overlap, i.e. independent water pools), <code>"partial"</code> (partial overlap determined by soil moisture) or <code>"total"</code> (total overlap, i.e. plants extract from common soil pools). Note that if no local control parameters are supplied, the model will employ <code>rhizosphereOverlap = "total"</code> as default, because otherwise the model will perform a soil water balance for each plant water pool, which will make simulations much more expensive computationally.</li>
 <li><code>infiltrationCorrection [= 5.0]</code>: Factor to correct infiltration amount in the GreenAmpt1911 model in single-domain simulations.</li>
 <li><code>ndailysteps [= 24]</code>: Number of steps into which each day is divided for determination of soil water balance, stomatal conductance, transpiration and photosynthesis (24 equals 1-hour intervals).</li>
 <li><code>max_nsubsteps_soil [= 300]</code>: Maximum number of substeps within each subdaily (hourly) step for soil water balance solving.</li>
@@ -1127,7 +1128,7 @@ Ro_j = Ro_j + Ru_i \cdot q_{ij}
 <h2><span class="header-section-number">21.7</span> Simulation tips<a href="watershedhydrology.html#simulation-tips" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In this last section we provide some recommendations aimed at guiding user for distributed watershed water balance modelling.</p>
 <p><strong>1. Watershed level water balance closure</strong> - When using Richards-solving (i.e. <code>soilDomains = "single"</code> or <code>soilDomains = "dual"</code>), there is no warranty that the water balance will be closed at the the watershed level (see <a href="watershedhydrology.html#watershedbalance">21.3</a>). The reason is that errors can accumulate when solving Richards equations, that the soil water balance model tries to fit into either deep drainage term or the capillarity rise term. Since capillarity is drawn from the aquifer below, users can check whether the latter occurred by inspecting the column <code>NegativeAquiferCorrection</code> from the <code>watershed_balance</code> output data frame. Some combinations of watershed control parameters are more prone to errors in water balance closure than others, and our experience tells us that this happens with low values of <span class="math inline">\(n_{lat}\)</span> combined with high values of <span class="math inline">\(R_{lat}\)</span>. We recommend addressing those errors by decreasing <code>richards_tolerance</code> in local control options, increasing <code>num_daily_substeps</code> in watershed control options, or both. Naturally, this will come at the cost of larger computational time.</p>
-<p><strong>2. Computational strategy for sensitivity analysis and calibration</strong> - The cohort-based description of vegetation increases computation times of distributed watershed simulations. At the stage of calibrating watershed parameters or analyzing the hydrological sensitivity to them, one can decrease the cost of vegetation calculations, by decreasing the number of plant cohorts in <code>"wildland"</code> cells. This can be done by using function <code>initialize_landscape()</code>. Specially effective will be to use option <code>reduce_to_dominant = TRUE</code>, which will choose the dominant tree species (and shrub, if present), while keeping the same leaf area index for the cell.</p>
+<p><strong>2. Computational strategy for sensitivity analysis and calibration</strong> - The cohort-based description of vegetation increases computation times of distributed watershed simulations. At the stage of calibrating watershed parameters or analyzing the hydrological sensitivity to them, one can decrease the cost of vegetation calculations, by decreasing the number of plant cohorts in <code>"wildland"</code> cells (another important computational factor, that interacts with the number of cohorts is the local control parameter <code>rhizosphereOverlap</code>). This can be done by using function <code>initialize_landscape()</code>. Specially effective will be to use option <code>reduce_to_dominant = TRUE</code>, which will choose the dominant tree species (and shrub, if present), while keeping the same leaf area index for the cell.</p>
 
 </div>
 </div>
