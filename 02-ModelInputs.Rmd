@@ -15,7 +15,7 @@ Since preparing inputs for simulations can be daunting for most users, package [
 ## Input structures
 ### Input structures in medfate {#inputstructuresmedfate}
 
-Package **medfate** deals with simulations at stand level and, hence, the data structures defined in the package are meant to encapsulate information about a target forest stands and the properties of the soil where it grows:
+Package **medfate** deals with simulations at stand level and, hence, the data structures defined in the package are meant to encapsulate information about a target forest stand and the properties of the soil where it grows:
 
 + S3 class `soil` is a *data frame* that is initialized using a data frame of soil physical properties, but the table includes also soil hydraulic parameters and state variables. Soil objects are described in subsection \@ref(soilinitialization).
 + S3 class `forest` is a *list* of forest inventory data corresponding to a single forest stand. It mainly refers to tree and shrub measurements, but can include many other information such as herbaceous vegetation, seedling bank, seed bank, tree snags or litter. Forest plot objects are described in subsection \@ref(forestobjects). 
@@ -30,7 +30,7 @@ knitr::include_graphics("figures/input_workflow.png")
 
 ### Input structures in medfateland {#medfatelandstructures}
 
-Spatial information for **medfateland** needs to be provided in `sf` objects (i.e. data frames with geometry, see package [**sf**](https://cran.r-project.org/package=sf)). For each forest stand to be simulated, these object must include a geometry, topographic features as well as a `forest` object and `soil` object, as illustrated in the figure below:
+Spatial information for **medfateland** needs to be provided in a `sf` object (i.e. a data frame with geometry, see package [**sf**](https://cran.r-project.org/package=sf)). For each forest stand to be simulated, this object must include a geometry, topographic features as well as a `forest` object and `soil` object, as illustrated in the figure below:
 
 
 ```{r datastructures, out.width='100%', fig.align="center", fig.cap="Relationship between data structures in medfate and medfateland", echo=FALSE}
@@ -71,7 +71,7 @@ Topography has a relatively small direct influence in **medfate** simulations, b
 
 ## Soil description  {#soilinput}
 
-Soils are described in **medfate** using $S > 1$ discrete soil layers ($s \in \{1, 2, ..., S\}$). Here the word *soil* refers to the volume comprised between between forest floor and the depth that plant rooting systems can reach (i.e., the critical zone), including cracks within the bedrock. The number and size of soil layers may correspond to changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties and are considered **static soil parameters** in simulations. In contrast, soil moisture content, other variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered, are all **soil state variables**.
+Soils are described in **medfate** using $S > 1$ discrete soil layers ($s \in \{1, 2, ..., S\}$). Here the word *soil* refers to the volume comprised between forest floor and the depth that plant rooting systems can reach (i.e., the critical zone), including cracks within the bedrock. The number and size of soil layers may correspond to changes in soil properties along depth, but also can be chosen to reflect differences in plant rooting depths. The physical properties of the soil are needed to estimate soil hydraulic properties and are considered **static soil parameters** in simulations. In contrast, soil moisture content, other variables that depend on moisture (e.g. soil water potential and soil conductivity) and soil temperature, if the soil energy balance is considered, are all **soil state variables**.
 
 ### Soil physico-chemical properties
 
@@ -84,13 +84,13 @@ For each soil layer $s$, the following physico-chemical parameters are accepted 
 | $d_{s}$ | mm | `widths` | Width of soil layer $s$ | Yes |
 | $P_{clay,s}$ | % | `clay` | Percent volume of clay (within soil particles fraction) in layer $s$  | Yes |
 | $P_{sand,s}$ | % | `sand` | Percent volume of sand (within soil particles fraction) in layer $s$ | Yes |
-| $OM_s$ | % | `om` | Percentage of organic mater per dry weight (can be missing) in layer $s$ | No |
+| $OM_s$ | % | `om` | Percentage of organic matter per dry weight (can be missing) in layer $s$ | No |
 | $N_s$ | $g/kg$  | `nitrogen` | Sum of total nitrogen (ammonia, organic and reduced nitrogen) in layer $s$ | No |
 | $pH_s$ | [0-14] | `ph` | pH in water of layer $s$ | No |
 | $BD_{s}$ | $g \cdot cm^{-3}$ |`bd` | Bulk density in layer $s$| Yes |
 | $P_{rocks,s}$ | % | `rfc` | Rock fragment content as percent volume (within whole soil) in layer $s$ | Yes |
 
-The percent volume of silt is 100\% minus the percent volume of clay and sand. Whenever possible, soil physico-chemical properties should be measured in soil profiles conducted at the target forest plot (although soil profiles rarely reach rooting depths of deeply-rooted plants). Soil input data should be arranged in a `data.frame` with soil layers in rows and physico-chemicl variables in columns (see function `defaultSoilParams()`). The following is an example with four soil layers:
+The percent volume of silt is 100\% minus the percent volume of clay and sand. Whenever possible, soil physico-chemical properties should be measured in soil profiles conducted at the target forest plot (although soil profiles rarely reach rooting depths of deeply-rooted plants). Soil input data should be arranged in a `data.frame` with soil layers in rows and physico-chemical variables in columns (see function `defaultSoilParams()`). The following is an example with four soil layers:
 
 ```{r}
 soildf <- defaultSoilParams()
@@ -102,7 +102,7 @@ Package **medfateland** includes a function `add_soilgrids()` to fetch soil info
 
 The depth of a given soil layer $s$ ($Z_s$; in mm) is defined as the sum of layer widths from the surface to the target layer:
 \begin{equation}
-Z_s = \sum_{i=1}^s{d_s}
+Z_s = \sum_{i=1}^s{d_i}
 \end{equation}
 And the overall *soil depth*  ($Z_{soil}$; in mm) is the sum of widths across all soil layers. As the soil may include deep rocky layers, the value of $Z_{soil}$ may be larger than the soil depth reported in soil profiles. 
 
@@ -112,11 +112,11 @@ The **water retention curve** of a soil is the relationship between *volumetric 
 
 Two water retention curve models are available in **medfate** (fig. \@ref(fig:retention-curves)):
 
-1. *Saxton model*: In this model, volumetric soil moisture $\theta(\Psi)$ corresponding to a given water potential $\Psi$ (in MPa) below field capacity (i.e., $\Psi < \Psi_{fc}$) is calculated using: 
-\begin{equation}\theta(\Psi) = (\Psi/A)^{(1/B)}\end{equation}
-where $A$ and $B$ depend on the texture and, if available, organic matter in the soil. If organic matter is available, $A$ and $B$ are calculated from $P_{clay}$, $P_{sand}$ and $OM$ following @Saxton2006. Otherwise, they are calculated from $P_{clay}$ and $P_{sand}$ as indicated in @Saxton1986. Volumetric changes between field capacity and saturation (i.e., $\Psi_{fc} \leq \Psi < 0$) are estimated using a linear function.
+1. *Saxton model*: In this model, volumetric soil moisture $\theta(\Psi)$ corresponding to a given water potential $\Psi$ (in MPa) below -0.01 MPa  is calculated using: 
+\begin{equation}\theta(\Psi) = (\left| \Psi \right| /A)^{(1/B)}\end{equation}
+where $A$ and $B$ depend on the texture and, if available, organic matter in the soil. If organic matter is available, $A$ and $B$ are calculated from $P_{clay}$, $P_{sand}$ and $OM$ following @Saxton2006. Otherwise, they are calculated from $P_{clay}$ and $P_{sand}$ as indicated in @Saxton1986. Volumetric changes between -0.01 MPa and saturation (i.e., $-0.01 \leq \Psi < 0$) are estimated using a linear function.
 2. *Van Genuchten model*: The well known van Genuchten [-@Genuchten1980] model is:
-\begin{equation}\theta(\Psi) = \theta_{res}+\frac{\theta_{sat}-\theta_{res}}{\left[1+ (\alpha \cdot \Psi)^n \right]^{1-1/n}}\end{equation}
+\begin{equation}\theta(\Psi) = \theta_{res}+\frac{\theta_{sat}-\theta_{res}}{\left[1+ (\alpha \cdot \left| \Psi \right| )^n \right]^{1-1/n}}\end{equation}
 where $\theta(\psi)$ is the water retention, $\theta_{sat}$ is the saturated water content, $\theta_{res}$ is the residual water content, $\alpha$ is related to the inverse of the air entry pressure, and $n$ is a measure of the pore-size distribution. 
 
 (ref:retention-curves-cap) Water retention curves under the Saxton and Van Genuchten models, for the same physical attributes (25% sand, 25% clay, 50% silt and bulk density of $1.5 g \cdot cm^{-3}$). Parameters of the Van Genuchten curve have been estimated using pedotransfer functions given in @Toth2015.

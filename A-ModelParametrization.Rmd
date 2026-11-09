@@ -1,10 +1,11 @@
 # (APPENDIX) Appendices {-}
 
-# Inbuilt parameter estimation {#modelparametrization}
+# Functional parameter estimation {#modelparametrization}
 
 ## Introduction
 
-Package **medfate** has been designed to allow simulations requiring a minimum set of vegetation functional parameters. This entails that several other parameters have to be estimated automatically (via inbuilt procedures) before starting simulations. Inbuilt parameter estimation is done in functions `spwbInput()` and `growthInput()`, with the user controlling the process through the species parameter table input (e.g., `SpParamsMED`) and the object `control` (see default control values in `defaultControl()`).
+Package **medfate** requires a large number of plant functional parameters for each species. These are normally specified at the species level using a species-by-parameters table `SpParams`. In this appendix, we detail procedures to obtain suitable values.
+
 
 ## Strict, scaled and imputable parameters
 
@@ -176,7 +177,106 @@ The following tables describe how the different functional parameters are dealt 
 | $h$ |  `HeatContent`| High fuel heat content.| No | No |  \@ref(imputationflammability) |
 | $LI$ | `PercentLignin`|  Percentage of lignin in leaves | No | No | \@ref(imputationflammability)|
 
+## Package traits4models
+
+
+Package **traits4models** is designed to facilitate creating plant species parameter tables for process-based models of forest function and/or dynamics (see the [package website](https://emf-creaf.github.io/traits4models/index.html)). Specifically, several utility functions are provided to:
+
+ 1. Harmonize plant trait databases.
+ 2. Harmonize allometry databases.
+ 3. Populate species parameter tables for trait-enabled mechanistic models.
+
+In other words, the idea of the package is to facilitate harmonizing multiple trait and allometric sources, so that later this information can be used to populate species parameter tables for multiple models, the whole workflow being reproducible. A key element in this process is the taxonomic backbone used as reference in taxon name harmonization, both for trait and allometry data sources and target species lists in models. 
+
+```{r, out.width='100%', fig.align="center", fig.cap="Parameter estimation workflow using package **traits4models**.", echo=FALSE}
+knitr::include_graphics("figures/traits4models_workflow.png")
+```
+
+
+### Trait database and allometry database harmonization
+
+Species parameter values cannot be drawn from a single data source. Moreover, the availability of plant trait and allometry data continuously increases, as additional efforts are made in observational or experimental studies (Kattge et al. 2020). This means that multiple data sources need to be harmonized and compiled before species parameter tables are built. 
+
+#### Trait source harmonization
+
+Harmonization of plant trait sources in **traits4models** involves:
+
+  + Nomenclature of measured variables (i.e. plant traits)
+  + Measurement units (and measurement methods if available)
+  + Taxonomic nomenclature of biological entities
+
+Name and measurement units/methods harmonization is source-specific, but can be easily done using packages from **tidyverse**. It should follow the information found in an internal data frame `HarmonizedTraitDefinition`, which sets correct trait definitions:
+
+ +  `Definition`: Trait conceptual definition.
+ +  `Notation`: Name used to refer to the trait.
+ +  `Type`: Either numeric (quantitative real), integer (quantitative counts) or string (qualitative).
+ +  `Units`: Unit required for quantitative traits.
+ +  `EquivalentUnits`: Alternative, but equivalent unit notation.
+ +  `AcceptedMethods`: Set of comma-separated measurement methods accepted.
+ +  `AcceptedValues`: Set of comma-separated accepted values for qualitative traits.
+ +  `MinimumValue`: Minimum value for quantitative traits.
+ +  `MaximumValue`: Maximum value for quantitative traits.
+
+
+Harmonization of plant names is done via function `harmonize_taxonomy_WFO()` which requires the specification of a file containing the taxonomic backbone, which is taken from [World Flora Online](https://www.worldfloraonline.org/). Function `harmonize_taxonomy_WFO()` takes a data frame as input, with a column called `originalName` containing the taxon names to be harmonized. It returns the same data frame, but with additional columns `acceptedName`, `acceptedNameAuthorship`, `family`, `genus`, `specificEpithet`, and `taxonRank`. 
+
+Harmonized trait data can be in wide-format or long-format, but the latter is preferred.Function `check_harmonized_trait()` is used to check for the nomenclature of variables, units and that trait values fall within expected ranges. When defined, it also allows checking that measurement methods fall within the accepted vocabulary. When in long format, the following columns need to be always defined (but some can contain missing values):
+
+ + `Trait` - A character describing the the name of the trait, with values according to the notation in HarmonizedTraitDefinition.
+ + `Value` - A character or numeric containing the trait value. For numeric traits, values should be coercible to numbers via as.numeric.
+ + `Units` - A character describing the units of the trait, with values according to units in HarmonizedTraitDefinition.
+ + `Method` - A character describing the measurement method of the trait, for those traits where different alternative methods are described in `HarmonizedTraitDefinition`.
+ + `Level` - A character describing the level of aggregation of data, either: `'individual'` (individual measurement), `'population'` (population-level average) or `'taxon'` (taxon-level average).
+
+Additional columns are optional (but recommended):
+
+ + `Reference` - A string describing the harmonized trait data source, i.e. normally a reference.
+ + `DOI` - A string describing the DOI of the harmonized trait data source.
+ + `OriginalReference` - A string describing the original source of trait data (if Reference is a compilation).
+ + `OriginalDOI` - A string describing the DOI of the original source of trait data (if Reference is already a compilation).
+ + `Priority` - A numeric value to prioritize some data values (sources) over others (1 means highest priority).
+ + `checkVersion` - A string of the package version used for harmonization checking.
+
+#### Allometry source harmonization
+
+Harmonization of allometric equations follows a an approach analogous to trait database harmonization, involving:
+
+  + Specification of predictor and response variables.
+  + Specification of equations and parameters
+  + Taxonomic nomenclature of biological entities, using `harmonize_taxonomy_WFO()`.
+
+Function `check_harmonized_allometry()` checks that the input data frame conforms has columns (columns `Priority`, `Reference` and `DOI` are also recommended):
+
+ + `Response` -  identifies the response variable.
+ + `ResponseDescription` - contains a longer description of the response variable.
+ + `Predictor1`, `Predictor2`, ...  - identify predictor variables.
+ + `PredictorDescription1`, `PredictorDescription2`, ... - contain longer descriptions of predictor variables.
+ + `Equation` - containing the mathematical allometric equation, with parameters identified using `a`, `b`, `c`, ..., `f`.
+ +  Allometry coefficient columns should be named `a`, `b`, `c`, ..., `f` and contain numeric values.
+
+### Generating species parameter tables
+
+Although currently only defined for **medfate**, package **traits4models** should be useful to generate species-level parameter tables for other process-based models. We have envisioned the following six steps for species parameter definition and filling, each one being implemented in a different R function:
+
+| # |  Task            | Function  |
+|---|------------------|-----------|
+| 1 | Initialize species parameter table for [*model*] from a set of harmonized taxon names | `init_[model]_params()`  |
+| 2 | Fills species parameter table for [*model*] with trait data from harmonized data sources | `fill_[model]_traits()` |
+| 3 | Use harmonized allometric equations to fill [*model*] allometric coefficients for taxa on the basis of their accepted name | `fill_[model]_allometries()` |
+| 4 | Extracts species parameter values for [*model*] from forest inventory data | `fill_[model]_inventory_traits()` |
+| 5 | Imputation of strict (i.e. not imputed internally) parameters in [*model*] | `complete_[model]_string()` |
+| 6 | Checks that parameter table has the appropriate format and content for simulations with [*model*] | `check_[model]_params()` |
+
+The corresponding six functions have been already designed and coded for `[model] = medfate`, but could be implemented for other models. If desired, functions `fill_[model]_traits()` and `fill_[model]_allometries()` can be designed to prioritize or perform average-weighting of values from different harmonized trait sources thanks to fields `Level` and `Priority` (see above), by internally calling the function `taxon_trait_summary()` of the package. Additionally, functions `check_[model]_params()` can be used to check not only the format and content of species parameters but also the ecological and physiological consistency of parameter values.
+
+### Harmonization scripts and included species parameter tables
+
+Although package **traits4models** is available, we do not expect most users to develop scripts for trait harmonization and species parameter building themselves. For this reason, we provide data harmonization scripts in a GitHub repository called [**traits_and_models**](https://github.com/emf-creaf/traits_and_models). Additionally, the package already includes a set of predefined species parameter tables to be matched with forest inventory data from different countries (e.g. `SpParamsES` for Spain, `SpParamsFR` for France or `SpParamsUS`for USA).
+
+
 ## Imputation of missing values
+
+Package **medfate** has been designed to allow performing simulations without all functional parameters being specified. Several parameters are estimated automatically (via inbuilt procedures) before starting simulations. Inbuilt parameter estimation is done in functions `spwbInput()` and `growthInput()`, with the user controlling the process through the species parameter table input (e.g., `SpParamsMED`) and the object `control` (see default control values in `defaultControl()`).
 
 ### Genus-level imputation
 
