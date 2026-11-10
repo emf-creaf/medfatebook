@@ -3,15 +3,15 @@
 # Functional parameter estimation {#modelparametrization}
 
 
-Package **medfate** requires determining a large number of functional parameters for each plant cohort (see \@ref(parameterlist)). These are normally specified at the species level using a species-by-parameters table `SpParams`, and the package provides an example of such tables for Mediterranean species: `SpParamsMED`. In this appendix we detail procedures to obtain appropriate functional parameter values in general. This includes: (a) estimating taxon-level representative values from bibliographic plant trait/allometry sources, after previous harmonisation (see \@ref(traits4models)); (b) using of imputation rules to fill missing values (see \@ref(imputation)); and (c) using scaling rules to estimate functional parameters that depend on cohort structural parameters (see \@ref(scaling)).
+Conducting simulations with **medfate** models requires determining a large number of functional parameters for plant cohorts (see \@ref(parameterlist)). Most of them are specified at the species level using a species-by-parameters table `SpParams`, and the package provides an example of such tables (i.e. `SpParamsMED`), for a predefined set of Mediterranean species. In this appendix we detail our procedures to obtain appropriate functional parameter values for simulations. This includes: (a) estimating taxon-level representative values from bibliographic plant trait/allometry sources, after previous harmonisation (see \@ref(traits4models)); (b) using of inbuilt imputation rules to fill missing taxon-level values (see \@ref(imputation)); and (c) using inbuilt scaling rules to estimate cohort-level functional parameters that depend on cohort structural attributes (see \@ref(scaling)).
 
 ## Strict, scaled and imputable parameters {#parameterlist}
 
 Different kinds of vegetation functional parameters can be distinguished according to whether inbuilt parameter estimation is possible and how it is conducted:
 
- + **Strictly-required parameters** are those for which there are no inbuilt estimation procedures implemented in the initialization functions. Hence, either values in the species parameter table input are non-missing or suitable values need to be specified before running simulation models. Only plant/leaf classification parameters and plant size parameters are strict. The remaining can be estimated from other parameters if missing values occur. This facilitates employing the model with data scarcity, because only a set of functional parameters have to be strictly filled, from either soft trait databases or forest inventory data (however, this has an uncertainty cost).
- + **Scaled parameters** are functional parameters that cannot be defined at the species level, because they need to be estimated taking into account the size and structure of the plant cohort. These are not normally defined at the level of species parameter table. Specific `control` parameters are used to determine how scaling is performed.
- + **Imputable parameters** parameters are those for which the initialization routines can provide default values or estimations derived from relationships with other parameters. Parameter imputation is conducted if control parameter `fillMissingSpParams = TRUE`. Sometimes, default parameter values are also specified in the `control` object.
+ + **Strictly-required parameters** are those for which there are no inbuilt estimation procedures implemented in the initialization functions. Hence, the species parameter table `SpParams` cannot contain missing values for these parameters. Only plant/leaf classification parameters and plant size parameters are strict, while the remaining can be estimated from other parameters if missing values occur. A reduced number of strict parameters facilitates conducting model simulations with data scarcity, because strict parameters can be easily determined from either soft trait databases or forest inventory data. However, resorting on trait parameter imputation has a cost, because it involves a higher prediction uncertainty [@balaguer-romano_key_2026].
+ + **Scaled parameters** are functional parameters (such as stem conductance) that cannot be defined at the species level, because they need to be estimated taking into account the size and structure of the plant cohort. These are not normally defined at the level of species parameter table `SpParams`, although they depend on other parameters defined there. Specific `control` parameters are used to determine how scaling is performed.
+ + **Imputable parameters** parameters are those for which the initialization routines can provide default values or estimations derived from averages for higher taxonomic entities or from functional relationships (i.e. trait coordination) with other parameters. Parameter imputation is conducted if control parameter `fillMissingSpParams = TRUE`. Sometimes, default parameter values are also specified in the `control` object.
  
 The following tables describe how the different functional parameters are dealt with, grouped by function. Links are given to the chapter subsections where scaling and/or imputation procedures are described. 
 
@@ -188,9 +188,9 @@ The following tables describe how the different functional parameters are dealt 
 
 ## Building species parameter tables with package traits4models {#traits4models}
 
-Parameter values for models requiring multiple parameters cannot usually be drawn from a single data source. Moreover, the availability of plant trait and allometry data continuously increases, as additional efforts are made in observational or experimental studies (Kattge et al. 2020). Therefore, multiple data sources need to be compiled, harmonized and organized before species parameter tables are built. Package **traits4models** is designed to facilitate creating plant species parameter tables (such as `SpParams`) for process-based models of forest function and/or dynamics (see the [package website](https://emf-creaf.github.io/traits4models/index.html)). More specifically, the idea is to facilitate the development of reproducible data workflows to harmonize multiple trait and allometric sources and use this information to populate species parameter tables for multiple models (Fig. \@ref(fig:traits4modelsworkflow)). The package offers utility functions to: (1) Harmonize plant trait databases; (2) Harmonize allometry databases; and (3) Populate species parameter tables for trait-enabled mechanistic models. A key element in the harmonization process is the taxonomic backbone used as reference in taxon name harmonization, both for trait and allometry data sources and target species lists in models. 
+Parameter values for models requiring multiple parameters cannot usually be drawn from a single data source. Moreover, the availability of plant trait and allometry data continuously increases, as additional efforts are made in observational or experimental studies [@Kattge2020; @falster_austraits_2021; @baez_funandes_2022]. Therefore, multiple data sources need to be compiled and harmonized in order to derive suitable parameter values for models. Package **traits4models** is designed to facilitate obtaining plant species parameter values for process-based models of forest function and/or dynamics (see the [package website](https://emf-creaf.github.io/traits4models/index.html)). More specifically, it facilitates the development of reproducible data workflows to harmonize multiple plant trait and allometric equation sources and use this information to populate model species parameter tables (Fig. \@ref(fig:traits4modelsworkflow)). The package includes functions that are grouped in three tasks: (1) Harmonization plant trait databases; (2) Harmonization of allometry databases; and (3) Filling of species parameter tables for trait-enabled mechanistic models. Key elements in the harmonization process are the convention of trait definition and the taxonomic backbone used as reference in taxon name harmonization. Note that plant name harmonization has to be applied to both trait/allometry data sources and model target species lists, so that plant identity matching is safely conducted. 
 
-```{r traits4modelsworkflow, out.width='100%', fig.align="center", fig.cap="Parameter estimation workflow using package **traits4models**. Harmonization of allometric equations is not included but follows an analogous design.", echo=FALSE}
+```{r traits4modelsworkflow, out.width='100%', fig.align="center", fig.cap="Parameter estimation workflow using package **traits4models**.", echo=FALSE}
 knitr::include_graphics("figures/traits4models_workflow.png")
 ```
 
@@ -201,6 +201,27 @@ Harmonization of plant trait sources in **traits4models** involves three data el
   + Nomenclature of measured variables (i.e. plant traits)
   + Measurement units and methods (if available)
   + Taxonomic nomenclature of biological entities
+
+**Harmonized trait data format**
+
+Harmonized trait data can be in wide or long formats, but the latter is preferred. When in long format (one row per trait value), the following columns need to be defined (but can contain missing data):
+
+ + `Trait` - A character describing the the name of the trait, with values according to the notation in `HarmonizedTraitDefinition`.
+ + `Value` - A character or numeric containing the trait value. For numeric traits, values should be coercible to numbers via as.numeric.
+ + `Units` - A character describing the units of the trait, with values according to units in `HarmonizedTraitDefinition`.
+ + `Method` - A character describing the measurement method of the trait, for those traits where different alternative methods are described in `HarmonizedTraitDefinition`.
+ + `Level` - A character describing the level of aggregation of trait data, either: `'individual'` (individual measurement), `'population'` (population-level average) or `'taxon'` (taxon-level average).
+
+Additional metadata columns are optional, but strongly recommended:
+
+ + `Reference` - A string describing the harmonized trait data source, i.e. normally a reference.
+ + `DOI` - A string describing the DOI of the harmonized trait data source.
+ + `OriginalReference` - A string describing the original source of trait data (if Reference is a compilation).
+ + `OriginalDOI` - A string describing the DOI of the original source of trait data (if Reference is already a compilation).
+ + `Priority` - A numeric value to prioritize some data values (sources) over others (1 means highest priority).
+ + `checkVersion` - A string of the package version used for harmonization checking.
+
+**Harmonization of measurements**
 
 Name and measurement units/methods harmonization is source-specific, and therefore the package does not include dedicated functions for this, but it can be conducted using packages from **tidyverse**. The result of this harmonization should follow the information found in an internal data frame `HarmonizedTraitDefinition`, which sets the convention for trait definitions:
 
@@ -214,25 +235,13 @@ Name and measurement units/methods harmonization is source-specific, and therefo
  +  `MinimumValue`: Minimum value for quantitative traits.
  +  `MaximumValue`: Maximum value for quantitative traits.
 
+**Harmonization of plant names**
 
-Harmonization of plant names is done via function `harmonize_taxonomy_WFO()` which requires a file containing a taxonomic backbone from [World Flora Online](https://www.worldfloraonline.org/). Input for function `harmonize_taxonomy_WFO()` is a data frame including a column called `originalName`, which contains the plant names to be harmonized. The function returns the same data frame, but with additional columns `acceptedName`, `acceptedNameAuthorship`, `family`, `genus`, `specificEpithet`, and `taxonRank`. 
+Harmonization of plant names is done via function `harmonize_taxonomy_WFO()` which requires a file containing a taxonomic backbone from [World Flora Online](https://www.worldfloraonline.org/) [@kindt_worldflora_2020]. Input for function `harmonize_taxonomy_WFO()` is a data frame including a column called `originalName`, which contains the plant names to be harmonized. The function returns the same data frame, but with additional columns `acceptedName`, `acceptedNameAuthorship`, `family`, `genus`, `specificEpithet`, and `taxonRank`. 
 
-Harmonized trait data can be in wide or long formats, but the latter is preferred. Function `check_harmonized_trait()` is used to check for the nomenclature of variables, units and that trait values fall within expected ranges. For some traits, the function also allows checking that the measurement method falls within an accepted method list. When in long format, the following columns need to be always defined (but can contain missing values) in harmonized trait data:
+**Checking harmonized trait data tables**
 
- + `Trait` - A character describing the the name of the trait, with values according to the notation in `HarmonizedTraitDefinition`.
- + `Value` - A character or numeric containing the trait value. For numeric traits, values should be coercible to numbers via as.numeric.
- + `Units` - A character describing the units of the trait, with values according to units in `HarmonizedTraitDefinition`.
- + `Method` - A character describing the measurement method of the trait, for those traits where different alternative methods are described in `HarmonizedTraitDefinition`.
- + `Level` - A character describing the level of aggregation of data, either: `'individual'` (individual measurement), `'population'` (population-level average) or `'taxon'` (taxon-level average).
-
-Additional metadata columns are optional, but strongly recommended:
-
- + `Reference` - A string describing the harmonized trait data source, i.e. normally a reference.
- + `DOI` - A string describing the DOI of the harmonized trait data source.
- + `OriginalReference` - A string describing the original source of trait data (if Reference is a compilation).
- + `OriginalDOI` - A string describing the DOI of the original source of trait data (if Reference is already a compilation).
- + `Priority` - A numeric value to prioritize some data values (sources) over others (1 means highest priority).
- + `checkVersion` - A string of the package version used for harmonization checking.
+Function `check_harmonized_trait()` is used to check that harmonized trait data is acceptable according to `HarmonizedTraitDefinition`. Specifically, the function evaluates the structure of the data (i.e. column names), the nomenclature of traits (against `Notation`). For quantitative traits, the function verifies their units (against `Units` or `EquivalentUnits`) and that trait values fall within expected ranges (using `MinimumValue` and `MaximumValue`). For qualitative traits, it checks that values are included in the set of accepted values (`AcceptedValues`). For those traits where measurements method has been defined, the function also allows checking that the measurement method falls within an accepted method list (using `AcceptedMethods`).
 
 ### Allometry source harmonization
 
@@ -242,7 +251,7 @@ Harmonization of allometric equations follows a an approach analogous to trait d
   + Specification of equations and parameters
   + Taxonomic nomenclature of biological entities, using `harmonize_taxonomy_WFO()`.
 
-Function `check_harmonized_allometry()` checks that the input data frame conforms has columns (columns `Priority`, `Reference` and `DOI` are also recommended):
+Harmonized allometry data has to be in long format, with one row per allometric equation, and function `check_harmonized_allometry()` checks that the input data frame conforms to the following column names (columns `Priority`, `Reference` and `DOI` are also recommended):
 
  + `Response` -  identifies the response variable.
  + `ResponseDescription` - contains a longer description of the response variable.
