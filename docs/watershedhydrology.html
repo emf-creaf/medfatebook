@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-11-13" />
+<meta name="date" content="2026-11-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -806,8 +806,8 @@ Figure 21.1: AI-generated figure illustrating the simulation of watershed hydrol
 <p>Similar to other models such as TETIS <span class="citation">(<a href="#ref-Frances2007">Francés <em>et al.</em> 2007</a>)</span>, three lateral flows are considered between adjacent cells:</p>
 <ol style="list-style-type: lower-roman">
 <li>Overland surface flows from upper elevation cells to lower elevation ones.</li>
-<li>Lateral saturated soil flows (i.e. interflow) between adjacent cells.</li>
-<li>Lateral groundwater flow (i.e. baseflow) between adjacent cells.</li>
+<li>Lateral saturated soil flows (i.e. interflow) between adjacent cells where soil is defined.</li>
+<li>Lateral groundwater flow (i.e. baseflow) between the aquifer compartment adjacent cells.</li>
 </ol>
 <p>Routing of overland surface flows is modeled following T-HYDRO <span class="citation">Ostendorf &amp; Reynolds (<a href="#ref-Ostendorf1993">1993</a>)</span>. In large watersheds not all water entering the river channel will end up reaching the watershed outlet the same day, so it is necessary to perform channel routing. If the user specifies a river network, river channel routing is performed by calculating an average flow velocity of the whole channel network, according to Manning’s equation. Subsurface flows, including both soil saturated flow and groundwater flow, are modeled following the kinematic wave approximation of DSHVM <span class="citation">Wigmosta <em>et al.</em> (<a href="#ref-Wigmosta1994">1994</a>)</span>.</p>
 <p>Split-parameter parametrization, following <span class="citation">Francés <em>et al.</em> (<a href="#ref-Frances2007">2007</a>)</span>, allows reducing the parameters to be calibrated for practical applications.</p>
@@ -838,18 +838,18 @@ Figure 21.1: AI-generated figure illustrating the simulation of watershed hydrol
 <span class="math display" id="eq:cellsoilwaterbalanceequation">\[\begin{equation}
 \Delta{V_{soil}} = (If + Lw + Cr) - (Dd + Se + Es + Tr_{herb} + Tr_{woody})  \tag{21.2}
 \end{equation}\]</span>
-where the terms were defined in <a href="basicwaterbalance.html#soilwaterbalance">3.3</a>. Here, the lateral flows (i.e. <span class="math inline">\(Lw\)</span>) are specially important, compared to spatially-uncoupled simulations. They are defined as <span class="math inline">\(Lw = \Delta S_{lat}\)</span>, the variation in water content derived from the balance between soil lateral inputs and outputs:
+where the terms were defined in <a href="basicwaterbalance.html#soilwaterbalance">3.3</a>. Here, the soil lateral flows (i.e. <span class="math inline">\(Lw\)</span>) are particularly important, compared to spatially-uncoupled simulations. Soil lateral flows can be positive (inflow) or negative (outflow) and are defined as <span class="math inline">\(Lw = \Delta S_{lat}\)</span>, the variation in water content derived from the balance between soil lateral inputs and outputs:
 <span class="math display">\[\begin{equation}
 Lw = \Delta S_{lat} = S_{lat, in} - S_{lat, out}
 \end{equation}\]</span></li>
-<li>Variations in the aquifer water content of a cell are summarized by:
+<li>Variations in the aquifer water content of a cell (<span class="math inline">\(\Delta{V_{aquifer}}\)</span>) are summarized by:
 <span class="math display" id="eq:cellaquiferwaterbalanceequation">\[\begin{equation}
-  \Delta{S_{aquifer}} = Dd - Cr - Exf - Dal - \Delta{S_{base}}
+  \Delta{V_{aquifer}} = Dd - Cr - Exf - Dal - \Delta{A_{lat}}
   \tag{21.3}
 \end{equation}\]</span>
-where <span class="math inline">\(Dd\)</span> is deep drainage from the above-lying soil, <span class="math inline">\(Cr\)</span> is capillary rise into the above-lying soil, <span class="math inline">\(Exf\)</span> is the aquifer exfiltration (ocurring when the water table reaches the soil surface), <span class="math inline">\(Dal\)</span> is drainage loss to a deeper aquifer (not connected to watershed outlets) and <span class="math inline">\(\Delta{S_{base}}\)</span> is the variation in water content of the aquifer derived from the balance between groundwater lateral inputs and outputs.
+where <span class="math inline">\(Dd\)</span> is deep drainage from the above-lying soil, <span class="math inline">\(Cr\)</span> is capillary rise into the above-lying soil, <span class="math inline">\(Exf\)</span> is the aquifer exfiltration (ocurring when the water table reaches the soil surface), <span class="math inline">\(Dal\)</span> is drainage loss to a deeper aquifer (not connected to watershed outlets) and <span class="math inline">\(\Delta{A_{lat}}\)</span> is the variation in water content of the aquifer derived from the balance between groundwater lateral inputs and outputs.
 <span class="math display">\[\begin{equation}
-\Delta S_{base} = S_{base, in} - S_{base, out}
+\Delta A_{lat} = A_{lat, in} - A_{lat, out}
 \end{equation}\]</span></li>
 </ol>
 </div>
@@ -867,15 +867,15 @@ where <span class="math inline">\(\hat{Ps}\)</span> and <span class="math inline
 \Delta{\hat{V}_{soil}} = (\hat{If} + \hat{Cr}) - (\hat{Dd} + \hat{Se} + \hat{Es} +  \hat{Tr}_{woody} + \hat{Tr}_{herb})
 \end{equation}\]</span>
 where <span class="math inline">\(\hat{If}\)</span>, <span class="math inline">\(\hat{Cr}\)</span>, <span class="math inline">\(\hat{Dd}\)</span>, <span class="math inline">\(\hat{Se}\)</span>, <span class="math inline">\(\hat{Es}\)</span>, <span class="math inline">\(\hat{Tr}_{woody}\)</span> and <span class="math inline">\(\hat{Tr}_{herb}\)</span> are the average (over cells) of infiltration, capillary rise, soil evaporation, plant transpiration and herb transpiration, respectively. Lateral saturated soil flows are not included as they cancel out at the watershed level.</li>
-<li>Changes in the average of cell aquifer water content (<span class="math inline">\(\Delta{\hat{S}_{aquifer}}\)</span>) are the result of balancing averages for deep drainage (<span class="math inline">\(\hat{Dd}\)</span>) from soils, capillarity rise to soils (<span class="math inline">\(\hat{Cr}\)</span>), aquifer exfiltration (<span class="math inline">\(\hat{Exf}\)</span>) and loss to a deeper aquifer (<span class="math inline">\(\hat{Dal}\)</span>):
+<li>Changes in the average of cell aquifer water content (<span class="math inline">\(\Delta{\hat{V}_{aquifer}}\)</span>) are the result of balancing averages for deep drainage (<span class="math inline">\(\hat{Dd}\)</span>) from soils, capillarity rise to soils (<span class="math inline">\(\hat{Cr}\)</span>), aquifer exfiltration (<span class="math inline">\(\hat{Exf}\)</span>) and loss to a deeper aquifer (<span class="math inline">\(\hat{Dal}\)</span>):
 <span class="math display">\[\begin{equation}
-  \Delta{\hat{S}_{aquifer}} = \hat{Dd} - \hat{Cr} - \hat{Exf} - \hat{Dal}
+  \Delta{\hat{V}_{aquifer}} = \hat{Dd} - \hat{Cr} - \hat{Exf} - \hat{Dal}
 \end{equation}\]</span></li>
 <li>If we integrate the three water compartments, water balance at the watershed level is given by:
 <span class="math display">\[\begin{equation}
-  \Delta{S_{watershed}} = \hat{Pr} - (\hat{In} + \hat{Es} + \hat{Tr}_{woody} + \hat{Tr}_{herb}) - \hat{Exp} - \hat{Dal}
+  \Delta{V_{watershed}} = \hat{Pr} - (\hat{In} + \hat{Es} + \hat{Tr}_{woody} + \hat{Tr}_{herb}) - \hat{Exp} - \hat{Dal}
 \end{equation}\]</span>
-where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}+\Delta{\hat{V}_{soil}}+\Delta{\hat{S}_{aquifer}}\)</span> is the change in water content in the watershed and <span class="math inline">\(\hat{Exp}\)</span> is the water exported as runoff to catchment outlet cells (note that the watershed balance equation assumes that all water reaching river channel has reached network outlets).</li>
+where <span class="math inline">\(\Delta{V_{watershed}} = \Delta{\hat{S}_{snow}}+\Delta{\hat{V}_{soil}}+\Delta{\hat{V}_{aquifer}}\)</span> is the change in water content in the watershed and <span class="math inline">\(\hat{Exp}\)</span> is the water exported as runoff to catchment outlet cells (note that the watershed balance equation assumes that all water reaching river channel has reached network outlets).</li>
 </ol>
 </div>
 </div>
@@ -884,16 +884,16 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 <p>The model can perform water balance simulations on the whole watershed or its subwatersheds, the latter allowing parallelization. If subwatersheds are considered, the results need to be aggregated at the end of water balance simulations.</p>
 <p>For every day to be simulated in a watershed or subwatershed, the model performs the following steps:</p>
 <ol style="list-style-type: decimal">
-<li>Calculation of soil lateral flows between adjacent cells (see <a href="watershedhydrology.html#soilsaturatedflows">21.6.1</a>), according to sub-steps (i.e. <code>num_daily_substeps</code>) if required by the user, and determine the balance of soil lateral flows (i.e. determine <span class="math inline">\(\Delta{S_{lat}}\)</span>) for each cell.</li>
+<li>Calculation of soil lateral flows between adjacent cells where soils are defined (see <a href="watershedhydrology.html#soilsaturatedflows">21.6.1</a>), according to sub-steps (i.e. <code>num_daily_substeps</code>) if required by the user; and determine the balance of soil lateral flows (i.e. determine <span class="math inline">\(\Delta{S_{lat}}\)</span>) for each of those cells.</li>
 <li>Process cell vertical processes, including overland runoff-runon dynamics:
 <ol style="list-style-type: lower-alpha">
 <li>In cells that lack soil (i.e. <em>rock</em>, <em>artificial</em> and <em>water</em>). For <em>rock</em> and <em>artificial</em> cells, subsurface flows are not considered, runon and snow pack dynamics is still processed in these cells. In <em>artificial</em> cells all runon, rainfall input or snow melt becomes runoff to be passed downhill. In <em>rock</em> cells, water can infiltrate directly to the aquifer, where a maximum rate is confronted with the runon/rainfall/snowmelt input. In the case of <em>water</em> cells, snow pack dynamics are also processed, but all liquid water (from rain or snow melt) is poured (as deep drainage) down to the aquifer below.</li>
-<li>In cells having soil (i.e. <em>wildland</em> or <em>agriculture</em>), cells are processed accounting for subsurface flows, runon from upslope cells, and capillarity from the groundwater level, which complete eqs. <a href="watershedhydrology.html#eq:cellsnowpackwaterbalanceequation">(21.1)</a> and <a href="watershedhydrology.html#eq:cellsoilwaterbalanceequation">(21.2)</a>. All processes mentioned in <a href="basicwaterbalance.html#basicwaterbalancescheduling">3.4</a> are taken into account. In cells that are watershed outlet or belong to channel capillarity from the aquifer is excluded to avoid the confusion (and instability) between local soil saturation excess and aquifer exfiltration.<br />
+<li>In cells having soil (i.e. <em>wildland</em> or <em>agriculture</em>), cells are processed accounting for subsurface flows, runon from upslope cells, and capillarity from the groundwater level, which complete eqs. <a href="watershedhydrology.html#eq:cellsnowpackwaterbalanceequation">(21.1)</a> and <a href="watershedhydrology.html#eq:cellsoilwaterbalanceequation">(21.2)</a>. Note that the balance of lateral flows needs to be disaggregated between soil layers. All processes mentioned in <a href="basicwaterbalance.html#basicwaterbalancescheduling">3.4</a> are taken into account. In cells that are watershed outlet or belong to channel capillarity from the aquifer is excluded to avoid the confusion (and instability) between local soil saturation excess and aquifer exfiltration.<br />
 </li>
 <li>In any kind of cell, after vertical flows are considered any surface runoff generated is distributed as overland flow to neighbor downhill cells (see <a href="watershedhydrology.html#overlandflows">21.6.3</a>). If a cell is part of the channel network, its runoff is instead stored for latter processing of channel routing (see <a href="watershedhydrology.html#watershedexport">21.6.4</a>). If a cell does not have downhill neighbors (i.e outlet cell) and is not in a channel, its runoff becomes water exported from the watershed (see <a href="watershedhydrology.html#watershedexport">21.6.4</a>).</li>
 </ol></li>
-<li>Calculation of groundwater lateral flows between adjacent cells (see <a href="watershedhydrology.html#groundwaterflows">21.6.2</a>), according to sub-steps (i.e. <code>num_daily_substeps</code>) if required by the user, and apply changes in cell aquifer water content due to the balance of groundwater lateral flows (<span class="math inline">\(\Delta{S_{base}}\)</span> in eq. <a href="watershedhydrology.html#eq:cellaquiferwaterbalanceequation">(21.3)</a>) and vertical flows between soils and the aquifer below, i.e. deep drainage and capillarity rise.</li>
-<li>Apply drainage losses from the aquifer towards a deeper aquifer not connected to watershed outlets (<a href="watershedhydrology.html#deepaquiferloss">21.6.5</a>), completing eq. <a href="watershedhydrology.html#eq:cellaquiferwaterbalanceequation">(21.3)</a>.</li>
+<li>Calculation of groundwater lateral flows between adjacent cells (see <a href="watershedhydrology.html#groundwaterflows">21.6.2</a>), according to sub-steps (i.e. <code>num_daily_substeps</code>) if required by the user, and apply changes in cell aquifer water content due to the balance of groundwater lateral flows (<span class="math inline">\(\Delta{A_{lat}}\)</span> in eq. <a href="watershedhydrology.html#eq:cellaquiferwaterbalanceequation">(21.3)</a>) and vertical flows between soils and the aquifer below, i.e. deep drainage and capillarity rise.</li>
+<li>Apply drainage losses from the aquifer towards a deeper aquifer not connected to watershed outlets (<span class="math inline">\(Dal\)</span>; see <a href="watershedhydrology.html#deepaquiferloss">21.6.5</a>), completing eq. <a href="watershedhydrology.html#eq:cellaquiferwaterbalanceequation">(21.3)</a>.</li>
 </ol>
 <p>Channel routing is optional, depending on whether a channel network has been supplied. Channel routing is performed after water balance simulations of the watershed (or its subwatersheds) are finished. For each day to be simulated and each channel cell, the model adds the water that reached the channel during water balance simulations to the volume of water in the network of the corresponding watershed outlet. After that the model applies channel routing, which can result in a channel backlog of water for the next day (see details <a href="watershedhydrology.html#watershedexport">21.6.4</a>).</p>
 </div>
@@ -906,19 +906,19 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 </div>
 <div id="watershed-meteorology-input" class="section level3 hasAnchor" number="21.5.2">
 <h3><span class="header-section-number">21.5.2</span> Watershed meteorology input<a href="watershedhydrology.html#watershed-meteorology-input" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Simulation of watershed hydrology requires specifying weather variables for all cells and the simulation period considered. Functions <code>spwb_land()</code> and <code>growth_land()</code> allow weather to be specified in three ways:</p>
+<p>Simulation of watershed hydrology requires specifying weather variables for all cells and the simulation period considered. Functions <code>spwb_land()</code>, <code>growth_land()</code> and <code>fordyn_land()</code> allow weather to be specified in three ways:</p>
 <ul>
 <li>If a single data frame of daily weather is provided, the model assumes that all watershed cells experience the same weather.</li>
 <li>A different data frame of daily weather may be provided for each cell, using column <code>meteo</code> of the <code>sf</code> object (see <a href="model-inputs.html#medfatelandstructures">2.1.2</a>).</li>
-<li>If an interpolator object of class <code>stars</code> is provided, the model will call function <code>interpolate_data()</code> for every day to be simulated (see <strong>meteoland</strong> package documentation).</li>
+<li>If an interpolator object of class <code>stars</code> is provided, the model will call function <code>interpolate_data()</code> for every day to be simulated (see <strong>meteoland</strong> package documentation) at a spatial resolution dictated by raster definition and the control variable <code>weather_aggregation_factor</code>.</li>
 </ul>
 </div>
 <div id="relevantcontrol" class="section level3 hasAnchor" number="21.5.3">
 <h3><span class="header-section-number">21.5.3</span> Local control parameters relevant for hydrological simulations<a href="watershedhydrology.html#relevantcontrol" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Hydrological simulations require specifying how local processes are simulated for each cell via control parameters (see <a href="basicwaterbalance.html#basicwaterbalancecontrol">3.5.3</a>). While some of them may be changed depending the specific application, there are some of them that are highly relevant for hydrological simulations, because of their effect on local soil water balance:</p>
 <ul>
-<li><code>soilDomains [= "buckets"]</code>: Either ‘buckets’ (for multi-bucket model), ‘single’ (for single-domain Richards model) or ‘dual’ (for dual-permeability model). Note that if no local control parameters are supplied, the model will employ <code>soilDomains = "single"</code>, meaning that vertical bulk soil flows are simulated using a single permeability domain with Richards equation.</li>
-<li><code>rhizosphereOverlap [="partial"]</code>: A string indicating the degree of rhizosphere spatial overlap between plant cohorts: Either <code>"none"</code> (no overlap, i.e. independent water pools), <code>"partial"</code> (partial overlap determined by soil moisture) or <code>"total"</code> (total overlap, i.e. plants extract from common soil pools). Note that if no local control parameters are supplied, the model will employ <code>rhizosphereOverlap = "total"</code> as default, because otherwise the model will perform a soil water balance for each plant water pool, which will make simulations much more expensive computationally.</li>
+<li><code>soilDomains [= "buckets"]</code>: Either <code>"buckets"</code> (for multi-bucket model), <code>"single"</code> (for single-domain Richards model) or <code>"dual"</code> (for dual-permeability model). While <code>"buckets"</code> is the default in <strong>medfate</strong>, it is not recommended for watershed hydrological applications. Therefore, if no local control parameters are explicitly supplied, the watershed simulation functions will employ <code>soilDomains = "single"</code>, meaning that vertical bulk soil flows are simulated using a single permeability domain with Richards equation.</li>
+<li><code>rhizosphereOverlap [="partial"]</code>: A string indicating the degree of rhizosphere spatial overlap between plant cohorts: Either <code>"none"</code> (no overlap, i.e. independent water pools), <code>"partial"</code> (partial overlap determined by soil moisture) or <code>"total"</code> (total overlap, i.e. plants extract from common soil pools). While <code>"partial"</code> is the default in <strong>medfate</strong>, it can lead to very slow computations in watershed simulations, due to the need to perform water balance for each plant water pool. Therefore, if no local control parameters are explicitly supplied, the watershed simulation functions will employ <code>rhizosphereOverlap = "total"</code> as default.</li>
 <li><code>infiltrationCorrection [= 5.0]</code>: Factor to correct infiltration amount in the GreenAmpt1911 model in single-domain simulations.</li>
 <li><code>ndailysteps [= 24]</code>: Number of steps into which each day is divided for determination of soil water balance, stomatal conductance, transpiration and photosynthesis (24 equals 1-hour intervals).</li>
 <li><code>max_nsubsteps_soil [= 300]</code>: Maximum number of substeps within each subdaily (hourly) step for soil water balance solving.</li>
@@ -927,14 +927,14 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 </div>
 <div id="watershedbalancecontrol" class="section level3 hasAnchor" number="21.5.4">
 <h3><span class="header-section-number">21.5.4</span> Watershed hydraulic control parameters<a href="watershedhydrology.html#watershedbalancecontrol" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Distributed hydrological models suffer from the need to specify many parameters. Frances et al. <span class="citation">(<a href="#ref-Frances2007">2007</a>)</span> demonstrated that by using a proper parameter structure, it is possible to obtain an excellent automatic calibration of a distributed conceptual model while maintaining the spatial variability of parameters. In particular, they showed how to define effective model parameters for those quantities normally estimated at the point scale, so that model parameters and estimates usually suffer from being <em>uncommensurable</em>. Effective model parameters can in this situation be defined as a <em>correction function</em> of the corresponding hydrological characteristic. If the correction function takes into account the model and input errors, the temporal and spatial scale effects and also the hydrological characteristics estimation error, it is reasonable to assume the correction function for each parameter will be common to all cells within the watershed. Frances et al. <span class="citation">(<a href="#ref-Frances2007">2007</a>)</span> suggest using a correction factor for each hydraulic parameter, in a strategy called <em>split-parameter</em>. From the calibration point of view, a very important consequence of the split-parameter approach is that the number of variables to be adjusted is reduced dramatically.</p>
+<p>Distributed hydrological models suffer from the need to specify many parameters. Frances et al. <span class="citation">(<a href="#ref-Frances2007">2007</a>)</span> demonstrated that by using a proper parameter structure, it is possible to obtain an excellent automatic calibration of a distributed conceptual model while maintaining the spatial variability of parameters. In particular, they showed how to define effective model parameters for those quantities normally estimated at the point scale, so that model parameters and estimates usually suffer from being <em>uncommensurable</em>. Effective model parameters can in this situation be defined as a <em>correction function</em> of the corresponding hydrological characteristic. If the correction function takes into account the model and input errors, the temporal and spatial scale effects and also the hydrological characteristics estimation error, it is reasonable to assume the correction function for each parameter will be common to all cells within the watershed. Frances et al. <span class="citation">(<a href="#ref-Frances2007">2007</a>)</span> suggest using a correction factor for each hydraulic parameter, in a strategy called <em>split-parameter</em>. From the calibration point of view, a very important consequence of the split-parameter approach is that the number of variables to be adjusted is reduced dramatically and does not depend on the size of the domain to be simulated.</p>
 <p>Our model follows Frances et al. <span class="citation">(<a href="#ref-Frances2007">2007</a>)</span> in that correction factors are defined for three hydraulic parameters with spatial variation across the watershed:</p>
 <ul>
 <li><span class="math inline">\(K_{sat, vert}\)</span> saturated soil conductivity for vertical fluxes into, within and out of the soil.</li>
-<li><span class="math inline">\(K_{sat, lat}\)</span> saturated soil conductivity for soil lateral (horizontal) fluxes.</li>
-<li><span class="math inline">\(K_{sat, base}\)</span> bedrock conductivity for groundwater lateral flows.</li>
+<li><span class="math inline">\(K_{sat, inter}\)</span> saturated soil conductivity for soil lateral (horizontal) interflows.</li>
+<li><span class="math inline">\(K_{sat, base}\)</span> bedrock conductivity for groundwater lateral baseflows.</li>
 </ul>
-<p>The effective model parameter for each of these is defined for the spatial (depending on the grid resolution) and temporal (daily) scales of the model. Parameters <span class="math inline">\(K_{sat, vert}\)</span> and <span class="math inline">\(K_{sat, lat}\)</span> are split into the input soil saturated conductivity value <span class="math inline">\(K_{sat}\)</span> (in the case of <span class="math inline">\(K_{sat, lat}\)</span>, that corresponding to the topsoil), assumed to have been estimated at a given spatial and temporal scale, and the corresponding correction factor, i.e. <span class="math inline">\(R_{vert}\)</span> or <span class="math inline">\(R_{lat}\)</span> . Analogously, <span class="math inline">\(K_{sat, base}\)</span> is split between an input bedrock conductivity value (<span class="math inline">\(K_{bedrock}\)</span>, supplied as <code>bedrock_conductivity</code> layer) and the correction factor <span class="math inline">\(R_{base}\)</span>. The values for these correction factors should be the target of calibration procedures, assuming that the spatial heterogeneity of effective parameters is adequately covered by the soil and bedrock spatial inputs.</p>
+<p>The effective model parameter for each of these is defined for the spatial (depending on the grid resolution) and temporal (daily) scales of the model. Parameters <span class="math inline">\(K_{sat, vert}\)</span> and <span class="math inline">\(K_{sat, inter}\)</span> are split into the input soil saturated conductivity value <span class="math inline">\(K_{sat}\)</span> (in the case of <span class="math inline">\(K_{sat, inter}\)</span>, that corresponding to the topsoil), assumed to have been estimated at a given spatial and temporal scale, and the corresponding correction factor, i.e. <span class="math inline">\(R_{vert}\)</span> or <span class="math inline">\(R_{inter}\)</span> . Analogously, <span class="math inline">\(K_{sat, base}\)</span> is split between an input bedrock conductivity value (<span class="math inline">\(K_{bedrock}\)</span>, supplied as <code>bedrock_conductivity</code> layer) and the correction factor <span class="math inline">\(R_{base}\)</span>. The values for these correction factors should be the target of calibration procedures, assuming that the spatial heterogeneity of effective parameters is adequately covered by the soil and bedrock spatial inputs.</p>
 <p>The following table describes the full set of watershed hydraulic control parameters:</p>
 <table>
 <colgroup>
@@ -961,12 +961,12 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 <td>Logical flag to include saturated soil flows in simulations.</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(R_{lat}\)</span></td>
+<td><span class="math inline">\(R_{inter}\)</span></td>
 <td><code>R_interflow</code></td>
 <td>Multiplier of soil lateral conductivity (eq. <a href="watershedhydrology.html#eq:interflowtransmissivity">(21.4)</a>).</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(n_{lat}\)</span></td>
+<td><span class="math inline">\(n_{inter}\)</span></td>
 <td><code>n_interflow</code></td>
 <td>Power exponent regulating the effect of soil saturation level on soil lateral transmissivity (eq. <a href="watershedhydrology.html#eq:interflowtransmissivity">(21.4)</a>).</td>
 </tr>
@@ -986,7 +986,7 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 <td>Power exponent regulating the effect of aquifer height on groundwater lateral transmissivity (eq. <a href="watershedhydrology.html#eq:baseflowtransmissivity">(21.5)</a>).</td>
 </tr>
 <tr class="even">
-<td></td>
+<td><span class="math inline">\(n_{manning}\)</span></td>
 <td><code>n_manning</code></td>
 <td>Manning’s roughness coefficient for channel routing calculations.</td>
 </tr>
@@ -1016,9 +1016,14 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 <td>Maximum infiltration rate for rocky cells (mm·day-1).</td>
 </tr>
 <tr class="even">
-<td></td>
+<td><span class="math inline">\(Dal_{max}\)</span></td>
 <td><code>deep_aquifer_loss</code></td>
 <td>Maximum daily loss rate from watershed aquifer towards a deeper aquifer not connected to outlets (mm·day-1).</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>weather_aggregation_factor</code></td>
+<td>An integer specifying the spatial aggregation for interpolated weather.</td>
 </tr>
 </tbody>
 </table>
@@ -1064,14 +1069,14 @@ where <span class="math inline">\(\Delta{S_{watershed}} = \Delta{\hat{S}_{snow}}
 </tr>
 </tbody>
 </table>
-<p>Note that while simulations can be performed for sub-watersheds separately, at present the model does not produce results at the sub-watershed level. However, the partitioning of sub-watersheds is included in the output, so that users can cross it with <code>outlet_export_m3s</code> to get the discharge generated in each sub-watershed.</p>
+<p>Note that while simulations can be performed for sub-watersheds separately, at present the model does not produce water balance results at the sub-watershed level. However, the partitioning of cells sub-watersheds is included in the <code>sf</code> output, so that users can cross this information with <code>outlet_export_m3s</code> to get the discharge generated in each sub-watershed.</p>
 </div>
 </div>
 <div id="watershedbalancedetails" class="section level2 hasAnchor" number="21.6">
 <h2><span class="header-section-number">21.6</span> Process details<a href="watershedhydrology.html#watershedbalancedetails" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div id="soilsaturatedflows" class="section level3 hasAnchor" number="21.6.1">
 <h3><span class="header-section-number">21.6.1</span> Soil saturated lateral flow<a href="watershedhydrology.html#soilsaturatedflows" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Soil saturated lateral flows follow the saturated subsurface flow model of Wigmosta et al. <span class="citation">(<a href="#ref-Wigmosta1994">1994</a>)</span>, which is based on a kinematic wave approximation. Each grid cell can exchange water with its eight adjacent neighbors.</p>
+<p>Soil saturated lateral flows (or interflows) follow the saturated subsurface flow model of Wigmosta et al. <span class="citation">(<a href="#ref-Wigmosta1994">1994</a>)</span>, which is based on a kinematic wave approximation. Each grid cell can exchange water with its eight adjacent neighbors.</p>
 <p>Local hydraulic gradients are approximated by local ground surface slopes, so that each cell will generally receive water from its upslope neighbors and discharge to its downslope neighbors. The rate of saturated flow from cell <span class="math inline">\(i\)</span> to its downgradient neighbors is equal to <span class="citation">(<a href="#ref-Wigmosta1999">Wigmosta &amp; Lettenmaier 1999</a>)</span>:
 <span class="math display">\[\begin{eqnarray}
 q_{ij} &amp;=&amp; - T_{i}\cdot \tan(\beta_{i,j})\cdot w_j \;\;\; \beta_{i,j} &lt; 0\\
@@ -1079,13 +1084,13 @@ q_{ij} &amp;=&amp; 0 \;\;\; \beta_{i,j} \geq 0
 \end{eqnarray}\]</span>
 where <span class="math inline">\(q_{i,k}\)</span> is the flux rate (in <span class="math inline">\(m3/day\)</span>) from cell <span class="math inline">\(i\)</span> in the direction towards neighbor <span class="math inline">\(j\)</span>, <span class="math inline">\(T_{i}\)</span> is the transmissivity (in <span class="math inline">\(m2/day\)</span>) at cell <span class="math inline">\(i\)</span>, <span class="math inline">\(\beta_{i,j}\)</span> is the water table slope in the direction of <span class="math inline">\(j\)</span> and <span class="math inline">\(w_j\)</span> is the width (in <span class="math inline">\(m\)</span>) of cell <span class="math inline">\(j\)</span>. The transmissivity function for soil saturated lateral flux in cell <span class="math inline">\(i\)</span> (<span class="math inline">\(T_{lat,i}\)</span>) is specified using:
 <span class="math display" id="eq:interflowtransmissivity">\[\begin{equation}
-T_{sat,i} = \frac{R_{lat}\cdot K_{sat,i} \cdot Z_{soil,i}}{n_{lat}} \cdot (1 - Z_{sat,i}/Z_{soil,i})^{n_{lat}}
+T_{inter,i} = \frac{R_{inter}\cdot K_{sat,i} \cdot Z_{soil,i}}{n_{inter}} \cdot (1 - Z_{sat,i}/Z_{soil,i})^{n_{inter}}
 \tag{21.4}
 \end{equation}\]</span>
-where <span class="math inline">\(K_{sat,i}\)</span> is the saturated conductivity of the first (top) soil layer in cell <span class="math inline">\(i\)</span>, <span class="math inline">\(Z_{soil,i}\)</span> is the soil depth at cell <span class="math inline">\(i\)</span>, <span class="math inline">\(Z_{sat,i}\)</span> is the depth of saturated water at cell <span class="math inline">\(i\)</span> (see <a href="model-inputs.html#watercontent">2.3.4</a>) and <span class="math inline">\(n_{lat}\)</span> is a power exponent regulating the responsiveness of transmissivity to the level of saturation. <span class="math inline">\(R_{lat}\)</span> is the correction factor (a watershed parameter) for the fact that <span class="math inline">\(K_{sat,i}\)</span> is assessed from soil samples, whereas the parameter in the model is defined at the scale of a grid cell <span class="citation">(<a href="#ref-Frances2007">Francés <em>et al.</em> 2007</a>)</span>, as explained above. Soil saturated lateral flows are calculated at daily time steps or smaller substeps, as dictated by watershed control parameter <code>num_daily_substeps</code>. Since changes in local soil moisture fluxes are applied after all daily lateral fluxes have been estimated (see <a href="watershedhydrology.html#watershedbalancescheduling">21.4</a>), the estimation of lateral fluxes limits negative flows taking into account the difference between <span class="math inline">\(Z_{sat}\)</span> and <span class="math inline">\(Z_{soil}\)</span> and the mean soil porosity.</p>
+where <span class="math inline">\(K_{sat,i}\)</span> is the saturated conductivity of the first (top) soil layer in cell <span class="math inline">\(i\)</span>, <span class="math inline">\(Z_{soil,i}\)</span> is the soil depth at cell <span class="math inline">\(i\)</span>, <span class="math inline">\(Z_{sat,i}\)</span> is the depth of saturated water at cell <span class="math inline">\(i\)</span> (see <a href="model-inputs.html#watercontent">2.3.4</a>) and <span class="math inline">\(n_{inter}\)</span> is a power exponent regulating the responsiveness of transmissivity to the level of saturation. <span class="math inline">\(R_{inter}\)</span> is the correction factor (a watershed parameter) for the fact that <span class="math inline">\(K_{sat,i}\)</span> is assessed from soil samples, whereas the parameter in the model is defined at the scale of a grid cell <span class="citation">(<a href="#ref-Frances2007">Francés <em>et al.</em> 2007</a>)</span>, as explained above. Soil saturated lateral flows are calculated at daily time steps or smaller substeps, as dictated by watershed control parameter <code>num_daily_substeps</code>. Since changes in local soil moisture fluxes are applied after all daily lateral fluxes have been estimated (see <a href="watershedhydrology.html#watershedbalancescheduling">21.4</a>), the estimation of lateral fluxes limits negative flows taking into account the difference between <span class="math inline">\(Z_{sat}\)</span> and <span class="math inline">\(Z_{soil}\)</span> and the mean soil porosity.</p>
 <p>Soil saturated lateral flux inputs and outputs for a given cell <span class="math inline">\(i\)</span> are balanced to determine increase or decrease in soil moisture:
 <span class="math display">\[\begin{equation}
-\Delta{S_{lat,i}} = S_{lat, in} - S_{lat, out} = \sum_{j}{q_{lat, ji}} - \sum_{j}{q_{lat, ij}}
+\Delta{S_{lat,i}} = S_{lat, in} - S_{lat, out} = \sum_{j}{q_{inter, ji}} - \sum_{j}{q_{inter, ij}}
 \end{equation}\]</span>
 Hence, soil layers are not considered separately in the estimation of soil saturated flows and balance. For their source/sink effect on local soil water balance, however, the resulting lateral flow is divided between soil layers. For positive flows, mode water will be entering those layers with larger saturation deficit, whereas for negative flows more water will be removed from layers where there is a larger excess from field capacity.</p>
 </div>
@@ -1100,9 +1105,9 @@ T_{base,i} = \frac{R_{base}\cdot K_{bedrock,i} \cdot Z_{bedrock,i}}{n_{base}} \c
 where <span class="math inline">\(K_{bedrock,i}\)</span> is the bedrock conductivity at cell <span class="math inline">\(i\)</span>, <span class="math inline">\(R_{base}\)</span> is the correction factor for base flows, <span class="math inline">\(Z_{bedrock,i}\)</span> is the depth of the unaltered bedrock, <span class="math inline">\(Z_{aquifer,i}\)</span> is the depth of the aquifer water table and <span class="math inline">\(n_{base}\)</span> is again a power exponent regulating the responsiveness of transmissivity to the aquifer level.</p>
 <p>Groundwater lateral flux inputs and outputs for a given cell <span class="math inline">\(i\)</span> are balanced to determine increase or decrease of the aquifer balance:
 <span class="math display">\[\begin{equation}
-\Delta{S_{base,i}} = S_{base, in} - S_{base, out} = \sum_{j}{q_{base, ji}} - \sum_{j}{q_{base, ij}}
+\Delta{A_{lat,i}} = A_{lat, in} - A_{lat, out} = \sum_{j}{q_{base, ji}} - \sum_{j}{q_{base, ij}}
 \end{equation}\]</span></p>
-<p>Aquifer update due to lateral flows is coupled to the vertical balance due to deep drainage or capillarity rise from/to the overlying soil. If the depth to aquifer becomes negative (i.e. the aquifer reaches the soil surface) for an outlet or channel cell, then exfiltration (<span class="math inline">\(Exf\)</span>) occurs.</p>
+<p>Aquifer update due to lateral flows is coupled to the vertical balance due to deep drainage (<span class="math inline">\(Dd\)</span>) or capillarity rise (<span class="math inline">\(Cr\)</span>) from/to the overlying soil. If the depth to aquifer becomes negative (i.e. the aquifer reaches the soil surface) for an outlet or channel cell, then exfiltration (<span class="math inline">\(Exf\)</span>) occurs.</p>
 </div>
 <div id="overlandflows" class="section level3 hasAnchor" number="21.6.3">
 <h3><span class="header-section-number">21.6.3</span> Overland runoff<a href="watershedhydrology.html#overlandflows" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -1131,13 +1136,13 @@ Ro_j = Ro_j + Ru_i \cdot q_{ij}
 </div>
 <div id="deepaquiferloss" class="section level3 hasAnchor" number="21.6.5">
 <h3><span class="header-section-number">21.6.5</span> Losses towards a deeper aquifer<a href="watershedhydrology.html#deepaquiferloss" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Daily losses from the aquifer towards a deeper aquifer not connected to watershed outlets are simulated by means of a daily maximum loss rate (which can be specified either via the watershed control parameter called <code>deep_aquifer_loss</code> or using an input <code>sf</code> column with the same name) that is compared with the current aquifer content. The minimum of those values is subtracted from the current aquifer content.</p>
+<p>Daily losses from the aquifer towards a deeper aquifer not connected to watershed outlets are simulated by means of a daily maximum loss rate (<span class="math inline">\(Dal_{max}\)</span>, which can be specified either via the watershed control parameter called <code>deep_aquifer_loss</code> or using an input <code>sf</code> column with the same name) that is compared with the current aquifer content. The minimum of those values is subtracted from the current aquifer content.</p>
 </div>
 </div>
 <div id="simulation-tips-4" class="section level2 hasAnchor" number="21.7">
 <h2><span class="header-section-number">21.7</span> Simulation tips<a href="watershedhydrology.html#simulation-tips-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In this last section we provide some recommendations aimed at guiding user for distributed watershed water balance modelling.</p>
-<p><strong>1. Watershed level water balance closure</strong> - When using Richards-solving (i.e. <code>soilDomains = "single"</code> or <code>soilDomains = "dual"</code>), there is no warranty that the water balance will be closed at the the watershed level (see <a href="watershedhydrology.html#watershedbalance">21.3</a>). The reason is that errors can accumulate when solving Richards equations, that the soil water balance model tries to fit into either deep drainage term or the capillarity rise term. Since capillarity is drawn from the aquifer below, users can check whether the latter occurred by inspecting the column <code>NegativeAquiferCorrection</code> from the <code>watershed_balance</code> output data frame. Some combinations of watershed control parameters are more prone to errors in water balance closure than others, and our experience tells us that this happens with low values of <span class="math inline">\(n_{lat}\)</span> combined with high values of <span class="math inline">\(R_{lat}\)</span>. We recommend addressing those errors by decreasing <code>richards_tolerance</code> in local control options, increasing <code>num_daily_substeps</code> in watershed control options, or both. Naturally, this will come at the cost of larger computational time.</p>
+<p><strong>1. Watershed level water balance closure</strong> - When using Richards-solving (i.e. <code>soilDomains = "single"</code> or <code>soilDomains = "dual"</code>), there is no warranty that the water balance will be closed at the the watershed level (see <a href="watershedhydrology.html#watershedbalance">21.3</a>). The reason is that errors can accumulate when solving Richards equations, that the soil water balance model tries to fit into either deep drainage term or the capillarity rise term. Since capillarity is drawn from the aquifer below, users can check whether the latter occurred by inspecting the column <code>NegativeAquiferCorrection</code> from the <code>watershed_balance</code> output data frame. Some combinations of watershed control parameters are more prone to errors in water balance closure than others, and our experience tells us that this happens with low values of <span class="math inline">\(n_{inter}\)</span> combined with high values of <span class="math inline">\(R_{inter}\)</span>. We recommend addressing those errors by decreasing <code>richards_tolerance</code> in local control options, increasing <code>num_daily_substeps</code> in watershed control options, or both. Naturally, this will come at the cost of larger computational time.</p>
 <p><strong>2. Computational strategy for sensitivity analysis and calibration</strong> - The cohort-based description of vegetation increases computation times of distributed watershed simulations. At the stage of calibrating watershed parameters or analyzing the hydrological sensitivity to them, one can decrease the cost of vegetation calculations, by decreasing the number of plant cohorts in <code>"wildland"</code> cells (another important computational factor, that interacts with the number of cohorts is the local control parameter <code>rhizosphereOverlap</code>). This can be done by using function <code>initialize_landscape()</code>. Specially effective will be to use option <code>reduce_to_dominant = TRUE</code>, which will choose the dominant tree species (and shrub, if present), while keeping the same leaf area index for the cell.</p>
 
 </div>
